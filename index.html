@@ -1028,7 +1028,7 @@ footer p{font-size:12px;color:var(--gray-400);}
           <div class="fit-arrow">✕</div>
           <div>
             <h4>Kỳ vọng viral thần tốc trong 1–2 tuần</h4>
-            <p>Nếu kỳ vọng 5–10k followers sau 2 tuần — <span class="warn">ĐỪNG THAM GIA nha các bạn.</span></p>
+            <p>Nếu kỳ vọng 5–10k followers sau 2 tuần — <span class="warn">ĐỪNG THAM GIA nha các sốp.</span></p>
           </div>
         </div>
       </div>
@@ -1126,7 +1126,7 @@ footer p{font-size:12px;color:var(--gray-400);}
       <div class="price-type">Live Class · Cohort mới</div>
       <div class="price-urgency">
         <span style="width:8px;height:8px;border-radius:50%;background:var(--red);display:inline-block;flex-shrink:0;"></span>
-        Đã có 1/10 người giữ chỗ Early Bird!
+        Đã có <span id="price-counter">1/10</span> người giữ chỗ Early Bird!
       </div>
       <div class="price-was">1,000,000đ</div>
       <div class="price-num"><span class="js-price">499.000đ</span><span class="unit"> / khóa</span></div>
@@ -1199,7 +1199,7 @@ footer p{font-size:12px;color:var(--gray-400);}
 <!-- CTA -->
 <section class="cta-section">
 <div class="cta-inner">
-  <div class="cta-tag"><span class="dot-live"></span> Còn<span id="cta-slots-left">9</span>slot Early Bird</div>
+  <div class="cta-tag"><span class="dot-live"></span> Còn <span id="cta-slots-left">9</span> slot Early Bird</div>
   <h2>Đăng ký hôm nay.<br><span>499k.</span> Hối hận thì không kịp.</h2>
   <p>Đủ 10 người → giá tự động tăng lên 1 triệu, không báo trước.<br>Điền form — mình xác nhận trong 24h.</p>
   <div class="cta-btn-wrap">
@@ -1216,7 +1216,7 @@ footer p{font-size:12px;color:var(--gray-400);}
 <!-- FOOTER -->
 <footer>
   <div class="logo">TikTok cùng Tờ<span class="dot">.</span></div>
-  <p>© 2026 TikTok cùng Tờ · by Minh Toàn</p>
+  <p>© 2025 TikTok cùng Tờ · by Minh Toàn</p>
   <p>TikTok: <strong style="color:var(--teal)">Toàn Thích Trải Nghiệm</strong></p>
 </footer>
 
@@ -1293,7 +1293,7 @@ const COURSE = {
   name:        'TikTok cùng Tờ',       // Tên khóa học
   price:       '499.000đ',             // Học phí Early Bird
   priceAfter:  '1.000.000đ',           // Học phí sau Early Bird
-  startDate:   'Updating',   // Ngày khai giảng
+  startDate:   'Thứ 5, 29/05/2026',   // Ngày khai giảng
   schedule:    'Thứ 5 & Thứ 7, 20:00–21:30', // Lịch học
 
   // --- SLOT ---
@@ -1303,7 +1303,7 @@ const COURSE = {
                      // → Tổng luôn = maxSlots ✅
 
   // --- KẾT NỐI ---
-  telegramBotToken: '7836419098:AAGcj07USg4ZQiLSI6gu48sSD2cJX3j1yuc',
+  telegramBotToken: '8692249468:AAGghjo8J-WymnsSZNvnFWED5ECUxDnJCVs',
   telegramChatId:   '5116087301',
   sheetsWebhookUrl: 'https://script.google.com/macros/s/AKfycbw2DkFUgWbMdmX7FnsF0M3xa4FNMsDSNhwib-PzxCmf1Zw78M-b_VOw81vkXCryP4e3Fw/exec',
 
@@ -1338,6 +1338,7 @@ function closeForm(){
   document.body.style.overflow='';
 }
 document.getElementById('regModal').addEventListener('click',function(e){if(e.target===this)closeForm();});
+updateCounter(getRegs().length); // sync tất cả counter khi load trang
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeForm();});
 
 function submitReg(){
@@ -1395,6 +1396,7 @@ function updateCounter(total){
   const ct=document.getElementById('counter-text');if(ct)ct.textContent=txt;
   const hc=document.getElementById('hero-counter');if(hc)hc.textContent=n+'/'+CONFIG.maxSlots;
   const sl=document.getElementById('cta-slots-left');if(sl)sl.textContent=rem;
+  const pc=document.getElementById('price-counter');if(pc)pc.textContent=n+'/'+CONFIG.maxSlots;
 }
 
 function toggleFaq(el){
