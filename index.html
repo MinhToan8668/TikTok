@@ -4,88 +4,87 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f9e8dd">
-<title>Tự Mình Xây Kênh — Khóa học TikTok 30 ngày thực chiến</title>
-<meta name="description" content="Khóa học xây kênh TikTok 4 tuần (30 ngày) — học lý thuyết live qua MS Teams mỗi tối Thứ 5, trong tuần được ngồi edit cùng mentor tới khi ra video hoàn chỉnh. Dạy bằng số liệu thật, không dạy mẹo may rủi.">
+<title>Tự Mình Xây Kênh — Lớp TikTok 30 ngày</title>
+<meta name="description" content="Lớp học xây kênh TikTok 30 ngày. Mỗi tuần một buổi live tối Thứ 5, các tối còn lại mentor ngồi edit cùng bạn tới khi ra video hoàn chỉnh. Dạy bằng số liệu thật, không dạy mẹo may rủi.">
 <meta name="robots" content="index,follow">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Tự Mình Xây Kênh — Khóa học TikTok 30 ngày">
-<meta property="og:description" content="4 tuần · 1 buổi live/tuần · edit cùng mentor các buổi tối. Xây kênh nghiêm túc bằng số liệu thật.">
+<meta property="og:title" content="Tự Mình Xây Kênh — Lớp TikTok 30 ngày">
+<meta property="og:description" content="Học xây kênh bằng số liệu thật. 4 tuần, lớp nhỏ, mentor edit kèm tới khi ra video.">
 <meta property="og:locale" content="vi_VN">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&family=Be+Vietnam+Pro:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Shantell+Sans:ital,wght@0,500;1,500;1,600&display=swap" rel="stylesheet">
 <style>
-/* ═══════════════ TOKENS ═══════════════ */
+/* ═══════════ GIẤY & MỰC ═══════════ */
 :root{
-  --cream:#f9e8dd;          /* màu chủ đạo 1 */
-  --cream-lt:#fdf5ee;
-  --cream-dk:#f2dccb;
-  --lime:#99df00;           /* màu chủ đạo 2 */
-  --lime-bright:#aef226;
-  --lime-ink:#5d8a00;       /* lime đủ tối để làm chữ trên nền sáng */
-  --lime-soft:rgba(153,223,0,.14);
-  --lime-glow:rgba(153,223,0,.28);
-  --ink:#1d2312;            /* chữ chính */
-  --ink-2:#3a4030;
-  --muted:#6f6a5f;
-  --muted-2:#9a938a;
-  --card:#ffffff;
-  --border:#eadbce;
-  --border-2:#ddc9b8;
-  --border-3:#c9b39f;
-  --dark:#171c0e;           /* section tối để tạo nhịp */
-  --dark-2:#202613;
-  --dark-border:#333c22;
-  --gold:#d99a2b;
-  --red:#d5453c;
-  --r:16px; --r-sm:11px;
-  --shell:1160px;
-  --pad:clamp(20px,5vw,48px);
+  --paper:#f9e8dd;        /* màu chủ đạo 1 — nền giấy */
+  --paper-lt:#fdf3ea;
+  --paper-dk:#f1d9c6;
+  --lime:#99df00;         /* màu chủ đạo 2 — bút dạ quang */
+  --lime-deep:#5f8c00;    /* lime đủ tối để làm chữ */
+  --lime-wash:rgba(153,223,0,.16);
+  --ink:#26210f;          /* mực */
+  --ink-soft:#4a4432;
+  --quiet:#7d7462;
+  --faint:#a89c88;
+  --line:#e3cdb9;
+  --line-dk:#c9ad93;
+  --moss:#222b10;         /* section tối */
+  --moss-2:#2b3517;
+  --moss-line:#414f26;
+  --gold:#c98a1e;
+  --red:#c44536;
+  --card:#fffaf4;
+  --r:18px; --r-sm:12px;
+  --shell:1080px;
+  --pad:clamp(20px,5vw,44px);
   --ease:cubic-bezier(.22,1,.36,1);
+  --disp:'Bricolage Grotesque','Be Vietnam Pro',system-ui,sans-serif;
+  --hand:'Shantell Sans','Be Vietnam Pro',cursive;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
 body{
-  background:var(--cream-lt);color:var(--ink-2);
+  background:var(--paper);color:var(--ink-soft);
   font-family:'Be Vietnam Pro',system-ui,sans-serif;font-weight:400;
   overflow-x:hidden;-webkit-font-smoothing:antialiased;
-  font-size:15px;line-height:1.65;
+  font-size:15.5px;line-height:1.7;
 }
 body.lock{overflow:hidden}
 img{max-width:100%;display:block}
 button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
-:focus-visible{outline:2px solid var(--lime-ink);outline-offset:3px;border-radius:4px}
+:focus-visible{outline:2px solid var(--lime-deep);outline-offset:3px;border-radius:4px}
 
-h1,h2,h3,h4,.display{font-family:'Montserrat',sans-serif;color:var(--ink);letter-spacing:-.02em}
-em{font-style:normal;color:var(--lime-ink)}
-.mark{position:relative;white-space:nowrap}
-.mark::after{content:'';position:absolute;left:-2%;right:-2%;bottom:.06em;height:.34em;
-  background:var(--lime);opacity:.55;z-index:-1;border-radius:3px;transform:skewX(-8deg)}
+h1,h2,h3,h4{font-family:var(--disp);color:var(--ink);letter-spacing:-.02em;text-wrap:balance}
+.hand{font-family:var(--hand);font-style:italic;font-weight:500;color:var(--lime-deep);letter-spacing:0}
 
 .shell{max-width:var(--shell);margin:0 auto;padding-left:var(--pad);padding-right:var(--pad)}
 section{position:relative;z-index:1}
-.sec{padding:clamp(64px,9vw,110px) 0}
+.sec{padding:clamp(64px,9vw,116px) 0}
 
-.eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:11px;letter-spacing:.18em;
-  text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:20px;
-  font-family:'Montserrat',sans-serif;flex-wrap:wrap;row-gap:4px}
-.eyebrow::before{content:'';width:26px;height:2px;background:var(--lime);border-radius:2px}
-.h2{font-size:clamp(28px,4.4vw,46px);font-weight:800;line-height:1.08;margin-bottom:16px}
-.lead{font-size:clamp(15px,1.6vw,17px);color:var(--muted);max-width:58ch;line-height:1.75}
-.sec-head{margin-bottom:clamp(36px,5vw,56px)}
+.kicker{font-family:var(--hand);font-style:italic;font-size:15px;color:var(--lime-deep);
+  display:block;margin-bottom:14px}
+.h2{font-size:clamp(29px,4.6vw,48px);font-weight:800;line-height:1.06;margin-bottom:18px}
+.lead{font-size:clamp(15px,1.65vw,17px);color:var(--quiet);max-width:60ch;line-height:1.8}
+.sec-head{margin-bottom:clamp(34px,5vw,54px)}
+
+/* nét gạch tay dưới chữ */
+.u{position:relative;white-space:nowrap}
+.u::after{content:'';position:absolute;left:-1%;right:-1%;bottom:.02em;height:.5em;z-index:-1;
+  background:var(--lime);opacity:.8;border-radius:2px;transform:skewX(-10deg) rotate(-.6deg)}
 
 /* buttons */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  font-family:'Montserrat',sans-serif;font-weight:700;letter-spacing:.01em;
-  border-radius:999px;transition:transform .18s var(--ease),background .18s,box-shadow .25s,opacity .2s;
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  font-family:var(--disp);font-weight:700;letter-spacing:.01em;
+  border-radius:999px;transition:transform .18s var(--ease),box-shadow .22s,background .18s;
   white-space:nowrap;text-decoration:none}
-.btn:active{transform:translateY(0) scale(.985)}
-.btn-lime{background:var(--lime);color:#1a2400;box-shadow:0 6px 22px var(--lime-glow)}
-.btn-lime:hover{background:var(--lime-bright);transform:translateY(-2px);box-shadow:0 12px 32px var(--lime-glow)}
-.btn-dark{background:var(--ink);color:#fdfdf8}
-.btn-dark:hover{background:#2c3320;transform:translateY(-2px)}
-.btn-ghost{border:1.5px solid var(--border-3);color:var(--ink-2)}
-.btn-ghost:hover{border-color:var(--lime-ink);color:var(--lime-ink);background:var(--lime-soft)}
+.btn:active{transform:translateY(1px) scale(.985)}
+.btn-ink{background:var(--ink);color:var(--paper-lt);box-shadow:0 5px 0 rgba(38,33,15,.22)}
+.btn-ink:hover{transform:translateY(-2px);box-shadow:0 8px 0 rgba(38,33,15,.22);background:#332d18}
+.btn-lime{background:var(--lime);color:#1c2600;box-shadow:0 5px 0 rgba(95,140,0,.35)}
+.btn-lime:hover{transform:translateY(-2px);box-shadow:0 8px 0 rgba(95,140,0,.35)}
+.btn-line{border:1.5px solid var(--line-dk);color:var(--ink-soft);background:transparent}
+.btn-line:hover{border-color:var(--ink);color:var(--ink)}
 .btn-sm{padding:10px 20px;font-size:13px;min-height:40px}
 .btn-md{padding:13px 26px;font-size:14px}
 .btn-lg{padding:16px 34px;font-size:15px}
@@ -94,380 +93,388 @@ section{position:relative;z-index:1}
 .btn .arw{transition:transform .2s var(--ease)}
 .btn:hover .arw{transform:translateX(3px)}
 
-/* pills / dots */
 .pill{display:inline-flex;align-items:center;gap:7px;font-size:11.5px;font-weight:600;
-  letter-spacing:.06em;text-transform:uppercase;padding:6px 13px;border-radius:999px;
-  border:1px solid var(--border-2);color:var(--muted);font-family:'Montserrat',sans-serif}
-.pill.em{border-color:rgba(120,175,0,.45);color:var(--lime-ink);background:var(--lime-soft)}
-.pill.gold{border-color:rgba(217,154,43,.4);color:var(--gold);background:rgba(217,154,43,.08)}
-.dot{width:7px;height:7px;border-radius:50%;background:var(--lime-ink);flex-shrink:0;
-  box-shadow:0 0 0 0 var(--lime-glow);animation:ping 2.4s infinite}
-@keyframes ping{0%{box-shadow:0 0 0 0 var(--lime-glow)}70%{box-shadow:0 0 0 7px rgba(153,223,0,0)}100%{box-shadow:0 0 0 0 rgba(153,223,0,0)}}
+  letter-spacing:.05em;text-transform:uppercase;padding:6px 14px;border-radius:999px;
+  border:1.5px solid var(--line-dk);color:var(--quiet);font-family:var(--disp)}
+.pill.em{border-color:var(--lime-deep);color:var(--lime-deep);background:var(--lime-wash)}
+.pill.gold{border-color:rgba(201,138,30,.5);color:var(--gold);background:rgba(201,138,30,.08)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--lime-deep);flex-shrink:0;
+  animation:blink 2.2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
 
-/* progress */
-.prog{height:8px;border-radius:999px;background:var(--cream-dk);overflow:hidden;position:relative}
-.prog i{display:block;height:100%;border-radius:999px;width:0;
-  background:linear-gradient(90deg,#7cb800,var(--lime),var(--lime-bright));
+.prog{height:9px;border-radius:999px;background:var(--paper-dk);overflow:hidden;
+  border:1px solid var(--line)}
+.prog i{display:block;height:100%;border-radius:999px;width:0;background:var(--lime);
   transition:width 1.1s var(--ease)}
-.prog.full i{background:linear-gradient(90deg,var(--gold),#f0c86a)}
+.prog.full i{background:var(--gold)}
 
-/* reveal */
-.rv{opacity:0;transform:translateY(22px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.rv{opacity:0;transform:translateY(20px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
 .rv.in{opacity:1;transform:none}
 
-/* ═══════════════ ANNOUNCE ═══════════════ */
-#announce{display:none;position:relative;z-index:120;background:var(--ink);color:var(--lime-bright);
+/* ═══════════ ANNOUNCE ═══════════ */
+#announce{display:none;position:relative;z-index:120;background:var(--ink);color:var(--lime);
   text-align:center;padding:10px 44px 10px 16px;font-size:13px;font-weight:500}
 #announce.on{display:block}
 #announce .x{position:absolute;right:10px;top:50%;transform:translateY(-50%);
   width:26px;height:26px;border-radius:50%;font-size:16px;line-height:1;opacity:.6;color:#fff}
 #announce .x:hover{opacity:1;background:rgba(255,255,255,.12)}
 
-/* ═══════════════ NAV ═══════════════ */
-nav{position:sticky;top:0;z-index:110;border-bottom:1px solid transparent;
-  background:rgba(253,245,238,.8);backdrop-filter:blur(18px) saturate(1.3);
+/* ═══════════ NAV ═══════════ */
+nav{position:sticky;top:0;z-index:110;border-bottom:1.5px solid transparent;
+  background:rgba(249,232,221,.82);backdrop-filter:blur(16px) saturate(1.3);
   transition:border-color .3s,background .3s}
-nav.stuck{border-bottom-color:var(--border);background:rgba(253,245,238,.95)}
+nav.stuck{border-bottom-color:var(--line);background:rgba(249,232,221,.96)}
 .nav-in{display:flex;align-items:center;justify-content:space-between;gap:16px;
-  padding-top:14px;padding-bottom:14px}
-.brand{display:flex;align-items:center;gap:10px;text-decoration:none}
-.brand-badge{width:38px;height:38px;border-radius:12px;background:var(--ink);color:var(--lime);
-  display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;
-  font-weight:900;font-size:15px;letter-spacing:-.05em;box-shadow:0 4px 14px rgba(29,35,18,.18)}
-.brand-name{font-family:'Montserrat',sans-serif;font-weight:800;font-size:15.5px;color:var(--ink);
-  letter-spacing:-.02em;line-height:1.15}
-.brand-name small{display:block;font-size:10px;font-weight:600;letter-spacing:.14em;
-  text-transform:uppercase;color:var(--muted-2)}
+  padding-top:15px;padding-bottom:15px}
+.brand{display:flex;align-items:baseline;gap:8px;text-decoration:none;font-family:var(--disp)}
+.brand b{font-weight:800;font-size:17px;color:var(--ink);letter-spacing:-.02em}
+.brand span{font-family:var(--hand);font-style:italic;font-size:12.5px;color:var(--lime-deep)}
 .nav-links{display:flex;gap:2px;align-items:center}
-.nav-link{font-size:13.5px;color:var(--muted);padding:10px 12px;border-radius:10px;
-  min-height:40px;display:inline-flex;align-items:center;transition:color .2s,background .2s;font-weight:500}
-.nav-link:hover{color:var(--ink);background:var(--cream)}
-.nav-cta{display:flex;align-items:center;gap:12px}
-.nav-slots{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;white-space:nowrap}
-.nav-slots b{color:var(--lime-ink);font-weight:700}
-.burger{display:none;width:42px;height:42px;border-radius:12px;border:1.5px solid var(--border-2);
-  align-items:center;justify-content:center;flex-direction:column;gap:4.5px;background:#fff}
+.nav-link{font-size:13.5px;color:var(--quiet);padding:10px 12px;border-radius:10px;
+  min-height:40px;display:inline-flex;align-items:center;transition:color .2s;font-weight:500}
+.nav-link:hover{color:var(--ink)}
+.nav-cta{display:flex;align-items:center;gap:14px}
+.nav-slots{font-size:12px;color:var(--quiet);display:flex;align-items:center;gap:6px;white-space:nowrap}
+.nav-slots b{color:var(--lime-deep);font-weight:700}
+.burger{display:none;width:42px;height:42px;border-radius:12px;border:1.5px solid var(--line-dk);
+  align-items:center;justify-content:center;flex-direction:column;gap:4.5px}
 .burger span{display:block;width:16px;height:2px;background:var(--ink);border-radius:2px;transition:.25s var(--ease)}
 .burger.on span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
 .burger.on span:nth-child(2){opacity:0}
 .burger.on span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
-#drawer{display:none;border-top:1px solid var(--border);background:var(--cream-lt);padding:8px var(--pad) 20px}
+#drawer{display:none;border-top:1.5px solid var(--line);background:var(--paper);padding:8px var(--pad) 20px}
 #drawer.on{display:block}
-#drawer a{display:block;padding:14px 0;border-bottom:1px solid var(--border);
-  font-size:15px;color:var(--ink-2);text-decoration:none;font-weight:500}
+#drawer a{display:block;padding:14px 0;border-bottom:1px solid var(--line);
+  font-size:15px;color:var(--ink-soft);text-decoration:none;font-weight:500}
 #drawer .btn{width:100%;margin-top:18px}
 
-/* ═══════════════ HERO ═══════════════ */
-.hero{position:relative;padding:clamp(52px,8vw,96px) 0 clamp(48px,7vw,84px);overflow:hidden;
-  background:
-    radial-gradient(ellipse 60% 55% at 85% 8%,rgba(153,223,0,.16),transparent 65%),
-    radial-gradient(ellipse 50% 45% at -5% 90%,rgba(153,223,0,.10),transparent 60%),
-    var(--cream)}
-.hero::before{content:'';position:absolute;inset:0;pointer-events:none;opacity:.5;
-  background-image:radial-gradient(rgba(29,35,18,.055) 1px,transparent 1px);
-  background-size:22px 22px}
-.hero-in{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.12fr) minmax(300px,.88fr);
-  gap:clamp(36px,5vw,72px);align-items:center}
-.hero h1{font-size:clamp(40px,6.6vw,76px);font-weight:900;line-height:1.0;letter-spacing:-.035em;margin-bottom:22px}
-.hero .lead{font-size:clamp(15px,1.8vw,18px);margin-bottom:28px}
+/* ═══════════ HERO ═══════════ */
+.hero{position:relative;padding:clamp(56px,9vw,110px) 0 clamp(40px,6vw,64px);overflow:visible}
+.hero h1{font-size:clamp(46px,8.6vw,104px);font-weight:800;line-height:.98;
+  letter-spacing:-.035em;margin-bottom:26px;max-width:15ch}
+.hero h1 .thin{font-weight:500;color:var(--ink-soft)}
+.hero-note{position:relative;font-family:var(--hand);font-style:italic;font-size:clamp(14px,1.7vw,17px);
+  color:var(--lime-deep);margin-bottom:26px;max-width:34ch;line-height:1.6;transform:rotate(-1.1deg)}
+.hero-note::before{content:'↳';margin-right:8px;font-style:normal}
+.hero .lead{margin-bottom:30px;max-width:56ch}
 .hero .lead strong{color:var(--ink);font-weight:600}
-.hero-actions{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-bottom:24px}
-.hero-meta{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:12.5px;color:var(--muted)}
-.hero-meta span{display:inline-flex;align-items:center;gap:6px}
-.hero-meta b{color:var(--ink);font-weight:600}
+.hero-actions{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-bottom:34px}
+.hero-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:clamp(24px,4vw,56px);
+  align-items:end}
 
-/* live slot card */
-.slotcard{background:var(--card);border:1px solid var(--border-2);border-radius:var(--r);
-  padding:28px;position:relative;box-shadow:0 18px 50px -18px rgba(90,70,45,.28)}
-.slot-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px}
-.slot-num{font-family:'Montserrat',sans-serif;font-size:clamp(38px,5vw,52px);font-weight:900;
-  line-height:1;color:var(--ink);letter-spacing:-.04em}
-.slot-num small{font-size:.42em;color:var(--muted-2);font-weight:700;letter-spacing:0}
-.slot-lbl{font-size:12.5px;color:var(--muted)}
-.slot-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;
-  margin-top:14px;font-size:12.5px;color:var(--muted)}
-.slot-foot b{color:var(--lime-ink);font-weight:700}
-.slot-rows{margin-top:20px;padding-top:18px;border-top:1px dashed var(--border-2);
-  display:flex;flex-direction:column;gap:11px}
-.slot-row{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px}
-.slot-row span{color:var(--muted)}
-.slot-row b{color:var(--ink);font-weight:600;text-align:right}
-.slot-row .thr{color:var(--muted-2);text-decoration:line-through;font-weight:400;margin-right:6px}
+/* phiếu ghi danh — tấm tag giấy xoay nhẹ */
+.tag{position:relative;width:min(320px,86vw);background:var(--card);border:1.5px solid var(--line-dk);
+  border-radius:var(--r-sm);padding:24px 24px 20px;transform:rotate(1.6deg);
+  box-shadow:0 16px 40px -18px rgba(80,60,35,.35);flex-shrink:0}
+.tag::before{content:'';position:absolute;top:-12px;left:50%;transform:translateX(-50%) rotate(-3deg);
+  width:86px;height:24px;background:rgba(153,223,0,.5);border:1px solid rgba(95,140,0,.25);
+  border-radius:2px}
+.tag-t{font-family:var(--hand);font-style:italic;font-size:13.5px;color:var(--quiet);margin-bottom:14px}
+.tag-num{font-family:var(--disp);font-size:46px;font-weight:800;color:var(--ink);
+  line-height:1;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.tag-num small{font-size:.4em;color:var(--faint);font-weight:700}
+.tag-lbl{font-size:12px;color:var(--quiet);margin:4px 0 14px}
+.tag .prog{margin-bottom:16px}
+.tag-rows{display:flex;flex-direction:column;gap:9px;padding-top:14px;border-top:1.5px dashed var(--line-dk)}
+.tag-row{display:flex;justify-content:space-between;gap:12px;font-size:12.5px}
+.tag-row span{color:var(--quiet)}
+.tag-row b{color:var(--ink);font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+.tag-row .thr{color:var(--faint);text-decoration:line-through;font-weight:400;margin-right:6px}
+.tag-status{position:absolute;right:16px;top:16px}
 
-/* ═══════════════ TRUST STRIP ═══════════════ */
-.trust{border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:#fff}
-.trust-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border)}
-.trust-item{background:#fff;padding:26px clamp(16px,2.4vw,30px)}
-.trust-num{font-family:'Montserrat',sans-serif;font-size:clamp(28px,3.6vw,40px);font-weight:900;
-  color:var(--lime-ink);line-height:1;letter-spacing:-.04em;margin-bottom:9px}
-.trust-lbl{font-size:12.5px;color:var(--muted);line-height:1.55}
-.trust-lbl b{color:var(--ink-2);font-weight:600}
+/* ═══════════ TICKER ═══════════ */
+.ticker{background:var(--lime);border-top:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink);
+  overflow:hidden;padding:12px 0;transform:rotate(-.4deg) scale(1.01);position:relative;z-index:2}
+.ticker-in{display:flex;gap:0;width:max-content;animation:tick 26s linear infinite}
+.ticker span{font-family:var(--disp);font-weight:700;font-size:14px;color:#1c2600;
+  letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;padding-right:18px}
+.ticker span::after{content:'✳';margin-left:18px;font-weight:400}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
-/* ═══════════════ PAIN ═══════════════ */
-.pain-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.pain-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);
-  padding:30px 28px;transition:border-color .3s,transform .3s var(--ease),box-shadow .3s}
-.pain-card:hover{border-color:var(--border-3);transform:translateY(-4px);
-  box-shadow:0 16px 38px -16px rgba(90,70,45,.25)}
-.pain-ic{width:44px;height:44px;border-radius:12px;background:var(--cream);
-  display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:18px}
-.pain-card h3{font-size:16.5px;font-weight:800;margin-bottom:10px;line-height:1.35}
-.pain-card p{font-size:14px;color:var(--muted);line-height:1.7}
-.pain-quote{font-size:12.5px;color:var(--lime-ink);font-weight:600;margin-top:14px;
-  padding-top:12px;border-top:1px dashed var(--border)}
+/* ═══════════ THƯ NGỎ ═══════════ */
+.letter-wrap{max-width:680px;margin:0 auto}
+.letter{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r);
+  padding:clamp(30px,5vw,56px);position:relative;
+  box-shadow:0 24px 60px -30px rgba(80,60,35,.3)}
+.letter::before{content:'';position:absolute;top:-14px;right:38px;width:110px;height:28px;
+  background:rgba(153,223,0,.45);border:1px solid rgba(95,140,0,.2);border-radius:2px;
+  transform:rotate(2.5deg)}
+.letter p{font-size:clamp(15px,1.7vw,16.5px);line-height:1.85;color:var(--ink-soft);margin-bottom:20px;
+  max-width:62ch}
+.letter p strong{color:var(--ink);font-weight:600}
+.letter .hi{font-family:var(--hand);font-style:italic;font-size:17px;color:var(--ink);margin-bottom:22px}
+.letter .sig{margin-top:30px;padding-top:22px;border-top:1.5px dashed var(--line-dk);
+  display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.sig-name{font-family:var(--hand);font-style:italic;font-weight:600;font-size:24px;color:var(--ink);
+  transform:rotate(-2deg)}
+.sig-role{font-size:12px;color:var(--quiet);margin-top:2px}
+.letter .ps{font-size:13.5px;color:var(--quiet);font-style:italic;margin:26px 0 0;line-height:1.7}
+.letter .ps b{color:var(--lime-deep);font-style:normal}
 
-/* ═══════════════ METHOD (dark) ═══════════════ */
-.method{background:var(--dark);color:#cfd4c2}
-.method .eyebrow{color:#8f987d}
-.method .h2{color:#fdfdf6}
-.method .lead{color:#9aa287}
-.method em{color:var(--lime)}
-.method-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.mcard{background:var(--dark-2);border:1px solid var(--dark-border);border-radius:var(--r);
-  padding:30px 28px;transition:border-color .3s,transform .3s var(--ease)}
-.mcard:hover{border-color:#4a5530;transform:translateY(-4px)}
-.mcard .n{font-family:'Montserrat',sans-serif;font-size:13px;font-weight:800;color:var(--lime);
-  letter-spacing:.1em;margin-bottom:14px;display:flex;align-items:center;gap:10px}
-.mcard .n::after{content:'';flex:1;height:1px;background:var(--dark-border)}
-.mcard h3{font-size:16.5px;font-weight:800;color:#fdfdf6;margin-bottom:10px;line-height:1.35}
-.mcard p{font-size:13.5px;color:#9aa287;line-height:1.7}
-.pillar-note{margin-top:28px;display:flex;gap:14px;flex-wrap:wrap}
-.pillar-chip{font-size:12.5px;color:#cfd4c2;border:1px solid var(--dark-border);
-  border-radius:999px;padding:8px 16px;background:rgba(153,223,0,.05)}
-.pillar-chip b{color:var(--lime);font-weight:700}
+/* ═══════════ 3 NGUYÊN TẮC ═══════════ */
+.rules{display:flex;flex-direction:column}
+.rule{display:grid;grid-template-columns:minmax(64px,110px) 1fr;gap:clamp(18px,3.5vw,44px);
+  padding:clamp(26px,4vw,38px) 0;border-top:1.5px solid var(--line);align-items:start}
+.rule:last-child{border-bottom:1.5px solid var(--line)}
+.rule-n{font-family:var(--hand);font-style:italic;font-weight:600;font-size:clamp(24px,3.4vw,34px);
+  color:var(--lime-deep);transform:rotate(-3deg);padding-top:4px}
+.rule h3{font-size:clamp(19px,2.6vw,26px);font-weight:800;margin-bottom:10px}
+.rule p{font-size:15px;color:var(--quiet);line-height:1.8;max-width:60ch}
+.rule p b{color:var(--ink);font-weight:600}
 
-/* ═══════════════ ROADMAP ═══════════════ */
-.roadmap{background:var(--cream)}
-.rhythm{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:clamp(36px,5vw,52px)}
-.rhythm-card{background:#fff;border:1px solid var(--border-2);border-radius:var(--r);padding:26px 28px;
-  display:flex;gap:18px;align-items:flex-start}
-.rhythm-ic{width:46px;height:46px;border-radius:13px;background:var(--ink);color:var(--lime);
-  display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-.rhythm-card h4{font-size:15.5px;font-weight:800;margin-bottom:6px}
-.rhythm-card p{font-size:13.5px;color:var(--muted);line-height:1.65}
-.rhythm-card b{color:var(--lime-ink);font-weight:700}
-.track{display:flex;flex-direction:column;gap:12px}
-.week{display:grid;grid-template-columns:120px 1fr;gap:24px;align-items:flex-start;
-  background:#fff;border:1px solid var(--border);border-left:3px solid var(--lime);
-  border-radius:var(--r-sm);padding:26px 30px;transition:transform .25s var(--ease),box-shadow .25s}
-.week:hover{transform:translateX(4px);box-shadow:0 14px 34px -16px rgba(90,70,45,.25)}
-.week-side{display:flex;flex-direction:column;gap:4px;padding-top:2px}
-.week-n{font-family:'Montserrat',sans-serif;font-size:13px;font-weight:800;color:var(--muted-2);
-  letter-spacing:.14em;text-transform:uppercase}
-.week-big{font-family:'Montserrat',sans-serif;font-size:34px;font-weight:900;color:var(--lime-ink);
-  letter-spacing:-.04em;line-height:1}
-.week h4{font-size:17px;font-weight:800;margin-bottom:8px;line-height:1.35}
-.week > div > p{font-size:13.5px;color:var(--muted);line-height:1.7}
-.week-pts{list-style:none;display:grid;gap:8px;margin-top:14px;padding-top:14px;
-  border-top:1px dashed var(--border)}
-.week-pts li{font-size:13px;color:var(--ink-2);line-height:1.55;display:flex;gap:9px}
-.week-pts li::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--lime-ink);
-  flex-shrink:0;margin-top:7px}
-.week-tag{display:inline-block;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
-  font-family:'Montserrat',sans-serif;font-weight:700;
-  color:var(--gold);border:1px solid rgba(217,154,43,.4);border-radius:999px;padding:4px 12px;margin-top:14px}
+/* ═══════════ MỘT TUẦN ═══════════ */
+.weekbar{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-bottom:26px}
+.day{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-sm);
+  padding:16px 10px 14px;text-align:center;min-height:128px;display:flex;flex-direction:column;
+  align-items:center;gap:8px;transition:transform .25s var(--ease)}
+.day:hover{transform:translateY(-3px)}
+.day .d{font-family:var(--disp);font-weight:800;font-size:15px;color:var(--faint)}
+.day .what{font-size:11px;line-height:1.45;color:var(--quiet)}
+.day.live{background:var(--ink);border-color:var(--ink);transform:rotate(-1.2deg)}
+.day.live:hover{transform:rotate(-1.2deg) translateY(-3px)}
+.day.live .d{color:var(--lime)}
+.day.live .what{color:var(--paper);font-weight:500}
+.day.live .badge{font-family:var(--hand);font-style:italic;font-size:10.5px;color:var(--lime);
+  border:1px solid rgba(153,223,0,.4);border-radius:999px;padding:2px 8px}
+.day.edit{border-style:dashed;border-color:var(--lime-deep);background:var(--lime-wash)}
+.day.edit .d{color:var(--lime-deep)}
+.day .ic{font-size:17px}
+.week-note{font-family:var(--hand);font-style:italic;font-size:14.5px;color:var(--lime-deep);
+  text-align:center;transform:rotate(-.6deg)}
 
-/* ═══════════════ MENTORS ═══════════════ */
-.mentors{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
-.mentor{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:34px;
-  position:relative;overflow:hidden;transition:transform .3s var(--ease),box-shadow .3s}
-.mentor:hover{transform:translateY(-4px);box-shadow:0 20px 48px -20px rgba(90,70,45,.3)}
-.mentor::after{content:'';position:absolute;top:-46px;right:-46px;width:130px;height:130px;
-  border-radius:50%;background:var(--lime-soft)}
-.mentor-avatar{width:66px;height:66px;border-radius:20px;background:var(--ink);color:var(--lime);
-  display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;
-  font-weight:900;font-size:24px;margin-bottom:18px;position:relative;z-index:1}
-.mentor-name{font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px;position:relative;z-index:1}
-.mentor-role{font-size:12.5px;color:var(--lime-ink);font-weight:700;text-transform:uppercase;
-  letter-spacing:.08em;font-family:'Montserrat',sans-serif;margin-bottom:16px}
-.mentor p{font-size:14px;color:var(--muted);line-height:1.75;margin-bottom:16px}
-.mentor-badges{display:flex;flex-direction:column;gap:10px;padding-top:16px;border-top:1px dashed var(--border)}
-.mentor-badge{display:flex;gap:10px;font-size:13px;line-height:1.5;color:var(--ink-2)}
-.mentor-badge::before{content:'→';color:var(--lime-ink);font-weight:800;flex-shrink:0}
+/* ═══════════ LỘ TRÌNH ═══════════ */
+.route{background:var(--moss);color:#c8cfb4}
+.route .kicker{color:var(--lime)}
+.route .h2{color:var(--paper-lt)}
+.route .lead{color:#96a07d}
+.stops{counter-reset:stop;display:flex;flex-direction:column}
+.stop{display:grid;grid-template-columns:minmax(70px,120px) 1fr;gap:clamp(18px,3.5vw,48px);
+  padding:clamp(28px,4vw,40px) 0;border-top:1px solid var(--moss-line);align-items:start}
+.stop:last-child{border-bottom:1px solid var(--moss-line)}
+.stop-side{display:flex;flex-direction:column;gap:4px}
+.stop-w{font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:#78825c;
+  font-family:var(--disp);font-weight:700}
+.stop-n{font-family:var(--disp);font-size:clamp(36px,5vw,56px);font-weight:800;color:var(--lime);
+  line-height:1;letter-spacing:-.04em}
+.stop h3{font-size:clamp(19px,2.6vw,26px);font-weight:800;color:var(--paper-lt);margin-bottom:10px}
+.stop > div > p{font-size:14.5px;color:#96a07d;line-height:1.8;max-width:62ch}
+.stop ul{list-style:none;display:grid;gap:9px;margin-top:16px}
+.stop li{font-size:13.5px;color:#c8cfb4;line-height:1.6;display:flex;gap:10px}
+.stop li::before{content:'—';color:var(--lime);flex-shrink:0}
+.stop .hand{margin-top:16px;display:inline-block;font-size:14px;color:var(--lime);transform:rotate(-1deg)}
 
-/* ═══════════════ PRICING ═══════════════ */
-.pricing{background:#fff;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
-.price-wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,420px);
-  gap:clamp(28px,4.5vw,64px);align-items:center}
-.price-card{position:relative;border:2px solid var(--ink);border-radius:var(--r);
-  padding:38px 36px;background:var(--cream-lt);
-  box-shadow:8px 8px 0 var(--lime)}
-.price-badge{position:absolute;top:-13px;left:30px;background:var(--ink);color:var(--lime-bright);
-  font-family:'Montserrat',sans-serif;font-size:10.5px;font-weight:800;letter-spacing:.14em;
-  text-transform:uppercase;padding:6px 14px;border-radius:999px}
-.price-type{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);
-  margin-bottom:14px;font-family:'Montserrat',sans-serif;font-weight:700}
-.price-was{font-size:14px;color:var(--muted-2);text-decoration:line-through}
-.price-amt{font-family:'Montserrat',sans-serif;font-size:clamp(34px,4.6vw,50px);font-weight:900;
-  letter-spacing:-.04em;line-height:1.05;color:var(--ink);margin:6px 0 10px}
-.price-amt .u{display:block;font-size:13px;color:var(--muted);font-weight:500;letter-spacing:0;margin-top:5px;font-family:'Be Vietnam Pro',sans-serif}
-.price-save{font-size:12.5px;color:var(--gold);font-weight:700;margin-bottom:20px}
-.price-feats{list-style:none;display:flex;flex-direction:column;gap:11px;
-  padding-top:20px;border-top:1px dashed var(--border-2)}
-.price-feats li{font-size:13.5px;display:flex;gap:10px;line-height:1.55;color:var(--ink-2)}
-.price-feats li::before{content:'✓';color:var(--lime-ink);font-weight:800;flex-shrink:0}
-.price-card .btn{margin-top:26px;width:100%}
-.price-note{margin-top:20px;font-size:12.5px;color:var(--muted);line-height:1.6;text-align:center}
-.price-side .h2{margin-bottom:18px}
-.price-side p{font-size:15px;color:var(--muted);line-height:1.8;margin-bottom:14px}
-.price-side strong{color:var(--ink);font-weight:600}
+/* ═══════════ MENTORS ═══════════ */
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:clamp(20px,3vw,32px)}
+.person{position:relative;padding:clamp(26px,3.5vw,38px);background:var(--card);
+  border:1.5px solid var(--line);border-radius:var(--r);
+  box-shadow:0 20px 50px -28px rgba(80,60,35,.3)}
+.person:first-child{transform:rotate(-.7deg)}
+.person:last-child{transform:rotate(.8deg)}
+.person-top{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+.face{width:60px;height:60px;border-radius:50%;background:var(--ink);color:var(--lime);
+  display:flex;align-items:center;justify-content:center;font-family:var(--disp);
+  font-weight:800;font-size:21px;flex-shrink:0}
+.person h3{font-size:21px;font-weight:800;line-height:1.2}
+.person-role{font-family:var(--hand);font-style:italic;font-size:13.5px;color:var(--lime-deep)}
+.person p{font-size:14px;color:var(--quiet);line-height:1.8;margin-bottom:14px}
+.person p b{color:var(--ink);font-weight:600}
+.person-list{display:flex;flex-direction:column;gap:9px;padding-top:16px;border-top:1.5px dashed var(--line-dk)}
+.person-list div{display:flex;gap:10px;font-size:13px;line-height:1.55;color:var(--ink-soft)}
+.person-list div::before{content:'✦';color:var(--lime-deep);flex-shrink:0}
+.person .stick{position:absolute;top:-12px;right:22px;font-family:var(--hand);font-style:italic;
+  font-size:12px;color:var(--ink);background:var(--lime);padding:5px 13px;border-radius:3px;
+  transform:rotate(2deg);box-shadow:0 3px 8px rgba(80,60,35,.2)}
 
-/* ═══════════════ CTA ═══════════════ */
-.cta{text-align:center;position:relative;overflow:hidden;padding:clamp(72px,10vw,120px) 0;
-  background:
-    radial-gradient(ellipse 55% 60% at 50% 110%,rgba(153,223,0,.22),transparent 65%),
-    var(--dark)}
-.cta h2{font-size:clamp(32px,5.4vw,58px);font-weight:900;letter-spacing:-.04em;line-height:1.02;
-  margin-bottom:18px;color:#fdfdf6}
-.cta em{color:var(--lime)}
-.cta-in{position:relative;z-index:1;max-width:660px;margin:0 auto}
-.cta-in > p{color:#9aa287;font-size:16px;margin-bottom:32px}
-.cta-prog{max-width:400px;margin:0 auto 30px}
-.cta-prog .lbl{display:flex;justify-content:space-between;font-size:12.5px;color:#9aa287;margin-bottom:9px}
-.cta-prog .lbl b{color:#fdfdf6;font-weight:600}
-.cta .prog{background:#2c3418}
-.cta-sub{font-size:12.5px;color:#7d8569;margin-top:16px;line-height:1.6}
-.cta-live{display:inline-flex;align-items:center;gap:9px;font-size:13px;color:#cfd4c2;margin-top:26px;
-  border:1px solid var(--dark-border);border-radius:999px;padding:8px 18px;background:rgba(153,223,0,.05)}
+/* ═══════════ HỌC PHÍ — BIÊN NHẬN ═══════════ */
+.fee{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,400px);
+  gap:clamp(30px,5vw,72px);align-items:center}
+.fee-side p{font-size:15.5px;color:var(--quiet);line-height:1.85;margin-bottom:16px;max-width:54ch}
+.fee-side strong{color:var(--ink);font-weight:600}
+.fee-side .hand{display:inline-block;font-size:15px;margin-top:6px;transform:rotate(-1deg)}
+.receipt{background:var(--card);border:1.5px solid var(--line-dk);border-radius:6px;
+  padding:30px 30px 26px;position:relative;transform:rotate(1deg);
+  box-shadow:0 22px 55px -25px rgba(80,60,35,.4);
+  font-variant-numeric:tabular-nums}
+.receipt::before,.receipt::after{content:'';position:absolute;left:0;right:0;height:8px;
+  background-image:radial-gradient(circle at 6px 0,transparent 5px,var(--paper) 5px);
+  background-size:14px 8px;background-position:center}
+.receipt::before{top:-1px;transform:rotate(180deg)}
+.receipt::after{bottom:-1px}
+.rc-head{text-align:center;padding-bottom:16px;border-bottom:1.5px dashed var(--line-dk);margin-bottom:16px}
+.rc-head b{font-family:var(--disp);font-weight:800;font-size:16px;color:var(--ink);
+  letter-spacing:.06em;text-transform:uppercase}
+.rc-head span{display:block;font-size:11.5px;color:var(--quiet);margin-top:4px}
+.rc-row{display:flex;justify-content:space-between;gap:14px;font-size:13.5px;padding:7px 0}
+.rc-row span{color:var(--quiet)}
+.rc-row b{color:var(--ink);font-weight:600;text-align:right}
+.rc-row.strike b{color:var(--faint);text-decoration:line-through;font-weight:400}
+.rc-total{display:flex;justify-content:space-between;align-items:baseline;gap:14px;
+  margin-top:12px;padding-top:14px;border-top:1.5px dashed var(--line-dk)}
+.rc-total span{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--quiet);
+  font-family:var(--disp);font-weight:700}
+.rc-total b{font-family:var(--disp);font-size:clamp(26px,3vw,32px);font-weight:800;color:var(--ink);
+  letter-spacing:-.03em}
+.rc-save{text-align:right;font-family:var(--hand);font-style:italic;font-size:13px;color:var(--lime-deep);
+  margin-top:4px}
+.receipt .btn{width:100%;margin-top:20px}
+.rc-foot{text-align:center;font-size:11.5px;color:var(--faint);margin-top:12px;line-height:1.6}
+
+/* ═══════════ CTA ═══════════ */
+.cta{text-align:center;position:relative;overflow:hidden;padding:clamp(76px,10vw,128px) 0;
+  background:var(--moss)}
+.cta::before{content:'';position:absolute;inset:auto -10% -55% -10%;height:80%;
+  background:radial-gradient(ellipse at 50% 100%,rgba(153,223,0,.22),transparent 65%);pointer-events:none}
+.cta-in{position:relative;z-index:1;max-width:640px;margin:0 auto}
+.cta .kicker{color:var(--lime)}
+.cta h2{font-size:clamp(32px,5.6vw,60px);font-weight:800;letter-spacing:-.035em;line-height:1.02;
+  margin-bottom:18px;color:var(--paper-lt)}
+.cta-in > p{color:#96a07d;font-size:16px;margin-bottom:32px}
+.cta-prog{max-width:380px;margin:0 auto 30px}
+.cta-prog .lbl{display:flex;justify-content:space-between;font-size:12.5px;color:#96a07d;margin-bottom:9px}
+.cta-prog .lbl b{color:var(--paper-lt);font-weight:600}
+.cta .prog{background:var(--moss-2);border-color:var(--moss-line)}
+.cta-sub{font-size:12.5px;color:#78825c;margin-top:16px;line-height:1.6}
+.cta-live{display:inline-flex;align-items:center;gap:9px;font-size:13px;color:#c8cfb4;margin-top:26px;
+  border:1px solid var(--moss-line);border-radius:999px;padding:8px 18px}
 .cta-live .dot{background:var(--lime)}
 
-/* ═══════════════ FAQ ═══════════════ */
-.faq{max-width:760px}
-.faq-item{border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:10px;
-  background:#fff;overflow:hidden;transition:border-color .25s}
-.faq-item.on{border-color:var(--border-3)}
-.faq-q{width:100%;text-align:left;padding:19px 22px;font-size:15px;font-weight:600;color:var(--ink);
-  display:flex;justify-content:space-between;align-items:center;gap:18px;transition:color .2s}
-.faq-q:hover{color:var(--lime-ink)}
-.faq-q .arr{flex-shrink:0;width:24px;height:24px;border-radius:50%;border:1.5px solid var(--border-3);
-  display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--lime-ink);
-  transition:transform .3s var(--ease),background .25s}
-.faq-item.on .arr{transform:rotate(135deg);background:var(--lime-soft)}
+/* ═══════════ FAQ ═══════════ */
+.faq{max-width:720px}
+.faq-item{border-top:1.5px solid var(--line)}
+.faq-item:last-child{border-bottom:1.5px solid var(--line)}
+.faq-q{width:100%;text-align:left;padding:20px 4px;font-size:16px;font-weight:600;color:var(--ink);
+  display:flex;justify-content:space-between;align-items:center;gap:18px;
+  font-family:var(--disp);transition:color .2s}
+.faq-q:hover{color:var(--lime-deep)}
+.faq-q .arr{flex-shrink:0;font-family:var(--hand);font-style:italic;font-size:20px;
+  color:var(--lime-deep);transition:transform .3s var(--ease)}
+.faq-item.on .arr{transform:rotate(45deg)}
 .faq-a{max-height:0;overflow:hidden;transition:max-height .38s var(--ease)}
-.faq-a > div{padding:0 22px 20px;font-size:14px;color:var(--muted);line-height:1.75}
+.faq-a > div{padding:0 4px 24px;font-size:14.5px;color:var(--quiet);line-height:1.85;max-width:62ch}
 .faq-a strong{color:var(--ink);font-weight:600}
 
-/* ═══════════════ FOOTER ═══════════════ */
-footer{border-top:1px solid var(--border);position:relative;z-index:1;background:var(--cream)}
+/* ═══════════ FOOTER ═══════════ */
+footer{border-top:1.5px solid var(--line);position:relative;z-index:1}
 .foot-in{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;
-  padding-top:32px;padding-bottom:calc(32px + env(safe-area-inset-bottom))}
-footer p{font-size:12.5px;color:var(--muted-2)}
-footer a{color:var(--muted);text-decoration:none;font-weight:500}
-footer a:hover{color:var(--lime-ink)}
+  padding-top:34px;padding-bottom:calc(34px + env(safe-area-inset-bottom))}
+.foot-brand{font-family:var(--hand);font-style:italic;font-weight:600;font-size:17px;color:var(--ink)}
+footer p{font-size:12.5px;color:var(--faint)}
+footer a{color:var(--quiet);text-decoration:none;font-weight:500}
+footer a:hover{color:var(--lime-deep)}
 
-/* ═══════════════ STICKY MOBILE CTA ═══════════════ */
+/* ═══════════ STICKY MOBILE CTA ═══════════ */
 #sticky{display:none;position:fixed;left:0;right:0;bottom:0;z-index:105;
-  background:rgba(253,245,238,.96);backdrop-filter:blur(16px);border-top:1px solid var(--border-2);
+  background:rgba(249,232,221,.97);backdrop-filter:blur(16px);border-top:1.5px solid var(--line-dk);
   padding:11px 14px calc(11px + env(safe-area-inset-bottom));
   transform:translateY(110%);transition:transform .35s var(--ease)}
 #sticky.on{transform:none}
 .sticky-in{display:flex;align-items:center;gap:12px;max-width:520px;margin:0 auto}
 .sticky-txt{flex:1;min-width:0}
-.sticky-txt b{display:block;font-family:'Montserrat',sans-serif;font-size:14px;color:var(--ink);font-weight:800}
-.sticky-txt span{font-size:11.5px;color:var(--muted);display:block;
+.sticky-txt b{display:block;font-family:var(--disp);font-size:14px;color:var(--ink);font-weight:800}
+.sticky-txt span{font-size:11.5px;color:var(--quiet);display:block;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-/* ═══════════════ MODAL + FORM ═══════════════ */
-.ov{display:none;position:fixed;inset:0;z-index:200;background:rgba(24,20,12,.55);
-  backdrop-filter:blur(10px);overflow-y:auto;padding:24px 16px;
+/* ═══════════ MODAL + FORM ═══════════ */
+.ov{display:none;position:fixed;inset:0;z-index:200;background:rgba(38,33,15,.5);
+  backdrop-filter:blur(9px);overflow-y:auto;padding:24px 16px;
   align-items:flex-start;justify-content:center}
 .ov.on{display:flex;animation:fade .25s var(--ease)}
 @keyframes fade{from{opacity:0}to{opacity:1}}
-.modal{background:var(--cream-lt);border:1px solid var(--border-2);border-radius:var(--r);
+.modal{background:var(--paper-lt);border:1.5px solid var(--line-dk);border-radius:var(--r);
   max-width:560px;width:100%;padding:clamp(26px,4vw,42px);position:relative;margin:auto;
-  animation:pop .35s var(--ease);box-shadow:0 30px 80px -20px rgba(40,30,15,.4)}
+  animation:pop .35s var(--ease);box-shadow:0 30px 80px -20px rgba(40,30,15,.45)}
 @keyframes pop{from{opacity:0;transform:translateY(18px) scale(.98)}to{opacity:1;transform:none}}
-.modal-x{position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:10px;
-  border:1.5px solid var(--border-2);color:var(--muted);font-size:19px;line-height:1;
-  display:flex;align-items:center;justify-content:center;transition:.2s;background:#fff}
+.modal-x{position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:50%;
+  border:1.5px solid var(--line-dk);color:var(--quiet);font-size:19px;line-height:1;
+  display:flex;align-items:center;justify-content:center;transition:.2s;background:var(--card)}
 .modal-x:hover{border-color:var(--red);color:var(--red)}
-.modal h2{font-size:23px;font-weight:800;margin-bottom:7px;letter-spacing:-.02em}
-.modal-sub{color:var(--muted);font-size:13.5px;line-height:1.6;margin-bottom:24px}
-.modal-sub b{color:var(--lime-ink);font-weight:600}
-.fsec{font-family:'Montserrat',sans-serif;font-size:11px;font-weight:800;letter-spacing:.16em;
-  text-transform:uppercase;color:var(--muted-2);margin:24px 0 2px;display:flex;align-items:center;gap:10px}
-.fsec::after{content:'';flex:1;height:1px;background:var(--border)}
+.modal h2{font-size:24px;font-weight:800;margin-bottom:7px;letter-spacing:-.02em}
+.modal-sub{color:var(--quiet);font-size:13.5px;line-height:1.65;margin-bottom:24px}
+.modal-sub b{color:var(--lime-deep);font-weight:600}
+.fsec{font-family:var(--hand);font-style:italic;font-size:14px;color:var(--lime-deep);
+  margin:24px 0 2px;display:flex;align-items:center;gap:12px}
+.fsec::after{content:'';flex:1;height:1.5px;background:var(--line);border-radius:2px}
 .fsec:first-child{margin-top:0}
 .fields{display:flex;flex-direction:column;gap:14px}
 .fg{display:flex;flex-direction:column;gap:6px}
-.fl{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600;
-  font-family:'Montserrat',sans-serif}
+.fl{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--quiet);font-weight:700;
+  font-family:var(--disp)}
 .fi2{display:grid;grid-template-columns:1.4fr 1fr;gap:14px}
 .fi2b{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
-.inp{background:#fff;border:1.5px solid var(--border-2);border-radius:var(--r-sm);
+.inp{background:var(--card);border:1.5px solid var(--line-dk);border-radius:var(--r-sm);
   padding:12px 15px;color:var(--ink);font-family:inherit;font-size:14.5px;font-weight:400;
   outline:none;transition:border-color .2s,box-shadow .2s;resize:vertical;width:100%;appearance:none}
-select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236f6a5f' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%237d7462' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat:no-repeat;background-position:right 14px center;padding-right:34px}
-.inp:focus{border-color:var(--lime-ink);box-shadow:0 0 0 3px var(--lime-soft)}
-.inp::placeholder{color:var(--muted-2)}
+.inp:focus{border-color:var(--lime-deep);box-shadow:0 0 0 3px var(--lime-wash)}
+.inp::placeholder{color:var(--faint)}
 .inp.bad{border-color:var(--red)}
 .err{font-size:11.5px;color:var(--red);display:none}
 .fg.invalid .err{display:block}
 .form-msg{display:none;margin-top:16px;padding:12px 15px;border-radius:var(--r-sm);font-size:13.5px;line-height:1.5}
 .form-msg.on{display:block}
-.form-msg.bad{background:rgba(213,69,60,.08);border:1px solid rgba(213,69,60,.3);color:var(--red)}
+.form-msg.bad{background:rgba(196,69,54,.08);border:1px solid rgba(196,69,54,.3);color:var(--red)}
 #btnSubmit{width:100%;margin-top:22px}
-.privacy{font-size:11.5px;color:var(--muted-2);text-align:center;margin-top:12px;line-height:1.5}
-.spin{width:15px;height:15px;border:2px solid rgba(0,0,0,.2);border-top-color:#1a2400;
+.privacy{font-size:11.5px;color:var(--faint);text-align:center;margin-top:12px;line-height:1.5}
+.spin{width:15px;height:15px;border:2px solid rgba(255,255,255,.3);border-top-color:var(--paper-lt);
   border-radius:50%;animation:spin .7s linear infinite;display:none}
 @keyframes spin{to{transform:rotate(360deg)}}
 #btnSubmit.busy .spin{display:block}
 #btnSubmit.busy .lbl{opacity:.7}
 
-/* done view + zalo */
 #doneView{display:none;text-align:center;padding:10px 0}
-.done-ic{width:70px;height:70px;border-radius:50%;background:var(--lime-soft);
-  border:2px solid var(--lime);display:flex;align-items:center;justify-content:center;
+.done-ic{width:70px;height:70px;border-radius:50%;background:var(--lime-wash);
+  border:2px solid var(--lime-deep);display:flex;align-items:center;justify-content:center;
   font-size:32px;margin:0 auto 20px}
 #doneView h3{font-size:24px;font-weight:800;margin-bottom:12px}
-#doneView p{color:var(--muted);line-height:1.7;font-size:14.5px;margin-bottom:18px}
+#doneView p{color:var(--quiet);line-height:1.7;font-size:14.5px;margin-bottom:18px}
 #doneView p strong{color:var(--ink);font-weight:600}
-.zalo-box{margin:22px 0 6px;padding:22px;border:2px dashed var(--lime-ink);border-radius:var(--r);
-  background:var(--lime-soft)}
-.zalo-box h4{font-size:15px;font-weight:800;margin-bottom:8px}
-.zalo-box p{font-size:13px;color:var(--muted);margin-bottom:16px}
+.zalo-box{margin:22px 0 6px;padding:24px 22px;border:2px dashed var(--lime-deep);border-radius:var(--r);
+  background:var(--lime-wash);transform:rotate(-.5deg)}
+.zalo-box h4{font-size:15.5px;font-weight:800;margin-bottom:8px}
+.zalo-box p{font-size:13px;color:var(--quiet);margin-bottom:16px}
 .zalo-box .btn{width:100%}
 
-/* ═══════════════ ADMIN (chỉ xem) ═══════════════ */
-#admin{display:none;position:fixed;inset:0;z-index:300;background:var(--cream-lt);overflow-y:auto;padding:32px 16px}
+/* ═══════════ ADMIN (chỉ xem) ═══════════ */
+#admin{display:none;position:fixed;inset:0;z-index:300;background:var(--paper);overflow-y:auto;padding:32px 16px}
 .adm-in{max-width:940px;margin:0 auto}
 .adm-hd{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:24px}
 .adm-hd h2{font-size:22px;font-weight:800}
 .adm-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:22px}
-.adm-stat{background:#fff;border:1px solid var(--border);border-radius:var(--r-sm);padding:16px 18px}
-.adm-stat b{display:block;font-family:'Montserrat',sans-serif;font-size:24px;font-weight:900;color:var(--lime-ink)}
-.adm-stat span{font-size:11.5px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase}
-.reg{background:#fff;border:1px solid var(--border);border-left:3px solid var(--gold);
+.adm-stat{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-sm);padding:16px 18px}
+.adm-stat b{display:block;font-family:var(--disp);font-size:24px;font-weight:800;color:var(--lime-deep)}
+.adm-stat span{font-size:11.5px;color:var(--quiet);letter-spacing:.05em;text-transform:uppercase}
+.reg{background:var(--card);border:1.5px solid var(--line);border-left:3px solid var(--gold);
   border-radius:var(--r-sm);padding:20px 22px;margin-bottom:9px}
-.reg.approved{border-left-color:var(--lime-ink)}
+.reg.approved{border-left-color:var(--lime-deep)}
 .reg.rejected{border-left-color:var(--red);opacity:.55}
 .reg-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
-.reg-nm{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:800;color:var(--ink)}
-.reg-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:7px;font-size:13px;color:var(--muted)}
-.reg-meta b{color:var(--ink-2);font-weight:500}
-.reg-goal{font-size:13px;color:var(--muted);font-style:italic;margin-top:11px;line-height:1.6}
-.adm-note{background:#fff;border:1px solid var(--border);border-radius:var(--r-sm);
-  padding:18px 20px;font-size:13.5px;color:var(--muted);line-height:1.7;margin-bottom:20px}
-.adm-note b{color:var(--lime-ink)}
-.adm-empty{text-align:center;padding:60px 20px;color:var(--muted)}
+.reg-nm{font-family:var(--disp);font-size:16px;font-weight:800;color:var(--ink)}
+.reg-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:7px;font-size:13px;color:var(--quiet)}
+.reg-meta b{color:var(--ink-soft);font-weight:500}
+.reg-goal{font-size:13px;color:var(--quiet);font-style:italic;margin-top:11px;line-height:1.6}
+.adm-note{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-sm);
+  padding:18px 20px;font-size:13.5px;color:var(--quiet);line-height:1.7;margin-bottom:20px}
+.adm-note b{color:var(--lime-deep)}
+.adm-empty{text-align:center;padding:60px 20px;color:var(--quiet)}
 
-/* ═══════════════ RESPONSIVE ═══════════════ */
-@media(max-width:1000px){
-  .hero-in{grid-template-columns:1fr;gap:32px}
-  .trust-grid{grid-template-columns:repeat(2,1fr)}
-  .price-wrap{grid-template-columns:1fr;gap:36px}
+/* ═══════════ RESPONSIVE ═══════════ */
+@media(max-width:960px){
+  .hero-row{grid-template-columns:1fr}
+  .tag{transform:rotate(1deg);margin-top:8px}
+  .fee{grid-template-columns:1fr}
+  .receipt{max-width:420px;margin:0 auto}
 }
 @media(max-width:820px){
   .nav-links,.nav-slots{display:none}
   .burger{display:flex}
   .nav-cta .btn{display:none}
-  .pain-grid,.method-grid,.rhythm,.mentors{grid-template-columns:1fr}
+  .duo{grid-template-columns:1fr}
+  .person:first-child,.person:last-child{transform:none}
   .fi2,.fi2b{grid-template-columns:1fr}
-  .week{grid-template-columns:1fr;gap:12px;padding:22px 20px}
-  .week-side{flex-direction:row;align-items:baseline;gap:10px}
-  .week-big{font-size:26px}
+  .weekbar{grid-template-columns:repeat(4,1fr)}
+  .day{min-height:112px}
   #sticky{display:block}
   body{padding-bottom:calc(68px + env(safe-area-inset-bottom))}
   .foot-in{flex-direction:column;text-align:center;gap:14px}
@@ -476,32 +483,23 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
   .burger{width:44px;height:44px}
   .modal-x{width:40px;height:40px;top:12px;right:12px}
   footer a{display:inline-block;padding:8px 4px}
+  .rule{grid-template-columns:1fr;gap:8px}
+  .stop{grid-template-columns:1fr;gap:12px}
+  .stop-side{flex-direction:row;align-items:baseline;gap:12px}
+  .stop-n{font-size:32px}
 }
-@media(max-width:600px){
-  .trust-grid{grid-template-columns:1fr 1fr}
-  .trust-item{padding:20px 16px}
-  .sec-head{margin-bottom:30px}
-  .price-card{padding:30px 24px;box-shadow:5px 5px 0 var(--lime)}
-}
-@media(max-width:430px){
-  .eyebrow{letter-spacing:.1em;gap:8px}
-  .hero h1{font-size:clamp(32px,10vw,42px);letter-spacing:-.03em}
-  .h2{font-size:clamp(25px,7.4vw,34px)}
-  .cta h2{font-size:clamp(27px,8.4vw,38px)}
-  .slot-num{font-size:clamp(34px,11vw,44px)}
-  .hero-actions{gap:10px}
+@media(max-width:520px){
+  .weekbar{grid-template-columns:repeat(2,1fr);gap:8px}
+  .day{min-height:104px}
   .hero-actions .btn{width:100%}
-  .btn-lg{padding:15px 24px;font-size:14.5px}
-  .btn-xl{padding:17px 28px;font-size:15px}
-  .slotcard{padding:22px 20px}
-  .pain-card,.mcard,.mentor{padding:24px 20px}
-  .modal h2{font-size:21px}
-  .trust-grid{grid-template-columns:1fr 1fr}
+  .letter{padding:26px 20px}
+  .receipt{padding:24px 20px}
 }
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;
     transition-duration:.01ms!important;scroll-behavior:auto!important}
   .rv{opacity:1;transform:none}
+  .ticker-in{animation:none}
 }
 </style>
 </head>
@@ -517,213 +515,206 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 <nav id="nav">
   <div class="shell nav-in">
     <a class="brand" href="#top" aria-label="Tự Mình Xây Kênh">
-      <span class="brand-badge">TM</span>
-      <span class="brand-name">Tự Mình Xây Kênh<small>#tuminhxaykenh</small></span>
+      <b>Tự Mình Xây Kênh</b><span>lớp 30 ngày</span>
     </a>
     <div class="nav-links">
-      <button class="nav-link" data-go="pain">Dành cho ai</button>
-      <button class="nav-link" data-go="method">Cách dạy</button>
-      <button class="nav-link" data-go="roadmap">Lộ trình 30 ngày</button>
+      <button class="nav-link" data-go="letter">Thư ngỏ</button>
+      <button class="nav-link" data-go="tuan">Một tuần trong lớp</button>
+      <button class="nav-link" data-go="lotrinh">Lộ trình</button>
       <button class="nav-link" data-go="mentors">Người dạy</button>
-      <button class="nav-link" data-go="pricing">Học phí</button>
-      <button class="nav-link" data-go="faq">FAQ</button>
+      <button class="nav-link" data-go="hocphi">Học phí</button>
+      <button class="nav-link" data-go="faq">Hỏi đáp</button>
     </div>
     <div class="nav-cta">
-      <div class="nav-slots"><span class="dot"></span>còn <b data-bind="computed.remaining">—</b> suất</div>
-      <button class="btn btn-lime btn-sm" data-open>Đăng ký giữ chỗ</button>
+      <div class="nav-slots"><span class="dot"></span>còn <b data-bind="computed.remaining">—</b> chỗ</div>
+      <button class="btn btn-ink btn-sm" data-open>Giữ chỗ</button>
       <button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
     </div>
   </div>
   <div id="drawer">
-    <a href="#pain">Dành cho ai</a>
-    <a href="#method">Cách dạy</a>
-    <a href="#roadmap">Lộ trình 30 ngày</a>
+    <a href="#letter">Thư ngỏ</a>
+    <a href="#tuan">Một tuần trong lớp</a>
+    <a href="#lotrinh">Lộ trình 30 ngày</a>
     <a href="#mentors">Người dạy</a>
-    <a href="#pricing">Học phí</a>
-    <a href="#faq">Câu hỏi thường gặp</a>
-    <button class="btn btn-lime btn-md" data-open>Đăng ký giữ chỗ →</button>
+    <a href="#hocphi">Học phí</a>
+    <a href="#faq">Hỏi đáp</a>
+    <button class="btn btn-ink btn-md" data-open>Đăng ký giữ chỗ →</button>
   </div>
 </nav>
 
 <!-- ════════ HERO ════════ -->
 <header class="hero" id="top">
-  <div class="shell hero-in">
-    <div>
-      <div class="eyebrow" data-tpl="Khóa TikTok thực chiến · {{computed.cohortLabel}} · {{computed.statusLabel}}"></div>
-      <h1>Xây kênh<br>nghiêm túc.<br>Viral <span class="mark">có công thức.</span></h1>
-      <p class="lead">Khóa học <strong>30 ngày</strong> dạy bạn xây kênh TikTok bằng <strong>số liệu thật</strong> — watch time, retention, hook rate — không phải mẹo may rủi. Học lý thuyết live mỗi tuần, và trong tuần được <strong>ngồi edit cùng mentor</strong> tới khi ra video hoàn chỉnh.</p>
-      <div class="hero-actions">
-        <button class="btn btn-lime btn-lg" data-open data-cta>Đăng ký giữ chỗ <span class="arw">→</span></button>
-        <button class="btn btn-ghost btn-lg" data-go="roadmap">Xem lộ trình 30 ngày</button>
+  <div class="shell">
+    <h1>Đăng hoài<br><span class="thin">mà không ai xem,</span><br>là do thiếu <span class="u">công thức.</span></h1>
+    <div class="hero-note">không phải do bạn kém duyên hay thuật toán ghét bạn đâu</div>
+    <p class="lead">Đây là lớp học xây kênh TikTok trong <strong>30 ngày</strong> của hai người đang đứng kênh Tự Mình Xây Kênh. Mỗi tuần một buổi live học lý thuyết, các tối còn lại tụi mình <strong>ngồi edit cùng bạn</strong> — tới khi video của bạn thật sự đăng được. Mọi thứ dạy bằng số liệu: watch time, retention, hook rate. Không dạy mẹo may rủi.</p>
+    <div class="hero-row">
+      <div>
+        <div class="hero-actions">
+          <button class="btn btn-ink btn-lg" data-open data-cta>Đăng ký giữ chỗ <span class="arw">→</span></button>
+          <button class="btn btn-line btn-lg" data-go="letter">Đọc thư ngỏ đã ↓</button>
+        </div>
       </div>
-      <div class="hero-meta">
-        <span>⏱ <b>90 giây</b> điền form</span>
-        <span>📅 <b data-bind="computed.scheduleShort">—</b></span>
-        <span>🎬 <b data-tpl="{{schedule.weeks}} tuần · {{schedule.sessions}} buổi live + edit kèm 1:1"></b></span>
-      </div>
+      <!-- PHIẾU GHI DANH -->
+      <aside class="tag rv">
+        <span class="tag-status pill em" id="statusPill"><span class="dot"></span><span data-bind="computed.statusLabel">—</span></span>
+        <div class="tag-t">phiếu ghi danh · <span data-bind="computed.cohortLabel">—</span></div>
+        <div class="tag-num"><span data-bind="computed.totalRegistered">—</span><small data-tpl="/{{slots.max}} chỗ"></small></div>
+        <div class="tag-lbl" data-tpl="lớp nhỏ, tối đa {{slots.max}} người để kèm sát"></div>
+        <div class="prog" id="heroProg"><i></i></div>
+        <div class="tag-rows">
+          <div class="tag-row"><span>Học phí đăng ký sớm</span>
+            <b><i class="thr" data-bind="computed.price.regular"></i><span data-bind="computed.price.earlyBird"></span></b></div>
+          <div class="tag-row"><span>Khai giảng</span><b data-bind="cohort.startDate">—</b></div>
+          <div class="tag-row"><span>Buổi live</span><b data-bind="computed.scheduleShort">—</b></div>
+        </div>
+      </aside>
     </div>
-
-    <!-- LIVE SLOT CARD -->
-    <aside class="slotcard rv">
-      <div class="slot-top">
-        <div>
-          <div class="slot-num"><span data-bind="computed.totalRegistered">—</span><small data-tpl="/{{slots.max}}"></small></div>
-          <div class="slot-lbl" style="margin-top:6px">chỗ đã được giữ</div>
-        </div>
-        <span class="pill em" id="statusPill"><span class="dot"></span><span data-bind="computed.statusLabel">—</span></span>
-      </div>
-      <div class="prog" id="heroProg"><i></i></div>
-      <div class="slot-foot">
-        <span data-tpl="Lớp tối đa {{slots.max}} người để kèm sát"></span>
-        <b data-tpl="còn {{computed.remaining}} suất"></b>
-      </div>
-      <div class="slot-rows">
-        <div class="slot-row">
-          <span>Học phí Early Bird</span>
-          <b><i class="thr" data-bind="computed.price.regular"></i><span data-bind="computed.price.earlyBird"></span></b>
-        </div>
-        <div class="slot-row"><span>Khai giảng dự kiến</span><b data-bind="cohort.startDate"></b></div>
-        <div class="slot-row"><span>Lịch buổi live</span><b data-bind="computed.scheduleShort"></b></div>
-        <div class="slot-row"><span>Nền tảng học</span><b data-tpl="{{schedule.platform}} + hỗ trợ edit buổi tối"></b></div>
-      </div>
-    </aside>
   </div>
 </header>
 
-<!-- ════════ TRUST ════════ -->
-<div class="trust">
-  <div class="shell" style="padding-left:0;padding-right:0;max-width:var(--shell)">
-    <div class="trust-grid">
-      <div class="trust-item"><div class="trust-num" data-bind="stats.cohortsDone">—</div>
-        <div class="trust-lbl"><b>Khóa đã dạy</b><br>với case học viên thật</div></div>
-      <div class="trust-item"><div class="trust-num" data-bind="stats.students">—</div>
-        <div class="trust-lbl"><b>Học viên đã theo học</b><br>đủ ngành nghề, đủ xuất phát điểm</div></div>
-      <div class="trust-item"><div class="trust-num" data-bind="schedule.weeks">—</div>
-        <div class="trust-lbl"><b>Tuần đồng hành</b><br>1 buổi live/tuần + edit kèm buổi tối</div></div>
-      <div class="trust-item"><div class="trust-num">2</div>
-        <div class="trust-lbl"><b>Mentor theo sát</b><br>Minh Toàn &amp; Tiểu My</div></div>
-    </div>
+<!-- ════════ TICKER ════════ -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-in" id="tickerIn">
+    <span>xây kênh nghiêm túc</span><span>viral có công thức</span><span>30 ngày</span>
+    <span>edit kèm 1:1</span><span>số liệu thật</span><span>lớp nhỏ</span>
   </div>
 </div>
 
-<!-- ════════ PAIN ════════ -->
-<section class="sec" id="pain"><div class="shell">
-  <div class="sec-head rv">
-    <div class="eyebrow">Khóa này dành cho ai</div>
-    <h2 class="h2">Bạn có chuyên môn, có cố gắng.<br>Chỉ thiếu <em>công thức.</em></h2>
+<!-- ════════ THƯ NGỎ ════════ -->
+<section class="sec" id="letter"><div class="shell">
+  <div class="sec-head rv" style="text-align:center">
+    <span class="kicker">trước khi bạn bấm nút gì, đọc cái này đã</span>
+    <h2 class="h2">Thư từ người đứng lớp</h2>
   </div>
-  <div class="pain-grid">
-    <div class="pain-card rv"><div class="pain-ic">💼</div>
-      <h3>Người đi làm muốn xây thương hiệu cá nhân</h3>
-      <p>Bạn giỏi chuyên môn — tài chính, giáo dục, y tế, kỹ thuật... — nhưng chưa ai biết bạn là ai. Bạn cần một format dễ làm theo để chia sẻ chuyên môn mà không phải "diễn" giỏi trước ống kính.</p>
-      <div class="pain-quote">"Tôi có chuyên môn nhưng sợ lên hình vì không quen."</div></div>
-    <div class="pain-card rv"><div class="pain-ic">💸</div>
-      <h3>Người muốn có thu nhập phụ từ TikTok</h3>
-      <p>Affiliate, KOC, bán khóa học hay dịch vụ cá nhân — bạn không cần shop hay sản phẩm sẵn. Bạn cần công thức cụ thể, áp dụng ngay bằng điện thoại, không cần thiết bị hay ê-kíp.</p>
-      <div class="pain-quote">"Đăng hoài không viral, làm mãi vẫn 0 follow."</div></div>
-    <div class="pain-card rv"><div class="pain-ic">🚀</div>
-      <h3>Người tìm cơ hội mới qua nội dung</h3>
-      <p>Dùng TikTok như một chiếc CV sống: thể hiện năng lực để được để ý, được mời hợp tác, tuyển dụng. Bạn cần hiểu thuật toán hoạt động ra sao để tự tin làm nội dung đều đặn.</p>
-      <div class="pain-quote">"Không biết bắt đầu từ đâu, sợ tốn công mà không ai xem."</div></div>
+  <div class="letter-wrap rv">
+    <div class="letter">
+      <p class="hi">Chào bạn, mình là Toàn.</p>
+      <p>Mình đoán bạn đang ở một trong hai chỗ: hoặc là <strong>chưa dám đăng video nào</strong> vì ngại lên hình, hoặc là <strong>đã đăng kha khá rồi mà chẳng video nào đi đến đâu</strong>. Cả hai kiểu mình đều gặp nhiều ở hai khóa trước — và thú thật, chính mình cũng từng ở đó.</p>
+      <p>Cái mình nhận ra sau thời gian đứng kênh và đứng lớp: người ta không thiếu cố gắng, người ta thiếu một cách làm <strong>kiểm chứng được</strong>. Video flop, mở phần phân tích lên là thấy lý do nằm sờ sờ ở đó — tụt người xem ở giây thứ mấy, hook giữ được bao nhiêu phần trăm. Nhưng chẳng ai chỉ cho bạn cách đọc mấy con số ấy, nên bạn cứ đoán mò, rồi đổ cho thuật toán.</p>
+      <p>Lớp này mình dựng để làm đúng một việc: <strong>trong 30 ngày, biến việc làm video từ trò may rủi thành một quy trình bạn tự lặp lại được.</strong> Tối Thứ 5 hằng tuần mình dạy live — lý thuyết và định hướng riêng cho kênh của từng người. Còn các buổi tối trong tuần, mình với My không giao bài tập rồi biến mất, mà mở máy <strong>ngồi edit cùng bạn</strong> cho tới khi video đủ tốt để bấm đăng.</p>
+      <p>Lớp cố tình giữ nhỏ. Kèm kiểu này không kèm đông được — nên nếu bạn đọc tới đây mà thấy đúng chỗ mình đang kẹt, điền form bên dưới. Chưa mất đồng nào đâu: mình sẽ gọi nói chuyện trước, hợp thì mới vào lớp.</p>
+      <div class="sig">
+        <div>
+          <div class="sig-name">Toàn &amp; My</div>
+          <div class="sig-role">hai người đứng kênh Tự Mình Xây Kênh</div>
+        </div>
+        <button class="btn btn-lime btn-md" data-open data-cta>Điền form giữ chỗ <span class="arw">→</span></button>
+      </div>
+      <p class="ps"><b>Tái bút:</b> nếu bạn định "để tháng sau rảnh hơn rồi học" — tháng sau bạn vẫn bận y như vậy thôi. Lớp thiết kế cho người đi làm mà, mỗi tuần vài buổi tối là đủ.</p>
+    </div>
   </div>
 </div></section>
 
-<!-- ════════ METHOD (dark) ════════ -->
-<section class="sec method" id="method"><div class="shell">
+<!-- ════════ 3 NGUYÊN TẮC ════════ -->
+<section class="sec" style="padding-top:0"><div class="shell">
   <div class="sec-head rv">
-    <div class="eyebrow">Cách tụi mình dạy</div>
-    <h2 class="h2">"Nghiêm túc" nghĩa là<br>dạy bằng <em>số liệu thật.</em></h2>
-    <p class="lead">Đây cũng là 3 nguyên tắc của kênh Tự Mình Xây Kênh — và là thứ bạn sẽ thấy trong từng buổi học.</p>
+    <span class="kicker">nói trước để khỏi hiểu lầm</span>
+    <h2 class="h2">Ba điều tụi mình<br>khăng khăng giữ.</h2>
   </div>
-  <div class="method-grid">
-    <div class="mcard rv"><div class="n">01</div>
-      <h3>Có dữ liệu, có logic</h3>
-      <p>Mọi nhận định đều gắn với con số cụ thể: watch time, retention, hook rate. Không có kiểu "video này hay vì… cảm giác vậy". Bạn học cách đọc số liệu của chính kênh mình.</p></div>
-    <div class="mcard rv"><div class="n">02</div>
-      <h3>Tôn trọng người xem</h3>
-      <p>Không câu view rẻ tiền, không giật tít sai sự thật. Vẫn viral — nhưng viral vì nội dung có giá trị thật. Kênh bạn xây xong sẽ bền, không sợ "bay màu" theo trend.</p></div>
-    <div class="mcard rv"><div class="n">03</div>
-      <h3>Có hệ thống, lặp lại được</h3>
-      <p>Mục tiêu cuối là bạn cầm được một công thức tự chạy tiếp, không phụ thuộc may mắn nhất thời — và không phụ thuộc cả tụi mình sau khi khóa kết thúc.</p></div>
-  </div>
-  <div class="pillar-note rv">
-    <span class="pillar-chip">🔍 <b>Mổ xẻ video viral &amp; flop</b> — rút công thức từ video trending</span>
-    <span class="pillar-chip">📈 <b>Phân tích kênh thật</b> — suy ngược ai phù hợp làm kiểu nào</span>
-    <span class="pillar-chip">⚠️ <b>Sai lầm người mới</b> — từ case thật của học viên các khóa trước</span>
+  <div class="rules">
+    <div class="rule rv">
+      <div class="rule-n">một,</div>
+      <div>
+        <h3>Nhận định nào cũng phải có số đi kèm</h3>
+        <p>Trong lớp không có kiểu "video này hay vì… cảm giác nó cuốn". Hay là hay ở đâu — <b>hook giữ được bao nhiêu phần trăm, người xem rớt ở giây thứ mấy</b> — mở số liệu ra nói chuyện. Bạn sẽ quen dần với việc tự chấm video của mình bằng dữ liệu, thay vì ngồi đợi may.</p>
+      </div>
+    </div>
+    <div class="rule rv">
+      <div class="rule-n">hai,</div>
+      <div>
+        <h3>Viral nhưng không rẻ tiền</h3>
+        <p>Tụi mình không dạy giật tít sai sự thật hay câu view chớp nhoáng. Kênh xây kiểu đó lên nhanh mà <b>sập cũng nhanh</b>, và cái giá là uy tín của chính bạn. Vẫn nhắm viral — nhưng viral vì nội dung có giá trị thật với người xem.</p>
+      </div>
+    </div>
+    <div class="rule rv">
+      <div class="rule-n">ba,</div>
+      <div>
+        <h3>Ra khóa là bạn tự chạy được</h3>
+        <p>Thước đo thành công của lớp không phải một video ăn may triệu view, mà là bạn cầm được <b>một quy trình lặp lại được</b>: từ ý tưởng, kịch bản, quay, dựng đến đọc số — và không cần tụi mình đứng cạnh nữa.</p>
+      </div>
+    </div>
   </div>
 </div></section>
 
-<!-- ════════ ROADMAP ════════ -->
-<section class="sec roadmap" id="roadmap"><div class="shell">
+<!-- ════════ MỘT TUẦN TRONG LỚP ════════ -->
+<section class="sec" id="tuan" style="padding-top:0"><div class="shell">
   <div class="sec-head rv">
-    <div class="eyebrow">Lộ trình 30 ngày</div>
-    <h2 class="h2">4 tuần. Mỗi tuần một trận đánh.<br>Kết thúc bằng <em>kênh chạy thật.</em></h2>
-    <p class="lead">Nhịp học được thiết kế cho người đi làm: lý thuyết gói gọn trong 1 buổi tối mỗi tuần, phần còn lại là làm thật — có mentor ngồi kèm.</p>
+    <span class="kicker">lịch thật, không phải lịch minh họa</span>
+    <h2 class="h2">Một tuần trong lớp<br>trông như thế này.</h2>
+    <p class="lead">Thiết kế cho người đi làm: lý thuyết gói trong một buổi tối, còn lại là làm thật vào các buổi tối bạn rảnh — hẹn lịch riêng với mentor, không cứng nhắc.</p>
   </div>
-
-  <div class="rhythm">
-    <div class="rhythm-card rv"><div class="rhythm-ic">🎓</div><div>
-      <h4>Buổi live lý thuyết + định hướng kênh</h4>
-      <p><b data-bind="computed.scheduleShort">Tối Thứ 5 · 20:00–22:00</b> hàng tuần qua <b data-bind="schedule.platform">MS Teams</b>. Học công thức, phân tích case, và chỉnh định hướng kênh của từng người ngay trong buổi.</p>
-    </div></div>
-    <div class="rhythm-card rv"><div class="rhythm-ic">✂️</div><div>
-      <h4>Các buổi tối trong tuần: edit cùng mentor</h4>
-      <p>Không giao bài về rồi bỏ mặc. Trong tuần, mentor <b>ngồi edit cùng bạn</b> vào các buổi tối — từ kịch bản đến dựng — tới khi ra <b>video hoàn chỉnh đăng được</b>.</p>
-    </div></div>
+  <div class="weekbar rv">
+    <div class="day"><span class="d">T2</span><span class="ic">✍️</span><span class="what">Viết kịch bản theo khung đã học</span></div>
+    <div class="day edit"><span class="d">T3</span><span class="ic">🎬</span><span class="what">Tối: quay + edit kèm mentor</span></div>
+    <div class="day"><span class="d">T4</span><span class="ic">📤</span><span class="what">Đăng video, để số liệu chạy</span></div>
+    <div class="day live"><span class="d">T5</span><span class="badge">LIVE</span><span class="what" data-tpl="{{schedule.time}} — học qua {{schedule.platform}}"></span></div>
+    <div class="day edit"><span class="d">T6</span><span class="ic">✂️</span><span class="what">Tối: edit kèm — sửa tới khi mượt</span></div>
+    <div class="day"><span class="d">T7</span><span class="ic">📊</span><span class="what">Đọc số liệu video trong tuần</span></div>
+    <div class="day"><span class="d">CN</span><span class="ic">☕</span><span class="what">Nghỉ. Nghỉ cũng là một phần của kênh bền</span></div>
   </div>
+  <div class="week-note rv">các tối edit kèm hẹn linh hoạt theo lịch của bạn — chỉ buổi live Thứ 5 là cố định</div>
+</div></section>
 
-  <div class="track">
-    <article class="week rv">
-      <div class="week-side"><span class="week-n">Tuần</span><span class="week-big">01</span></div>
+<!-- ════════ LỘ TRÌNH 30 NGÀY ════════ -->
+<section class="sec route" id="lotrinh"><div class="shell">
+  <div class="sec-head rv">
+    <span class="kicker">bốn tuần, mỗi tuần một việc ra tấm ra món</span>
+    <h2 class="h2">30 ngày, bốn chặng.</h2>
+    <p class="lead">Thứ tự này có chủ đích: chưa vững nền thì chưa nói chuyện viral, chưa có video thì chưa nói chuyện kiếm tiền.</p>
+  </div>
+  <div class="stops">
+    <article class="stop rv">
+      <div class="stop-side"><span class="stop-w">Tuần</span><span class="stop-n">01</span></div>
       <div>
-        <h4>Nền móng &amp; định vị kênh</h4>
-        <p>Hiểu thuật toán TikTok phân phối video ra sao, rồi chốt ngách và định vị cá nhân của bạn — thứ quyết định 80% kênh có đi xa được không.</p>
-        <ul class="week-pts">
-          <li>Thuật toán đề xuất hoạt động thế nào: các chỉ số nó thật sự đo</li>
-          <li>Chọn ngách theo chuyên môn + hoàn cảnh sống của chính bạn</li>
-          <li>Định vị cá nhân &amp; dựng profile kênh chuẩn (tên, bio, avatar, ghim)</li>
-          <li>Buổi tối trong tuần: dựng xong bộ khung kênh, quay video đầu tiên</li>
+        <h3>Dựng nền &amp; chọn đúng ngách</h3>
+        <p>Tuần đầu chưa vội quay chụp gì nhiều. Việc quan trọng nhất là hiểu thuật toán thật sự đo cái gì, rồi chốt ngách và định vị — chọn sai ở bước này thì ba tuần sau có cố mấy cũng ngược gió.</p>
+        <ul>
+          <li>Thuật toán phân phối video kiểu gì, và vì sao "đăng đều" chưa đủ</li>
+          <li>Chọn ngách từ chuyên môn + hoàn cảnh sống của chính bạn, không chọn theo trend</li>
+          <li>Dựng bộ mặt kênh: tên, bio, avatar, video ghim</li>
+          <li>Cuối tuần: video đầu tiên lên sóng — quay cùng mentor nếu bạn run</li>
         </ul>
       </div>
     </article>
-    <article class="week rv">
-      <div class="week-side"><span class="week-n">Tuần</span><span class="week-big">02</span></div>
+    <article class="stop rv">
+      <div class="stop-side"><span class="stop-w">Tuần</span><span class="stop-n">02</span></div>
       <div>
-        <h4>Công thức nội dung viral</h4>
-        <p>Mổ xẻ video viral và video flop bằng số liệu để rút ra công thức: hook 3 giây đầu, cấu trúc giữ chân, và kịch bản lặp lại được cho ngách của bạn.</p>
-        <ul class="week-pts">
-          <li>Hook rate, watch time, retention — đọc và tối ưu từng chỉ số</li>
-          <li>5 khung kịch bản dùng lại được, viết kịch bản trong 15 phút</li>
-          <li>Phân tích 1 kênh cùng ngách với bạn: họ làm gì mà chạy</li>
-          <li>Buổi tối trong tuần: quay + edit cùng mentor ra 2–3 video theo công thức</li>
+        <h3>Công thức giữ chân người xem</h3>
+        <p>Mổ một video viral và một video flop cùng ngách với bạn, đặt số liệu hai đứa cạnh nhau — công thức tự lộ ra. Rồi bạn áp vào kịch bản của chính mình.</p>
+        <ul>
+          <li>Hook 3 giây đầu: các kiểu mở khiến người ta ở lại (kèm số chứng minh)</li>
+          <li>Khung kịch bản dùng lại được — viết một kịch bản trong 15 phút</li>
+          <li>Đọc hook rate, watch time, retention trên chính video tuần 1 của bạn</li>
+          <li>Tối trong tuần: ra 2–3 video theo công thức, mentor kèm từng cái</li>
         </ul>
       </div>
     </article>
-    <article class="week rv">
-      <div class="week-side"><span class="week-n">Tuần</span><span class="week-big">03</span></div>
+    <article class="stop rv">
+      <div class="stop-side"><span class="stop-w">Tuần</span><span class="stop-n">03</span></div>
       <div>
-        <h4>Quay &amp; edit như người chuyên</h4>
-        <p>Chỉ cần điện thoại. Học nhịp dựng, sound, typo, cách edit giữ chân người xem — và sửa trực tiếp trên chính video của bạn, không phải video mẫu.</p>
-        <ul class="week-pts">
-          <li>Setup quay bằng điện thoại: góc máy, ánh sáng, âm thanh</li>
-          <li>Edit trên CapCut: nhịp cắt, sound effect, typo (đúng style kênh)</li>
-          <li>Chấm video của từng học viên bằng số liệu thật của video đó</li>
-          <li>Buổi tối trong tuần: mentor edit kèm 1:1 tới khi video mượt</li>
+        <h3>Quay &amp; dựng bằng đúng cái điện thoại</h3>
+        <p>Không cần máy quay, không cần đèn. Tuần này học nhịp cắt, sound, chữ trên màn hình — và sửa trực tiếp trên video của bạn chứ không phải video mẫu của lớp.</p>
+        <ul>
+          <li>Góc máy, ánh sáng, tiếng — tận dụng những gì bạn đang có sẵn</li>
+          <li>Dựng trên CapCut: nhịp cắt theo hook, sound effect, typo đúng vibe kênh</li>
+          <li>Từng người được chấm video bằng số liệu thật của video đó</li>
+          <li>Tối trong tuần: buổi edit kèm 1:1 sâu nhất của cả khóa</li>
         </ul>
       </div>
     </article>
-    <article class="week rv">
-      <div class="week-side"><span class="week-n">Tuần</span><span class="week-big">04</span></div>
+    <article class="stop rv">
+      <div class="stop-side"><span class="stop-w">Tuần</span><span class="stop-n">04</span></div>
       <div>
-        <h4>Tăng trưởng &amp; kiếm tiền từ kênh</h4>
-        <p>Đọc số liệu cả kênh để biết nhân bản cái gì, bỏ cái gì. Chốt hướng kiếm tiền phù hợp với bạn và lộ trình 90 ngày tự chạy sau khóa.</p>
-        <ul class="week-pts">
-          <li>Đọc analytics tổng kênh: video nào nhân bản, series nào nên bỏ</li>
-          <li>Các hướng kiếm tiền: affiliate, booking, dịch vụ, khóa/sản phẩm cá nhân</li>
-          <li>Lịch content 90 ngày sau khóa — có hệ thống, lặp lại được</li>
-          <li>Tổng kết 1:1: định hướng riêng cho kênh của từng học viên</li>
+        <h3>Đọc số cả kênh &amp; hướng ra tiền</h3>
+        <p>Nhìn lại toàn bộ số liệu ba tuần: cái gì đáng nhân bản, cái gì nên bỏ. Rồi chốt hướng kiếm tiền hợp với bạn — không phải hướng đang hot trên mạng.</p>
+        <ul>
+          <li>Analytics cả kênh: nhận ra video "kéo kênh" và series nên dừng</li>
+          <li>Affiliate, booking, dịch vụ, sản phẩm riêng — cái nào hợp với ngách của bạn</li>
+          <li>Lịch nội dung 90 ngày sau khóa, xây từ chính số liệu của bạn</li>
+          <li>Buổi 1:1 cuối: định hướng riêng cho kênh của từng người</li>
         </ul>
-        <span class="week-tag">Ra khóa với kênh đang chạy thật</span>
+        <span class="hand">ra khóa với kênh đang chạy, không phải với một tờ chứng nhận</span>
       </div>
     </article>
   </div>
@@ -732,61 +723,64 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 <!-- ════════ MENTORS ════════ -->
 <section class="sec" id="mentors"><div class="shell">
   <div class="sec-head rv">
-    <div class="eyebrow">Người dạy</div>
-    <h2 class="h2">Hai mentor, hai vai trò.<br>Cùng theo bạn <em>cả 30 ngày.</em></h2>
-    <p class="lead">Người dạy bạn là hai người đang trực tiếp đứng kênh Tự Mình Xây Kênh — dạy đúng cái tụi mình đang làm hàng ngày, không dạy từ giáo trình chép lại.</p>
+    <span class="kicker">người sẽ ngồi cạnh bạn suốt một tháng</span>
+    <h2 class="h2">Hai người dạy,<br>hai vai khác nhau.</h2>
   </div>
-  <div class="mentors">
-    <div class="mentor rv">
-      <div class="mentor-avatar">MT</div>
-      <div class="mentor-name">Minh Toàn</div>
-      <div class="mentor-role">Chiến lược · Định vị · Số liệu</div>
-      <p>Phụ trách phần "xương sống" của khóa: định vị kênh, phân tích công thức viral bằng dữ liệu, và định hướng kiếm tiền. Đã đứng lớp 2 khóa trước với học viên đủ mọi xuất phát điểm — người chưa từng đăng video nào cho tới người kẹt mãi ở vài trăm follow.</p>
-      <div class="mentor-badges">
-        <div class="mentor-badge">Đồng sáng lập kênh Tự Mình Xây Kênh</div>
-        <div class="mentor-badge">Dạy phân tích nội dung bằng số liệu: watch time, retention, hook rate</div>
-        <div class="mentor-badge">Trực tiếp tư vấn định hướng 1:1 cho từng học viên</div>
+  <div class="duo">
+    <div class="person rv">
+      <div class="person-top">
+        <div class="face">T</div>
+        <div><h3>Minh Toàn</h3><span class="person-role">phần "nghĩ" — chiến lược &amp; số liệu</span></div>
+      </div>
+      <p>Toàn lo phần xương sống của khóa: định vị kênh, mổ công thức viral bằng dữ liệu, và định hướng kiếm tiền. Đã đứng <b>hai khóa trước</b> với học viên đủ kiểu xuất phát điểm — từ người chưa dám đăng video nào tới người kẹt mãi ở vài trăm follow.</p>
+      <div class="person-list">
+        <div>Đồng sáng lập, đứng kênh Tự Mình Xây Kênh</div>
+        <div>Dạy đọc watch time, retention, hook rate trên kênh của chính bạn</div>
+        <div>Trực tiếp gọi tư vấn định hướng cho từng người trước khi vào lớp</div>
       </div>
     </div>
-    <div class="mentor rv">
-      <div class="mentor-avatar">TM</div>
-      <div class="mentor-name">Tiểu My</div>
-      <div class="mentor-role">Sản xuất · Quay dựng · Edit kèm</div>
-      <p>Người sẽ ngồi cạnh bạn ở các buổi tối trong tuần: từ kịch bản, quay bằng điện thoại đến dựng CapCut hoàn chỉnh. Trẻ, làm nội dung mỗi ngày, và hiểu chính xác cảm giác "ngại lên hình" của người mới — vì đã tự đi qua giai đoạn đó.</p>
-      <div class="mentor-badges">
-        <div class="mentor-badge">Đồng sáng lập kênh Tự Mình Xây Kênh</div>
-        <div class="mentor-badge">Phụ trách các buổi edit kèm 1:1 buổi tối trong tuần</div>
-        <div class="mentor-badge">Đồng hành tới khi bạn có video hoàn chỉnh tự tin đăng</div>
+    <div class="person rv">
+      <span class="stick">đang chờ chính chủ duyệt lời giới thiệu 😄</span>
+      <div class="person-top">
+        <div class="face">M</div>
+        <div><h3>Tiểu My</h3><span class="person-role">phần "làm" — quay dựng &amp; edit kèm</span></div>
+      </div>
+      <p>My là người sẽ ngồi cạnh bạn ở các buổi tối trong tuần — từ kịch bản, quay bằng điện thoại đến bản dựng cuối trên CapCut. Làm nội dung mỗi ngày, và hiểu rõ cảm giác ngại lên hình của người mới, <b>vì chính My cũng từng đi qua đoạn đó</b>.</p>
+      <div class="person-list">
+        <div>Đồng sáng lập, đứng kênh Tự Mình Xây Kênh</div>
+        <div>Phụ trách các buổi edit kèm 1:1 buổi tối</div>
+        <div>Đồng hành tới khi bạn tự tin bấm nút đăng</div>
       </div>
     </div>
   </div>
 </div></section>
 
-<!-- ════════ PRICING ════════ -->
-<section class="sec pricing" id="pricing"><div class="shell">
-  <div class="price-wrap">
-    <div class="price-side rv">
-      <div class="eyebrow">Học phí</div>
-      <h2 class="h2">Một khóa học.<br>Một kênh <em>của riêng bạn.</em></h2>
-      <p>Lớp giữ sĩ số nhỏ (<strong data-tpl="tối đa {{slots.max}} người"></strong>) để mentor kèm sát được từng kênh. Vì vậy suất Early Bird có hạn — đăng ký trước khi lớp đủ người để giữ mức giá ưu đãi.</p>
-      <p><strong>Đăng ký trước, tư vấn trước, đóng phí sau.</strong> Sau khi điền form, tụi mình sẽ gọi tư vấn định hướng miễn phí — thấy phù hợp bạn mới giữ chỗ chính thức.</p>
+<!-- ════════ HỌC PHÍ ════════ -->
+<section class="sec" id="hocphi" style="padding-top:0"><div class="shell">
+  <div class="fee">
+    <div class="fee-side rv">
+      <span class="kicker">nói chuyện tiền nong cho rõ ràng</span>
+      <h2 class="h2">Trả một lần,<br>giữ được cái nghề.</h2>
+      <p>Lớp giữ sĩ số nhỏ — <strong data-tpl="tối đa {{slots.max}} người"></strong> — vì kèm edit 1:1 không kèm đông được. Đăng ký sớm trước khi lớp đủ người thì giữ được mức phí ưu đãi.</p>
+      <p>Và trình tự là: <strong>điền form → tụi mình gọi tư vấn định hướng miễn phí → hợp thì mới đóng phí.</strong> Nếu nghe xong bạn thấy chưa hợp, coi như được một buổi tư vấn không mất gì — tụi mình cũng đỡ nhận nhầm người chưa sẵn sàng.</p>
+      <span class="hand">↳ điền form chưa phải trả đồng nào đâu, yên tâm</span>
     </div>
-    <div class="price-card rv">
-      <span class="price-badge">Early Bird</span>
-      <div class="price-type" data-tpl="Lớp live · {{computed.cohortLabel}} · khai giảng {{cohort.startDate}}"></div>
-      <div class="price-was" data-bind="computed.price.regular">—</div>
-      <div class="price-amt"><span data-bind="computed.price.earlyBird">—</span><span class="u">/ trọn khóa 30 ngày</span></div>
-      <div class="price-save" data-tpl="Tiết kiệm {{computed.price.saveAmount}} ({{computed.price.savePercent}}%) so với giá gốc"></div>
-      <ul class="price-feats">
-        <li data-tpl="{{schedule.sessions}} buổi live lý thuyết + định hướng qua {{schedule.platform}}"></li>
-        <li>Edit kèm 1:1 các buổi tối trong tuần — tới khi ra video hoàn chỉnh</li>
-        <li>Bộ khung kịch bản + checklist quay dựng dùng lại được</li>
-        <li>Chấm kênh &amp; video bằng số liệu thật của chính bạn</li>
-        <li>Group Zalo lớp học — hỏi đáp và đồng hành sau khóa</li>
-        <li>Tư vấn định hướng 1:1 tổng kết cuối khóa</li>
-      </ul>
-      <button class="btn btn-dark btn-md" data-open data-cta>Giữ chỗ Early Bird <span class="arw">→</span></button>
-      <p class="price-note">Điền form không mất phí · Tư vấn xong mới quyết định</p>
+    <div class="receipt rv">
+      <div class="rc-head">
+        <b>Tự Mình Xây Kênh</b>
+        <span data-tpl="{{computed.cohortLabel}} · khai giảng {{cohort.startDate}}"></span>
+      </div>
+      <div class="rc-row"><span data-tpl="{{schedule.sessions}} buổi live ({{computed.scheduleShort}})"></span><b>✓</b></div>
+      <div class="rc-row"><span>Edit kèm 1:1 các buổi tối trong tuần</span><b>✓</b></div>
+      <div class="rc-row"><span>Khung kịch bản + checklist quay dựng</span><b>✓</b></div>
+      <div class="rc-row"><span>Chấm video bằng số liệu thật của bạn</span><b>✓</b></div>
+      <div class="rc-row"><span>Group Zalo lớp, còn dùng sau khóa</span><b>✓</b></div>
+      <div class="rc-row"><span>Buổi 1:1 định hướng cuối khóa</span><b>✓</b></div>
+      <div class="rc-row strike" style="margin-top:8px"><span>Học phí gốc</span><b data-bind="computed.price.regular">—</b></div>
+      <div class="rc-total"><span>Đăng ký sớm</span><b data-bind="computed.price.earlyBird">—</b></div>
+      <div class="rc-save" data-tpl="đỡ được {{computed.price.saveAmount}} nếu giữ chỗ trước khi lớp đủ người"></div>
+      <button class="btn btn-ink btn-md" data-open data-cta>Giữ chỗ đăng ký sớm <span class="arw">→</span></button>
+      <div class="rc-foot">điền form miễn phí · tư vấn xong mới quyết định</div>
     </div>
   </div>
 </div></section>
@@ -794,31 +788,34 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 <!-- ════════ CTA ════════ -->
 <section class="cta" id="dangky">
   <div class="shell cta-in">
-    <h2 data-html="{{computed.cohortLabel}} khai giảng<br><em>{{cohort.startDate}}.</em>"></h2>
-    <p>Điền form 90 giây — tụi mình đọc kỹ từng đăng ký và gọi tư vấn định hướng trong 24 giờ.</p>
+    <span class="kicker">tới đoạn quyết định rồi</span>
+    <h2 data-html="{{computed.cohortLabel}} khai giảng {{cohort.startDate}}."></h2>
+    <p>Form mất chừng 90 giây. Tụi mình đọc kỹ từng đăng ký — điền càng thật, buổi tư vấn của bạn càng trúng.</p>
     <div class="cta-prog">
       <div class="lbl">
         <span data-tpl="{{computed.totalRegistered}}/{{slots.max}} chỗ"></span>
-        <b data-tpl="còn {{computed.remaining}} suất"></b>
+        <b data-tpl="còn {{computed.remaining}} chỗ"></b>
       </div>
       <div class="prog" id="ctaProg"><i></i></div>
     </div>
-    <button class="btn btn-lime btn-xl" data-open data-cta>Đăng ký giữ chỗ ngay <span class="arw">→</span></button>
-    <p class="cta-sub" data-tpl="{{computed.scheduleShort}} · Điền xong nhận ngay link group Zalo lớp học"></p>
+    <button class="btn btn-lime btn-xl" data-open data-cta>Đăng ký giữ chỗ <span class="arw">→</span></button>
+    <p class="cta-sub" data-tpl="{{computed.scheduleShort}} · điền xong nhận ngay link group Zalo của lớp"></p>
     <div class="cta-live"><span class="dot"></span><span id="ctaLive">—</span></div>
   </div>
 </section>
 
 <!-- ════════ FAQ ════════ -->
 <section class="sec" id="faq"><div class="shell">
-  <div class="sec-head rv"><div class="eyebrow">FAQ</div><h2 class="h2">Câu hỏi<br>thường gặp.</h2></div>
+  <div class="sec-head rv">
+    <span class="kicker">mấy câu ai cũng nhắn hỏi</span>
+    <h2 class="h2">Bạn hỏi,<br>mình trả lời thật.</h2>
+  </div>
   <div class="faq" id="faqList"></div>
 </div></section>
 
 <footer><div class="shell foot-in">
-  <a class="brand" href="#top"><span class="brand-badge">TM</span>
-    <span class="brand-name">Tự Mình Xây Kênh<small>#tuminhxaykenh</small></span></a>
-  <p>© <span id="yr"></span> Tự Mình Xây Kênh · Minh Toàn &amp; Tiểu My</p>
+  <span class="foot-brand">Tự Mình Xây Kênh</span>
+  <p>© <span id="yr"></span> · Toàn &amp; My · #tuminhxaykenh</p>
   <p><a id="tiktokLink" href="#" target="_blank" rel="noopener">TikTok: <span data-bind="contact.tiktok"></span></a></p>
 </div></footer>
 
@@ -827,9 +824,9 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
   <div class="sticky-in">
     <div class="sticky-txt">
       <b data-bind="computed.price.earlyBirdShort">—</b>
-      <span data-tpl="{{computed.cohortLabel}} · còn {{computed.remaining}} suất Early Bird"></span>
+      <span data-tpl="{{computed.cohortLabel}} · còn {{computed.remaining}} chỗ đăng ký sớm"></span>
     </div>
-    <button class="btn btn-lime btn-md" data-open data-cta>Giữ chỗ →</button>
+    <button class="btn btn-ink btn-md" data-open data-cta>Giữ chỗ →</button>
   </div>
 </div>
 
@@ -840,10 +837,10 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 
     <div id="formView">
       <h2 id="mTitle">Đăng ký giữ chỗ</h2>
-      <p class="modal-sub"><b id="mCohort">—</b><br>Điền càng chi tiết, buổi tư vấn định hướng của bạn càng "trúng". Điền xong nhận ngay link group Zalo lớp.</p>
+      <p class="modal-sub"><b id="mCohort">—</b><br>Điền càng chi tiết, buổi tư vấn của bạn càng trúng. Điền xong nhận ngay link group Zalo lớp.</p>
       <form class="fields" id="regForm" novalidate>
 
-        <div class="fsec">Về bạn</div>
+        <div class="fsec">về bạn</div>
         <div class="fg"><label class="fl" for="f-name">Họ và tên *</label>
           <input class="inp" id="f-name" name="name" autocomplete="name" placeholder="Nguyễn Văn A">
           <span class="err">Vui lòng nhập họ tên</span></div>
@@ -856,10 +853,10 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
             <span class="err">Nhập năm 4 chữ số</span></div>
         </div>
         <div class="fg"><label class="fl" for="f-job">Công việc / lĩnh vực chuyên môn *</label>
-          <input class="inp" id="f-job" name="job" placeholder="VD: Chuyên viên tài chính / Giáo viên / Sinh viên năm 4...">
+          <input class="inp" id="f-job" name="job" placeholder="VD: chuyên viên tài chính / giáo viên / sinh viên năm 4...">
           <span class="err">Cho mình biết bạn đang làm gì nhé</span></div>
 
-        <div class="fsec">Về kênh của bạn</div>
+        <div class="fsec">về kênh của bạn</div>
         <div class="fg"><label class="fl" for="f-channel">Link hoặc tên kênh TikTok (nếu đã có)</label>
           <input class="inp" id="f-channel" name="channel" placeholder="@tenkenh hoặc dán link — chưa có cứ để trống">
           <span class="err"></span></div>
@@ -884,10 +881,10 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
             <span class="err">Chọn quỹ thời gian của bạn</span></div>
         </div>
         <div class="fg"><label class="fl" for="f-topic">Chủ đề / ngách bạn muốn làm *</label>
-          <input class="inp" id="f-topic" name="topic" placeholder="VD: chia sẻ kiến thức tài chính, review đồ gia dụng, vlog nghề...">
+          <input class="inp" id="f-topic" name="topic" placeholder="VD: kiến thức tài chính, review đồ gia dụng, vlog nghề...">
           <span class="err">Cho mình biết chủ đề bạn định làm nhé</span></div>
 
-        <div class="fsec">Mục tiêu của bạn</div>
+        <div class="fsec">mục tiêu của bạn</div>
         <div class="fg"><label class="fl" for="f-target">Bạn xây kênh chủ yếu để làm gì? *</label>
           <select class="inp" id="f-target" name="target">
             <option value="" selected disabled>Chọn mục tiêu chính</option>
@@ -898,7 +895,7 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
           </select>
           <span class="err">Chọn mục tiêu chính của bạn</span></div>
         <div class="fg"><label class="fl" for="f-goal">Kỳ vọng cụ thể sau 30 ngày? *</label>
-          <textarea class="inp" id="f-goal" name="goal" rows="3" placeholder="VD: có 10 video đầu tiên và hiểu số liệu kênh mình / ra đơn affiliate đầu tiên / tự tin lên hình..."></textarea>
+          <textarea class="inp" id="f-goal" name="goal" rows="3" placeholder="VD: có 10 video đầu tiên và hiểu số liệu kênh mình / ra đơn affiliate đầu tiên / hết ngại lên hình..."></textarea>
           <span class="err">Viết giúp mình vài dòng về kỳ vọng của bạn nhé</span></div>
 
         <div class="hp" aria-hidden="true">
@@ -906,7 +903,7 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
         </div>
       </form>
       <div class="form-msg" id="formMsg"></div>
-      <button class="btn btn-lime btn-lg" id="btnSubmit">
+      <button class="btn btn-ink btn-lg" id="btnSubmit">
         <span class="spin"></span><span class="lbl">Gửi đăng ký &amp; nhận link Zalo →</span></button>
       <p class="privacy">Thông tin chỉ dùng để tư vấn và xếp lớp · Không chia sẻ cho bên thứ ba</p>
     </div>
@@ -916,12 +913,12 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
       <h3 id="doneTitle">Đã nhận đăng ký!</h3>
       <p id="doneBody">Tụi mình sẽ gọi tư vấn định hướng qua SĐT trong vòng <strong>24 giờ</strong>.</p>
       <div class="zalo-box" id="zaloBox" style="display:none">
-        <h4>💬 Bước tiếp theo: vào group Zalo lớp học</h4>
-        <p>Mọi thông báo lịch học, tài liệu và hỗ trợ đều nằm trong group này — vào ngay để không lỡ thông tin nhé.</p>
-        <a class="btn btn-dark btn-md" id="zaloBtn" href="#" target="_blank" rel="noopener">Tham gia group Zalo →</a>
+        <h4>💬 Bước tiếp theo: vào group Zalo lớp</h4>
+        <p>Lịch học, tài liệu, hỏi đáp — tất cả nằm trong group này. Vào ngay kẻo lỡ thông tin nhé.</p>
+        <a class="btn btn-ink btn-md" id="zaloBtn" href="#" target="_blank" rel="noopener">Tham gia group Zalo →</a>
       </div>
       <span class="pill gold" id="donePill">⏳ Đang chờ xác nhận</span>
-      <div style="margin-top:24px"><button class="btn btn-ghost btn-md" data-close>Đóng</button></div>
+      <div style="margin-top:24px"><button class="btn btn-line btn-md" data-close>Đóng</button></div>
     </div>
   </div>
 </div>
@@ -931,7 +928,7 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
   <div class="adm-in">
     <div class="adm-hd">
       <h2 id="admTitle">⚙️ Tự Mình Xây Kênh — Admin</h2>
-      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('admin').style.display='none';document.body.classList.remove('lock')">Đóng ×</button>
+      <button class="btn btn-line btn-sm" onclick="document.getElementById('admin').style.display='none';document.body.classList.remove('lock')">Đóng ×</button>
     </div>
     <div class="adm-note">
       Bảng này <b>chỉ để xem</b>. Mọi thao tác — duyệt học viên, đổi giá, đổi lịch, đổi sĩ số, bật thông báo —
@@ -960,11 +957,10 @@ var CACHE_KEY = 'tmxk_cfg_v1';
 
 /* ── Config dự phòng: dùng khi chưa cấu hình API hoặc mạng lỗi ── */
 var FALLBACK = {
-  cohort:{number:3,status:'open',openText:'Đang mở đăng ký',startDate:'Đang chốt lịch'},
+  cohort:{number:3,status:'open',openText:'Đang mở đăng ký',startDate:'đang chốt lịch'},
   slots:{max:15,base:0,registered:0},
   pricing:{earlyBird:2000000,regular:3000000},
-  schedule:{days:'Tối Thứ 5',time:'20:00–22:00',platform:'MS Teams',
-            weeks:4,sessions:4},
+  schedule:{days:'Tối Thứ 5',time:'20:00–22:00',platform:'MS Teams',weeks:4,sessions:4},
   zalo:{groupUrl:''},
   stats:{cohortsDone:2,students:'30+'},
   contact:{tiktok:'Tự Mình Xây Kênh',tiktokUrl:'https://www.tiktok.com/'},
@@ -972,20 +968,20 @@ var FALLBACK = {
 };
 
 var FAQS = [
-  {q:'Tôi chưa từng đăng video nào, học được không?',
-   a:'Được — và thật ra đó là nhóm học viên đông nhất của tụi mình. Tuần 1 bắt đầu từ số 0: dựng kênh, chọn ngách, quay video đầu tiên. Chỉ cần một chiếc điện thoại và mỗi tuần vài buổi tối.'},
-  {q:'Lịch học cụ thể thế nào?',
-   a:'<strong>{{computed.scheduleShort}}</strong> hàng tuần là buổi live lý thuyết + định hướng qua {{schedule.platform}}, kéo dài {{schedule.weeks}} tuần (30 ngày). Ngoài ra, các buổi tối trong tuần mentor sẽ hẹn lịch <strong>edit cùng bạn</strong> tới khi ra video hoàn chỉnh — lịch linh hoạt theo từng học viên.'},
-  {q:'"Edit cùng mentor" nghĩa là sao?',
-   a:'Nghĩa đen luôn: bạn và mentor cùng mở project, sửa trực tiếp trên video <strong>của bạn</strong> — từ kịch bản, cắt dựng, sound đến typo. Không phải xem video hướng dẫn quay sẵn rồi tự bơi.'},
-  {q:'Tôi cần chuẩn bị thiết bị gì?',
-   a:'Một chiếc điện thoại quay được video là đủ. Edit dùng CapCut bản miễn phí. Không cần máy quay, mic hay đèn — tụi mình sẽ chỉ cách tận dụng những gì bạn đang có.'},
-  {q:'Khóa này khác gì các khóa dạy TikTok khác?',
-   a:'Hai điểm. Một: dạy bằng <strong>số liệu thật</strong> (watch time, retention, hook rate) chứ không phải mẹo cảm tính. Hai: <strong>làm cùng bạn</strong> — lớp giữ sĩ số nhỏ để mentor edit kèm 1:1 các buổi tối, nên bạn ra khóa với kênh đang chạy thật chứ không chỉ "đã hiểu lý thuyết".'},
-  {q:'Đăng ký xong thì thanh toán thế nào?',
-   a:'Điền form xong bạn <strong>chưa phải đóng gì cả</strong>. Tụi mình gọi tư vấn định hướng trong 24 giờ — thấy phù hợp bạn mới đóng phí giữ chỗ Early Bird {{computed.price.earlyBird}}. Không phù hợp thì coi như một buổi tư vấn miễn phí.'},
-  {q:'Sau 30 ngày kết thúc là hết hỗ trợ?',
-   a:'Không. Group Zalo lớp vẫn hoạt động sau khóa để hỏi đáp, chia sẻ số liệu kênh và nhận góp ý. Bạn cũng có buổi tổng kết 1:1 với lộ trình 90 ngày để tự chạy tiếp.'}
+  {q:'Mình chưa từng đăng video nào, học nổi không?',
+   a:'Nổi — và thật ra đây là nhóm đông nhất trong hai khóa trước. Tuần 1 bắt đầu từ con số 0: dựng kênh, chọn ngách, quay video đầu tiên (quay cùng mentor nếu bạn run). Cần đúng một chiếc điện thoại và vài buổi tối mỗi tuần.'},
+  {q:'Lịch học cụ thể ra sao?',
+   a:'Buổi live cố định duy nhất là <strong>{{computed.scheduleShort}}</strong> hằng tuần, qua {{schedule.platform}}, trong {{schedule.weeks}} tuần. Các buổi edit kèm buổi tối thì hẹn linh hoạt theo lịch của bạn với mentor — người đi làm sắp xếp thoải mái.'},
+  {q:'"Edit kèm 1:1" nghĩa là thế nào?',
+   a:'Nghĩa đen luôn: bạn và mentor cùng mở project, sửa trực tiếp trên video <strong>của bạn</strong> — kịch bản, nhịp cắt, sound, chữ. Không phải kiểu gửi video hướng dẫn quay sẵn rồi để bạn tự bơi.'},
+  {q:'Cần sắm thiết bị gì không?',
+   a:'Không. Một chiếc điện thoại quay được video là đủ, dựng bằng CapCut bản miễn phí. Trong lớp có hẳn một buổi chỉ cách tận dụng góc nhà, ánh sáng và đồ có sẵn của bạn.'},
+  {q:'Khóa này khác gì mấy khóa dạy TikTok đầy trên mạng?',
+   a:'Hai chỗ. Một: dạy bằng <strong>số liệu thật</strong> — watch time, retention, hook rate của chính video bạn — chứ không phải mẹo cảm tính. Hai: <strong>làm cùng bạn</strong>. Lớp giữ sĩ số nhỏ để mentor edit kèm từng người, nên bạn ra khóa với kênh đang chạy thật, không phải với một xấp ghi chú.'},
+  {q:'Điền form xong có phải đóng tiền luôn không?',
+   a:'Không. Điền form là <strong>chưa mất đồng nào</strong>. Tụi mình gọi tư vấn định hướng trong 24 giờ, hai bên thấy hợp thì bạn mới đóng phí giữ chỗ {{computed.price.earlyBird}}. Không hợp thì coi như một buổi tư vấn miễn phí, không ai phiền ai.'},
+  {q:'Hết 30 ngày là hết hỗ trợ luôn à?',
+   a:'Không đâu. Group Zalo của lớp vẫn chạy sau khóa — hỏi đáp, khoe số liệu, nhờ góp ý đều được. Bạn cũng cầm theo lộ trình 90 ngày xây từ chính số liệu kênh mình để tự chạy tiếp.'}
 ];
 
 /* ══════════════ HELPERS ══════════════ */
@@ -1096,7 +1092,7 @@ function render(cfg){
   });
 
   var pill=$('#statusPill');
-  if(pill){pill.className='pill '+(C.isFull||C.isClosed?'gold':'em')}
+  if(pill){pill.className='tag-status pill '+(C.isFull||C.isClosed?'gold':'em')}
 
   $$('[data-cta]').forEach(function(b){
     if(b.__label===undefined) b.__label=b.innerHTML;
@@ -1111,12 +1107,12 @@ function render(cfg){
   var cl=$('#ctaLive');
   if(cl){
     cl.textContent = C.remaining>0
-      ? C.totalRegistered+' người đã đăng ký · còn '+C.remaining+' suất Early Bird'
+      ? C.totalRegistered+' người đã giữ chỗ · còn '+C.remaining+' chỗ đăng ký sớm'
       : '🎉 Đã đủ '+CFG.slots.max+' người — '+C.cohortLabel+' sắp khai giảng!';
   }
 
   var mc=$('#mCohort');
-  if(mc) mc.textContent=C.cohortLabel+' · Khóa TikTok 30 ngày · khai giảng '+CFG.cohort.startDate;
+  if(mc) mc.textContent=C.cohortLabel+' · lớp TikTok 30 ngày · khai giảng '+CFG.cohort.startDate;
 
   $('#announce').classList.toggle('on', !!(CFG.announcement && CFG.announcement.show && CFG.announcement.text));
 
@@ -1127,8 +1123,8 @@ function render(cfg){
 
   if(!faqBuilt) buildFaq(); else bindFaqText();
 
-  document.title='Tự Mình Xây Kênh — Khóa TikTok 30 ngày · '+C.cohortLabel+
-                 (C.remaining>0?' · còn '+C.remaining+' suất':'');
+  document.title='Tự Mình Xây Kênh — Lớp TikTok 30 ngày · '+C.cohortLabel+
+                 (C.remaining>0?' · còn '+C.remaining+' chỗ':'');
 }
 
 function buildFaq(){
@@ -1243,7 +1239,7 @@ function initForm(){
 
     var els=$$('#regForm .inp'), bad=null;
     els.forEach(function(el){ if(!validateField(el) && !bad) bad=el; });
-    if(bad){ bad.focus(); msg('Vui lòng kiểm tra lại các ô được tô đỏ.'); return; }
+    if(bad){ bad.focus(); msg('Bạn xem lại giúp mình mấy ô tô đỏ nhé.'); return; }
 
     // bot tự động thường điền hết mọi ô, kể cả ô ẩn
     var trap=$('#f-website');
@@ -1280,8 +1276,8 @@ function initForm(){
       })
       .catch(function(){
         btn.classList.remove('busy');
-        msg('Không gửi được — kiểm tra kết nối mạng rồi thử lại nhé. '+
-            'Hoặc nhắn trực tiếp TikTok: '+(CFG?CFG.contact.tiktok:''));
+        msg('Không gửi được — bạn kiểm tra mạng rồi thử lại nhé. '+
+            'Hoặc nhắn thẳng TikTok: '+(CFG?CFG.contact.tiktok:''));
       });
   }
 
@@ -1305,9 +1301,9 @@ function initForm(){
     else zbox.style.display='none';
 
     if(dup){
-      $('#doneTitle').textContent='Bạn đã có trong danh sách rồi!';
+      $('#doneTitle').textContent='Bạn có trong danh sách rồi nè!';
       $('#doneBody').innerHTML='Số điện thoại này đã đăng ký '+esc(C.cohortLabel||'')+
-        '. Tụi mình sẽ liên hệ sớm nhất có thể.';
+        ' trước đó. Tụi mình sẽ liên hệ sớm nhất có thể.';
       $('#donePill').textContent='✓ Đã ghi nhận trước đó';
     }else{
       $('#doneTitle').textContent='Đã nhận đăng ký!';
@@ -1318,7 +1314,7 @@ function initForm(){
   }
 }
 
-/* ══════════════ REVEAL / NAV / STICKY ══════════════ */
+/* ══════════════ REVEAL / NAV / STICKY / TICKER ══════════════ */
 var io=null;
 function observe(root){
   if(!('IntersectionObserver' in window)){
@@ -1337,18 +1333,22 @@ function observe(root){
 function initChrome(){
   var nav=$('#nav'), sticky=$('#sticky'), hero=$('#top');
 
+  // nhân đôi nội dung ticker để vòng lặp liền mạch
+  var t=$('#tickerIn');
+  if(t) t.innerHTML+=t.innerHTML;
+
   window.addEventListener('scroll',function(){
     nav.classList.toggle('stuck',window.scrollY>12);
     if(sticky){
-      var past=window.scrollY>(hero?hero.offsetHeight*.7:500);
+      var past=window.scrollY>(hero?hero.offsetHeight*.75:500);
       sticky.classList.toggle('on',past && !$('#modal').classList.contains('on'));
     }
   },{passive:true});
 
   $$('[data-go]').forEach(function(b){
     b.addEventListener('click',function(){
-      var t=document.getElementById(b.getAttribute('data-go'));
-      if(t) t.scrollIntoView({behavior:'smooth',block:'start'});
+      var el=document.getElementById(b.getAttribute('data-go'));
+      if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
       closeDrawer();
     });
   });
@@ -1407,7 +1407,7 @@ function initAdmin(){
         return '<div class="reg '+esc(r.status)+'">'+
           '<div class="reg-top"><span class="reg-nm">'+esc(r.name)+'</span>'+
             '<span class="pill '+(r.status==='approved'?'em':'gold')+'">'+ic+'</span>'+
-            '<span style="font-size:11.5px;color:var(--muted-2)">'+esc(r.time)+' · '+esc(r.id)+'</span></div>'+
+            '<span style="font-size:11.5px;color:var(--faint)">'+esc(r.time)+' · '+esc(r.id)+'</span></div>'+
           '<div class="reg-meta"><span>📱 <b>'+esc(r.phone)+'</b></span>'+
             '<span>🎂 <b>'+esc(r.year)+'</b></span><span>💼 <b>'+esc(r.job)+'</b></span>'+
             (r.channel?'<span>🎵 <b>'+esc(r.channel)+'</b></span>':'')+
