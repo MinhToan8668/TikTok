@@ -169,7 +169,9 @@ nav.stuck{border-bottom-color:var(--line);background:rgba(249,232,221,.96)}
 .tag::before{content:'';position:absolute;top:-12px;left:50%;transform:translateX(-50%) rotate(-3deg);
   width:86px;height:24px;background:rgba(153,223,0,.5);border:1px solid rgba(95,140,0,.25);
   border-radius:2px}
-.tag-t{font-family:var(--hand);font-style:italic;font-size:13.5px;color:var(--quiet);margin-bottom:14px}
+.tag-head{display:flex;justify-content:space-between;align-items:center;gap:8px 10px;
+  flex-wrap:wrap;margin-bottom:14px}
+.tag-t{font-family:var(--hand);font-style:italic;font-size:13.5px;color:var(--quiet)}
 .tag-num{font-family:var(--disp);font-size:46px;font-weight:800;color:var(--ink);
   line-height:1;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
 .tag-num small{font-size:.4em;color:var(--faint);font-weight:700}
@@ -180,7 +182,6 @@ nav.stuck{border-bottom-color:var(--line);background:rgba(249,232,221,.96)}
 .tag-row span{color:var(--quiet)}
 .tag-row b{color:var(--ink);font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
 .tag-row .thr{color:var(--faint);text-decoration:line-through;font-weight:400;margin-right:6px}
-.tag-status{position:absolute;right:16px;top:16px}
 
 /* ═══════════ TICKER ═══════════ */
 .ticker{background:var(--lime);border-top:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink);
@@ -560,16 +561,19 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
       </div>
       <!-- PHIẾU GHI DANH -->
       <aside class="tag rv">
-        <span class="tag-status pill em" id="statusPill"><span class="dot"></span><span data-bind="computed.statusLabel">—</span></span>
-        <div class="tag-t">phiếu ghi danh · <span data-bind="computed.cohortLabel">—</span></div>
+        <div class="tag-head">
+          <div class="tag-t">phiếu ghi danh · <span data-bind="computed.cohortLabel">—</span></div>
+          <span class="pill em" id="statusPill"><span class="dot"></span><span data-bind="computed.statusLabel">—</span></span>
+        </div>
         <div class="tag-num"><span data-bind="computed.totalRegistered">—</span><small data-tpl="/{{slots.max}} chỗ"></small></div>
         <div class="tag-lbl" data-tpl="lớp nhỏ, tối đa {{slots.max}} người để kèm sát"></div>
         <div class="prog" id="heroProg"><i></i></div>
         <div class="tag-rows">
-          <div class="tag-row"><span>Học phí đăng ký sớm</span>
+          <div class="tag-row"><span>Học phí ưu đãi</span>
             <b><i class="thr" data-bind="computed.price.regular"></i><span data-bind="computed.price.earlyBird"></span></b></div>
           <div class="tag-row"><span>Khai giảng</span><b data-bind="cohort.startDate">—</b></div>
           <div class="tag-row"><span>Buổi live</span><b data-bind="computed.scheduleShort">—</b></div>
+          <div class="tag-row"><span>Edit kèm 1:1</span><b>các tối trong tuần</b></div>
         </div>
       </aside>
     </div>
@@ -1101,7 +1105,7 @@ function render(cfg){
   });
 
   var pill=$('#statusPill');
-  if(pill){pill.className='tag-status pill '+(C.isFull||C.isClosed?'gold':'em')}
+  if(pill){pill.className='pill '+(C.isFull||C.isClosed?'gold':'em')}
 
   $$('[data-cta]').forEach(function(b){
     if(b.__label===undefined) b.__label=b.innerHTML;
