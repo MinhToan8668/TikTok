@@ -304,7 +304,10 @@ nav.stuck{border-bottom-color:var(--line);background:rgba(249,232,221,.96)}
 .rc-head b{font-family:var(--disp);font-weight:800;font-size:16px;color:var(--ink);
   letter-spacing:.06em;text-transform:uppercase}
 .rc-head span{display:block;font-size:11.5px;color:var(--quiet);margin-top:4px}
-.rc-row{display:flex;justify-content:space-between;gap:14px;font-size:13.5px;padding:7px 0}
+.rc-sec{font-family:var(--hand);font-style:italic;font-size:12.5px;color:var(--lime-deep);
+  margin:10px 0 2px;display:flex;align-items:center;gap:10px}
+.rc-sec::after{content:'';flex:1;border-top:1.5px dashed var(--line)}
+.rc-row{display:flex;justify-content:space-between;gap:14px;font-size:13px;padding:5.5px 0;line-height:1.5}
 .rc-row span{color:var(--quiet)}
 .rc-row b{color:var(--ink);font-weight:600;text-align:right}
 .rc-row.strike b{color:var(--faint);text-decoration:line-through;font-weight:400}
@@ -589,15 +592,15 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
   </div>
   <div class="letter-wrap rv">
     <div class="letter">
-      <p class="hi">Chào bạn, mình là Toàn.</p>
+      <p class="hi">Chào bạn, mình là Toàn — founder Tự Mình Xây Kênh.</p>
       <p>Mình đoán bạn đang ở một trong hai chỗ: hoặc là <strong>chưa dám đăng video nào</strong> vì ngại lên hình, hoặc là <strong>đã đăng kha khá rồi mà chẳng video nào đi đến đâu</strong>. Cả hai kiểu mình đều gặp nhiều ở hai khóa trước — và thú thật, chính mình cũng từng ở đó.</p>
       <p>Cái mình nhận ra sau thời gian đứng kênh và đứng lớp: người ta không thiếu cố gắng, người ta thiếu một cách làm <strong>kiểm chứng được</strong>. Video flop, mở phần phân tích lên là thấy lý do nằm sờ sờ ở đó — tụt người xem ở giây thứ mấy, hook giữ được bao nhiêu phần trăm. Nhưng chẳng ai chỉ cho bạn cách đọc mấy con số ấy, nên bạn cứ đoán mò, rồi đổ cho thuật toán.</p>
       <p>Lớp này mình dựng để làm đúng một việc: <strong>trong 30 ngày, biến việc làm video từ trò may rủi thành một quy trình bạn tự lặp lại được.</strong> Tối Thứ 5 hằng tuần mình dạy live — lý thuyết và định hướng riêng cho kênh của từng người. Còn các buổi tối trong tuần, tụi mình không giao bài tập rồi biến mất — mentor mở máy <strong>ngồi edit cùng bạn</strong> cho tới khi video đủ tốt để bấm đăng.</p>
       <p>Lớp cố tình giữ nhỏ. Kèm kiểu này không kèm đông được — nên nếu bạn đọc tới đây mà thấy đúng chỗ mình đang kẹt, điền form bên dưới. Chưa mất đồng nào đâu: mình sẽ gọi nói chuyện trước, hợp thì mới vào lớp.</p>
       <div class="sig">
         <div>
-          <div class="sig-name">Minh Toàn</div>
-          <div class="sig-role">viết thay cả đội sáng lập Tự Mình Xây Kênh</div>
+          <div class="sig-name">Đội ngũ Tự Mình Xây Kênh</div>
+          <div class="sig-role">#tuminhxaykenh</div>
         </div>
         <button class="btn btn-lime btn-md" data-open data-cta>Điền form giữ chỗ <span class="arw">→</span></button>
       </div>
@@ -725,18 +728,18 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
   <div class="sec-head rv">
     <span class="kicker">người sẽ ngồi cạnh bạn suốt một tháng</span>
     <h2 class="h2">Hai gương mặt đứng kênh<br>trực tiếp đứng lớp.</h2>
-    <p class="lead">Tự Mình Xây Kênh do một đội ba người sáng lập cùng vận hành. Hai TikToker bạn vẫn thấy trên kênh sẽ là mentor trực tiếp của bạn — mỗi người một vai, phía sau còn cả đội lo cho lớp chạy trơn tru.</p>
+    <p class="lead">Tự Mình Xây Kênh do một đội ba người sáng lập cùng vận hành. Hai TikToker bạn vẫn thấy trên kênh sẽ là mentor trực tiếp của bạn — cả hai cùng dạy, cùng edit kèm và hỗ trợ qua lại, nên lúc nào bạn cũng có người bên cạnh; phía sau còn cả đội lo cho lớp chạy trơn tru.</p>
   </div>
   <div class="duo">
     <div class="person rv">
       <div class="person-top">
         <div class="face">T</div>
-        <div><h3>Minh Toàn</h3><span class="person-role">phần "nghĩ" — chiến lược &amp; số liệu</span></div>
+        <div><h3>Minh Toàn</h3><span class="person-role">founder · mentor đồng hành của bạn</span></div>
       </div>
-      <p>Toàn lo phần xương sống của khóa: định vị kênh, mổ công thức viral bằng dữ liệu, và định hướng kiếm tiền. Đã đứng <b>hai khóa trước</b> với học viên đủ kiểu xuất phát điểm — từ người chưa dám đăng video nào tới người kẹt mãi ở vài trăm follow.</p>
+      <p>Toàn đứng kênh và đã đứng <b>hai khóa trước</b> với học viên đủ kiểu xuất phát điểm — từ người chưa dám đăng video nào tới người kẹt mãi ở vài trăm follow. Trong lớp, Toàn cùng bạn đi trọn quy trình: định vị kênh, mổ công thức viral bằng số liệu, và cả những buổi tối ngồi edit chung.</p>
       <div class="person-list">
-        <div>Đồng sáng lập, đứng kênh Tự Mình Xây Kênh</div>
-        <div>Dạy đọc watch time, retention, hook rate trên kênh của chính bạn</div>
+        <div>Đồng sáng lập, một trong hai gương mặt đứng kênh Tự Mình Xây Kênh</div>
+        <div>Dạy live, chấm video bằng watch time, retention, hook rate của chính bạn</div>
         <div>Trực tiếp gọi tư vấn định hướng cho từng người trước khi vào lớp</div>
       </div>
     </div>
@@ -744,12 +747,12 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
       <span class="stick">đang chờ chính chủ duyệt lời giới thiệu 😄</span>
       <div class="person-top">
         <div class="face">M</div>
-        <div><h3>Tiểu My</h3><span class="person-role">phần "làm" — quay dựng &amp; edit kèm</span></div>
+        <div><h3>Tiểu My</h3><span class="person-role">founder · mentor đồng hành của bạn</span></div>
       </div>
-      <p>Tiểu My là người sẽ ngồi cạnh bạn ở các buổi tối trong tuần — từ kịch bản, quay bằng điện thoại đến bản dựng cuối trên CapCut. Làm nội dung mỗi ngày, và hiểu rõ cảm giác ngại lên hình của người mới, <b>vì chính Tiểu My cũng từng đi qua đoạn đó</b>.</p>
+      <p>Tiểu My làm nội dung mỗi ngày trên kênh, và hiểu rõ cảm giác ngại lên hình của người mới — <b>vì chính Tiểu My cũng từng đi qua đoạn đó</b>. Trong lớp, Tiểu My cùng dạy, cùng góp ý kịch bản và ngồi edit với bạn từ cảnh quay đầu tới bản dựng cuối trên CapCut.</p>
       <div class="person-list">
-        <div>Đồng sáng lập, đứng kênh Tự Mình Xây Kênh</div>
-        <div>Phụ trách các buổi edit kèm 1:1 buổi tối</div>
+        <div>Đồng sáng lập, một trong hai gương mặt đứng kênh Tự Mình Xây Kênh</div>
+        <div>Dạy live, góp ý kịch bản và edit kèm các buổi tối trong tuần</div>
         <div>Đồng hành tới khi bạn tự tin bấm nút đăng</div>
       </div>
     </div>
@@ -760,23 +763,28 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 <section class="sec" id="hocphi" style="padding-top:0"><div class="shell">
   <div class="fee">
     <div class="fee-side rv">
-      <span class="kicker">nói chuyện tiền nong cho rõ ràng</span>
-      <h2 class="h2">Trả một lần,<br>giữ được cái nghề.</h2>
-      <p>Lớp giữ sĩ số nhỏ — <strong data-tpl="tối đa {{slots.max}} người"></strong> — vì kèm edit 1:1 không kèm đông được. Đăng ký sớm trước khi lớp đủ người thì giữ được mức phí ưu đãi.</p>
-      <p>Và trình tự là: <strong>điền form → tụi mình gọi tư vấn định hướng miễn phí → hợp thì mới đóng phí.</strong> Nếu nghe xong bạn thấy chưa hợp, coi như được một buổi tư vấn không mất gì — tụi mình cũng đỡ nhận nhầm người chưa sẵn sàng.</p>
-      <span class="hand">↳ điền form chưa phải trả đồng nào đâu, yên tâm</span>
+      <span class="kicker">một khoản đầu tư cho chính bạn</span>
+      <h2 class="h2">Đóng một lần,<br>bạn có tất cả.</h2>
+      <p>Mỗi lớp tụi mình chỉ nhận <strong data-tpl="tối đa {{slots.max}} bạn"></strong> — đủ ít để mentor nhớ tên từng người, thuộc từng kênh, và không ai bị bỏ lại phía sau. Giữ chỗ sớm trước khi lớp đủ người, bạn còn được mức học phí ưu đãi.</p>
+      <p>Và bạn không cần quyết ngay hôm nay đâu. Cứ <strong>để lại thông tin trước</strong> — tụi mình sẽ gọi trò chuyện, nghe bạn kể về kênh bạn muốn xây và tư vấn định hướng miễn phí. Khi cả hai bên đều thấy hợp, mình mới nói tiếp chuyện học phí.</p>
+      <span class="hand">↳ để lại thông tin hoàn toàn miễn phí, không ràng buộc gì nha</span>
     </div>
     <div class="receipt rv">
       <div class="rc-head">
         <b>Tự Mình Xây Kênh</b>
         <span data-tpl="{{computed.cohortLabel}} · khai giảng {{cohort.startDate}}"></span>
       </div>
-      <div class="rc-row"><span data-tpl="{{schedule.sessions}} buổi live ({{computed.scheduleShort}})"></span><b>✓</b></div>
-      <div class="rc-row"><span>Edit kèm 1:1 các buổi tối trong tuần</span><b>✓</b></div>
-      <div class="rc-row"><span>Khung kịch bản + checklist quay dựng</span><b>✓</b></div>
-      <div class="rc-row"><span>Chấm video bằng số liệu thật của bạn</span><b>✓</b></div>
-      <div class="rc-row"><span>Group Zalo lớp, còn dùng sau khóa</span><b>✓</b></div>
-      <div class="rc-row"><span>Buổi 1:1 định hướng cuối khóa</span><b>✓</b></div>
+      <div class="rc-sec">trong 30 ngày</div>
+      <div class="rc-row"><span data-tpl="{{schedule.sessions}} buổi live cùng founder ({{computed.scheduleShort}})"></span><b>✓</b></div>
+      <div class="rc-row"><span>Edit kèm 1:1 buổi tối — không giới hạn số buổi</span><b>✓</b></div>
+      <div class="rc-row"><span>Bộ khung kịch bản + checklist quay bằng điện thoại</span><b>✓</b></div>
+      <div class="rc-row"><span>Video được chấm bằng số liệu thật hằng tuần</span><b>✓</b></div>
+      <div class="rc-row"><span>Recording + tài liệu từng buổi, xem lại mãi</span><b>✓</b></div>
+      <div class="rc-sec">mang về sau khóa</div>
+      <div class="rc-row"><span>Kênh TikTok của bạn — đã chạy, đã có video</span><b>✓</b></div>
+      <div class="rc-row"><span>Lộ trình nội dung 90 ngày viết riêng cho kênh bạn</span><b>✓</b></div>
+      <div class="rc-row"><span>Group Zalo học viên — sau khóa vẫn hỏi đáp thoải mái</span><b>✓</b></div>
+      <div class="rc-row"><span>Buổi 1:1 tổng kết &amp; định hướng kiếm tiền</span><b>✓</b></div>
       <div class="rc-row strike" style="margin-top:8px"><span>Học phí gốc</span><b data-bind="computed.price.regular">—</b></div>
       <div class="rc-total"><span>Đăng ký sớm</span><b data-bind="computed.price.earlyBird">—</b></div>
       <div class="rc-save" data-tpl="đỡ được {{computed.price.saveAmount}} nếu giữ chỗ trước khi lớp đủ người"></div>
