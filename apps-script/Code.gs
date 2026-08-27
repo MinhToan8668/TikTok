@@ -32,7 +32,9 @@ var SETUP = {
   BOT_TOKEN:      '',   // token bot Telegram từ @BotFather
   ADMIN_CHAT_IDS: '',   // chat id điều khiển bot, cách nhau dấu phẩy
   ADMIN_KEY:      '',   // mật khẩu xem trang admin (?admin=...)
-  EXEC_URL:       ''    // URL /exec của bản deploy hiện tại
+  EXEC_URL:       '',   // URL /exec của bản deploy hiện tại
+  SHEET_ID:       ''    // ID Google Sheet lưu đăng ký — để trống thì
+                        // setup tự tạo Sheet mới và tự nhớ ID
 };
 function cfgProp(name){
   return PropertiesService.getScriptProperties().getProperty(name) || SETUP[name] || '';
@@ -86,8 +88,28 @@ function money(n){
 }
 function nowVN(){ return Utilities.formatDate(new Date(),'GMT+7','dd/MM/yyyy HH:mm'); }
 
-/* ═══════════════ SHEET ═══════════════ */
-function ss(){ return SpreadsheetApp.getActiveSpreadsheet(); }
+/* ═══════════════ SHEET ═══════════════
+   Chạy được cả khi project KHÔNG gắn với Sheet nào (tạo rời từ
+   script.google.com): mở theo SHEET_ID, chưa có thì tự tạo Sheet
+   mới rồi nhớ ID trong Script Properties.                        */
+var _ss = null;
+function ss(){
+  if (_ss) return _ss;
+
+  var bound = SpreadsheetApp.getActiveSpreadsheet();   // project gắn Sheet
+  if (bound){ _ss = bound; return _ss; }
+
+  var id = cfgProp('SHEET_ID');
+  if (id){
+    _ss = SpreadsheetApp.openById(id);
+    return _ss;
+  }
+
+  // Lần đầu: tự tạo Sheet mới và lưu ID lại để các lần sau dùng đúng file
+  _ss = SpreadsheetApp.create('TMXK - Đăng ký');
+  props().setProperty('SHEET_ID', _ss.getId());
+  return _ss;
+}
 
 function sheet(){
   var sh = ss().getSheetByName(SHEET_NAME);
@@ -543,7 +565,7 @@ function setup(){
     throw new Error('Chưa điền BOT_TOKEN / ADMIN_CHAT_IDS trong SETUP ở đầu file.');
 
   sheet();
-  out.push('✔ Sheet "'+SHEET_NAME+'" sẵn sàng');
+  out.push('✔ Sheet "'+SHEET_NAME+'" sẵn sàng: '+ss().getUrl());
 
   var me = tgApi('getMe', {});
   if (!me || !me.ok){
