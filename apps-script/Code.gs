@@ -21,6 +21,21 @@
  * ═══════════════════════════════════════════════════════════════
  */
 
+/* ─────────────────────────────────────────────────────────────
+   SETUP NHANH — điền 4 giá trị này rồi dán cả file vào Apps Script.
+   (Hoặc để trống và đặt trong Script Properties — an toàn hơn nếu
+   file này có nguy cơ bị chia sẻ. KHÔNG commit token lên GitHub.)
+   ───────────────────────────────────────────────────────────── */
+var SETUP = {
+  BOT_TOKEN:      '',   // token bot Telegram từ @BotFather
+  ADMIN_CHAT_IDS: '',   // chat id được điều khiển bot, cách nhau dấu phẩy
+  ADMIN_KEY:      '',   // mật khẩu xem trang admin (?admin=...)
+  EXEC_URL:       ''    // URL /exec của web app (dùng cho setWebhook)
+};
+function cfgProp(name){
+  return PropertiesService.getScriptProperties().getProperty(name) || SETUP[name] || '';
+}
+
 var SHEET_NAME = 'DangKy';
 var HEADERS = ['id','time','cohort','name','phone','year','job',
                'channel','stage','time_week','topic','target','goal',
@@ -111,7 +126,7 @@ function jsonOut(obj){
 
 /* ═══════════════ TELEGRAM ═══════════════ */
 function tgSend(chatId, text){
-  var token = props().getProperty('BOT_TOKEN');
+  var token = cfgProp('BOT_TOKEN');
   if (!token || !chatId) return;
   try{
     UrlFetchApp.fetch('https://api.telegram.org/bot'+token+'/sendMessage',{
@@ -122,11 +137,11 @@ function tgSend(chatId, text){
   }catch(e){}
 }
 function tgBroadcast(text){
-  var ids = (props().getProperty('ADMIN_CHAT_IDS')||'').split(',');
+  var ids = cfgProp('ADMIN_CHAT_IDS').split(',');
   ids.forEach(function(id){ id=id.trim(); if(id) tgSend(id,text); });
 }
 function isAdmin(chatId){
-  var ids = (props().getProperty('ADMIN_CHAT_IDS')||'').split(',').map(function(s){return s.trim()});
+  var ids = cfgProp('ADMIN_CHAT_IDS').split(',').map(function(s){return s.trim()});
   return ids.indexOf(String(chatId)) > -1;
 }
 
@@ -140,7 +155,7 @@ function doGet(e){
 
   if (action === 'regs'){
     var key = e.parameter.key || '';
-    if (!key || key !== props().getProperty('ADMIN_KEY'))
+    if (!key || key !== cfgProp('ADMIN_KEY'))
       return jsonOut({ok:false, error:'unauthorized'});
     var cfg = publicConfig();
     var max = Math.max(1, Number(cfg.slots.max)||1);
@@ -405,14 +420,13 @@ function setStatus(chatId,id,status,prefix){
 }
 
 /**
- * Chạy MỘT LẦN sau khi dán BOT_TOKEN vào Script Properties và deploy:
- * chọn hàm setWebhook trong editor rồi bấm Run — bot sẽ trỏ về web app này.
- * Dán URL /exec của bản deploy hiện tại vào biến EXEC_URL bên dưới trước khi chạy.
+ * Chạy MỘT LẦN sau khi điền SETUP (hoặc Script Properties) và deploy:
+ * chọn hàm setWebhook trên thanh công cụ rồi bấm Run — Telegram sẽ trỏ
+ * bot về web app này. Log hiện "ok":true là thành công.
  */
 function setWebhook(){
-  var EXEC_URL = 'PASTE_APPS_SCRIPT_URL_HERE'; // URL kết thúc bằng /exec
-  var token = props().getProperty('BOT_TOKEN');
+  var token = cfgProp('BOT_TOKEN');
   var res = UrlFetchApp.fetch('https://api.telegram.org/bot'+token+
-    '/setWebhook?url='+encodeURIComponent(EXEC_URL),{muteHttpExceptions:true});
+    '/setWebhook?url='+encodeURIComponent(cfgProp('EXEC_URL')),{muteHttpExceptions:true});
   Logger.log(res.getContentText());
 }
