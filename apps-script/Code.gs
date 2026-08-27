@@ -549,14 +549,24 @@ function setStatus(chatId,id,status,prefix){
   sheet().getRange(hit.row, HEADERS.indexOf('status')+1).setValue(status);
   tgSend(chatId,prefix+' *'+hit.name+'* ('+hit.phone+').');
 }
+/* ═══════════════ CÀI ĐẶT — chạy tay trong editor ═══════════════
+   Bot chạy bằng CHẾ ĐỘ HỎI ĐỊNH KỲ (polling): script tự hỏi Telegram
+   mỗi phút thay vì để Telegram gọi ngược vào /exec. Lý do: Apps Script
+   LUÔN trả 302 cho POST, Telegram đòi 200 thẳng → webhook báo
+   "Wrong response from the webhook: 302 Found" rồi bot chết câm.
+   Polling đi chiều ngược lại nên không có URL nào để hỏng.
+   Đổi lại: tin đầu tiên chờ tối đa ~1 phút, các tin sau gần như tức thì
+   (khi có lệnh, script bám lại long-poll thêm một lúc).                */
 
-/* ═══════════════ CÀI ĐẶT — chạy tay trong editor ═══════════════ */
+var HOI_TRAN_GIAY = 30;   // trần thời gian một lượt chạy được phép bám
+var HOI_CHO_GIAY  = 10;   // mỗi lần hỏi nằm chờ bao lâu khi đang có việc
+var HOI_RONG_TOI  = 2;    // im lặng mấy lượt liền thì nhường lượt sau
 
 /**
- * setup — CHẠY MỘT LẦN sau khi điền SETUP và deploy.
- * Tự làm hết: tạo sheet, kiểm tra token, nạp menu lệnh, tự thử /exec
- * rồi mới nối webhook (kèm drop_pending_updates để xả sạch hàng chờ cũ
- * — chính hàng chờ này gây spam liên tục). Chạy lại nhiều lần vẫn an toàn.
+ * setup — CHẠY MỘT LẦN sau khi dán code.
+ * Tự làm hết: tạo/mở sheet, kiểm tra token, nạp menu lệnh, NGẮT webhook
+ * (kèm xả hàng chờ — nguồn spam), bỏ qua tin tồn cũ, rồi đặt lịch hỏi
+ * Telegram mỗi phút. Chạy lại nhiều lần vẫn an toàn.
  */
 function setup(){
   var out = [];
@@ -600,29 +610,24 @@ function setup(){
     ? '✔ Đã nạp menu lệnh — nút Menu xanh hiện cạnh ô chat'
     : '• Không nạp được menu lệnh (gõ tay vẫn chạy bình thường)');
 
-  // Chỉ nối webhook khi tự thử thấy /exec dùng được — nối bừa thì Telegram
-  // nhận 302 rồi gửi lại update mãi (chính là vụ spam không ngừng).
-  if (webhookDungDuoc()){
-    var hook = tgApi('setWebhook',{
-      url: String(cfgProp('EXEC_URL')).trim(),
-      allowed_updates: ['message'],
-      drop_pending_updates: true        // xả sạch hàng chờ cũ — hết spam ngay
-    });
-    if (hook && hook.ok){
-      out.push('✔ Đã nối webhook (đã xả hàng chờ cũ) — bot trả lời tức thì');
-      out.push('  Bot có nhắn điên loạn lần nữa → chạy hàm  dungBot');
-    } else {
-      out.push('✘ Không nối được webhook: '+JSON.stringify(hook));
-    }
-  } else {
-    out.push('✘ /exec chưa trả về nội dung hợp lệ → KHÔNG nối webhook.');
-    out.push('  Thường do: (1) chưa deploy New version sau khi dán code,');
-    out.push('  (2) Who has access chưa để "Anyone".');
-    out.push('  Sửa xong deploy lại rồi chạy setup lần nữa.');
+  try{
+    datLichHoi();
+    out.push('✔ Đã ngắt webhook + đặt lịch hỏi Telegram mỗi phút');
+    out.push('  Tin đầu chờ tối đa 1 phút, các tin sau gần như tức thì.');
+    out.push('  Bot có nhắn điên loạn → chạy hàm  dungBot');
+  }catch(err){
+    out.push('✘ Không tự đặt được lịch chạy: '+err);
+    out.push('');
+    out.push('ĐẶT TAY (1 phút là xong):');
+    out.push('  1. Cột trái Apps Script → biểu tượng đồng hồ (Triggers)');
+    out.push('  2. Add Trigger (góc dưới phải)');
+    out.push('  3. Chọn hàm: hoiTelegram · Event source: Time-driven');
+    out.push('     · Type: Minutes timer · Interval: Every minute');
+    out.push('  4. Save, cấp quyền khi Google hỏi');
   }
 
   out.push('');
-  out.push('Xong. Vào Telegram nhắn /menu cho bot để kiểm tra.');
+  out.push('Xong. Vào Telegram nhắn /menu cho bot (tin đầu chờ tối đa 1 phút).');
   Logger.log(out.join('\n'));
   tgSend(cfgProp('ADMIN_CHAT_IDS').split(',')[0].trim(),
     '✅ *Backend Tự Mình Xây Kênh đã sẵn sàng*\n\nBot: @'+me.result.username+
@@ -631,36 +636,89 @@ function setup(){
 
 /**
  * DỪNG KHẨN CẤP — bot đang nhắn liên tục thì chọn hàm này bấm Run.
- * Ngắt webhook + xóa sạch hàng chờ, bot im ngay lập tức.
- * Sửa xong chạy lại  setup  để nối lại.
+ * Ngắt webhook, xóa hàng chờ, gỡ lịch hỏi. Bot im ngay lập tức.
+ * Muốn bật lại: chạy  setup.
  */
 function dungBot(){
+  var out = [];
   var r = tgApi('deleteWebhook',{drop_pending_updates:true});
-  Logger.log(r && r.ok
-    ? '✔ Đã ngắt webhook và xóa hàng chờ. Bot im ngay lập tức.\n  Chạy lại setup khi muốn bật lại.'
-    : '✘ Lỗi: '+JSON.stringify(r));
+  out.push('✔ Đã ngắt webhook + xóa hàng chờ ('+(r && r.ok ? 'ok' : JSON.stringify(r))+')');
+  try{ out.push('✔ Đã gỡ '+goLichHoi()+' lịch chạy. Bot im ngay lập tức.'); }
+  catch(err){
+    out.push('✘ Không gỡ được lịch bằng code — gỡ tay: cột trái → đồng hồ →');
+    out.push('  ba chấm ở dòng hoiTelegram → Delete trigger.');
+  }
+  out.push('  Chạy lại  setup  khi muốn bật bot.');
+  Logger.log(out.join('\n'));
+}
+
+/* Ngắt webhook, bỏ qua tin tồn cũ, dựng lại lịch hỏi mỗi phút */
+function datLichHoi(){
+  tgApi('deleteWebhook',{drop_pending_updates:true});
+  datMocMoiNhat();
+  goLichHoi();
+  ScriptApp.newTrigger('hoiTelegram').timeBased().everyMinutes(1).create();
+}
+
+function goLichHoi(){
+  var n = 0;
+  ScriptApp.getProjectTriggers().forEach(function(t){
+    if (t.getHandlerFunction()==='hoiTelegram'){ ScriptApp.deleteTrigger(t); n++; }
+  });
+  return n;
 }
 
 /**
- * Tự gọi /exec đúng kiểu Telegram gọi để xem webhook có dùng được không.
- * Apps Script LUÔN trả 302 sang script.googleusercontent.com — đó là đường
- * phục vụ nội dung bình thường, Telegram đi theo được. Hỏng thật là khi
- * chuyển hướng dẫn về trang đăng nhập Google (quyền truy cập đặt sai).
+ * Dời mốc đọc qua hết các tin đang tồn mà không xử lý chúng.
+ * Không có bước này, bật bot lên là nó trả lời dồn cả loạt lệnh cũ.
  */
-function webhookDungDuoc(){
-  var url = String(cfgProp('EXEC_URL')).trim();
-  if (url.slice(-5) !== '/exec') return false;
+function datMocMoiNhat(){
+  var r = tgApi('getUpdates',{offset:-1, timeout:0, limit:1});
+  if (r && r.ok && r.result && r.result.length){
+    props().setProperty('TG_OFFSET', String(r.result[0].update_id + 1));
+  }
+}
+
+/**
+ * Lịch chạy gọi hàm này mỗi phút. Lúc rảnh chỉ tốn ~1 giây; hễ có lệnh
+ * thật thì bám lại long-poll thêm một lúc để các lệnh tiếp theo trong
+ * cùng phiên được trả lời gần như tức thì.
+ */
+function hoiTelegram(){
+  var lock = LockService.getScriptLock();
+  if (!lock.tryLock(1000)) return;          // lượt trước còn đang bám
   try{
-    var res = UrlFetchApp.fetch(url,{
-      method:'post', contentType:'application/json',
-      payload: JSON.stringify({ping:true}),
-      followRedirects:false, muteHttpExceptions:true
-    });
-    if (res.getResponseCode() === 200) return true;
-    var h = res.getAllHeaders();
-    var loc = String(h.Location || h.location || '');
-    return loc.indexOf('script.googleusercontent.com/macros/echo') > -1;
-  }catch(err){ return false; }
+    if (motLuotHoi(0) <= 0) return;         // rảnh hoặc lỗi mạng — thoát ngay
+    var het = Date.now() + HOI_TRAN_GIAY*1000;
+    var rong = 0;
+    while (Date.now() < het && rong < HOI_RONG_TOI){
+      var n = motLuotHoi(HOI_CHO_GIAY);
+      if (n < 0) break;
+      rong = (n===0) ? rong+1 : 0;
+    }
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/** Trả về số update đã xử lý, 0 nếu không có, -1 nếu gọi Telegram lỗi. */
+function motLuotHoi(choGiay){
+  var off = Number(props().getProperty('TG_OFFSET') || 0);
+  var r = tgApi('getUpdates',{
+    offset:off, timeout:choGiay, limit:20, allowed_updates:['message']
+  });
+  if (!r || !r.ok || !r.result) return -1;
+  if (!r.result.length) return 0;
+
+  // Dời mốc TRƯỚC khi xử lý: một tin gây lỗi cũng không làm kẹt hàng chờ mãi
+  var maxId = off;
+  r.result.forEach(function(u){ if(u.update_id >= maxId) maxId = u.update_id+1; });
+  props().setProperty('TG_OFFSET', String(maxId));
+
+  r.result.forEach(function(u){
+    try{ handleTelegram(u); }catch(err){ ghiLoi('hoiTelegram', err); }
+  });
+  return r.result.length;
 }
 
 /** Chẩn đoán khi bot im hoặc lỗi — chạy rồi đọc Execution log. */
@@ -668,15 +726,25 @@ function kiemTra(){
   var out = [];
   var me = tgApi('getMe',{});
   out.push('Bot: '+(me && me.ok ? '@'+me.result.username : '✘ token sai hoặc mạng lỗi'));
+
+  var soLich = -1;
+  try{
+    soLich = ScriptApp.getProjectTriggers().filter(function(t){
+      return t.getHandlerFunction()==='hoiTelegram';
+    }).length;
+  }catch(err){}
+  out.push('Lịch hỏi mỗi phút: '+(
+    soLich>0 ? '✔ đang chạy ('+soLich+' lịch)' :
+    soLich===0 ? '✘ CHƯA CÓ — bot sẽ không nhận lệnh. Chạy setup hoặc đặt tay.' :
+    '? không đọc được (thiếu quyền)'));
+  out.push('Đã đọc tới update: '+(props().getProperty('TG_OFFSET')||'chưa có'));
+
   var wh = tgApi('getWebhookInfo',{});
   if (wh && wh.ok){
     var w = wh.result;
-    out.push('Webhook: '+(w.url||'(chưa nối)'));
-    if (w.pending_update_count) out.push('Tin đang chờ: '+w.pending_update_count);
-    if (w.last_error_message)
-      out.push('Lỗi gần nhất: '+w.last_error_message+' lúc '+new Date(w.last_error_date*1000));
+    out.push('Webhook: '+(w.url||'(không nối — đúng, chế độ hỏi không cần webhook)'));
+    if (w.url) out.push('  ⚠ Webhook đang nối sẽ tranh tin với chế độ hỏi — chạy setup để gỡ.');
   }
-  out.push('/exec tự thử: '+(webhookDungDuoc() ? '✔ dùng được' : '✘ chưa dùng được'));
   out.push('Đăng ký trong sheet: '+allRegs().length+' dòng');
   out.push('ADMIN_KEY: '+cfgProp('ADMIN_KEY'));
   Logger.log(out.join('\n'));
