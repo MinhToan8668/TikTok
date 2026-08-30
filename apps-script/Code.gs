@@ -42,9 +42,10 @@ function cfgProp(name){
 
 var SHEET_NAME = 'DangKy';
 var LOG_SHEET  = 'Log';
-var HEADERS = ['id','time','cohort','name','phone','year','job',
-               'channel','stage','time_week','topic','target','goal',
-               'source','status'];
+var HEADERS = ['id','time','cohort','name','phone','age','gender','job','strength',
+               'goals','timeline','audience','aud_age','aud_gender','pain',
+               'niche','tone','format','refs','time_week','camera','gear','fear',
+               'tried','unique','expect','channel','source','status'];
 
 /* ─────────────── CONFIG mặc định (bot ghi đè dần) ─────────────── */
 var DEFAULT_CONFIG = {
@@ -112,9 +113,15 @@ function ss(){
 }
 
 function sheet(){
-  var sh = ss().getSheetByName(SHEET_NAME);
+  var wb = ss();
+  var sh = wb.getSheetByName(SHEET_NAME);
+  // form đổi cấu trúc → tab cũ sai số cột thì đổi tên giữ lại, tạo tab mới đúng cột
+  if (sh && sh.getLastRow() >= 1 && sh.getLastColumn() !== HEADERS.length){
+    sh.setName(SHEET_NAME + '_cu_' + Utilities.formatDate(new Date(),'GMT+7','ddMMyy_HHmm'));
+    sh = null;
+  }
   if (!sh){
-    sh = ss().insertSheet(SHEET_NAME);
+    sh = wb.insertSheet(SHEET_NAME);
     sh.appendRow(HEADERS);
     sh.setFrozenRows(1);
   }
@@ -309,30 +316,54 @@ function handleRegister(d){
     var id = 'TMXK'+ new Date().getTime().toString(36).toUpperCase();
     var time = nowVN();
 
+    var f = function(k){ return String(d[k]||'') };
     sheet().appendRow([id, time, label, name, "'"+phone,
-      String(d.year||''), String(d.job||''), String(d.channel||''),
-      String(d.stage||''), String(d.time||''), String(d.topic||''),
-      String(d.target||''), String(d.goal||''), String(d.source||'web'), 'pending']);
+      f('age'), f('gender'), f('job'), f('strength'),
+      f('goals'), f('timeline'), f('audience'), f('aud_age'), f('aud_gender'), f('pain'),
+      f('niche'), f('tone'), f('format'), f('refs'), f('time'), f('camera'), f('gear'), f('fear'),
+      f('tried'), f('unique'), f('expect'), f('channel'), f('source')||'web', 'pending']);
 
     var cfg2 = publicConfig();
     var total = (Number(cfg2.slots.base)||0) + (Number(cfg2.slots.registered)||0);
     var remaining = Math.max(0,(Number(cfg2.slots.max)||0)-total);
 
+    var dong = function(icon, nhan, k){
+      var v = String(d[k]||'').trim();
+      return v ? icon+' '+nhan+': '+v : '';
+    };
     tgBroadcast([
       '🌱 *Đăng ký mới — Tự Mình Xây Kênh*','',
       '👤 *'+name+'*  ·  `'+id+'`',
       '📱 `'+phone+'`',
-      '🎂 '+(d.year||'—')+'   💼 '+(d.job||'—'),
-      d.channel ? '🎵 Kênh: '+d.channel : '🎵 Chưa có kênh',
-      '📊 '+(d.stage||'—'),
-      '⏰ '+(d.time||'—'),
-      '🏷 Ngách: '+(d.topic||'—'),
-      '🎯 '+(d.target||'—'),
-      '💭 _"'+(d.goal||'')+'"_','',
+      [d.age?'🎂 '+d.age+' tuổi':'', d.gender||''].filter(String).join('  ·  '),
+      dong('💼','Nghề','job'),
+      dong('💪','Thế mạnh','strength'),'',
+      '*🎯 Mục tiêu & động lực*',
+      dong('🏁','Xây kênh để','goals'),
+      dong('⏳','Muốn đạt trong','timeline'),'',
+      '*👥 Khán giả nhắm tới*',
+      dong('🗣','Nói với','audience'),
+      [String(d.aud_age||''), String(d.aud_gender||'')].filter(String).join(' · '),
+      dong('🩹','Nỗi đau khán giả','pain'),'',
+      '*🎬 Nội dung & phong cách*',
+      dong('🏷','Ngách','niche'),
+      dong('🎙','Tone','tone'),
+      dong('📐','Định dạng','format'),
+      dong('⭐','Kênh tham khảo','refs'),'',
+      '*🔋 Năng lực & nguồn lực*',
+      dong('⏰','Thời gian/tuần','time'),
+      dong('🎥','Tự tin camera','camera'),
+      dong('🧰','Thiết bị','gear'),
+      dong('😰','Lo ngại','fear'),'',
+      '*🤝 Kỳ vọng & cam kết*',
+      dong('📊','Từng thử TikTok','tried'),
+      dong('🎵','Kênh hiện có','channel'),
+      dong('✨','Điểm khác biệt','unique'),
+      d.expect ? '💭 Muốn được định hướng nhất:\n_"'+d.expect+'"_' : '','',
       '🕐 '+time+' · '+label,
       '📈 Tổng: '+total+'/'+cfg2.slots.max+' — còn '+remaining+' suất','',
       'Duyệt: `/duyet '+id+'`  ·  Từ chối: `/tuchoi '+id+'`'
-    ].join('\n'));
+    ].filter(function(x){return x!==''}).join('\n'));
 
     // đủ chỗ → tự chuyển trạng thái và báo admin
     if (remaining<=0 && cfg.cohort.status==='open'){
@@ -503,7 +534,7 @@ function handleTelegram(update){
       regs2.forEach(function(r,i){
         var st={pending:'⏳',approved:'✅',rejected:'❌'}[r.status]||'·';
         lines.push((i+1)+'. '+st+' *'+r.name+'* — `'+r.phone+'`\n    `'+r.id+'` · '+
-                   (r.stage||'')+(r.topic?' · '+r.topic:''));
+                   (r.tried||'')+(r.niche?' · '+r.niche:''));
       });
       return tgSend(chatId,lines.join('\n'));
     }
