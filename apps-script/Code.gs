@@ -787,6 +787,8 @@ function setup(){
     {command:'dong',       description:'🔴 Đóng đăng ký'},
     {command:'duyet',      description:'✅ Duyệt — /duyet AB12'},
     {command:'tuchoi',     description:'❌ Từ chối — /tuchoi AB12'},
+    {command:'nen',        description:'🖼 Vẽ nền Teams — /nen Minh Toàn'},
+    {command:'huy',        description:'👌 Hủy câu hỏi đang chờ'},
     {command:'sheet',      description:'📄 Link Google Sheet'},
     {command:'menu',       description:'⚙️ Danh sách đầy đủ lệnh'}
   ]});
