@@ -75,22 +75,22 @@ function ve(){
   var dot  = toiMode ? '#1b220d' : '#26210f';
 
   cx.fillStyle=bg; cx.fillRect(0,0,1920,1080);
-  veMark(88,74,1.55,brick,LIME,dot);
+  veMark(84,76,2.05,brick,LIME,dot);
 
   cx.fillStyle=chu; cx.textBaseline='alphabetic';
-  cx.font='800 58px "Bricolage Grotesque",sans-serif';
-  cx.fillText('Tự Mình Xây Kênh',250,152);
+  cx.font='800 78px "Bricolage Grotesque",sans-serif';
+  cx.fillText('Tự Mình Xây Kênh',300,184);
 
-  cx.font='800 72px "Bricolage Grotesque",sans-serif';
-  var w=cx.measureText(ten).width, x=1824-w;
-  cx.fillText(ten,x,140);
-  cx.fillStyle=LIME; ro(x,166,w,9,4.5);       // gạch chân lime dưới tên
+  cx.font='800 100px "Bricolage Grotesque",sans-serif';
+  var w=cx.measureText(ten).width, x=1832-w;
+  cx.fillText(ten,x,168);
+  cx.fillStyle=LIME; ro(x,200,w,12,6);        // gạch chân lime dưới tên
   ro(0,1058,1920,22,0);                       // vạch lime đáy khung
 }
 
 function veKhiSanFont(){
-  var f1=document.fonts.load('800 72px "Bricolage Grotesque"');
-  var f2=document.fonts.load('800 58px "Bricolage Grotesque"');
+  var f1=document.fonts.load('800 100px "Bricolage Grotesque"');
+  var f2=document.fonts.load('800 78px "Bricolage Grotesque"');
   Promise.all([f1,f2]).then(ve).catch(ve);
 }
 
