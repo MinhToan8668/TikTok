@@ -496,6 +496,8 @@ function handleTelegram(update){
         '*✅ Duyệt học viên*',
         '✅ /duyet `AB12` — duyệt (hoặc bấm nút trên tin báo)',
         '❌ /tuchoi `AB12` — từ chối','',
+        '*🖼 Đồ họa*',
+        '🖼 /nen `Minh Toàn` — bot vẽ nền gọi Teams rồi gửi file (thêm `| toi` cho nền tối)','',
         '*⚙️ Khác*',
         '🏫 /sokhoa `2` — số khóa đã dạy',
         '🎓 /hocvien `30+` — số học viên hiển thị'
@@ -654,6 +656,25 @@ function handleTelegram(update){
     case 'duyet':  return setStatus(chatId,arg,'approved','✅ Đã duyệt');
     case 'tuchoi': return setStatus(chatId,arg,'rejected','❌ Đã từ chối');
 
+    case 'nen': case 'background': {
+      if(!arg){ datCho(chatId,'nen');
+        return tgSend(chatId,'🖼 Nhắn tên giảng viên vào tin tiếp theo.\n'+
+          'VD:  `Minh Toàn`  (nền sáng)   ·   `Minh Toàn | toi`  (nền tối)\n/huy để thôi.'); }
+      var phanNen = arg.split('|');
+      var tenGV = phanNen[0].trim();
+      var nenToi = /t[oố]i|dark/i.test(phanNen[1]||'');
+      if(!tenGV) return tgSend(chatId,'Thiếu tên. VD: `/nen Minh Toàn`');
+      tgSend(chatId,'⏳ Đang vẽ nền cho *'+tenGV+'*'+(nenToi?' — nền tối':' — nền sáng')+'… (~15 giây)');
+      try{
+        var anh = veNenTeams(tenGV, nenToi);
+        tgSendFile(chatId, anh, 'Nền Teams — '+tenGV+(nenToi?' (tối)':' (sáng)'));
+      }catch(err){
+        ghiLoi('veNenTeams', err);
+        tgSend(chatId,'✘ Không vẽ được nền: '+err+'\n(Lần đầu dùng /nen phải chạy lại hàm setup trong Apps Script để cấp thêm quyền Slides.)');
+      }
+      return;
+    }
+
     case 'sheet': return tgSend(chatId,'📄 '+ss().getUrl());
     case 'id':    return tgSend(chatId,'Chat ID: `'+chatId+'`');
 
@@ -732,6 +753,93 @@ function setStatus(chatId,id,status,prefix){
   sheet().getRange(hit.row, HEADERS.indexOf('status')+1).setValue(status);
   tgSend(chatId,prefix+' *'+hit.name+'* ('+hit.phone+').');
 }
+/* ═══════════════ VẼ NỀN TEAMS ═══════════════
+   Apps Script không có canvas → dựng layout bằng Google Slides
+   (hình chữ nhật bo góc làm gạch, text box làm chữ) rồi xuất
+   thumbnail PNG của slide, gửi qua Telegram, xong xóa file nháp.  */
+function veNenTeams(ten, toi){
+  var LIME='#99df00';
+  var bg    = toi ? '#1b220d' : '#f9e8dd';
+  var chu   = toi ? '#f7f2e9' : '#26210f';
+  var gach  = toi ? '#f4efe6' : '#26210f';
+  var dotPl = toi ? '#1b220d' : '#26210f';
+
+  var pres = SlidesApp.create('TMXK nen tam - xoa duoc');
+  var slide = pres.getSlides()[0];
+  slide.getPageElements().forEach(function(el){ el.remove(); });
+
+  var W = pres.getPageWidth(), H = pres.getPageHeight();
+  var k = W/1920;                       // đổi tọa độ px 1920 → pt của slide
+  var RR = SlidesApp.ShapeType.ROUND_RECTANGLE;
+
+  function o(shape, mau){               // tô đặc, bỏ viền
+    shape.getFill().setSolidFill(mau);
+    shape.getBorder().setTransparent();
+    return shape;
+  }
+  // nền
+  o(slide.insertShape(SlidesApp.ShapeType.RECTANGLE, 0,0,W,H), bg);
+
+  // chồng gạch (hệ gốc 64x45, đặt tại (84,76) px, phóng 2.05)
+  var S=2.05, mx=84, my=76;
+  function vg(x,y,w,h,mau,xoay){
+    var sh = o(slide.insertShape(RR, (mx+x*S)*k, (my+y*S)*k, w*S*k, h*S*k), mau);
+    if (xoay) sh.setRotation(xoay);
+    return sh;
+  }
+  var limeBrick = vg(19,11,26,12, LIME, -9);
+  vg(19,28,26,12, gach); vg(4,44,26,12, gach); vg(34,44,26,12, gach);
+  // nút play trên viên lime
+  var tri = o(slide.insertShape(SlidesApp.ShapeType.TRIANGLE,
+    limeBrick.getLeft()+limeBrick.getWidth()*0.36,
+    limeBrick.getTop()+limeBrick.getHeight()*0.22,
+    limeBrick.getWidth()*0.30, limeBrick.getHeight()*0.56), dotPl);
+  tri.setRotation(81);                  // mũi quay sang phải, nghiêng theo viên gạch
+
+  function chuBox(txt, xPx, yPx, wPx, sizePx, canPhai){
+    var tb = slide.insertTextBox(txt, xPx*k, yPx*k, wPx*k, sizePx*1.5*k);
+    var t = tb.getText();
+    t.getTextStyle().setFontFamily('Bricolage Grotesque').setBold(true)
+      .setFontSize(Math.round(sizePx*k*0.99)).setForegroundColor(chu);
+    t.getParagraphs()[0].getRange().getParagraphStyle().setParagraphAlignment(
+      canPhai ? SlidesApp.ParagraphAlignment.END : SlidesApp.ParagraphAlignment.START);
+    return tb;
+  }
+  chuBox('Tự Mình Xây Kênh', 292, 86, 900, 78, false);
+  chuBox(ten, 632, 66, 1200, 100, true);
+  // gạch chân lime dưới tên (bề rộng cố định, canh phải) + vạch đáy
+  o(slide.insertShape(RR, (1832-560)*k, 200*k, 560*k, 12*k), LIME);
+  o(slide.insertShape(SlidesApp.ShapeType.RECTANGLE, 0, 1058*k, W, 22*k), LIME);
+
+  pres.saveAndClose();
+
+  // xuất PNG qua Slides API (thumbnail LARGE = 1600px ngang)
+  var id = pres.getId();
+  var pageId = SlidesApp.openById(id).getSlides()[0].getObjectId();
+  var url = 'https://slides.googleapis.com/v1/presentations/'+id+
+            '/pages/'+pageId+'/thumbnail?thumbnailProperties.thumbnailSize=LARGE';
+  var meta = JSON.parse(UrlFetchApp.fetch(url,{
+    headers:{Authorization:'Bearer '+ScriptApp.getOAuthToken()}, muteHttpExceptions:true
+  }).getContentText());
+  if (!meta.contentUrl) throw new Error('Slides không trả ảnh: '+JSON.stringify(meta).slice(0,200));
+  var blob = UrlFetchApp.fetch(meta.contentUrl).getBlob()
+    .setName('nen-teams-'+ten.replace(/\s+/g,'-').toLowerCase()+(toi?'-toi':'-sang')+'.png');
+
+  try{ DriveApp.getFileById(id).setTrashed(true); }catch(e){}   // dọn file nháp
+  return blob;
+}
+
+/* Gửi file (giữ nguyên chất lượng, không bị Telegram nén như ảnh) */
+function tgSendFile(chatId, blob, caption){
+  var token = cfgProp('BOT_TOKEN');
+  if (!token || !chatId) return;
+  UrlFetchApp.fetch('https://api.telegram.org/bot'+token+'/sendDocument',{
+    method:'post',
+    payload:{chat_id:String(chatId), caption:caption||'', document:blob},
+    muteHttpExceptions:true
+  });
+}
+
 /* ═══════════════ CÀI ĐẶT — chạy tay trong editor ═══════════════
    Bot chạy bằng CHẾ ĐỘ HỎI ĐỊNH KỲ (polling): script tự hỏi Telegram
    mỗi phút thay vì để Telegram gọi ngược vào /exec. Lý do: Apps Script
