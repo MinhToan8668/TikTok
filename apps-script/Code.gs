@@ -2,31 +2,52 @@
  * ═══════════════════════════════════════════════════════════════
  *  TỰ MÌNH XÂY KÊNH — Backend Google Apps Script
  * ═══════════════════════════════════════════════════════════════
- *  Một file này làm 3 việc:
- *   1. GET  ?action=config  → trả config cho landing page
- *   2. POST {action:register} → lưu đăng ký vào Google Sheet
- *      + báo về Telegram cho admin
- *   3. POST từ Telegram (webhook) → bot admin: đổi giá, lịch,
- *      sĩ số, ngày khai giảng, link Zalo, thông báo, duyệt học viên…
+ *  Một file làm 3 việc:
+ *   1. GET  ?action=config      → trả config cho landing page
+ *   2. POST {action:'register'} → lưu đăng ký vào Sheet + báo Telegram
+ *   3. POST từ Telegram webhook → bot admin đổi giá / lịch / sĩ số /
+ *      link Zalo / thông báo / duyệt học viên
  *
- *  BẢO MẬT: token Telegram nằm trong Script Properties (server),
- *  KHÔNG nằm trong file HTML. Xem HUONG-DAN.md để cài đặt.
+ *  CHỐNG SPAM: Telegram gửi lại cùng một update nếu không nhận được
+ *  phản hồi kịp (Apps Script chậm + trả 302). Mỗi update chỉ được xử
+ *  lý MỘT lần nhờ cache update_id, và doPost bọc try/catch toàn bộ
+ *  để không bao giờ trả trang lỗi về cho Telegram.
  *
- *  Script Properties cần có:
- *   BOT_TOKEN       = token bot Telegram (tạo MỚI qua @BotFather —
- *                     token cũ đã lộ trên GitHub, phải /revoke)
- *   ADMIN_CHAT_IDS  = các chat id được phép điều khiển bot,
- *                     cách nhau dấu phẩy. VD: 5116087301,123456789
- *   ADMIN_KEY       = mật khẩu xem trang admin (?admin=...)
+ *  CÀI ĐẶT (3 bước):
+ *   1. Dán cả file vào Apps Script (tạo từ Google Sheet:
+ *      Extensions → Apps Script), điền SETUP bên dưới → Lưu
+ *   2. Deploy → Manage deployments → ✏️ → Version: New version
+ *      · Execute as: Me  · Who has access: Anyone   ← bắt buộc
+ *   3. Chọn hàm  setup  → Run → đọc Execution log
+ *
+ *  Bot đang nhắn điên loạn? → chạy hàm  dungBot  là im ngay.
  * ═══════════════════════════════════════════════════════════════
  */
 
-var SHEET_NAME = 'DangKy';
-var HEADERS = ['id','time','cohort','name','phone','year','job',
-               'channel','stage','time_week','topic','target','goal',
-               'source','status'];
+/* ─────────────────────────────────────────────────────────────
+   SETUP — điền 4 giá trị này. KHÔNG commit file đã điền lên GitHub.
+   (Có thể để trống và đặt trong Script Properties với cùng tên key.)
+   ───────────────────────────────────────────────────────────── */
+var SETUP = {
+  BOT_TOKEN:      '',   // token bot Telegram từ @BotFather
+  ADMIN_CHAT_IDS: '',   // chat id điều khiển bot, cách nhau dấu phẩy
+  ADMIN_KEY:      '',   // mật khẩu xem trang admin (?admin=...)
+  EXEC_URL:       '',   // URL /exec của bản deploy hiện tại
+  SHEET_ID:       ''    // ID Google Sheet lưu đăng ký — để trống thì
+                        // setup tự tạo Sheet mới và tự nhớ ID
+};
+function cfgProp(name){
+  return PropertiesService.getScriptProperties().getProperty(name) || SETUP[name] || '';
+}
 
-/* ─────────────── CONFIG mặc định (bot sẽ ghi đè) ─────────────── */
+var SHEET_NAME = 'DangKy';
+var LOG_SHEET  = 'Log';
+var HEADERS = ['id','time','cohort','name','phone','age','gender','job','strength',
+               'goals','timeline','audience','aud_age','aud_gender','pain',
+               'niche','tone','format','refs','time_week','camera','gear','fear',
+               'tried','unique','expect','channel','source','status'];
+
+/* ─────────────── CONFIG mặc định (bot ghi đè dần) ─────────────── */
 var DEFAULT_CONFIG = {
   cohort:{number:3,status:'open',openText:'Đang mở đăng ký',startDate:'Đang chốt lịch'},
   slots:{max:15,base:0},
@@ -38,13 +59,14 @@ var DEFAULT_CONFIG = {
   announcement:{show:false,text:''}
 };
 
-/* ═══════════════ HELPERS ═══════════════ */
+/* ═══════════════ CONFIG ═══════════════ */
 function props(){ return PropertiesService.getScriptProperties(); }
 
 function getConfig(){
   var raw = props().getProperty('CONFIG');
-  var cfg = raw ? JSON.parse(raw) : {};
-  return deepMerge(DEFAULT_CONFIG, cfg);
+  var cfg;
+  try{ cfg = raw ? JSON.parse(raw) : null; }catch(e){ cfg = null; }
+  return deepMerge(DEFAULT_CONFIG, cfg || {});
 }
 function saveConfig(cfg){ props().setProperty('CONFIG', JSON.stringify(cfg)); }
 
@@ -65,12 +87,41 @@ function money(n){
   n=Number(n)||0;
   return String(n).replace(/\B(?=(\d{3})+(?!\d))/g,'.')+'đ';
 }
+function nowVN(){ return Utilities.formatDate(new Date(),'GMT+7','dd/MM/yyyy HH:mm'); }
+
+/* ═══════════════ SHEET ═══════════════
+   Chạy được cả khi project KHÔNG gắn với Sheet nào (tạo rời từ
+   script.google.com): mở theo SHEET_ID, chưa có thì tự tạo Sheet
+   mới rồi nhớ ID trong Script Properties.                        */
+var _ss = null;
+function ss(){
+  if (_ss) return _ss;
+
+  var bound = SpreadsheetApp.getActiveSpreadsheet();   // project gắn Sheet
+  if (bound){ _ss = bound; return _ss; }
+
+  var id = cfgProp('SHEET_ID');
+  if (id){
+    _ss = SpreadsheetApp.openById(id);
+    return _ss;
+  }
+
+  // Lần đầu: tự tạo Sheet mới và lưu ID lại để các lần sau dùng đúng file
+  _ss = SpreadsheetApp.create('TMXK - Đăng ký');
+  props().setProperty('SHEET_ID', _ss.getId());
+  return _ss;
+}
 
 function sheet(){
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sh = ss.getSheetByName(SHEET_NAME);
+  var wb = ss();
+  var sh = wb.getSheetByName(SHEET_NAME);
+  // form đổi cấu trúc → tab cũ sai số cột thì đổi tên giữ lại, tạo tab mới đúng cột
+  if (sh && sh.getLastRow() >= 1 && sh.getLastColumn() !== HEADERS.length){
+    sh.setName(SHEET_NAME + '_cu_' + Utilities.formatDate(new Date(),'GMT+7','ddMMyy_HHmm'));
+    sh = null;
+  }
   if (!sh){
-    sh = ss.insertSheet(SHEET_NAME);
+    sh = wb.insertSheet(SHEET_NAME);
     sh.appendRow(HEADERS);
     sh.setFrozenRows(1);
   }
@@ -89,18 +140,16 @@ function allRegs(){
   });
 }
 
-/* Số đăng ký hợp lệ (không bị từ chối) của lớp hiện tại */
-function countRegistered(cfg){
+function countRegistered(cfg, preloaded){
   var label = cohortLabel(cfg);
-  return allRegs().filter(function(r){
+  return (preloaded||allRegs()).filter(function(r){
     return r.cohort===label && r.status!=='rejected';
   }).length;
 }
 
-/* Config công khai trả cho landing page (kèm số đã đăng ký) */
-function publicConfig(){
+function publicConfig(preloaded){
   var cfg = getConfig();
-  cfg.slots.registered = countRegistered(cfg);
+  cfg.slots.registered = countRegistered(cfg, preloaded);
   return cfg;
 }
 
@@ -109,67 +158,135 @@ function jsonOut(obj){
     .setMimeType(ContentService.MimeType.JSON);
 }
 
-/* ═══════════════ TELEGRAM ═══════════════ */
-function tgSend(chatId, text){
-  var token = props().getProperty('BOT_TOKEN');
-  if (!token || !chatId) return;
+/* Ghi lỗi ra sheet Log để lần ra được, thay vì mất hút */
+function ghiLoi(cho, err){
+  try{ Logger.log(cho+': '+err); }catch(e2){}
   try{
-    UrlFetchApp.fetch('https://api.telegram.org/bot'+token+'/sendMessage',{
-      method:'post', contentType:'application/json', muteHttpExceptions:true,
-      payload: JSON.stringify({chat_id:chatId, text:text, parse_mode:'Markdown',
-                               disable_web_page_preview:true})
+    var sh = ss().getSheetByName(LOG_SHEET) || ss().insertSheet(LOG_SHEET);
+    sh.appendRow([nowVN(), cho, String(err), String(err && err.stack || '')]);
+  }catch(e3){}
+}
+
+/* ═══════════════ TELEGRAM — HẠ TẦNG ═══════════════ */
+function tgApi(method, payload){
+  var token = cfgProp('BOT_TOKEN');
+  if (!token) return null;
+  try{
+    var res = UrlFetchApp.fetch('https://api.telegram.org/bot'+token+'/'+method,{
+      method:'post', contentType:'application/json',
+      payload: JSON.stringify(payload), muteHttpExceptions:true
     });
-  }catch(e){}
+    return JSON.parse(res.getContentText());
+  }catch(err){ return null; }
+}
+
+/* Gửi tin: cắt tin dài quá 4096 ký tự, và nếu Markdown lệch làm
+   Telegram từ chối thì gửi lại dạng chữ thường — không tin nào mất trắng */
+function tgSend(chatId, text){
+  if (!chatId) return;
+  var manh = catNho(String(text), 3800);
+  for (var i=0;i<manh.length;i++){
+    var p = {chat_id:chatId, text:manh[i], parse_mode:'Markdown',
+             disable_web_page_preview:true};
+    var r = tgApi('sendMessage', p);
+    if (r && r.ok===false){
+      delete p.parse_mode;
+      p.text = manh[i].replace(/[`*_]/g,'');
+      tgApi('sendMessage', p);
+    }
+  }
+}
+function catNho(s, max){
+  if (s.length<=max) return [s];
+  var out=[], cur='';
+  s.split('\n').forEach(function(d){
+    while (d.length>max){
+      if (cur){ out.push(cur); cur=''; }
+      out.push(d.slice(0,max)); d=d.slice(max);
+    }
+    if (cur && cur.length+d.length+1>max){ out.push(cur); cur=d; }
+    else cur = cur ? cur+'\n'+d : d;
+  });
+  if (cur) out.push(cur);
+  return out;
 }
 function tgBroadcast(text){
-  var ids = (props().getProperty('ADMIN_CHAT_IDS')||'').split(',');
-  ids.forEach(function(id){ id=id.trim(); if(id) tgSend(id,text); });
+  cfgProp('ADMIN_CHAT_IDS').split(',').forEach(function(id){
+    id=id.trim(); if(id) tgSend(id,text);
+  });
 }
 function isAdmin(chatId){
-  var ids = (props().getProperty('ADMIN_CHAT_IDS')||'').split(',').map(function(s){return s.trim()});
+  var ids = cfgProp('ADMIN_CHAT_IDS').split(',').map(function(s){return s.trim()});
   return ids.indexOf(String(chatId)) > -1;
+}
+
+/* ═══════════════ CHỐNG XỬ LÝ TRÙNG ═══════════════
+   Telegram gửi lại đúng update đó nếu không nhận được phản hồi kịp.
+   Apps Script chạy chậm (mở Sheet, gọi API) nên chuyện này xảy ra
+   thường xuyên — mỗi lần gửi lại là bot nhắn thêm một tin, thành
+   vòng lặp spam. Nhớ update_id đã xử lý trong cache 6 tiếng.        */
+function daXuLy(updateId){
+  try{
+    var cache = CacheService.getScriptCache();
+    var key = 'tgu_'+updateId;
+    if (cache.get(key)) return true;
+    cache.put(key,'1',21600);   // 6 giờ — mức tối đa của CacheService
+    return false;
+  }catch(err){
+    return false;               // cache lỗi thì vẫn xử lý, thà trùng còn hơn mất
+  }
 }
 
 /* ═══════════════ ENTRY: GET ═══════════════ */
 function doGet(e){
-  var action = e && e.parameter && e.parameter.action;
+  try{
+    var p = (e && e.parameter) || {};
+    var action = p.action || 'config';
 
-  if (action === 'config'){
-    return jsonOut({ok:true, config: publicConfig()});
+    if (action === 'config') return jsonOut({ok:true, config: publicConfig()});
+
+    if (action === 'regs'){
+      if (!p.key || p.key !== cfgProp('ADMIN_KEY'))
+        return jsonOut({ok:false, error:'unauthorized'});
+      var all = allRegs();
+      var cfg = publicConfig(all);
+      var max = Math.max(1, Number(cfg.slots.max)||1);
+      var total = (Number(cfg.slots.base)||0) + (Number(cfg.slots.registered)||0);
+      cfg.computed = { cohortLabel: cohortLabel(cfg), remaining: Math.max(0, max-total) };
+      return jsonOut({ok:true, config:cfg, regs:all});
+    }
+
+    return jsonOut({ok:true, service:'tuminhxaykenh', hint:'?action=config'});
+  }catch(err){
+    ghiLoi('doGet', err);
+    return jsonOut({ok:false, error:'internal'});
   }
-
-  if (action === 'regs'){
-    var key = e.parameter.key || '';
-    if (!key || key !== props().getProperty('ADMIN_KEY'))
-      return jsonOut({ok:false, error:'unauthorized'});
-    var cfg = publicConfig();
-    var max = Math.max(1, Number(cfg.slots.max)||1);
-    var total = (Number(cfg.slots.base)||0) + (Number(cfg.slots.registered)||0);
-    cfg.computed = {
-      cohortLabel: cohortLabel(cfg),
-      remaining: Math.max(0, max-total)
-    };
-    return jsonOut({ok:true, config:cfg, regs:allRegs()});
-  }
-
-  return jsonOut({ok:true, service:'tuminhxaykenh', hint:'?action=config'});
 }
 
-/* ═══════════════ ENTRY: POST ═══════════════ */
+/* ═══════════════ ENTRY: POST ═══════════════
+   Bọc TOÀN BỘ try/catch: một lỗi ném ra ngoài doPost là Apps Script
+   trả trang báo lỗi qua chuyển hướng — Telegram nhận 302, kết luận
+   webhook hỏng rồi gửi lại mãi. Luôn trả 200 tử tế.                 */
 function doPost(e){
-  var body = {};
-  try{ body = JSON.parse(e.postData.contents); }catch(err){ return jsonOut({ok:false,error:'bad_json'}); }
+  try{
+    var body = {};
+    try{ body = JSON.parse(e.postData.contents); }catch(err){ body = {}; }
 
-  // Update từ Telegram webhook
-  if (body.message || body.callback_query || body.edited_message){
-    handleTelegram(body);
-    return jsonOut({ok:true});
+    // Update từ Telegram webhook — mỗi update chỉ xử lý MỘT lần
+    if (body.update_id !== undefined){
+      if (!daXuLy(body.update_id)){
+        try{ handleTelegram(body); }catch(err){ ghiLoi('handleTelegram', err); }
+      }
+      return jsonOut({ok:true});
+    }
+
+    if (body.action === 'register') return handleRegister(body);
+
+    return jsonOut({ok:false, error:'unknown_action'});
+  }catch(err){
+    ghiLoi('doPost', err);
+    return jsonOut({ok:false, error:'internal'});
   }
-
-  // Đăng ký từ landing page
-  if (body.action === 'register') return handleRegister(body);
-
-  return jsonOut({ok:false, error:'unknown_action'});
 }
 
 /* ═══════════════ ĐĂNG KÝ ═══════════════ */
@@ -197,32 +314,64 @@ function handleRegister(d){
     if (dup) return jsonOut({ok:true, duplicate:true, config: publicConfig()});
 
     var id = 'TMXK'+ new Date().getTime().toString(36).toUpperCase();
-    var time = Utilities.formatDate(new Date(),'GMT+7','dd/MM/yyyy HH:mm');
+    var time = nowVN();
 
-    sheet().appendRow([id, time, label, name, phone,
-      String(d.year||''), String(d.job||''), String(d.channel||''),
-      String(d.stage||''), String(d.time||''), String(d.topic||''),
-      String(d.target||''), String(d.goal||''), String(d.source||'web'), 'pending']);
+    var f = function(k){ return String(d[k]||'') };
+    sheet().appendRow([id, time, label, name, "'"+phone,
+      f('age'), f('gender'), f('job'), f('strength'),
+      f('goals'), f('timeline'), f('audience'), f('aud_age'), f('aud_gender'), f('pain'),
+      f('niche'), f('tone'), f('format'), f('refs'), f('time'), f('camera'), f('gear'), f('fear'),
+      f('tried'), f('unique'), f('expect'), f('channel'), f('source')||'web', 'pending']);
 
     var cfg2 = publicConfig();
     var total = (Number(cfg2.slots.base)||0) + (Number(cfg2.slots.registered)||0);
     var remaining = Math.max(0,(Number(cfg2.slots.max)||0)-total);
 
+    var dong = function(icon, nhan, k){
+      var v = String(d[k]||'').trim();
+      return v ? icon+' '+nhan+': '+v : '';
+    };
     tgBroadcast([
       '🌱 *Đăng ký mới — Tự Mình Xây Kênh*','',
       '👤 *'+name+'*  ·  `'+id+'`',
-      '📱 '+phone,
-      '🎂 '+(d.year||'—')+'   💼 '+(d.job||'—'),
-      d.channel ? '🎵 Kênh: '+d.channel : '🎵 Chưa có kênh',
-      '📊 '+(d.stage||'—'),
-      '⏰ '+(d.time||'—'),
-      '🏷 Ngách: '+(d.topic||'—'),
-      '🎯 '+(d.target||'—'),
-      '💭 _"'+(d.goal||'')+'"_','',
+      '📱 `'+phone+'`',
+      [d.age?'🎂 '+d.age+' tuổi':'', d.gender||''].filter(String).join('  ·  '),
+      dong('💼','Nghề','job'),
+      dong('💪','Thế mạnh','strength'),'',
+      '*🎯 Mục tiêu & động lực*',
+      dong('🏁','Xây kênh để','goals'),
+      dong('⏳','Muốn đạt trong','timeline'),'',
+      '*👥 Khán giả nhắm tới*',
+      dong('🗣','Nói với','audience'),
+      [String(d.aud_age||''), String(d.aud_gender||'')].filter(String).join(' · '),
+      dong('🩹','Nỗi đau khán giả','pain'),'',
+      '*🎬 Nội dung & phong cách*',
+      dong('🏷','Ngách','niche'),
+      dong('🎙','Tone','tone'),
+      dong('📐','Định dạng','format'),
+      dong('⭐','Kênh tham khảo','refs'),'',
+      '*🔋 Năng lực & nguồn lực*',
+      dong('⏰','Thời gian/tuần','time'),
+      dong('🎥','Tự tin camera','camera'),
+      dong('🧰','Thiết bị','gear'),
+      dong('😰','Lo ngại','fear'),'',
+      '*🤝 Kỳ vọng & cam kết*',
+      dong('📊','Từng thử TikTok','tried'),
+      dong('🎵','Kênh hiện có','channel'),
+      dong('✨','Điểm khác biệt','unique'),
+      d.expect ? '💭 Muốn được định hướng nhất:\n_"'+d.expect+'"_' : '','',
       '🕐 '+time+' · '+label,
       '📈 Tổng: '+total+'/'+cfg2.slots.max+' — còn '+remaining+' suất','',
       'Duyệt: `/duyet '+id+'`  ·  Từ chối: `/tuchoi '+id+'`'
-    ].join('\n'));
+    ].filter(function(x){return x!==''}).join('\n'));
+
+    // đủ chỗ → tự chuyển trạng thái và báo admin
+    if (remaining<=0 && cfg.cohort.status==='open'){
+      cfg.cohort.status='full';
+      saveConfig(cfg);
+      tgBroadcast('🎉 *'+label+' đã đủ '+cfg.slots.max+' người!* Web tự chuyển sang '+
+                  '"đã đủ chỗ". Mở lớp mới: /solop '+(Number(cfg.cohort.number)+1));
+    }
 
     return jsonOut({ok:true, config: cfg2});
   } finally {
@@ -230,7 +379,7 @@ function handleRegister(d){
   }
 }
 
-/* ═══════════════ BOT TELEGRAM ═══════════════ */
+/* ═══════════════ BOT TELEGRAM — ROUTER ═══════════════ */
 function handleTelegram(update){
   var msg = update.message || update.edited_message;
   if (!msg || !msg.text) return;
@@ -238,8 +387,7 @@ function handleTelegram(update){
   var text = msg.text.trim();
 
   if (!isAdmin(chatId)){
-    // Trả lời chat id để lần đầu cài đặt biết id cần thêm vào ADMIN_CHAT_IDS
-    tgSend(chatId,'⛔ Bạn không có quyền dùng bot này.\nChat ID của bạn: `'+chatId+'`');
+    tgSend(chatId,'⛔ Bot này chỉ dành cho quản trị Tự Mình Xây Kênh.\nChat ID của bạn: `'+chatId+'`');
     return;
   }
 
@@ -252,82 +400,90 @@ function handleTelegram(update){
 
     case 'start': case 'menu': case 'help':
       tgSend(chatId,[
-        '🌱 *Bot quản lý — Tự Mình Xây Kênh*','',
-        '*Xem nhanh*',
-        '/trangthai — toàn bộ cấu hình hiện tại',
-        '/danhsach — danh sách đăng ký lớp hiện tại','',
-        '*Giá & lớp học*',
-        '/giasom `2000000` — giá Early Bird',
-        '/gia `3000000` — giá gốc',
-        '/solop `3` — số thứ tự lớp (đổi lớp mới)',
-        '/siso `15` — sĩ số tối đa',
-        '/ngoaihethong `2` — số HV đăng ký ngoài web','',
-        '*Lịch học*',
-        '/khaigiang `05/09/2026` — ngày khai giảng dự kiến',
-        '/lichhoc `Tối Thứ 5 | 20:00–22:00` — lịch buổi live',
-        '/sotuan `4` — số tuần  ·  /sobuoi `4` — số buổi live','',
-        '*Liên kết & thông báo*',
-        '/zalo `https://zalo.me/g/...` — link group Zalo',
-        '/tiktok `https://tiktok.com/@...` — link kênh',
-        '/thongbao `nội dung` — bật banner thông báo',
-        '/tatthongbao — tắt banner','',
-        '*Trạng thái đăng ký*',
-        '/mo — mở đăng ký  ·  /du — báo đủ chỗ  ·  /dong — đóng hẳn','',
-        '*Duyệt học viên*',
-        '/duyet `TMXK...`  ·  /tuchoi `TMXK...`','',
-        '*Khác*',
-        '/sokhoa `2` — số khóa đã dạy  ·  /hocvien `30+` — số học viên'
+        '🌱 *Bot quản lý — Tự Mình Xây Kênh*',
+        '_Đổi gì ở đây web cũng tự cập nhật trong ~1 phút._','',
+        '👉 Lệnh có số/chữ phía sau thì phải gõ kèm giá trị.',
+        'Bấm lệnh trơn (VD /giasom) bot sẽ hiện giá trị đang dùng.','',
+        '*👀 Xem nhanh*',
+        '📋 /trangthai — toàn bộ cấu hình hiện tại',
+        '👥 /danhsach — danh sách đăng ký lớp hiện tại',
+        '📄 /sheet — link Google Sheet','',
+        '*💰 Giá & lớp học*',
+        '💰 /giasom `2000000` — giá ưu đãi đăng ký sớm',
+        '💸 /gia `3000000` — giá gốc',
+        '🔢 /solop `3` — số thứ tự lớp (đổi lớp mới)',
+        '🪑 /siso `15` — sĩ số tối đa',
+        '👤 /ngoaihethong `2` — số HV đăng ký ngoài web','',
+        '*📅 Lịch học*',
+        '📅 /khaigiang `05/09/2026` — ngày khai giảng',
+        '🕗 /lichhoc `Tối Thứ 5 | 20:00–22:00` — lịch buổi live',
+        '📆 /sotuan `4` — số tuần',
+        '📚 /sobuoi `4` — số buổi live','',
+        '*🔗 Liên kết & thông báo*',
+        '💬 /zalo `https://zalo.me/g/...` — link group Zalo',
+        '🎵 /tiktok `https://tiktok.com/@...` — link kênh',
+        '📢 /thongbao `nội dung` — bật banner đầu trang',
+        '🔕 /tatthongbao — tắt banner','',
+        '*🚦 Trạng thái đăng ký*',
+        '🟢 /mo — mở đăng ký',
+        '🟡 /du — báo đủ chỗ (chuyển sang danh sách chờ)',
+        '🔴 /dong — đóng đăng ký','',
+        '*✅ Duyệt học viên*',
+        '✅ /duyet `TMXK...` — duyệt một đăng ký',
+        '❌ /tuchoi `TMXK...` — từ chối một đăng ký','',
+        '*⚙️ Khác*',
+        '🏫 /sokhoa `2` — số khóa đã dạy',
+        '🎓 /hocvien `30+` — số học viên hiển thị'
       ].join('\n'));
       return;
 
-    case 'trangthai': {
-      var c2 = publicConfig();
+    case 'trangthai': case 'status': {
+      var all = allRegs();
+      var c2 = publicConfig(all);
+      var lbl = cohortLabel(c2);
+      var regs = all.filter(function(r){return r.cohort===lbl});
+      var pend = regs.filter(function(r){return r.status==='pending'}).length;
       var tot = (Number(c2.slots.base)||0)+(Number(c2.slots.registered)||0);
+      var stTxt = {open:'🟢 đang mở',full:'🟡 đủ chỗ',closed:'🔴 đã đóng'}[c2.cohort.status]||c2.cohort.status;
       tgSend(chatId,[
-        '📋 *'+cohortLabel(c2)+' — trạng thái: '+c2.cohort.status+'*','',
-        '💰 Early Bird: '+money(c2.pricing.earlyBird)+'  (gốc '+money(c2.pricing.regular)+')',
-        '👥 Sĩ số: '+tot+'/'+c2.slots.max+'  (web '+c2.slots.registered+' + ngoài '+c2.slots.base+')',
+        '📋 *'+lbl+'* · '+stTxt,'',
+        '👥 '+tot+'/'+c2.slots.max+'  (web '+c2.slots.registered+' + ngoài '+c2.slots.base+
+          ' · ⏳ '+pend+' chờ duyệt)',
+        '💰 Ưu đãi: '+money(c2.pricing.earlyBird)+'  (gốc '+money(c2.pricing.regular)+')',
         '📅 Khai giảng: '+c2.cohort.startDate,
         '🕗 Lịch: '+c2.schedule.days+' · '+c2.schedule.time+' · '+c2.schedule.platform,
         '📆 '+c2.schedule.weeks+' tuần · '+c2.schedule.sessions+' buổi live',
         '💬 Zalo: '+(c2.zalo.groupUrl||'(chưa đặt)'),
         '🎵 TikTok: '+(c2.contact.tiktokUrl||'(chưa đặt)'),
-        '📢 Thông báo: '+(c2.announcement.show?('BẬT — "'+c2.announcement.text+'"'):'tắt'),
+        '📢 Banner: '+(c2.announcement.show?('BẬT — "'+c2.announcement.text+'"'):'tắt'),
         '🏫 Đã dạy: '+c2.stats.cohortsDone+' khóa · '+c2.stats.students+' học viên'
       ].join('\n'));
       return;
     }
 
-    case 'giasom': return setNum(chatId,cfg,arg,function(n){cfg.pricing.earlyBird=n},
-      function(){return '✅ Giá Early Bird: *'+money(cfg.pricing.earlyBird)+'*'});
-    case 'gia': return setNum(chatId,cfg,arg,function(n){cfg.pricing.regular=n},
-      function(){return '✅ Giá gốc: *'+money(cfg.pricing.regular)+'*'});
-    case 'solop': return setNum(chatId,cfg,arg,function(n){cfg.cohort.number=n},
-      function(){return '✅ Đã chuyển sang *'+cohortLabel(cfg)+'* (đếm đăng ký tính theo lớp mới)'});
-    case 'siso': return setNum(chatId,cfg,arg,function(n){cfg.slots.max=n},
-      function(){return '✅ Sĩ số tối đa: *'+cfg.slots.max+'*'});
-    case 'ngoaihethong': return setNum(chatId,cfg,arg,function(n){cfg.slots.base=n},
-      function(){return '✅ Số HV ngoài hệ thống: *'+cfg.slots.base+'*'});
-    case 'sotuan': return setNum(chatId,cfg,arg,function(n){cfg.schedule.weeks=n},
-      function(){return '✅ Số tuần: *'+cfg.schedule.weeks+'*'});
-    case 'sobuoi': return setNum(chatId,cfg,arg,function(n){cfg.schedule.sessions=n},
-      function(){return '✅ Số buổi live: *'+cfg.schedule.sessions+'*'});
-    case 'sokhoa': return setNum(chatId,cfg,arg,function(n){cfg.stats.cohortsDone=n},
-      function(){return '✅ Số khóa đã dạy: *'+cfg.stats.cohortsDone+'*'});
+    case 'giasom': return setNum(chatId,cfg,arg,'pricing.earlyBird','Giá ưu đãi',true);
+    case 'gia':    return setNum(chatId,cfg,arg,'pricing.regular','Giá gốc',true);
+    case 'solop':  return setNum(chatId,cfg,arg,'cohort.number','Số lớp',false);
+    case 'siso':   return setNum(chatId,cfg,arg,'slots.max','Sĩ số tối đa',false);
+    case 'ngoaihethong': return setNum(chatId,cfg,arg,'slots.base','HV ngoài hệ thống',false);
+    case 'sotuan': return setNum(chatId,cfg,arg,'schedule.weeks','Số tuần',false);
+    case 'sobuoi': return setNum(chatId,cfg,arg,'schedule.sessions','Số buổi live',false);
+    case 'sokhoa': return setNum(chatId,cfg,arg,'stats.cohortsDone','Số khóa đã dạy',false);
 
     case 'hocvien':
-      if(!arg) return tgSend(chatId,'Cách dùng: /hocvien `30+`');
+      if(!arg) return tgSend(chatId,'Đang hiện: *'+cfg.stats.students+'*\nĐổi: `/hocvien 30+`');
       cfg.stats.students=arg; saveConfig(cfg);
       return tgSend(chatId,'✅ Số học viên hiển thị: *'+arg+'*');
 
     case 'khaigiang':
-      if(!arg) return tgSend(chatId,'Cách dùng: /khaigiang `05/09/2026`');
+      if(!arg) return tgSend(chatId,'Đang là: *'+cfg.cohort.startDate+'*\nĐổi: `/khaigiang 05/09/2026`');
       cfg.cohort.startDate=arg; saveConfig(cfg);
       return tgSend(chatId,'✅ Ngày khai giảng: *'+arg+'*');
 
     case 'lichhoc': {
       if(!arg || arg.indexOf('|')<0)
-        return tgSend(chatId,'Cách dùng: /lichhoc `Tối Thứ 5 | 20:00–22:00`');
+        return tgSend(chatId,'Đang là: *'+cfg.schedule.days+' · '+cfg.schedule.time+
+          '*\nĐổi: `/lichhoc Tối Thứ 5 | 20:00–22:00`');
       var parts=arg.split('|');
       cfg.schedule.days=parts[0].trim();
       cfg.schedule.time=parts[1].trim();
@@ -336,83 +492,298 @@ function handleTelegram(update){
     }
 
     case 'zalo':
-      if(!arg) return tgSend(chatId,'Cách dùng: /zalo `https://zalo.me/g/...`\nXóa link: /zalo `xoa`');
+      if(!arg) return tgSend(chatId,'Đang là: '+(cfg.zalo.groupUrl||'(chưa đặt)')+
+        '\nĐổi: `/zalo https://zalo.me/g/...`\nXóa: `/zalo xoa`');
       cfg.zalo.groupUrl = (arg.toLowerCase()==='xoa') ? '' : arg;
       saveConfig(cfg);
       return tgSend(chatId, cfg.zalo.groupUrl
-        ? '✅ Link group Zalo đã cập nhật — học viên điền form xong sẽ thấy nút tham gia.'
+        ? '✅ Link Zalo đã cập nhật — học viên điền form xong sẽ thấy nút tham gia.'
         : '✅ Đã xóa link Zalo — nút tham gia sẽ ẩn.');
 
     case 'tiktok':
-      if(!arg) return tgSend(chatId,'Cách dùng: /tiktok `https://www.tiktok.com/@tenkenh`');
+      if(!arg) return tgSend(chatId,'Đang là: '+(cfg.contact.tiktokUrl||'(chưa đặt)')+
+        '\nĐổi: `/tiktok https://www.tiktok.com/@tenkenh`');
       cfg.contact.tiktokUrl=arg; saveConfig(cfg);
       return tgSend(chatId,'✅ Link TikTok đã cập nhật.');
 
     case 'thongbao':
-      if(!arg) return tgSend(chatId,'Cách dùng: /thongbao `Lớp 03 khai giảng 05/09 — còn 5 suất Early Bird!`');
+      if(!arg) return tgSend(chatId, cfg.announcement.show
+        ? 'Banner đang BẬT: "'+cfg.announcement.text+'"\nĐổi: `/thongbao nội dung mới`\nTắt: /tatthongbao'
+        : 'Banner đang tắt.\nBật: `/thongbao Lớp 03 khai giảng 05/09!`');
       cfg.announcement={show:true,text:arg}; saveConfig(cfg);
-      return tgSend(chatId,'📢 Banner thông báo đã BẬT:\n"'+arg+'"');
+      return tgSend(chatId,'📢 Banner đã BẬT:\n"'+arg+'"');
     case 'tatthongbao':
       cfg.announcement.show=false; saveConfig(cfg);
-      return tgSend(chatId,'🔕 Banner thông báo đã tắt.');
+      return tgSend(chatId,'🔕 Banner đã tắt.');
 
     case 'mo':
       cfg.cohort.status='open'; saveConfig(cfg);
-      return tgSend(chatId,'✅ Đã MỞ đăng ký '+cohortLabel(cfg)+'.');
+      return tgSend(chatId,'🟢 Đã MỞ đăng ký '+cohortLabel(cfg)+'.');
     case 'du':
       cfg.cohort.status='full'; saveConfig(cfg);
-      return tgSend(chatId,'✅ Đã báo ĐỦ CHỖ — nút trên web chuyển thành "vào danh sách chờ".');
+      return tgSend(chatId,'🟡 Đã báo ĐỦ CHỖ — nút trên web chuyển thành "vào danh sách chờ".');
     case 'dong':
       cfg.cohort.status='closed'; saveConfig(cfg);
-      return tgSend(chatId,'✅ Đã ĐÓNG đăng ký — form trên web bị khóa.');
+      return tgSend(chatId,'🔴 Đã ĐÓNG đăng ký — form trên web bị khóa.');
 
-    case 'danhsach': {
+    case 'danhsach': case 'ds': {
       var label2=cohortLabel(cfg);
-      var regs=allRegs().filter(function(r){return r.cohort===label2});
-      if(!regs.length) return tgSend(chatId,'Chưa có đăng ký nào cho '+label2+'.');
-      var lines=['📋 *'+label2+' — '+regs.length+' đăng ký*',''];
-      regs.forEach(function(r,i){
+      var regs2=allRegs().filter(function(r){return r.cohort===label2});
+      if(!regs2.length) return tgSend(chatId,'Chưa có đăng ký nào cho '+label2+'.');
+      var lines=['📋 *'+label2+' — '+regs2.length+' đăng ký*',''];
+      regs2.forEach(function(r,i){
         var st={pending:'⏳',approved:'✅',rejected:'❌'}[r.status]||'·';
-        lines.push((i+1)+'. '+st+' *'+r.name+'* — '+r.phone+'\n    `'+r.id+'` · '+(r.stage||'')+
-                   (r.topic?' · '+r.topic:''));
+        lines.push((i+1)+'. '+st+' *'+r.name+'* — `'+r.phone+'`\n    `'+r.id+'` · '+
+                   (r.tried||'')+(r.niche?' · '+r.niche:''));
       });
       return tgSend(chatId,lines.join('\n'));
     }
 
-    case 'duyet': return setStatus(chatId,arg,'approved','✅ Đã duyệt');
+    case 'duyet':  return setStatus(chatId,arg,'approved','✅ Đã duyệt');
     case 'tuchoi': return setStatus(chatId,arg,'rejected','❌ Đã từ chối');
+
+    case 'sheet': return tgSend(chatId,'📄 '+ss().getUrl());
+    case 'id':    return tgSend(chatId,'Chat ID: `'+chatId+'`');
 
     default:
       tgSend(chatId,'Không hiểu lệnh /'+cmd+' — gõ /menu để xem danh sách.');
   }
 }
 
-function setNum(chatId,cfg,arg,apply,doneMsg){
-  var n=Number(String(arg).replace(/[^\d]/g,''));
-  if(!arg || isNaN(n)) return tgSend(chatId,'Cần một con số. VD: `2000000`');
-  apply(n); saveConfig(cfg);
-  tgSend(chatId,doneMsg());
+function getPath(o,path){ return path.split('.').reduce(function(a,k){return a?a[k]:undefined},o); }
+function setPath(o,path,v){
+  var ks=path.split('.'), last=ks.pop();
+  ks.reduce(function(a,k){return a[k]},o)[last]=v;
+}
+
+/* Nhận 2000000, 2.000.000, 2tr, 2M, 500k */
+function docTien(s){
+  var raw=String(s).toLowerCase().replace(/[.,\s]/g,'');
+  if(/^\d+(\.\d+)?(tr|m)$/.test(raw)) return parseFloat(raw)*1000000;
+  if(/^\d+k$/.test(raw)) return parseFloat(raw)*1000;
+  return parseInt(raw.replace(/\D/g,''),10);
+}
+
+function setNum(chatId,cfg,arg,path,label,isMoney){
+  if(!String(arg).trim()){
+    var cur=getPath(cfg,path);
+    return tgSend(chatId,label+' đang là *'+(isMoney?money(cur):cur)+'*\n'+
+      'Đổi bằng cách gõ lệnh kèm số'+(isMoney?' (gõ tắt `2tr` `500k` cũng được)':'')+'.');
+  }
+  var n = isMoney ? docTien(arg) : parseInt(String(arg).replace(/\D/g,''),10);
+  if(isNaN(n)||n<0) return tgSend(chatId,'Không đọc được giá trị `'+arg+'`.');
+  setPath(cfg,path,n); saveConfig(cfg);
+  tgSend(chatId,'✅ '+label+' = *'+(isMoney?money(n):n)+'*\n\nWeb sẽ cập nhật trong ~1 phút.');
 }
 
 function setStatus(chatId,id,status,prefix){
-  if(!id) return tgSend(chatId,'Cách dùng: kèm mã đăng ký. VD: `/duyet TMXK...`');
-  var regs=allRegs();
+  if(!id){
+    tgSend(chatId,'Cần kèm mã đăng ký, VD `/duyet TMXK...` — gõ /danhsach để xem mã.');
+    return;
+  }
   var hit=null;
-  regs.forEach(function(r){ if(r.id.toLowerCase()===id.toLowerCase()) hit=r; });
+  allRegs().forEach(function(r){ if(r.id.toLowerCase()===id.toLowerCase()) hit=r; });
   if(!hit) return tgSend(chatId,'Không tìm thấy mã `'+id+'`. Gõ /danhsach để xem mã.');
   sheet().getRange(hit.row, HEADERS.indexOf('status')+1).setValue(status);
   tgSend(chatId,prefix+' *'+hit.name+'* ('+hit.phone+').');
 }
+/* ═══════════════ CÀI ĐẶT — chạy tay trong editor ═══════════════
+   Bot chạy bằng CHẾ ĐỘ HỎI ĐỊNH KỲ (polling): script tự hỏi Telegram
+   mỗi phút thay vì để Telegram gọi ngược vào /exec. Lý do: Apps Script
+   LUÔN trả 302 cho POST, Telegram đòi 200 thẳng → webhook báo
+   "Wrong response from the webhook: 302 Found" rồi bot chết câm.
+   Polling đi chiều ngược lại nên không có URL nào để hỏng.
+   Đổi lại: tin đầu tiên chờ tối đa ~1 phút, các tin sau gần như tức thì
+   (khi có lệnh, script bám lại long-poll thêm một lúc).                */
+
+var HOI_TRAN_GIAY = 30;   // trần thời gian một lượt chạy được phép bám
+var HOI_CHO_GIAY  = 10;   // mỗi lần hỏi nằm chờ bao lâu khi đang có việc
+var HOI_RONG_TOI  = 2;    // im lặng mấy lượt liền thì nhường lượt sau
 
 /**
- * Chạy MỘT LẦN sau khi dán BOT_TOKEN vào Script Properties và deploy:
- * chọn hàm setWebhook trong editor rồi bấm Run — bot sẽ trỏ về web app này.
- * Dán URL /exec của bản deploy hiện tại vào biến EXEC_URL bên dưới trước khi chạy.
+ * setup — CHẠY MỘT LẦN sau khi dán code.
+ * Tự làm hết: tạo/mở sheet, kiểm tra token, nạp menu lệnh, NGẮT webhook
+ * (kèm xả hàng chờ — nguồn spam), bỏ qua tin tồn cũ, rồi đặt lịch hỏi
+ * Telegram mỗi phút. Chạy lại nhiều lần vẫn an toàn.
  */
-function setWebhook(){
-  var EXEC_URL = 'PASTE_APPS_SCRIPT_URL_HERE'; // URL kết thúc bằng /exec
-  var token = props().getProperty('BOT_TOKEN');
-  var res = UrlFetchApp.fetch('https://api.telegram.org/bot'+token+
-    '/setWebhook?url='+encodeURIComponent(EXEC_URL),{muteHttpExceptions:true});
-  Logger.log(res.getContentText());
+function setup(){
+  var out = [];
+
+  if (!cfgProp('BOT_TOKEN') || !cfgProp('ADMIN_CHAT_IDS'))
+    throw new Error('Chưa điền BOT_TOKEN / ADMIN_CHAT_IDS trong SETUP ở đầu file.');
+
+  sheet();
+  out.push('✔ Sheet "'+SHEET_NAME+'" sẵn sàng: '+ss().getUrl());
+
+  var me = tgApi('getMe', {});
+  if (!me || !me.ok){
+    out.push('✘ Token không hợp lệ — kiểm tra lại với @BotFather rồi chạy lại setup');
+    Logger.log(out.join('\n'));
+    return;
+  }
+  out.push('✔ Bot: @'+me.result.username);
+
+  var cmds = tgApi('setMyCommands',{commands:[
+    {command:'trangthai',  description:'📋 Tình trạng lớp hiện tại'},
+    {command:'danhsach',   description:'👥 Danh sách đăng ký'},
+    {command:'giasom',     description:'💰 Giá ưu đãi — /giasom 2000000'},
+    {command:'gia',        description:'💰 Giá gốc — /gia 3000000'},
+    {command:'khaigiang',  description:'📅 Ngày khai giảng — /khaigiang 05/09'},
+    {command:'lichhoc',    description:'🕗 Lịch live — /lichhoc Tối T5 | 20:00–22:00'},
+    {command:'solop',      description:'🔢 Đổi số lớp — /solop 4'},
+    {command:'siso',       description:'🪑 Sĩ số tối đa — /siso 15'},
+    {command:'ngoaihethong',description:'👤 HV ngoài web — /ngoaihethong 2'},
+    {command:'zalo',       description:'💬 Link group Zalo'},
+    {command:'thongbao',   description:'📢 Bật banner thông báo'},
+    {command:'tatthongbao',description:'🔕 Tắt banner'},
+    {command:'mo',         description:'🟢 Mở đăng ký'},
+    {command:'du',         description:'🟡 Báo đủ chỗ'},
+    {command:'dong',       description:'🔴 Đóng đăng ký'},
+    {command:'duyet',      description:'✅ Duyệt — /duyet TMXK...'},
+    {command:'tuchoi',     description:'❌ Từ chối — /tuchoi TMXK...'},
+    {command:'sheet',      description:'📄 Link Google Sheet'},
+    {command:'menu',       description:'⚙️ Danh sách đầy đủ lệnh'}
+  ]});
+  out.push(cmds && cmds.ok
+    ? '✔ Đã nạp menu lệnh — nút Menu xanh hiện cạnh ô chat'
+    : '• Không nạp được menu lệnh (gõ tay vẫn chạy bình thường)');
+
+  try{
+    datLichHoi();
+    out.push('✔ Đã ngắt webhook + đặt lịch hỏi Telegram mỗi phút');
+    out.push('  Tin đầu chờ tối đa 1 phút, các tin sau gần như tức thì.');
+    out.push('  Bot có nhắn điên loạn → chạy hàm  dungBot');
+  }catch(err){
+    out.push('✘ Không tự đặt được lịch chạy: '+err);
+    out.push('');
+    out.push('ĐẶT TAY (1 phút là xong):');
+    out.push('  1. Cột trái Apps Script → biểu tượng đồng hồ (Triggers)');
+    out.push('  2. Add Trigger (góc dưới phải)');
+    out.push('  3. Chọn hàm: hoiTelegram · Event source: Time-driven');
+    out.push('     · Type: Minutes timer · Interval: Every minute');
+    out.push('  4. Save, cấp quyền khi Google hỏi');
+  }
+
+  out.push('');
+  out.push('Xong. Vào Telegram nhắn /menu cho bot (tin đầu chờ tối đa 1 phút).');
+  Logger.log(out.join('\n'));
+  tgSend(cfgProp('ADMIN_CHAT_IDS').split(',')[0].trim(),
+    '✅ *Backend Tự Mình Xây Kênh đã sẵn sàng*\n\nBot: @'+me.result.username+
+    '\n\nGõ /menu để xem danh sách lệnh.');
+}
+
+/**
+ * DỪNG KHẨN CẤP — bot đang nhắn liên tục thì chọn hàm này bấm Run.
+ * Ngắt webhook, xóa hàng chờ, gỡ lịch hỏi. Bot im ngay lập tức.
+ * Muốn bật lại: chạy  setup.
+ */
+function dungBot(){
+  var out = [];
+  var r = tgApi('deleteWebhook',{drop_pending_updates:true});
+  out.push('✔ Đã ngắt webhook + xóa hàng chờ ('+(r && r.ok ? 'ok' : JSON.stringify(r))+')');
+  try{ out.push('✔ Đã gỡ '+goLichHoi()+' lịch chạy. Bot im ngay lập tức.'); }
+  catch(err){
+    out.push('✘ Không gỡ được lịch bằng code — gỡ tay: cột trái → đồng hồ →');
+    out.push('  ba chấm ở dòng hoiTelegram → Delete trigger.');
+  }
+  out.push('  Chạy lại  setup  khi muốn bật bot.');
+  Logger.log(out.join('\n'));
+}
+
+/* Ngắt webhook, bỏ qua tin tồn cũ, dựng lại lịch hỏi mỗi phút */
+function datLichHoi(){
+  tgApi('deleteWebhook',{drop_pending_updates:true});
+  datMocMoiNhat();
+  goLichHoi();
+  ScriptApp.newTrigger('hoiTelegram').timeBased().everyMinutes(1).create();
+}
+
+function goLichHoi(){
+  var n = 0;
+  ScriptApp.getProjectTriggers().forEach(function(t){
+    if (t.getHandlerFunction()==='hoiTelegram'){ ScriptApp.deleteTrigger(t); n++; }
+  });
+  return n;
+}
+
+/**
+ * Dời mốc đọc qua hết các tin đang tồn mà không xử lý chúng.
+ * Không có bước này, bật bot lên là nó trả lời dồn cả loạt lệnh cũ.
+ */
+function datMocMoiNhat(){
+  var r = tgApi('getUpdates',{offset:-1, timeout:0, limit:1});
+  if (r && r.ok && r.result && r.result.length){
+    props().setProperty('TG_OFFSET', String(r.result[0].update_id + 1));
+  }
+}
+
+/**
+ * Lịch chạy gọi hàm này mỗi phút. Lúc rảnh chỉ tốn ~1 giây; hễ có lệnh
+ * thật thì bám lại long-poll thêm một lúc để các lệnh tiếp theo trong
+ * cùng phiên được trả lời gần như tức thì.
+ */
+function hoiTelegram(){
+  var lock = LockService.getScriptLock();
+  if (!lock.tryLock(1000)) return;          // lượt trước còn đang bám
+  try{
+    if (motLuotHoi(0) <= 0) return;         // rảnh hoặc lỗi mạng — thoát ngay
+    var het = Date.now() + HOI_TRAN_GIAY*1000;
+    var rong = 0;
+    while (Date.now() < het && rong < HOI_RONG_TOI){
+      var n = motLuotHoi(HOI_CHO_GIAY);
+      if (n < 0) break;
+      rong = (n===0) ? rong+1 : 0;
+    }
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/** Trả về số update đã xử lý, 0 nếu không có, -1 nếu gọi Telegram lỗi. */
+function motLuotHoi(choGiay){
+  var off = Number(props().getProperty('TG_OFFSET') || 0);
+  var r = tgApi('getUpdates',{
+    offset:off, timeout:choGiay, limit:20, allowed_updates:['message']
+  });
+  if (!r || !r.ok || !r.result) return -1;
+  if (!r.result.length) return 0;
+
+  // Dời mốc TRƯỚC khi xử lý: một tin gây lỗi cũng không làm kẹt hàng chờ mãi
+  var maxId = off;
+  r.result.forEach(function(u){ if(u.update_id >= maxId) maxId = u.update_id+1; });
+  props().setProperty('TG_OFFSET', String(maxId));
+
+  r.result.forEach(function(u){
+    try{ handleTelegram(u); }catch(err){ ghiLoi('hoiTelegram', err); }
+  });
+  return r.result.length;
+}
+
+/** Chẩn đoán khi bot im hoặc lỗi — chạy rồi đọc Execution log. */
+function kiemTra(){
+  var out = [];
+  var me = tgApi('getMe',{});
+  out.push('Bot: '+(me && me.ok ? '@'+me.result.username : '✘ token sai hoặc mạng lỗi'));
+
+  var soLich = -1;
+  try{
+    soLich = ScriptApp.getProjectTriggers().filter(function(t){
+      return t.getHandlerFunction()==='hoiTelegram';
+    }).length;
+  }catch(err){}
+  out.push('Lịch hỏi mỗi phút: '+(
+    soLich>0 ? '✔ đang chạy ('+soLich+' lịch)' :
+    soLich===0 ? '✘ CHƯA CÓ — bot sẽ không nhận lệnh. Chạy setup hoặc đặt tay.' :
+    '? không đọc được (thiếu quyền)'));
+  out.push('Đã đọc tới update: '+(props().getProperty('TG_OFFSET')||'chưa có'));
+
+  var wh = tgApi('getWebhookInfo',{});
+  if (wh && wh.ok){
+    var w = wh.result;
+    out.push('Webhook: '+(w.url||'(không nối — đúng, chế độ hỏi không cần webhook)'));
+    if (w.url) out.push('  ⚠ Webhook đang nối sẽ tranh tin với chế độ hỏi — chạy setup để gỡ.');
+  }
+  out.push('Đăng ký trong sheet: '+allRegs().length+' dòng');
+  out.push('ADMIN_KEY: '+cfgProp('ADMIN_KEY'));
+  Logger.log(out.join('\n'));
 }
