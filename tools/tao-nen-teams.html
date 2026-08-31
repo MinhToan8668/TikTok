@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tạo nền Teams — Tự Mình Xây Kênh</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#f9e8dd;--lime:#99df00;--ink:#26210f;--moss:#1b220d}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Bricolage Grotesque',system-ui,sans-serif;background:var(--paper);
+       color:var(--ink);min-height:100vh;display:grid;place-items:center;padding:24px}
+  .card{width:min(760px,100%);background:#fff;border:1.5px solid rgba(38,33,15,.14);
+        border-radius:20px;padding:26px;box-shadow:0 14px 40px rgba(38,33,15,.10)}
+  h1{font-size:22px;font-weight:800;margin:0 0 4px}
+  p.sub{margin:0 0 18px;font-size:14px;opacity:.65}
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+  input[type=text]{flex:1;min-width:200px;font:inherit;font-size:17px;font-weight:500;
+    padding:12px 14px;border:1.5px solid rgba(38,33,15,.22);border-radius:12px;background:var(--paper)}
+  input[type=text]:focus{outline:2px solid var(--lime);border-color:transparent}
+  .seg{display:flex;border:1.5px solid rgba(38,33,15,.22);border-radius:12px;overflow:hidden}
+  .seg button{font:inherit;font-size:14px;font-weight:800;padding:12px 16px;border:0;
+    background:#fff;color:var(--ink);cursor:pointer}
+  .seg button.on{background:var(--ink);color:var(--lime)}
+  canvas{width:100%;border-radius:12px;border:1.5px solid rgba(38,33,15,.14);display:block}
+  .dl{margin-top:14px;width:100%;font:inherit;font-size:16px;font-weight:800;padding:14px;
+    border:0;border-radius:12px;background:var(--lime);color:var(--ink);cursor:pointer}
+  .dl:hover{filter:brightness(1.05)}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>Tạo nền gọi MS Teams</h1>
+  <p class="sub">Điền tên → chọn nền sáng/tối → bấm tải. Ảnh xuất ra 1920×1080.</p>
+  <div class="row">
+    <input id="ten" type="text" value="Minh Toàn" maxlength="30" placeholder="Tên giảng viên">
+    <div class="seg">
+      <button id="bSang" class="on" type="button">☀️ Sáng</button>
+      <button id="bToi" type="button">🌙 Tối</button>
+    </div>
+  </div>
+  <canvas id="cv" width="1920" height="1080"></canvas>
+  <button class="dl" id="tai" type="button">⬇️ Tải nền PNG</button>
+</div>
+
+<script>
+var LIME='#99df00', toiMode=false;
+var cv=document.getElementById('cv'), cx=cv.getContext('2d');
+
+function ro(x,y,w,h,r){ // rounded rect
+  cx.beginPath();
+  cx.moveTo(x+r,y); cx.arcTo(x+w,y,x+w,y+h,r); cx.arcTo(x+w,y+h,x,y+h,r);
+  cx.arcTo(x,y+h,x,y,r); cx.arcTo(x,y,x+w,y,r); cx.closePath(); cx.fill();
+}
+
+/* Chồng gạch: gốc hệ 64x45, scale s, đặt tại (px,py) */
+function veMark(px,py,s,brick,play,dot){
+  cx.save(); cx.translate(px,py); cx.scale(s,s);
+  cx.save();                                  // viên lime xoay -9°
+  cx.translate(32,17); cx.rotate(-9*Math.PI/180); cx.translate(-32,-17);
+  cx.fillStyle=play; ro(19,11,26,12,3);
+  cx.fillStyle=dot;
+  cx.beginPath(); cx.moveTo(30,14.4); cx.lineTo(30,19.6); cx.lineTo(36.6,17); cx.closePath(); cx.fill();
+  cx.restore();
+  cx.fillStyle=brick; ro(19,28,26,12,3); ro(4,44,26,12,3); ro(34,44,26,12,3);
+  cx.restore();
+}
+
+function ve(){
+  var ten=(document.getElementById('ten').value||'').trim()||' ';
+  var bg   = toiMode ? '#1b220d' : '#f9e8dd';
+  var chu  = toiMode ? '#f7f2e9' : '#26210f';
+  var brick= toiMode ? '#f4efe6' : '#26210f';
+  var dot  = toiMode ? '#1b220d' : '#26210f';
+
+  cx.fillStyle=bg; cx.fillRect(0,0,1920,1080);
+  veMark(88,74,1.55,brick,LIME,dot);
+
+  cx.fillStyle=chu; cx.textBaseline='alphabetic';
+  cx.font='800 58px "Bricolage Grotesque",sans-serif';
+  cx.fillText('Tự Mình Xây Kênh',250,152);
+
+  cx.font='800 72px "Bricolage Grotesque",sans-serif';
+  var w=cx.measureText(ten).width, x=1824-w;
+  cx.fillText(ten,x,140);
+  cx.fillStyle=LIME; ro(x,166,w,9,4.5);       // gạch chân lime dưới tên
+  ro(0,1058,1920,22,0);                       // vạch lime đáy khung
+}
+
+function veKhiSanFont(){
+  var f1=document.fonts.load('800 72px "Bricolage Grotesque"');
+  var f2=document.fonts.load('800 58px "Bricolage Grotesque"');
+  Promise.all([f1,f2]).then(ve).catch(ve);
+}
+
+document.getElementById('ten').addEventListener('input',ve);
+document.getElementById('bSang').onclick=function(){toiMode=false;chon(this);ve()};
+document.getElementById('bToi').onclick=function(){toiMode=true;chon(this);ve()};
+function chon(b){
+  document.querySelectorAll('.seg button').forEach(function(x){x.classList.remove('on')});
+  b.classList.add('on');
+}
+document.getElementById('tai').onclick=function(){
+  ve();
+  var ten=(document.getElementById('ten').value||'nen').trim()
+    .normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D')
+    .replace(/[^\w]+/g,'-').toLowerCase();
+  var a=document.createElement('a');
+  a.download='nen-teams-'+ten+(toiMode?'-toi':'-sang')+'.png';
+  a.href=cv.toDataURL('image/png');
+  a.click();
+};
+
+veKhiSanFont();
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(ve);
+</script>
+</body>
+</html>
