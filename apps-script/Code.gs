@@ -50,7 +50,7 @@ var HEADERS = ['id','time','cohort','name','phone','age','gender','job','strengt
 /* ─────────────── CONFIG mặc định (bot ghi đè dần) ─────────────── */
 var DEFAULT_CONFIG = {
   cohort:{number:3,status:'open',openText:'Đang mở đăng ký',startDate:'Đang chốt lịch'},
-  slots:{max:15,base:0},
+  slots:{max:15,base:0,fixed:''},   // fixed = '' → tự đếm; là số → đặt tay
   pricing:{earlyBird:2000000,regular:3000000},
   schedule:{days:'Tối Thứ 5',time:'20:00–22:00',platform:'MS Teams',weeks:4,sessions:4},
   zalo:{groupUrl:''},
@@ -149,7 +149,17 @@ function countRegistered(cfg, preloaded){
 
 function publicConfig(preloaded){
   var cfg = getConfig();
-  cfg.slots.registered = countRegistered(cfg, preloaded);
+  var thuc = countRegistered(cfg, preloaded);
+  cfg.slots.web = thuc;                       // số đếm thật từ Sheet
+  var dat = cfg.slots.fixed;
+  if (dat !== '' && dat !== null && dat !== undefined && !isNaN(Number(dat))){
+    cfg.slots.registered = Math.max(0, Number(dat));   // admin đặt tay
+    cfg.slots.base = 0;                                // đã đặt tay thì không cộng thêm
+    cfg.slots.manual = true;
+  } else {
+    cfg.slots.registered = thuc;
+    cfg.slots.manual = false;
+  }
   return cfg;
 }
 
@@ -182,12 +192,14 @@ function tgApi(method, payload){
 
 /* Gửi tin: cắt tin dài quá 4096 ký tự, và nếu Markdown lệch làm
    Telegram từ chối thì gửi lại dạng chữ thường — không tin nào mất trắng */
-function tgSend(chatId, text){
+function tgSend(chatId, text, keyboard){
   if (!chatId) return;
   var manh = catNho(String(text), 3800);
   for (var i=0;i<manh.length;i++){
     var p = {chat_id:chatId, text:manh[i], parse_mode:'Markdown',
              disable_web_page_preview:true};
+    // nút bấm chỉ gắn vào mảnh cuối
+    if (keyboard && i===manh.length-1) p.reply_markup = {inline_keyboard:keyboard};
     var r = tgApi('sendMessage', p);
     if (r && r.ok===false){
       delete p.parse_mode;
@@ -195,6 +207,14 @@ function tgSend(chatId, text){
       tgApi('sendMessage', p);
     }
   }
+}
+function tgBroadcastKb(text, keyboard){
+  cfgProp('ADMIN_CHAT_IDS').split(',').forEach(function(id){
+    id=id.trim(); if(id) tgSend(id,text,keyboard);
+  });
+}
+function tgAnswer(cbId, text){
+  return tgApi('answerCallbackQuery',{callback_query_id:cbId, text:text||''});
 }
 function catNho(s, max){
   if (s.length<=max) return [s];
@@ -215,6 +235,24 @@ function tgBroadcast(text){
     id=id.trim(); if(id) tgSend(id,text);
   });
 }
+/* ═══ CHẾ ĐỘ HỎI–ĐÁP ═══
+   Bấm lệnh trơn (VD /giasom) → bot hỏi và nhớ lại trong 5 phút;
+   tin nhắn thường kế tiếp được hiểu là giá trị cho lệnh đó.      */
+function datCho(chatId, cmd){
+  try{ CacheService.getScriptCache().put('cho_'+chatId, cmd, 300); }catch(e){}
+}
+function layCho(chatId){
+  try{
+    var c = CacheService.getScriptCache();
+    var v = c.get('cho_'+chatId);
+    if (v) c.remove('cho_'+chatId);
+    return v;
+  }catch(e){ return null; }
+}
+function xoaCho(chatId){
+  try{ CacheService.getScriptCache().remove('cho_'+chatId); }catch(e){}
+}
+
 function isAdmin(chatId){
   var ids = cfgProp('ADMIN_CHAT_IDS').split(',').map(function(s){return s.trim()});
   return ids.indexOf(String(chatId)) > -1;
@@ -289,6 +327,18 @@ function doPost(e){
   }
 }
 
+/* Mã đăng ký ngắn 4 ký tự (bỏ chữ dễ nhầm O/0/I/1) — dễ gõ tay */
+function maNgan(daCo){
+  var BANG='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  var dung={}; (daCo||[]).forEach(function(r){ dung[String(r.id).toUpperCase()]=1 });
+  for (var lan=0; lan<50; lan++){
+    var m='';
+    for (var i=0;i<4;i++) m += BANG.charAt(Math.floor(Math.random()*BANG.length));
+    if (!dung[m]) return m;
+  }
+  return String(new Date().getTime()).slice(-5);   // dự phòng, gần như không tới
+}
+
 /* ═══════════════ ĐĂNG KÝ ═══════════════ */
 function handleRegister(d){
   // honeypot: bot spam điền cả ô ẩn → giả vờ thành công
@@ -313,7 +363,7 @@ function handleRegister(d){
     });
     if (dup) return jsonOut({ok:true, duplicate:true, config: publicConfig()});
 
-    var id = 'TMXK'+ new Date().getTime().toString(36).toUpperCase();
+    var id = maNgan(allRegs());
     var time = nowVN();
 
     var f = function(k){ return String(d[k]||'') };
@@ -331,39 +381,40 @@ function handleRegister(d){
       var v = String(d[k]||'').trim();
       return v ? icon+' '+nhan+': '+v : '';
     };
-    tgBroadcast([
+    // chỉ in tiêu đề nhóm khi nhóm đó thật sự có nội dung
+    var nhom = function(tieude, dongs){
+      var co = dongs.filter(function(x){return x});
+      return co.length ? ['', tieude].concat(co) : [];
+    };
+    var tin = [
       '🌱 *Đăng ký mới — Tự Mình Xây Kênh*','',
-      '👤 *'+name+'*  ·  `'+id+'`',
+      '👤 *'+name+'*   ·   mã `'+id+'`',
       '📱 `'+phone+'`',
       [d.age?'🎂 '+d.age+' tuổi':'', d.gender||''].filter(String).join('  ·  '),
       dong('💼','Nghề','job'),
-      dong('💪','Thế mạnh','strength'),'',
-      '*🎯 Mục tiêu & động lực*',
-      dong('🏁','Xây kênh để','goals'),
-      dong('⏳','Muốn đạt trong','timeline'),'',
-      '*👥 Khán giả nhắm tới*',
-      dong('🗣','Nói với','audience'),
-      [String(d.aud_age||''), String(d.aud_gender||'')].filter(String).join(' · '),
-      dong('🩹','Nỗi đau khán giả','pain'),'',
-      '*🎬 Nội dung & phong cách*',
-      dong('🏷','Ngách','niche'),
-      dong('🎙','Tone','tone'),
-      dong('📐','Định dạng','format'),
-      dong('⭐','Kênh tham khảo','refs'),'',
-      '*🔋 Năng lực & nguồn lực*',
-      dong('⏰','Thời gian/tuần','time'),
-      dong('🎥','Tự tin camera','camera'),
-      dong('🧰','Thiết bị','gear'),
-      dong('😰','Lo ngại','fear'),'',
-      '*🤝 Kỳ vọng & cam kết*',
-      dong('📊','Từng thử TikTok','tried'),
-      dong('🎵','Kênh hiện có','channel'),
-      dong('✨','Điểm khác biệt','unique'),
-      d.expect ? '💭 Muốn được định hướng nhất:\n_"'+d.expect+'"_' : '','',
+      dong('💪','Thế mạnh','strength')
+    ]
+    .concat(nhom('*🎯 Mục tiêu*', [dong('🏁','Xây kênh để','goals'), dong('⏳','Muốn đạt trong','timeline')]))
+    .concat(nhom('*👥 Khán giả*', [dong('🗣','Nói với','audience'),
+             [String(d.aud_age||''), String(d.aud_gender||'')].filter(String).join(' · '),
+             dong('🩹','Nỗi đau','pain')]))
+    .concat(nhom('*🎬 Nội dung*', [dong('🏷','Ngách','niche'), dong('🎙','Tone','tone'),
+             dong('📐','Định dạng','format'), dong('⭐','Tham khảo','refs')]))
+    .concat(nhom('*🔋 Nguồn lực*', [dong('⏰','Thời gian/tuần','time'), dong('🎥','Tự tin camera','camera'),
+             dong('🧰','Thiết bị','gear'), dong('😰','Lo ngại','fear')]))
+    .concat(nhom('*🤝 Kỳ vọng*', [dong('📊','Từng thử TikTok','tried'), dong('🎵','Kênh hiện có','channel'),
+             dong('✨','Khác biệt','unique'),
+             d.expect ? '💭 Muốn được định hướng nhất:\n_"'+d.expect+'"_' : '']))
+    .concat(['',
       '🕐 '+time+' · '+label,
-      '📈 Tổng: '+total+'/'+cfg2.slots.max+' — còn '+remaining+' suất','',
-      'Duyệt: `/duyet '+id+'`  ·  Từ chối: `/tuchoi '+id+'`'
-    ].filter(function(x){return x!==''}).join('\n'));
+      '📈 Tổng: '+total+'/'+cfg2.slots.max+' — còn '+remaining+' suất'])
+    .filter(function(x){return x!==undefined && x!==null})
+    .join('\n');
+
+    tgBroadcastKb(tin, [[
+      {text:'✅ Duyệt',   callback_data:'ok:'+id},
+      {text:'❌ Từ chối', callback_data:'no:'+id}
+    ]]);
 
     // đủ chỗ → tự chuyển trạng thái và báo admin
     if (remaining<=0 && cfg.cohort.status==='open'){
@@ -381,6 +432,7 @@ function handleRegister(d){
 
 /* ═══════════════ BOT TELEGRAM — ROUTER ═══════════════ */
 function handleTelegram(update){
+  if (update.callback_query) return handleCallback(update.callback_query);
   var msg = update.message || update.edited_message;
   if (!msg || !msg.text) return;
   var chatId = msg.chat.id;
@@ -392,9 +444,21 @@ function handleTelegram(update){
   }
 
   var m = text.match(/^\/(\w+)(?:@\w+)?\s*([\s\S]*)$/);
-  if (!m){ tgSend(chatId,'Gõ /menu để xem danh sách lệnh nhé.'); return; }
+  if (!m){
+    // không phải lệnh — có đang chờ trả lời cho lệnh nào không?
+    var choCmd = layCho(chatId);
+    if (!choCmd){ tgSend(chatId,'Gõ /menu để xem danh sách lệnh nhé.'); return; }
+    m = [null, choCmd, text];
+  } else {
+    xoaCho(chatId);   // gõ lệnh mới thì bỏ câu hỏi đang chờ
+  }
   var cmd = m[1].toLowerCase(), arg = (m[2]||'').trim();
   var cfg = getConfig();
+
+  if (cmd==='huy' || cmd==='cancel'){
+    tgSend(chatId,'👌 Đã hủy, không đổi gì cả.');
+    return;
+  }
 
   switch(cmd){
 
@@ -402,8 +466,8 @@ function handleTelegram(update){
       tgSend(chatId,[
         '🌱 *Bot quản lý — Tự Mình Xây Kênh*',
         '_Đổi gì ở đây web cũng tự cập nhật trong ~1 phút._','',
-        '👉 Lệnh có số/chữ phía sau thì phải gõ kèm giá trị.',
-        'Bấm lệnh trơn (VD /giasom) bot sẽ hiện giá trị đang dùng.','',
+        '👉 Bấm lệnh trơn (VD /giasom) → bot hỏi → bạn chỉ cần',
+        'nhắn con số/nội dung ở tin tiếp theo. Đổi ý thì /huy.','',
         '*👀 Xem nhanh*',
         '📋 /trangthai — toàn bộ cấu hình hiện tại',
         '👥 /danhsach — danh sách đăng ký lớp hiện tại',
@@ -413,7 +477,8 @@ function handleTelegram(update){
         '💸 /gia `3000000` — giá gốc',
         '🔢 /solop `3` — số thứ tự lớp (đổi lớp mới)',
         '🪑 /siso `15` — sĩ số tối đa',
-        '👤 /ngoaihethong `2` — số HV đăng ký ngoài web','',
+        '👤 /ngoaihethong `2` — số HV đăng ký ngoài web',
+        '👥 /dadangky `12` — đặt tay số người đã đăng ký (`auto` để tự đếm)','',
         '*📅 Lịch học*',
         '📅 /khaigiang `05/09/2026` — ngày khai giảng',
         '🕗 /lichhoc `Tối Thứ 5 | 20:00–22:00` — lịch buổi live',
@@ -429,8 +494,8 @@ function handleTelegram(update){
         '🟡 /du — báo đủ chỗ (chuyển sang danh sách chờ)',
         '🔴 /dong — đóng đăng ký','',
         '*✅ Duyệt học viên*',
-        '✅ /duyet `TMXK...` — duyệt một đăng ký',
-        '❌ /tuchoi `TMXK...` — từ chối một đăng ký','',
+        '✅ /duyet `AB12` — duyệt (hoặc bấm nút trên tin báo)',
+        '❌ /tuchoi `AB12` — từ chối','',
         '*⚙️ Khác*',
         '🏫 /sokhoa `2` — số khóa đã dạy',
         '🎓 /hocvien `30+` — số học viên hiển thị'
@@ -447,8 +512,9 @@ function handleTelegram(update){
       var stTxt = {open:'🟢 đang mở',full:'🟡 đủ chỗ',closed:'🔴 đã đóng'}[c2.cohort.status]||c2.cohort.status;
       tgSend(chatId,[
         '📋 *'+lbl+'* · '+stTxt,'',
-        '👥 '+tot+'/'+c2.slots.max+'  (web '+c2.slots.registered+' + ngoài '+c2.slots.base+
-          ' · ⏳ '+pend+' chờ duyệt)',
+        '👥 '+tot+'/'+c2.slots.max+'  '+(c2.slots.manual
+          ? '(đặt tay · Sheet đang có '+c2.slots.web+' · ⏳ '+pend+' chờ duyệt)'
+          : '(web '+c2.slots.web+' + ngoài '+c2.slots.base+' · ⏳ '+pend+' chờ duyệt)'),
         '💰 Ưu đãi: '+money(c2.pricing.earlyBird)+'  (gốc '+money(c2.pricing.regular)+')',
         '📅 Khai giảng: '+c2.cohort.startDate,
         '🕗 Lịch: '+c2.schedule.days+' · '+c2.schedule.time+' · '+c2.schedule.platform,
@@ -461,29 +527,65 @@ function handleTelegram(update){
       return;
     }
 
-    case 'giasom': return setNum(chatId,cfg,arg,'pricing.earlyBird','Giá ưu đãi',true);
-    case 'gia':    return setNum(chatId,cfg,arg,'pricing.regular','Giá gốc',true);
-    case 'solop':  return setNum(chatId,cfg,arg,'cohort.number','Số lớp',false);
-    case 'siso':   return setNum(chatId,cfg,arg,'slots.max','Sĩ số tối đa',false);
-    case 'ngoaihethong': return setNum(chatId,cfg,arg,'slots.base','HV ngoài hệ thống',false);
-    case 'sotuan': return setNum(chatId,cfg,arg,'schedule.weeks','Số tuần',false);
-    case 'sobuoi': return setNum(chatId,cfg,arg,'schedule.sessions','Số buổi live',false);
-    case 'sokhoa': return setNum(chatId,cfg,arg,'stats.cohortsDone','Số khóa đã dạy',false);
+    case 'giasom': return setNum(chatId,cfg,arg,'pricing.earlyBird','Giá ưu đãi',true,'giasom');
+    case 'gia':    return setNum(chatId,cfg,arg,'pricing.regular','Giá gốc',true,'gia');
+    case 'solop':  return setNum(chatId,cfg,arg,'cohort.number','Số lớp',false,'solop');
+    case 'siso':   return setNum(chatId,cfg,arg,'slots.max','Sĩ số tối đa',false,'siso');
+    case 'ngoaihethong': return setNum(chatId,cfg,arg,'slots.base','HV ngoài hệ thống',false,'ngoaihethong');
+    case 'dadangky': case 'sodangky': {
+      var c5 = publicConfig();
+      var dangHien = (Number(c5.slots.base)||0) + (Number(c5.slots.registered)||0);
+      if (!arg){
+        datCho(chatId,'dadangky');
+        return tgSend(chatId,[
+          '👥 Đang hiện trên web: *'+dangHien+'/'+c5.slots.max+'*'+
+            (c5.slots.manual ? '  _(đặt tay)_' : '  _(tự đếm)_'),
+          'Đếm thật trong Sheet: '+c5.slots.web+' người','',
+          '👉 Nhắn số muốn hiện vào tin tiếp theo (VD `12`),',
+          'nhắn `auto` để tự đếm lại, hoặc /huy.'
+        ].join('\n'));
+      }
+      if (/^(auto|tu|tự|tudong|off)$/i.test(arg)){
+        cfg.slots.fixed = ''; saveConfig(cfg);
+        var c6 = publicConfig();
+        var t6 = (Number(c6.slots.base)||0) + (Number(c6.slots.registered)||0);
+        return tgSend(chatId,'✅ Về chế độ *tự đếm* — web hiện '+t6+'/'+c6.slots.max+' người.');
+      }
+      var n5 = Number(String(arg).replace(/[^\d]/g,''));
+      if (!arg.match(/\d/) || isNaN(n5))
+        return tgSend(chatId,'Cần một con số. VD: `/dadangky 12`  ·  về tự đếm: `/dadangky auto`');
+      cfg.slots.fixed = n5; saveConfig(cfg);
+      return tgSend(chatId,[
+        '✅ Đã đặt *'+n5+'/'+cfg.slots.max+'* người đăng ký — còn '+
+          Math.max(0,(Number(cfg.slots.max)||0)-n5)+' suất.',
+        '_Số này giữ nguyên kể cả khi có người đăng ký mới._',
+        'Quay lại tự đếm: `/dadangky auto`'
+      ].join('\n'));
+    }
+
+    case 'sotuan': return setNum(chatId,cfg,arg,'schedule.weeks','Số tuần',false,'sotuan');
+    case 'sobuoi': return setNum(chatId,cfg,arg,'schedule.sessions','Số buổi live',false,'sobuoi');
+    case 'sokhoa': return setNum(chatId,cfg,arg,'stats.cohortsDone','Số khóa đã dạy',false,'sokhoa');
 
     case 'hocvien':
-      if(!arg) return tgSend(chatId,'Đang hiện: *'+cfg.stats.students+'*\nĐổi: `/hocvien 30+`');
+      if(!arg){ datCho(chatId,'hocvien');
+        return tgSend(chatId,'Đang hiện: *'+cfg.stats.students+'*\n\n👉 Nhắn số mới vào tin tiếp theo (VD `30+`), hoặc /huy.'); }
       cfg.stats.students=arg; saveConfig(cfg);
       return tgSend(chatId,'✅ Số học viên hiển thị: *'+arg+'*');
 
     case 'khaigiang':
-      if(!arg) return tgSend(chatId,'Đang là: *'+cfg.cohort.startDate+'*\nĐổi: `/khaigiang 05/09/2026`');
+      if(!arg){ datCho(chatId,'khaigiang');
+        return tgSend(chatId,'Đang là: *'+cfg.cohort.startDate+'*\n\n👉 Nhắn ngày mới vào tin tiếp theo (VD `05/09/2026`), hoặc /huy.'); }
       cfg.cohort.startDate=arg; saveConfig(cfg);
       return tgSend(chatId,'✅ Ngày khai giảng: *'+arg+'*');
 
     case 'lichhoc': {
-      if(!arg || arg.indexOf('|')<0)
-        return tgSend(chatId,'Đang là: *'+cfg.schedule.days+' · '+cfg.schedule.time+
-          '*\nĐổi: `/lichhoc Tối Thứ 5 | 20:00–22:00`');
+      if(!arg || arg.indexOf('|')<0){
+        datCho(chatId,'lichhoc');
+        return tgSend(chatId,'Đang là: *'+cfg.schedule.days+' · '+cfg.schedule.time+'*\n\n'+
+          '👉 Nhắn lịch mới vào tin tiếp theo, nhớ có dấu | ngăn giữa ngày và giờ:\n'+
+          '`Tối Thứ 5 | 20:00–22:00`  ·  /huy để thôi.');
+      }
       var parts=arg.split('|');
       cfg.schedule.days=parts[0].trim();
       cfg.schedule.time=parts[1].trim();
@@ -492,8 +594,9 @@ function handleTelegram(update){
     }
 
     case 'zalo':
-      if(!arg) return tgSend(chatId,'Đang là: '+(cfg.zalo.groupUrl||'(chưa đặt)')+
-        '\nĐổi: `/zalo https://zalo.me/g/...`\nXóa: `/zalo xoa`');
+      if(!arg){ datCho(chatId,'zalo');
+        return tgSend(chatId,'Đang là: '+(cfg.zalo.groupUrl||'(chưa đặt)')+
+          '\n\n👉 Nhắn link group mới vào tin tiếp theo (nhắn `xoa` để gỡ link), hoặc /huy.'); }
       cfg.zalo.groupUrl = (arg.toLowerCase()==='xoa') ? '' : arg;
       saveConfig(cfg);
       return tgSend(chatId, cfg.zalo.groupUrl
@@ -501,15 +604,18 @@ function handleTelegram(update){
         : '✅ Đã xóa link Zalo — nút tham gia sẽ ẩn.');
 
     case 'tiktok':
-      if(!arg) return tgSend(chatId,'Đang là: '+(cfg.contact.tiktokUrl||'(chưa đặt)')+
-        '\nĐổi: `/tiktok https://www.tiktok.com/@tenkenh`');
+      if(!arg){ datCho(chatId,'tiktok');
+        return tgSend(chatId,'Đang là: '+(cfg.contact.tiktokUrl||'(chưa đặt)')+
+          '\n\n👉 Nhắn link kênh mới vào tin tiếp theo, hoặc /huy.'); }
       cfg.contact.tiktokUrl=arg; saveConfig(cfg);
       return tgSend(chatId,'✅ Link TikTok đã cập nhật.');
 
     case 'thongbao':
-      if(!arg) return tgSend(chatId, cfg.announcement.show
-        ? 'Banner đang BẬT: "'+cfg.announcement.text+'"\nĐổi: `/thongbao nội dung mới`\nTắt: /tatthongbao'
-        : 'Banner đang tắt.\nBật: `/thongbao Lớp 03 khai giảng 05/09!`');
+      if(!arg){ datCho(chatId,'thongbao');
+        return tgSend(chatId,(cfg.announcement.show
+          ? 'Banner đang BẬT: "'+cfg.announcement.text+'"'
+          : 'Banner đang tắt.')+
+          '\n\n👉 Nhắn nội dung banner vào tin tiếp theo, hoặc /huy. Tắt hẳn: /tatthongbao'); }
       cfg.announcement={show:true,text:arg}; saveConfig(cfg);
       return tgSend(chatId,'📢 Banner đã BẬT:\n"'+arg+'"');
     case 'tatthongbao':
@@ -533,10 +639,16 @@ function handleTelegram(update){
       var lines=['📋 *'+label2+' — '+regs2.length+' đăng ký*',''];
       regs2.forEach(function(r,i){
         var st={pending:'⏳',approved:'✅',rejected:'❌'}[r.status]||'·';
-        lines.push((i+1)+'. '+st+' *'+r.name+'* — `'+r.phone+'`\n    `'+r.id+'` · '+
-                   (r.tried||'')+(r.niche?' · '+r.niche:''));
+        lines.push((i+1)+'. '+st+' *'+r.name+'* — `'+r.phone+'`  ·  mã `'+r.id+'`'+
+                   (r.niche?'\n    '+r.niche:''));
       });
-      return tgSend(chatId,lines.join('\n'));
+      // nút duyệt nhanh cho tối đa 5 bạn đang chờ
+      var cho = regs2.filter(function(r){return r.status==='pending'}).slice(0,5);
+      var kb = cho.map(function(r){ return [
+        {text:'✅ '+r.name, callback_data:'ok:'+r.id},
+        {text:'❌', callback_data:'no:'+r.id}
+      ]});
+      return tgSend(chatId, lines.join('\n'), kb.length?kb:null);
     }
 
     case 'duyet':  return setStatus(chatId,arg,'approved','✅ Đã duyệt');
@@ -548,6 +660,33 @@ function handleTelegram(update){
     default:
       tgSend(chatId,'Không hiểu lệnh /'+cmd+' — gõ /menu để xem danh sách.');
   }
+}
+
+/* Bấm nút ✅ Duyệt / ❌ Từ chối ngay trên tin báo đăng ký */
+function handleCallback(cb){
+  var chatId = cb.message && cb.message.chat && cb.message.chat.id;
+  if (!isAdmin(chatId)) return tgAnswer(cb.id, 'Không có quyền');
+
+  var p = String(cb.data||'').split(':');
+  var act = p[0], ma = p[1];
+  if (act!=='ok' && act!=='no') return tgAnswer(cb.id);
+
+  var hit=null;
+  allRegs().forEach(function(r){ if(String(r.id).toUpperCase()===String(ma).toUpperCase()) hit=r; });
+  if (!hit) return tgAnswer(cb.id, 'Không tìm thấy mã '+ma);
+
+  var trangThai = (act==='ok') ? 'approved' : 'rejected';
+  sheet().getRange(hit.row, HEADERS.indexOf('status')+1).setValue(trangThai);
+  tgAnswer(cb.id, act==='ok' ? 'Đã duyệt '+hit.name : 'Đã từ chối '+hit.name);
+
+  // đổi nút thành nhãn kết quả để khỏi bấm nhầm lần nữa
+  tgApi('editMessageReplyMarkup',{
+    chat_id: chatId, message_id: cb.message.message_id,
+    reply_markup:{inline_keyboard:[[{
+      text:(act==='ok' ? '✅ Đã duyệt — ' : '❌ Đã từ chối — ')+hit.name,
+      callback_data:'xong'
+    }]]}
+  });
 }
 
 function getPath(o,path){ return path.split('.').reduce(function(a,k){return a?a[k]:undefined},o); }
@@ -564,21 +703,27 @@ function docTien(s){
   return parseInt(raw.replace(/\D/g,''),10);
 }
 
-function setNum(chatId,cfg,arg,path,label,isMoney){
+function setNum(chatId,cfg,arg,path,label,isMoney,cmd){
   if(!String(arg).trim()){
     var cur=getPath(cfg,path);
-    return tgSend(chatId,label+' đang là *'+(isMoney?money(cur):cur)+'*\n'+
-      'Đổi bằng cách gõ lệnh kèm số'+(isMoney?' (gõ tắt `2tr` `500k` cũng được)':'')+'.');
+    if (cmd) datCho(chatId, cmd);
+    return tgSend(chatId,label+' đang là *'+(isMoney?money(cur):cur)+'*\n\n'+
+      '👉 Nhắn giá trị mới vào tin tiếp theo là xong'+
+      (isMoney?' (`2tr` `1500k` `2000000` đều hiểu)':'')+', hoặc /huy để thôi.');
   }
   var n = isMoney ? docTien(arg) : parseInt(String(arg).replace(/\D/g,''),10);
-  if(isNaN(n)||n<0) return tgSend(chatId,'Không đọc được giá trị `'+arg+'`.');
+  if(isNaN(n)||n<0){
+    if (cmd) datCho(chatId, cmd);   // hỏi lại, khỏi phải bấm lệnh lần nữa
+    return tgSend(chatId,'Không đọc được `'+arg+'` — nhắn lại một con số nhé, hoặc /huy.');
+  }
   setPath(cfg,path,n); saveConfig(cfg);
   tgSend(chatId,'✅ '+label+' = *'+(isMoney?money(n):n)+'*\n\nWeb sẽ cập nhật trong ~1 phút.');
 }
 
 function setStatus(chatId,id,status,prefix){
   if(!id){
-    tgSend(chatId,'Cần kèm mã đăng ký, VD `/duyet TMXK...` — gõ /danhsach để xem mã.');
+    datCho(chatId, status==='approved' ? 'duyet' : 'tuchoi');
+    tgSend(chatId,'👉 Nhắn mã học viên vào tin tiếp theo (VD `AB12`) — gõ /danhsach để xem mã, /huy để thôi.');
     return;
   }
   var hit=null;
@@ -633,14 +778,15 @@ function setup(){
     {command:'solop',      description:'🔢 Đổi số lớp — /solop 4'},
     {command:'siso',       description:'🪑 Sĩ số tối đa — /siso 15'},
     {command:'ngoaihethong',description:'👤 HV ngoài web — /ngoaihethong 2'},
+    {command:'dadangky',   description:'👥 Đặt số đã đăng ký — /dadangky 12 · auto'},
     {command:'zalo',       description:'💬 Link group Zalo'},
     {command:'thongbao',   description:'📢 Bật banner thông báo'},
     {command:'tatthongbao',description:'🔕 Tắt banner'},
     {command:'mo',         description:'🟢 Mở đăng ký'},
     {command:'du',         description:'🟡 Báo đủ chỗ'},
     {command:'dong',       description:'🔴 Đóng đăng ký'},
-    {command:'duyet',      description:'✅ Duyệt — /duyet TMXK...'},
-    {command:'tuchoi',     description:'❌ Từ chối — /tuchoi TMXK...'},
+    {command:'duyet',      description:'✅ Duyệt — /duyet AB12'},
+    {command:'tuchoi',     description:'❌ Từ chối — /tuchoi AB12'},
     {command:'sheet',      description:'📄 Link Google Sheet'},
     {command:'menu',       description:'⚙️ Danh sách đầy đủ lệnh'}
   ]});
@@ -743,7 +889,7 @@ function hoiTelegram(){
 function motLuotHoi(choGiay){
   var off = Number(props().getProperty('TG_OFFSET') || 0);
   var r = tgApi('getUpdates',{
-    offset:off, timeout:choGiay, limit:20, allowed_updates:['message']
+    offset:off, timeout:choGiay, limit:20, allowed_updates:['message','callback_query']
   });
   if (!r || !r.ok || !r.result) return -1;
   if (!r.result.length) return 0;
