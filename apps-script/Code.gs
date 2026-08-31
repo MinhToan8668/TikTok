@@ -235,6 +235,24 @@ function tgBroadcast(text){
     id=id.trim(); if(id) tgSend(id,text);
   });
 }
+/* ═══ CHẾ ĐỘ HỎI–ĐÁP ═══
+   Bấm lệnh trơn (VD /giasom) → bot hỏi và nhớ lại trong 5 phút;
+   tin nhắn thường kế tiếp được hiểu là giá trị cho lệnh đó.      */
+function datCho(chatId, cmd){
+  try{ CacheService.getScriptCache().put('cho_'+chatId, cmd, 300); }catch(e){}
+}
+function layCho(chatId){
+  try{
+    var c = CacheService.getScriptCache();
+    var v = c.get('cho_'+chatId);
+    if (v) c.remove('cho_'+chatId);
+    return v;
+  }catch(e){ return null; }
+}
+function xoaCho(chatId){
+  try{ CacheService.getScriptCache().remove('cho_'+chatId); }catch(e){}
+}
+
 function isAdmin(chatId){
   var ids = cfgProp('ADMIN_CHAT_IDS').split(',').map(function(s){return s.trim()});
   return ids.indexOf(String(chatId)) > -1;
@@ -426,9 +444,21 @@ function handleTelegram(update){
   }
 
   var m = text.match(/^\/(\w+)(?:@\w+)?\s*([\s\S]*)$/);
-  if (!m){ tgSend(chatId,'Gõ /menu để xem danh sách lệnh nhé.'); return; }
+  if (!m){
+    // không phải lệnh — có đang chờ trả lời cho lệnh nào không?
+    var choCmd = layCho(chatId);
+    if (!choCmd){ tgSend(chatId,'Gõ /menu để xem danh sách lệnh nhé.'); return; }
+    m = [null, choCmd, text];
+  } else {
+    xoaCho(chatId);   // gõ lệnh mới thì bỏ câu hỏi đang chờ
+  }
   var cmd = m[1].toLowerCase(), arg = (m[2]||'').trim();
   var cfg = getConfig();
+
+  if (cmd==='huy' || cmd==='cancel'){
+    tgSend(chatId,'👌 Đã hủy, không đổi gì cả.');
+    return;
+  }
 
   switch(cmd){
 
@@ -436,8 +466,8 @@ function handleTelegram(update){
       tgSend(chatId,[
         '🌱 *Bot quản lý — Tự Mình Xây Kênh*',
         '_Đổi gì ở đây web cũng tự cập nhật trong ~1 phút._','',
-        '👉 Lệnh có số/chữ phía sau thì phải gõ kèm giá trị.',
-        'Bấm lệnh trơn (VD /giasom) bot sẽ hiện giá trị đang dùng.','',
+        '👉 Bấm lệnh trơn (VD /giasom) → bot hỏi → bạn chỉ cần',
+        'nhắn con số/nội dung ở tin tiếp theo. Đổi ý thì /huy.','',
         '*👀 Xem nhanh*',
         '📋 /trangthai — toàn bộ cấu hình hiện tại',
         '👥 /danhsach — danh sách đăng ký lớp hiện tại',
@@ -497,22 +527,24 @@ function handleTelegram(update){
       return;
     }
 
-    case 'giasom': return setNum(chatId,cfg,arg,'pricing.earlyBird','Giá ưu đãi',true);
-    case 'gia':    return setNum(chatId,cfg,arg,'pricing.regular','Giá gốc',true);
-    case 'solop':  return setNum(chatId,cfg,arg,'cohort.number','Số lớp',false);
-    case 'siso':   return setNum(chatId,cfg,arg,'slots.max','Sĩ số tối đa',false);
-    case 'ngoaihethong': return setNum(chatId,cfg,arg,'slots.base','HV ngoài hệ thống',false);
+    case 'giasom': return setNum(chatId,cfg,arg,'pricing.earlyBird','Giá ưu đãi',true,'giasom');
+    case 'gia':    return setNum(chatId,cfg,arg,'pricing.regular','Giá gốc',true,'gia');
+    case 'solop':  return setNum(chatId,cfg,arg,'cohort.number','Số lớp',false,'solop');
+    case 'siso':   return setNum(chatId,cfg,arg,'slots.max','Sĩ số tối đa',false,'siso');
+    case 'ngoaihethong': return setNum(chatId,cfg,arg,'slots.base','HV ngoài hệ thống',false,'ngoaihethong');
     case 'dadangky': case 'sodangky': {
       var c5 = publicConfig();
       var dangHien = (Number(c5.slots.base)||0) + (Number(c5.slots.registered)||0);
-      if (!arg)
+      if (!arg){
+        datCho(chatId,'dadangky');
         return tgSend(chatId,[
           '👥 Đang hiện trên web: *'+dangHien+'/'+c5.slots.max+'*'+
             (c5.slots.manual ? '  _(đặt tay)_' : '  _(tự đếm)_'),
           'Đếm thật trong Sheet: '+c5.slots.web+' người','',
-          'Đặt tay: `/dadangky 12`',
-          'Quay lại tự đếm: `/dadangky auto`'
+          '👉 Nhắn số muốn hiện vào tin tiếp theo (VD `12`),',
+          'nhắn `auto` để tự đếm lại, hoặc /huy.'
         ].join('\n'));
+      }
       if (/^(auto|tu|tự|tudong|off)$/i.test(arg)){
         cfg.slots.fixed = ''; saveConfig(cfg);
         var c6 = publicConfig();
@@ -531,24 +563,29 @@ function handleTelegram(update){
       ].join('\n'));
     }
 
-    case 'sotuan': return setNum(chatId,cfg,arg,'schedule.weeks','Số tuần',false);
-    case 'sobuoi': return setNum(chatId,cfg,arg,'schedule.sessions','Số buổi live',false);
-    case 'sokhoa': return setNum(chatId,cfg,arg,'stats.cohortsDone','Số khóa đã dạy',false);
+    case 'sotuan': return setNum(chatId,cfg,arg,'schedule.weeks','Số tuần',false,'sotuan');
+    case 'sobuoi': return setNum(chatId,cfg,arg,'schedule.sessions','Số buổi live',false,'sobuoi');
+    case 'sokhoa': return setNum(chatId,cfg,arg,'stats.cohortsDone','Số khóa đã dạy',false,'sokhoa');
 
     case 'hocvien':
-      if(!arg) return tgSend(chatId,'Đang hiện: *'+cfg.stats.students+'*\nĐổi: `/hocvien 30+`');
+      if(!arg){ datCho(chatId,'hocvien');
+        return tgSend(chatId,'Đang hiện: *'+cfg.stats.students+'*\n\n👉 Nhắn số mới vào tin tiếp theo (VD `30+`), hoặc /huy.'); }
       cfg.stats.students=arg; saveConfig(cfg);
       return tgSend(chatId,'✅ Số học viên hiển thị: *'+arg+'*');
 
     case 'khaigiang':
-      if(!arg) return tgSend(chatId,'Đang là: *'+cfg.cohort.startDate+'*\nĐổi: `/khaigiang 05/09/2026`');
+      if(!arg){ datCho(chatId,'khaigiang');
+        return tgSend(chatId,'Đang là: *'+cfg.cohort.startDate+'*\n\n👉 Nhắn ngày mới vào tin tiếp theo (VD `05/09/2026`), hoặc /huy.'); }
       cfg.cohort.startDate=arg; saveConfig(cfg);
       return tgSend(chatId,'✅ Ngày khai giảng: *'+arg+'*');
 
     case 'lichhoc': {
-      if(!arg || arg.indexOf('|')<0)
-        return tgSend(chatId,'Đang là: *'+cfg.schedule.days+' · '+cfg.schedule.time+
-          '*\nĐổi: `/lichhoc Tối Thứ 5 | 20:00–22:00`');
+      if(!arg || arg.indexOf('|')<0){
+        datCho(chatId,'lichhoc');
+        return tgSend(chatId,'Đang là: *'+cfg.schedule.days+' · '+cfg.schedule.time+'*\n\n'+
+          '👉 Nhắn lịch mới vào tin tiếp theo, nhớ có dấu | ngăn giữa ngày và giờ:\n'+
+          '`Tối Thứ 5 | 20:00–22:00`  ·  /huy để thôi.');
+      }
       var parts=arg.split('|');
       cfg.schedule.days=parts[0].trim();
       cfg.schedule.time=parts[1].trim();
@@ -557,8 +594,9 @@ function handleTelegram(update){
     }
 
     case 'zalo':
-      if(!arg) return tgSend(chatId,'Đang là: '+(cfg.zalo.groupUrl||'(chưa đặt)')+
-        '\nĐổi: `/zalo https://zalo.me/g/...`\nXóa: `/zalo xoa`');
+      if(!arg){ datCho(chatId,'zalo');
+        return tgSend(chatId,'Đang là: '+(cfg.zalo.groupUrl||'(chưa đặt)')+
+          '\n\n👉 Nhắn link group mới vào tin tiếp theo (nhắn `xoa` để gỡ link), hoặc /huy.'); }
       cfg.zalo.groupUrl = (arg.toLowerCase()==='xoa') ? '' : arg;
       saveConfig(cfg);
       return tgSend(chatId, cfg.zalo.groupUrl
@@ -566,15 +604,18 @@ function handleTelegram(update){
         : '✅ Đã xóa link Zalo — nút tham gia sẽ ẩn.');
 
     case 'tiktok':
-      if(!arg) return tgSend(chatId,'Đang là: '+(cfg.contact.tiktokUrl||'(chưa đặt)')+
-        '\nĐổi: `/tiktok https://www.tiktok.com/@tenkenh`');
+      if(!arg){ datCho(chatId,'tiktok');
+        return tgSend(chatId,'Đang là: '+(cfg.contact.tiktokUrl||'(chưa đặt)')+
+          '\n\n👉 Nhắn link kênh mới vào tin tiếp theo, hoặc /huy.'); }
       cfg.contact.tiktokUrl=arg; saveConfig(cfg);
       return tgSend(chatId,'✅ Link TikTok đã cập nhật.');
 
     case 'thongbao':
-      if(!arg) return tgSend(chatId, cfg.announcement.show
-        ? 'Banner đang BẬT: "'+cfg.announcement.text+'"\nĐổi: `/thongbao nội dung mới`\nTắt: /tatthongbao'
-        : 'Banner đang tắt.\nBật: `/thongbao Lớp 03 khai giảng 05/09!`');
+      if(!arg){ datCho(chatId,'thongbao');
+        return tgSend(chatId,(cfg.announcement.show
+          ? 'Banner đang BẬT: "'+cfg.announcement.text+'"'
+          : 'Banner đang tắt.')+
+          '\n\n👉 Nhắn nội dung banner vào tin tiếp theo, hoặc /huy. Tắt hẳn: /tatthongbao'); }
       cfg.announcement={show:true,text:arg}; saveConfig(cfg);
       return tgSend(chatId,'📢 Banner đã BẬT:\n"'+arg+'"');
     case 'tatthongbao':
@@ -662,21 +703,27 @@ function docTien(s){
   return parseInt(raw.replace(/\D/g,''),10);
 }
 
-function setNum(chatId,cfg,arg,path,label,isMoney){
+function setNum(chatId,cfg,arg,path,label,isMoney,cmd){
   if(!String(arg).trim()){
     var cur=getPath(cfg,path);
-    return tgSend(chatId,label+' đang là *'+(isMoney?money(cur):cur)+'*\n'+
-      'Đổi bằng cách gõ lệnh kèm số'+(isMoney?' (gõ tắt `2tr` `500k` cũng được)':'')+'.');
+    if (cmd) datCho(chatId, cmd);
+    return tgSend(chatId,label+' đang là *'+(isMoney?money(cur):cur)+'*\n\n'+
+      '👉 Nhắn giá trị mới vào tin tiếp theo là xong'+
+      (isMoney?' (`2tr` `1500k` `2000000` đều hiểu)':'')+', hoặc /huy để thôi.');
   }
   var n = isMoney ? docTien(arg) : parseInt(String(arg).replace(/\D/g,''),10);
-  if(isNaN(n)||n<0) return tgSend(chatId,'Không đọc được giá trị `'+arg+'`.');
+  if(isNaN(n)||n<0){
+    if (cmd) datCho(chatId, cmd);   // hỏi lại, khỏi phải bấm lệnh lần nữa
+    return tgSend(chatId,'Không đọc được `'+arg+'` — nhắn lại một con số nhé, hoặc /huy.');
+  }
   setPath(cfg,path,n); saveConfig(cfg);
   tgSend(chatId,'✅ '+label+' = *'+(isMoney?money(n):n)+'*\n\nWeb sẽ cập nhật trong ~1 phút.');
 }
 
 function setStatus(chatId,id,status,prefix){
   if(!id){
-    tgSend(chatId,'Cần kèm mã đăng ký, VD `/duyet AB12` — gõ /danhsach để xem mã.');
+    datCho(chatId, status==='approved' ? 'duyet' : 'tuchoi');
+    tgSend(chatId,'👉 Nhắn mã học viên vào tin tiếp theo (VD `AB12`) — gõ /danhsach để xem mã, /huy để thôi.');
     return;
   }
   var hit=null;
