@@ -90,6 +90,7 @@ màn hình cảm ơn.
 | `/solop 4` | Mở lớp mới (số thứ tự lớp) |
 | `/siso 15` | Sĩ số tối đa |
 | `/ngoaihethong 2` | Số học viên đăng ký ngoài web (chuyển khoản tay…) |
+| `/dadangky 12` · `/dadangky auto` | Đặt tay số người đã đăng ký hiện trên web / quay lại tự đếm |
 | `/zalo <link>` | Link group Zalo hiện sau khi đăng ký |
 | `/thongbao <nội dung>` | Bật banner thông báo đầu trang |
 | `/tatthongbao` | Tắt banner |

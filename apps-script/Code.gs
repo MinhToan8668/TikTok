@@ -50,7 +50,7 @@ var HEADERS = ['id','time','cohort','name','phone','age','gender','job','strengt
 /* ─────────────── CONFIG mặc định (bot ghi đè dần) ─────────────── */
 var DEFAULT_CONFIG = {
   cohort:{number:3,status:'open',openText:'Đang mở đăng ký',startDate:'Đang chốt lịch'},
-  slots:{max:15,base:0},
+  slots:{max:15,base:0,fixed:''},   // fixed = '' → tự đếm; là số → đặt tay
   pricing:{earlyBird:2000000,regular:3000000},
   schedule:{days:'Tối Thứ 5',time:'20:00–22:00',platform:'MS Teams',weeks:4,sessions:4},
   zalo:{groupUrl:''},
@@ -149,7 +149,17 @@ function countRegistered(cfg, preloaded){
 
 function publicConfig(preloaded){
   var cfg = getConfig();
-  cfg.slots.registered = countRegistered(cfg, preloaded);
+  var thuc = countRegistered(cfg, preloaded);
+  cfg.slots.web = thuc;                       // số đếm thật từ Sheet
+  var dat = cfg.slots.fixed;
+  if (dat !== '' && dat !== null && dat !== undefined && !isNaN(Number(dat))){
+    cfg.slots.registered = Math.max(0, Number(dat));   // admin đặt tay
+    cfg.slots.base = 0;                                // đã đặt tay thì không cộng thêm
+    cfg.slots.manual = true;
+  } else {
+    cfg.slots.registered = thuc;
+    cfg.slots.manual = false;
+  }
   return cfg;
 }
 
@@ -437,7 +447,8 @@ function handleTelegram(update){
         '💸 /gia `3000000` — giá gốc',
         '🔢 /solop `3` — số thứ tự lớp (đổi lớp mới)',
         '🪑 /siso `15` — sĩ số tối đa',
-        '👤 /ngoaihethong `2` — số HV đăng ký ngoài web','',
+        '👤 /ngoaihethong `2` — số HV đăng ký ngoài web',
+        '👥 /dadangky `12` — đặt tay số người đã đăng ký (`auto` để tự đếm)','',
         '*📅 Lịch học*',
         '📅 /khaigiang `05/09/2026` — ngày khai giảng',
         '🕗 /lichhoc `Tối Thứ 5 | 20:00–22:00` — lịch buổi live',
@@ -471,8 +482,9 @@ function handleTelegram(update){
       var stTxt = {open:'🟢 đang mở',full:'🟡 đủ chỗ',closed:'🔴 đã đóng'}[c2.cohort.status]||c2.cohort.status;
       tgSend(chatId,[
         '📋 *'+lbl+'* · '+stTxt,'',
-        '👥 '+tot+'/'+c2.slots.max+'  (web '+c2.slots.registered+' + ngoài '+c2.slots.base+
-          ' · ⏳ '+pend+' chờ duyệt)',
+        '👥 '+tot+'/'+c2.slots.max+'  '+(c2.slots.manual
+          ? '(đặt tay · Sheet đang có '+c2.slots.web+' · ⏳ '+pend+' chờ duyệt)'
+          : '(web '+c2.slots.web+' + ngoài '+c2.slots.base+' · ⏳ '+pend+' chờ duyệt)'),
         '💰 Ưu đãi: '+money(c2.pricing.earlyBird)+'  (gốc '+money(c2.pricing.regular)+')',
         '📅 Khai giảng: '+c2.cohort.startDate,
         '🕗 Lịch: '+c2.schedule.days+' · '+c2.schedule.time+' · '+c2.schedule.platform,
@@ -490,6 +502,35 @@ function handleTelegram(update){
     case 'solop':  return setNum(chatId,cfg,arg,'cohort.number','Số lớp',false);
     case 'siso':   return setNum(chatId,cfg,arg,'slots.max','Sĩ số tối đa',false);
     case 'ngoaihethong': return setNum(chatId,cfg,arg,'slots.base','HV ngoài hệ thống',false);
+    case 'dadangky': case 'sodangky': {
+      var c5 = publicConfig();
+      var dangHien = (Number(c5.slots.base)||0) + (Number(c5.slots.registered)||0);
+      if (!arg)
+        return tgSend(chatId,[
+          '👥 Đang hiện trên web: *'+dangHien+'/'+c5.slots.max+'*'+
+            (c5.slots.manual ? '  _(đặt tay)_' : '  _(tự đếm)_'),
+          'Đếm thật trong Sheet: '+c5.slots.web+' người','',
+          'Đặt tay: `/dadangky 12`',
+          'Quay lại tự đếm: `/dadangky auto`'
+        ].join('\n'));
+      if (/^(auto|tu|tự|tudong|off)$/i.test(arg)){
+        cfg.slots.fixed = ''; saveConfig(cfg);
+        var c6 = publicConfig();
+        var t6 = (Number(c6.slots.base)||0) + (Number(c6.slots.registered)||0);
+        return tgSend(chatId,'✅ Về chế độ *tự đếm* — web hiện '+t6+'/'+c6.slots.max+' người.');
+      }
+      var n5 = Number(String(arg).replace(/[^\d]/g,''));
+      if (!arg.match(/\d/) || isNaN(n5))
+        return tgSend(chatId,'Cần một con số. VD: `/dadangky 12`  ·  về tự đếm: `/dadangky auto`');
+      cfg.slots.fixed = n5; saveConfig(cfg);
+      return tgSend(chatId,[
+        '✅ Đã đặt *'+n5+'/'+cfg.slots.max+'* người đăng ký — còn '+
+          Math.max(0,(Number(cfg.slots.max)||0)-n5)+' suất.',
+        '_Số này giữ nguyên kể cả khi có người đăng ký mới._',
+        'Quay lại tự đếm: `/dadangky auto`'
+      ].join('\n'));
+    }
+
     case 'sotuan': return setNum(chatId,cfg,arg,'schedule.weeks','Số tuần',false);
     case 'sobuoi': return setNum(chatId,cfg,arg,'schedule.sessions','Số buổi live',false);
     case 'sokhoa': return setNum(chatId,cfg,arg,'stats.cohortsDone','Số khóa đã dạy',false);
@@ -690,6 +731,7 @@ function setup(){
     {command:'solop',      description:'🔢 Đổi số lớp — /solop 4'},
     {command:'siso',       description:'🪑 Sĩ số tối đa — /siso 15'},
     {command:'ngoaihethong',description:'👤 HV ngoài web — /ngoaihethong 2'},
+    {command:'dadangky',   description:'👥 Đặt số đã đăng ký — /dadangky 12 · auto'},
     {command:'zalo',       description:'💬 Link group Zalo'},
     {command:'thongbao',   description:'📢 Bật banner thông báo'},
     {command:'tatthongbao',description:'🔕 Tắt banner'},
