@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Tự Mình Xây Kênh">
+  <!--
+    TỰ MÌNH XÂY KÊNH — logo "viên gạch hôm nay"
+    Ý nghĩa: xây kênh như xây nhà — hai viên gạch móng và một viên giữa đã
+    nằm chắc (màu mực), viên gạch lime mang nút play đang được chính tay bạn
+    đặt xuống, hơi nghiêng vì còn đang thao tác. Mỗi video là một viên gạch;
+    viên quan trọng nhất luôn là viên hôm nay. Chồng gạch xếp cao dần = kênh
+    lớn dần, và hình khối tổng thể vươn lên như một mũi tên tăng trưởng.
+  -->
+  <g transform="rotate(-9 32 17)">
+    <rect x="19" y="11" width="26" height="12" rx="3" fill="#26210f"/>
+    <path d="M30 14.4v5.2a1 1 0 0 0 1.52.86l4.6-2.6a1 1 0 0 0 0-1.72l-4.6-2.6A1 1 0 0 0 30 14.4z" fill="#26210f"/>
+  </g>
+  <rect x="19" y="28" width="26" height="12" rx="3" fill="#26210f"/>
+  <rect x="4"  y="44" width="26" height="12" rx="3" fill="#26210f"/>
+  <rect x="34" y="44" width="26" height="12" rx="3" fill="#26210f"/>
+</svg>

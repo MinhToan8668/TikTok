@@ -95,7 +95,7 @@ màn hình cảm ơn.
 | `/tatthongbao` | Tắt banner |
 | `/mo` · `/du` · `/dong` | Trạng thái đăng ký của lớp |
 | `/danhsach` | Danh sách đăng ký lớp hiện tại |
-| `/duyet TMXK...` · `/tuchoi TMXK...` | Duyệt / từ chối một đăng ký |
+| `/duyet AB12` · `/tuchoi AB12` | Duyệt / từ chối một đăng ký (hoặc bấm thẳng nút ✅/❌ trong tin báo) |
 
 ## Trang admin chỉ-xem
 
