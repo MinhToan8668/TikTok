@@ -670,7 +670,11 @@ function handleTelegram(update){
         tgSendFile(chatId, anh, 'Nền Teams — '+tenGV+(nenToi?' (tối)':' (sáng)'));
       }catch(err){
         ghiLoi('veNenTeams', err);
-        tgSend(chatId,'✘ Không vẽ được nền: '+err+'\n(Lần đầu dùng /nen phải chạy lại hàm setup trong Apps Script để cấp thêm quyền Slides.)');
+        tgSend(chatId, ['✘ Không vẽ được nền.','`'+err+'`','',
+          'Thử theo thứ tự:',
+          '1. Mở Apps Script → chạy tay hàm `setup` một lần, đồng ý hết các quyền Google hỏi.',
+          '2. Vẫn lỗi → chạy hàm `kiemTraNen` trong Apps Script, đọc Execution log sẽ chỉ rõ chỗ hỏng.'
+        ].join('\n'));
       }
       return;
     }
@@ -813,20 +817,68 @@ function veNenTeams(ten, toi){
 
   pres.saveAndClose();
 
-  // xuất PNG qua Slides API (thumbnail LARGE = 1600px ngang)
   var id = pres.getId();
-  var pageId = SlidesApp.openById(id).getSlides()[0].getObjectId();
-  var url = 'https://slides.googleapis.com/v1/presentations/'+id+
-            '/pages/'+pageId+'/thumbnail?thumbnailProperties.thumbnailSize=LARGE';
-  var meta = JSON.parse(UrlFetchApp.fetch(url,{
-    headers:{Authorization:'Bearer '+ScriptApp.getOAuthToken()}, muteHttpExceptions:true
-  }).getContentText());
-  if (!meta.contentUrl) throw new Error('Slides không trả ảnh: '+JSON.stringify(meta).slice(0,200));
-  var blob = UrlFetchApp.fetch(meta.contentUrl).getBlob()
-    .setName('nen-teams-'+ten.replace(/\s+/g,'-').toLowerCase()+(toi?'-toi':'-sang')+'.png');
+  var blob;
+  try{
+    blob = xuatAnhSlide(id);
+  } finally {
+    try{ DriveApp.getFileById(id).setTrashed(true); }catch(e){}   // dọn file nháp dù thành hay bại
+  }
+  return blob.setName('nen-teams-'+khongDau(ten)+(toi?'-toi':'-sang')+'.png');
+}
 
-  try{ DriveApp.getFileById(id).setTrashed(true); }catch(e){}   // dọn file nháp
-  return blob;
+/* Bỏ dấu + gạch nối để đặt tên file cho lành */
+function khongDau(s){
+  var g = 'àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ';
+  var k = 'aaaaaaaaaaaaaaaaaeeeeeeeeeeeiiiiioooooooooooooooooouuuuuuuuuuuyyyyyd';
+  var r = '';
+  String(s).toLowerCase().split('').forEach(function(c){
+    var i = g.indexOf(c);
+    r += (i > -1) ? k.charAt(i) : c;
+  });
+  return r.replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || 'nen';
+}
+
+/**
+ * Xuất slide đầu tiên ra PNG. Thử 2 đường:
+ *  1. Link export sẵn có của Google Docs — KHÔNG cần bật API nào.
+ *  2. Slides API thumbnail — chỉ chạy nếu project đã bật Slides API.
+ * Đường 1 gần như luôn được, nên bình thường không phải đụng tới Cloud Console.
+ */
+function xuatAnhSlide(id){
+  var token = ScriptApp.getOAuthToken();
+  var pageId;
+  try{ pageId = SlidesApp.openById(id).getSlides()[0].getObjectId(); }catch(e){}
+  var loi = [];
+
+  // ── Đường 1: docs.google.com/.../export/png
+  try{
+    var u1 = 'https://docs.google.com/presentation/d/'+id+'/export/png?id='+id+
+             (pageId ? '&pageid='+pageId : '');
+    var r1 = UrlFetchApp.fetch(u1, {
+      headers:{Authorization:'Bearer '+token}, muteHttpExceptions:true, followRedirects:true
+    });
+    if (r1.getResponseCode()===200){
+      var b1 = r1.getBlob();
+      if (String(b1.getContentType()).indexOf('image') === 0) return b1;
+      loi.push('export trả về '+b1.getContentType());
+    } else {
+      loi.push('export mã '+r1.getResponseCode());
+    }
+  }catch(e1){ loi.push('export lỗi '+e1); }
+
+  // ── Đường 2: Slides API thumbnail
+  try{
+    var u2 = 'https://slides.googleapis.com/v1/presentations/'+id+'/pages/'+pageId+
+             '/thumbnail?thumbnailProperties.thumbnailSize=LARGE';
+    var meta = JSON.parse(UrlFetchApp.fetch(u2,{
+      headers:{Authorization:'Bearer '+token}, muteHttpExceptions:true
+    }).getContentText());
+    if (meta.contentUrl) return UrlFetchApp.fetch(meta.contentUrl).getBlob();
+    loi.push('thumbnail: '+((meta.error && meta.error.message) || 'không rõ'));
+  }catch(e2){ loi.push('thumbnail lỗi '+e2); }
+
+  throw new Error(loi.join(' · '));
 }
 
 /* Gửi file (giữ nguyên chất lượng, không bị Telegram nén như ảnh) */
@@ -1013,6 +1065,27 @@ function motLuotHoi(choGiay){
     try{ handleTelegram(u); }catch(err){ ghiLoi('hoiTelegram', err); }
   });
   return r.result.length;
+}
+
+/** Chẩn đoán riêng cho lệnh /nen — chạy tay rồi đọc Execution log. */
+function kiemTraNen(){
+  var out = [];
+  try{
+    var blob = veNenTeams('Kiểm Tra', false);
+    out.push('✔ Vẽ được nền: '+blob.getName()+' — '+Math.round(blob.getBytes().length/1024)+' KB');
+    var admin = cfgProp('ADMIN_CHAT_IDS').split(',')[0].trim();
+    if (admin){ tgSendFile(admin, blob, 'Ảnh thử từ kiemTraNen'); out.push('✔ Đã gửi thử qua Telegram'); }
+  }catch(err){
+    out.push('✘ Lỗi: '+err);
+    out.push('');
+    out.push('Nếu thấy chữ "has not been used in project ... or it is disabled":');
+    out.push('  → Mở Apps Script → ⚙️ Project Settings → xem "Google Cloud Platform (GCP) Project"');
+    out.push('  → bấm vào số project, vào Cloud Console → APIs & Services → Enable APIs');
+    out.push('  → bật "Google Slides API", đợi 1-2 phút rồi chạy lại.');
+    out.push('Nếu thấy lỗi quyền (authorization/permission):');
+    out.push('  → chạy tay hàm  setup  và đồng ý toàn bộ quyền Google hỏi.');
+  }
+  Logger.log(out.join('\n'));
 }
 
 /** Chẩn đoán khi bot im hoặc lỗi — chạy rồi đọc Execution log. */
