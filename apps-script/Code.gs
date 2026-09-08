@@ -30,7 +30,8 @@
    ───────────────────────────────────────────────────────────── */
 var SETUP = {
   BOT_TOKEN:      '',   // token bot Telegram từ @BotFather
-  ADMIN_CHAT_IDS: '',   // chat id điều khiển bot, cách nhau dấu phẩy
+  ADMIN_CHAT_IDS: '',   // chat id ĐƯỢC RA LỆNH (chat riêng của bạn), cách nhau dấu phẩy
+  NOTIFY_CHAT_IDS: '',  // chat id CHỈ NHẬN THÔNG BÁO (group nội bộ) — xem được, không sửa được
   ADMIN_KEY:      '',   // mật khẩu xem trang admin (?admin=...)
   EXEC_URL:       '',   // URL /exec của bản deploy hiện tại
   SHEET_ID:       ''    // ID Google Sheet lưu đăng ký — để trống thì
@@ -208,9 +209,12 @@ function tgSend(chatId, text, keyboard){
     }
   }
 }
+/* Admin nhận kèm nút bấm; group chỉ-xem nhận bản không nút
+   (nút duyệt bấm trong group cũng không ăn, nên không gửi cho khỏi rối) */
 function tgBroadcastKb(text, keyboard){
-  cfgProp('ADMIN_CHAT_IDS').split(',').forEach(function(id){
-    id=id.trim(); if(id) tgSend(id,text,keyboard);
+  dsChat('ADMIN_CHAT_IDS').forEach(function(id){ tgSend(id,text,keyboard) });
+  dsChat('NOTIFY_CHAT_IDS').forEach(function(id){
+    tgSend(id, text+'\n\n_Duyệt/từ chối làm trong chat riêng với bot._');
   });
 }
 function tgAnswer(cbId, text){
@@ -231,9 +235,8 @@ function catNho(s, max){
   return out;
 }
 function tgBroadcast(text){
-  cfgProp('ADMIN_CHAT_IDS').split(',').forEach(function(id){
-    id=id.trim(); if(id) tgSend(id,text);
-  });
+  dsChat('ADMIN_CHAT_IDS').concat(dsChat('NOTIFY_CHAT_IDS'))
+    .forEach(function(id){ tgSend(id,text) });
 }
 /* ═══ CHẾ ĐỘ HỎI–ĐÁP ═══
    Bấm lệnh trơn (VD /giasom) → bot hỏi và nhớ lại trong 5 phút;
@@ -253,10 +256,21 @@ function xoaCho(chatId){
   try{ CacheService.getScriptCache().remove('cho_'+chatId); }catch(e){}
 }
 
-function isAdmin(chatId){
-  var ids = cfgProp('ADMIN_CHAT_IDS').split(',').map(function(s){return s.trim()});
-  return ids.indexOf(String(chatId)) > -1;
+/* ═══ PHÂN QUYỀN ═══
+   ADMIN  = chat riêng của bạn → làm được mọi lệnh
+   NOTIFY = group nội bộ       → nhận thông báo + vài lệnh chỉ xem  */
+function dsChat(key){
+  return cfgProp(key).split(',').map(function(s){return s.trim()}).filter(String);
 }
+function isAdmin(chatId){
+  return dsChat('ADMIN_CHAT_IDS').indexOf(String(chatId)) > -1;
+}
+function isNotify(chatId){
+  return dsChat('NOTIFY_CHAT_IDS').indexOf(String(chatId)) > -1;
+}
+
+/* Lệnh group chỉ-xem được phép dùng — muốn siết/nới thì sửa mảng này */
+var LENH_XEM = ['trangthai','status','danhsach','ds','menu','start','help','id'];
 
 /* ═══════════════ CHỐNG XỬ LÝ TRÙNG ═══════════════
    Telegram gửi lại đúng update đó nếu không nhận được phản hồi kịp.
@@ -438,14 +452,19 @@ function handleTelegram(update){
   var chatId = msg.chat.id;
   var text = msg.text.trim();
 
-  if (!isAdmin(chatId)){
-    tgSend(chatId,'⛔ Bot này chỉ dành cho quản trị Tự Mình Xây Kênh.\nChat ID của bạn: `'+chatId+'`');
+  var quanTri = isAdmin(chatId);
+  var chiXem  = !quanTri && isNotify(chatId);   // group nội bộ
+
+  if (!quanTri && !chiXem){
+    tgSend(chatId,'⛔ Bot này chỉ dành cho quản trị Tự Mình Xây Kênh.\nChat ID của chat này: `'+chatId+'`');
     return;
   }
 
   var m = text.match(/^\/(\w+)(?:@\w+)?\s*([\s\S]*)$/);
   if (!m){
-    // không phải lệnh — có đang chờ trả lời cho lệnh nào không?
+    // Trong group, tin nhắn thường KHÔNG phải nói với bot → im lặng,
+    // không thì bot chen vào mọi câu chuyện của mọi người.
+    if (chiXem) return;
     var choCmd = layCho(chatId);
     if (!choCmd){ tgSend(chatId,'Gõ /menu để xem danh sách lệnh nhé.'); return; }
     m = [null, choCmd, text];
@@ -453,6 +472,12 @@ function handleTelegram(update){
     xoaCho(chatId);   // gõ lệnh mới thì bỏ câu hỏi đang chờ
   }
   var cmd = m[1].toLowerCase(), arg = (m[2]||'').trim();
+
+  if (chiXem && LENH_XEM.indexOf(cmd) < 0){
+    tgSend(chatId,'👀 Trong group chỉ xem được /trangthai và /danhsach.\n'+
+      'Muốn đổi giá / duyệt học viên thì nhắn riêng cho bot nhé.');
+    return;
+  }
   var cfg = getConfig();
 
   if (cmd==='huy' || cmd==='cancel'){
@@ -463,6 +488,14 @@ function handleTelegram(update){
   switch(cmd){
 
     case 'start': case 'menu': case 'help':
+      if (chiXem) return tgSend(chatId,[
+        '🌱 *Bot Tự Mình Xây Kênh — chế độ theo dõi*','',
+        'Group này nhận thông báo mỗi khi có đăng ký mới,',
+        'và xem được tình hình lớp bằng mấy lệnh sau:','',
+        '📋 /trangthai — sĩ số, giá, lịch, còn bao nhiêu chỗ',
+        '👥 /danhsach — danh sách đăng ký lớp hiện tại','',
+        '_Đổi giá, đổi lịch, duyệt học viên… làm trong chat riêng với bot._'
+      ].join('\n'));
       tgSend(chatId,[
         '🌱 *Bot quản lý — Tự Mình Xây Kênh*',
         '_Đổi gì ở đây web cũng tự cập nhật trong ~1 phút._','',
@@ -650,7 +683,7 @@ function handleTelegram(update){
         {text:'✅ '+r.name, callback_data:'ok:'+r.id},
         {text:'❌', callback_data:'no:'+r.id}
       ]});
-      return tgSend(chatId, lines.join('\n'), kb.length?kb:null);
+      return tgSend(chatId, lines.join('\n'), (quanTri && kb.length) ? kb : null);
     }
 
     case 'duyet':  return setStatus(chatId,arg,'approved','✅ Đã duyệt');
@@ -1113,6 +1146,8 @@ function kiemTra(){
     if (w.url) out.push('  ⚠ Webhook đang nối sẽ tranh tin với chế độ hỏi — chạy setup để gỡ.');
   }
   out.push('Đăng ký trong sheet: '+allRegs().length+' dòng');
+  out.push('Chat ra lệnh được: '+(dsChat('ADMIN_CHAT_IDS').join(', ')||'(chưa có)'));
+  out.push('Group chỉ nhận báo: '+(dsChat('NOTIFY_CHAT_IDS').join(', ')||'(chưa có)'));
   out.push('ADMIN_KEY: '+cfgProp('ADMIN_KEY'));
   Logger.log(out.join('\n'));
 }
