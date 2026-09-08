@@ -34,7 +34,8 @@ Trong Apps Script editor: **Project Settings (⚙️) → Script Properties → 
 | Property | Giá trị |
 |---|---|
 | `BOT_TOKEN` | Token MỚI từ BotFather (bước 0) |
-| `ADMIN_CHAT_IDS` | Chat ID của Toàn (và Tiểu My nếu muốn), cách nhau dấu phẩy. VD: `5116087301,987654321` |
+| `ADMIN_CHAT_IDS` | Chat ID **được ra lệnh** (chat riêng của Toàn, Tiểu My…), cách nhau dấu phẩy. VD: `5116087301,987654321` |
+| `NOTIFY_CHAT_IDS` | Chat ID group **chỉ nhận thông báo** — thấy tin đăng ký mới, dùng được `/trangthai` `/danhsach`, không đổi được gì. VD: `-1001234567890` |
 | `ADMIN_KEY` | Một chuỗi bí mật tùy chọn để mở trang admin, VD: `tmxk-2026-xyz` |
 
 ## Bước 4 — Deploy Web App

@@ -438,7 +438,38 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 .form-msg{display:none;margin-top:16px;padding:12px 15px;border-radius:var(--r-sm);font-size:13.5px;line-height:1.5}
 .form-msg.on{display:block}
 .form-msg.bad{background:rgba(196,69,54,.08);border:1px solid rgba(196,69,54,.3);color:var(--red)}
-#btnSubmit{width:100%;margin-top:22px}
+/* thanh tiến độ + các bước */
+.prog{height:5px;background:var(--line);border-radius:99px;overflow:hidden;margin-bottom:9px}
+.prog i{display:block;height:100%;background:var(--lime);border-radius:99px;
+  transition:width .35s var(--ease)}
+.prog-lbl{font-size:11.5px;color:var(--quiet);margin-bottom:20px;
+  display:flex;align-items:baseline;gap:7px;font-family:var(--disp)}
+.prog-lbl b{color:var(--lime-deep);font-weight:800;letter-spacing:.04em}
+.prog-lbl span{font-family:var(--hand);font-style:italic;font-size:13.5px}
+.step{display:none;flex-direction:column;gap:14px}
+.step.on{display:flex;animation:stepIn .3s var(--ease)}
+@keyframes stepIn{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:none}}
+.hint{font-size:11.5px;color:var(--faint);line-height:1.5;margin-top:-2px}
+/* ô chọn nhiều dạng thẻ */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{position:relative;cursor:pointer}
+.chip input{position:absolute;opacity:0;width:0;height:0}
+.chip span{display:block;padding:9px 14px;border-radius:99px;font-size:13px;line-height:1.2;
+  border:1.5px solid var(--line-dk);background:var(--card);color:var(--ink-soft);transition:.18s}
+.chip:hover span{border-color:var(--lime-deep)}
+.chip input:checked+span{background:var(--lime);border-color:var(--lime-deep);
+  color:#1c2600;font-weight:600}
+.chip input:focus-visible+span{box-shadow:0 0 0 3px var(--lime-wash)}
+/* thang điểm 1–5 */
+.scale{display:flex;gap:7px}
+.scale .chip{flex:1}
+.scale .chip span{text-align:center;padding:11px 0;font-weight:700;font-family:var(--disp)}
+.scale-ends{display:flex;justify-content:space-between;font-size:11px;color:var(--faint);margin-top:2px}
+/* nút điều hướng */
+.fnav{display:flex;gap:10px;margin-top:22px}
+.fnav .btn{flex:1}
+#btnBack{flex:0 0 auto;padding-left:18px;padding-right:18px}
+#btnSubmit{margin-top:0}
 .privacy{font-size:11.5px;color:var(--faint);text-align:center;margin-top:12px;line-height:1.5}
 .spin{width:15px;height:15px;border:2px solid rgba(255,255,255,.3);border-top-color:var(--paper-lt);
   border-radius:50%;animation:spin .7s linear infinite;display:none}
@@ -567,6 +598,9 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
   .foot-in{flex-direction:column;text-align:center;gap:14px}
   .modal{padding:26px 20px}
   .inp{font-size:16px;padding:13px 15px}  /* dưới 16px iOS Safari tự phóng to trang */
+  .chip span{padding:10px 15px;font-size:13.5px}
+  .fnav{flex-direction:column-reverse}
+  #btnBack{width:100%}
   .burger{width:44px;height:44px}
   .modal-x{width:40px;height:40px;top:12px;right:12px}
   footer a{display:inline-block;padding:8px 4px}
@@ -1010,58 +1044,155 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 
     <div id="formView">
       <h2 id="mTitle">Đăng ký giữ chỗ</h2>
-      <p class="modal-sub"><b id="mCohort">—</b><br>Chỉ mất chừng 90 giây. Điền xong nhận ngay link group Zalo lớp — phần khám kênh chi tiết tụi mình sẽ làm cùng bạn sau.</p>
+      <p class="modal-sub"><b id="mCohort">—</b><br>Bốn bước ngắn để tụi mình hiểu kênh của bạn trước khi lớp bắt đầu. Điền xong nhận ngay link group Zalo lớp.</p>
       <form class="fields" id="regForm" novalidate>
+        <div class="prog"><i id="progBar" style="width:25%"></i></div>
+        <div class="prog-lbl"><b id="stepNo">BƯỚC 1/4</b><span id="stepName">về bạn</span></div>
 
-        <div class="fsec">về bạn</div>
-        <div class="fg"><label class="fl" for="f-name">Họ tên / tên gọi trên mạng *</label>
-          <input class="inp" id="f-name" name="name" autocomplete="name" placeholder="Nguyễn Văn A / @tengoi">
-          <span class="err">Cho mình biết tên bạn nhé</span></div>
-        <div class="fi2">
-          <div class="fg"><label class="fl" for="f-phone">Số điện thoại (Zalo) *</label>
-            <input class="inp" id="f-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="09xx xxx xxx">
-            <span class="err">Số điện thoại chưa hợp lệ</span></div>
-          <div class="fg"><label class="fl" for="f-age">Tuổi</label>
-            <input class="inp" id="f-age" name="age" inputmode="numeric" maxlength="2" placeholder="25">
+        <!-- ───── Bước 1 ───── -->
+        <section class="step on" data-step="1">
+          <div class="fg"><label class="fl" for="f-name">Họ tên / tên gọi trên mạng *</label>
+            <input class="inp" id="f-name" name="name" autocomplete="name" placeholder="Nguyễn Văn A / @tengoi">
+            <span class="err">Cho mình biết tên bạn nhé</span></div>
+          <div class="fi2">
+            <div class="fg"><label class="fl" for="f-phone">Số điện thoại (Zalo) *</label>
+              <input class="inp" id="f-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="09xx xxx xxx">
+              <span class="err">Số điện thoại chưa hợp lệ</span></div>
+            <div class="fg"><label class="fl" for="f-age">Tuổi</label>
+              <input class="inp" id="f-age" name="age" inputmode="numeric" maxlength="2" placeholder="25">
+              <span class="err"></span></div>
+          </div>
+          <div class="fg"><label class="fl">Giới tính</label>
+            <div class="chips" data-radio="gender">
+              <label class="chip"><input type="radio" name="gender" value="Nữ"><span>Nữ</span></label>
+              <label class="chip"><input type="radio" name="gender" value="Nam"><span>Nam</span></label>
+              <label class="chip"><input type="radio" name="gender" value="Khác"><span>Khác</span></label>
+            </div></div>
+          <div class="fg"><label class="fl" for="f-job">Nghề nghiệp / vai trò hiện tại *</label>
+            <input class="inp" id="f-job" name="job" placeholder="VD: nhân viên bank / giáo viên / sinh viên...">
+            <span class="err">Cho mình biết bạn đang làm gì nhé</span></div>
+          <div class="fg"><label class="fl" for="f-strength">Chuyên môn / thế mạnh nổi bật nhất</label>
+            <textarea class="inp" id="f-strength" name="strength" rows="2" placeholder="Bạn giỏi điều gì nhất? Người khác hay nhờ bạn tư vấn về chủ đề nào?"></textarea>
             <span class="err"></span></div>
-        </div>
-        <div class="fg"><label class="fl" for="f-job">Nghề nghiệp hiện tại *</label>
-          <input class="inp" id="f-job" name="job" placeholder="VD: nhân viên bank / giáo viên / sinh viên...">
-          <span class="err">Cho mình biết bạn đang làm gì nhé</span></div>
+        </section>
 
-        <div class="fsec">về kênh của bạn</div>
-        <div class="fi2b">
-          <div class="fg"><label class="fl" for="f-tried">Bạn từng thử làm TikTok chưa? *</label>
-            <select class="inp" id="f-tried" name="tried"><option value="" selected disabled>Chọn tình trạng</option><option>Chưa bao giờ</option><option>Thử vài video rồi dừng</option><option>Đang có kênh nhưng chưa ra gì</option><option>Đang có kênh &gt; 1.000 follow</option></select>
-            <span class="err">Chọn tình trạng giúp mình</span></div>
-          <div class="fg"><label class="fl" for="f-channel">Link kênh (nếu đã có)</label>
-            <input class="inp" id="f-channel" name="channel" placeholder="@tenkenh hoặc dán link">
+        <!-- ───── Bước 2 ───── -->
+        <section class="step" data-step="2">
+          <div class="fg"><label class="fl">Xây kênh TikTok để làm gì? *</label>
+            <div class="chips" data-multi="goals">
+          <label class="chip"><input type="checkbox" name="goals" value="Kiếm thu nhập"><span>Kiếm thu nhập</span></label>
+          <label class="chip"><input type="checkbox" name="goals" value="Xây thương hiệu cá nhân"><span>Xây thương hiệu cá nhân</span></label>
+          <label class="chip"><input type="checkbox" name="goals" value="Bán sản phẩm / dịch vụ"><span>Bán sản phẩm / dịch vụ</span></label>
+          <label class="chip"><input type="checkbox" name="goals" value="Chia sẻ kiến thức"><span>Chia sẻ kiến thức</span></label>
+          <label class="chip"><input type="checkbox" name="goals" value="Kết nối cộng đồng"><span>Kết nối cộng đồng</span></label>
+          <label class="chip"><input type="checkbox" name="goals" value="Được nổi tiếng"><span>Được nổi tiếng</span></label>
+          <label class="chip"><input type="checkbox" name="goals" value="Thỏa đam mê / sáng tạo"><span>Thỏa đam mê / sáng tạo</span></label>
+            </div>
+            <p class="hint">Chọn được nhiều ô nhé.</p>
+            <span class="err">Chọn giúp mình ít nhất một mục tiêu</span></div>
+          <div class="fg"><label class="fl" for="f-timeline">Muốn đạt mục tiêu trong bao lâu?</label>
+            <select class="inp" id="f-timeline" name="timeline"><option value="" selected disabled>Chọn mốc thời gian</option><option>1–3 tháng</option><option>3–6 tháng</option><option>6–12 tháng</option><option>Không vội, chơi lâu dài</option></select>
             <span class="err"></span></div>
-        </div>
-        <div class="fg"><label class="fl" for="f-niche">Chủ đề / ngách bạn đang nghĩ đến *</label>
-          <input class="inp" id="f-niche" name="niche" placeholder="Chưa chắc cũng không sao — cứ ghi vài ý">
-          <span class="err">Cứ ghi đại vài ý bạn đang nghĩ nhé</span></div>
+          <div class="fg"><label class="fl" for="f-audience">Bạn muốn nói chuyện với ai?</label>
+            <textarea class="inp" id="f-audience" name="audience" rows="2" placeholder="Mô tả người xem lý tưởng — càng cụ thể càng tốt"></textarea>
+            <span class="err"></span></div>
+          <div class="fi2b">
+            <div class="fg"><label class="fl" for="f-aud_age">Nhóm tuổi khán giả</label>
+              <select class="inp" id="f-aud_age" name="aud_age"><option value="" selected disabled>Chọn nhóm tuổi</option><option>Gen Z (16–24)</option><option>Millennials (25–35)</option><option>35–45</option><option>45+</option><option>Đa dạng</option></select>
+              <span class="err"></span></div>
+            <div class="fg"><label class="fl" for="f-aud_gender">Giới tính khán giả</label>
+              <select class="inp" id="f-aud_gender" name="aud_gender"><option value="" selected disabled>Chọn giới tính</option><option>Chủ yếu nữ</option><option>Chủ yếu nam</option><option>Cả hai</option></select>
+              <span class="err"></span></div>
+          </div>
+          <div class="fg"><label class="fl" for="f-pain">Nỗi đau / vấn đề của khán giả bạn muốn giải quyết</label>
+            <textarea class="inp" id="f-pain" name="pain" rows="2" placeholder="Họ đang mắc kẹt ở đâu mà bạn gỡ được?"></textarea>
+            <span class="err"></span></div>
+        </section>
 
-        <div class="fsec">mục tiêu của bạn</div>
-        <div class="fi2b">
-          <div class="fg"><label class="fl" for="f-goals">Xây kênh chủ yếu để làm gì? *</label>
-            <select class="inp" id="f-goals" name="goals"><option value="" selected disabled>Chọn mục tiêu chính</option><option>Kiếm thu nhập</option><option>Xây thương hiệu cá nhân</option><option>Bán sản phẩm / dịch vụ</option><option>Chia sẻ kiến thức</option><option>Thỏa đam mê / sáng tạo</option></select>
-            <span class="err">Chọn mục tiêu chính của bạn</span></div>
-          <div class="fg"><label class="fl" for="f-time">Thời gian dành mỗi tuần</label>
+        <!-- ───── Bước 3 ───── -->
+        <section class="step" data-step="3">
+          <div class="fg"><label class="fl" for="f-niche">Chủ đề / ngách bạn đang nghĩ đến *</label>
+            <input class="inp" id="f-niche" name="niche" placeholder="Chưa chắc cũng không sao — cứ ghi vài ý">
+            <span class="err">Cứ ghi đại vài ý bạn đang nghĩ nhé</span></div>
+          <div class="fg"><label class="fl">Tone of voice bạn muốn thể hiện</label>
+            <div class="chips" data-multi="tone">
+          <label class="chip"><input type="checkbox" name="tone" value="Chị em thân mật"><span>Chị em thân mật</span></label>
+          <label class="chip"><input type="checkbox" name="tone" value="Chuyên nghiệp, sắc bén"><span>Chuyên nghiệp, sắc bén</span></label>
+          <label class="chip"><input type="checkbox" name="tone" value="Vui vẻ, hài hước"><span>Vui vẻ, hài hước</span></label>
+          <label class="chip"><input type="checkbox" name="tone" value="Truyền cảm hứng"><span>Truyền cảm hứng</span></label>
+          <label class="chip"><input type="checkbox" name="tone" value="Thẳng thắn, thực tế"><span>Thẳng thắn, thực tế</span></label>
+          <label class="chip"><input type="checkbox" name="tone" value="Giáo dục, trầm tĩnh"><span>Giáo dục, trầm tĩnh</span></label>
+          <label class="chip"><input type="checkbox" name="tone" value="Kể chuyện"><span>Kể chuyện</span></label>
+            </div><span class="err"></span></div>
+          <div class="fg"><label class="fl" for="f-format">Định dạng video bạn nghĩ mình phù hợp</label>
+            <select class="inp" id="f-format" name="format"><option value="" selected disabled>Chọn định dạng</option><option>Talking head (nói thẳng vào cam)</option><option>Voiceover + text / slides</option><option>Vlog / nhật ký cuộc sống</option><option>Tutorial / hướng dẫn</option><option>Duet / bắt trend</option><option>Chưa biết</option></select>
+            <span class="err"></span></div>
+          <div class="fg"><label class="fl" for="f-refs">Kênh TikTok bạn tham khảo / yêu thích</label>
+            <input class="inp" id="f-refs" name="refs" placeholder="@tenkenh1, @tenkenh2... kể cả kênh nước ngoài">
+            <span class="err"></span></div>
+        </section>
+
+        <!-- ───── Bước 4 ───── -->
+        <section class="step" data-step="4">
+          <div class="fg"><label class="fl" for="f-time">Thời gian dành cho kênh mỗi tuần</label>
             <select class="inp" id="f-time" name="time"><option value="" selected disabled>Chọn quỹ thời gian</option><option>Dưới 3 giờ/tuần</option><option>3–7 giờ/tuần</option><option>7–15 giờ/tuần</option><option>15+ giờ (full-time)</option></select>
             <span class="err"></span></div>
-        </div>
-        <div class="fg"><label class="fl" for="f-expect">Điều bạn muốn được định hướng nhất *</label>
-          <textarea class="inp" id="f-expect" name="expect" rows="3" placeholder="VD: chọn ngách hợp nghề đang làm / hết ngại lên hình / cách edit giữ chân người xem..."></textarea>
-          <span class="err">Viết giúp mình vài dòng nhé — phần này tụi mình đọc kỹ nhất</span></div>
+          <div class="fg"><label class="fl">Mức độ thoải mái khi lên hình</label>
+            <div class="chips scale" data-radio="camera">
+              <label class="chip"><input type="radio" name="camera" value="1"><span>1</span></label>
+              <label class="chip"><input type="radio" name="camera" value="2"><span>2</span></label>
+              <label class="chip"><input type="radio" name="camera" value="3"><span>3</span></label>
+              <label class="chip"><input type="radio" name="camera" value="4"><span>4</span></label>
+              <label class="chip"><input type="radio" name="camera" value="5"><span>5</span></label>
+            </div>
+            <div class="scale-ends"><span>1 · ngại lắm</span><span>5 · rất tự tin</span></div>
+            <span class="err"></span></div>
+          <div class="fg"><label class="fl">Thiết bị &amp; công cụ đang có</label>
+            <div class="chips" data-multi="gear">
+          <label class="chip"><input type="checkbox" name="gear" value="Điện thoại tốt"><span>Điện thoại tốt</span></label>
+          <label class="chip"><input type="checkbox" name="gear" value="Laptop"><span>Laptop</span></label>
+          <label class="chip"><input type="checkbox" name="gear" value="Ring light / đèn quay"><span>Ring light / đèn quay</span></label>
+          <label class="chip"><input type="checkbox" name="gear" value="Micro rời"><span>Micro rời</span></label>
+          <label class="chip"><input type="checkbox" name="gear" value="Tripod / chân máy"><span>Tripod / chân máy</span></label>
+          <label class="chip"><input type="checkbox" name="gear" value="Biết dựng video cơ bản"><span>Biết dựng video cơ bản</span></label>
+          <label class="chip"><input type="checkbox" name="gear" value="Có ngân sách đầu tư thêm"><span>Có ngân sách đầu tư thêm</span></label>
+            </div><span class="err"></span></div>
+          <div class="fg"><label class="fl">Điều bạn lo ngại nhất khi làm TikTok</label>
+            <div class="chips" data-multi="fear">
+          <label class="chip"><input type="checkbox" name="fear" value="Sợ bị phán xét / chê bai"><span>Sợ bị phán xét / chê bai</span></label>
+          <label class="chip"><input type="checkbox" name="fear" value="Không biết nói gì / hết ý"><span>Không biết nói gì / hết ý</span></label>
+          <label class="chip"><input type="checkbox" name="fear" value="Không có thời gian"><span>Không có thời gian</span></label>
+          <label class="chip"><input type="checkbox" name="fear" value="Không biết edit video"><span>Không biết edit video</span></label>
+          <label class="chip"><input type="checkbox" name="fear" value="Sợ không ai xem"><span>Sợ không ai xem</span></label>
+          <label class="chip"><input type="checkbox" name="fear" value="Không biết bắt đầu từ đâu"><span>Không biết bắt đầu từ đâu</span></label>
+            </div><span class="err"></span></div>
+          <div class="fi2b">
+            <div class="fg"><label class="fl" for="f-tried">Bạn từng thử làm TikTok chưa? *</label>
+              <select class="inp" id="f-tried" name="tried"><option value="" selected disabled>Chọn tình trạng</option><option>Chưa bao giờ</option><option>Thử vài video rồi dừng</option><option>Đang có kênh nhưng chưa ra gì</option><option>Đang có kênh &gt; 1.000 follow</option></select>
+              <span class="err">Chọn tình trạng giúp mình</span></div>
+            <div class="fg"><label class="fl" for="f-channel">Link kênh (nếu đã có)</label>
+              <input class="inp" id="f-channel" name="channel" placeholder="@tenkenh hoặc dán link">
+              <span class="err"></span></div>
+          </div>
+          <div class="fg"><label class="fl" for="f-unique">Điều gì giúp bạn khác biệt so với 1.000 kênh cùng chủ đề?</label>
+            <textarea class="inp" id="f-unique" name="unique" rows="2" placeholder="Góc nhìn riêng, câu chuyện cá nhân, phong cách... cứ viết thật, đừng nghĩ quá nhiều"></textarea>
+            <span class="err"></span></div>
+          <div class="fg"><label class="fl" for="f-expect">Điều bạn muốn được định hướng nhất *</label>
+            <textarea class="inp" id="f-expect" name="expect" rows="3" placeholder="VD: chọn ngách hợp nghề đang làm / hết ngại lên hình / cách edit giữ chân người xem..."></textarea>
+            <span class="err">Viết giúp mình vài dòng nhé — phần này tụi mình đọc kỹ nhất</span></div>
+        </section>
 
         <div class="hp" aria-hidden="true">
           <label>Để trống ô này<input type="text" id="f-website" name="website" tabindex="-1" autocomplete="off"></label>
         </div>
       </form>
       <div class="form-msg" id="formMsg"></div>
-      <button class="btn btn-ink btn-lg" id="btnSubmit">
-        <span class="spin"></span><span class="lbl">Gửi đăng ký &amp; nhận link Zalo →</span></button>
+      <div class="fnav">
+        <button class="btn btn-line btn-md" id="btnBack" type="button" style="display:none">← Quay lại</button>
+        <button class="btn btn-ink btn-lg" id="btnNext" type="button">Tiếp tục →</button>
+        <button class="btn btn-ink btn-lg" id="btnSubmit" style="display:none">
+          <span class="spin"></span><span class="lbl">Gửi đăng ký &amp; nhận link Zalo →</span></button>
+      </div>
       <p class="privacy">Thông tin chỉ dùng để tư vấn và xếp lớp · Không chia sẻ cho bên thứ ba</p>
     </div>
 
@@ -1343,6 +1474,7 @@ function openModal(){
   $('#doneView').style.display='none';
   $('#formMsg').className='form-msg';
   document.body.classList.add('lock');
+  goStep(1);
   setTimeout(function(){ var n=$('#f-name'); if(n) n.focus(); },60);
 }
 function closeModal(){
@@ -1357,12 +1489,57 @@ var RULES={
   job:    function(v){return v.trim().length>=2},
   niche:  function(v){return v.trim().length>=2},
   tried:  function(v){return v.trim().length>0},
-  goals:  function(v){return v.trim().length>0},
   expect: function(v){return v.trim().length>=5}
 };
-var MULTI=['goals','tone','gear','fear'];   // nhóm checkbox, goals bắt buộc
+var MULTI=['goals','tone','gear','fear'];        // nhóm chọn nhiều
+var RADIO=['gender','camera'];                   // nhóm chọn một
+var MULTI_REQ=['goals'];                         // nhóm bắt buộc chọn ít nhất 1
 function groupVal(name){
   return $$('#regForm input[name="'+name+'"]:checked').map(function(el){return el.value}).join('; ');
+}
+
+/* ── Chia form thành 4 bước ── */
+var TONG_BUOC=4, BUOC=1;
+var TEN_BUOC=['về bạn','mục tiêu & khán giả','nội dung & phong cách','nguồn lực & kỳ vọng'];
+
+function goStep(n){
+  BUOC=Math.min(TONG_BUOC,Math.max(1,n));
+  $$('#regForm .step').forEach(function(sec){
+    sec.classList.toggle('on', Number(sec.dataset.step)===BUOC);
+  });
+  $('#progBar').style.width=(BUOC/TONG_BUOC*100)+'%';
+  $('#stepNo').textContent='BƯỚC '+BUOC+'/'+TONG_BUOC;
+  $('#stepName').textContent=TEN_BUOC[BUOC-1];
+  $('#btnBack').style.display   = BUOC>1 ? '' : 'none';
+  $('#btnNext').style.display   = BUOC<TONG_BUOC ? '' : 'none';
+  $('#btnSubmit').style.display = BUOC===TONG_BUOC ? '' : 'none';
+  $('#formMsg').className='form-msg';
+  var m=$('.modal'); if(m) m.scrollIntoView({block:'start',behavior:'smooth'});
+}
+
+/* Ô hỏng có thể là input, cũng có thể là cả nhóm chip */
+function focusBad(el){
+  var t = el.classList.contains('chips') ? el.querySelector('input') : el;
+  if(t && t.focus) t.focus();
+  if(el.scrollIntoView) el.scrollIntoView({block:'center',behavior:'smooth'});
+}
+
+/* Kiểm tra riêng các ô của một bước; trả về ô hỏng đầu tiên (nếu có) */
+function checkStep(n){
+  var sec=$('#regForm .step[data-step="'+n+'"]');
+  if(!sec) return null;
+  var bad=null;
+  Array.prototype.forEach.call(sec.querySelectorAll('.inp'),function(el){
+    if(!validateField(el) && !bad) bad=el;
+  });
+  MULTI_REQ.forEach(function(name){
+    var box=sec.querySelector('[data-multi="'+name+'"]');
+    if(!box) return;
+    var ok=!!groupVal(name);
+    box.parentNode.classList.toggle('invalid',!ok);
+    if(!ok && !bad) bad=box;
+  });
+  return bad;
 }
 
 function validateField(el){
@@ -1382,6 +1559,24 @@ function initForm(){
     el.addEventListener('change',function(){ validateField(el) });
   });
 
+  // chọn chip xong thì bỏ báo đỏ ngay
+  $$('#regForm .chips input').forEach(function(el){
+    el.addEventListener('change',function(){
+      var fg=el.closest('.fg'); if(fg) fg.classList.remove('invalid');
+    });
+  });
+
+  $('#btnNext').addEventListener('click',function(){
+    var bad=checkStep(BUOC);
+    if(bad){
+      focusBad(bad);
+      msg('Bạn xem lại giúp mình mấy ô tô đỏ nhé.');
+      return;
+    }
+    goStep(BUOC+1);
+  });
+  $('#btnBack').addEventListener('click',function(){ goStep(BUOC-1) });
+
   $('#regForm').addEventListener('submit',function(e){e.preventDefault();submit()});
   $('#btnSubmit').addEventListener('click',submit);
 
@@ -1395,10 +1590,18 @@ function initForm(){
     var btn=$('#btnSubmit');
     if(btn.classList.contains('busy')) return;
 
-    var els=$$('#regForm .inp'), bad=null;
-    els.forEach(function(el){ if(!validateField(el) && !bad) bad=el; });
-
-    if(bad){ bad.focus(); msg('Bạn xem lại giúp mình mấy ô tô đỏ nhé.'); return; }
+    var bad=null, buocHong=0;
+    for(var i=1;i<=TONG_BUOC;i++){
+      var b=checkStep(i);
+      if(b && !bad){ bad=b; buocHong=i; }
+    }
+    if(bad){
+      if(buocHong!==BUOC) goStep(buocHong);
+      setTimeout(function(){ focusBad(bad) },60);
+      msg('Bạn xem lại giúp mình mấy ô tô đỏ ở bước '+buocHong+' nhé.');
+      return;
+    }
+    var els=$$('#regForm .inp');
 
     // bot tự động thường điền hết mọi ô, kể cả ô ẩn
     var trap=$('#f-website');
@@ -1406,6 +1609,7 @@ function initForm(){
 
     var data={action:'register',source:'web'};
     els.forEach(function(el){ data[el.name]=(el.value||'').trim() });
+    MULTI.concat(RADIO).forEach(function(name){ data[name]=groupVal(name) });
     data.website='';
 
     btn.classList.add('busy');

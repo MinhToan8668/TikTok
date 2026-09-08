@@ -30,7 +30,8 @@
    ───────────────────────────────────────────────────────────── */
 var SETUP = {
   BOT_TOKEN:      '',   // token bot Telegram từ @BotFather
-  ADMIN_CHAT_IDS: '',   // chat id điều khiển bot, cách nhau dấu phẩy
+  ADMIN_CHAT_IDS: '',   // chat id ĐƯỢC RA LỆNH (chat riêng của bạn), cách nhau dấu phẩy
+  NOTIFY_CHAT_IDS: '',  // chat id CHỈ NHẬN THÔNG BÁO (group nội bộ) — xem được, không sửa được
   ADMIN_KEY:      '',   // mật khẩu xem trang admin (?admin=...)
   EXEC_URL:       '',   // URL /exec của bản deploy hiện tại
   SHEET_ID:       ''    // ID Google Sheet lưu đăng ký — để trống thì
@@ -208,9 +209,12 @@ function tgSend(chatId, text, keyboard){
     }
   }
 }
+/* Admin nhận kèm nút bấm; group chỉ-xem nhận bản không nút
+   (nút duyệt bấm trong group cũng không ăn, nên không gửi cho khỏi rối) */
 function tgBroadcastKb(text, keyboard){
-  cfgProp('ADMIN_CHAT_IDS').split(',').forEach(function(id){
-    id=id.trim(); if(id) tgSend(id,text,keyboard);
+  dsChat('ADMIN_CHAT_IDS').forEach(function(id){ tgSend(id,text,keyboard) });
+  dsChat('NOTIFY_CHAT_IDS').forEach(function(id){
+    tgSend(id, text+'\n\n_Duyệt/từ chối làm trong chat riêng với bot._');
   });
 }
 function tgAnswer(cbId, text){
@@ -231,9 +235,8 @@ function catNho(s, max){
   return out;
 }
 function tgBroadcast(text){
-  cfgProp('ADMIN_CHAT_IDS').split(',').forEach(function(id){
-    id=id.trim(); if(id) tgSend(id,text);
-  });
+  dsChat('ADMIN_CHAT_IDS').concat(dsChat('NOTIFY_CHAT_IDS'))
+    .forEach(function(id){ tgSend(id,text) });
 }
 /* ═══ CHẾ ĐỘ HỎI–ĐÁP ═══
    Bấm lệnh trơn (VD /giasom) → bot hỏi và nhớ lại trong 5 phút;
@@ -253,10 +256,21 @@ function xoaCho(chatId){
   try{ CacheService.getScriptCache().remove('cho_'+chatId); }catch(e){}
 }
 
-function isAdmin(chatId){
-  var ids = cfgProp('ADMIN_CHAT_IDS').split(',').map(function(s){return s.trim()});
-  return ids.indexOf(String(chatId)) > -1;
+/* ═══ PHÂN QUYỀN ═══
+   ADMIN  = chat riêng của bạn → làm được mọi lệnh
+   NOTIFY = group nội bộ       → nhận thông báo + vài lệnh chỉ xem  */
+function dsChat(key){
+  return cfgProp(key).split(',').map(function(s){return s.trim()}).filter(String);
 }
+function isAdmin(chatId){
+  return dsChat('ADMIN_CHAT_IDS').indexOf(String(chatId)) > -1;
+}
+function isNotify(chatId){
+  return dsChat('NOTIFY_CHAT_IDS').indexOf(String(chatId)) > -1;
+}
+
+/* Lệnh group chỉ-xem được phép dùng — muốn siết/nới thì sửa mảng này */
+var LENH_XEM = ['trangthai','status','danhsach','ds','menu','start','help','id'];
 
 /* ═══════════════ CHỐNG XỬ LÝ TRÙNG ═══════════════
    Telegram gửi lại đúng update đó nếu không nhận được phản hồi kịp.
@@ -438,14 +452,19 @@ function handleTelegram(update){
   var chatId = msg.chat.id;
   var text = msg.text.trim();
 
-  if (!isAdmin(chatId)){
-    tgSend(chatId,'⛔ Bot này chỉ dành cho quản trị Tự Mình Xây Kênh.\nChat ID của bạn: `'+chatId+'`');
+  var quanTri = isAdmin(chatId);
+  var chiXem  = !quanTri && isNotify(chatId);   // group nội bộ
+
+  if (!quanTri && !chiXem){
+    tgSend(chatId,'⛔ Bot này chỉ dành cho quản trị Tự Mình Xây Kênh.\nChat ID của chat này: `'+chatId+'`');
     return;
   }
 
   var m = text.match(/^\/(\w+)(?:@\w+)?\s*([\s\S]*)$/);
   if (!m){
-    // không phải lệnh — có đang chờ trả lời cho lệnh nào không?
+    // Trong group, tin nhắn thường KHÔNG phải nói với bot → im lặng,
+    // không thì bot chen vào mọi câu chuyện của mọi người.
+    if (chiXem) return;
     var choCmd = layCho(chatId);
     if (!choCmd){ tgSend(chatId,'Gõ /menu để xem danh sách lệnh nhé.'); return; }
     m = [null, choCmd, text];
@@ -453,6 +472,12 @@ function handleTelegram(update){
     xoaCho(chatId);   // gõ lệnh mới thì bỏ câu hỏi đang chờ
   }
   var cmd = m[1].toLowerCase(), arg = (m[2]||'').trim();
+
+  if (chiXem && LENH_XEM.indexOf(cmd) < 0){
+    tgSend(chatId,'👀 Trong group chỉ xem được /trangthai và /danhsach.\n'+
+      'Muốn đổi giá / duyệt học viên thì nhắn riêng cho bot nhé.');
+    return;
+  }
   var cfg = getConfig();
 
   if (cmd==='huy' || cmd==='cancel'){
@@ -463,6 +488,14 @@ function handleTelegram(update){
   switch(cmd){
 
     case 'start': case 'menu': case 'help':
+      if (chiXem) return tgSend(chatId,[
+        '🌱 *Bot Tự Mình Xây Kênh — chế độ theo dõi*','',
+        'Group này nhận thông báo mỗi khi có đăng ký mới,',
+        'và xem được tình hình lớp bằng mấy lệnh sau:','',
+        '📋 /trangthai — sĩ số, giá, lịch, còn bao nhiêu chỗ',
+        '👥 /danhsach — danh sách đăng ký lớp hiện tại','',
+        '_Đổi giá, đổi lịch, duyệt học viên… làm trong chat riêng với bot._'
+      ].join('\n'));
       tgSend(chatId,[
         '🌱 *Bot quản lý — Tự Mình Xây Kênh*',
         '_Đổi gì ở đây web cũng tự cập nhật trong ~1 phút._','',
@@ -650,7 +683,7 @@ function handleTelegram(update){
         {text:'✅ '+r.name, callback_data:'ok:'+r.id},
         {text:'❌', callback_data:'no:'+r.id}
       ]});
-      return tgSend(chatId, lines.join('\n'), kb.length?kb:null);
+      return tgSend(chatId, lines.join('\n'), (quanTri && kb.length) ? kb : null);
     }
 
     case 'duyet':  return setStatus(chatId,arg,'approved','✅ Đã duyệt');
@@ -670,7 +703,11 @@ function handleTelegram(update){
         tgSendFile(chatId, anh, 'Nền Teams — '+tenGV+(nenToi?' (tối)':' (sáng)'));
       }catch(err){
         ghiLoi('veNenTeams', err);
-        tgSend(chatId,'✘ Không vẽ được nền: '+err+'\n(Lần đầu dùng /nen phải chạy lại hàm setup trong Apps Script để cấp thêm quyền Slides.)');
+        tgSend(chatId, ['✘ Không vẽ được nền.','`'+err+'`','',
+          'Thử theo thứ tự:',
+          '1. Mở Apps Script → chạy tay hàm `setup` một lần, đồng ý hết các quyền Google hỏi.',
+          '2. Vẫn lỗi → chạy hàm `kiemTraNen` trong Apps Script, đọc Execution log sẽ chỉ rõ chỗ hỏng.'
+        ].join('\n'));
       }
       return;
     }
@@ -813,20 +850,68 @@ function veNenTeams(ten, toi){
 
   pres.saveAndClose();
 
-  // xuất PNG qua Slides API (thumbnail LARGE = 1600px ngang)
   var id = pres.getId();
-  var pageId = SlidesApp.openById(id).getSlides()[0].getObjectId();
-  var url = 'https://slides.googleapis.com/v1/presentations/'+id+
-            '/pages/'+pageId+'/thumbnail?thumbnailProperties.thumbnailSize=LARGE';
-  var meta = JSON.parse(UrlFetchApp.fetch(url,{
-    headers:{Authorization:'Bearer '+ScriptApp.getOAuthToken()}, muteHttpExceptions:true
-  }).getContentText());
-  if (!meta.contentUrl) throw new Error('Slides không trả ảnh: '+JSON.stringify(meta).slice(0,200));
-  var blob = UrlFetchApp.fetch(meta.contentUrl).getBlob()
-    .setName('nen-teams-'+ten.replace(/\s+/g,'-').toLowerCase()+(toi?'-toi':'-sang')+'.png');
+  var blob;
+  try{
+    blob = xuatAnhSlide(id);
+  } finally {
+    try{ DriveApp.getFileById(id).setTrashed(true); }catch(e){}   // dọn file nháp dù thành hay bại
+  }
+  return blob.setName('nen-teams-'+khongDau(ten)+(toi?'-toi':'-sang')+'.png');
+}
 
-  try{ DriveApp.getFileById(id).setTrashed(true); }catch(e){}   // dọn file nháp
-  return blob;
+/* Bỏ dấu + gạch nối để đặt tên file cho lành */
+function khongDau(s){
+  var g = 'àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ';
+  var k = 'aaaaaaaaaaaaaaaaaeeeeeeeeeeeiiiiioooooooooooooooooouuuuuuuuuuuyyyyyd';
+  var r = '';
+  String(s).toLowerCase().split('').forEach(function(c){
+    var i = g.indexOf(c);
+    r += (i > -1) ? k.charAt(i) : c;
+  });
+  return r.replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || 'nen';
+}
+
+/**
+ * Xuất slide đầu tiên ra PNG. Thử 2 đường:
+ *  1. Link export sẵn có của Google Docs — KHÔNG cần bật API nào.
+ *  2. Slides API thumbnail — chỉ chạy nếu project đã bật Slides API.
+ * Đường 1 gần như luôn được, nên bình thường không phải đụng tới Cloud Console.
+ */
+function xuatAnhSlide(id){
+  var token = ScriptApp.getOAuthToken();
+  var pageId;
+  try{ pageId = SlidesApp.openById(id).getSlides()[0].getObjectId(); }catch(e){}
+  var loi = [];
+
+  // ── Đường 1: docs.google.com/.../export/png
+  try{
+    var u1 = 'https://docs.google.com/presentation/d/'+id+'/export/png?id='+id+
+             (pageId ? '&pageid='+pageId : '');
+    var r1 = UrlFetchApp.fetch(u1, {
+      headers:{Authorization:'Bearer '+token}, muteHttpExceptions:true, followRedirects:true
+    });
+    if (r1.getResponseCode()===200){
+      var b1 = r1.getBlob();
+      if (String(b1.getContentType()).indexOf('image') === 0) return b1;
+      loi.push('export trả về '+b1.getContentType());
+    } else {
+      loi.push('export mã '+r1.getResponseCode());
+    }
+  }catch(e1){ loi.push('export lỗi '+e1); }
+
+  // ── Đường 2: Slides API thumbnail
+  try{
+    var u2 = 'https://slides.googleapis.com/v1/presentations/'+id+'/pages/'+pageId+
+             '/thumbnail?thumbnailProperties.thumbnailSize=LARGE';
+    var meta = JSON.parse(UrlFetchApp.fetch(u2,{
+      headers:{Authorization:'Bearer '+token}, muteHttpExceptions:true
+    }).getContentText());
+    if (meta.contentUrl) return UrlFetchApp.fetch(meta.contentUrl).getBlob();
+    loi.push('thumbnail: '+((meta.error && meta.error.message) || 'không rõ'));
+  }catch(e2){ loi.push('thumbnail lỗi '+e2); }
+
+  throw new Error(loi.join(' · '));
 }
 
 /* Gửi file (giữ nguyên chất lượng, không bị Telegram nén như ảnh) */
@@ -1015,6 +1100,27 @@ function motLuotHoi(choGiay){
   return r.result.length;
 }
 
+/** Chẩn đoán riêng cho lệnh /nen — chạy tay rồi đọc Execution log. */
+function kiemTraNen(){
+  var out = [];
+  try{
+    var blob = veNenTeams('Kiểm Tra', false);
+    out.push('✔ Vẽ được nền: '+blob.getName()+' — '+Math.round(blob.getBytes().length/1024)+' KB');
+    var admin = cfgProp('ADMIN_CHAT_IDS').split(',')[0].trim();
+    if (admin){ tgSendFile(admin, blob, 'Ảnh thử từ kiemTraNen'); out.push('✔ Đã gửi thử qua Telegram'); }
+  }catch(err){
+    out.push('✘ Lỗi: '+err);
+    out.push('');
+    out.push('Nếu thấy chữ "has not been used in project ... or it is disabled":');
+    out.push('  → Mở Apps Script → ⚙️ Project Settings → xem "Google Cloud Platform (GCP) Project"');
+    out.push('  → bấm vào số project, vào Cloud Console → APIs & Services → Enable APIs');
+    out.push('  → bật "Google Slides API", đợi 1-2 phút rồi chạy lại.');
+    out.push('Nếu thấy lỗi quyền (authorization/permission):');
+    out.push('  → chạy tay hàm  setup  và đồng ý toàn bộ quyền Google hỏi.');
+  }
+  Logger.log(out.join('\n'));
+}
+
 /** Chẩn đoán khi bot im hoặc lỗi — chạy rồi đọc Execution log. */
 function kiemTra(){
   var out = [];
@@ -1040,6 +1146,8 @@ function kiemTra(){
     if (w.url) out.push('  ⚠ Webhook đang nối sẽ tranh tin với chế độ hỏi — chạy setup để gỡ.');
   }
   out.push('Đăng ký trong sheet: '+allRegs().length+' dòng');
+  out.push('Chat ra lệnh được: '+(dsChat('ADMIN_CHAT_IDS').join(', ')||'(chưa có)'));
+  out.push('Group chỉ nhận báo: '+(dsChat('NOTIFY_CHAT_IDS').join(', ')||'(chưa có)'));
   out.push('ADMIN_KEY: '+cfgProp('ADMIN_KEY'));
   Logger.log(out.join('\n'));
 }
