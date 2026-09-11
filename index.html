@@ -283,6 +283,59 @@ nav.stuck{border-bottom-color:var(--line);background:rgba(249,232,221,.96)}
 .stop li::before{content:'—';color:var(--lime);flex-shrink:0}
 .stop .hand{margin-top:16px;display:inline-block;font-size:14px;color:var(--lime);transform:rotate(-1deg)}
 
+/* ═══════════ DẠNG VIDEO ═══════════ */
+.dangs{display:grid;grid-template-columns:repeat(2,1fr);gap:clamp(16px,2.4vw,24px)}
+.dang{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r);
+  padding:clamp(22px,3vw,30px);display:flex;flex-direction:column;gap:15px;
+  transition:transform .25s var(--ease),box-shadow .25s}
+.dang:hover{transform:translateY(-3px);box-shadow:0 20px 45px -28px rgba(80,60,35,.4)}
+.dang-top{display:flex;align-items:center;gap:11px;flex-wrap:wrap}
+.dang-n{font-family:var(--hand);font-style:italic;font-size:21px;color:var(--lime-deep);
+  transform:rotate(-4deg)}
+.dang h3{font-size:clamp(18px,2.1vw,21px);font-weight:800;line-height:1.2;flex:1;min-width:0}
+.dang-ai{font-size:11.5px;color:var(--quiet);border:1.5px solid var(--line-dk);
+  border-radius:999px;padding:4px 12px;line-height:1.35}
+.dang-lb{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint);
+  font-family:var(--disp);font-weight:700;margin-bottom:7px;display:block}
+.dang ul{list-style:none;display:grid;gap:7px}
+.dang li{font-size:13.5px;line-height:1.6;color:var(--quiet);position:relative;padding-left:16px}
+.dang li::before{content:'·';color:var(--lime-deep);font-weight:800;
+  position:absolute;left:4px;top:0}
+.dang li b{color:var(--ink);font-weight:600}
+.dang-khung{background:var(--paper);border-radius:var(--r-sm);padding:14px 16px;
+  font-size:13px;line-height:1.75;color:var(--ink-soft)}
+.dang-khung b{color:var(--lime-deep);font-weight:700}
+.dang-xem{margin-top:auto;align-self:flex-start;font-size:13px;font-weight:700;
+  font-family:var(--disp);color:var(--ink);text-decoration:none;padding-bottom:2px;
+  border-bottom:2.5px solid var(--lime);transition:color .2s}
+.dang-xem:hover{color:var(--lime-deep)}
+.dangs-note{text-align:center;margin-top:clamp(26px,4vw,38px);font-family:var(--hand);
+  font-style:italic;font-size:15px;color:var(--lime-deep)}
+
+/* ═══════════ TRONG GÓI CÓ GÌ ═══════════ */
+.goi{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(16px,2.2vw,24px);
+  align-items:start}
+.goi-cot{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r);
+  padding:clamp(22px,3vw,30px);height:100%}
+.goi-cot.em{border:2px solid var(--lime-deep);background:var(--lime-wash);position:relative}
+.goi-cot.em::before{content:'phần đắt nhất';position:absolute;top:-12px;left:24px;
+  font-family:var(--hand);font-style:italic;font-size:12px;color:#1c2600;
+  background:var(--lime);padding:4px 13px;border-radius:3px;transform:rotate(-1.5deg)}
+.goi-ic{font-size:23px;line-height:1;margin-bottom:12px;display:block}
+.goi-cot h3{font-size:17.5px;font-weight:800;margin-bottom:5px;line-height:1.25}
+.goi-sub{font-size:12.5px;color:var(--quiet);margin-bottom:17px;line-height:1.55}
+.goi-list{list-style:none;display:grid;gap:12px}
+.goi-list li{font-size:13.5px;line-height:1.6;color:var(--ink-soft);
+  position:relative;padding-left:22px}
+.goi-list li::before{content:'✓';color:var(--lime-deep);font-weight:800;
+  position:absolute;left:0;top:0}
+.goi-list b{color:var(--ink);font-weight:600}
+.goi-neo{margin-top:clamp(26px,4vw,38px);background:var(--moss);color:#c8cfb4;
+  border-radius:var(--r);padding:clamp(24px,3.5vw,36px);text-align:center}
+.goi-neo p{font-size:clamp(15px,1.8vw,17.5px);line-height:1.75;max-width:60ch;margin:0 auto}
+.goi-neo b{color:var(--lime);font-weight:700}
+.goi-neo .hand{display:block;margin-top:14px;font-size:15px;color:var(--lime)}
+
 /* ═══════════ MENTORS ═══════════ */
 .duo{display:grid;grid-template-columns:1fr 1fr;gap:clamp(20px,3vw,32px)}
 .person{position:relative;padding:clamp(26px,3.5vw,38px);background:var(--card);
@@ -614,6 +667,11 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
   .grad-shot{max-width:300px;margin:0 auto}
   .grad:first-child,.grad:last-child{transform:none}
 }
+@media(max-width:900px){
+  .dangs{grid-template-columns:1fr}
+  .goi{grid-template-columns:1fr}
+  .goi-cot.em::before{left:18px}
+}
 @media(max-width:700px){
   .duo{grid-template-columns:1fr}
   .person:first-child,.person:last-child{transform:none}
@@ -659,6 +717,7 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
       <button class="nav-link" data-go="letter">Thư ngỏ</button>
       <button class="nav-link" data-go="tuan">Một tuần trong lớp</button>
       <button class="nav-link" data-go="lotrinh">Lộ trình</button>
+      <button class="nav-link" data-go="cogi">Nhận được gì</button>
       <button class="nav-link" data-go="mentors">Người dạy</button>
       <button class="nav-link" data-go="ketqua">Học viên cũ</button>
       <button class="nav-link" data-go="hocphi">Học phí</button>
@@ -674,6 +733,8 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
     <a href="#letter">Thư ngỏ</a>
     <a href="#tuan">Một tuần trong lớp</a>
     <a href="#lotrinh">Lộ trình 30 ngày</a>
+    <a href="#dangvideo">5 dạng video</a>
+    <a href="#cogi">Nhận được gì</a>
     <a href="#mentors">Người dạy</a>
     <a href="#ketqua">Học viên cũ</a>
     <a href="#hocphi">Học phí</a>
@@ -699,6 +760,7 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
       <div class="hero-chips rv">
         <span class="hero-chip" data-tpl="🎓 {{schedule.sessions}} buổi live · {{computed.scheduleShort}}"></span>
         <span class="hero-chip">✂️ Edit kèm 1:1 các tối trong tuần</span>
+        <span class="hero-chip">🧰 Bộ kịch bản + hướng dẫn quay 5 dạng video</span>
         <span class="hero-chip" data-tpl="🪑 Lớp tối đa {{slots.max}} người"></span>
       </div>
     </div>
@@ -885,6 +947,89 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
   </div>
 </div></section>
 
+<!-- ════════ 5 DẠNG VIDEO ════════ -->
+<section class="sec" id="dangvideo"><div class="shell">
+  <div class="sec-head rv">
+    <span class="kicker">có sẵn trong gói, phát ngay buổi đầu</span>
+    <h2 class="h2">Năm dạng video,<br>quay <em>kiểu gì cho đúng?</em></h2>
+    <p class="lead">Mỗi dạng tụi mình đưa bạn ba thứ: cách đặt máy và lấy sáng bằng đúng cái điện thoại đang có, khung kịch bản điền vào là ra bài, và video mẫu để coi trước khi bấm quay. Dưới đây là bản rút gọn.</p>
+  </div>
+  <div class="dangs">
+
+    <article class="dang rv">
+      <div class="dang-top"><span class="dang-n">01</span><h3>Talking head</h3>
+        <span class="dang-ai">hợp với người có chuyên môn</span></div>
+      <div><span class="dang-lb">Quay thế nào</span>
+        <ul>
+          <li>Điện thoại ngang tầm mắt, cách mặt 60–80cm — thấp hơn là lên hình thành "nhìn xuống"</li>
+          <li>Ngồi <b>quay mặt về phía cửa sổ</b>, đừng để cửa sổ sau lưng</li>
+          <li>Phòng vang tiếng thì cắm tai nghe có dây, mic nằm gần cổ áo</li>
+        </ul></div>
+      <div class="dang-khung"><b>Khung:</b> chốt luôn kết luận ở câu đầu → vì sao lại vậy →
+        một ví dụ có thật của chính bạn → hỏi ngược người xem để kéo bình luận</div>
+      <a class="dang-xem" href="" target="_blank" rel="noopener">Xem video mẫu →</a>
+    </article>
+
+    <article class="dang rv">
+      <div class="dang-top"><span class="dang-n">02</span><h3>Vlog đời thường</h3>
+        <span class="dang-ai">hợp với người ngại nói thẳng vào cam</span></div>
+      <div><span class="dang-lb">Quay thế nào</span>
+        <ul>
+          <li>Quay thật nhiều cảnh ngắn 2–4 giây, mỗi cảnh <b>dư ra 2 giây đầu và cuối</b> để còn cắt</li>
+          <li>Cầm máy ngang eo đi tới, đừng vừa đi vừa lia máy — người xem chóng mặt</li>
+          <li>Ưu tiên quay lúc sáng tự nhiên; tối về quay trong nhà là vỡ hạt ngay</li>
+        </ul></div>
+      <div class="dang-khung"><b>Khung:</b> mở bằng cảnh đắt nhất trong ngày (đừng mở bằng cảnh ngủ dậy)
+        → trình tự việc → một khoảnh khắc thật, kể cả lúc hỏng → chốt bằng cảm nghĩ ngắn</div>
+      <a class="dang-xem" href="" target="_blank" rel="noopener">Xem video mẫu →</a>
+    </article>
+
+    <article class="dang rv">
+      <div class="dang-top"><span class="dang-n">03</span><h3>POV một ngày</h3>
+        <span class="dang-ai">hợp với nghề lạ, lịch sinh hoạt có nhịp</span></div>
+      <div><span class="dang-lb">Quay thế nào</span>
+        <ul>
+          <li>Mỗi mốc giờ một cảnh, <b>ghi giờ lên màn hình</b> — người xem bám được nhịp</li>
+          <li>Vài cảnh lặp lại nên để nguyên một góc cố định, tạo cảm giác quen thuộc</li>
+          <li>Quay rải trong ngày, đừng dồn một buổi rồi diễn lại — lên hình giả ngay</li>
+        </ul></div>
+      <div class="dang-khung"><b>Khung:</b> giờ dậy → việc căng nhất trong ngày →
+        một chi tiết trong nghề ít ai biết → kết lúc hết ngày, để lại một câu tự hỏi</div>
+      <a class="dang-xem" href="" target="_blank" rel="noopener">Xem video mẫu →</a>
+    </article>
+
+    <article class="dang rv">
+      <div class="dang-top"><span class="dang-n">04</span><h3>Review &amp; mở hộp</h3>
+        <span class="dang-ai">hợp với bán hàng, affiliate</span></div>
+      <div><span class="dang-lb">Quay thế nào</span>
+        <ul>
+          <li>Đặt sản phẩm trên nền trơn một màu, một tay giữ một tay thao tác</li>
+          <li>Đủ ba cảnh: <b>tổng thể · cận chi tiết · đang dùng thật</b> — thiếu cảnh thứ ba là mất tin</li>
+          <li>Quay cận thì lùi máy ra rồi zoom nhẹ, đừng dí sát ống kính</li>
+        </ul></div>
+      <div class="dang-khung"><b>Khung:</b> nói điểm dở trước, điểm hay sau →
+        ai nên mua, ai đừng mua → giá và mua ở đâu. Chê trước thì lời khen mới có trọng lượng</div>
+      <a class="dang-xem" href="" target="_blank" rel="noopener">Xem video mẫu →</a>
+    </article>
+
+    <article class="dang rv">
+      <div class="dang-top"><span class="dang-n">05</span><h3>Kể chuyện</h3>
+        <span class="dang-ai">dạng dễ viral nhất, ai cũng làm được</span></div>
+      <div><span class="dang-lb">Quay thế nào</span>
+        <ul>
+          <li>Nói thẳng vào cam, chèn ảnh chụp màn hình hoặc clip tư liệu vào giữa</li>
+          <li>Giữ nét mặt thật — <b>diễn là hỏng</b>, người xem TikTok nhận ra rất nhanh</li>
+          <li>Quay một mạch từ đầu tới cuối, sai thì quay lại cả câu, đừng chắp vá</li>
+        </ul></div>
+      <div class="dang-khung"><b>Khung:</b> thả ngay tình huống gay cấn ở câu đầu →
+        kể bối cảnh → cao trào → bài học rút ra. Đừng kể theo thứ tự thời gian</div>
+      <a class="dang-xem" href="" target="_blank" rel="noopener">Xem video mẫu →</a>
+    </article>
+
+  </div>
+  <p class="dangs-note">↳ vào lớp bạn nhận bản đầy đủ: kịch bản mẫu từng dạng, bộ hook mở đầu và danh sách video tham khảo</p>
+</div></section>
+
 <!-- ════════ MENTORS ════════ -->
 <section class="sec" id="mentors"><div class="shell">
   <div class="sec-head rv">
@@ -957,6 +1102,59 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
   <div class="grads-note rv"><span class="hand">↳ số liệu cập nhật 08/2026 · bấm "Xem kênh" để kiểm chứng</span></div>
 </div></section>
 
+<!-- ════════ TRONG GÓI CÓ GÌ ════════ -->
+<section class="sec" id="cogi"><div class="shell">
+  <div class="sec-head rv" style="text-align:center">
+    <span class="kicker">gói học gồm những gì</span>
+    <h2 class="h2">Một lần đóng,<br>ba thứ mang về.</h2>
+  </div>
+  <div class="goi">
+
+    <div class="goi-cot em rv">
+      <span class="goi-ic">🎬</span>
+      <h3>Học và dựng cùng mentor</h3>
+      <p class="goi-sub">Phần không ai nhân bản được — người thật ngồi cùng bạn.</p>
+      <ul class="goi-list">
+        <li><b data-tpl="{{schedule.sessions}} buổi live"></b> tối Thứ 5 hằng tuần, 20:00–22:00 — lý thuyết và chốt hướng đi cho kênh</li>
+        <li><b>Edit kèm 1:1</b> các tối trong tuần, ngồi dựng chung tới khi ra video hoàn chỉnh</li>
+        <li>Mỗi video được <b>chấm bằng số liệu thật</b>: hook rate, retention, người xem rớt ở giây thứ mấy</li>
+        <li>Một <b>buổi 1:1 riêng</b> chốt định hướng kênh và hướng ra tiền</li>
+        <li>Group Zalo hỏi đáp suốt khóa, mentor trả lời trong ngày</li>
+      </ul>
+    </div>
+
+    <div class="goi-cot rv">
+      <span class="goi-ic">🧰</span>
+      <h3>Bộ tài nguyên dùng mãi</h3>
+      <p class="goi-sub">Phát ngay buổi đầu, tải về giữ luôn.</p>
+      <ul class="goi-list">
+        <li><b>Khung kịch bản viral</b> theo từng dạng video — điền nội dung của bạn vào là ra bài</li>
+        <li><b>Bộ hook mở đầu</b> đã chạy có số, phân theo ngách</li>
+        <li><b>Hướng dẫn quay 5 dạng content</b> — talking head, vlog, POV một ngày, review, kể chuyện — kèm video mẫu từng dạng</li>
+        <li><b>Checklist trước khi đăng</b> — soát 10 giây, tránh mấy lỗi làm video chết ngay từ đầu</li>
+        <li>Bản ghi toàn bộ buổi live, xem lại bao nhiêu lần cũng được</li>
+      </ul>
+    </div>
+
+    <div class="goi-cot rv">
+      <span class="goi-ic">🌱</span>
+      <h3>Thứ còn lại sau 30 ngày</h3>
+      <p class="goi-sub">Cái bạn thật sự trả tiền để có.</p>
+      <ul class="goi-list">
+        <li><b>Kênh đã chạy thật</b> — có video, có số liệu, không phải một tờ chứng nhận</li>
+        <li><b>Tự dựng được video</b> — hết khóa không còn phải thuê ai, cũng không phải chờ ai</li>
+        <li><b>Lịch nội dung 90 ngày</b> viết riêng cho kênh bạn, dựa trên số liệu bạn vừa chạy</li>
+        <li>Ở lại group cựu học viên, sau khóa vẫn hỏi được</li>
+      </ul>
+    </div>
+
+  </div>
+  <div class="goi-neo rv">
+    <p>Thuê người dựng ngoài một video TikTok tầm <b>200–400k</b>. Ra 12 video trong 30 ngày là đã <b>3–5 triệu</b> — và tháng sau vẫn phải thuê tiếp.</p>
+    <span class="hand">học phí ở đây bằng đúng một tháng thuê editor, khác ở chỗ hết tháng bạn không cần thuê nữa</span>
+  </div>
+</div></section>
+
 <!-- ════════ HỌC PHÍ ════════ -->
 <section class="sec" id="hocphi" style="padding-top:0"><div class="shell">
   <div class="fee">
@@ -972,17 +1170,21 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
         <b>Tự Mình Xây Kênh</b>
         <span data-tpl="{{computed.cohortLabel}} · khai giảng {{cohort.startDate}}"></span>
       </div>
-      <div class="rc-sec">trong 30 ngày</div>
-      <div class="rc-row"><span data-tpl="{{schedule.sessions}} buổi live cùng founder ({{computed.scheduleShort}})"></span><b>✓</b></div>
-      <div class="rc-row"><span>Edit kèm 1:1 buổi tối — không giới hạn số buổi</span><b>✓</b></div>
-      <div class="rc-row"><span>Bộ khung kịch bản + checklist quay bằng điện thoại</span><b>✓</b></div>
-      <div class="rc-row"><span>Video được chấm bằng số liệu thật hằng tuần</span><b>✓</b></div>
-      <div class="rc-row"><span>Recording + tài liệu từng buổi, xem lại mãi</span><b>✓</b></div>
+      <div class="rc-sec">học cùng mentor</div>
+      <div class="rc-row"><span data-tpl="{{schedule.sessions}} buổi live ({{computed.scheduleShort}})"></span><b>✓</b></div>
+      <div class="rc-row"><span>Edit kèm 1:1 các tối trong tuần</span><b>✓</b></div>
+      <div class="rc-row"><span>Chấm video bằng số liệu thật hằng tuần</span><b>✓</b></div>
+      <div class="rc-row"><span>Buổi 1:1 chốt định hướng kênh</span><b>✓</b></div>
+      <div class="rc-sec">bộ tài nguyên</div>
+      <div class="rc-row"><span>Khung kịch bản viral theo từng dạng video</span><b>✓</b></div>
+      <div class="rc-row"><span>Bộ hook mở đầu đã chạy có số</span><b>✓</b></div>
+      <div class="rc-row"><span>Hướng dẫn quay 5 dạng content + video mẫu</span><b>✓</b></div>
+      <div class="rc-row"><span>Checklist soát video trước khi đăng</span><b>✓</b></div>
+      <div class="rc-row"><span>Bản ghi toàn bộ buổi live, xem lại mãi</span><b>✓</b></div>
       <div class="rc-sec">mang về sau khóa</div>
-      <div class="rc-row"><span>Kênh TikTok của bạn — đã chạy, đã có video</span><b>✓</b></div>
-      <div class="rc-row"><span>Lộ trình nội dung 90 ngày viết riêng cho kênh bạn</span><b>✓</b></div>
-      <div class="rc-row"><span>Group Zalo học viên — sau khóa vẫn hỏi đáp thoải mái</span><b>✓</b></div>
-      <div class="rc-row"><span>Buổi 1:1 tổng kết &amp; định hướng kiếm tiền</span><b>✓</b></div>
+      <div class="rc-row"><span>Kênh đã chạy thật — có video, có số liệu</span><b>✓</b></div>
+      <div class="rc-row"><span>Lịch nội dung 90 ngày viết riêng cho kênh bạn</span><b>✓</b></div>
+      <div class="rc-row"><span>Group cựu học viên — sau khóa vẫn hỏi đáp</span><b>✓</b></div>
       <div class="rc-row strike" style="margin-top:8px"><span>Học phí gốc</span><b data-bind="computed.price.regular">—</b></div>
       <div class="rc-total"><span>Đăng ký sớm</span><b data-bind="computed.price.earlyBird">—</b></div>
       <div class="rc-save" data-tpl="đỡ được {{computed.price.saveAmount}} nếu giữ chỗ trước khi lớp đủ người"></div>
@@ -1247,7 +1449,7 @@ var CACHE_KEY = 'tmxk_cfg_v1';
 var FALLBACK = {
   cohort:{number:3,status:'open',openText:'Đang mở đăng ký',startDate:'đang chốt lịch'},
   slots:{max:15,base:0,registered:0},
-  pricing:{earlyBird:2000000,regular:3000000},
+  pricing:{earlyBird:3000000,regular:4000000},
   schedule:{days:'Tối Thứ 5',time:'20:00–22:00',platform:'MS Teams',weeks:4,sessions:4},
   zalo:{groupUrl:''},
   stats:{cohortsDone:2,students:'30+'},
@@ -1550,6 +1752,14 @@ function validateField(el){
   return ok;
 }
 
+/* Link video mẫu chưa điền thì giấu đi, khỏi hiện nút bấm vào không ra gì */
+function anLinkTrong(){
+  $$('.dang-xem').forEach(function(a){
+    var h=(a.getAttribute('href')||'').trim();
+    if(!h || h==='#') a.style.display='none';
+  });
+}
+
 function initForm(){
   $$('#regForm .inp').forEach(function(el){
     el.addEventListener('blur',function(){ if(el.value) validateField(el) });
@@ -1788,6 +1998,7 @@ function initAdmin(){
 
 /* ══════════════ BOOT ══════════════ */
 loadConfig();
+anLinkTrong();
 initForm();
 initChrome();
 observe();
