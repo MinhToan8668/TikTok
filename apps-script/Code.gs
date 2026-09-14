@@ -334,6 +334,10 @@ function doPost(e){
 
     if (body.action === 'register') return handleRegister(body);
 
+    // Khu học viên: đăng nhập / xem lịch / đặt / hủy  (xem Lich.gs)
+    if (String(body.action||'').indexOf('hv_') === 0) return jsonOut(lichApi(body));
+
+
     return jsonOut({ok:false, error:'unknown_action'});
   }catch(err){
     ghiLoi('doPost', err);
@@ -478,6 +482,9 @@ function handleTelegram(update){
       'Muốn đổi giá / duyệt học viên thì nhắn riêng cho bot nhé.');
     return;
   }
+  // Lệnh của khu lịch mentor (Lich.gs) — tách riêng cho gọn
+  if (quanTri && lichCoLenh(cmd)) return lichLenh(cmd, arg, chatId, msg);
+
   var cfg = getConfig();
 
   if (cmd==='huy' || cmd==='cancel'){
@@ -725,6 +732,9 @@ function handleCallback(cb){
   var chatId = cb.message && cb.message.chat && cb.message.chat.id;
   if (!isAdmin(chatId)) return tgAnswer(cb.id, 'Không có quyền');
 
+  // Nút của khu lịch mentor (Lich.gs) đều mang tiền tố "l:"
+  if (String(cb.data||'').indexOf('l:') === 0) return lichCallback(cb);
+
   var p = String(cb.data||'').split(':');
   var act = p[0], ma = p[1];
   if (act!=='ok' && act!=='no') return tgAnswer(cb.id);
@@ -953,6 +963,9 @@ function setup(){
   sheet();
   out.push('✔ Sheet "'+SHEET_NAME+'" sẵn sàng: '+ss().getUrl());
 
+  try{ out.push('✔ '+lichSetup()); }
+  catch(err){ out.push('✘ Không dựng được khu lịch mentor: '+err); }
+
   var me = tgApi('getMe', {});
   if (!me || !me.ok){
     out.push('✘ Token không hợp lệ — kiểm tra lại với @BotFather rồi chạy lại setup');
@@ -981,6 +994,14 @@ function setup(){
     {command:'duyet',      description:'✅ Duyệt — /duyet AB12'},
     {command:'tuchoi',     description:'❌ Từ chối — /tuchoi AB12'},
     {command:'nen',        description:'🖼 Vẽ nền Teams — /nen Minh Toàn'},
+    {command:'lich',       description:'🗓 Tick lịch rảnh kèm 1:1'},
+    {command:'lichtuan',   description:'📆 Xem lịch cả tuần + ai đã đặt'},
+    {command:'themhv',     description:'🔑 Cấp tài khoản — /themhv mail|Tên|mk'},
+    {command:'dshv',       description:'👤 Danh sách tài khoản học viên'},
+    {command:'xoahv',      description:'🗑 Xóa tài khoản — /xoahv mail'},
+    {command:'doimk',      description:'🔒 Đổi mật khẩu — /doimk mail|mk moi'},
+    {command:'nhactruoc',  description:'⏰ Nhắc trước mấy tiếng — /nhactruoc 6'},
+    {command:'tenmentor',  description:'✍️ Tên hiển thị — /tenmentor Minh Toàn'},
     {command:'huy',        description:'👌 Hủy câu hỏi đang chờ'},
     {command:'sheet',      description:'📄 Link Google Sheet'},
     {command:'menu',       description:'⚙️ Danh sách đầy đủ lệnh'}
