@@ -33,6 +33,7 @@ var CA = [
 ];
 
 var NHAC_TRUOC_MD = 6;      // giờ — mặc định nhắc trước 6 tiếng
+var TOI_DA_MD     = 2;      // mỗi học viên đặt tối đa mấy ca MỘT TUẦN
 var PHIEN_NGAY    = 30;     // token đăng nhập sống bao nhiêu ngày
 var BAM_VONG      = 1500;   // số vòng băm mật khẩu
 var DN_TOI_DA     = 5;      // số lần đăng nhập sai cho phép trong 10 phút
@@ -102,13 +103,29 @@ function ngayGon(ngay){ return ngay.slice(8,10)+'/'+ngay.slice(5,7); }
 
 function cfgLich(){
   var c = getConfig();
-  return { nhacTruoc: Number((c.lich||{}).nhacTruoc || NHAC_TRUOC_MD) };
+  var l = c.lich || {};
+  return {
+    nhacTruoc: Number(l.nhacTruoc || NHAC_TRUOC_MD),
+    toiDa:     Number(l.toiDa != null && l.toiDa !== '' ? l.toiDa : TOI_DA_MD)
+  };
 }
-function luuNhacTruoc(gio){
+function luuLich(khoa, giaTri){
   var c = getConfig();
   c.lich = c.lich || {};
-  c.lich.nhacTruoc = gio;
+  c.lich[khoa] = giaTri;
   saveConfig(c);
+}
+
+/** Học viên này đã giữ mấy ca trong tuần chứa ngày đó */
+function demCaTuan(hvMa, ngayTrongTuan, ds){
+  var dau = thuHai(ngayTrongTuan), cuoi = congNgay(dau, 6), n = 0;
+  (ds || moiLich()).forEach(function(r){
+    if (r.trangthai !== 'booked') return;
+    if (String(r.hv_ma) !== String(hvMa)) return;
+    if (r.ngay < dau || r.ngay > cuoi) return;
+    n++;
+  });
+  return n;
 }
 
 /* ═══════════════ TÊN & MẬT KHẨU ═══════════════ */
@@ -345,8 +362,11 @@ function apiXemLich(b){
     return ngays[k];
   });
 
+  var cf = cfgLich();
   return jsonOut({ok:true, ten:me.ten_goi||me.ten, vaitro:me.vaitro,
-                  tuan:dau, ngays:ds, ca:CA, nhacTruoc:cfgLich().nhacTruoc});
+                  tuan:dau, ngays:ds, ca:CA, nhacTruoc:cf.nhacTruoc,
+                  toiDa: laMentor ? 0 : cf.toiDa,
+                  daDat: laMentor ? 0 : demCaTuan(me.ma, dau)});
 }
 
 /* ── học viên đặt ca ── */
@@ -365,6 +385,15 @@ function apiDatLich(b){
     if (slot.trangthai === 'off')    return jsonOut({ok:false, error:'khong_thay'});
     if (mocGio(slot.ngay, slot.batdau) < new Date())
       return jsonOut({ok:false, error:'da_qua'});
+
+    // mỗi tuần chỉ giữ được tối đa mấy ca, để còn chỗ cho bạn khác
+    var cf = cfgLich();
+    if (cf.toiDa > 0){
+      var da = demCaTuan(me.ma, slot.ngay);
+      if (da >= cf.toiDa)
+        return jsonOut({ok:false, error:'qua_nhieu', toiDa:cf.toiDa, daDat:da,
+                        tuan:thuHai(slot.ngay)});
+    }
 
     var nhac = new Date(mocGio(slot.ngay, slot.batdau).getTime()
                         - cfgLich().nhacTruoc*3600*1000);
@@ -521,7 +550,8 @@ function chuanGio(s){
 
 /* ═══════════════ BOT — CHỈ QUẢN LÝ NGƯỜI DÙNG ═══════════════ */
 
-var LENH_LICH = ['lich','lichtuan','dstk','vaitro','xoatk','doimk','nhactruoc'];
+var LENH_LICH = ['lich','lichtuan','dstk','vaitro','xoatk','doimk',
+                 'nhactruoc','toida'];
 
 function lichCoLenh(cmd){
   return LENH_LICH.indexOf(cmd) > -1;
@@ -542,9 +572,11 @@ function lichLenh(cmd, arg, chatId, msg){
       var g = Number(String(arg).replace(/[^\d.]/g,''));
       if (!g || g <= 0 || g > 72)
         return tgSend(chatId,'Nhập số giờ từ 1 đến 72 nhé.');
-      luuNhacTruoc(g);
+      luuLich('nhacTruoc', g);
       return tgSend(chatId,'✅ Sẽ nhắc trước *'+g+' tiếng* cho các lịch đặt từ giờ.');
     }
+
+    case 'toida': return datToiDa(chatId, arg);
   }
 }
 
@@ -584,6 +616,53 @@ function lichCallback(cb){
     reply_markup:{inline_keyboard:[[{text:nhan, callback_data:'xong'}]]}
   });
   return tgAnswer(cb.id, tomTat);
+}
+
+/* ── giới hạn mỗi học viên đặt mấy ca một tuần ── */
+function datToiDa(chatId, arg){
+  var dang = cfgLich().toiDa;
+  if (!arg){
+    datCho(chatId,'toida');
+    return tgSend(chatId,[
+      '🎫 Mỗi học viên đang đặt được tối đa *'+
+        (dang>0 ? dang+' ca một tuần' : 'không giới hạn')+'*.','',
+      '👉 Nhắn số mới vào tin tiếp theo (VD `2`),',
+      'nhắn `0` để bỏ giới hạn, hoặc /huy.'
+    ].join('\n'));
+  }
+  var n = Number(String(arg).replace(/[^\d]/g,''));
+  if (String(arg).replace(/[^\d]/g,'') === '' || isNaN(n) || n > 20)
+    return tgSend(chatId,'Nhập một con số từ 0 đến 20 nhé. `0` là bỏ giới hạn.');
+
+  luuLich('toiDa', n);
+
+  // đếm xem tuần này ai đang giữ quá số mới, để biết mà xử lý
+  var ds = moiLich(), dem = {};
+  ds.forEach(function(r){
+    if (r.trangthai !== 'booked' || !r.hv_ma) return;
+    if (r.ngay < thuHai(homNay())) return;
+    var k = r.hv_ma+'|'+thuHai(r.ngay);
+    dem[k] = (dem[k]||0) + 1;
+  });
+  var qua = [];
+  Object.keys(dem).forEach(function(k){
+    if (n > 0 && dem[k] > n){
+      var hv = hvTheoMa(k.split('|')[0]);
+      qua.push((hv ? (hv.ten_goi||hv.ten) : k.split('|')[0])+
+               ' — tuần '+ngayGon(k.split('|')[1])+': '+dem[k]+' ca');
+    }
+  });
+
+  return tgSend(chatId, [
+    n > 0
+      ? '✅ Mỗi học viên đặt tối đa *'+n+' ca một tuần*.'
+      : '✅ Đã *bỏ giới hạn* — học viên đặt bao nhiêu ca cũng được.',
+    n > 0 ? '_Đặt quá số sẽ bị chặn ngay trên trang._' : ''
+  ].concat(qua.length ? ['', '⚠️ Đang có người giữ nhiều hơn số vừa đặt:']
+                        .concat(qua)
+                        .concat(['', '_Lịch cũ vẫn giữ nguyên, chỉ lần đặt mới bị chặn._'])
+                      : [])
+   .filter(String).join('\n'));
 }
 
 /* ── xem lịch cả tuần trong bot (chỉ đọc) ── */
@@ -750,6 +829,7 @@ function kiemTraLich(){
     ' · học viên '+ds.filter(function(r){return r.vaitro==='hv'}).length+')');
   out.push('Ca trong lịch: '+moiLich().filter(function(r){return r.trangthai!=='off'}).length+' đang mở');
   out.push('Nhắc trước: '+cfgLich().nhacTruoc+' tiếng');
+  out.push('Tối đa mỗi học viên: '+(cfgLich().toiDa>0 ? cfgLich().toiDa+' ca/tuần' : 'không giới hạn'));
   out.push('PEPPER: '+(props().getProperty('PEPPER') ? '✔ đã có' : '✘ CHƯA — chạy lichSetup'));
   var n = ScriptApp.getProjectTriggers().filter(function(t){
     return t.getHandlerFunction()==='nhacLich' }).length;

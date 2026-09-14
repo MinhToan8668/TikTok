@@ -119,6 +119,7 @@ không có nút (bấm trong nhóm không ăn), phân vai làm trong chat riêng
 | `/doimk an@gmail.com` | Cấp lại mật khẩu mới (10 ký tự, hiện một lần) |
 | `/lichtuan` | Xem lịch cả tuần: ai mở ca, ai đã đặt |
 | `/nhactruoc 6` | Nhắc trước mấy tiếng — đổi lúc nào cũng được |
+| `/toida 2` | Mỗi học viên đặt tối đa mấy ca **một tuần** (`0` = bỏ giới hạn) |
 
 `/xoatk` dọn luôn lịch: xoá **học viên** thì các ca họ đang giữ mở lại cho
 người khác; xoá **mentor** thì các ca họ mở bị gỡ khỏi lịch.
@@ -134,6 +135,19 @@ bằng cách bấm — muốn huỷ phải bấm vào ca đó và xác nhận (r
 cho bạn học viên).
 
 Mentor chỉ thấy ca của chính mình. Ca của mentor khác không hiện.
+
+## 6b. Giới hạn mỗi học viên
+
+Mặc định mỗi học viên chỉ giữ được **2 ca một tuần**, để còn chỗ cho người
+khác. Đổi bằng `/toida 3`, bỏ hẳn bằng `/toida 0`.
+
+Trên trang, học viên thấy một thanh đếm ngay trên lịch: *"Tuần này bạn đã đặt
+1/2 ca, còn 1 ca"*. Hết lượt thì thanh đổi màu vàng và mọi ca trống bị khoá —
+chỉ còn bấm huỷ được ca của chính mình. Huỷ một buổi là có lại lượt ngay.
+
+Giới hạn tính **theo từng tuần**, tuần sau lại đủ lượt. Đổi số nhỏ hơn thì
+lịch cũ vẫn giữ nguyên (không ai bị mất chỗ đã đặt), chỉ lần đặt mới bị chặn
+— bot liệt kê luôn ai đang giữ nhiều hơn số mới để bạn biết mà xử lý.
 
 ## 7. Học viên làm gì trên web
 
