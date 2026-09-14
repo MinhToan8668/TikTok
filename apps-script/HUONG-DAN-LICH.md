@@ -131,8 +131,10 @@ người khác; xoá **mentor** thì các ca họ mở bị gỡ khỏi lịch.
 là đóng. Cần giờ khác thì bấm **＋ giờ khác** rồi gõ `19:30-21:00`.
 
 Ca đã có học viên đặt hiện màu tối kèm **tên người đặt**, không đóng được
-bằng cách bấm — muốn huỷ phải bấm vào ca đó và xác nhận (rồi nhớ báo lại
-cho bạn học viên).
+bằng cách bấm ba ca mặc định — muốn huỷ phải bấm thẳng vào ca đó **hai lần**:
+lần đầu nút chuyển sang đỏ hỏi *"bấm lần nữa để xác nhận"*, lần hai mới huỷ
+thật (rồi nhớ báo lại cho bạn học viên). Bấm nhầm thì để yên 6 giây, nút tự
+trở lại bình thường.
 
 Mentor chỉ thấy ca của chính mình. Ca của mentor khác không hiện.
 
@@ -153,7 +155,8 @@ lịch cũ vẫn giữ nguyên (không ai bị mất chỗ đã đặt), chỉ l
 
 Đăng nhập → thấy **Khu học viên**: lịch theo tuần, lật tới lui bằng hai nút
 mũi tên, tick một ca là đặt xong. Ca người khác đã đặt bị ẩn cho đỡ rối; ca
-của chính họ hiện màu xanh và bấm lại là huỷ.
+của chính họ hiện màu xanh, bấm **hai lần** để huỷ (lần đầu hỏi lại cho chắc,
+lần hai mới huỷ).
 
 Mỗi lần đặt/huỷ, bot nhắn ngay về kèm tên và email người đặt. Trước giờ hẹn
 đúng `nhactruoc` tiếng, bot nhắn nhắc lần nữa.
@@ -185,6 +188,12 @@ rồi đăng nhập lại. `/vaitro` đã tự đá phiên cũ nên chỉ cần 
 
 **Không nhận được nhắc hẹn** — chạy `kiemTraLich`, xem dòng "Lịch nhắc". Báo
 chưa có trigger thì chạy `lichSetup`.
+
+**Bấm huỷ mà không huỷ được, cũng không báo gì** — bản cũ dùng `confirm()`,
+trình duyệt chặn hộp thoại khi trang chạy trong khung nhúng (iframe không có
+`allow-modals`) nên lệnh huỷ không bao giờ chạy. Bản này đã bỏ hẳn
+`confirm()` và `prompt()`, thay bằng bấm hai lần và ô nhập giờ tại chỗ. Nếu
+vẫn gặp, kiểm tra xem có đang chạy bản `index.html` cũ không.
 
 **Ai cũng báo sai mật khẩu** — `PEPPER` trong Script Properties bị đổi hoặc bị
 xoá. Cấp lại mật khẩu bằng `/doimk` cho từng người.

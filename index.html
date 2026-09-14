@@ -607,6 +607,19 @@ body.hv-mode{padding-bottom:0}
 .hv-them{border:1.5px dashed var(--line-dk);border-radius:999px;padding:9px 15px;
   font-size:13px;color:var(--quiet);background:transparent;transition:.18s}
 .hv-them:hover{border-color:var(--lime-deep);color:var(--lime-deep)}
+/* ô nhập giờ tại chỗ — thay cho prompt, cũng bị chặn khi nhúng */
+.hv-gio{display:flex;align-items:center;gap:7px;flex-wrap:wrap;
+  background:var(--paper);border:1.5px dashed var(--lime-deep);border-radius:var(--r-sm);
+  padding:8px 11px}
+.hv-gio input{border:1.5px solid var(--line-dk);border-radius:9px;padding:6px 9px;
+  font-family:inherit;font-size:14px;color:var(--ink);background:var(--card);
+  outline:none;width:132px}   /* đủ rộng cho cả máy hiện giờ kiểu 7:30 PM */
+.hv-gio input:focus{border-color:var(--lime-deep);box-shadow:0 0 0 3px var(--lime-wash)}
+.hv-gio span{font-size:13px;color:var(--quiet)}
+.hv-gio button{border-radius:999px;padding:7px 14px;font-size:13px;font-weight:700;
+  font-family:var(--disp)}
+.hv-gio .luu{background:var(--lime);color:#1c2600}
+.hv-gio .bo{border:1.5px solid var(--line-dk);color:var(--quiet)}
 .hv-han{display:flex;align-items:center;justify-content:space-between;gap:12px;
   flex-wrap:wrap;background:var(--card);border:1.5px solid var(--line);
   border-radius:var(--r-sm);padding:12px 16px;margin-bottom:14px;font-size:13.5px;
@@ -658,6 +671,12 @@ body.hv-mode{padding-bottom:0}
 .hv-ca.cua-toi{background:var(--lime);border-color:var(--lime-deep);color:#1c2600}
 .hv-ca.cua-toi b,.hv-ca.cua-toi em{color:#1c2600}
 .hv-ca[disabled]{opacity:.45;pointer-events:none}
+/* bấm lần nữa để xác nhận — thay cho hộp thoại confirm, vốn bị chặn khi trang nhúng.
+   Đặt sau .cua-toi / .mo / .khoa để đè được màu của mấy trạng thái đó. */
+.hv-ca.chac,.hv-ca.chac:hover{background:var(--red);border-color:var(--red);color:#fff;
+  animation:hvNhac .9s ease-in-out infinite}
+.hv-ca.chac b,.hv-ca.chac em{color:#fff}
+@keyframes hvNhac{0%,100%{opacity:1}50%{opacity:.72}}
 
 /* lịch của tôi */
 .hv-cua-toi{background:var(--moss);color:#c8cfb4;border-radius:var(--r);
@@ -2569,6 +2588,7 @@ function hvDangNhap(){
 
 /* ---- tải lịch tuần ---- */
 function hvTai(tuan){
+  hvBoCho();
   $('#hvNgays').innerHTML = '<div class="hv-trong">Đang tải lịch…</div>';
   hvGoi('hv_slots', {token:HV.token, tuan:tuan||''}).then(function(r){
     if (!r || !r.ok){
@@ -2655,7 +2675,7 @@ function hvVeHocVien(r){
     b.addEventListener('click', function(){ hvDat(b.getAttribute('data-dat')) });
   });
   $$('#hvNgays [data-huy]').forEach(function(b){
-    b.addEventListener('click', function(){ hvHuy(b.getAttribute('data-huy')) });
+    b.addEventListener('click', function(){ hvXinHuy(b, b.getAttribute('data-huy')) });
   });
 }
 
@@ -2715,13 +2735,13 @@ function hvVeMentor(r){
     });
   });
   $$('#hvNgays [data-them]').forEach(function(b){
-    b.addEventListener('click', function(){ hvThemGio(b.getAttribute('data-them')) });
+    b.addEventListener('click', function(){ hvThemGio(b, b.getAttribute('data-them')) });
   });
   $$('#hvNgays [data-go]').forEach(function(b){
     b.addEventListener('click', function(){ hvGoCa(b.getAttribute('data-go')) });
   });
   $$('#hvNgays [data-huy]').forEach(function(b){
-    b.addEventListener('click', function(){ hvHuy(b.getAttribute('data-huy')) });
+    b.addEventListener('click', function(){ hvXinHuy(b, b.getAttribute('data-huy')) });
   });
 }
 
@@ -2753,11 +2773,37 @@ function hvDat(id){
   }).catch(function(){ hvBao('#hvMsg','Không nối được máy chủ.'); hvTai(HV.tuan) });
 }
 
+/**
+ * Huỷ hai nhịp: bấm lần đầu nút đổi thành "chắc chưa", bấm lần nữa mới huỷ thật.
+ * Không dùng confirm() vì trình duyệt chặn hộp thoại khi trang chạy trong khung nhúng —
+ * confirm() trả về undefined, lệnh huỷ không bao giờ chạy mà cũng chẳng báo gì.
+ */
+var HV_CHO_HUY = null;   // {id, hen} — ca đang đợi bấm lần hai
+function hvBoCho(){
+  if (!HV_CHO_HUY) return;
+  clearTimeout(HV_CHO_HUY.hen);
+  HV_CHO_HUY = null;
+}
+function hvXinHuy(nut, id){
+  if (HV_CHO_HUY && HV_CHO_HUY.id === id){ hvBoCho(); return hvHuy(id); }
+
+  hvBoCho();
+  $$('#hvNgays .hv-ca.chac').forEach(function(b){ b.classList.remove('chac') });
+  var cu = nut.innerHTML;
+  nut.classList.add('chac');
+  nut.innerHTML = '<b>Huỷ buổi này?</b> <em>bấm lần nữa để xác nhận</em>';
+  hvBao('#hvMsg', laMentor()
+    ? 'Bấm lần nữa vào ca đó để huỷ hẳn. Học viên đã đặt sẽ mất chỗ — nhớ báo lại cho họ.'
+    : 'Bấm lần nữa vào ca đó để huỷ hẳn. Ca sẽ mở lại cho bạn khác đặt.');
+
+  HV_CHO_HUY = {id:id, hen:setTimeout(function(){
+    HV_CHO_HUY = null;
+    if (nut.isConnected){ nut.classList.remove('chac'); nut.innerHTML = cu; }
+    $('#hvMsg').className = 'hv-msg';
+  }, 6000)};
+}
+
 function hvHuy(id){
-  var hoi = laMentor()
-    ? 'Huỷ buổi này? Học viên đã đặt sẽ mất chỗ — nhớ báo lại cho họ.'
-    : 'Huỷ buổi kèm này? Ca sẽ mở lại cho bạn khác đặt.';
-  if (!confirm(hoi)) return;
   hvKhoa();
   hvGoi('hv_cancel', {token:HV.token, slotId:id}).then(function(r){
     if (r && r.ok) hvBao('#hvMsg','Đã huỷ. Bot cũng nhận được thông báo rồi.', true);
@@ -2780,13 +2826,40 @@ function hvMoCa(d){
   }).catch(function(){ hvBao('#hvMsg','Không nối được máy chủ.'); hvTai(HV.tuan) });
 }
 
-function hvThemGio(ngay){
-  var v = prompt('Mở thêm ca ngày '+hvGon(ngay)+' — nhập giờ kiểu  19:30-21:00', '19:30-21:00');
-  if (v === null) return;
-  var m = String(v).replace(/\s+/g,'').match(/^(\d{1,2})[:h](\d{2})[-–~](\d{1,2})[:h](\d{2})$/);
-  if (!m){ hvBao('#hvMsg','Giờ chưa đúng — nhập kiểu 19:30-21:00 nhé.'); return; }
-  var hai = function(a,b){ return ('0'+Number(a)).slice(-2)+':'+('0'+Number(b)).slice(-2) };
-  hvMoCa({ngay:ngay, batdau:hai(m[1],m[2]), ketthuc:hai(m[3],m[4])});
+/**
+ * Mở ô nhập giờ ngay tại dòng ngày đó. Không dùng prompt() — cũng bị chặn
+ * khi trang chạy trong khung nhúng, bấm vào là không thấy gì xảy ra.
+ */
+function hvThemGio(nut, ngay){
+  if (nut.nextSibling && nut.nextSibling.className === 'hv-gio') return;
+  var o = document.createElement('div');
+  o.className = 'hv-gio';
+  o.innerHTML = '<input type="time" value="19:30" step="900" aria-label="Giờ bắt đầu">'+
+                '<span>→</span>'+
+                '<input type="time" value="21:00" step="900" aria-label="Giờ kết thúc">'+
+                '<button class="luu">Mở ca</button><button class="bo">Thôi</button>';
+  nut.parentNode.insertBefore(o, nut.nextSibling);
+  nut.style.display = 'none';
+  var oo = o.querySelectorAll('input');
+  oo[0].focus();
+
+  var dong = function(){ o.remove(); nut.style.display = ''; };
+  o.querySelector('.bo').addEventListener('click', dong);
+  o.querySelector('.luu').addEventListener('click', function(){
+    var a = oo[0].value, b = oo[1].value;
+    if (!/^\d{2}:\d{2}$/.test(a) || !/^\d{2}:\d{2}$/.test(b) || a >= b){
+      hvBao('#hvMsg','Giờ chưa đúng — giờ kết thúc phải sau giờ bắt đầu.');
+      return;
+    }
+    dong();
+    hvMoCa({ngay:ngay, batdau:a, ketthuc:b});
+  });
+  Array.prototype.forEach.call(oo, function(i){
+    i.addEventListener('keydown', function(e){
+      if (e.key === 'Enter'){ e.preventDefault(); o.querySelector('.luu').click(); }
+      if (e.key === 'Escape') dong();
+    });
+  });
 }
 
 function hvGoCa(id){
