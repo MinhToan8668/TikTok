@@ -1,14 +1,23 @@
 # Lịch kèm 1:1 — hướng dẫn cài
 
-Khu này gồm hai nửa:
+Mọi thao tác lịch nằm **trên trang web**. Bot chỉ làm hai việc: **báo về**
+và **phân vai** cho người mới đăng ký.
 
-* **Mentor** tick lịch rảnh ngay trong bot Telegram.
-* **Học viên** đăng nhập ở khu riêng trên landing page, thấy ca còn trống theo
-  tuần rồi tick đặt. Đặt xong bot nhắn về cho Toàn, và nhắc lại trước giờ hẹn
-  6 tiếng (đổi được).
+```
+Người mới vào web → tự tạo tài khoản (email · mật khẩu · họ tên)
+        ↓
+Bot nhắn về cho Toàn:  [🎓 Học viên]  [🧑‍🏫 Mentor]  [🚫 Từ chối]
+        ↓
+Toàn bấm một nút → họ đăng nhập được, thấy đúng giao diện của vai đó
+        ↓
+Mentor tick ca rảnh trên web  →  Học viên thấy và tick đặt
+        ↓
+Bot báo về: ai đặt, ca nào, mentor nào  →  nhắc lại trước 6 tiếng
+```
 
-Mọi thứ nằm trong **`Lich.gs`** — một file riêng, không đụng vào `Code.gs` cũ
-ngoài 4 dòng nối ở dưới.
+Trang **không hỏi ai là mentor ai là học viên**. Vai trò do Toàn quyết trong
+bot, và người dùng chỉ thấy đúng phần của mình — học viên không bao giờ nhìn
+thấy màn hình mentor.
 
 ---
 
@@ -19,8 +28,8 @@ Trong Apps Script: **＋ → Script**, đặt tên `Lich`, dán toàn bộ nội
 
 ## 2. Bốn chỗ nối trong Code.gs
 
-Nếu bạn dán lại `Code.gs` từ repo thì đã có sẵn cả 4, khỏi làm gì thêm.
-Còn nếu đang sửa tay bản cũ thì đây là 4 chỗ:
+Dán lại `Code.gs` từ repo là đã có sẵn cả 4, khỏi làm gì thêm. Sửa tay bản cũ
+thì đây là 4 chỗ:
 
 **(a) trong `doPost`**, ngay dưới dòng `register`:
 
@@ -52,8 +61,8 @@ try{ out.push('✔ '+lichSetup()); }
 catch(err){ out.push('✘ Không dựng được khu lịch mentor: '+err); }
 ```
 
-và thêm 8 lệnh mới vào danh sách `setMyCommands` (`lich`, `lichtuan`,
-`themhv`, `dshv`, `xoahv`, `doimk`, `nhactruoc`, `tenmentor`).
+và thêm 6 lệnh mới vào `setMyCommands`: `lichtuan`, `dstk`, `vaitro`,
+`xoatk`, `doimk`, `nhactruoc`.
 
 ## 3. Chạy `setup`
 
@@ -61,7 +70,7 @@ Chọn hàm `setup` → **Run**. Nó sẽ:
 
 * tạo hai sheet **`Lich`** và **`HocVien`**;
 * sinh chuỗi `PEPPER` ngẫu nhiên (dùng để băm mật khẩu — đừng xóa, xóa là
-  mọi mật khẩu học viên hỏng hết, phải cấp lại);
+  mọi mật khẩu hỏng hết, phải cấp lại từng người);
 * đặt trigger `nhacLich` chạy 15 phút một lần để gửi nhắc hẹn;
 * nạp menu lệnh mới cho bot.
 
@@ -69,74 +78,99 @@ Muốn kiểm tra riêng khu lịch thì chạy tay hàm **`kiemTraLich`** rồi
 Execution log.
 
 **Deploy lại**: Deploy → Manage deployments → ✏️ → New version → Deploy.
-Không deploy lại thì landing page vẫn gọi vào bản cũ, khu học viên sẽ báo
-`unknown_action`.
+Không deploy lại thì khu học viên báo `unknown_action`.
 
 ---
 
-## 4. Mentor dùng thế nào
+## 4. Người dùng tự đăng ký
+
+Trên landing page bấm **"Khu học viên"** (hoặc vào thẳng `…/index.html#hocvien`)
+→ tab **Tạo tài khoản** → điền họ tên, email, mật khẩu (tối thiểu 6 ký tự).
+
+Bot nhắn ngay về chat riêng của Toàn:
+
+```
+🙋 Có người vừa đăng ký tài khoản
+
+👤 Nguyễn Văn An   (gọi là Văn An)
+📧 an@gmail.com
+🕐 14/09/2026 21:07
+
+Chọn vai trò để mở khoá tài khoản này:
+[🎓 Học viên]  [🧑‍🏫 Mentor]
+[🚫 Từ chối · xoá]
+```
+
+**Tên gọi** cắt họ ra, giữ tên đệm + tên: *Nguyễn Văn An* → **Văn An**,
+*Trần Thị Ngọc Hương* → **Thị Ngọc Hương**. Đây là tên hiện trong mọi tin
+báo về bot, nên nhìn phát biết ngay ai đặt lịch.
+
+Chưa bấm nút thì họ đăng nhập vẫn báo *"tụi mình chưa duyệt xong"* — mật
+khẩu đúng cũng không vào được. Nhóm nội bộ cũng nhận được tin báo nhưng
+không có nút (bấm trong nhóm không ăn), phân vai làm trong chat riêng.
+
+## 5. Lệnh bot
 
 | Lệnh | Việc |
 |---|---|
-| `/lich` | Mở bảng tuần, bấm vào ngày rồi tick ca rảnh |
-| `/lichtuan` | Xem cả tuần: ca nào trống, ca nào ai đã đặt |
-| `/tenmentor Minh Toàn` | Tên hiện cho học viên thấy (mặc định lấy tên Telegram) |
+| `/dstk` | Danh sách tài khoản, chia ba nhóm: chờ phân vai · mentor · học viên. Kèm nút phân vai nhanh cho tối đa 4 người đang chờ |
+| `/vaitro an@gmail.com mentor` | Đổi vai (`hv` hoặc `mentor`). Đổi xong phiên cũ bị đá, họ đăng nhập lại là thấy đúng giao diện |
+| `/xoatk an@gmail.com` | Xoá hẳn tài khoản |
+| `/doimk an@gmail.com` | Cấp lại mật khẩu mới (10 ký tự, hiện một lần) |
+| `/lichtuan` | Xem lịch cả tuần: ai mở ca, ai đã đặt |
 | `/nhactruoc 6` | Nhắc trước mấy tiếng — đổi lúc nào cũng được |
 
-Ba ca mặc định: **Sáng 9–11**, **Chiều 14–16**, **Tối 20–22**. Cần giờ lẻ thì
-trong bảng ngày bấm **“➕ Giờ khác”** rồi gõ `19:30-21:00` (hoặc
-`7h30 - 9h`, bot đọc được cả hai kiểu).
+`/xoatk` dọn luôn lịch: xoá **học viên** thì các ca họ đang giữ mở lại cho
+người khác; xoá **mentor** thì các ca họ mở bị gỡ khỏi lịch.
 
-Bấm lại một ca đang mở là tắt nó. Ca **đã có học viên đặt thì không tắt được**
-— hủy phía học viên hoặc nhắn cho họ trước đã.
+## 6. Mentor làm gì trên web
 
-## 5. Cấp tài khoản học viên
+Đăng nhập → thấy **Khu mentor**. Mỗi ngày có ba ca sẵn: **Sáng 9–11**,
+**Chiều 14–16**, **Tối 20–22**. Bấm một ca là mở cho học viên đặt, bấm lại
+là đóng. Cần giờ khác thì bấm **＋ giờ khác** rồi gõ `19:30-21:00`.
 
-```
-/themhv an@gmail.com Nguyễn An
-```
+Ca đã có học viên đặt hiện màu tối kèm **tên người đặt**, không đóng được
+bằng cách bấm — muốn huỷ phải bấm vào ca đó và xác nhận (rồi nhớ báo lại
+cho bạn học viên).
 
-Email trước, tên sau (tên không bắt buộc). Bot tự sinh mật khẩu 10 ký tự rồi
-nhắn lại cho bạn để chuyển cho học viên — không tự đặt mật khẩu được, cố ý
-vậy để khỏi ai đặt `123456`.
+Mentor chỉ thấy ca của chính mình. Ca của mentor khác không hiện.
 
-Gõ `/themhv` trống thì bot hỏi email ở tin nhắn tiếp theo, khỏi nhớ cú pháp.
+## 7. Học viên làm gì trên web
 
-| Lệnh | Việc |
-|---|---|
-| `/dshv` | Danh sách tài khoản |
-| `/doimk an@gmail.com` | Cấp lại mật khẩu mới (đá luôn phiên đang đăng nhập) |
-| `/xoahv an@gmail.com` | Xóa tài khoản (lịch họ đang giữ sẽ mở lại) |
+Đăng nhập → thấy **Khu học viên**: lịch theo tuần, lật tới lui bằng hai nút
+mũi tên, tick một ca là đặt xong. Ca người khác đã đặt bị ẩn cho đỡ rối; ca
+của chính họ hiện màu xanh và bấm lại là huỷ.
+
+Mỗi lần đặt/huỷ, bot nhắn ngay về kèm tên và email người đặt. Trước giờ hẹn
+đúng `nhactruoc` tiếng, bot nhắn nhắc lần nữa.
+
+## 8. Mật khẩu và phiên đăng nhập
 
 Mật khẩu **không lưu dạng chữ thường** ở bất cứ đâu: sheet chỉ giữ bản băm
-SHA-256 (1500 vòng, có salt riêng từng người + PEPPER chung). Quên mật khẩu
-thì cấp lại chứ không đọc lại được — cố ý như vậy.
+SHA-256 (1500 vòng, salt riêng từng người + PEPPER chung), so sánh theo thời
+gian hằng số. Quên mật khẩu thì cấp lại bằng `/doimk` chứ không đọc lại được
+— cố ý như vậy.
 
-## 6. Học viên dùng thế nào
-
-Trên landing page bấm **“Khu học viên”** (hoặc vào thẳng
-`…/index.html#hocvien`), đăng nhập bằng email + mật khẩu bạn cấp. Họ thấy
-lịch theo tuần, lật tới lui bằng hai nút mũi tên, tick một ca là đặt xong.
-Ca người khác đã đặt bị ẩn đi cho đỡ rối; ca của chính họ hiện rõ và hủy được.
-
-Mỗi lần đặt/hủy, bot nhắn ngay về chat của Toàn. Trước giờ hẹn đúng
-`nhactruoc` tiếng, bot nhắn nhắc một lần nữa.
-
-Phiên đăng nhập giữ 30 ngày. Trình duyệt chỉ lưu **token**, không lưu mật
-khẩu. Sai mật khẩu 5 lần trong 10 phút thì email đó bị khóa tạm.
+Phiên đăng nhập giữ 30 ngày, token cũng băm khi lưu. Trình duyệt chỉ giữ
+token, không giữ mật khẩu. Sai mật khẩu 5 lần trong 10 phút thì email đó bị
+khoá tạm.
 
 ---
 
 ## Sự cố hay gặp
 
-**Khu học viên báo “Không gọi được máy chủ”** — chưa deploy version mới, hoặc
+**Khu học viên báo "Không nối được máy chủ"** — chưa deploy version mới, hoặc
 `API` trong `index.html` trỏ vào deployment cũ.
 
-**Bấm nút trong bot không thấy gì** — thiếu chỗ nối (c), hoặc lịch hỏi
-Telegram (`datLichHoi`) đang tắt. Chạy lại `setup`.
+**Đăng ký xong bot không báo gì** — thiếu chỗ nối (a), hoặc chưa deploy lại.
 
-**Không nhận được nhắc hẹn** — chạy `kiemTraLich`, xem dòng “Lịch nhắc”. Nếu
-báo chưa có trigger thì chạy `lichSetup`.
+**Bấm nút phân vai không ăn** — thiếu chỗ nối (c). Chạy lại `setup`.
 
-**Học viên nào cũng báo sai mật khẩu** — `PEPPER` trong Script Properties bị
-đổi hoặc bị xóa. Cấp lại mật khẩu bằng `/doimk` cho từng người.
+**Người dùng đăng nhập vẫn thấy giao diện cũ sau khi đổi vai** — họ cần thoát
+rồi đăng nhập lại. `/vaitro` đã tự đá phiên cũ nên chỉ cần tải lại trang.
+
+**Không nhận được nhắc hẹn** — chạy `kiemTraLich`, xem dòng "Lịch nhắc". Báo
+chưa có trigger thì chạy `lichSetup`.
+
+**Ai cũng báo sai mật khẩu** — `PEPPER` trong Script Properties bị đổi hoặc bị
+xoá. Cấp lại mật khẩu bằng `/doimk` cho từng người.

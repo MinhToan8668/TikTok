@@ -2,8 +2,16 @@
  * ═══════════════════════════════════════════════════════════════
  *  LỊCH KÈM 1:1 — file phụ, dán vào Apps Script thành file riêng
  * ═══════════════════════════════════════════════════════════════
- *  Mentor mở ca trong Telegram → học viên thấy trên web → tick đặt
- *  → bot báo về + nhắc lại trước giờ hẹn.
+ *  Mọi thao tác lịch nằm TRÊN TRANG WEB, không tick trong bot:
+ *
+ *   • Ai cũng tự đăng ký tài khoản ở khu học viên (email, mật khẩu,
+ *     họ tên). Tài khoản mới ở trạng thái "chờ" — chưa vào được.
+ *   • Bot nhắn về cho Toàn kèm 3 nút: Học viên · Mentor · Từ chối.
+ *     Toàn bấm một nút là xong, người đó đăng nhập được ngay.
+ *   • Vai trò quyết định giao diện: mentor thấy bảng mở ca của mình,
+ *     học viên thấy bảng đặt ca. Trang không hỏi ai là ai cả.
+ *   • Đặt / huỷ lịch đều nhắn về bot kèm TÊN người đặt (tên đệm +
+ *     tên, cắt từ họ tên), và nhắc lại trước giờ hẹn.
  *
  *  Cần sửa 4 chỗ nhỏ trong Code.gs (xem HUONG-DAN-LICH.md).
  * ═══════════════════════════════════════════════════════════════
@@ -12,12 +20,12 @@
 var SHEET_LICH = 'Lich';
 var SHEET_HV   = 'HocVien';
 
-var LICH_HEADERS = ['id','mentor','ngay','batdau','ketthuc','trangthai',
-                    'hv_email','hv_ten','nhac_luc','da_nhac','ghichu','tao'];
-var HV_HEADERS   = ['email','ten','salt','hash','trangthai','token','token_han',
-                    'tao','dangnhap_cuoi'];
+var LICH_HEADERS = ['id','mentor_ma','mentor_ten','ngay','batdau','ketthuc','trangthai',
+                    'hv_ma','hv_ten','hv_email','nhac_luc','da_nhac','tao'];
+var HV_HEADERS   = ['ma','email','ten','ten_goi','salt','hash','vaitro','trangthai',
+                    'token','token_han','tao','dangnhap_cuoi'];
 
-/* Ba ca mặc định — sửa ở đây là đổi cho cả bot lẫn web */
+/* Ba ca mặc định — sửa ở đây là đổi cho cả web lẫn bot */
 var CA = [
   {ma:'s', ten:'Sáng',  batdau:'09:00', ketthuc:'11:00'},
   {ma:'c', ten:'Chiều', batdau:'14:00', ketthuc:'16:00'},
@@ -28,6 +36,7 @@ var NHAC_TRUOC_MD = 6;      // giờ — mặc định nhắc trước 6 tiếng
 var PHIEN_NGAY    = 30;     // token đăng nhập sống bao nhiêu ngày
 var BAM_VONG      = 1500;   // số vòng băm mật khẩu
 var DN_TOI_DA     = 5;      // số lần đăng nhập sai cho phép trong 10 phút
+var MK_TOI_THIEU  = 6;      // độ dài mật khẩu tối thiểu khi tự đăng ký
 
 /* ═══════════════ BẢNG TÍNH ═══════════════ */
 
@@ -93,9 +102,7 @@ function ngayGon(ngay){ return ngay.slice(8,10)+'/'+ngay.slice(5,7); }
 
 function cfgLich(){
   var c = getConfig();
-  return {
-    nhacTruoc: Number((c.lich||{}).nhacTruoc || NHAC_TRUOC_MD)
-  };
+  return { nhacTruoc: Number((c.lich||{}).nhacTruoc || NHAC_TRUOC_MD) };
 }
 function luuNhacTruoc(gio){
   var c = getConfig();
@@ -104,13 +111,45 @@ function luuNhacTruoc(gio){
   saveConfig(c);
 }
 
-/* ═══════════════ MẬT KHẨU ═══════════════ */
+/* ═══════════════ TÊN & MẬT KHẨU ═══════════════ */
 
-function chuoiNgauNhien(n, bang16){
-  var B = bang16 || 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+/**
+ * Cắt họ ra, giữ tên đệm + tên — để tin báo về bot gọi đúng tên người.
+ * "Nguyễn Văn An"        → "Văn An"
+ * "Trần Thị Ngọc Hương"  → "Thị Ngọc Hương"
+ * "An"                   → "An"
+ */
+function tenGoi(hoTen){
+  var p = String(hoTen||'').trim().replace(/\s+/g,' ').split(' ');
+  if (p.length <= 1) return p[0] || '';
+  return p.slice(1).join(' ');
+}
+
+/** Viết hoa đầu mỗi chữ, bỏ khoảng trắng thừa */
+function chuanTen(s){
+  return String(s||'').trim().replace(/\s+/g,' ').split(' ').map(function(w){
+    return w ? w.charAt(0).toUpperCase()+w.slice(1) : w;
+  }).join(' ');
+}
+
+function chuoiNgauNhien(n, bangChu){
+  var B = bangChu || 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
   var r = '';
   for (var i=0;i<n;i++) r += B.charAt(Math.floor(Math.random()*B.length));
   return r;
+}
+
+/** Mã ngắn 5 ký tự cho mỗi tài khoản — dùng làm callback_data của nút bot */
+function maTaiKhoan(daCo){
+  var B = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  var dung = {};
+  (daCo||[]).forEach(function(r){ dung[String(r.ma).toUpperCase()] = 1 });
+  for (var lan=0; lan<60; lan++){
+    var m = '';
+    for (var i=0;i<5;i++) m += B.charAt(Math.floor(Math.random()*B.length));
+    if (!dung[m]) return m;
+  }
+  return 'T'+String(new Date().getTime()).slice(-6);
 }
 
 function bamMK(pass, salt){
@@ -133,16 +172,34 @@ function bangNhau(a, b){
 }
 
 function chuanEmail(e){ return String(e||'').trim().toLowerCase(); }
+function emailHopLe(e){ return /^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(e); }
+
+function timHV(dieuKien){
+  var ra = null;
+  moiHV().forEach(function(r){ if (!ra && dieuKien(r)) ra = r });
+  return ra;
+}
+function hvTheoEmail(email){
+  var e = chuanEmail(email);
+  return timHV(function(r){ return chuanEmail(r.email) === e });
+}
+function hvTheoMa(ma){
+  var m = String(ma||'').toUpperCase();
+  return timHV(function(r){ return String(r.ma).toUpperCase() === m });
+}
 
 /* ═══════════════ API CHO WEB ═══════════════ */
 
 function lichApi(body){
   var act = String(body.action||'');
   try{
-    if (act === 'hv_login')  return apiDangNhap(body);
-    if (act === 'hv_slots')  return apiXemLich(body);
-    if (act === 'hv_book')   return apiDatLich(body);
-    if (act === 'hv_cancel') return apiHuyLich(body);
+    if (act === 'hv_signup')  return apiDangKy(body);
+    if (act === 'hv_login')   return apiDangNhap(body);
+    if (act === 'hv_slots')   return apiXemLich(body);
+    if (act === 'hv_book')    return apiDatLich(body);
+    if (act === 'hv_cancel')  return apiHuyLich(body);
+    if (act === 'hv_mo_ca')   return apiMoCa(body);
+    if (act === 'hv_xoa_ca')  return apiXoaCa(body);
     return jsonOut({ok:false, error:'unknown_action'});
   }catch(err){
     ghiLoi('lichApi/'+act, err);
@@ -150,6 +207,51 @@ function lichApi(body){
   }
 }
 
+/* ── tự đăng ký tài khoản ── */
+function apiDangKy(b){
+  var email = chuanEmail(b.email);
+  var pass  = String(b.pass||'');
+  var ten   = chuanTen(b.ten);
+
+  if (!email || !pass || !ten)   return jsonOut({ok:false, error:'thieu'});
+  if (!emailHopLe(email))        return jsonOut({ok:false, error:'email_sai'});
+  if (pass.length < MK_TOI_THIEU)return jsonOut({ok:false, error:'mk_ngan'});
+  if (ten.split(' ').length < 2) return jsonOut({ok:false, error:'ten_ngan'});
+
+  var lock = LockService.getScriptLock();
+  if (!lock.tryLock(8000)) return jsonOut({ok:false, error:'busy'});
+  try{
+    var ds = moiHV(), da = null;
+    ds.forEach(function(r){ if (chuanEmail(r.email)===email) da = r });
+    if (da) return jsonOut({ok:false, error:'da_ton_tai'});
+
+    var ma = maTaiKhoan(ds);
+    var salt = chuoiNgauNhien(16);
+    var goi = tenGoi(ten);
+
+    bang(SHEET_HV, HV_HEADERS).appendRow([
+      ma, email, ten, goi, salt, bamMK(pass, salt),
+      'cho', 'active', '', '', nowVN(), ''
+    ]);
+
+    tgBroadcastKb([
+      '🙋 *Có người vừa đăng ký tài khoản*','',
+      '👤 *'+ten+'*   _(gọi là '+goi+')_',
+      '📧 `'+email+'`',
+      '🕐 '+nowVN(),'',
+      'Chọn vai trò để mở khoá tài khoản này:'
+    ].join('\n'), [[
+      {text:'🎓 Học viên', callback_data:'l:v:h:'+ma},
+      {text:'🧑‍🏫 Mentor',  callback_data:'l:v:m:'+ma}
+    ],[
+      {text:'🚫 Từ chối · xoá', callback_data:'l:v:x:'+ma}
+    ]]);
+
+    return jsonOut({ok:true, cho:true});
+  } finally { lock.releaseLock(); }
+}
+
+/* ── đăng nhập ── */
 function apiDangNhap(b){
   var email = chuanEmail(b.email), pass = String(b.pass||'');
   if (!email || !pass) return jsonOut({ok:false, error:'thieu'});
@@ -159,8 +261,7 @@ function apiDangNhap(b){
   var sai = Number(cache.get(khoa) || 0);
   if (sai >= DN_TOI_DA) return jsonOut({ok:false, error:'khoa_tam'});
 
-  var hv = null;
-  moiHV().forEach(function(r){ if (chuanEmail(r.email)===email) hv = r; });
+  var hv = hvTheoEmail(email);
 
   if (!hv || hv.trangthai==='off' || !bangNhau(bamMK(pass, hv.salt), hv.hash)){
     cache.put(khoa, String(sai+1), 600);
@@ -168,22 +269,27 @@ function apiDangNhap(b){
   }
   cache.remove(khoa);
 
+  // đã đúng mật khẩu nhưng Toàn chưa phân vai
+  if (hv.vaitro !== 'hv' && hv.vaitro !== 'mentor')
+    return jsonOut({ok:false, error:'cho_duyet'});
+
   var token = chuoiNgauNhien(40);
   var han = new Date(); han.setDate(han.getDate() + PHIEN_NGAY);
   ghiO(SHEET_HV, HV_HEADERS, hv.row, 'token', bamMK(token, hv.salt));
   ghiO(SHEET_HV, HV_HEADERS, hv.row, 'token_han', han.toISOString());
   ghiO(SHEET_HV, HV_HEADERS, hv.row, 'dangnhap_cuoi', nowVN());
 
-  return jsonOut({ok:true, token:token, email:hv.email, ten:hv.ten || hv.email});
+  return jsonOut({ok:true, token:token, ten:hv.ten_goi||hv.ten, vaitro:hv.vaitro});
 }
 
-/** Đổi token thành hồ sơ học viên, hết hạn hoặc sai thì trả null */
+/** Đổi token thành hồ sơ, hết hạn / chưa duyệt / bị khoá thì trả null */
 function aiDay(token){
   token = String(token||'');
   if (token.length < 20) return null;
   var ra = null;
   moiHV().forEach(function(r){
     if (ra || !r.token || r.trangthai==='off') return;
+    if (r.vaitro!=='hv' && r.vaitro!=='mentor') return;
     if (!bangNhau(bamMK(token, r.salt), r.token)) return;
     if (r.token_han && new Date(r.token_han) < new Date()) return;
     ra = r;
@@ -191,14 +297,16 @@ function aiDay(token){
   return ra;
 }
 
+/* ── xem lịch tuần: học viên và mentor thấy hai thứ khác nhau ── */
 function apiXemLich(b){
-  var hv = aiDay(b.token);
-  if (!hv) return jsonOut({ok:false, error:'het_phien'});
+  var me = aiDay(b.token);
+  if (!me) return jsonOut({ok:false, error:'het_phien'});
 
-  var dau = thuHai(String(b.tuan||'').match(/^\d{4}-\d{2}-\d{2}$/) ? b.tuan : homNay());
+  var dau  = thuHai(String(b.tuan||'').match(/^\d{4}-\d{2}-\d{2}$/) ? b.tuan : homNay());
   var cuoi = congNgay(dau, 6);
-  var bay = homNay();
-  var email = chuanEmail(hv.email);
+  var bay  = homNay();
+  var giờNay = new Date();
+  var laMentor = me.vaitro === 'mentor';
 
   var ngays = {};
   for (var i=0;i<7;i++){
@@ -209,14 +317,27 @@ function apiXemLich(b){
   moiLich().forEach(function(r){
     if (r.ngay < dau || r.ngay > cuoi) return;
     if (r.trangthai === 'off') return;
-    var cuaToi = chuanEmail(r.hv_email) === email;
-    // ca người khác đã đặt thì giấu luôn, khỏi rối mắt
-    if (r.trangthai === 'booked' && !cuaToi) return;
-    ngays[r.ngay].slots.push({
-      id: r.id, mentor: r.mentor, batdau: r.batdau, ketthuc: r.ketthuc,
-      dat: r.trangthai === 'booked', cuaToi: cuaToi,
-      qua: mocGio(r.ngay, r.batdau) < new Date()
-    });
+    var daDat = r.trangthai === 'booked';
+
+    if (laMentor){
+      // mentor chỉ thấy ca của chính mình, kèm tên người đã đặt
+      if (String(r.mentor_ma) !== String(me.ma)) return;
+      ngays[r.ngay].slots.push({
+        id:r.id, batdau:r.batdau, ketthuc:r.ketthuc, dat:daDat,
+        hvTen: daDat ? (r.hv_ten||'') : '',
+        hvEmail: daDat ? (r.hv_email||'') : '',
+        qua: mocGio(r.ngay, r.batdau) < giờNay
+      });
+    } else {
+      // học viên: ca người khác đã đặt thì giấu, ca của mình thì hiện rõ
+      var cuaToi = daDat && String(r.hv_ma) === String(me.ma);
+      if (daDat && !cuaToi) return;
+      ngays[r.ngay].slots.push({
+        id:r.id, mentor:r.mentor_ten, batdau:r.batdau, ketthuc:r.ketthuc,
+        dat:daDat, cuaToi:cuaToi,
+        qua: mocGio(r.ngay, r.batdau) < giờNay
+      });
+    }
   });
 
   var ds = Object.keys(ngays).sort().map(function(k){
@@ -224,13 +345,15 @@ function apiXemLich(b){
     return ngays[k];
   });
 
-  return jsonOut({ok:true, ten:hv.ten||hv.email, tuan:dau, ngays:ds,
-                  nhacTruoc:cfgLich().nhacTruoc});
+  return jsonOut({ok:true, ten:me.ten_goi||me.ten, vaitro:me.vaitro,
+                  tuan:dau, ngays:ds, ca:CA, nhacTruoc:cfgLich().nhacTruoc});
 }
 
+/* ── học viên đặt ca ── */
 function apiDatLich(b){
-  var hv = aiDay(b.token);
-  if (!hv) return jsonOut({ok:false, error:'het_phien'});
+  var me = aiDay(b.token);
+  if (!me) return jsonOut({ok:false, error:'het_phien'});
+  if (me.vaitro !== 'hv') return jsonOut({ok:false, error:'khong_phai_hv'});
 
   var lock = LockService.getScriptLock();
   if (!lock.tryLock(8000)) return jsonOut({ok:false, error:'busy'});
@@ -239,24 +362,27 @@ function apiDatLich(b){
     moiLich().forEach(function(r){ if (r.id === String(b.slotId)) slot = r; });
     if (!slot) return jsonOut({ok:false, error:'khong_thay'});
     if (slot.trangthai === 'booked') return jsonOut({ok:false, error:'da_co_nguoi'});
+    if (slot.trangthai === 'off')    return jsonOut({ok:false, error:'khong_thay'});
     if (mocGio(slot.ngay, slot.batdau) < new Date())
       return jsonOut({ok:false, error:'da_qua'});
 
     var nhac = new Date(mocGio(slot.ngay, slot.batdau).getTime()
                         - cfgLich().nhacTruoc*3600*1000);
+    var goi = me.ten_goi || me.ten;
 
     ghiO(SHEET_LICH, LICH_HEADERS, slot.row, 'trangthai', 'booked');
-    ghiO(SHEET_LICH, LICH_HEADERS, slot.row, 'hv_email', hv.email);
-    ghiO(SHEET_LICH, LICH_HEADERS, slot.row, 'hv_ten', hv.ten||'');
+    ghiO(SHEET_LICH, LICH_HEADERS, slot.row, 'hv_ma',    me.ma);
+    ghiO(SHEET_LICH, LICH_HEADERS, slot.row, 'hv_ten',   goi);
+    ghiO(SHEET_LICH, LICH_HEADERS, slot.row, 'hv_email', me.email);
     ghiO(SHEET_LICH, LICH_HEADERS, slot.row, 'nhac_luc', nhac.toISOString());
-    ghiO(SHEET_LICH, LICH_HEADERS, slot.row, 'da_nhac', '');
+    ghiO(SHEET_LICH, LICH_HEADERS, slot.row, 'da_nhac',  '');
 
     tgBroadcast([
-      '📅 *Học viên vừa đặt lịch kèm 1:1*','',
-      '👤 '+(hv.ten||hv.email),
-      '📧 `'+hv.email+'`',
+      '📅 *'+goi+' vừa đặt lịch kèm 1:1*','',
+      '👤 '+me.ten+'   _(gọi là '+goi+')_',
+      '📧 `'+me.email+'`',
       '🗓 '+tenThu(slot.ngay)+' '+ngayGon(slot.ngay)+' · '+slot.batdau+'–'+slot.ketthuc,
-      '🧑‍🏫 Mentor: '+(slot.mentor||'—'),'',
+      '🧑‍🏫 Mentor: '+(slot.mentor_ten||'—'),'',
       '_Sẽ nhắc lại trước '+cfgLich().nhacTruoc+' tiếng._'
     ].join('\n'));
 
@@ -264,26 +390,95 @@ function apiDatLich(b){
   } finally { lock.releaseLock(); }
 }
 
+/* ── huỷ ca: học viên huỷ ca mình đặt, mentor huỷ ca trên lịch mình ── */
 function apiHuyLich(b){
-  var hv = aiDay(b.token);
-  if (!hv) return jsonOut({ok:false, error:'het_phien'});
+  var me = aiDay(b.token);
+  if (!me) return jsonOut({ok:false, error:'het_phien'});
 
   var slot = null;
   moiLich().forEach(function(r){ if (r.id === String(b.slotId)) slot = r; });
   if (!slot) return jsonOut({ok:false, error:'khong_thay'});
-  if (chuanEmail(slot.hv_email) !== chuanEmail(hv.email))
-    return jsonOut({ok:false, error:'khong_phai_cua_ban'});
+
+  var laChu = (me.vaitro === 'hv'     && String(slot.hv_ma)     === String(me.ma)) ||
+              (me.vaitro === 'mentor' && String(slot.mentor_ma) === String(me.ma));
+  if (!laChu) return jsonOut({ok:false, error:'khong_phai_cua_ban'});
+
+  var aiHuy = me.ten_goi || me.ten;
+  var hvCu  = slot.hv_ten || slot.hv_email || 'học viên';
 
   ghiO(SHEET_LICH, LICH_HEADERS, slot.row, 'trangthai', 'open');
+  ghiO(SHEET_LICH, LICH_HEADERS, slot.row, 'hv_ma',    '');
+  ghiO(SHEET_LICH, LICH_HEADERS, slot.row, 'hv_ten',   '');
   ghiO(SHEET_LICH, LICH_HEADERS, slot.row, 'hv_email', '');
-  ghiO(SHEET_LICH, LICH_HEADERS, slot.row, 'hv_ten', '');
   ghiO(SHEET_LICH, LICH_HEADERS, slot.row, 'nhac_luc', '');
-  ghiO(SHEET_LICH, LICH_HEADERS, slot.row, 'da_nhac', '');
+  ghiO(SHEET_LICH, LICH_HEADERS, slot.row, 'da_nhac',  '');
 
-  tgBroadcast('↩️ *'+(hv.ten||hv.email)+'* vừa huỷ lịch '+
+  tgBroadcast('↩️ *'+aiHuy+'* vừa huỷ buổi '+
     tenThu(slot.ngay)+' '+ngayGon(slot.ngay)+' · '+slot.batdau+'–'+slot.ketthuc+
-    '\nCa này mở lại cho người khác đặt.');
+    (me.vaitro==='mentor' ? '\nNgười đã đặt: '+hvCu+' — nhớ báo lại giúp họ.'
+                          : '\nMentor: '+(slot.mentor_ten||'—')+' · ca mở lại cho bạn khác.'));
 
+  return jsonOut({ok:true});
+}
+
+/* ── mentor mở / đóng ca ngay trên trang ── */
+function apiMoCa(b){
+  var me = aiDay(b.token);
+  if (!me) return jsonOut({ok:false, error:'het_phien'});
+  if (me.vaitro !== 'mentor') return jsonOut({ok:false, error:'khong_phai_mentor'});
+
+  var ngay = String(b.ngay||'');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(ngay)) return jsonOut({ok:false, error:'ngay_sai'});
+  if (ngay < homNay()) return jsonOut({ok:false, error:'da_qua'});
+
+  var g;
+  if (b.caMa){
+    CA.forEach(function(c){ if (c.ma === String(b.caMa)) g = {batdau:c.batdau, ketthuc:c.ketthuc} });
+    if (!g) return jsonOut({ok:false, error:'ca_la'});
+  } else {
+    g = chuanGio(String(b.batdau||'')+'-'+String(b.ketthuc||''));
+    if (!g) return jsonOut({ok:false, error:'gio_sai'});
+  }
+  if (mocGio(ngay, g.batdau) < new Date()) return jsonOut({ok:false, error:'da_qua'});
+
+  var lock = LockService.getScriptLock();
+  if (!lock.tryLock(8000)) return jsonOut({ok:false, error:'busy'});
+  try{
+    var co = null;
+    moiLich().forEach(function(r){
+      if (String(r.mentor_ma)===String(me.ma) && r.ngay===ngay &&
+          r.batdau===g.batdau && r.ketthuc===g.ketthuc && r.trangthai!=='off') co = r;
+    });
+
+    // bấm lại ca đang mở = đóng ca; ca đã có người đặt thì không đóng được
+    if (co){
+      if (co.trangthai === 'booked') return jsonOut({ok:false, error:'da_co_nguoi'});
+      ghiO(SHEET_LICH, LICH_HEADERS, co.row, 'trangthai', 'off');
+      return jsonOut({ok:true, mo:false});
+    }
+
+    bang(SHEET_LICH, LICH_HEADERS).appendRow([
+      'L'+chuoiNgauNhien(6), me.ma, me.ten_goi||me.ten, ngay, g.batdau, g.ketthuc,
+      'open', '', '', '', '', '', nowVN()
+    ]);
+    return jsonOut({ok:true, mo:true});
+  } finally { lock.releaseLock(); }
+}
+
+/** Mentor gỡ hẳn một ca trống khỏi lịch */
+function apiXoaCa(b){
+  var me = aiDay(b.token);
+  if (!me) return jsonOut({ok:false, error:'het_phien'});
+  if (me.vaitro !== 'mentor') return jsonOut({ok:false, error:'khong_phai_mentor'});
+
+  var slot = null;
+  moiLich().forEach(function(r){ if (r.id === String(b.slotId)) slot = r; });
+  if (!slot) return jsonOut({ok:false, error:'khong_thay'});
+  if (String(slot.mentor_ma) !== String(me.ma))
+    return jsonOut({ok:false, error:'khong_phai_cua_ban'});
+  if (slot.trangthai === 'booked') return jsonOut({ok:false, error:'da_co_nguoi'});
+
+  ghiO(SHEET_LICH, LICH_HEADERS, slot.row, 'trangthai', 'off');
   return jsonOut({ok:true});
 }
 
@@ -299,164 +494,17 @@ function nhacLich(){
 
     var conLai = Math.round((mocGio(r.ngay,r.batdau) - bay)/3600000);
     tgBroadcast([
-      '⏰ *Nhắc lịch kèm 1:1* — còn khoảng '+conLai+' tiếng','',
+      '⏰ *Nhắc buổi kèm 1:1* — còn khoảng '+conLai+' tiếng','',
       '👤 '+(r.hv_ten||r.hv_email),
       '📧 `'+r.hv_email+'`',
       '🗓 '+tenThu(r.ngay)+' '+ngayGon(r.ngay)+' · '+r.batdau+'–'+r.ketthuc,
-      '🧑‍🏫 Mentor: '+(r.mentor||'—')
+      '🧑‍🏫 Mentor: '+(r.mentor_ten||'—')
     ].join('\n'));
     ghiO(SHEET_LICH, LICH_HEADERS, r.row, 'da_nhac', nowVN());
   });
 }
 
-/* ═══════════════ BOT — LỆNH LỊCH ═══════════════ */
-
-var LENH_LICH = ['lich','lichtuan','themhv','dshv','xoahv','doimk',
-                 'nhactruoc','tenmentor'];
-
-function lichCoLenh(cmd){
-  return LENH_LICH.indexOf(cmd) > -1 || String(cmd).indexOf('gionhap|') === 0;
-}
-
-function tenMentor(msg, chatId){
-  var t = props().getProperty('MENTOR_'+chatId);
-  if (t) return t;
-  var f = (msg && msg.from) || {};
-  return (f.first_name||'') + (f.last_name ? ' '+f.last_name : '') || 'Mentor';
-}
-
-function lichLenh(cmd, arg, chatId, msg){
-  // đang chờ nhập giờ tự chọn cho một ngày cụ thể
-  if (String(cmd).indexOf('gionhap|') === 0){
-    var ngay = cmd.split('|')[1];
-    return nhapGioTay(chatId, ngay, arg, tenMentor(msg, chatId));
-  }
-
-  switch(cmd){
-    case 'lich':
-      if (arg) return themCaBangChu(chatId, arg, tenMentor(msg, chatId));
-      return tgSend(chatId, banTuanChu(thuHai(homNay())),
-                    banTuanNut(thuHai(homNay())));
-
-    case 'lichtuan':   return xemLichTuan(chatId, arg);
-    case 'themhv':     return themHocVien(chatId, arg);
-    case 'dshv':       return dsHocVien(chatId);
-    case 'xoahv':      return xoaHocVien(chatId, arg);
-    case 'doimk':      return doiMatKhau(chatId, arg);
-    case 'tenmentor':  return datTenMentor(chatId, arg);
-
-    case 'nhactruoc': {
-      if (!arg){ datCho(chatId,'nhactruoc');
-        return tgSend(chatId,'⏰ Đang nhắc trước *'+cfgLich().nhacTruoc+
-          ' tiếng*.\n\n👉 Nhắn số giờ mới vào tin tiếp theo (VD `6`), hoặc /huy.'); }
-      var g = Number(String(arg).replace(/[^\d.]/g,''));
-      if (!g || g <= 0 || g > 72)
-        return tgSend(chatId,'Nhập số giờ từ 1 đến 72 nhé.');
-      luuNhacTruoc(g);
-      return tgSend(chatId,'✅ Sẽ nhắc trước *'+g+' tiếng* cho các lịch đặt từ giờ.');
-    }
-  }
-}
-
-/* ── bảng tuần: mỗi ngày một nút, kèm số ca đang mở ── */
-
-function demCa(ngay, ds){
-  var mo=0, dat=0;
-  (ds||moiLich()).forEach(function(r){
-    if (r.ngay !== ngay || r.trangthai === 'off') return;
-    if (r.trangthai === 'booked') dat++; else mo++;
-  });
-  return {mo:mo, dat:dat};
-}
-
-function banTuanChu(dau){
-  return ['📅 *Lịch kèm 1:1* — tuần '+ngayGon(dau)+' → '+ngayGon(congNgay(dau,6)),'',
-    'Bấm một ngày để bật/tắt ca.',
-    '🟢 = đang mở cho học viên đặt   ·   🔒 = đã có người đặt'].join('\n');
-}
-
-function banTuanNut(dau){
-  var ds = moiLich(), hang = [], bay = homNay();
-  for (var i=0;i<7;i+=2){
-    var cot = [];
-    for (var j=i;j<Math.min(i+2,7);j++){
-      var n = congNgay(dau,j), d = demCa(n, ds);
-      var nhan = tenThu(n)+' '+ngayGon(n);
-      if (d.mo)  nhan += ' ·'+d.mo+'🟢';
-      if (d.dat) nhan += ' '+d.dat+'🔒';
-      if (n < bay) nhan = '· '+nhan;
-      cot.push({text:nhan, callback_data:'l:d:'+n});
-    }
-    hang.push(cot);
-  }
-  hang.push([
-    {text:'‹ Tuần trước', callback_data:'l:w:'+congNgay(dau,-7)},
-    {text:'Tuần sau ›',   callback_data:'l:w:'+congNgay(dau, 7)}
-  ]);
-  return hang;
-}
-
-/* ── bảng một ngày: ba ca + giờ tự nhập ── */
-
-function banNgayChu(ngay){
-  var ds = moiLich().filter(function(r){ return r.ngay===ngay && r.trangthai!=='off' });
-  var dong = ['📅 *'+tenThu(ngay)+' '+ngayGon(ngay)+'*',''];
-  if (!ds.length) dong.push('_Chưa mở ca nào._');
-  else ds.sort(function(a,b){ return a.batdau<b.batdau?-1:1 }).forEach(function(r){
-    dong.push((r.trangthai==='booked' ? '🔒 ' : '🟢 ')+r.batdau+'–'+r.ketthuc+
-      ' · '+(r.mentor||'—')+
-      (r.trangthai==='booked' ? '  ← '+(r.hv_ten||r.hv_email) : ''));
-  });
-  dong.push('', 'Bấm ca để bật/tắt. Ca đã có người đặt thì không tắt được.');
-  return dong.join('\n');
-}
-
-function banNgayNut(ngay){
-  var ds = moiLich().filter(function(r){ return r.ngay===ngay });
-  var hang = CA.map(function(c){
-    var co = null;
-    ds.forEach(function(r){
-      if (r.batdau===c.batdau && r.ketthuc===c.ketthuc && r.trangthai!=='off') co = r;
-    });
-    var dau = co ? (co.trangthai==='booked' ? '🔒' : '🟢') : '⚪';
-    return [{text:dau+' '+c.ten+' '+c.batdau+'–'+c.ketthuc,
-             callback_data:'l:t:'+ngay+':'+c.ma}];
-  });
-  hang.push([{text:'✍️ Giờ khác', callback_data:'l:x:'+ngay},
-             {text:'← Cả tuần',   callback_data:'l:w:'+thuHai(ngay)}]);
-  return hang;
-}
-
-/* ── bật/tắt một ca ── */
-
-function batTatCa(ngay, maCa, mentor){
-  var c = null;
-  CA.forEach(function(x){ if (x.ma===maCa) c = x });
-  if (!c) return 'Ca lạ';
-
-  var co = null;
-  moiLich().forEach(function(r){
-    if (r.ngay===ngay && r.batdau===c.batdau && r.ketthuc===c.ketthuc
-        && r.trangthai!=='off') co = r;
-  });
-
-  if (co && co.trangthai==='booked') return 'Ca này có người đặt rồi, không tắt được';
-  if (co){
-    ghiO(SHEET_LICH, LICH_HEADERS, co.row, 'trangthai', 'off');
-    return 'Đã tắt ca '+c.ten;
-  }
-  themCa(ngay, c.batdau, c.ketthuc, mentor);
-  return 'Đã mở ca '+c.ten;
-}
-
-function themCa(ngay, batdau, ketthuc, mentor){
-  bang(SHEET_LICH, LICH_HEADERS).appendRow([
-    'L'+chuoiNgauNhien(6), mentor||'', ngay, batdau, ketthuc,
-    'open', '', '', '', '', '', nowVN()
-  ]);
-}
-
-/* ── giờ tự nhập ── */
+/* ═══════════════ ĐỌC GIỜ TỰ NHẬP ═══════════════ */
 
 var RE_GIO = /^(\d{1,2})[:h](\d{2})\s*[-–~]\s*(\d{1,2})[:h](\d{2})$/;
 
@@ -471,76 +519,74 @@ function chuanGio(s){
   return {batdau:a, ketthuc:b};
 }
 
-function nhapGioTay(chatId, ngay, arg, mentor){
-  var g = chuanGio(arg);
-  if (!g){
-    datCho(chatId, 'gionhap|'+ngay);
-    return tgSend(chatId,'Chưa đọc được giờ. Nhắn kiểu `19:30-21:00` nhé, hoặc /huy.');
+/* ═══════════════ BOT — CHỈ QUẢN LÝ NGƯỜI DÙNG ═══════════════ */
+
+var LENH_LICH = ['lich','lichtuan','dstk','vaitro','xoatk','doimk','nhactruoc'];
+
+function lichCoLenh(cmd){
+  return LENH_LICH.indexOf(cmd) > -1;
+}
+
+function lichLenh(cmd, arg, chatId, msg){
+  switch(cmd){
+    case 'lich': case 'lichtuan': return xemLichTuan(chatId, arg);
+    case 'dstk':      return dsTaiKhoan(chatId);
+    case 'vaitro':    return doiVaiTro(chatId, arg);
+    case 'xoatk':     return xoaTaiKhoan(chatId, arg);
+    case 'doimk':     return capLaiMatKhau(chatId, arg);
+
+    case 'nhactruoc': {
+      if (!arg){ datCho(chatId,'nhactruoc');
+        return tgSend(chatId,'⏰ Đang nhắc trước *'+cfgLich().nhacTruoc+
+          ' tiếng*.\n\n👉 Nhắn số giờ mới vào tin tiếp theo (VD `6`), hoặc /huy.'); }
+      var g = Number(String(arg).replace(/[^\d.]/g,''));
+      if (!g || g <= 0 || g > 72)
+        return tgSend(chatId,'Nhập số giờ từ 1 đến 72 nhé.');
+      luuNhacTruoc(g);
+      return tgSend(chatId,'✅ Sẽ nhắc trước *'+g+' tiếng* cho các lịch đặt từ giờ.');
+    }
   }
-  themCa(ngay, g.batdau, g.ketthuc, mentor);
-  return tgSend(chatId,'✅ Đã mở ca *'+g.batdau+'–'+g.ketthuc+'* '+
-    tenThu(ngay)+' '+ngayGon(ngay)+'.\nGõ /lich để xem lại cả tuần.');
 }
 
-/** /lich 15/09 19:30-21:00 */
-function themCaBangChu(chatId, arg, mentor){
-  var p = String(arg).trim().split(/\s+/);
-  var md = (p[0]||'').match(/^(\d{1,2})\/(\d{1,2})(?:\/(\d{4}))?$/);
-  if (!md || p.length < 2)
-    return tgSend(chatId,'Cú pháp: `/lich 15/09 19:30-21:00`\nHoặc gõ /lich trơn để bấm nút.');
-  var nam = md[3] || homNay().slice(0,4);
-  var ngay = nam+'-'+('0'+md[2]).slice(-2)+'-'+('0'+md[1]).slice(-2);
-  var g = chuanGio(p.slice(1).join(''));
-  if (!g) return tgSend(chatId,'Giờ chưa đúng. Kiểu `19:30-21:00` nhé.');
-  themCa(ngay, g.batdau, g.ketthuc, mentor);
-  return tgSend(chatId,'✅ Đã mở ca *'+g.batdau+'–'+g.ketthuc+'* '+
-    tenThu(ngay)+' '+ngayGon(ngay)+'.');
-}
-
-/* ── callback từ nút bấm ── */
-
+/* ── nút bấm: phân vai / xoá tài khoản ── */
 function lichCallback(cb){
   var chatId = cb.message && cb.message.chat && cb.message.chat.id;
   if (!isAdmin(chatId)) return tgAnswer(cb.id, 'Không có quyền');
 
-  var p = String(cb.data||'').split(':');   // l : loai : ...
-  var loai = p[1];
+  var p = String(cb.data||'').split(':');   // l : v : h|m|x : <ma>
+  if (p[1] !== 'v') return tgAnswer(cb.id);
 
-  if (loai === 'w'){
-    var dau = thuHai(p[2]);
-    tgApi('editMessageText', {chat_id:chatId, message_id:cb.message.message_id,
-      text:banTuanChu(dau), parse_mode:'Markdown',
-      reply_markup:{inline_keyboard:banTuanNut(dau)}});
+  var loai = p[2], ma = p[3];
+  var hv = hvTheoMa(ma);
+  if (!hv) return tgAnswer(cb.id, 'Tài khoản này không còn');
+
+  var nhan, tomTat;
+  if (loai === 'h'){
+    ghiO(SHEET_HV, HV_HEADERS, hv.row, 'vaitro', 'hv');
+    ghiO(SHEET_HV, HV_HEADERS, hv.row, 'trangthai', 'active');
+    nhan = '🎓 '+hv.ten+' — học viên';
+    tomTat = 'Đã mở quyền học viên';
+  } else if (loai === 'm'){
+    ghiO(SHEET_HV, HV_HEADERS, hv.row, 'vaitro', 'mentor');
+    ghiO(SHEET_HV, HV_HEADERS, hv.row, 'trangthai', 'active');
+    nhan = '🧑‍🏫 '+hv.ten+' — mentor';
+    tomTat = 'Đã mở quyền mentor';
+  } else if (loai === 'x'){
+    bang(SHEET_HV, HV_HEADERS).deleteRow(hv.row);
+    nhan = '🚫 '+hv.ten+' — đã từ chối';
+    tomTat = 'Đã xoá tài khoản';
+  } else {
     return tgAnswer(cb.id);
   }
 
-  if (loai === 'd'){
-    tgApi('editMessageText', {chat_id:chatId, message_id:cb.message.message_id,
-      text:banNgayChu(p[2]), parse_mode:'Markdown',
-      reply_markup:{inline_keyboard:banNgayNut(p[2])}});
-    return tgAnswer(cb.id);
-  }
-
-  if (loai === 't'){
-    var tb = batTatCa(p[2], p[3], tenMentor(cb, chatId));
-    tgApi('editMessageText', {chat_id:chatId, message_id:cb.message.message_id,
-      text:banNgayChu(p[2]), parse_mode:'Markdown',
-      reply_markup:{inline_keyboard:banNgayNut(p[2])}});
-    return tgAnswer(cb.id, tb);
-  }
-
-  if (loai === 'x'){
-    datCho(chatId, 'gionhap|'+p[2]);
-    tgSend(chatId,'✍️ Nhắn giờ cho '+tenThu(p[2])+' '+ngayGon(p[2])+
-      ' vào tin tiếp theo — kiểu `19:30-21:00`. /huy để thôi.');
-    return tgAnswer(cb.id);
-  }
-
-  return tgAnswer(cb.id);
+  tgApi('editMessageReplyMarkup',{
+    chat_id: chatId, message_id: cb.message.message_id,
+    reply_markup:{inline_keyboard:[[{text:nhan, callback_data:'xong'}]]}
+  });
+  return tgAnswer(cb.id, tomTat);
 }
 
-/* ── xem lịch tuần dạng chữ ── */
-
+/* ── xem lịch cả tuần trong bot (chỉ đọc) ── */
 function xemLichTuan(chatId, arg){
   var dau = thuHai(String(arg||'').match(/^\d{4}-\d{2}-\d{2}$/) ? arg : homNay());
   var ds = moiLich().filter(function(r){
@@ -548,7 +594,7 @@ function xemLichTuan(chatId, arg){
   });
   if (!ds.length)
     return tgSend(chatId,'Tuần '+ngayGon(dau)+' → '+ngayGon(congNgay(dau,6))+
-      ' chưa mở ca nào.\nGõ /lich để mở.');
+      ' chưa mentor nào mở ca.\n_Mentor mở ca trong khu học viên trên web._');
 
   var dong = ['📅 *Tuần '+ngayGon(dau)+' → '+ngayGon(congNgay(dau,6))+'*'];
   for (var i=0;i<7;i++){
@@ -559,86 +605,124 @@ function xemLichTuan(chatId, arg){
     dong.push('', '*'+tenThu(n)+' '+ngayGon(n)+'*');
     caNgay.forEach(function(r){
       dong.push((r.trangthai==='booked'?'🔒 ':'🟢 ')+r.batdau+'–'+r.ketthuc+
-        ' · '+(r.mentor||'—')+
+        ' · '+(r.mentor_ten||'—')+
         (r.trangthai==='booked'?'  ← '+(r.hv_ten||r.hv_email):''));
     });
   }
+  dong.push('', '🟢 còn trống · 🔒 đã có người đặt');
   return tgSend(chatId, dong.join('\n'));
 }
 
-/* ── tài khoản học viên ── */
+/* ── danh sách tài khoản ── */
+function dsTaiKhoan(chatId){
+  var ds = moiHV();
+  if (!ds.length) return tgSend(chatId,
+    'Chưa ai đăng ký tài khoản.\n_Mọi người tự đăng ký ở khu học viên trên web._');
 
-function themHocVien(chatId, arg){
-  if (!arg){ datCho(chatId,'themhv');
-    return tgSend(chatId,'👤 Nhắn email học viên vào tin tiếp theo.\n'+
-      'Kèm tên cũng được: `an@gmail.com Nguyễn An`'); }
+  var cho = ds.filter(function(r){ return r.vaitro!=='hv' && r.vaitro!=='mentor' });
+  var men = ds.filter(function(r){ return r.vaitro==='mentor' });
+  var hvs = ds.filter(function(r){ return r.vaitro==='hv' });
+
+  var dong = ['👥 *'+ds.length+' tài khoản*'];
+  function khoi(tieude, list, icon){
+    if (!list.length) return;
+    dong.push('', '*'+tieude+' ('+list.length+')*');
+    list.forEach(function(r){
+      dong.push(icon+' '+r.ten+' — `'+r.email+'`'+
+        (r.trangthai==='off' ? '  _(đang khoá)_' : '')+
+        (r.dangnhap_cuoi ? '\n    vào lần cuối: '+r.dangnhap_cuoi : '\n    _chưa đăng nhập lần nào_'));
+    });
+  }
+  khoi('Đang chờ phân vai', cho, '⏳');
+  khoi('Mentor', men, '🧑‍🏫');
+  khoi('Học viên', hvs, '🎓');
+
+  dong.push('', '_Đổi vai: /vaitro mail hv · /vaitro mail mentor_');
+  dong.push('_Xoá: /xoatk mail  ·  Cấp lại mật khẩu: /doimk mail_');
+
+  // nút phân vai nhanh cho tối đa 4 người đang chờ
+  var kb = cho.slice(0,4).map(function(r){ return [
+    {text:'🎓 '+ (r.ten_goi||r.ten), callback_data:'l:v:h:'+r.ma},
+    {text:'🧑‍🏫',                    callback_data:'l:v:m:'+r.ma},
+    {text:'🚫',                      callback_data:'l:v:x:'+r.ma}
+  ]});
+  return tgSend(chatId, dong.join('\n'), kb.length ? kb : null);
+}
+
+/* ── đổi vai trò bằng lệnh ── */
+function doiVaiTro(chatId, arg){
+  if (!arg){ datCho(chatId,'vaitro');
+    return tgSend(chatId,'Nhắn vào tin tiếp theo: `email hv` hoặc `email mentor`\n'+
+      'VD: `an@gmail.com mentor`  ·  Gõ /dstk để xem danh sách.'); }
 
   var p = String(arg).trim().split(/\s+/);
-  var email = chuanEmail(p[0]);
-  var ten = p.slice(1).join(' ');
-  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))
-    return tgSend(chatId,'Email chưa đúng: `'+p[0]+'`');
+  var hv = hvTheoEmail(p[0]);
+  if (!hv) return tgSend(chatId,'Không thấy `'+p[0]+'`. Gõ /dstk để xem danh sách.');
 
-  var da = null;
-  moiHV().forEach(function(r){ if (chuanEmail(r.email)===email) da = r });
+  var v = String(p[1]||'').toLowerCase();
+  var vai = /^(mentor|m|gv)$/.test(v) ? 'mentor'
+          : /^(hv|h|hocvien|học viên)$/.test(v) ? 'hv' : '';
+  if (!vai) return tgSend(chatId,'Vai trò phải là `hv` hoặc `mentor`.\nVD: `/vaitro '+hv.email+' mentor`');
+
+  ghiO(SHEET_HV, HV_HEADERS, hv.row, 'vaitro', vai);
+  ghiO(SHEET_HV, HV_HEADERS, hv.row, 'trangthai', 'active');
+  ghiO(SHEET_HV, HV_HEADERS, hv.row, 'token', '');   // đá phiên cũ để nạp lại đúng giao diện
+
+  return tgSend(chatId,'✅ *'+hv.ten+'* giờ là *'+(vai==='mentor'?'mentor':'học viên')+'*.\n'+
+    '_Họ cần đăng nhập lại để thấy đúng giao diện._');
+}
+
+/* ── xoá tài khoản ── */
+function xoaTaiKhoan(chatId, arg){
+  if (!arg){ datCho(chatId,'xoatk');
+    return tgSend(chatId,'Nhắn email cần xoá vào tin tiếp theo. Gõ /dstk để xem danh sách.'); }
+  var hv = hvTheoEmail(arg);
+  if (!hv) return tgSend(chatId,'Không thấy `'+chuanEmail(arg)+'` trong danh sách.');
+
+  var ten = hv.ten, vai = hv.vaitro;
+
+  // trả lại các ca liên quan trước khi xoá, khỏi để lịch treo tên người đã đi
+  var moLai = 0, goCa = 0;
+  moiLich().forEach(function(r){
+    if (vai === 'hv' && String(r.hv_ma) === String(hv.ma) && r.trangthai === 'booked'){
+      ghiO(SHEET_LICH, LICH_HEADERS, r.row, 'trangthai', 'open');
+      ['hv_ma','hv_ten','hv_email','nhac_luc','da_nhac'].forEach(function(c){
+        ghiO(SHEET_LICH, LICH_HEADERS, r.row, c, '');
+      });
+      moLai++;
+    }
+    if (vai === 'mentor' && String(r.mentor_ma) === String(hv.ma) && r.trangthai !== 'off'){
+      ghiO(SHEET_LICH, LICH_HEADERS, r.row, 'trangthai', 'off');
+      goCa++;
+    }
+  });
+
+  bang(SHEET_HV, HV_HEADERS).deleteRow(hv.row);
+
+  return tgSend(chatId,'🗑 Đã xoá *'+ten+'*.'+
+    (moLai ? '\n'+moLai+' ca họ đang giữ đã mở lại cho người khác.' : '')+
+    (goCa  ? '\n'+goCa+' ca họ mở đã gỡ khỏi lịch.' : ''));
+}
+
+/* ── cấp lại mật khẩu ── */
+function capLaiMatKhau(chatId, arg){
+  if (!arg){ datCho(chatId,'doimk');
+    return tgSend(chatId,'Nhắn email cần cấp lại mật khẩu vào tin tiếp theo.'); }
+  var hv = hvTheoEmail(arg);
+  if (!hv) return tgSend(chatId,'Không thấy `'+chuanEmail(arg)+'` trong danh sách.');
 
   var mk = chuoiNgauNhien(10);
   var salt = chuoiNgauNhien(16);
-
-  if (da){
-    ghiO(SHEET_HV, HV_HEADERS, da.row, 'salt', salt);
-    ghiO(SHEET_HV, HV_HEADERS, da.row, 'hash', bamMK(mk, salt));
-    ghiO(SHEET_HV, HV_HEADERS, da.row, 'token', '');
-    ghiO(SHEET_HV, HV_HEADERS, da.row, 'trangthai', 'active');
-    if (ten) ghiO(SHEET_HV, HV_HEADERS, da.row, 'ten', ten);
-  } else {
-    bang(SHEET_HV, HV_HEADERS).appendRow([
-      email, ten, salt, bamMK(mk, salt), 'active', '', '', nowVN(), ''
-    ]);
-  }
+  ghiO(SHEET_HV, HV_HEADERS, hv.row, 'salt', salt);
+  ghiO(SHEET_HV, HV_HEADERS, hv.row, 'hash', bamMK(mk, salt));
+  ghiO(SHEET_HV, HV_HEADERS, hv.row, 'token', '');
 
   return tgSend(chatId, [
-    (da ? '🔄 *Đã cấp lại mật khẩu*' : '✅ *Đã tạo tài khoản học viên*'),'',
-    '📧 `'+email+'`',
+    '🔄 *Đã cấp lại mật khẩu cho '+hv.ten+'*','',
+    '📧 `'+hv.email+'`',
     '🔑 `'+mk+'`','',
-    'Gửi hai dòng trên cho học viên. Mật khẩu chỉ hiện ở đây một lần —',
-    'quên thì gõ lại /themhv để cấp mật khẩu mới.'
+    'Gửi hai dòng trên cho họ. Mật khẩu chỉ hiện ở đây một lần.'
   ].join('\n'));
-}
-
-function dsHocVien(chatId){
-  var ds = moiHV();
-  if (!ds.length) return tgSend(chatId,'Chưa có tài khoản học viên nào.\nTạo bằng /themhv');
-  var dong = ['👥 *'+ds.length+' tài khoản học viên*',''];
-  ds.forEach(function(r,i){
-    dong.push((i+1)+'. '+(r.trangthai==='off'?'🚫 ':'✅ ')+
-      (r.ten||'(chưa có tên)')+' — `'+r.email+'`'+
-      (r.dangnhap_cuoi ? '\n    vào lần cuối: '+r.dangnhap_cuoi : '\n    _chưa đăng nhập lần nào_'));
-  });
-  return tgSend(chatId, dong.join('\n'));
-}
-
-function xoaHocVien(chatId, arg){
-  if (!arg){ datCho(chatId,'xoahv');
-    return tgSend(chatId,'Nhắn email cần khoá vào tin tiếp theo.'); }
-  var email = chuanEmail(arg), hit = null;
-  moiHV().forEach(function(r){ if (chuanEmail(r.email)===email) hit = r });
-  if (!hit) return tgSend(chatId,'Không thấy `'+email+'` trong danh sách.');
-  ghiO(SHEET_HV, HV_HEADERS, hit.row, 'trangthai', 'off');
-  ghiO(SHEET_HV, HV_HEADERS, hit.row, 'token', '');
-  return tgSend(chatId,'🚫 Đã khoá `'+email+'`. Mở lại bằng /themhv (cấp mật khẩu mới).');
-}
-
-function doiMatKhau(chatId, arg){
-  return themHocVien(chatId, arg);   // cấp lại mật khẩu = tạo lại
-}
-
-function datTenMentor(chatId, arg){
-  if (!arg){ datCho(chatId,'tenmentor');
-    return tgSend(chatId,'Tên hiện tại: *'+tenMentor(null, chatId)+'*\n\n'+
-      '👉 Nhắn tên mới vào tin tiếp theo (tên này hiện cho học viên thấy).'); }
-  props().setProperty('MENTOR_'+chatId, String(arg).trim());
-  return tgSend(chatId,'✅ Học viên sẽ thấy tên mentor là *'+String(arg).trim()+'*');
 }
 
 /* ═══════════════ CÀI ĐẶT ═══════════════ */
@@ -659,8 +743,12 @@ function lichSetup(){
 /** Chẩn đoán — chạy tay rồi đọc Execution log. */
 function kiemTraLich(){
   var out = [];
-  out.push('Ca đang có: '+moiLich().length+' dòng');
-  out.push('Tài khoản học viên: '+moiHV().length);
+  var ds = moiHV();
+  out.push('Tài khoản: '+ds.length+
+    ' (chờ '+ds.filter(function(r){return r.vaitro!=='hv'&&r.vaitro!=='mentor'}).length+
+    ' · mentor '+ds.filter(function(r){return r.vaitro==='mentor'}).length+
+    ' · học viên '+ds.filter(function(r){return r.vaitro==='hv'}).length+')');
+  out.push('Ca trong lịch: '+moiLich().filter(function(r){return r.trangthai!=='off'}).length+' đang mở');
   out.push('Nhắc trước: '+cfgLich().nhacTruoc+' tiếng');
   out.push('PEPPER: '+(props().getProperty('PEPPER') ? '✔ đã có' : '✘ CHƯA — chạy lichSetup'));
   var n = ScriptApp.getProjectTriggers().filter(function(t){

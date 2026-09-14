@@ -587,6 +587,31 @@ body.hv-mode{padding-bottom:0}
 .hv-login .fields{gap:14px}
 .hv-login .btn{width:100%;margin-top:20px}
 .hv-note{font-size:12px;color:var(--faint);text-align:center;margin-top:14px;line-height:1.6}
+/* hai tab: đăng nhập · đăng ký */
+.hv-tab{display:flex;gap:6px;background:var(--paper);border:1.5px solid var(--line);
+  border-radius:999px;padding:4px;margin-bottom:22px}
+.hv-tab button{flex:1;border-radius:999px;padding:9px 8px;font-size:13.5px;font-weight:700;
+  font-family:var(--disp);color:var(--quiet);transition:.18s}
+.hv-tab button.on{background:var(--ink);color:var(--paper-lt)}
+.hv-cho{background:var(--lime-wash);border:1.5px solid var(--lime-deep);
+  border-radius:var(--r-sm);padding:16px 18px;font-size:13.5px;line-height:1.7;
+  color:var(--ink-soft);margin-top:18px}
+.hv-cho b{color:var(--lime-deep);font-weight:700}
+
+/* ca của mentor — ba trạng thái: chưa mở · đang mở · có người đặt */
+.hv-ca.mo{background:var(--lime);border-color:var(--lime-deep);color:#1c2600}
+.hv-ca.mo b{color:#1c2600}
+.hv-ca.khoa{background:var(--moss);border-color:var(--moss);color:#c8cfb4;cursor:default}
+.hv-ca.khoa b{color:var(--lime)}
+.hv-ca.khoa:hover{transform:none}
+.hv-them{border:1.5px dashed var(--line-dk);border-radius:999px;padding:9px 15px;
+  font-size:13px;color:var(--quiet);background:transparent;transition:.18s}
+.hv-them:hover{border-color:var(--lime-deep);color:var(--lime-deep)}
+.hv-chu{font-size:12.5px;color:var(--faint);margin-top:16px;line-height:1.7}
+.hv-chu b{color:var(--ink-soft);font-weight:600}
+.hv-vai{font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;
+  font-family:var(--disp);color:var(--lime-deep);background:var(--lime-wash);
+  border:1.5px solid var(--lime-deep);border-radius:999px;padding:3px 10px}
 
 /* tuần */
 .hv-tuan{display:flex;align-items:center;justify-content:space-between;gap:12px;
@@ -1383,9 +1408,11 @@ body.hv-mode{padding-bottom:0}
   <div class="hv-bar"><div class="shell hv-bar-in">
     <div class="hv-brand">
       <svg width="26" height="26" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><g transform="rotate(-9 32 17)"><rect x="19" y="11" width="26" height="12" rx="3" fill="#99df00"/><path d="M30 14.4v5.2a1 1 0 0 0 1.52.86l4.6-2.6a1 1 0 0 0 0-1.72l-4.6-2.6A1 1 0 0 0 30 14.4z" fill="#26210f"/></g><rect x="19" y="28" width="26" height="12" rx="3" fill="#26210f"/><rect x="4" y="44" width="26" height="12" rx="3" fill="#26210f"/><rect x="34" y="44" width="26" height="12" rx="3" fill="#26210f"/></svg>
-      <div><b>Khu học viên</b><br><span>Tự Mình Xây Kênh</span></div>
+
+      <div><b id="hvTenKhu">Khu học viên</b><br><span>Tự Mình Xây Kênh</span></div>
     </div>
     <div class="hv-bar-act">
+      <span class="hv-vai" id="hvVai" style="display:none">mentor</span>
       <span class="hv-who" id="hvWho" style="display:none">Chào <b>—</b></span>
       <button class="hv-nut" id="hvThoat" style="display:none">Thoát</button>
       <button class="hv-nut" data-hv-dong>← Trang khóa học</button>
@@ -1394,35 +1421,64 @@ body.hv-mode{padding-bottom:0}
 
   <div class="shell hv-wrap">
 
-    <!-- chưa đăng nhập -->
+    <!-- chưa đăng nhập: hai tab -->
     <div id="hvLogin">
       <div class="hv-login">
-        <h2>Đăng nhập</h2>
-        <p class="sub">Khu này dành riêng cho học viên đang học. Dùng email và mật khẩu mentor đã cấp cho bạn.</p>
-        <form class="fields" id="hvForm" novalidate>
-          <div class="fg"><label class="fl" for="hv-email">Email</label>
-            <input class="inp" id="hv-email" type="email" autocomplete="email" placeholder="ban@gmail.com">
-            <span class="err">Email chưa đúng</span></div>
-          <div class="fg"><label class="fl" for="hv-pass">Mật khẩu</label>
-            <input class="inp" id="hv-pass" type="password" autocomplete="current-password" placeholder="••••••••">
-            <span class="err">Nhập mật khẩu giúp mình</span></div>
-        </form>
-        <button class="btn btn-ink btn-lg" id="hvVao">
-          <span class="spin"></span><span class="lbl">Vào khu học viên →</span></button>
-        <div class="hv-msg" id="hvLoginMsg"></div>
-        <p class="hv-note">Chưa có tài khoản? Nhắn cho mentor trong group Zalo của lớp để được cấp.</p>
+        <div class="hv-tab">
+          <button id="hvTabVao" class="on">Đăng nhập</button>
+          <button id="hvTabKy">Tạo tài khoản</button>
+        </div>
+
+        <!-- đăng nhập -->
+        <div id="hvPanelVao">
+          <h2>Đăng nhập</h2>
+          <p class="sub">Dành cho người đã được duyệt vào lớp. Chưa có tài khoản thì bấm <b>Tạo tài khoản</b> ở trên.</p>
+          <form class="fields" id="hvForm" novalidate>
+            <div class="fg"><label class="fl" for="hv-email">Email</label>
+              <input class="inp" id="hv-email" type="email" autocomplete="email" placeholder="ban@gmail.com">
+              <span class="err">Email chưa đúng</span></div>
+            <div class="fg"><label class="fl" for="hv-pass">Mật khẩu</label>
+              <input class="inp" id="hv-pass" type="password" autocomplete="current-password" placeholder="••••••••">
+              <span class="err">Nhập mật khẩu giúp mình</span></div>
+          </form>
+          <button class="btn btn-ink btn-lg" id="hvVao">
+            <span class="spin"></span><span class="lbl">Đăng nhập →</span></button>
+          <div class="hv-msg" id="hvLoginMsg"></div>
+          <p class="hv-note">Quên mật khẩu? Nhắn cho mentor trong group Zalo của lớp để được cấp lại.</p>
+        </div>
+
+        <!-- tạo tài khoản -->
+        <div id="hvPanelKy" style="display:none">
+          <h2>Tạo tài khoản</h2>
+          <p class="sub">Điền xong là tụi mình nhận được ngay. Duyệt trong ngày, duyệt xong bạn đăng nhập là vào được.</p>
+          <form class="fields" id="hvFormKy" novalidate>
+            <div class="fg"><label class="fl" for="ky-ten">Họ và tên</label>
+              <input class="inp" id="ky-ten" type="text" autocomplete="name" placeholder="Nguyễn Văn An">
+              <span class="err">Ghi đầy đủ họ và tên giúp mình</span></div>
+            <div class="fg"><label class="fl" for="ky-email">Email</label>
+              <input class="inp" id="ky-email" type="email" autocomplete="email" placeholder="ban@gmail.com">
+              <span class="err">Email chưa đúng</span></div>
+            <div class="fg"><label class="fl" for="ky-pass">Mật khẩu</label>
+              <input class="inp" id="ky-pass" type="password" autocomplete="new-password" placeholder="ít nhất 6 ký tự">
+              <span class="err">Mật khẩu cần ít nhất 6 ký tự</span>
+              <span class="hint">Đặt mật khẩu riêng, đừng dùng lại mật khẩu email nhé.</span></div>
+          </form>
+          <button class="btn btn-ink btn-lg" id="hvKy">
+            <span class="spin"></span><span class="lbl">Gửi đăng ký →</span></button>
+          <div class="hv-msg" id="hvKyMsg"></div>
+        </div>
       </div>
     </div>
 
     <!-- đã đăng nhập -->
     <div id="hvApp" style="display:none">
       <div class="hv-head">
-        <h1>Đặt lịch kèm 1:1</h1>
-        <p>Chọn một ca trống là xong — mentor nhận thông báo ngay. Bận thì bấm lại đúng ca đó để huỷ, ca sẽ mở lại cho bạn khác.</p>
+        <h1 id="hvTieuDe">Đặt lịch kèm 1:1</h1>
+        <p id="hvMoTa">Chọn một ca trống là xong — mentor nhận thông báo ngay. Bận thì bấm lại đúng ca đó để huỷ, ca sẽ mở lại cho bạn khác.</p>
       </div>
 
       <div class="hv-cua-toi" id="hvMineBox" style="display:none">
-        <h3>📌 Lịch sắp tới của bạn</h3>
+        <h3 id="hvMineTieuDe">📌 Lịch sắp tới của bạn</h3>
         <div class="hv-mine" id="hvMine"></div>
       </div>
 
@@ -1434,6 +1490,12 @@ body.hv-mode{padding-bottom:0}
 
       <div class="hv-ngays" id="hvNgays"></div>
       <div class="hv-msg" id="hvMsg"></div>
+      <p class="hv-chu" id="hvChu" style="display:none">
+        <b>Cách dùng:</b> bấm một ca để mở cho học viên đặt, bấm lại để đóng.
+        Cần giờ khác ba ca sẵn có thì bấm <b>＋ giờ khác</b> rồi nhập kiểu <b>19:30-21:00</b>.
+        Ca đã có người đặt thì không đóng được — muốn huỷ phải bấm vào ca đó và xác nhận,
+        nhớ báo lại cho bạn học viên.
+      </p>
     </div>
 
   </div>
@@ -2198,10 +2260,10 @@ function initAdmin(){
 
 /* ══════════════ KHU HỌC VIÊN ══════════════ */
 
-var HV = {token:'', ten:'', tuan:'', demo:false};
+var HV = {token:'', ten:'', vaitro:'', tuan:'', nhac:6, demo:false};
 var HV_KEY = 'tmxk_hv';
 
-/* ---- ngày giờ, tất cả theo múi giờ máy học viên ---- */
+/* ---- ngày giờ, tất cả theo múi giờ máy người dùng ---- */
 function hvISO(d){
   return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);
 }
@@ -2214,6 +2276,18 @@ function hvCong(iso, n){
   var d = new Date(iso+'T12:00:00'); d.setDate(d.getDate()+n); return hvISO(d);
 }
 function hvGon(iso){ return iso.slice(8,10)+'/'+iso.slice(5,7); }
+function hvGioNay(){
+  var d = new Date();
+  return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
+}
+function hvThu(iso){
+  return ['CN','T2','T3','T4','T5','T6','T7'][new Date(iso+'T12:00:00').getDay()];
+}
+/* cắt họ, giữ tên đệm + tên — giống hệt cách backend làm */
+function hvTenGoi(hoTen){
+  var q = String(hoTen||'').trim().replace(/\s+/g,' ').split(' ');
+  return q.length <= 1 ? (q[0]||'') : q.slice(1).join(' ');
+}
 
 /* ---- gọi backend ---- */
 function hvGoi(action, data){
@@ -2226,48 +2300,94 @@ function hvGoi(action, data){
 }
 
 /* ---- dữ liệu giả cho bản xem thử ---- */
-var HV_DEMO_DAT = {};
+var HV_CA = [{ma:'s',ten:'Sáng',batdau:'09:00',ketthuc:'11:00'},
+             {ma:'c',ten:'Chiều',batdau:'14:00',ketthuc:'16:00'},
+             {ma:'t',ten:'Tối',  batdau:'20:00',ketthuc:'22:00'}];
+var HV_DEMO_CA = {};     // id "ngày|giờ bắt đầu" → {ngay,batdau,ketthuc,dat,hvTen}
+var HV_DEMO_VAI = 'hv';
+
 function hvGiaLap(action, d){
-  var dau = hvThuHai(d && d.tuan ? d.tuan : hvISO(new Date()));
-  if (action === 'hv_login')
-    return {ok:true, token:'demo', ten:'Học viên demo', email:d.email||'demo@tmxk.vn'};
-  if (action === 'hv_book'){ HV_DEMO_DAT[d.slotId] = 1; return {ok:true}; }
-  if (action === 'hv_cancel'){ delete HV_DEMO_DAT[d.slotId]; return {ok:true}; }
+  if (action === 'hv_signup') return {ok:true, cho:true};
+  if (action === 'hv_login'){
+    HV_DEMO_VAI = /mentor/i.test(d.email||'') ? 'mentor' : 'hv';
+    return {ok:true, token:'demo', vaitro:HV_DEMO_VAI, ten:hvTenGoi('Nguyễn Văn An')};
+  }
+  if (action === 'hv_book'){
+    var o = HV_DEMO_CA[d.slotId];
+    if (o){ o.dat = true; o.hvTen = HV.ten; }
+    return {ok:true};
+  }
+  if (action === 'hv_cancel'){
+    var c = HV_DEMO_CA[d.slotId];
+    if (c){ c.dat = false; c.hvTen = ''; }
+    return {ok:true};
+  }
+  if (action === 'hv_mo_ca'){
+    var g = d.caMa ? HV_CA.filter(function(c){ return c.ma === d.caMa })[0]
+                   : {batdau:d.batdau, ketthuc:d.ketthuc};
+    if (!g) return {ok:false, error:'ca_la'};
+    var id = d.ngay+'|'+g.batdau;
+    if (HV_DEMO_CA[id]){
+      if (HV_DEMO_CA[id].dat) return {ok:false, error:'da_co_nguoi'};
+      delete HV_DEMO_CA[id]; return {ok:true, mo:false};
+    }
+    HV_DEMO_CA[id] = {ngay:d.ngay, batdau:g.batdau, ketthuc:g.ketthuc, dat:false, hvTen:''};
+    return {ok:true, mo:true};
+  }
+  if (action === 'hv_xoa_ca'){ delete HV_DEMO_CA[d.slotId]; return {ok:true}; }
   if (action !== 'hv_slots') return {ok:false, error:'unknown_action'};
 
-  var CA = [['09:00','11:00','Minh Toàn'],['14:00','16:00','Tiểu My'],['20:00','22:00','Minh Toàn']];
+  var dau = d.tuan ? hvThuHai(d.tuan) : hvThuHai(hvISO(new Date()));
   var bay = hvISO(new Date()), ngays = [];
   for (var i=0;i<7;i++){
     var n = hvCong(dau,i), slots = [];
-    if (i!==6) CA.forEach(function(c,j){
-      if ((i+j) % 3 === 0) return;            // chừa vài ca cho giống thật
-      var id = n+'-'+j;
-      slots.push({id:id, mentor:c[2], batdau:c[0], ketthuc:c[1],
-        dat:!!HV_DEMO_DAT[id], cuaToi:!!HV_DEMO_DAT[id], qua:n < bay});
-    });
-    ngays.push({ngay:n, thu:['T2','T3','T4','T5','T6','T7','CN'][i], gon:hvGon(n),
-                qua:n < bay, slots:slots});
+    if (HV_DEMO_VAI === 'mentor'){
+      // mentor chỉ thấy đúng những ca mình đã mở
+      Object.keys(HV_DEMO_CA).forEach(function(id){
+        var o = HV_DEMO_CA[id];
+        if (o.ngay !== n) return;
+        slots.push({id:id, batdau:o.batdau, ketthuc:o.ketthuc, dat:o.dat,
+                    hvTen:o.hvTen||'', hvEmail:o.dat?'an@gmail.com':'', qua:n < bay});
+      });
+    } else {
+      // học viên: bịa sẵn vài ca mentor đã mở, cộng thêm ca mình vừa đặt
+      HV_CA.forEach(function(c, j){
+        var id = n+'|'+c.batdau;
+        var o = HV_DEMO_CA[id];
+        if (!o && (i+j) % 3 !== 0) return;
+        if (!o){
+          o = HV_DEMO_CA[id] = {ngay:n, batdau:c.batdau, ketthuc:c.ketthuc, dat:false, hvTen:''};
+        }
+        slots.push({id:id, mentor:(i%2 ? 'Tiểu My' : 'Minh Toàn'),
+                    batdau:o.batdau, ketthuc:o.ketthuc,
+                    dat:o.dat, cuaToi:o.dat, qua:n < bay});
+      });
+    }
+    slots.sort(function(a,c){ return a.batdau < c.batdau ? -1 : 1 });
+    ngays.push({ngay:n, thu:hvThu(n), gon:hvGon(n), qua:n < bay, slots:slots});
   }
-  return {ok:true, ten:'Học viên demo', tuan:dau, ngays:ngays, nhacTruoc:6};
+  return {ok:true, ten:HV.ten||'Văn An', vaitro:HV_DEMO_VAI, tuan:dau,
+          ngays:ngays, ca:HV_CA, nhacTruoc:6};
 }
 
 /* ---- mở / đóng khu học viên ---- */
-function hvKhoiTrang(){
-  return $$('body > *').filter(function(el){
-    return el.id !== 'khuhv' && el.id !== 'admin' && el.tagName !== 'SCRIPT';
+function hvKhoiTrang(an){
+  Array.prototype.forEach.call(document.body.children, function(el){
+    if (el.id === 'khuhv' || el.id === 'admin' || el.tagName === 'SCRIPT') return;
+    el.style.display = an ? 'none' : '';
   });
 }
 function hvMo(){
-  hvKhoiTrang().forEach(function(el){ el.style.display = 'none' });
+  hvKhoiTrang(true);
   $('#khuhv').classList.add('on');
   document.body.classList.add('hv-mode');
   if (location.hash !== '#hocvien') history.replaceState(null,'','#hocvien');
   window.scrollTo(0,0);
-  if (HV.token) hvTai(HV.tuan); else setTimeout(function(){ $('#hv-email').focus() },80);
+  if (HV.token) hvTai('');
 }
 function hvDong(){
   $('#khuhv').classList.remove('on');
-  hvKhoiTrang().forEach(function(el){ el.style.display = '' });
+  hvKhoiTrang(false);
   document.body.classList.remove('hv-mode');
   if (location.hash === '#hocvien') history.replaceState(null,'',location.pathname);
   window.scrollTo(0,0);
@@ -2275,27 +2395,29 @@ function hvDong(){
 
 function hvBao(el, text, tot){
   var m = $(el);
-  m.textContent = text;
+  m.innerHTML = text;
   m.className = 'hv-msg on ' + (tot ? 'good' : 'bad');
-  if (tot) setTimeout(function(){ m.className = 'hv-msg' }, 4000);
+  if (tot) setTimeout(function(){ m.className = 'hv-msg' }, 5000);
 }
 
-/* ---- đăng nhập / thoát ---- */
+/* ---- nhớ phiên ---- */
 function hvNhoPhien(){
   try{
-    var raw = localStorage.getItem(HV_KEY);
-    if (!raw) return;
-    var o = JSON.parse(raw);
-    if (o && o.token){ HV.token = o.token; HV.ten = o.ten || ''; }
+    var o = JSON.parse(localStorage.getItem(HV_KEY) || 'null');
+    if (o && o.token){ HV.token = o.token; HV.ten = o.ten||''; HV.vaitro = o.vaitro||'hv'; }
   }catch(e){}
 }
 function hvLuuPhien(){
-  try{ localStorage.setItem(HV_KEY, JSON.stringify({token:HV.token, ten:HV.ten})); }catch(e){}
+  try{ localStorage.setItem(HV_KEY,
+    JSON.stringify({token:HV.token, ten:HV.ten, vaitro:HV.vaitro})); }catch(e){}
 }
 function hvQuenPhien(){
-  HV.token=''; HV.ten='';
+  HV.token=''; HV.ten=''; HV.vaitro='';
   try{ localStorage.removeItem(HV_KEY); }catch(e){}
 }
+
+/* ---- đổi giao diện theo vai trò ---- */
+var laMentor = function(){ return HV.vaitro === 'mentor' };
 
 function hvVaoTrong(){
   $('#hvLogin').style.display = 'none';
@@ -2303,39 +2425,110 @@ function hvVaoTrong(){
   $('#hvWho').style.display   = '';
   $('#hvThoat').style.display = '';
   $('#hvWho').innerHTML = 'Chào <b>' + esc(HV.ten || 'bạn') + '</b>';
+
+  var m = laMentor();
+  $('#hvVai').style.display = m ? '' : 'none';
+  $('#hvTenKhu').textContent = m ? 'Khu mentor' : 'Khu học viên';
+  $('#hvTieuDe').textContent = m ? 'Lịch rảnh của bạn' : 'Đặt lịch kèm 1:1';
+  $('#hvMoTa').textContent = m
+    ? 'Bấm vào ca bạn rảnh là mở cho học viên đặt. Học viên đặt xong bạn thấy tên họ ngay tại ca đó, và bot cũng báo về nhóm.'
+    : 'Chọn một ca trống là xong — mentor nhận thông báo ngay. Bận thì bấm lại đúng ca đó để huỷ, ca sẽ mở lại cho bạn khác.';
+  $('#hvMineTieuDe').textContent = m ? '📌 Buổi đã có người đặt' : '📌 Lịch sắp tới của bạn';
+  $('#hvChu').style.display = m ? 'block' : 'none';
 }
 function hvRaNgoai(){
   $('#hvLogin').style.display = 'block';
   $('#hvApp').style.display   = 'none';
   $('#hvWho').style.display   = 'none';
+  $('#hvVai').style.display   = 'none';
   $('#hvThoat').style.display = 'none';
+  $('#hvTenKhu').textContent  = 'Khu học viên';
 }
 
-function hvDangNhap(){
-  var btn = $('#hvVao');
-  if (btn.classList.contains('busy')) return;
-  var email = ($('#hv-email').value||'').trim();
-  var pass  = $('#hv-pass').value||'';
+/* ---- chuyển tab đăng nhập / đăng ký ---- */
+function hvTab(ky){
+  $('#hvTabVao').classList.toggle('on', !ky);
+  $('#hvTabKy').classList.toggle('on', ky);
+  $('#hvPanelVao').style.display = ky ? 'none' : 'block';
+  $('#hvPanelKy').style.display  = ky ? 'block' : 'none';
+}
+
+/* ---- kiểm tra ô nhập ---- */
+function hvSoat(cap){
   var xau = false;
-  [['#hv-email', /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)],
-   ['#hv-pass',  pass.length >= 1]].forEach(function(x){
+  cap.forEach(function(x){
     var el = $(x[0]);
     el.classList.toggle('bad', !x[1]);
     el.parentNode.classList.toggle('invalid', !x[1]);
     if (!x[1]) xau = true;
   });
-  if (xau) return;
+  return !xau;
+}
+
+/* ---- tạo tài khoản ---- */
+function hvDangKy(){
+  var btn = $('#hvKy');
+  if (btn.classList.contains('busy')) return;
+  var ten   = ($('#ky-ten').value||'').trim();
+  var email = ($('#ky-email').value||'').trim();
+  var pass  = $('#ky-pass').value||'';
+
+  if (!hvSoat([
+    ['#ky-ten',   ten.replace(/\s+/g,' ').split(' ').length >= 2],
+    ['#ky-email', /^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(email)],
+    ['#ky-pass',  pass.length >= 6]
+  ])) return;
+
+  btn.classList.add('busy');
+  $('#hvKyMsg').className = 'hv-msg';
+  hvGoi('hv_signup', {ten:ten, email:email, pass:pass}).then(function(r){
+    btn.classList.remove('busy');
+    if (r && r.ok){
+      $('#hvPanelKy').innerHTML =
+        '<h2>Gửi xong rồi 🎉</h2>' +
+        '<p class="sub">Tụi mình vừa nhận được đăng ký của <b>' + esc(hvTenGoi(ten)) + '</b>.</p>' +
+        '<div class="hv-cho">Duyệt xong bạn quay lại đây, bấm <b>Đăng nhập</b> với chính ' +
+        'email <b>' + esc(email) + '</b> và mật khẩu vừa đặt là vào được.<br><br>' +
+        'Thường trong ngày là xong. Lâu quá thì nhắn cho tụi mình trong group Zalo nhé.</div>';
+    } else {
+      hvBao('#hvKyMsg', {
+        da_ton_tai:'Email này đăng ký rồi. Bấm <b>Đăng nhập</b> ở trên, quên mật khẩu thì nhắn mentor cấp lại.',
+        email_sai:'Email chưa đúng định dạng.',
+        mk_ngan:'Mật khẩu cần ít nhất 6 ký tự.',
+        ten_ngan:'Ghi đầy đủ họ và tên giúp mình (VD: Nguyễn Văn An).',
+        thieu:'Điền đủ ba ô giúp mình.'
+      }[r && r.error] || 'Không gửi được, thử lại giúp mình.');
+    }
+  }).catch(function(){
+    btn.classList.remove('busy');
+    hvBao('#hvKyMsg','Không nối được máy chủ — kiểm tra mạng rồi thử lại.');
+  });
+}
+
+/* ---- đăng nhập ---- */
+function hvDangNhap(){
+  var btn = $('#hvVao');
+  if (btn.classList.contains('busy')) return;
+  var email = ($('#hv-email').value||'').trim();
+  var pass  = $('#hv-pass').value||'';
+
+  if (!hvSoat([
+    ['#hv-email', /^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(email)],
+    ['#hv-pass',  pass.length >= 1]
+  ])) return;
 
   btn.classList.add('busy');
   $('#hvLoginMsg').className = 'hv-msg';
   hvGoi('hv_login', {email:email, pass:pass}).then(function(r){
     btn.classList.remove('busy');
     if (r && r.ok){
-      HV.token = r.token; HV.ten = r.ten || email;
+      HV.token = r.token; HV.ten = r.ten || email; HV.vaitro = r.vaitro || 'hv';
+      $('#hv-pass').value = '';
       hvLuuPhien(); hvVaoTrong(); hvTai('');
     } else {
       hvBao('#hvLoginMsg', {
         sai:'Email hoặc mật khẩu chưa đúng.',
+        cho_duyet:'Tài khoản đúng rồi, nhưng tụi mình chưa duyệt xong. Chờ chút nhé — thường trong ngày là xong.',
         khoa_tam:'Sai nhiều lần quá — chờ 10 phút rồi thử lại nhé.',
         thieu:'Điền cả email lẫn mật khẩu giúp mình.'
       }[r && r.error] || 'Không đăng nhập được, thử lại giúp mình.');
@@ -2346,7 +2539,7 @@ function hvDangNhap(){
   });
 }
 
-/* ---- tải và vẽ lịch tuần ---- */
+/* ---- tải lịch tuần ---- */
 function hvTai(tuan){
   $('#hvNgays').innerHTML = '<div class="hv-trong">Đang tải lịch…</div>';
   hvGoi('hv_slots', {token:HV.token, tuan:tuan||''}).then(function(r){
@@ -2361,24 +2554,38 @@ function hvTai(tuan){
       return;
     }
     HV.tuan = r.tuan;
+    HV.nhac = r.nhacTruoc || HV.nhac;
+    if (r.ca && r.ca.length) HV_CA = r.ca;
+    if (r.vaitro && r.vaitro !== HV.vaitro){   // Toàn vừa đổi vai → đổi luôn giao diện
+      HV.vaitro = r.vaitro; hvLuuPhien(); hvVaoTrong();
+    }
     if (r.ten){ HV.ten = r.ten; $('#hvWho').innerHTML = 'Chào <b>'+esc(r.ten)+'</b>'; }
-    hvVe(r);
+    if (laMentor()) hvVeMentor(r); else hvVeHocVien(r);
   }).catch(function(){
     $('#hvNgays').innerHTML = '';
     hvBao('#hvMsg','Không nối được máy chủ.');
   });
 }
 
-function hvVe(r){
-  var bay = hvISO(new Date());
+function hvKhungTuan(r){
   $('#hvNhanTuan').textContent = 'Tuần ' + hvGon(r.tuan) + ' – ' + hvGon(hvCong(r.tuan,6));
-  $('#hvTruoc').disabled = hvCong(r.tuan,-7) < hvThuHai(bay);
+  $('#hvTruoc').disabled = hvCong(r.tuan,-7) < hvThuHai(hvISO(new Date()));
+}
+function hvKhungNgay(d, bay, trong, cas){
+  return '<div class="hv-ngay'+(d.qua?' qua':'')+(d.ngay===bay?' homnay':'')+'">'+
+    '<div class="hv-d"><b>'+esc(d.thu)+'</b><span>'+esc(d.gon)+'</span>'+
+    (d.ngay===bay?'<i>hôm nay</i>':'')+'</div>'+
+    '<div class="hv-cas">'+(cas || '<span class="hv-trong">'+trong+'</span>')+'</div></div>';
+}
 
-  // lịch của tôi (gom cả tuần đang xem)
+/* ---- màn hình HỌC VIÊN ---- */
+function hvVeHocVien(r){
+  var bay = hvISO(new Date());
+  hvKhungTuan(r);
+
   var cua = [];
   r.ngays.forEach(function(d){
-    d.slots.forEach(function(s){ if (s.cuaToi && !s.qua)
-      cua.push({d:d, s:s}); });
+    d.slots.forEach(function(s){ if (s.cuaToi && !s.qua) cua.push({d:d, s:s}); });
   });
   $('#hvMineBox').style.display = cua.length ? 'block' : 'none';
   $('#hvMine').innerHTML = cua.map(function(x){
@@ -2396,48 +2603,148 @@ function hvVe(r){
       return '<button class="hv-ca" data-dat="'+esc(s.id)+'">'+
              '<b>'+esc(s.batdau)+'–'+esc(s.ketthuc)+'</b> <em>'+esc(s.mentor||'')+'</em></button>';
     }).filter(String).join('');
-
-    return '<div class="hv-ngay'+(d.qua?' qua':'')+(d.ngay===bay?' homnay':'')+'">'+
-      '<div class="hv-d"><b>'+esc(d.thu)+'</b><span>'+esc(d.gon)+'</span>'+
-      (d.ngay===bay?'<i>hôm nay</i>':'')+'</div>'+
-      '<div class="hv-cas">'+(cas || '<span class="hv-trong">'+
-        (d.qua?'đã qua':'chưa có ca nào')+'</span>')+'</div></div>';
+    return hvKhungNgay(d, bay, d.qua ? 'đã qua' : 'chưa mentor nào mở ca', cas);
   }).join('');
 
   $$('#hvNgays [data-dat]').forEach(function(b){
-    b.addEventListener('click', function(){ hvDat(b.getAttribute('data-dat'), r.nhacTruoc) });
+    b.addEventListener('click', function(){ hvDat(b.getAttribute('data-dat')) });
   });
   $$('#hvNgays [data-huy]').forEach(function(b){
     b.addEventListener('click', function(){ hvHuy(b.getAttribute('data-huy')) });
   });
 }
 
-function hvDat(id, nhac){
-  $$('#hvNgays .hv-ca').forEach(function(b){ b.disabled = true });
-  hvGoi('hv_book', {token:HV.token, slotId:id}).then(function(r){
-    if (r && r.ok){
-      hvBao('#hvMsg','✅ Đặt lịch xong — mentor đã nhận thông báo'+
-        (nhac?', sẽ được nhắc lại trước '+nhac+' tiếng':'')+'.', true);
-      hvTai(HV.tuan);
-    } else {
-      hvBao('#hvMsg', {
-        da_co_nguoi:'Tiếc quá, vừa có bạn khác đặt mất ca này rồi.',
-        da_qua:'Ca này qua giờ mất rồi.',
-        het_phien:'Phiên hết hạn, bạn đăng nhập lại nhé.'
-      }[r && r.error] || 'Không đặt được, thử lại giúp mình.');
-      hvTai(HV.tuan);
-    }
-  }).catch(function(){
-    hvBao('#hvMsg','Không nối được máy chủ.'); hvTai(HV.tuan);
+/* ---- màn hình MENTOR ---- */
+function hvVeMentor(r){
+  var bay = hvISO(new Date());
+  hvKhungTuan(r);
+
+  var dat = [];
+  r.ngays.forEach(function(d){
+    d.slots.forEach(function(s){ if (s.dat && !s.qua) dat.push({d:d, s:s}); });
+  });
+  $('#hvMineBox').style.display = dat.length ? 'block' : 'none';
+  $('#hvMine').innerHTML = dat.map(function(x){
+    return '<div><span>'+esc(x.d.thu)+' '+esc(x.d.gon)+' · '+esc(x.s.batdau)+'–'+esc(x.s.ketthuc)+
+           '</span><b>'+esc(x.s.hvTen||'học viên')+'</b></div>';
+  }).join('');
+
+  $('#hvNgays').innerHTML = r.ngays.map(function(d){
+    if (d.qua) return hvKhungNgay(d, bay, 'đã qua', '');
+
+    // ba ca mặc định: đối chiếu giờ để biết ca nào đang mở
+    var cas = HV_CA.map(function(c){
+      var co = null;
+      d.slots.forEach(function(s){ if (s.batdau===c.batdau && s.ketthuc===c.ketthuc) co = s; });
+      if (co && co.dat)
+        return '<button class="hv-ca khoa" data-huy="'+esc(co.id)+'">'+
+               '<b>'+esc(c.batdau)+'–'+esc(c.ketthuc)+'</b> 🔒 '+esc(co.hvTen||'đã có người')+'</button>';
+      // hôm nay mà ca đã qua giờ thì máy chủ cũng từ chối — làm mờ luôn cho khỏi bấm hụt
+      var quaGio = d.ngay===bay && c.batdau <= hvGioNay();
+      if (quaGio && !co) return '';
+      return '<button class="hv-ca'+(co?' mo':'')+'" data-ca="'+esc(c.ma)+'" data-ngay="'+esc(d.ngay)+'"'+
+             (quaGio?' disabled':'')+'>'+
+             '<b>'+esc(c.ten)+'</b> '+esc(c.batdau)+'–'+esc(c.ketthuc)+
+             (co ? ' ✓' : '')+'</button>';
+    }).join('');
+
+    // ca giờ lẻ mentor tự thêm
+    var le = d.slots.filter(function(s){
+      return !HV_CA.some(function(c){ return c.batdau===s.batdau && c.ketthuc===s.ketthuc });
+    }).map(function(s){
+      if (s.dat)
+        return '<button class="hv-ca khoa" data-huy="'+esc(s.id)+'">'+
+               '<b>'+esc(s.batdau)+'–'+esc(s.ketthuc)+'</b> 🔒 '+esc(s.hvTen||'đã có người')+'</button>';
+      return '<button class="hv-ca mo" data-go="'+esc(s.id)+'">'+
+             '<b>'+esc(s.batdau)+'–'+esc(s.ketthuc)+'</b> ✓ <em>— bấm để gỡ</em></button>';
+    }).join('');
+
+    var them = '<button class="hv-them" data-them="'+esc(d.ngay)+'">＋ giờ khác</button>';
+    return hvKhungNgay(d, bay, '', cas + le + them);
+  }).join('');
+
+  $$('#hvNgays [data-ca]').forEach(function(b){
+    b.addEventListener('click', function(){
+      hvMoCa({ngay:b.getAttribute('data-ngay'), caMa:b.getAttribute('data-ca')});
+    });
+  });
+  $$('#hvNgays [data-them]').forEach(function(b){
+    b.addEventListener('click', function(){ hvThemGio(b.getAttribute('data-them')) });
+  });
+  $$('#hvNgays [data-go]').forEach(function(b){
+    b.addEventListener('click', function(){ hvGoCa(b.getAttribute('data-go')) });
+  });
+  $$('#hvNgays [data-huy]').forEach(function(b){
+    b.addEventListener('click', function(){ hvHuy(b.getAttribute('data-huy')) });
   });
 }
 
+function hvKhoa(){ $$('#hvNgays button').forEach(function(b){ b.disabled = true }); }
+
+var HV_LOI = {
+  da_co_nguoi:'Ca này vừa có người đặt mất rồi.',
+  da_qua:'Ca này qua giờ mất rồi.',
+  het_phien:'Phiên hết hạn, bạn đăng nhập lại nhé.',
+  khong_phai_cua_ban:'Đây không phải ca của bạn.',
+  khong_phai_hv:'Chỉ học viên mới đặt được ca.',
+  khong_phai_mentor:'Chỉ mentor mới mở được ca.',
+  gio_sai:'Giờ chưa đúng — nhập kiểu 19:30-21:00 nhé.',
+  khong_thay:'Ca này không còn trên lịch.'
+};
+function hvLoi(el, r, mac){ hvBao(el, HV_LOI[r && r.error] || mac); }
+
+/* ---- học viên: đặt / huỷ ---- */
+function hvDat(id){
+  hvKhoa();
+  hvGoi('hv_book', {token:HV.token, slotId:id}).then(function(r){
+    if (r && r.ok) hvBao('#hvMsg','✅ Đặt xong — mentor đã nhận thông báo, sẽ được nhắc lại trước '+
+                          HV.nhac+' tiếng.', true);
+    else hvLoi('#hvMsg', r, 'Không đặt được, thử lại giúp mình.');
+    hvTai(HV.tuan);
+  }).catch(function(){ hvBao('#hvMsg','Không nối được máy chủ.'); hvTai(HV.tuan) });
+}
+
 function hvHuy(id){
-  if (!confirm('Huỷ buổi kèm này? Ca sẽ mở lại cho bạn khác đặt.')) return;
-  $$('#hvNgays .hv-ca').forEach(function(b){ b.disabled = true });
+  var hoi = laMentor()
+    ? 'Huỷ buổi này? Học viên đã đặt sẽ mất chỗ — nhớ báo lại cho họ.'
+    : 'Huỷ buổi kèm này? Ca sẽ mở lại cho bạn khác đặt.';
+  if (!confirm(hoi)) return;
+  hvKhoa();
   hvGoi('hv_cancel', {token:HV.token, slotId:id}).then(function(r){
-    if (r && r.ok) hvBao('#hvMsg','Đã huỷ. Mentor cũng nhận được thông báo rồi.', true);
-    else hvBao('#hvMsg','Không huỷ được, thử lại giúp mình.');
+    if (r && r.ok) hvBao('#hvMsg','Đã huỷ. Bot cũng nhận được thông báo rồi.', true);
+    else hvLoi('#hvMsg', r, 'Không huỷ được, thử lại giúp mình.');
+    hvTai(HV.tuan);
+  }).catch(function(){ hvBao('#hvMsg','Không nối được máy chủ.'); hvTai(HV.tuan) });
+}
+
+/* ---- mentor: mở / đóng / thêm giờ lẻ ---- */
+function hvMoCa(d){
+  hvKhoa();
+  var body = {token:HV.token, ngay:d.ngay};
+  if (d.caMa) body.caMa = d.caMa; else { body.batdau = d.batdau; body.ketthuc = d.ketthuc; }
+  hvGoi('hv_mo_ca', body).then(function(r){
+    if (r && r.ok) hvBao('#hvMsg', r.mo
+      ? '✅ Đã mở ca — học viên thấy và đặt được ngay.'
+      : 'Đã đóng ca này.', true);
+    else hvLoi('#hvMsg', r, 'Không đổi được ca, thử lại giúp mình.');
+    hvTai(HV.tuan);
+  }).catch(function(){ hvBao('#hvMsg','Không nối được máy chủ.'); hvTai(HV.tuan) });
+}
+
+function hvThemGio(ngay){
+  var v = prompt('Mở thêm ca ngày '+hvGon(ngay)+' — nhập giờ kiểu  19:30-21:00', '19:30-21:00');
+  if (v === null) return;
+  var m = String(v).replace(/\s+/g,'').match(/^(\d{1,2})[:h](\d{2})[-–~](\d{1,2})[:h](\d{2})$/);
+  if (!m){ hvBao('#hvMsg','Giờ chưa đúng — nhập kiểu 19:30-21:00 nhé.'); return; }
+  var hai = function(a,b){ return ('0'+Number(a)).slice(-2)+':'+('0'+Number(b)).slice(-2) };
+  hvMoCa({ngay:ngay, batdau:hai(m[1],m[2]), ketthuc:hai(m[3],m[4])});
+}
+
+function hvGoCa(id){
+  hvKhoa();
+  hvGoi('hv_xoa_ca', {token:HV.token, slotId:id}).then(function(r){
+    if (r && r.ok) hvBao('#hvMsg','Đã gỡ ca khỏi lịch.', true);
+    else hvLoi('#hvMsg', r, 'Không gỡ được ca.');
     hvTai(HV.tuan);
   }).catch(function(){ hvBao('#hvMsg','Không nối được máy chủ.'); hvTai(HV.tuan) });
 }
@@ -2448,11 +2755,20 @@ function initHV(){
 
   $$('[data-hv-mo]').forEach(function(b){ b.addEventListener('click', hvMo) });
   $$('[data-hv-dong]').forEach(function(b){ b.addEventListener('click', hvDong) });
+
+  $('#hvTabVao').addEventListener('click', function(){ hvTab(false) });
+  $('#hvTabKy').addEventListener('click',  function(){ hvTab(true) });
+
   $('#hvVao').addEventListener('click', hvDangNhap);
   $('#hvForm').addEventListener('submit', function(e){ e.preventDefault(); hvDangNhap() });
   $('#hv-pass').addEventListener('keydown', function(e){ if(e.key==='Enter') hvDangNhap() });
+
+  $('#hvKy').addEventListener('click', hvDangKy);
+  $('#hvFormKy').addEventListener('submit', function(e){ e.preventDefault(); hvDangKy() });
+  $('#ky-pass').addEventListener('keydown', function(e){ if(e.key==='Enter') hvDangKy() });
+
   $('#hvThoat').addEventListener('click', function(){
-    hvQuenPhien(); hvRaNgoai(); $('#hv-pass').value=''; 
+    hvQuenPhien(); hvRaNgoai(); hvTab(false); $('#hv-pass').value='';
   });
   $('#hvTruoc').addEventListener('click', function(){ hvTai(hvCong(HV.tuan,-7)) });
   $('#hvSau').addEventListener('click',   function(){ hvTai(hvCong(HV.tuan, 7)) });
