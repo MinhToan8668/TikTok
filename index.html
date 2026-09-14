@@ -305,6 +305,21 @@ nav.stuck{border-bottom-color:var(--line);background:rgba(249,232,221,.96)}
 .dang-khung{background:var(--paper);border-radius:var(--r-sm);padding:14px 16px;
   font-size:13px;line-height:1.75;color:var(--ink-soft)}
 .dang-khung b{color:var(--lime-deep);font-weight:700}
+.dang-loi{font-size:12.5px;line-height:1.65;color:var(--quiet);
+  border-left:2.5px solid var(--red);padding-left:13px}
+.dang-loi b{color:var(--red);font-weight:700}
+/* ba điều đúng cho cả năm dạng */
+.chung{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(14px,2vw,20px);
+  margin-bottom:clamp(28px,4vw,40px)}
+.chung-o{background:var(--moss);color:#c8cfb4;border-radius:var(--r);
+  padding:clamp(20px,2.6vw,26px)}
+.chung-n{font-family:var(--hand);font-style:italic;font-size:13px;color:var(--lime);
+  display:block;margin-bottom:9px}
+.chung-o h4{font-size:16px;font-weight:800;color:var(--paper-lt);
+  margin-bottom:8px;line-height:1.3}
+.chung-o p{font-size:13px;line-height:1.7}
+.chung-o b{color:var(--lime);font-weight:700}
+@media(max-width:900px){.chung{grid-template-columns:1fr}}
 .dang-xem{margin-top:auto;align-self:flex-start;font-size:13px;font-weight:700;
   font-family:var(--disp);color:var(--ink);text-decoration:none;padding-bottom:2px;
   border-bottom:2.5px solid var(--lime);transition:color .2s}
@@ -1042,8 +1057,27 @@ body.hv-mode{padding-bottom:0}
   <div class="sec-head rv">
     <span class="kicker">có sẵn trong gói, phát ngay buổi đầu</span>
     <h2 class="h2">Năm dạng video,<br>quay <em>kiểu gì cho đúng?</em></h2>
-    <p class="lead">Mỗi dạng tụi mình đưa bạn ba thứ: cách đặt máy và lấy sáng bằng đúng cái điện thoại đang có, khung kịch bản điền vào là ra bài, và video mẫu để coi trước khi bấm quay. Dưới đây là bản rút gọn.</p>
+    <p class="lead">Mỗi dạng tụi mình đưa bạn ba thứ: cách đặt máy và lấy sáng bằng đúng cái điện thoại đang có, khung kịch bản có mốc giây điền vào là ra bài, và video mẫu để coi trước khi bấm quay. Kèm cả lỗi hay gặp nhất của dạng đó — biết trước thì khỏi mất một buổi quay. Dưới đây là bản rút gọn.</p>
   </div>
+
+  <div class="chung rv">
+    <div class="chung-o">
+      <span class="chung-n">đúng cho mọi dạng · 01</span>
+      <h4>Ba giây đầu quyết định cả video</h4>
+      <p>Khoảng <b>7 trên 10 người xem</b> quyết định lướt hay ở lại ngay trong 3 giây đầu. Muốn TikTok đẩy đi xa, video cần giữ được tầm <b>70% người xem qua giây thứ 3</b>, 60% ở giây 15, 50% ở giây 30. Nên bỏ hết chào hỏi, logo, intro chậm — vào thẳng phần đắt nhất.</p>
+    </div>
+    <div class="chung-o">
+      <span class="chung-n">đúng cho mọi dạng · 02</span>
+      <h4>Quay 1080p 30fps, đừng quay 4K</h4>
+      <p>TikTok nén về 1080p hết, quay 4K chỉ làm file nặng chứ lên hình không đẹp hơn. Dùng <b>camera sau</b> (nét hơn camera trước), <b>chạm giữ vào mặt để khoá nét và khoá sáng</b> trước khi bấm quay. Lúc đăng nhớ bật "cho phép tải lên chất lượng cao" và đăng khi đang có wifi.</p>
+    </div>
+    <div class="chung-o">
+      <span class="chung-n">đúng cho mọi dạng · 03</span>
+      <h4>Không có phụ đề là mất một nửa người xem</h4>
+      <p>Phần lớn người lướt TikTok <b>để tắt tiếng</b> — trong lớp, trên xe, chỗ đông người. Video có phụ đề tăng thời lượng xem <b>12–40%</b>. Trước khi đăng, tắt tiếng coi lại một lượt: nếu không hiểu video nói gì thì chưa đăng được.</p>
+    </div>
+  </div>
+
   <div class="dangs">
 
     <article class="dang rv">
@@ -1051,12 +1085,15 @@ body.hv-mode{padding-bottom:0}
         <span class="dang-ai">hợp với người có chuyên môn</span></div>
       <div><span class="dang-lb">Quay thế nào</span>
         <ul>
-          <li>Điện thoại ngang tầm mắt, cách mặt 60–80cm — thấp hơn là lên hình thành "nhìn xuống"</li>
-          <li>Ngồi <b>quay mặt về phía cửa sổ</b>, đừng để cửa sổ sau lưng</li>
-          <li>Phòng vang tiếng thì cắm tai nghe có dây, mic nằm gần cổ áo</li>
+          <li>Máy <b>ngang tầm mắt</b>, chừa trống khoảng một đốt ngón tay phía trên đầu, cách mặt 60–80cm</li>
+          <li>Ngồi <b>cách tường ít nhất một mét</b> — sát tường là đổ bóng cứng sau gáy, nhìn rất nghiệp dư</li>
+          <li>Sáng: quay mặt về phía cửa sổ. Có đèn ring thì <b>hất chéo 45°</b>, để chính diện là mặt bẹt như ảnh thẻ</li>
+          <li>Tiếng quan trọng hơn hình — phòng vang thì cắm tai nghe có dây, mic cách miệng chừng một gang tay</li>
         </ul></div>
-      <div class="dang-khung"><b>Khung:</b> chốt luôn kết luận ở câu đầu → vì sao lại vậy →
-        một ví dụ có thật của chính bạn → hỏi ngược người xem để kéo bình luận</div>
+      <div class="dang-khung"><b>Khung:</b> <b>0–3s</b> chốt luôn kết luận, không rào đón →
+        <b>3–15s</b> vì sao lại vậy → <b>15–40s</b> một ví dụ có thật của chính bạn →
+        <b>5s cuối</b> hỏi ngược người xem để kéo bình luận</div>
+      <div class="dang-loi"><b>Lỗi hay gặp:</b> để điện thoại thấp hơn mặt. Lên hình thành cằm to, mắt nhìn xuống — người xem thấy kẻ cả dù bạn không hề có ý đó.</div>
       <a class="dang-xem" href="" target="_blank" rel="noopener">Xem video mẫu →</a>
     </article>
 
@@ -1065,12 +1102,14 @@ body.hv-mode{padding-bottom:0}
         <span class="dang-ai">hợp với người ngại nói thẳng vào cam</span></div>
       <div><span class="dang-lb">Quay thế nào</span>
         <ul>
-          <li>Quay thật nhiều cảnh ngắn 2–4 giây, mỗi cảnh <b>dư ra 2 giây đầu và cuối</b> để còn cắt</li>
-          <li>Cầm máy ngang eo đi tới, đừng vừa đi vừa lia máy — người xem chóng mặt</li>
-          <li>Ưu tiên quay lúc sáng tự nhiên; tối về quay trong nhà là vỡ hạt ngay</li>
+          <li>Học đúng một chuỗi: <b>rộng → trung → cận</b>. Rộng cho biết đang ở đâu, trung cho biết đang làm gì, cận cho thấy bàn tay hoặc chi tiết. Ba cảnh này ghép lại là xong một đoạn</li>
+          <li>Tới chỗ mới thì <b>quay cảnh rộng trước đã</b> — người xem cần biết bối cảnh rồi mới quan tâm chi tiết</li>
+          <li>Mỗi cảnh bấm quay <b>8–10 giây dù chỉ định dùng 2–3 giây</b>, dư đầu dư cuối mới cắt vào đúng nhịp được</li>
+          <li>Vừa đi vừa quay thì chùng gối, hai tay ôm máy sát ngực, mắt nhìn thẳng — đừng lia máy trong lúc đang bước</li>
         </ul></div>
       <div class="dang-khung"><b>Khung:</b> mở bằng cảnh đắt nhất trong ngày (đừng mở bằng cảnh ngủ dậy)
         → trình tự việc → một khoảnh khắc thật, kể cả lúc hỏng → chốt bằng cảm nghĩ ngắn</div>
+      <div class="dang-loi"><b>Lỗi hay gặp:</b> quay một cảnh dài ba phút rồi tính về cắt. Không có cảnh khác để cắt sang thì video đứng hình, người xem lướt ở giây thứ tám.</div>
       <a class="dang-xem" href="" target="_blank" rel="noopener">Xem video mẫu →</a>
     </article>
 
@@ -1079,12 +1118,14 @@ body.hv-mode{padding-bottom:0}
         <span class="dang-ai">hợp với nghề lạ, lịch sinh hoạt có nhịp</span></div>
       <div><span class="dang-lb">Quay thế nào</span>
         <ul>
-          <li>Mỗi mốc giờ một cảnh, <b>ghi giờ lên màn hình</b> — người xem bám được nhịp</li>
-          <li>Vài cảnh lặp lại nên để nguyên một góc cố định, tạo cảm giác quen thuộc</li>
-          <li>Quay rải trong ngày, đừng dồn một buổi rồi diễn lại — lên hình giả ngay</li>
+          <li>Trước khi quay, <b>viết ra 5–6 mốc</b> trong ngày rồi chỉ quay đúng mấy mốc đó. Quay bừa rồi mới ngồi nghĩ là cách nhanh nhất để bỏ cả buổi</li>
+          <li>Mỗi mốc <b>ghi giờ lên màn hình</b> — người xem bám được nhịp nên ở lại lâu hơn hẳn</li>
+          <li>Vài cảnh lặp lại hằng ngày (pha cà phê, mở máy) thì giữ <b>nguyên một góc cố định</b> suốt cả tuần — lâu dần thành chữ ký của kênh</li>
+          <li>Sau một chuỗi cảnh nhanh thì <b>xen một cảnh chậm</b>. Nhanh đều từ đầu tới cuối thì xem 30 giây là mệt</li>
         </ul></div>
       <div class="dang-khung"><b>Khung:</b> giờ dậy → việc căng nhất trong ngày →
         một chi tiết trong nghề ít ai biết → kết lúc hết ngày, để lại một câu tự hỏi</div>
+      <div class="dang-loi"><b>Lỗi hay gặp:</b> dồn quay cả ngày vào một buổi rồi diễn lại. Ánh sáng không khớp với giờ ghi trên màn — người xem nhận ra ngay và mất luôn niềm tin vào cả kênh.</div>
       <a class="dang-xem" href="" target="_blank" rel="noopener">Xem video mẫu →</a>
     </article>
 
@@ -1093,12 +1134,14 @@ body.hv-mode{padding-bottom:0}
         <span class="dang-ai">hợp với bán hàng, affiliate</span></div>
       <div><span class="dang-lb">Quay thế nào</span>
         <ul>
-          <li>Đặt sản phẩm trên nền trơn một màu, một tay giữ một tay thao tác</li>
-          <li>Đủ ba cảnh: <b>tổng thể · cận chi tiết · đang dùng thật</b> — thiếu cảnh thứ ba là mất tin</li>
-          <li>Quay cận thì lùi máy ra rồi zoom nhẹ, đừng dí sát ống kính</li>
+          <li>Kẹp máy <b>chiếu thẳng từ trên xuống</b>, quay góc nhìn bàn tay. Người xem thấy như chính tay mình đang mở — tin hơn hẳn góc ngang</li>
+          <li>Sáng phải đủ và mềm: quay cận mà thiếu sáng là <b>vỡ hạt ngay</b>. Đèn đừng dội thẳng vào mặt hộp bóng, hất chéo cho đọc được chữ trên vỏ</li>
+          <li>Quay chi tiết thì <b>lùi máy ra 20–30cm rồi mới zoom</b> — dí sát ống kính là máy rà nét liên tục, xem rất nhức mắt</li>
+          <li>Đủ ba cảnh: <b>tổng thể · cận chi tiết · đang dùng thật</b>. Thiếu cảnh thứ ba là mất tin</li>
         </ul></div>
       <div class="dang-khung"><b>Khung:</b> nói điểm dở trước, điểm hay sau →
         ai nên mua, ai đừng mua → giá và mua ở đâu. Chê trước thì lời khen mới có trọng lượng</div>
+      <div class="dang-loi"><b>Lỗi hay gặp:</b> khen từ đầu tới cuối. Bình luận đầu tiên sẽ là "được trả tiền hả" — và video chết ở đúng bình luận đó.</div>
       <a class="dang-xem" href="" target="_blank" rel="noopener">Xem video mẫu →</a>
     </article>
 
@@ -1107,12 +1150,15 @@ body.hv-mode{padding-bottom:0}
         <span class="dang-ai">dạng dễ viral nhất, ai cũng làm được</span></div>
       <div><span class="dang-lb">Quay thế nào</span>
         <ul>
-          <li>Nói thẳng vào cam, chèn ảnh chụp màn hình hoặc clip tư liệu vào giữa</li>
-          <li>Giữ nét mặt thật — <b>diễn là hỏng</b>, người xem TikTok nhận ra rất nhanh</li>
-          <li>Quay một mạch từ đầu tới cuối, sai thì quay lại cả câu, đừng chắp vá</li>
+          <li>Câu đầu phải là <b>chỗ gay cấn nhất và để hở phần kết</b> — người xem phải ở lại mới biết chuyện ra sao. Đó là thứ kéo tỉ lệ xem hết lên</li>
+          <li><b>Đừng kể xuôi theo thời gian.</b> Vào thẳng khúc căng, xong mới quay lại kể bối cảnh — đây là lỗi phổ biến nhất của người mới</li>
+          <li>Quay một mạch từ đầu tới cuối, sai thì <b>làm lại nguyên câu</b>. Chắp vá từng chữ nghe gượng lắm</li>
+          <li>Cứ <b>3–5 giây đổi hình một lần</b>: chèn ảnh chụp màn hình, clip tư liệu, hoặc đổi góc máy. Mắt có cái mới thì tay không lướt</li>
         </ul></div>
-      <div class="dang-khung"><b>Khung:</b> thả ngay tình huống gay cấn ở câu đầu →
-        kể bối cảnh → cao trào → bài học rút ra. Đừng kể theo thứ tự thời gian</div>
+      <div class="dang-khung"><b>Khung:</b> <b>0–3s</b> thả ngay tình huống gay cấn →
+        <b>4–15s</b> bối cảnh vừa đủ để chuyện có sức nặng → <b>16–45s</b> cao trào →
+        <b>5s cuối</b> bài học rút ra, rồi cắt luôn</div>
+      <div class="dang-loi"><b>Lỗi hay gặp:</b> kết bằng "cảm ơn mọi người đã xem". Nói hết phần hay rồi còn lê thêm mấy giây là tỉ lệ xem hết rơi thẳng — hết chuyện thì cắt.</div>
       <a class="dang-xem" href="" target="_blank" rel="noopener">Xem video mẫu →</a>
     </article>
 
