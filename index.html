@@ -758,6 +758,33 @@ body.hv-mode{padding-bottom:0}
 .hv-ca.chac b,.hv-ca.chac em{color:#fff}
 @keyframes hvNhac{0%,100%{opacity:1}50%{opacity:.72}}
 
+/* Đã tick nhưng CHƯA lưu. Cũng phải đặt sau .mo/.khoa để đè được màu.
+   Viền nét đứt = "đang chờ bạn bấm Lưu", khác hẳn viền liền của ca đã lưu. */
+.hv-ca.se-mo,.hv-ca.se-mo:hover{background:var(--lime-wash);border-style:dashed;
+  border-color:var(--lime-deep);color:var(--ink)}
+.hv-ca.se-mo b{color:var(--ink)}
+.hv-ca.se-dong,.hv-ca.se-dong:hover{background:transparent;border-style:dashed;
+  border-color:var(--line-dk);color:var(--quiet);text-decoration:line-through}
+.hv-ca.se-dong b{color:var(--quiet);text-decoration:line-through}
+.hv-ca .cho{font-style:normal;font-size:12px;color:var(--lime-deep);font-weight:700}
+.hv-ca.se-dong .cho{color:var(--quiet)}
+
+/* Thanh Lưu — dính đáy màn hình để tick tới đâu cũng thấy, kể cả khi
+   cuộn xuống cuối tuần. Cộng thêm safe-area cho điện thoại có khấc. */
+.hv-luu{position:sticky;bottom:0;z-index:5;display:none;gap:10px;align-items:center;
+  flex-wrap:wrap;margin-top:14px;padding:12px 14px;
+  padding-bottom:calc(12px + env(safe-area-inset-bottom, 0px));
+  background:var(--card);border:1.5px solid var(--lime-deep);border-radius:14px;
+  box-shadow:0 -6px 18px rgba(38,33,15,.10)}
+.hv-luu.on{display:flex}
+.hv-luu .dem{flex:1 1 180px;font-size:14px;color:var(--ink)}
+.hv-luu .dem b{color:var(--lime-deep)}
+.hv-luu .dem i{font-style:normal;display:block;font-size:12.5px;color:var(--quiet);margin-top:2px}
+.hv-luu button{border-radius:999px;padding:10px 20px;font:inherit;font-weight:700;
+  cursor:pointer;border:1.5px solid var(--line-dk);background:transparent;color:var(--ink)}
+.hv-luu button.chinh{background:var(--lime);border-color:var(--lime-deep);color:#1c2600}
+.hv-luu button.busy{opacity:.6;pointer-events:none}
+
 /* lịch của tôi */
 .hv-cua-toi{background:var(--moss);color:#c8cfb4;border-radius:var(--r);
   padding:clamp(20px,3vw,26px);margin-bottom:22px}
@@ -1608,10 +1635,17 @@ body.hv-mode{padding-bottom:0}
 
       <div class="hv-han" id="hvHan" style="display:none"></div>
       <div class="hv-ngays" id="hvNgays"></div>
+      <div class="hv-luu" id="hvLuu">
+        <span class="dem" id="hvLuuDem"></span>
+        <button type="button" id="hvLuuBo">Bỏ thay đổi</button>
+        <button type="button" class="chinh" id="hvLuuOk">Lưu lịch</button>
+      </div>
       <div id="hvTQ" style="display:none"></div>
       <div class="hv-msg" id="hvMsg"></div>
       <p class="hv-chu" id="hvChu" style="display:none">
-        <b>Cách dùng:</b> bấm một ca để mở cho học viên đặt, bấm lại để đóng.
+        <b>Cách dùng:</b> bấm vào những ca bạn rảnh — tick bao nhiêu cũng được, chưa lưu
+        thì chưa ai thấy. Tick nhầm thì bấm lại chính ca đó là bỏ. Xong hết mới bấm
+        <b>Lưu lịch</b> một lần. Ca đang mở mà tick vào là <b>sẽ đóng</b>.
         Cần giờ khác ba ca sẵn có thì bấm <b>＋ giờ khác</b> rồi nhập kiểu <b>19:30-21:00</b>.
         Ca đã có người đặt thì không đóng được — muốn huỷ phải bấm vào ca đó và xác nhận,
         nhớ báo lại cho bạn học viên.
@@ -2381,7 +2415,9 @@ function initAdmin(){
 /* ══════════════ KHU HỌC VIÊN ══════════════ */
 
 var HV = {token:'', ten:'', vaitro:'', tuan:'', nhac:6, toiDa:0, daDat:0, demo:false,
-          cheDo:'toi'};   // mentor: 'toi' = lịch của tôi · 'tq' = tổng quan lớp
+          cheDo:'toi',    // mentor: 'toi' = lịch của tôi · 'tq' = tổng quan lớp
+          cho:{},         // ca mentor đã tick nhưng CHƯA lưu
+          rM:null};       // gói lịch mentor gần nhất, để vẽ lại tại chỗ khi tick
 var HV_KEY = 'tmxk_hv';
 
 /* ---- ngày giờ, tất cả theo múi giờ máy người dùng ---- */
@@ -2445,12 +2481,12 @@ function hvGiaLap(action, d){
     if (HV_DEMO_TOIDA > 0 && demO >= HV_DEMO_TOIDA)
       return {ok:false, error:'qua_nhieu', toiDa:HV_DEMO_TOIDA, daDat:demO};
     o.dat = true; o.hvTen = HV.ten;
-    return {ok:true};
+    return {ok:true, lich: hvGiaLap('hv_slots', {tuan:o.ngay})};
   }
   if (action === 'hv_cancel'){
     var c = HV_DEMO_CA[d.slotId];
     if (c){ c.dat = false; c.hvTen = ''; }
-    return {ok:true};
+    return {ok:true, lich: hvGiaLap('hv_slots', {tuan:c ? c.ngay : ''})};
   }
   if (action === 'hv_mo_ca'){
     var g = d.caMa ? HV_CA.filter(function(c){ return c.ma === d.caMa })[0]
@@ -2459,10 +2495,29 @@ function hvGiaLap(action, d){
     var id = d.ngay+'|'+g.batdau;
     if (HV_DEMO_CA[id]){
       if (HV_DEMO_CA[id].dat) return {ok:false, error:'da_co_nguoi'};
-      delete HV_DEMO_CA[id]; return {ok:true, mo:false};
+      delete HV_DEMO_CA[id];
+      return {ok:true, mo:false, lich: hvGiaLap('hv_slots', {tuan:d.ngay})};
     }
     HV_DEMO_CA[id] = {ngay:d.ngay, batdau:g.batdau, ketthuc:g.ketthuc, dat:false, hvTen:''};
-    return {ok:true, mo:true};
+    return {ok:true, mo:true, lich: hvGiaLap('hv_slots', {tuan:d.ngay})};
+  }
+  if (action === 'hv_luu_ca'){
+    var them = 0, dongLai = 0, boQua = [];
+    (d.ca||[]).forEach(function(x){
+      var id = x.ngay+'|'+x.batdau;
+      var o = HV_DEMO_CA[id];
+      if (x.mo){
+        if (o) return;
+        HV_DEMO_CA[id] = {ngay:x.ngay, batdau:x.batdau, ketthuc:x.ketthuc, dat:false, hvTen:''};
+        them++;
+      } else {
+        if (!o) return;
+        if (o.dat) return boQua.push(x.ngay+' '+x.batdau+' — đã có người đặt');
+        delete HV_DEMO_CA[id]; dongLai++;
+      }
+    });
+    return {ok:true, them:them, dong:dongLai, boQua:boQua,
+            lich: hvGiaLap('hv_slots', {tuan:d.tuan})};
   }
   if (action === 'hv_xoa_ca'){ delete HV_DEMO_CA[d.slotId]; return {ok:true}; }
   if (action === 'hv_tongquan') return hvGiaLapTongQuan(d);
@@ -2610,7 +2665,7 @@ function hvVaoTrong(){
   $('#hvTenKhu').textContent = m ? 'Khu mentor' : 'Khu học viên';
   $('#hvTieuDe').textContent = m ? 'Lịch rảnh của bạn' : 'Đặt lịch kèm 1:1';
   $('#hvMoTa').textContent = m
-    ? 'Bấm vào ca bạn rảnh là mở cho học viên đặt. Học viên đặt xong bạn thấy tên họ ngay tại ca đó, và bot cũng báo về nhóm.'
+    ? 'Tick vào những ca bạn rảnh rồi bấm Lưu lịch — lưu xong học viên mới đặt được. Có người đặt là bạn thấy tên họ ngay tại ca đó, bot cũng báo về nhóm.'
     : 'Chọn một ca trống là xong — mentor nhận thông báo ngay. Bận thì bấm lại đúng ca đó để huỷ, ca sẽ mở lại cho bạn khác.';
   $('#hvMineTieuDe').textContent = m ? '📌 Buổi đã có người đặt' : '📌 Lịch sắp tới của bạn';
   $('#hvChu').style.display = m ? 'block' : 'none';
@@ -2751,20 +2806,37 @@ function hvTai(tuan){
       hvBao('#hvMsg','Không tải được lịch, thử lại giúp mình.');
       return;
     }
-    HV.tuan = r.tuan;
-    HV.nhac = r.nhacTruoc || HV.nhac;
-    HV.toiDa = Number(r.toiDa || 0);
-    HV.daDat = Number(r.daDat || 0);
-    if (r.ca && r.ca.length) HV_CA = r.ca;
-    if (r.vaitro && r.vaitro !== HV.vaitro){   // Toàn vừa đổi vai → đổi luôn giao diện
-      HV.vaitro = r.vaitro; hvLuuPhien(); hvVaoTrong();
-    }
-    if (r.ten){ HV.ten = r.ten; $('#hvWho').innerHTML = 'Chào <b>'+esc(r.ten)+'</b>'; }
-    if (laMentor()) hvVeMentor(r); else hvVeHocVien(r);
+    hvNhan(r);
   }).catch(function(){
     $('#hvNgays').innerHTML = '';
     hvBao('#hvMsg','Không nối được máy chủ.');
   });
+}
+
+/**
+ * Nhận một gói lịch tuần rồi vẽ lại màn hình.
+ * Đặt / huỷ / mở ca đều trả kèm gói này trong cùng lượt trả lời, nên bấm
+ * xong là thấy ngay — không phải gọi máy chủ thêm lần nữa chỉ để tải lại.
+ */
+function hvNhan(r){
+  hvBoCho();
+  $('#hvTQ').style.display = 'none';
+  $('#hvNgays').style.display = '';
+  HV.tuan = r.tuan;
+  HV.nhac = r.nhacTruoc || HV.nhac;
+  HV.toiDa = Number(r.toiDa || 0);
+  HV.daDat = Number(r.daDat || 0);
+  if (r.ca && r.ca.length) HV_CA = r.ca;
+  if (r.vaitro && r.vaitro !== HV.vaitro){   // Toàn vừa đổi vai → đổi luôn giao diện
+    HV.vaitro = r.vaitro; hvLuuPhien(); hvVaoTrong();
+  }
+  if (r.ten){ HV.ten = r.ten; $('#hvWho').innerHTML = 'Chào <b>'+esc(r.ten)+'</b>'; }
+  if (laMentor()) hvVeMentor(r); else hvVeHocVien(r);
+}
+
+/** Máy chủ có gửi kèm lịch mới thì vẽ luôn, không thì mới đi tải lại. */
+function hvSau(r){
+  if (r && r.lich) hvNhan(r.lich); else hvTai(HV.tuan);
 }
 
 function hvKhungTuan(r){
@@ -2781,6 +2853,7 @@ function hvKhungNgay(d, bay, trong, cas){
 /* ---- màn hình HỌC VIÊN ---- */
 function hvVeHocVien(r){
   var bay = hvISO(new Date());
+  $('#hvLuu').classList.remove('on');   // thanh Lưu chỉ có ở màn mentor
   hvKhungTuan(r);
 
   var cua = [];
@@ -2831,6 +2904,7 @@ function hvVeHocVien(r){
 
 /* ---- màn hình MENTOR ---- */
 function hvVeMentor(r){
+  HV.rM = r;                      // giữ lại để tick xong vẽ lại ngay, khỏi gọi máy chủ
   var bay = hvISO(new Date());
   hvKhungTuan(r);
   $('#hvHan').style.display = 'none';
@@ -2851,54 +2925,146 @@ function hvVeMentor(r){
 
     // ba ca mặc định: đối chiếu giờ để biết ca nào đang mở
     var cas = HV_CA.map(function(c){
-      var co = null;
-      d.slots.forEach(function(s){ if (s.batdau===c.batdau && s.ketthuc===c.ketthuc) co = s; });
+      var co = hvCaTai(d, c.batdau, c.ketthuc);
       if (co && co.dat)
         return '<button class="hv-ca khoa" data-huy="'+esc(co.id)+'">'+
                '<b>'+esc(c.batdau)+'–'+esc(c.ketthuc)+'</b> 🔒 '+esc(co.hvTen||'đã có người')+'</button>';
       // hôm nay mà ca đã qua giờ thì máy chủ cũng từ chối — làm mờ luôn cho khỏi bấm hụt
       var quaGio = d.ngay===bay && c.batdau <= hvGioNay();
       if (quaGio && !co) return '';
-      return '<button class="hv-ca'+(co?' mo':'')+'" data-ca="'+esc(c.ma)+'" data-ngay="'+esc(d.ngay)+'"'+
-             (quaGio?' disabled':'')+'>'+
-             '<b>'+esc(c.ten)+'</b> '+esc(c.batdau)+'–'+esc(c.ketthuc)+
-             (co ? ' ✓' : '')+'</button>';
+      return hvNutCa(d.ngay, c.batdau, c.ketthuc, !!co, quaGio,
+                     '<b>'+esc(c.ten)+'</b> '+esc(c.batdau)+'–'+esc(c.ketthuc));
     }).join('');
 
-    // ca giờ lẻ mentor tự thêm
-    var le = d.slots.filter(function(s){
-      return !HV_CA.some(function(c){ return c.batdau===s.batdau && c.ketthuc===s.ketthuc });
-    }).map(function(s){
-      if (s.dat)
-        return '<button class="hv-ca khoa" data-huy="'+esc(s.id)+'">'+
-               '<b>'+esc(s.batdau)+'–'+esc(s.ketthuc)+'</b> 🔒 '+esc(s.hvTen||'đã có người')+'</button>';
-      return '<button class="hv-ca mo" data-go="'+esc(s.id)+'">'+
-             '<b>'+esc(s.batdau)+'–'+esc(s.ketthuc)+'</b> ✓ <em>— bấm để gỡ</em></button>';
+    // ca giờ lẻ đã có trên máy chủ
+    var le = d.slots.filter(function(s){ return !hvCaMacDinh(s.batdau, s.ketthuc) })
+      .map(function(s){
+        if (s.dat)
+          return '<button class="hv-ca khoa" data-huy="'+esc(s.id)+'">'+
+                 '<b>'+esc(s.batdau)+'–'+esc(s.ketthuc)+'</b> 🔒 '+esc(s.hvTen||'đã có người')+'</button>';
+        return hvNutCa(d.ngay, s.batdau, s.ketthuc, true, false,
+                       '<b>'+esc(s.batdau)+'–'+esc(s.ketthuc)+'</b>');
+      }).join('');
+
+    // giờ lẻ vừa tick thêm, máy chủ chưa biết tới
+    var moi = hvChoTrongNgay(d.ngay).filter(function(x){
+      return x.mo && !hvCaMacDinh(x.batdau, x.ketthuc) && !hvCaTai(d, x.batdau, x.ketthuc);
+    }).map(function(x){
+      return hvNutCa(d.ngay, x.batdau, x.ketthuc, false, false,
+                     '<b>'+esc(x.batdau)+'–'+esc(x.ketthuc)+'</b>');
     }).join('');
 
     var them = '<button class="hv-them" data-them="'+esc(d.ngay)+'">＋ giờ khác</button>';
-    return hvKhungNgay(d, bay, '', cas + le + them);
+    return hvKhungNgay(d, bay, '', cas + le + moi + them);
   }).join('');
 
-  $$('#hvNgays [data-ca]').forEach(function(b){
+  $$('#hvNgays [data-tick]').forEach(function(b){
     b.addEventListener('click', function(){
-      hvMoCa({ngay:b.getAttribute('data-ngay'), caMa:b.getAttribute('data-ca')});
+      hvTick(b.getAttribute('data-tick'), b.getAttribute('data-mo') === '1');
     });
   });
   $$('#hvNgays [data-them]').forEach(function(b){
     b.addEventListener('click', function(){ hvThemGio(b, b.getAttribute('data-them')) });
   });
-  $$('#hvNgays [data-go]').forEach(function(b){
-    b.addEventListener('click', function(){ hvGoCa(b.getAttribute('data-go')) });
-  });
   $$('#hvNgays [data-huy]').forEach(function(b){
     b.addEventListener('click', function(){ hvXinHuy(b, b.getAttribute('data-huy')) });
+  });
+
+  hvThanhLuu();
+}
+
+/* ══ TICK TẠI CHỖ RỒI BẤM LƯU (màn mentor) ══════════════════════════
+   Mỗi cái tick chỉ đổi trạng thái trong trang, không gọi máy chủ. Mở
+   lịch cả tuần là mười mấy cái tick — trước đây là mười mấy lượt chờ.
+   Bấm Lưu mới gửi tất cả lên trong MỘT lượt.
+   HV.cho: khoá "ngày|giờ bắt đầu|giờ kết thúc" → {ngay,batdau,ketthuc,mo}  */
+
+function hvCaMacDinh(batdau, ketthuc){
+  return HV_CA.some(function(c){ return c.batdau===batdau && c.ketthuc===ketthuc });
+}
+function hvCaTai(d, batdau, ketthuc){
+  var ra = null;
+  d.slots.forEach(function(s){ if (s.batdau===batdau && s.ketthuc===ketthuc) ra = s });
+  return ra;
+}
+function hvChoTrongNgay(ngay){
+  return Object.keys(HV.cho).map(function(k){ return HV.cho[k] })
+    .filter(function(x){ return x.ngay === ngay })
+    .sort(function(a,c){ return a.batdau < c.batdau ? -1 : 1 });
+}
+
+/** Một nút ca: hiện trạng thái đã lưu, hoặc trạng thái đang chờ lưu */
+function hvNutCa(ngay, batdau, ketthuc, dangMo, quaGio, nhan){
+  var k = ngay+'|'+batdau+'|'+ketthuc;
+  var p = HV.cho[k];
+  var cls = 'hv-ca' + (p ? (p.mo ? ' se-mo' : ' se-dong') : (dangMo ? ' mo' : ''));
+  var duoi = p ? (p.mo ? ' <em class="cho">＋ sẽ mở</em>' : ' <em class="cho">✕ sẽ đóng</em>')
+               : (dangMo ? ' ✓' : '');
+  return '<button class="'+cls+'" data-tick="'+esc(k)+'" data-mo="'+(dangMo?'1':'0')+'"'+
+         (quaGio ? ' disabled' : '')+'>'+ nhan + duoi +'</button>';
+}
+
+/** Tick / bỏ tick một ca. Tick về đúng trạng thái cũ thì coi như chưa đổi gì. */
+function hvTick(k, dangMo){
+  if (HV.cho[k]) delete HV.cho[k];
+  else {
+    var p = k.split('|');
+    HV.cho[k] = {ngay:p[0], batdau:p[1], ketthuc:p[2], mo:!dangMo};
+  }
+  if (HV.rM) hvVeMentor(HV.rM);
+}
+
+function hvSoCho(){ return Object.keys(HV.cho).length; }
+
+function hvThanhLuu(){
+  var thanh = $('#hvLuu'), n = hvSoCho();
+  thanh.classList.toggle('on', n > 0);
+  if (!n) return;
+  var mo = 0, dong = 0;
+  Object.keys(HV.cho).forEach(function(k){ HV.cho[k].mo ? mo++ : dong++ });
+  var phan = [];
+  if (mo)   phan.push('<b>'+mo+'</b> ca sẽ mở');
+  if (dong) phan.push('<b>'+dong+'</b> ca sẽ đóng');
+  $('#hvLuuDem').innerHTML = phan.join(' · ') +
+    '<i>Chưa lưu — bấm <b>Lưu lịch</b> thì học viên mới thấy.</i>';
+}
+
+function hvBoCho2(){
+  HV.cho = {};
+  if (HV.rM) hvVeMentor(HV.rM);
+}
+
+function hvLuuCa(){
+  var ds = Object.keys(HV.cho).map(function(k){ return HV.cho[k] });
+  if (!ds.length) return;
+  var nut = $('#hvLuuOk');
+  nut.classList.add('busy'); nut.textContent = 'Đang lưu…';
+  var xong = function(){ nut.classList.remove('busy'); nut.textContent = 'Lưu lịch'; };
+
+  hvGoi('hv_luu_ca', {token:HV.token, tuan:HV.tuan, ca:ds}).then(function(r){
+    xong();
+    if (r && r.ok){
+      HV.cho = {};
+      var phan = [];
+      if (r.them) phan.push('mở '+r.them+' ca');
+      if (r.dong) phan.push('đóng '+r.dong+' ca');
+      hvBao('#hvMsg','✅ Đã lưu — '+(phan.join(' · ') || 'không có gì thay đổi')+'.'+
+        (r.boQua && r.boQua.length
+          ? '<br>Bỏ qua: '+r.boQua.map(esc).join('; ') : ''), !(r.boQua && r.boQua.length));
+    } else {
+      hvLoi('#hvMsg', r, 'Không lưu được, thử lại giúp mình.');
+    }
+    hvSau(r);
+  }).catch(function(){
+    xong();
+    hvBao('#hvMsg','Không nối được máy chủ — thay đổi vẫn còn đó, bấm Lưu lại nhé.');
   });
 }
 
 /* ---- TỔNG QUAN LỚP (mentor) ---- */
 function hvTaiTongQuan(tuan){
   var tq = $('#hvTQ');
+  $('#hvLuu').classList.remove('on');
   $('#hvNgays').style.display = 'none';
   $('#hvMineBox').style.display = 'none';
   $('#hvHan').style.display = 'none';
@@ -3026,7 +3192,7 @@ function hvDat(id){
       hvBao('#hvMsg','Tuần này bạn giữ đủ <b>'+r.toiDa+' ca</b> rồi — để dành chỗ cho các bạn khác nữa. '+
                      'Muốn đổi thì huỷ một buổi ở trên rồi đặt lại nhé.');
     else hvLoi('#hvMsg', r, 'Không đặt được, thử lại giúp mình.');
-    hvTai(HV.tuan);
+    hvSau(r);
   }).catch(function(){ hvBao('#hvMsg','Không nối được máy chủ.'); hvTai(HV.tuan) });
 }
 
@@ -3065,21 +3231,7 @@ function hvHuy(id){
   hvGoi('hv_cancel', {token:HV.token, slotId:id}).then(function(r){
     if (r && r.ok) hvBao('#hvMsg','Đã huỷ. Bot cũng nhận được thông báo rồi.', true);
     else hvLoi('#hvMsg', r, 'Không huỷ được, thử lại giúp mình.');
-    hvTai(HV.tuan);
-  }).catch(function(){ hvBao('#hvMsg','Không nối được máy chủ.'); hvTai(HV.tuan) });
-}
-
-/* ---- mentor: mở / đóng / thêm giờ lẻ ---- */
-function hvMoCa(d){
-  hvKhoa();
-  var body = {token:HV.token, ngay:d.ngay};
-  if (d.caMa) body.caMa = d.caMa; else { body.batdau = d.batdau; body.ketthuc = d.ketthuc; }
-  hvGoi('hv_mo_ca', body).then(function(r){
-    if (r && r.ok) hvBao('#hvMsg', r.mo
-      ? '✅ Đã mở ca — học viên thấy và đặt được ngay.'
-      : 'Đã đóng ca này.', true);
-    else hvLoi('#hvMsg', r, 'Không đổi được ca, thử lại giúp mình.');
-    hvTai(HV.tuan);
+    hvSau(r);
   }).catch(function(){ hvBao('#hvMsg','Không nối được máy chủ.'); hvTai(HV.tuan) });
 }
 
@@ -3109,7 +3261,7 @@ function hvThemGio(nut, ngay){
       return;
     }
     dong();
-    hvMoCa({ngay:ngay, batdau:a, ketthuc:b});
+    hvTick(ngay+'|'+a+'|'+b, false);   // thêm vào danh sách chờ lưu, chưa gọi máy chủ
   });
   Array.prototype.forEach.call(oo, function(i){
     i.addEventListener('keydown', function(e){
@@ -3117,15 +3269,6 @@ function hvThemGio(nut, ngay){
       if (e.key === 'Escape') dong();
     });
   });
-}
-
-function hvGoCa(id){
-  hvKhoa();
-  hvGoi('hv_xoa_ca', {token:HV.token, slotId:id}).then(function(r){
-    if (r && r.ok) hvBao('#hvMsg','Đã gỡ ca khỏi lịch.', true);
-    else hvLoi('#hvMsg', r, 'Không gỡ được ca.');
-    hvTai(HV.tuan);
-  }).catch(function(){ hvBao('#hvMsg','Không nối được máy chủ.'); hvTai(HV.tuan) });
 }
 
 function initHV(){
@@ -3149,6 +3292,8 @@ function initHV(){
   $('#hvThoat').addEventListener('click', function(){
     hvQuenPhien(); hvRaNgoai(); hvTab(false); hvDoiCheDo('toi'); $('#hv-pass').value='';
   });
+  $('#hvLuuOk').addEventListener('click', hvLuuCa);
+  $('#hvLuuBo').addEventListener('click', hvBoCho2);
   $('#hvTabToi').addEventListener('click', function(){ hvDoiCheDo('toi'); hvTai(HV.tuan) });
   $('#hvTabTQ').addEventListener('click',  function(){ hvDoiCheDo('tq');  hvTai(HV.tuan) });
   $('#hvTruoc').addEventListener('click', function(){ hvTai(hvCong(HV.tuan,-7)) });
