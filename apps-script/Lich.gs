@@ -76,15 +76,33 @@ function docBang(ten, headers, chuan){
 /* ── Chữa dữ liệu đã lỡ bị Sheets đổi kiểu ──────────────────────────
    Sheet cũ (tạo trước khi ép định dạng văn bản) có thể đang giữ ngày
    dưới dạng Date và giờ dưới dạng số thời gian. Đọc ra phải nắn lại,
-   không thì so sánh ngày sai bét và ca biến mất khỏi lịch.            */
+   không thì so sánh ngày sai bét và ca biến mất khỏi lịch.
+
+   PHẢI đọc lại bằng ĐÚNG múi giờ của bảng tính — chính múi giờ mà
+   Sheets đã dùng khi cất giá trị. Đọc bằng 'GMT+7' cứng là sai 7 phút:
+   ô giờ thuần được cất trên ngày gốc 1899-12-30, mà năm 1899 Việt Nam
+   chưa có múi giờ chuẩn, còn dùng giờ mặt trời +07:06:30. Ca 20:00 đọc
+   ra thành 19:53, 14:00 thành 13:53. Lệch đó không chỉ hiện sai giờ:
+   nút bấm lại không khớp được ca cũ nên mỗi lần bấm là đẻ thêm một
+   dòng mới thay vì đóng ca — đó là mấy ca trùng lặp trong lịch.       */
+var _tzBang = null;
+function muiGioBang(){
+  if (_tzBang) return _tzBang;
+  try{ _tzBang = ss().getSpreadsheetTimeZone() || 'GMT+7'; }
+  catch(e){ _tzBang = 'GMT+7'; }
+  return _tzBang;
+}
+/** Làm tròn về phút gần nhất — nuốt mấy giây lẻ do lệch múi giờ cũ */
+function tronPhut(d){ return new Date(Math.round(d.getTime()/60000)*60000); }
+
 function oNgay(v){
-  if (v instanceof Date) return Utilities.formatDate(v,'GMT+7','yyyy-MM-dd');
+  if (v instanceof Date) return Utilities.formatDate(tronPhut(v), muiGioBang(), 'yyyy-MM-dd');
   var s = String(v==null?'':v).trim();
   var m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
   return m ? m[0] : s;
 }
 function oGio(v){
-  if (v instanceof Date) return Utilities.formatDate(v,'GMT+7','HH:mm');
+  if (v instanceof Date) return Utilities.formatDate(tronPhut(v), muiGioBang(), 'HH:mm');
   var s = String(v==null?'':v).trim();
   var m = s.match(/^(\d{1,2}):(\d{2})/);
   return m ? ('0'+m[1]).slice(-2)+':'+m[2] : s;
@@ -286,6 +304,7 @@ function lichApi(body){
     if (act === 'hv_book')    return apiDatLich(body);
     if (act === 'hv_cancel')  return apiHuyLich(body);
     if (act === 'hv_mo_ca')   return apiMoCa(body);
+    if (act === 'hv_luu_ca')  return apiLuuCa(body);
     if (act === 'hv_xoa_ca')  return apiXoaCa(body);
     if (act === 'hv_tongquan')return apiTongQuan(body);
     return jsonOut({ok:false, error:'unknown_action'});
@@ -598,6 +617,80 @@ function apiMoCa(b){
   } finally { lock.releaseLock(); }
 }
 
+/**
+ * Lưu NHIỀU thay đổi ca trong MỘT lượt gọi.
+ * Mentor tick qua tick lại trên trang bao nhiêu cũng được — không đụng
+ * máy chủ lần nào — rồi bấm Lưu một cái là gửi hết lên đây. Trước đây
+ * mỗi cái tick là một lượt đi–về, mở lịch cả tuần là mười mấy lượt chờ.
+ * Nhận: ca = [{ngay, batdau, ketthuc, mo:true|false}, …]
+ */
+var LUU_CA_TOI_DA = 60;
+
+function apiLuuCa(b){
+  var me = aiDay(b.token);
+  if (!me) return jsonOut({ok:false, error:'het_phien'});
+  if (me.vaitro !== 'mentor') return jsonOut({ok:false, error:'khong_phai_mentor'});
+
+  var xin = b.ca;
+  if (!xin || !xin.length) return jsonOut({ok:false, error:'trong'});
+  if (xin.length > LUU_CA_TOI_DA)
+    return jsonOut({ok:false, error:'qua_nhieu_ca', toiDa:LUU_CA_TOI_DA});
+
+  var lock = LockService.getScriptLock();
+  if (!lock.tryLock(8000)) return jsonOut({ok:false, error:'busy'});
+  try{
+    var tatCa = moiLich(), bay = new Date();
+
+    // tra nhanh ca đang mở của chính mình
+    var dangCo = {};
+    tatCa.forEach(function(r){
+      if (String(r.mentor_ma) !== String(me.ma) || r.trangthai === 'off') return;
+      dangCo[r.ngay+'|'+r.batdau+'|'+r.ketthuc] = r;
+    });
+
+    var themVao = [], dong = [], boQua = [], tuan = null;
+
+    xin.forEach(function(x){
+      var ngay = String(x.ngay||'');
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(ngay)) return;
+      var g = chuanGio(String(x.batdau||'')+'-'+String(x.ketthuc||''));
+      if (!g) return;
+      if (!tuan) tuan = ngay;
+
+      var khoa = ngay+'|'+g.batdau+'|'+g.ketthuc;
+      var co = dangCo[khoa];
+      var nhan = tenThu(ngay)+' '+ngayGon(ngay)+' '+g.batdau+'–'+g.ketthuc;
+
+      if (x.mo){
+        if (co) return;                                   // đã mở sẵn
+        if (mocGio(ngay, g.batdau) < bay) return boQua.push(nhan+' — đã qua giờ');
+        themVao.push(['L'+chuoiNgauNhien(6), me.ma, me.ten_goi||me.ten,
+                      ngay, g.batdau, g.ketthuc, 'open', '', '', '', '', '', nowVN()]);
+        dangCo[khoa] = {moiThem:true};   // chặn trùng ngay trong cùng một lượt gửi
+      } else {
+        if (!co || co.moiThem) return;                    // vốn đã đóng
+        if (co.trangthai === 'booked')
+          return boQua.push(nhan+' — '+(co.hv_ten||'có người')+' đã đặt, không đóng được');
+        dong.push(co);
+        delete dangCo[khoa];
+      }
+    });
+
+    // ghi thành khối: thêm bao nhiêu ca cũng chỉ một lượt ghi
+    if (themVao.length){
+      var sh = bang(SHEET_LICH, LICH_HEADERS);
+      sh.getRange(sh.getLastRow()+1, 1, themVao.length, LICH_HEADERS.length)
+        .setValues(themVao);
+    }
+    dong.forEach(function(r){
+      ghiO(SHEET_LICH, LICH_HEADERS, r.row, 'trangthai', 'off');
+    });
+
+    return jsonOut({ok:true, them:themVao.length, dong:dong.length, boQua:boQua,
+                    lich: duLieuTuan(me, tuan)});
+  } finally { lock.releaseLock(); }
+}
+
 /** Mentor gỡ hẳn một ca trống khỏi lịch */
 function apiXoaCa(b){
   var me = aiDay(b.token);
@@ -724,7 +817,7 @@ function chuanGio(s){
 /* ═══════════════ BOT — CHỈ QUẢN LÝ NGƯỜI DÙNG ═══════════════ */
 
 var LENH_LICH = ['lich','lichtuan','dstk','vaitro','xoatk','doimk',
-                 'nhactruoc','toida'];
+                 'nhactruoc','toida','donlich'];
 
 function lichCoLenh(cmd){
   return LENH_LICH.indexOf(cmd) > -1;
@@ -749,8 +842,71 @@ function lichLenh(cmd, arg, chatId, msg){
       return tgSend(chatId,'✅ Sẽ nhắc trước *'+g+' tiếng* cho các lịch đặt từ giờ.');
     }
 
-    case 'toida': return datToiDa(chatId, arg);
+    case 'toida':   return datToiDa(chatId, arg);
+    case 'donlich': return donLich(chatId, arg);
   }
+}
+
+/* ── dọn lịch: gỡ ca trùng, hoặc xoá sạch ca chưa ai đặt ──────────────
+   Ca trùng là di chứng của lỗi đọc giờ lệch 7 phút: nút bấm lại không
+   khớp được ca cũ nên mỗi lần bấm đẻ thêm một dòng. Code đã sửa, nhưng
+   dòng lỡ tạo thì vẫn nằm đó, phải dọn tay một lần.                  */
+function donLich(chatId, arg){
+  var ds = moiLich().filter(function(r){ return r.trangthai !== 'off' });
+  var a = String(arg||'').trim().toLowerCase();
+
+  // gom nhóm theo mentor + ngày + giờ để tìm ca trùng
+  var nhom = {};
+  ds.forEach(function(r){
+    var k = r.mentor_ma+'|'+r.ngay+'|'+r.batdau+'|'+r.ketthuc;
+    (nhom[k] = nhom[k] || []).push(r);
+  });
+  var thua = [];
+  Object.keys(nhom).forEach(function(k){
+    var g = nhom[k];
+    if (g.length < 2) return;
+    // giữ lại ca đã có người đặt; không có ai đặt thì giữ ca đầu tiên
+    var giu = null;
+    g.forEach(function(r){ if (!giu && r.trangthai === 'booked') giu = r });
+    if (!giu) giu = g[0];
+    g.forEach(function(r){ if (r !== giu && r.trangthai !== 'booked') thua.push(r) });
+  });
+  var trong = ds.filter(function(r){ return r.trangthai !== 'booked' });
+  var daDat = ds.length - trong.length;
+
+  if (!a){
+    datCho(chatId,'donlich');
+    return tgSend(chatId, [
+      '🧹 *Dọn lịch*','',
+      'Đang có *'+ds.length+' ca* trên lịch:',
+      '· '+trong.length+' ca trống',
+      '· '+daDat+' ca đã có người đặt',
+      thua.length ? '· ⚠️ *'+thua.length+' ca bị trùng* (cùng mentor, cùng ngày giờ)' : '· không có ca nào trùng',
+      '',
+      'Nhắn vào tin tiếp theo:',
+      '`trung` — chỉ gỡ '+thua.length+' ca trùng, giữ nguyên phần còn lại',
+      '`tatca` — xoá sạch *'+trong.length+' ca trống* (ca đã có người đặt vẫn giữ)',
+      '/huy — thôi, không đụng gì',
+      '',
+      '_Ca xoá chỉ bị ẩn khỏi lịch, dòng vẫn nằm trong Sheet để đối chiếu._'
+    ].join('\n'));
+  }
+
+  if (a === 'trung'){
+    if (!thua.length) return tgSend(chatId,'Không có ca nào trùng. Lịch sạch rồi.');
+    thua.forEach(function(r){ ghiO(SHEET_LICH, LICH_HEADERS, r.row, 'trangthai', 'off') });
+    return tgSend(chatId,'🧹 Đã gỡ *'+thua.length+' ca trùng*. Gõ /lichtuan để xem lại.');
+  }
+
+  if (/^(tatca|tat ca|tất cả|xoahet|xoa het)$/.test(a)){
+    if (!trong.length) return tgSend(chatId,'Không còn ca trống nào để xoá.');
+    trong.forEach(function(r){ ghiO(SHEET_LICH, LICH_HEADERS, r.row, 'trangthai', 'off') });
+    return tgSend(chatId, '🧹 Đã xoá sạch *'+trong.length+' ca trống*.'+
+      (daDat ? '\nGiữ nguyên '+daDat+' ca đã có người đặt.' : '')+
+      '\n\nMentor vào khu học viên tick lại lịch rảnh rồi bấm *Lưu* nhé.');
+  }
+
+  return tgSend(chatId,'Nhắn `trung` hoặc `tatca` nhé. Gõ /donlich để xem lại số liệu.');
 }
 
 /* ── nút bấm: phân vai / xoá tài khoản ── */

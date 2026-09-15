@@ -205,6 +205,22 @@ tự chuyển sang kiểu mới.
 
 ## Sự cố hay gặp
 
+**Ca hiện sai giờ (20:00 thành 19:53) và bị nhân bản nhiều dòng** — đã sửa.
+Sheets cất ô giờ thuần trên ngày gốc **1899-12-30**. Năm đó Việt Nam chưa có
+múi giờ chuẩn, còn dùng giờ mặt trời **+07:06:30**. Code đọc lại bằng `'GMT+7'`
+cứng nên lệch đúng 7 phút: `20:00` ra `19:53`, `14:00` ra `13:53`. Lệch đó
+không chỉ hiện sai giờ — nút bấm lại đối chiếu `r.batdau === '20:00'` không
+bao giờ khớp, nên mỗi lần bấm **đẻ thêm một dòng mới** thay vì đóng ca. Đó là
+mấy ca trùng lặp.
+
+Nay `oNgay` / `oGio` đọc bằng đúng `ss().getSpreadsheetTimeZone()` — chính múi
+giờ Sheets đã dùng khi cất — và làm tròn về phút gần nhất.
+
+Dòng đã lỡ tạo thì dọn tay một lần bằng **`/donlich`**:
+- `/donlich` → xem có bao nhiêu ca, bao nhiêu ca trùng
+- nhắn `trung` → chỉ gỡ bản thừa, giữ lại một ca mỗi khung giờ
+- nhắn `tatca` → xoá sạch ca trống, **giữ nguyên ca đã có người đặt**
+
 **Bấm tick lịch xong phải chờ mấy giây mới thấy** — đã sửa. Bốn nguyên nhân
 cộng dồn, nếu thấy lại thì soi theo thứ tự này:
 
@@ -217,6 +233,11 @@ cộng dồn, nếu thấy lại thì soi theo thứ tự này:
 3. *Trang gọi hai lượt cho một lần bấm.* Bấm xong gọi `hv_book`, rồi gọi tiếp
    `hv_slots` chỉ để tải lại. Nay `hv_book` / `hv_cancel` / `hv_mo_ca` /
    `hv_xoa_ca` trả kèm luôn lịch tuần mới, trang vẽ lại ngay — **một** lượt.
+   Riêng màn mentor còn gộp mạnh hơn: tick ca chỉ đổi trạng thái trong trang,
+   **không gọi máy chủ lần nào**; bấm **Lưu lịch** mới gửi tất cả lên bằng một
+   lượt `hv_luu_ca`. Mở lịch cả tuần trước đây là mười mấy lượt chờ, nay là một.
+   Học viên vẫn đặt/huỷ ngay lập tức — mỗi tuần chỉ vài ca, và cần biết liền
+   là ca đó còn trống hay vừa có người khác giành mất.
 4. *Con bot chặn đường.* `hoiTelegram` chạy mỗi phút và bám tới 30 giây, mà nó
    giữ đúng cái khoá script mà `hv_book` cũng xin. Người bấm phải xếp hàng sau
    nó, có lúc chờ hết 8 giây rồi nhận "Máy chủ đang bận". Nay bot dùng cờ

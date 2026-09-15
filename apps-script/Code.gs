@@ -573,7 +573,8 @@ function handleTelegram(update){
         '🔒 /doimk `mail` — cấp lại mật khẩu',
         '📆 /lichtuan — lịch cả tuần, ai mở ca, ai đã đặt',
         '⏰ /nhactruoc `6` — nhắc trước mấy tiếng',
-        '🎫 /toida `2` — mỗi học viên tối đa mấy ca một tuần (`0` = bỏ giới hạn)','',
+        '🎫 /toida `2` — mỗi học viên tối đa mấy ca một tuần (`0` = bỏ giới hạn)',
+        '🧹 /donlich — dọn ca trùng hoặc xoá sạch ca trống','',
         '*🖼 Đồ họa*',
         '🖼 /nen `Minh Toàn` — bot vẽ nền gọi Teams rồi gửi file (thêm `| toi` cho nền tối)','',
         '*⚙️ Khác*',
@@ -1039,6 +1040,7 @@ function setup(){
     {command:'doimk',      description:'🔒 Cấp lại mật khẩu — /doimk mail'},
     {command:'nhactruoc',  description:'⏰ Nhắc trước mấy tiếng — /nhactruoc 6'},
     {command:'toida',      description:'🎫 Mỗi HV tối đa mấy ca/tuần — /toida 2'},
+    {command:'donlich',    description:'🧹 Dọn ca trùng / xoá sạch ca trống'},
     {command:'huy',        description:'👌 Hủy câu hỏi đang chờ'},
     {command:'sheet',      description:'📄 Link Google Sheet'},
     {command:'menu',       description:'⚙️ Danh sách đầy đủ lệnh'}
