@@ -639,13 +639,44 @@ body.hv-mode{padding-bottom:0}
 .hv-chedo button{border-radius:999px;padding:8px 16px;font-size:13.5px;font-weight:700;
   font-family:var(--disp);color:var(--quiet);transition:.18s;white-space:nowrap}
 .hv-chedo button.on{background:var(--ink);color:var(--paper-lt)}
-.tq-so{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
-.tq-o{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-sm);
-  padding:14px 16px}
-.tq-o b{display:block;font-family:var(--disp);font-size:26px;font-weight:800;
-  color:var(--ink);letter-spacing:-.03em;line-height:1.1;font-variant-numeric:tabular-nums}
-.tq-o span{font-size:12px;color:var(--quiet);line-height:1.4;display:block;margin-top:4px}
-.tq-o small{font-size:11px;color:var(--faint)}
+.tq-so{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+.tq-o{position:relative;background:var(--card);border:1.5px solid var(--line);
+  border-radius:var(--r);padding:16px 18px 14px;overflow:hidden;
+  transition:transform .25s var(--ease),box-shadow .25s}
+.tq-o:hover{transform:translateY(-2px);box-shadow:0 18px 40px -26px rgba(80,60,35,.4)}
+.tq-o .ic{position:absolute;top:12px;right:14px;font-size:18px;opacity:.55}
+.tq-o b{display:block;font-family:var(--disp);font-size:clamp(26px,3vw,34px);font-weight:800;
+  color:var(--ink);letter-spacing:-.035em;line-height:1;font-variant-numeric:tabular-nums}
+.tq-o b small{font-size:.5em;font-weight:700;color:var(--faint);letter-spacing:0}
+.tq-o span{font-size:12.5px;color:var(--ink-soft);font-weight:500;line-height:1.4;
+  display:block;margin-top:6px}
+.tq-o small.ghi{display:block;font-size:11px;color:var(--faint);margin-top:2px}
+/* thanh đo mỏng — một màu, sáng→đậm theo tỉ lệ, không phải biểu đồ */
+.tq-do{height:6px;border-radius:99px;background:var(--paper-dk);overflow:hidden;
+  margin-top:10px;border:1px solid var(--line)}
+.tq-do i{display:block;height:100%;border-radius:99px;background:var(--lime);
+  width:0;transition:width .7s var(--ease)}
+.tq-do.trong i{background:var(--gold)}
+.tq-o.noi{background:var(--moss);border-color:var(--moss)}
+.tq-o.noi b{color:var(--lime)}
+.tq-o.noi b small{color:#96a07d}
+.tq-o.noi span{color:#c8cfb4}
+.tq-o.noi small.ghi{color:#78825c}
+.tq-o.noi .tq-do{background:var(--moss-2);border-color:var(--moss-line)}
+.tq-hai{display:grid;grid-template-columns:1fr 1fr;gap:clamp(14px,2vw,22px)}
+.tq-hai .tq-khoi{margin-top:0}
+.tq-cham{display:inline-flex;gap:4px;align-items:center}
+.tq-cham i{width:9px;height:9px;border-radius:50%;background:var(--paper-dk);
+  border:1.5px solid var(--line-dk);display:block;flex:none}
+.tq-cham i.xong{background:var(--lime);border-color:var(--lime-deep)}
+.tq-thanh{flex:0 0 110px;height:6px;border-radius:99px;background:var(--paper-dk);
+  border:1px solid var(--line);overflow:hidden}
+.tq-thanh i{display:block;height:100%;background:var(--lime);border-radius:99px}
+.tq-dong .phai{display:flex;align-items:center;gap:10px;flex-wrap:nowrap;justify-content:flex-end;
+  margin-left:auto}
+.tq-dong .so{min-width:44px;text-align:right}
+@media(max-width:420px){ .tq-thanh{flex-basis:70px} }
+@media(max-width:900px){ .tq-hai{grid-template-columns:1fr} .tq-hai .tq-khoi+.tq-khoi{margin-top:22px} }
 .tq-khoi{margin-top:22px}
 .tq-khoi h3{font-size:15px;font-weight:800;margin-bottom:10px;display:flex;
   align-items:baseline;gap:10px}
@@ -680,7 +711,7 @@ body.hv-mode{padding-bottom:0}
   border:1.5px solid var(--gold);color:var(--gold)}
 .tq-nhan.ok{border-color:var(--lime-deep);color:var(--lime-deep)}
 .tq-trong{padding:18px 16px;font-size:13px;color:var(--faint)}
-@media(max-width:700px){ .tq-so{grid-template-columns:repeat(2,1fr)} }
+@media(max-width:700px){ .tq-so{grid-template-columns:repeat(2,1fr)} .tq-o{padding:14px 14px 12px} }
 .hv-chu b{color:var(--ink-soft);font-weight:600}
 .hv-vai{font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;
   font-family:var(--disp);color:var(--lime-deep);background:var(--lime-wash);
@@ -744,6 +775,9 @@ body.hv-mode{padding-bottom:0}
 .hv-demo{background:var(--gold);color:#2b1f05;font-size:12.5px;font-weight:600;
   text-align:center;padding:8px 14px;line-height:1.5}
 @media(max-width:560px){
+  .hv-tuan{padding:9px 10px;gap:8px}
+  .hv-tuan b{font-size:13px;white-space:nowrap}
+  .hv-tuan .hv-nut{padding:7px 10px;font-size:12px}
   .hv-ngay{grid-template-columns:1fr;gap:10px}
   .hv-d{display:flex;align-items:baseline;gap:9px}
   .hv-d i{margin-top:0}
@@ -2893,19 +2927,27 @@ function hvVeTongQuan(r){
   var t = r.tong || {};
   var h = '';
 
-  // bốn con số đầu — chữ dùng màu mực thường, không tô màu theo giá trị
+  // bốn con số đầu — chữ dùng màu mực thường; thanh đo một màu cho tỉ lệ
+  var caTong = (t.caMo||0) + (t.caDat||0);
+  var pctDat = caTong ? Math.round(t.caDat*100/caTong) : 0;
+  var pctHV  = t.hvTong ? Math.round(t.hvDaDat*100/t.hvTong) : 0;
   h += '<div class="tq-so">'+
-    '<div class="tq-o"><b>'+t.caMo+'</b><span>ca còn trống</span><small>'+
-      (t.mentor||0)+' mentor đang mở ca</small></div>'+
-    '<div class="tq-o"><b>'+t.caDat+'</b><span>ca đã có người đặt</span><small>tuần này</small></div>'+
-    '<div class="tq-o"><b>'+t.hvDaDat+'<small style="font-size:.55em;font-weight:700"> /'+t.hvTong+'</small></b>'+
-      '<span>học viên đã đặt lịch</span><small>'+(t.hvChua||0)+' bạn chưa đặt</small></div>'+
-    '<div class="tq-o"><b>'+(HV.toiDa>0?HV.toiDa:'∞')+'</b><span>ca tối đa / học viên / tuần</span>'+
-      '<small>đổi bằng /toida trong bot</small></div>'+
+    '<div class="tq-o"><span class="ic">🗓</span><b>'+(t.caMo||0)+'</b>'+
+      '<span>ca còn trống</span><small class="ghi">'+(t.mentor||0)+' mentor đang mở ca</small></div>'+
+    '<div class="tq-o"><span class="ic">🔒</span><b>'+(t.caDat||0)+'<small> /'+caTong+'</small></b>'+
+      '<span>ca đã có người đặt</span>'+
+      '<div class="tq-do"><i style="width:'+pctDat+'%"></i></div>'+
+      '<small class="ghi">'+pctDat+'% số ca đã mở</small></div>'+
+    '<div class="tq-o noi"><span class="ic">🎓</span><b>'+(t.hvDaDat||0)+'<small> /'+(t.hvTong||0)+'</small></b>'+
+      '<span>học viên đã đặt lịch</span>'+
+      '<div class="tq-do"><i style="width:'+pctHV+'%"></i></div>'+
+      '<small class="ghi">'+(t.hvChua||0)+' bạn chưa đặt buổi nào</small></div>'+
+    '<div class="tq-o"><span class="ic">🎫</span><b>'+(HV.toiDa>0?HV.toiDa:'∞')+'</b>'+
+      '<span>ca tối đa mỗi học viên / tuần</span><small class="ghi">đổi bằng /toida trong bot</small></div>'+
   '</div>';
 
   // lịch cả lớp theo ngày — mỗi ca ghi tên mentor, ca đã đặt ghi thêm tên học viên
-  h += '<div class="tq-khoi"><h3>Lịch cả lớp <small>ca của bạn có viền xanh</small></h3>'+
+  h += '<div class="tq-khoi"><h3>Lịch cả lớp <small>ca của bạn có viền xanh · ca tối là đã có người</small></h3>'+
        '<div class="hv-ngays">';
   r.ngays.forEach(function(d){
     var cas = d.slots.map(function(sl){
@@ -2917,31 +2959,43 @@ function hvVeTongQuan(r){
   });
   h += '</div></div>';
 
-  // từng mentor: mở mấy ca, mấy ca đã có người
-  h += '<div class="tq-khoi"><h3>Mentor tuần này</h3><div class="tq-bang">';
+  h += '<div class="tq-hai" style="margin-top:22px">';
+
+  // từng mentor: thanh đo đặt/mở + con số
+  var moMax = Math.max.apply(null, [1].concat(r.mentors.map(function(m){ return m.mo })));
+  h += '<div class="tq-khoi"><h3>Mentor tuần này <small>đã đặt / đã mở</small></h3><div class="tq-bang">';
   if (!r.mentors.length) h += '<div class="tq-trong">Chưa có mentor nào được duyệt.</div>';
   r.mentors.forEach(function(m){
     var toi = laMentor() && HV.ten && m.ten === HV.ten;
+    var pct = m.mo ? Math.round(m.dat*100/m.mo) : 0;
     h += '<div class="tq-dong"><span><b>'+esc(m.ten)+'</b>'+(toi?' <em>(bạn)</em>':'')+'</span>'+
-      '<span class="so">'+(m.mo ? m.dat+' đặt / '+m.mo+' ca' : '<em>chưa mở ca</em>')+'</span></div>';
+      '<span class="phai">'+
+        (m.mo ? '<span class="tq-thanh" title="'+pct+'% ca đã có người"><i style="width:'+pct+'%"></i></span>'+
+                '<span class="so">'+m.dat+' / '+m.mo+'</span>'
+              : '<em>chưa mở ca</em>')+
+      '</span></div>';
   });
   h += '</div></div>';
 
-  // từng học viên: đã đặt mấy ca, ai chưa đặt nổi lên đầu
-  h += '<div class="tq-khoi"><h3>Học viên tuần này <small>bạn chưa đặt xếp lên trước</small></h3>'+
+  // từng học viên: chấm theo hạn mức, ai chưa đặt nổi lên đầu
+  h += '<div class="tq-khoi"><h3>Học viên tuần này <small>chưa đặt xếp lên trước</small></h3>'+
        '<div class="tq-bang">';
   if (!r.hocvien.length) h += '<div class="tq-trong">Chưa có học viên nào được duyệt.</div>';
   r.hocvien.forEach(function(hv){
-    var chua = hv.daDat === 0;
+    var chua = hv.daDat === 0, cham = '';
+    if (HV.toiDa > 0) for (var i=0;i<HV.toiDa;i++)
+      cham += '<i'+(i < hv.daDat ? ' class="xong"' : '')+'></i>';
     h += '<div class="tq-dong'+(chua?' chua':'')+'">'+
       '<span><b>'+esc(hv.ten)+'</b> <em>'+esc(hv.email)+'</em></span>'+
-      '<span style="display:flex;align-items:center;gap:10px">'+
-        (chua ? '<span class="tq-nhan">chưa đặt</span>'
-              : '<span class="tq-nhan ok">đã đặt</span>')+
+      '<span class="phai">'+
+        (chua ? '<span class="tq-nhan">chưa đặt</span>' : '<span class="tq-nhan ok">đã đặt</span>')+
+        (cham ? '<span class="tq-cham" aria-label="'+hv.daDat+' trên '+HV.toiDa+'">'+cham+'</span>' : '')+
         '<span class="so">'+hv.daDat+(HV.toiDa>0?'/'+HV.toiDa:'')+'</span>'+
       '</span></div>';
   });
   h += '</div></div>';
+
+  h += '</div>';   // .tq-hai
 
   $('#hvTQ').innerHTML = h;
 }
