@@ -217,6 +217,7 @@ function lichApi(body){
     if (act === 'hv_cancel')  return apiHuyLich(body);
     if (act === 'hv_mo_ca')   return apiMoCa(body);
     if (act === 'hv_xoa_ca')  return apiXoaCa(body);
+    if (act === 'hv_tongquan')return apiTongQuan(body);
     return jsonOut({ok:false, error:'unknown_action'});
   }catch(err){
     ghiLoi('lichApi/'+act, err);
@@ -509,6 +510,74 @@ function apiXoaCa(b){
 
   ghiO(SHEET_LICH, LICH_HEADERS, slot.row, 'trangthai', 'off');
   return jsonOut({ok:true});
+}
+
+/* ── tổng quan lớp: mentor nào cũng thấy lịch của nhau + tình hình học viên ── */
+function apiTongQuan(b){
+  var me = aiDay(b.token);
+  if (!me) return jsonOut({ok:false, error:'het_phien'});
+  if (me.vaitro !== 'mentor') return jsonOut({ok:false, error:'khong_phai_mentor'});
+
+  var dau  = thuHai(String(b.tuan||'').match(/^\d{4}-\d{2}-\d{2}$/) ? b.tuan : homNay());
+  var cuoi = congNgay(dau, 6);
+  var bay  = homNay();
+  var gioNay = new Date();
+
+  var ngays = {};
+  for (var i=0;i<7;i++){
+    var n = congNgay(dau, i);
+    ngays[n] = {ngay:n, thu:tenThu(n), gon:ngayGon(n), qua:(n < bay), slots:[]};
+  }
+
+  // gom theo mentor và theo học viên trong tuần này
+  var mentors = {}, datCua = {};
+  var caMo = 0, caDat = 0;
+  moiLich().forEach(function(r){
+    if (r.ngay < dau || r.ngay > cuoi || r.trangthai === 'off') return;
+    var daDat = r.trangthai === 'booked';
+    ngays[r.ngay].slots.push({
+      id:r.id, mentor:r.mentor_ten||'—', mentorMa:r.mentor_ma,
+      cuaToi: String(r.mentor_ma) === String(me.ma),
+      batdau:r.batdau, ketthuc:r.ketthuc, dat:daDat,
+      hvTen: daDat ? (r.hv_ten||'') : '',
+      qua: mocGio(r.ngay, r.batdau) < gioNay
+    });
+    var k = String(r.mentor_ma);
+    mentors[k] = mentors[k] || {ma:k, ten:r.mentor_ten||'—', mo:0, dat:0};
+    mentors[k].mo++;
+    if (daDat){ mentors[k].dat++; caDat++; datCua[String(r.hv_ma)] = (datCua[String(r.hv_ma)]||0)+1; }
+    else caMo++;
+  });
+
+  // mentor đã được duyệt nhưng tuần này chưa mở ca nào cũng hiện, để biết ai đang vắng
+  var dsHV = moiHV();
+  dsHV.forEach(function(r){
+    if (r.vaitro !== 'mentor' || r.trangthai === 'off') return;
+    var k = String(r.ma);
+    if (!mentors[k]) mentors[k] = {ma:k, ten:r.ten_goi||r.ten, mo:0, dat:0};
+  });
+
+  var hocvien = dsHV.filter(function(r){ return r.vaitro==='hv' && r.trangthai!=='off' })
+    .map(function(r){
+      return {ten:r.ten_goi||r.ten, email:r.email, daDat:datCua[String(r.ma)]||0,
+              vao: r.dangnhap_cuoi || ''};
+    })
+    .sort(function(a,c){ return a.daDat - c.daDat || (a.ten < c.ten ? -1 : 1) });
+
+  var dsMentor = Object.keys(mentors).map(function(k){ return mentors[k] })
+    .sort(function(a,c){ return c.mo - a.mo || (a.ten < c.ten ? -1 : 1) });
+
+  var ds = Object.keys(ngays).sort().map(function(k){
+    ngays[k].slots.sort(function(a,c){
+      return a.batdau < c.batdau ? -1 : a.batdau > c.batdau ? 1 : (a.mentor < c.mentor ? -1 : 1) });
+    return ngays[k];
+  });
+
+  var hvDaDat = hocvien.filter(function(h){ return h.daDat > 0 }).length;
+  return jsonOut({ok:true, tuan:dau, ngays:ds, mentors:dsMentor, hocvien:hocvien,
+    toiDa: cfgLich().toiDa,
+    tong:{ mentor:dsMentor.length, caMo:caMo, caDat:caDat,
+           hvTong:hocvien.length, hvDaDat:hvDaDat, hvChua:hocvien.length - hvDaDat }});
 }
 
 /* ═══════════════ NHẮC HẸN ═══════════════ */
