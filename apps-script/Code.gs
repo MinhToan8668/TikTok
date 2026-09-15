@@ -234,9 +234,37 @@ function catNho(s, max){
   if (cur) out.push(cur);
   return out;
 }
+/**
+ * Báo cho mọi chat cùng lúc thay vì lần lượt.
+ * tgSend gọi UrlFetchApp.fetch nối tiếp — hai chat là hai lần chờ mạng
+ * chồng lên nhau, mà người bấm trên trang phải đợi hết mới thấy phản hồi.
+ * fetchAll bắn cả hai đi một lượt. Tin dài quá cỡ hoặc Markdown lệch thì
+ * lui về đường cũ cho chắc.
+ */
 function tgBroadcast(text){
-  dsChat('ADMIN_CHAT_IDS').concat(dsChat('NOTIFY_CHAT_IDS'))
-    .forEach(function(id){ tgSend(id,text) });
+  var ds = dsChat('ADMIN_CHAT_IDS').concat(dsChat('NOTIFY_CHAT_IDS'));
+  if (!ds.length) return;
+  var token = cfgProp('BOT_TOKEN');
+  if (!token || String(text).length > 3800) {
+    ds.forEach(function(id){ tgSend(id,text) });
+    return;
+  }
+  var goi = ds.map(function(id){
+    return {url:'https://api.telegram.org/bot'+token+'/sendMessage',
+            method:'post', contentType:'application/json', muteHttpExceptions:true,
+            payload: JSON.stringify({chat_id:id, text:String(text),
+              parse_mode:'Markdown', disable_web_page_preview:true})};
+  });
+  var ra;
+  try{ ra = UrlFetchApp.fetchAll(goi); }
+  catch(err){ ds.forEach(function(id){ tgSend(id,text) }); return; }
+
+  // Markdown lệch → Telegram từ chối riêng tin đó, gửi lại dạng chữ thường
+  ra.forEach(function(r, i){
+    var ok = false;
+    try{ ok = JSON.parse(r.getContentText()).ok !== false }catch(e){}
+    if (!ok) tgSend(ds[i], String(text).replace(/[`*_]/g,''));
+  });
 }
 /* ═══ CHẾ ĐỘ HỎI–ĐÁP ═══
    Bấm lệnh trơn (VD /giasom) → bot hỏi và nhớ lại trong 5 phút;
@@ -1094,8 +1122,14 @@ function datMocMoiNhat(){
  * cùng phiên được trả lời gần như tức thì.
  */
 function hoiTelegram(){
-  var lock = LockService.getScriptLock();
-  if (!lock.tryLock(1000)) return;          // lượt trước còn đang bám
+  // KHÔNG dùng LockService ở đây. Vòng hỏi này bám tới 30 giây mỗi phút,
+  // mà đặt lịch / mở ca trên trang cũng xin đúng cái khoá script đó — người
+  // bấm phải xếp hàng sau con bot, có lúc chờ hết 8 giây rồi báo "busy".
+  // Một cờ trong cache là đủ để hai lượt hỏi không chồng nhau, và nó không
+  // đụng gì tới phần ghi dữ liệu.
+  var cache = CacheService.getScriptCache();
+  try{ if (cache.get('tg_dang_hoi')) return; }catch(e){}
+  try{ cache.put('tg_dang_hoi','1', HOI_TRAN_GIAY + 30); }catch(e){}
   try{
     if (motLuotHoi(0) <= 0) return;         // rảnh hoặc lỗi mạng — thoát ngay
     var het = Date.now() + HOI_TRAN_GIAY*1000;
@@ -1106,7 +1140,7 @@ function hoiTelegram(){
       rong = (n===0) ? rong+1 : 0;
     }
   } finally {
-    lock.releaseLock();
+    try{ cache.remove('tg_dang_hoi'); }catch(e){}
   }
 }
 
@@ -1125,6 +1159,8 @@ function motLuotHoi(choGiay){
   props().setProperty('TG_OFFSET', String(maxId));
 
   r.result.forEach(function(u){
+    if (daXuLy(u.update_id)) return;   // cờ cache không phải khoá thật:
+                                       // hai lượt lỡ chồng nhau vẫn không nhắn đôi
     try{ handleTelegram(u); }catch(err){ ghiLoi('hoiTelegram', err); }
   });
   return r.result.length;

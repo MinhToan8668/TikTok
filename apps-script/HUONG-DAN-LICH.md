@@ -191,9 +191,42 @@ Phiên đăng nhập giữ 30 ngày, token cũng băm khi lưu. Trình duyệt c
 token, không giữ mật khẩu. Sai mật khẩu 5 lần trong 10 phút thì email đó bị
 khoá tạm.
 
+Token có dạng `MÃTK.<40 ký tự ngẫu nhiên>` và trong sheet lưu dạng `n1:<băm>`
+— băm **một vòng** chứ không phải 1500 như mật khẩu. Cố ý khác nhau: mật khẩu
+do người đặt nên đoán được, cần băm chậm để ai lấy được sheet cũng không dò
+nổi; còn token là 40 ký tự ngẫu nhiên, dò cả đời không ra, băm chậm chỉ tổ làm
+mỗi lần bấm chờ thêm vài giây. Mã tài khoản nằm ở đầu token để tìm thẳng đúng
+dòng — đổi mã đó sang người khác vẫn không vào được, vì phần bí mật phải khớp.
+
+Token cấp trước bản này (kiểu cũ) vẫn dùng bình thường, lần đăng nhập tới là
+tự chuyển sang kiểu mới.
+
 ---
 
 ## Sự cố hay gặp
+
+**Bấm tick lịch xong phải chờ mấy giây mới thấy** — đã sửa. Bốn nguyên nhân
+cộng dồn, nếu thấy lại thì soi theo thứ tự này:
+
+1. *Băm chậm khi đổi token ra người dùng.* `aiDay()` từng băm 1500 vòng cho
+   **từng** tài khoản đang đăng nhập cho tới khi trúng — lớp 16 người là
+   24.000 vòng SHA-256 mỗi lượt gọi. Nay token mang sẵn mã tài khoản nên chỉ
+   băm **một lần**.
+2. *Ghi từng ô một.* Đặt một ca phải sửa 6 cột, mỗi `setValue` là một lần
+   đi–về với Google. Nay `ghiDong()` gộp thành **một** lượt ghi.
+3. *Trang gọi hai lượt cho một lần bấm.* Bấm xong gọi `hv_book`, rồi gọi tiếp
+   `hv_slots` chỉ để tải lại. Nay `hv_book` / `hv_cancel` / `hv_mo_ca` /
+   `hv_xoa_ca` trả kèm luôn lịch tuần mới, trang vẽ lại ngay — **một** lượt.
+4. *Con bot chặn đường.* `hoiTelegram` chạy mỗi phút và bám tới 30 giây, mà nó
+   giữ đúng cái khoá script mà `hv_book` cũng xin. Người bấm phải xếp hàng sau
+   nó, có lúc chờ hết 8 giây rồi nhận "Máy chủ đang bận". Nay bot dùng cờ
+   trong cache, khoá script để dành riêng cho phần ghi dữ liệu.
+
+Thêm nữa: báo Telegram cho nhiều chat giờ bắn song song (`fetchAll`) thay vì
+lần lượt.
+
+Muốn tự kiểm: chạy tay hàm `kiemTraLich` — nếu vẫn chậm, xem trong Apps Script
+**Executions**, cột thời lượng của `doPost`. Trên một giây là có gì đó sai.
 
 **Khu học viên báo "Không nối được máy chủ"** — chưa deploy version mới, hoặc
 `API` trong `index.html` trỏ vào deployment cũ.

@@ -2445,12 +2445,12 @@ function hvGiaLap(action, d){
     if (HV_DEMO_TOIDA > 0 && demO >= HV_DEMO_TOIDA)
       return {ok:false, error:'qua_nhieu', toiDa:HV_DEMO_TOIDA, daDat:demO};
     o.dat = true; o.hvTen = HV.ten;
-    return {ok:true};
+    return {ok:true, lich: hvGiaLap('hv_slots', {tuan:o.ngay})};
   }
   if (action === 'hv_cancel'){
     var c = HV_DEMO_CA[d.slotId];
     if (c){ c.dat = false; c.hvTen = ''; }
-    return {ok:true};
+    return {ok:true, lich: hvGiaLap('hv_slots', {tuan:c ? c.ngay : ''})};
   }
   if (action === 'hv_mo_ca'){
     var g = d.caMa ? HV_CA.filter(function(c){ return c.ma === d.caMa })[0]
@@ -2459,10 +2459,11 @@ function hvGiaLap(action, d){
     var id = d.ngay+'|'+g.batdau;
     if (HV_DEMO_CA[id]){
       if (HV_DEMO_CA[id].dat) return {ok:false, error:'da_co_nguoi'};
-      delete HV_DEMO_CA[id]; return {ok:true, mo:false};
+      delete HV_DEMO_CA[id];
+      return {ok:true, mo:false, lich: hvGiaLap('hv_slots', {tuan:d.ngay})};
     }
     HV_DEMO_CA[id] = {ngay:d.ngay, batdau:g.batdau, ketthuc:g.ketthuc, dat:false, hvTen:''};
-    return {ok:true, mo:true};
+    return {ok:true, mo:true, lich: hvGiaLap('hv_slots', {tuan:d.ngay})};
   }
   if (action === 'hv_xoa_ca'){ delete HV_DEMO_CA[d.slotId]; return {ok:true}; }
   if (action === 'hv_tongquan') return hvGiaLapTongQuan(d);
@@ -2751,20 +2752,37 @@ function hvTai(tuan){
       hvBao('#hvMsg','Không tải được lịch, thử lại giúp mình.');
       return;
     }
-    HV.tuan = r.tuan;
-    HV.nhac = r.nhacTruoc || HV.nhac;
-    HV.toiDa = Number(r.toiDa || 0);
-    HV.daDat = Number(r.daDat || 0);
-    if (r.ca && r.ca.length) HV_CA = r.ca;
-    if (r.vaitro && r.vaitro !== HV.vaitro){   // Toàn vừa đổi vai → đổi luôn giao diện
-      HV.vaitro = r.vaitro; hvLuuPhien(); hvVaoTrong();
-    }
-    if (r.ten){ HV.ten = r.ten; $('#hvWho').innerHTML = 'Chào <b>'+esc(r.ten)+'</b>'; }
-    if (laMentor()) hvVeMentor(r); else hvVeHocVien(r);
+    hvNhan(r);
   }).catch(function(){
     $('#hvNgays').innerHTML = '';
     hvBao('#hvMsg','Không nối được máy chủ.');
   });
+}
+
+/**
+ * Nhận một gói lịch tuần rồi vẽ lại màn hình.
+ * Đặt / huỷ / mở ca đều trả kèm gói này trong cùng lượt trả lời, nên bấm
+ * xong là thấy ngay — không phải gọi máy chủ thêm lần nữa chỉ để tải lại.
+ */
+function hvNhan(r){
+  hvBoCho();
+  $('#hvTQ').style.display = 'none';
+  $('#hvNgays').style.display = '';
+  HV.tuan = r.tuan;
+  HV.nhac = r.nhacTruoc || HV.nhac;
+  HV.toiDa = Number(r.toiDa || 0);
+  HV.daDat = Number(r.daDat || 0);
+  if (r.ca && r.ca.length) HV_CA = r.ca;
+  if (r.vaitro && r.vaitro !== HV.vaitro){   // Toàn vừa đổi vai → đổi luôn giao diện
+    HV.vaitro = r.vaitro; hvLuuPhien(); hvVaoTrong();
+  }
+  if (r.ten){ HV.ten = r.ten; $('#hvWho').innerHTML = 'Chào <b>'+esc(r.ten)+'</b>'; }
+  if (laMentor()) hvVeMentor(r); else hvVeHocVien(r);
+}
+
+/** Máy chủ có gửi kèm lịch mới thì vẽ luôn, không thì mới đi tải lại. */
+function hvSau(r){
+  if (r && r.lich) hvNhan(r.lich); else hvTai(HV.tuan);
 }
 
 function hvKhungTuan(r){
@@ -3026,7 +3044,7 @@ function hvDat(id){
       hvBao('#hvMsg','Tuần này bạn giữ đủ <b>'+r.toiDa+' ca</b> rồi — để dành chỗ cho các bạn khác nữa. '+
                      'Muốn đổi thì huỷ một buổi ở trên rồi đặt lại nhé.');
     else hvLoi('#hvMsg', r, 'Không đặt được, thử lại giúp mình.');
-    hvTai(HV.tuan);
+    hvSau(r);
   }).catch(function(){ hvBao('#hvMsg','Không nối được máy chủ.'); hvTai(HV.tuan) });
 }
 
@@ -3065,7 +3083,7 @@ function hvHuy(id){
   hvGoi('hv_cancel', {token:HV.token, slotId:id}).then(function(r){
     if (r && r.ok) hvBao('#hvMsg','Đã huỷ. Bot cũng nhận được thông báo rồi.', true);
     else hvLoi('#hvMsg', r, 'Không huỷ được, thử lại giúp mình.');
-    hvTai(HV.tuan);
+    hvSau(r);
   }).catch(function(){ hvBao('#hvMsg','Không nối được máy chủ.'); hvTai(HV.tuan) });
 }
 
@@ -3079,7 +3097,7 @@ function hvMoCa(d){
       ? '✅ Đã mở ca — học viên thấy và đặt được ngay.'
       : 'Đã đóng ca này.', true);
     else hvLoi('#hvMsg', r, 'Không đổi được ca, thử lại giúp mình.');
-    hvTai(HV.tuan);
+    hvSau(r);
   }).catch(function(){ hvBao('#hvMsg','Không nối được máy chủ.'); hvTai(HV.tuan) });
 }
 
@@ -3124,7 +3142,7 @@ function hvGoCa(id){
   hvGoi('hv_xoa_ca', {token:HV.token, slotId:id}).then(function(r){
     if (r && r.ok) hvBao('#hvMsg','Đã gỡ ca khỏi lịch.', true);
     else hvLoi('#hvMsg', r, 'Không gỡ được ca.');
-    hvTai(HV.tuan);
+    hvSau(r);
   }).catch(function(){ hvBao('#hvMsg','Không nối được máy chủ.'); hvTai(HV.tuan) });
 }
 
