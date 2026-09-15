@@ -335,7 +335,8 @@ function doPost(e){
     if (body.action === 'register') return handleRegister(body);
 
     // Khu học viên: đăng nhập / xem lịch / đặt / hủy  (xem Lich.gs)
-    if (String(body.action||'').indexOf('hv_') === 0) return jsonOut(lichApi(body));
+    // lichApi đã tự đóng gói JSON rồi — bọc thêm jsonOut là ra chuỗi rỗng
+    if (String(body.action||'').indexOf('hv_') === 0) return lichApi(body);
 
 
     return jsonOut({ok:false, error:'unknown_action'});

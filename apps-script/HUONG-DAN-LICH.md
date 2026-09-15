@@ -138,6 +138,25 @@ trở lại bình thường.
 
 Mentor chỉ thấy ca của chính mình. Ca của mentor khác không hiện.
 
+## 6a. Tổng quan lớp — mentor nhìn chung một bức tranh
+
+Trên đầu khu mentor có hai tab: **Lịch của tôi** và **Tổng quan lớp**. Tab
+tổng quan cho mọi mentor thấy:
+
+* **Bốn con số** của tuần đang xem: ca còn trống (kèm số mentor đang mở ca),
+  ca đã có người đặt, học viên đã đặt / tổng học viên (kèm số bạn chưa đặt),
+  và hạn mức ca mỗi tuần.
+* **Lịch cả lớp** theo ngày — mỗi ca ghi rõ tên mentor; ca đã đặt tô tối và
+  ghi thêm tên học viên. Ca của chính mình có viền xanh để nhận ra ngay.
+* **Mentor tuần này** — ai mở mấy ca, mấy ca đã có người. Mentor đã duyệt mà
+  chưa mở ca nào cũng hiện, để biết ai đang vắng.
+* **Học viên tuần này** — từng bạn đã đặt mấy ca; bạn **chưa đặt buổi nào**
+  xếp lên đầu và gắn nhãn *chưa đặt*, để mentor chủ động nhắn.
+
+Lật tuần bằng hai nút mũi tên như bình thường. Học viên không thấy tab này.
+API tương ứng là `hv_tongquan`, chỉ tài khoản mentor gọi được; phản hồi không
+chứa hash/salt hay token của ai.
+
 ## 6b. Giới hạn mỗi học viên
 
 Mặc định mỗi học viên chỉ giữ được **2 ca một tuần**, để còn chỗ cho người
