@@ -2544,7 +2544,8 @@ function hvGiaLapTongQuan(d){
     .sort(function(a,c){ return a.daDat - c.daDat });
   var hvDaDat = hocvien.filter(function(x){ return x.daDat>0 }).length;
   return {ok:true, tuan:dau, ngays:ngays, mentors:mentors, hocvien:hocvien, toiDa:HV_DEMO_TOIDA,
-    tong:{mentor:mentors.length, caMo:caMo, caDat:caDat, hvTong:hocvien.length,
+    tong:{mentor:mentors.length, mentorMoCa:mentors.filter(function(m){return m.mo>0}).length,
+          caMo:caMo, caDat:caDat, hvTong:hocvien.length,
           hvDaDat:hvDaDat, hvChua:hocvien.length-hvDaDat}};
 }
 
@@ -2933,7 +2934,8 @@ function hvVeTongQuan(r){
   var pctHV  = t.hvTong ? Math.round(t.hvDaDat*100/t.hvTong) : 0;
   h += '<div class="tq-so">'+
     '<div class="tq-o"><span class="ic">🗓</span><b>'+(t.caMo||0)+'</b>'+
-      '<span>ca còn trống</span><small class="ghi">'+(t.mentor||0)+' mentor đang mở ca</small></div>'+
+      '<span>ca còn trống</span><small class="ghi">'+
+      (t.mentorMoCa||0)+'/'+(t.mentor||0)+' mentor đang mở ca</small></div>'+
     '<div class="tq-o"><span class="ic">🔒</span><b>'+(t.caDat||0)+'<small> /'+caTong+'</small></b>'+
       '<span>ca đã có người đặt</span>'+
       '<div class="tq-do"><i style="width:'+pctDat+'%"></i></div>'+
