@@ -334,6 +334,10 @@ function doPost(e){
 
     if (body.action === 'register') return handleRegister(body);
 
+    // Khu học viên: đăng nhập / xem lịch / đặt / hủy  (xem Lich.gs)
+    if (String(body.action||'').indexOf('hv_') === 0) return jsonOut(lichApi(body));
+
+
     return jsonOut({ok:false, error:'unknown_action'});
   }catch(err){
     ghiLoi('doPost', err);
@@ -478,6 +482,9 @@ function handleTelegram(update){
       'Muốn đổi giá / duyệt học viên thì nhắn riêng cho bot nhé.');
     return;
   }
+  // Lệnh của khu lịch mentor (Lich.gs) — tách riêng cho gọn
+  if (quanTri && lichCoLenh(cmd)) return lichLenh(cmd, arg, chatId, msg);
+
   var cfg = getConfig();
 
   if (cmd==='huy' || cmd==='cancel'){
@@ -529,6 +536,15 @@ function handleTelegram(update){
         '*✅ Duyệt học viên*',
         '✅ /duyet `AB12` — duyệt (hoặc bấm nút trên tin báo)',
         '❌ /tuchoi `AB12` — từ chối','',
+        '*🎓 Khu học viên & lịch kèm 1:1*',
+        '_Mọi người tự đăng ký trên web; bot chỉ phân vai._',
+        '👥 /dstk — tài khoản: chờ duyệt · mentor · học viên',
+        '🎚 /vaitro `mail mentor` — đổi vai (`hv` hoặc `mentor`)',
+        '🗑 /xoatk `mail` — xoá tài khoản',
+        '🔒 /doimk `mail` — cấp lại mật khẩu',
+        '📆 /lichtuan — lịch cả tuần, ai mở ca, ai đã đặt',
+        '⏰ /nhactruoc `6` — nhắc trước mấy tiếng',
+        '🎫 /toida `2` — mỗi học viên tối đa mấy ca một tuần (`0` = bỏ giới hạn)','',
         '*🖼 Đồ họa*',
         '🖼 /nen `Minh Toàn` — bot vẽ nền gọi Teams rồi gửi file (thêm `| toi` cho nền tối)','',
         '*⚙️ Khác*',
@@ -724,6 +740,9 @@ function handleTelegram(update){
 function handleCallback(cb){
   var chatId = cb.message && cb.message.chat && cb.message.chat.id;
   if (!isAdmin(chatId)) return tgAnswer(cb.id, 'Không có quyền');
+
+  // Nút của khu lịch mentor (Lich.gs) đều mang tiền tố "l:"
+  if (String(cb.data||'').indexOf('l:') === 0) return lichCallback(cb);
 
   var p = String(cb.data||'').split(':');
   var act = p[0], ma = p[1];
@@ -953,6 +972,9 @@ function setup(){
   sheet();
   out.push('✔ Sheet "'+SHEET_NAME+'" sẵn sàng: '+ss().getUrl());
 
+  try{ out.push('✔ '+lichSetup()); }
+  catch(err){ out.push('✘ Không dựng được khu lịch mentor: '+err); }
+
   var me = tgApi('getMe', {});
   if (!me || !me.ok){
     out.push('✘ Token không hợp lệ — kiểm tra lại với @BotFather rồi chạy lại setup');
@@ -981,6 +1003,13 @@ function setup(){
     {command:'duyet',      description:'✅ Duyệt — /duyet AB12'},
     {command:'tuchoi',     description:'❌ Từ chối — /tuchoi AB12'},
     {command:'nen',        description:'🖼 Vẽ nền Teams — /nen Minh Toàn'},
+    {command:'lichtuan',   description:'📆 Lịch kèm 1:1 cả tuần + ai đã đặt'},
+    {command:'dstk',       description:'👥 Tài khoản: chờ duyệt · mentor · học viên'},
+    {command:'vaitro',     description:'🎚 Phân vai — /vaitro mail mentor'},
+    {command:'xoatk',      description:'🗑 Xoá tài khoản — /xoatk mail'},
+    {command:'doimk',      description:'🔒 Cấp lại mật khẩu — /doimk mail'},
+    {command:'nhactruoc',  description:'⏰ Nhắc trước mấy tiếng — /nhactruoc 6'},
+    {command:'toida',      description:'🎫 Mỗi HV tối đa mấy ca/tuần — /toida 2'},
     {command:'huy',        description:'👌 Hủy câu hỏi đang chờ'},
     {command:'sheet',      description:'📄 Link Google Sheet'},
     {command:'menu',       description:'⚙️ Danh sách đầy đủ lệnh'}

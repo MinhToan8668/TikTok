@@ -283,6 +283,74 @@ nav.stuck{border-bottom-color:var(--line);background:rgba(249,232,221,.96)}
 .stop li::before{content:'—';color:var(--lime);flex-shrink:0}
 .stop .hand{margin-top:16px;display:inline-block;font-size:14px;color:var(--lime);transform:rotate(-1deg)}
 
+/* ═══════════ DẠNG VIDEO ═══════════ */
+.dangs{display:grid;grid-template-columns:repeat(2,1fr);gap:clamp(16px,2.4vw,24px)}
+.dang{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r);
+  padding:clamp(22px,3vw,30px);display:flex;flex-direction:column;gap:15px;
+  transition:transform .25s var(--ease),box-shadow .25s}
+.dang:hover{transform:translateY(-3px);box-shadow:0 20px 45px -28px rgba(80,60,35,.4)}
+.dang-top{display:flex;align-items:center;gap:11px;flex-wrap:wrap}
+.dang-n{font-family:var(--hand);font-style:italic;font-size:21px;color:var(--lime-deep);
+  transform:rotate(-4deg)}
+.dang h3{font-size:clamp(18px,2.1vw,21px);font-weight:800;line-height:1.2;flex:1;min-width:0}
+.dang-ai{font-size:11.5px;color:var(--quiet);border:1.5px solid var(--line-dk);
+  border-radius:999px;padding:4px 12px;line-height:1.35}
+.dang-lb{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint);
+  font-family:var(--disp);font-weight:700;margin-bottom:7px;display:block}
+.dang ul{list-style:none;display:grid;gap:7px}
+.dang li{font-size:13.5px;line-height:1.6;color:var(--quiet);position:relative;padding-left:16px}
+.dang li::before{content:'·';color:var(--lime-deep);font-weight:800;
+  position:absolute;left:4px;top:0}
+.dang li b{color:var(--ink);font-weight:600}
+.dang-khung{background:var(--paper);border-radius:var(--r-sm);padding:14px 16px;
+  font-size:13px;line-height:1.75;color:var(--ink-soft)}
+.dang-khung b{color:var(--lime-deep);font-weight:700}
+.dang-loi{font-size:12.5px;line-height:1.65;color:var(--quiet);
+  border-left:2.5px solid var(--red);padding-left:13px}
+.dang-loi b{color:var(--red);font-weight:700}
+/* ba điều đúng cho cả năm dạng */
+.chung{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(14px,2vw,20px);
+  margin-bottom:clamp(28px,4vw,40px)}
+.chung-o{background:var(--moss);color:#c8cfb4;border-radius:var(--r);
+  padding:clamp(20px,2.6vw,26px)}
+.chung-n{font-family:var(--hand);font-style:italic;font-size:13px;color:var(--lime);
+  display:block;margin-bottom:9px}
+.chung-o h4{font-size:16px;font-weight:800;color:var(--paper-lt);
+  margin-bottom:8px;line-height:1.3}
+.chung-o p{font-size:13px;line-height:1.7}
+.chung-o b{color:var(--lime);font-weight:700}
+@media(max-width:900px){.chung{grid-template-columns:1fr}}
+.dang-xem{margin-top:auto;align-self:flex-start;font-size:13px;font-weight:700;
+  font-family:var(--disp);color:var(--ink);text-decoration:none;padding-bottom:2px;
+  border-bottom:2.5px solid var(--lime);transition:color .2s}
+.dang-xem:hover{color:var(--lime-deep)}
+.dangs-note{text-align:center;margin-top:clamp(26px,4vw,38px);font-family:var(--hand);
+  font-style:italic;font-size:15px;color:var(--lime-deep)}
+
+/* ═══════════ TRONG GÓI CÓ GÌ ═══════════ */
+.goi{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(16px,2.2vw,24px);
+  align-items:start}
+.goi-cot{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r);
+  padding:clamp(22px,3vw,30px);height:100%}
+.goi-cot.em{border:2px solid var(--lime-deep);background:var(--lime-wash);position:relative}
+.goi-cot.em::before{content:'phần đắt nhất';position:absolute;top:-12px;left:24px;
+  font-family:var(--hand);font-style:italic;font-size:12px;color:#1c2600;
+  background:var(--lime);padding:4px 13px;border-radius:3px;transform:rotate(-1.5deg)}
+.goi-ic{font-size:23px;line-height:1;margin-bottom:12px;display:block}
+.goi-cot h3{font-size:17.5px;font-weight:800;margin-bottom:5px;line-height:1.25}
+.goi-sub{font-size:12.5px;color:var(--quiet);margin-bottom:17px;line-height:1.55}
+.goi-list{list-style:none;display:grid;gap:12px}
+.goi-list li{font-size:13.5px;line-height:1.6;color:var(--ink-soft);
+  position:relative;padding-left:22px}
+.goi-list li::before{content:'✓';color:var(--lime-deep);font-weight:800;
+  position:absolute;left:0;top:0}
+.goi-list b{color:var(--ink);font-weight:600}
+.goi-neo{margin-top:clamp(26px,4vw,38px);background:var(--moss);color:#c8cfb4;
+  border-radius:var(--r);padding:clamp(24px,3.5vw,36px);text-align:center}
+.goi-neo p{font-size:clamp(15px,1.8vw,17.5px);line-height:1.75;max-width:60ch;margin:0 auto}
+.goi-neo b{color:var(--lime);font-weight:700}
+.goi-neo .hand{display:block;margin-top:14px;font-size:15px;color:var(--lime)}
+
 /* ═══════════ MENTORS ═══════════ */
 .duo{display:grid;grid-template-columns:1fr 1fr;gap:clamp(20px,3vw,32px)}
 .person{position:relative;padding:clamp(26px,3.5vw,38px);background:var(--card);
@@ -490,6 +558,149 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 .zalo-box p{font-size:13px;color:var(--quiet);margin-bottom:16px}
 .zalo-box .btn{width:100%}
 
+/* ═══════════ KHU HỌC VIÊN ═══════════ */
+#khuhv{display:none;min-height:100vh;background:var(--paper)}
+#khuhv.on{display:block}
+body.hv-mode{padding-bottom:0}
+.hv-bar{position:sticky;top:0;z-index:50;background:rgba(249,232,221,.96);
+  backdrop-filter:blur(14px);border-bottom:1.5px solid var(--line)}
+.hv-bar-in{display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding-top:14px;padding-bottom:14px;flex-wrap:wrap}
+.hv-brand{display:flex;align-items:center;gap:9px;font-family:var(--disp)}
+.hv-brand b{font-weight:800;font-size:16px;color:var(--ink);letter-spacing:-.02em}
+.hv-brand span{font-family:var(--hand);font-style:italic;font-size:12.5px;color:var(--lime-deep)}
+.hv-bar-act{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.hv-who{font-size:13px;color:var(--quiet)}
+.hv-who b{color:var(--ink);font-weight:600}
+.hv-wrap{padding-block:clamp(28px,5vw,56px) clamp(60px,8vw,90px)}
+.hv-head{margin-bottom:clamp(22px,3.5vw,34px)}
+.hv-head h1{font-size:clamp(26px,3.6vw,40px);font-weight:800;letter-spacing:-.03em;
+  line-height:1.08;margin-bottom:10px}
+.hv-head p{color:var(--quiet);font-size:15px;line-height:1.75;max-width:58ch}
+
+/* đăng nhập */
+.hv-login{max-width:420px;margin:0 auto;background:var(--card);
+  border:1.5px solid var(--line-dk);border-radius:var(--r);
+  padding:clamp(26px,4vw,38px);box-shadow:0 24px 60px -32px rgba(80,60,35,.35)}
+.hv-login h2{font-size:22px;font-weight:800;margin-bottom:7px}
+.hv-login .sub{font-size:13.5px;color:var(--quiet);line-height:1.65;margin-bottom:22px}
+.hv-login .fields{gap:14px}
+.hv-login .btn{width:100%;margin-top:20px}
+.hv-note{font-size:12px;color:var(--faint);text-align:center;margin-top:14px;line-height:1.6}
+/* hai tab: đăng nhập · đăng ký */
+.hv-tab{display:flex;gap:6px;background:var(--paper);border:1.5px solid var(--line);
+  border-radius:999px;padding:4px;margin-bottom:22px}
+.hv-tab button{flex:1;border-radius:999px;padding:9px 8px;font-size:13.5px;font-weight:700;
+  font-family:var(--disp);color:var(--quiet);transition:.18s}
+.hv-tab button.on{background:var(--ink);color:var(--paper-lt)}
+.hv-cho{background:var(--lime-wash);border:1.5px solid var(--lime-deep);
+  border-radius:var(--r-sm);padding:16px 18px;font-size:13.5px;line-height:1.7;
+  color:var(--ink-soft);margin-top:18px}
+.hv-cho b{color:var(--lime-deep);font-weight:700}
+
+/* ca của mentor — ba trạng thái: chưa mở · đang mở · có người đặt */
+.hv-ca.mo{background:var(--lime);border-color:var(--lime-deep);color:#1c2600}
+.hv-ca.mo b{color:#1c2600}
+.hv-ca.khoa{background:var(--moss);border-color:var(--moss);color:#c8cfb4;cursor:default}
+.hv-ca.khoa b{color:var(--lime)}
+.hv-ca.khoa:hover{transform:none}
+.hv-them{border:1.5px dashed var(--line-dk);border-radius:999px;padding:9px 15px;
+  font-size:13px;color:var(--quiet);background:transparent;transition:.18s}
+.hv-them:hover{border-color:var(--lime-deep);color:var(--lime-deep)}
+/* ô nhập giờ tại chỗ — thay cho prompt, cũng bị chặn khi nhúng */
+.hv-gio{display:flex;align-items:center;gap:7px;flex-wrap:wrap;
+  background:var(--paper);border:1.5px dashed var(--lime-deep);border-radius:var(--r-sm);
+  padding:8px 11px}
+.hv-gio input{border:1.5px solid var(--line-dk);border-radius:9px;padding:6px 9px;
+  font-family:inherit;font-size:14px;color:var(--ink);background:var(--card);
+  outline:none;width:132px}   /* đủ rộng cho cả máy hiện giờ kiểu 7:30 PM */
+.hv-gio input:focus{border-color:var(--lime-deep);box-shadow:0 0 0 3px var(--lime-wash)}
+.hv-gio span{font-size:13px;color:var(--quiet)}
+.hv-gio button{border-radius:999px;padding:7px 14px;font-size:13px;font-weight:700;
+  font-family:var(--disp)}
+.hv-gio .luu{background:var(--lime);color:#1c2600}
+.hv-gio .bo{border:1.5px solid var(--line-dk);color:var(--quiet)}
+.hv-han{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  flex-wrap:wrap;background:var(--card);border:1.5px solid var(--line);
+  border-radius:var(--r-sm);padding:12px 16px;margin-bottom:14px;font-size:13.5px;
+  color:var(--quiet);line-height:1.5}
+.hv-han b{font-family:var(--disp);color:var(--ink);font-weight:800}
+.hv-han.het{border-color:var(--gold);background:rgba(201,138,30,.08)}
+.hv-han.het b{color:var(--gold)}
+.hv-cham{display:flex;align-items:center;gap:5px;flex:none}
+.hv-cham i{flex:none;width:10px;height:10px;border-radius:50%;background:var(--paper-dk);
+  border:1.5px solid var(--line-dk);display:block}
+.hv-cham i.xong{background:var(--lime);border-color:var(--lime-deep)}
+.hv-chu{font-size:12.5px;color:var(--faint);margin-top:16px;line-height:1.7}
+.hv-chu b{color:var(--ink-soft);font-weight:600}
+.hv-vai{font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;
+  font-family:var(--disp);color:var(--lime-deep);background:var(--lime-wash);
+  border:1.5px solid var(--lime-deep);border-radius:999px;padding:3px 10px}
+
+/* tuần */
+.hv-tuan{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-sm);
+  padding:11px 14px;margin-bottom:18px}
+.hv-tuan b{font-family:var(--disp);font-size:14.5px;color:var(--ink);font-weight:800}
+.hv-nut{border:1.5px solid var(--line-dk);border-radius:10px;padding:8px 13px;
+  font-size:13px;font-weight:600;color:var(--ink-soft);background:var(--paper-lt);
+  transition:.18s;white-space:nowrap}
+.hv-nut:hover:not([disabled]){border-color:var(--lime-deep);color:var(--lime-deep)}
+.hv-nut[disabled]{opacity:.4;pointer-events:none}
+
+/* ngày + ca */
+.hv-ngays{display:grid;gap:10px}
+.hv-ngay{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-sm);
+  padding:15px 17px;display:grid;grid-template-columns:96px 1fr;gap:16px;align-items:start}
+.hv-ngay.qua{opacity:.5}
+.hv-ngay.homnay{border-color:var(--lime-deep);background:var(--lime-wash)}
+.hv-d{font-family:var(--disp);line-height:1.25}
+.hv-d b{display:block;font-size:15px;font-weight:800;color:var(--ink)}
+.hv-d span{font-size:12px;color:var(--quiet)}
+.hv-d i{font-style:normal;font-family:var(--hand);font-style:italic;font-size:12px;
+  color:var(--lime-deep);display:block;margin-top:2px}
+.hv-cas{display:flex;flex-wrap:wrap;gap:8px}
+.hv-trong{font-size:13px;color:var(--faint);padding:6px 0}
+.hv-ca{border:1.5px solid var(--line-dk);border-radius:999px;padding:9px 15px;
+  font-size:13px;line-height:1.3;background:var(--paper-lt);color:var(--ink-soft);
+  transition:.18s;text-align:left}
+.hv-ca:hover:not([disabled]){border-color:var(--lime-deep);background:var(--lime-wash);
+  transform:translateY(-1px)}
+.hv-ca b{font-weight:700;color:var(--ink)}
+.hv-ca em{font-style:normal;color:var(--quiet);font-size:12px}
+.hv-ca.cua-toi{background:var(--lime);border-color:var(--lime-deep);color:#1c2600}
+.hv-ca.cua-toi b,.hv-ca.cua-toi em{color:#1c2600}
+.hv-ca[disabled]{opacity:.45;pointer-events:none}
+/* bấm lần nữa để xác nhận — thay cho hộp thoại confirm, vốn bị chặn khi trang nhúng.
+   Đặt sau .cua-toi / .mo / .khoa để đè được màu của mấy trạng thái đó. */
+.hv-ca.chac,.hv-ca.chac:hover{background:var(--red);border-color:var(--red);color:#fff;
+  animation:hvNhac .9s ease-in-out infinite}
+.hv-ca.chac b,.hv-ca.chac em{color:#fff}
+@keyframes hvNhac{0%,100%{opacity:1}50%{opacity:.72}}
+
+/* lịch của tôi */
+.hv-cua-toi{background:var(--moss);color:#c8cfb4;border-radius:var(--r);
+  padding:clamp(20px,3vw,26px);margin-bottom:22px}
+.hv-cua-toi h3{color:var(--paper-lt);font-size:16px;font-weight:800;margin-bottom:13px}
+.hv-mine{display:grid;gap:9px}
+.hv-mine div{display:flex;justify-content:space-between;gap:14px;font-size:13.5px;
+  padding-bottom:9px;border-bottom:1px solid var(--moss-line);flex-wrap:wrap}
+.hv-mine div:last-child{border-bottom:none;padding-bottom:0}
+.hv-mine b{color:var(--lime);font-weight:700}
+.hv-msg{display:none;margin-top:14px;padding:12px 15px;border-radius:var(--r-sm);
+  font-size:13.5px;line-height:1.55}
+.hv-msg.on{display:block}
+.hv-msg.bad{background:rgba(196,69,54,.08);border:1px solid rgba(196,69,54,.3);color:var(--red)}
+.hv-msg.good{background:var(--lime-wash);border:1px solid var(--lime-deep);color:var(--lime-deep)}
+.hv-demo{background:var(--gold);color:#2b1f05;font-size:12.5px;font-weight:600;
+  text-align:center;padding:8px 14px;line-height:1.5}
+@media(max-width:560px){
+  .hv-ngay{grid-template-columns:1fr;gap:10px}
+  .hv-d{display:flex;align-items:baseline;gap:9px}
+  .hv-d i{margin-top:0}
+  .hv-ca{flex:1 1 100%}
+}
+
 /* ═══════════ ADMIN (chỉ xem) ═══════════ */
 #admin{display:none;position:fixed;inset:0;z-index:300;background:var(--paper);overflow-y:auto;padding:32px 16px}
 .adm-in{max-width:940px;margin:0 auto}
@@ -614,6 +825,11 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
   .grad-shot{max-width:300px;margin:0 auto}
   .grad:first-child,.grad:last-child{transform:none}
 }
+@media(max-width:900px){
+  .dangs{grid-template-columns:1fr}
+  .goi{grid-template-columns:1fr}
+  .goi-cot.em::before{left:18px}
+}
 @media(max-width:700px){
   .duo{grid-template-columns:1fr}
   .person:first-child,.person:last-child{transform:none}
@@ -659,6 +875,7 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
       <button class="nav-link" data-go="letter">Thư ngỏ</button>
       <button class="nav-link" data-go="tuan">Một tuần trong lớp</button>
       <button class="nav-link" data-go="lotrinh">Lộ trình</button>
+      <button class="nav-link" data-go="cogi">Nhận được gì</button>
       <button class="nav-link" data-go="mentors">Người dạy</button>
       <button class="nav-link" data-go="ketqua">Học viên cũ</button>
       <button class="nav-link" data-go="hocphi">Học phí</button>
@@ -666,6 +883,7 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
     </div>
     <div class="nav-cta">
       <div class="nav-slots"><span class="dot"></span>còn <b data-bind="computed.remaining">—</b> chỗ</div>
+      <button class="btn btn-line btn-sm" data-hv-mo>Khu học viên</button>
       <button class="btn btn-ink btn-sm" data-open>Giữ chỗ</button>
       <button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
     </div>
@@ -674,10 +892,13 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
     <a href="#letter">Thư ngỏ</a>
     <a href="#tuan">Một tuần trong lớp</a>
     <a href="#lotrinh">Lộ trình 30 ngày</a>
+    <a href="#dangvideo">5 dạng video</a>
+    <a href="#cogi">Nhận được gì</a>
     <a href="#mentors">Người dạy</a>
     <a href="#ketqua">Học viên cũ</a>
     <a href="#hocphi">Học phí</a>
     <a href="#faq">Hỏi đáp</a>
+    <button class="btn btn-line btn-md" data-hv-mo style="margin-top:18px">Khu học viên →</button>
     <button class="btn btn-ink btn-md" data-open>Đăng ký giữ chỗ →</button>
   </div>
 </nav>
@@ -699,6 +920,7 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
       <div class="hero-chips rv">
         <span class="hero-chip" data-tpl="🎓 {{schedule.sessions}} buổi live · {{computed.scheduleShort}}"></span>
         <span class="hero-chip">✂️ Edit kèm 1:1 các tối trong tuần</span>
+        <span class="hero-chip">🧰 Bộ kịch bản + hướng dẫn quay 5 dạng video</span>
         <span class="hero-chip" data-tpl="🪑 Lớp tối đa {{slots.max}} người"></span>
       </div>
     </div>
@@ -885,6 +1107,120 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
   </div>
 </div></section>
 
+<!-- ════════ 5 DẠNG VIDEO ════════ -->
+<section class="sec" id="dangvideo"><div class="shell">
+  <div class="sec-head rv">
+    <span class="kicker">có sẵn trong gói, phát ngay buổi đầu</span>
+    <h2 class="h2">Năm dạng video,<br>quay <em>kiểu gì cho đúng?</em></h2>
+    <p class="lead">Mỗi dạng tụi mình đưa bạn ba thứ: cách đặt máy và lấy sáng bằng đúng cái điện thoại đang có, khung kịch bản có mốc giây điền vào là ra bài, và video mẫu để coi trước khi bấm quay. Kèm cả lỗi hay gặp nhất của dạng đó — biết trước thì khỏi mất một buổi quay. Dưới đây là bản rút gọn.</p>
+  </div>
+
+  <div class="chung rv">
+    <div class="chung-o">
+      <span class="chung-n">đúng cho mọi dạng · 01</span>
+      <h4>Ba giây đầu quyết định cả video</h4>
+      <p>Khoảng <b>7 trên 10 người xem</b> quyết định lướt hay ở lại ngay trong 3 giây đầu. Muốn TikTok đẩy đi xa, video cần giữ được tầm <b>70% người xem qua giây thứ 3</b>, 60% ở giây 15, 50% ở giây 30. Nên bỏ hết chào hỏi, logo, intro chậm — vào thẳng phần đắt nhất.</p>
+    </div>
+    <div class="chung-o">
+      <span class="chung-n">đúng cho mọi dạng · 02</span>
+      <h4>Quay 1080p 30fps, đừng quay 4K</h4>
+      <p>TikTok nén về 1080p hết, quay 4K chỉ làm file nặng chứ lên hình không đẹp hơn. Dùng <b>camera sau</b> (nét hơn camera trước), <b>chạm giữ vào mặt để khoá nét và khoá sáng</b> trước khi bấm quay. Lúc đăng nhớ bật "cho phép tải lên chất lượng cao" và đăng khi đang có wifi.</p>
+    </div>
+    <div class="chung-o">
+      <span class="chung-n">đúng cho mọi dạng · 03</span>
+      <h4>Không có phụ đề là mất một nửa người xem</h4>
+      <p>Phần lớn người lướt TikTok <b>để tắt tiếng</b> — trong lớp, trên xe, chỗ đông người. Video có phụ đề tăng thời lượng xem <b>12–40%</b>. Trước khi đăng, tắt tiếng coi lại một lượt: nếu không hiểu video nói gì thì chưa đăng được.</p>
+    </div>
+  </div>
+
+  <div class="dangs">
+
+    <article class="dang rv">
+      <div class="dang-top"><span class="dang-n">01</span><h3>Talking head</h3>
+        <span class="dang-ai">hợp với người có chuyên môn</span></div>
+      <div><span class="dang-lb">Quay thế nào</span>
+        <ul>
+          <li>Máy <b>ngang tầm mắt</b>, chừa trống khoảng một đốt ngón tay phía trên đầu, cách mặt 60–80cm</li>
+          <li>Ngồi <b>cách tường ít nhất một mét</b> — sát tường là đổ bóng cứng sau gáy, nhìn rất nghiệp dư</li>
+          <li>Sáng: quay mặt về phía cửa sổ. Có đèn ring thì <b>hất chéo 45°</b>, để chính diện là mặt bẹt như ảnh thẻ</li>
+          <li>Tiếng quan trọng hơn hình — phòng vang thì cắm tai nghe có dây, mic cách miệng chừng một gang tay</li>
+        </ul></div>
+      <div class="dang-khung"><b>Khung:</b> <b>0–3s</b> chốt luôn kết luận, không rào đón →
+        <b>3–15s</b> vì sao lại vậy → <b>15–40s</b> một ví dụ có thật của chính bạn →
+        <b>5s cuối</b> hỏi ngược người xem để kéo bình luận</div>
+      <div class="dang-loi"><b>Lỗi hay gặp:</b> để điện thoại thấp hơn mặt. Lên hình thành cằm to, mắt nhìn xuống — người xem thấy kẻ cả dù bạn không hề có ý đó.</div>
+      <a class="dang-xem" href="" target="_blank" rel="noopener">Xem video mẫu →</a>
+    </article>
+
+    <article class="dang rv">
+      <div class="dang-top"><span class="dang-n">02</span><h3>Vlog đời thường</h3>
+        <span class="dang-ai">hợp với người ngại nói thẳng vào cam</span></div>
+      <div><span class="dang-lb">Quay thế nào</span>
+        <ul>
+          <li>Học đúng một chuỗi: <b>rộng → trung → cận</b>. Rộng cho biết đang ở đâu, trung cho biết đang làm gì, cận cho thấy bàn tay hoặc chi tiết. Ba cảnh này ghép lại là xong một đoạn</li>
+          <li>Tới chỗ mới thì <b>quay cảnh rộng trước đã</b> — người xem cần biết bối cảnh rồi mới quan tâm chi tiết</li>
+          <li>Mỗi cảnh bấm quay <b>8–10 giây dù chỉ định dùng 2–3 giây</b>, dư đầu dư cuối mới cắt vào đúng nhịp được</li>
+          <li>Vừa đi vừa quay thì chùng gối, hai tay ôm máy sát ngực, mắt nhìn thẳng — đừng lia máy trong lúc đang bước</li>
+        </ul></div>
+      <div class="dang-khung"><b>Khung:</b> mở bằng cảnh đắt nhất trong ngày (đừng mở bằng cảnh ngủ dậy)
+        → trình tự việc → một khoảnh khắc thật, kể cả lúc hỏng → chốt bằng cảm nghĩ ngắn</div>
+      <div class="dang-loi"><b>Lỗi hay gặp:</b> quay một cảnh dài ba phút rồi tính về cắt. Không có cảnh khác để cắt sang thì video đứng hình, người xem lướt ở giây thứ tám.</div>
+      <a class="dang-xem" href="" target="_blank" rel="noopener">Xem video mẫu →</a>
+    </article>
+
+    <article class="dang rv">
+      <div class="dang-top"><span class="dang-n">03</span><h3>POV một ngày</h3>
+        <span class="dang-ai">hợp với nghề lạ, lịch sinh hoạt có nhịp</span></div>
+      <div><span class="dang-lb">Quay thế nào</span>
+        <ul>
+          <li>Trước khi quay, <b>viết ra 5–6 mốc</b> trong ngày rồi chỉ quay đúng mấy mốc đó. Quay bừa rồi mới ngồi nghĩ là cách nhanh nhất để bỏ cả buổi</li>
+          <li>Mỗi mốc <b>ghi giờ lên màn hình</b> — người xem bám được nhịp nên ở lại lâu hơn hẳn</li>
+          <li>Vài cảnh lặp lại hằng ngày (pha cà phê, mở máy) thì giữ <b>nguyên một góc cố định</b> suốt cả tuần — lâu dần thành chữ ký của kênh</li>
+          <li>Sau một chuỗi cảnh nhanh thì <b>xen một cảnh chậm</b>. Nhanh đều từ đầu tới cuối thì xem 30 giây là mệt</li>
+        </ul></div>
+      <div class="dang-khung"><b>Khung:</b> giờ dậy → việc căng nhất trong ngày →
+        một chi tiết trong nghề ít ai biết → kết lúc hết ngày, để lại một câu tự hỏi</div>
+      <div class="dang-loi"><b>Lỗi hay gặp:</b> dồn quay cả ngày vào một buổi rồi diễn lại. Ánh sáng không khớp với giờ ghi trên màn — người xem nhận ra ngay và mất luôn niềm tin vào cả kênh.</div>
+      <a class="dang-xem" href="" target="_blank" rel="noopener">Xem video mẫu →</a>
+    </article>
+
+    <article class="dang rv">
+      <div class="dang-top"><span class="dang-n">04</span><h3>Review &amp; mở hộp</h3>
+        <span class="dang-ai">hợp với bán hàng, affiliate</span></div>
+      <div><span class="dang-lb">Quay thế nào</span>
+        <ul>
+          <li>Kẹp máy <b>chiếu thẳng từ trên xuống</b>, quay góc nhìn bàn tay. Người xem thấy như chính tay mình đang mở — tin hơn hẳn góc ngang</li>
+          <li>Sáng phải đủ và mềm: quay cận mà thiếu sáng là <b>vỡ hạt ngay</b>. Đèn đừng dội thẳng vào mặt hộp bóng, hất chéo cho đọc được chữ trên vỏ</li>
+          <li>Quay chi tiết thì <b>lùi máy ra 20–30cm rồi mới zoom</b> — dí sát ống kính là máy rà nét liên tục, xem rất nhức mắt</li>
+          <li>Đủ ba cảnh: <b>tổng thể · cận chi tiết · đang dùng thật</b>. Thiếu cảnh thứ ba là mất tin</li>
+        </ul></div>
+      <div class="dang-khung"><b>Khung:</b> nói điểm dở trước, điểm hay sau →
+        ai nên mua, ai đừng mua → giá và mua ở đâu. Chê trước thì lời khen mới có trọng lượng</div>
+      <div class="dang-loi"><b>Lỗi hay gặp:</b> khen từ đầu tới cuối. Bình luận đầu tiên sẽ là "được trả tiền hả" — và video chết ở đúng bình luận đó.</div>
+      <a class="dang-xem" href="" target="_blank" rel="noopener">Xem video mẫu →</a>
+    </article>
+
+    <article class="dang rv">
+      <div class="dang-top"><span class="dang-n">05</span><h3>Kể chuyện</h3>
+        <span class="dang-ai">dạng dễ viral nhất, ai cũng làm được</span></div>
+      <div><span class="dang-lb">Quay thế nào</span>
+        <ul>
+          <li>Câu đầu phải là <b>chỗ gay cấn nhất và để hở phần kết</b> — người xem phải ở lại mới biết chuyện ra sao. Đó là thứ kéo tỉ lệ xem hết lên</li>
+          <li><b>Đừng kể xuôi theo thời gian.</b> Vào thẳng khúc căng, xong mới quay lại kể bối cảnh — đây là lỗi phổ biến nhất của người mới</li>
+          <li>Quay một mạch từ đầu tới cuối, sai thì <b>làm lại nguyên câu</b>. Chắp vá từng chữ nghe gượng lắm</li>
+          <li>Cứ <b>3–5 giây đổi hình một lần</b>: chèn ảnh chụp màn hình, clip tư liệu, hoặc đổi góc máy. Mắt có cái mới thì tay không lướt</li>
+        </ul></div>
+      <div class="dang-khung"><b>Khung:</b> <b>0–3s</b> thả ngay tình huống gay cấn →
+        <b>4–15s</b> bối cảnh vừa đủ để chuyện có sức nặng → <b>16–45s</b> cao trào →
+        <b>5s cuối</b> bài học rút ra, rồi cắt luôn</div>
+      <div class="dang-loi"><b>Lỗi hay gặp:</b> kết bằng "cảm ơn mọi người đã xem". Nói hết phần hay rồi còn lê thêm mấy giây là tỉ lệ xem hết rơi thẳng — hết chuyện thì cắt.</div>
+      <a class="dang-xem" href="" target="_blank" rel="noopener">Xem video mẫu →</a>
+    </article>
+
+  </div>
+  <p class="dangs-note">↳ vào lớp bạn nhận bản đầy đủ: kịch bản mẫu từng dạng, bộ hook mở đầu và danh sách video tham khảo</p>
+</div></section>
+
 <!-- ════════ MENTORS ════════ -->
 <section class="sec" id="mentors"><div class="shell">
   <div class="sec-head rv">
@@ -957,6 +1293,59 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
   <div class="grads-note rv"><span class="hand">↳ số liệu cập nhật 08/2026 · bấm "Xem kênh" để kiểm chứng</span></div>
 </div></section>
 
+<!-- ════════ TRONG GÓI CÓ GÌ ════════ -->
+<section class="sec" id="cogi"><div class="shell">
+  <div class="sec-head rv" style="text-align:center">
+    <span class="kicker">gói học gồm những gì</span>
+    <h2 class="h2">Một lần đóng,<br>ba thứ mang về.</h2>
+  </div>
+  <div class="goi">
+
+    <div class="goi-cot em rv">
+      <span class="goi-ic">🎬</span>
+      <h3>Học và dựng cùng mentor</h3>
+      <p class="goi-sub">Phần không ai nhân bản được — người thật ngồi cùng bạn.</p>
+      <ul class="goi-list">
+        <li><b data-tpl="{{schedule.sessions}} buổi live"></b> tối Thứ 5 hằng tuần, 20:00–22:00 — lý thuyết và chốt hướng đi cho kênh</li>
+        <li><b>Edit kèm 1:1</b> các tối trong tuần, ngồi dựng chung tới khi ra video hoàn chỉnh</li>
+        <li>Mỗi video được <b>chấm bằng số liệu thật</b>: hook rate, retention, người xem rớt ở giây thứ mấy</li>
+        <li>Một <b>buổi 1:1 riêng</b> chốt định hướng kênh và hướng ra tiền</li>
+        <li>Group Zalo hỏi đáp suốt khóa, mentor trả lời trong ngày</li>
+      </ul>
+    </div>
+
+    <div class="goi-cot rv">
+      <span class="goi-ic">🧰</span>
+      <h3>Bộ tài nguyên dùng mãi</h3>
+      <p class="goi-sub">Phát ngay buổi đầu, tải về giữ luôn.</p>
+      <ul class="goi-list">
+        <li><b>Khung kịch bản viral</b> theo từng dạng video — điền nội dung của bạn vào là ra bài</li>
+        <li><b>Bộ hook mở đầu</b> đã chạy có số, phân theo ngách</li>
+        <li><b>Hướng dẫn quay 5 dạng content</b> — talking head, vlog, POV một ngày, review, kể chuyện — kèm video mẫu từng dạng</li>
+        <li><b>Checklist trước khi đăng</b> — soát 10 giây, tránh mấy lỗi làm video chết ngay từ đầu</li>
+        <li>Bản ghi toàn bộ buổi live, xem lại bao nhiêu lần cũng được</li>
+      </ul>
+    </div>
+
+    <div class="goi-cot rv">
+      <span class="goi-ic">🌱</span>
+      <h3>Thứ còn lại sau 30 ngày</h3>
+      <p class="goi-sub">Cái bạn thật sự trả tiền để có.</p>
+      <ul class="goi-list">
+        <li><b>Kênh đã chạy thật</b> — có video, có số liệu, không phải một tờ chứng nhận</li>
+        <li><b>Tự dựng được video</b> — hết khóa không còn phải thuê ai, cũng không phải chờ ai</li>
+        <li><b>Lịch nội dung 90 ngày</b> viết riêng cho kênh bạn, dựa trên số liệu bạn vừa chạy</li>
+        <li>Ở lại group cựu học viên, sau khóa vẫn hỏi được</li>
+      </ul>
+    </div>
+
+  </div>
+  <div class="goi-neo rv">
+    <p>Thuê người dựng ngoài một video TikTok tầm <b>200–400k</b>. Ra 12 video trong 30 ngày là đã <b>3–5 triệu</b> — và tháng sau vẫn phải thuê tiếp.</p>
+    <span class="hand">học phí ở đây bằng đúng một tháng thuê editor, khác ở chỗ hết tháng bạn không cần thuê nữa</span>
+  </div>
+</div></section>
+
 <!-- ════════ HỌC PHÍ ════════ -->
 <section class="sec" id="hocphi" style="padding-top:0"><div class="shell">
   <div class="fee">
@@ -972,17 +1361,21 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
         <b>Tự Mình Xây Kênh</b>
         <span data-tpl="{{computed.cohortLabel}} · khai giảng {{cohort.startDate}}"></span>
       </div>
-      <div class="rc-sec">trong 30 ngày</div>
-      <div class="rc-row"><span data-tpl="{{schedule.sessions}} buổi live cùng founder ({{computed.scheduleShort}})"></span><b>✓</b></div>
-      <div class="rc-row"><span>Edit kèm 1:1 buổi tối — không giới hạn số buổi</span><b>✓</b></div>
-      <div class="rc-row"><span>Bộ khung kịch bản + checklist quay bằng điện thoại</span><b>✓</b></div>
-      <div class="rc-row"><span>Video được chấm bằng số liệu thật hằng tuần</span><b>✓</b></div>
-      <div class="rc-row"><span>Recording + tài liệu từng buổi, xem lại mãi</span><b>✓</b></div>
+      <div class="rc-sec">học cùng mentor</div>
+      <div class="rc-row"><span data-tpl="{{schedule.sessions}} buổi live ({{computed.scheduleShort}})"></span><b>✓</b></div>
+      <div class="rc-row"><span>Edit kèm 1:1 các tối trong tuần</span><b>✓</b></div>
+      <div class="rc-row"><span>Chấm video bằng số liệu thật hằng tuần</span><b>✓</b></div>
+      <div class="rc-row"><span>Buổi 1:1 chốt định hướng kênh</span><b>✓</b></div>
+      <div class="rc-sec">bộ tài nguyên</div>
+      <div class="rc-row"><span>Khung kịch bản viral theo từng dạng video</span><b>✓</b></div>
+      <div class="rc-row"><span>Bộ hook mở đầu đã chạy có số</span><b>✓</b></div>
+      <div class="rc-row"><span>Hướng dẫn quay 5 dạng content + video mẫu</span><b>✓</b></div>
+      <div class="rc-row"><span>Checklist soát video trước khi đăng</span><b>✓</b></div>
+      <div class="rc-row"><span>Bản ghi toàn bộ buổi live, xem lại mãi</span><b>✓</b></div>
       <div class="rc-sec">mang về sau khóa</div>
-      <div class="rc-row"><span>Kênh TikTok của bạn — đã chạy, đã có video</span><b>✓</b></div>
-      <div class="rc-row"><span>Lộ trình nội dung 90 ngày viết riêng cho kênh bạn</span><b>✓</b></div>
-      <div class="rc-row"><span>Group Zalo học viên — sau khóa vẫn hỏi đáp thoải mái</span><b>✓</b></div>
-      <div class="rc-row"><span>Buổi 1:1 tổng kết &amp; định hướng kiếm tiền</span><b>✓</b></div>
+      <div class="rc-row"><span>Kênh đã chạy thật — có video, có số liệu</span><b>✓</b></div>
+      <div class="rc-row"><span>Lịch nội dung 90 ngày viết riêng cho kênh bạn</span><b>✓</b></div>
+      <div class="rc-row"><span>Group cựu học viên — sau khóa vẫn hỏi đáp</span><b>✓</b></div>
       <div class="rc-row strike" style="margin-top:8px"><span>Học phí gốc</span><b data-bind="computed.price.regular">—</b></div>
       <div class="rc-total"><span>Đăng ký sớm</span><b data-bind="computed.price.earlyBird">—</b></div>
       <div class="rc-save" data-tpl="đỡ được {{computed.price.saveAmount}} nếu giữ chỗ trước khi lớp đủ người"></div>
@@ -1034,6 +1427,108 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
       <span data-tpl="{{computed.cohortLabel}} · còn {{computed.remaining}} chỗ đăng ký sớm"></span>
     </div>
     <button class="btn btn-ink btn-md" data-open data-cta>Giữ chỗ →</button>
+  </div>
+</div>
+
+<!-- ════════ KHU HỌC VIÊN ════════ -->
+<div id="khuhv">
+  <div class="hv-demo" id="hvDemo" style="display:none">
+    ⚠️ Bản xem thử — dữ liệu bên dưới là giả, đăng nhập kiểu gì cũng vào được
+  </div>
+  <div class="hv-bar"><div class="shell hv-bar-in">
+    <div class="hv-brand">
+      <svg width="26" height="26" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><g transform="rotate(-9 32 17)"><rect x="19" y="11" width="26" height="12" rx="3" fill="#99df00"/><path d="M30 14.4v5.2a1 1 0 0 0 1.52.86l4.6-2.6a1 1 0 0 0 0-1.72l-4.6-2.6A1 1 0 0 0 30 14.4z" fill="#26210f"/></g><rect x="19" y="28" width="26" height="12" rx="3" fill="#26210f"/><rect x="4" y="44" width="26" height="12" rx="3" fill="#26210f"/><rect x="34" y="44" width="26" height="12" rx="3" fill="#26210f"/></svg>
+
+      <div><b id="hvTenKhu">Khu học viên</b><br><span>Tự Mình Xây Kênh</span></div>
+    </div>
+    <div class="hv-bar-act">
+      <span class="hv-vai" id="hvVai" style="display:none">mentor</span>
+      <span class="hv-who" id="hvWho" style="display:none">Chào <b>—</b></span>
+      <button class="hv-nut" id="hvThoat" style="display:none">Thoát</button>
+      <button class="hv-nut" data-hv-dong>← Trang khóa học</button>
+    </div>
+  </div></div>
+
+  <div class="shell hv-wrap">
+
+    <!-- chưa đăng nhập: hai tab -->
+    <div id="hvLogin">
+      <div class="hv-login">
+        <div class="hv-tab">
+          <button id="hvTabVao" class="on">Đăng nhập</button>
+          <button id="hvTabKy">Tạo tài khoản</button>
+        </div>
+
+        <!-- đăng nhập -->
+        <div id="hvPanelVao">
+          <h2>Đăng nhập</h2>
+          <p class="sub">Dành cho người đã được duyệt vào lớp. Chưa có tài khoản thì bấm <b>Tạo tài khoản</b> ở trên.</p>
+          <form class="fields" id="hvForm" novalidate>
+            <div class="fg"><label class="fl" for="hv-email">Email</label>
+              <input class="inp" id="hv-email" type="email" autocomplete="email" placeholder="ban@gmail.com">
+              <span class="err">Email chưa đúng</span></div>
+            <div class="fg"><label class="fl" for="hv-pass">Mật khẩu</label>
+              <input class="inp" id="hv-pass" type="password" autocomplete="current-password" placeholder="••••••••">
+              <span class="err">Nhập mật khẩu giúp mình</span></div>
+          </form>
+          <button class="btn btn-ink btn-lg" id="hvVao">
+            <span class="spin"></span><span class="lbl">Đăng nhập →</span></button>
+          <div class="hv-msg" id="hvLoginMsg"></div>
+          <p class="hv-note">Quên mật khẩu? Nhắn cho mentor trong group Zalo của lớp để được cấp lại.</p>
+        </div>
+
+        <!-- tạo tài khoản -->
+        <div id="hvPanelKy" style="display:none">
+          <h2>Tạo tài khoản</h2>
+          <p class="sub">Điền xong là tụi mình nhận được ngay. Duyệt trong ngày, duyệt xong bạn đăng nhập là vào được.</p>
+          <form class="fields" id="hvFormKy" novalidate>
+            <div class="fg"><label class="fl" for="ky-ten">Họ và tên</label>
+              <input class="inp" id="ky-ten" type="text" autocomplete="name" placeholder="Nguyễn Văn An">
+              <span class="err">Ghi đầy đủ họ và tên giúp mình</span></div>
+            <div class="fg"><label class="fl" for="ky-email">Email</label>
+              <input class="inp" id="ky-email" type="email" autocomplete="email" placeholder="ban@gmail.com">
+              <span class="err">Email chưa đúng</span></div>
+            <div class="fg"><label class="fl" for="ky-pass">Mật khẩu</label>
+              <input class="inp" id="ky-pass" type="password" autocomplete="new-password" placeholder="ít nhất 6 ký tự">
+              <span class="err">Mật khẩu cần ít nhất 6 ký tự</span>
+              <span class="hint">Đặt mật khẩu riêng, đừng dùng lại mật khẩu email nhé.</span></div>
+          </form>
+          <button class="btn btn-ink btn-lg" id="hvKy">
+            <span class="spin"></span><span class="lbl">Gửi đăng ký →</span></button>
+          <div class="hv-msg" id="hvKyMsg"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- đã đăng nhập -->
+    <div id="hvApp" style="display:none">
+      <div class="hv-head">
+        <h1 id="hvTieuDe">Đặt lịch kèm 1:1</h1>
+        <p id="hvMoTa">Chọn một ca trống là xong — mentor nhận thông báo ngay. Bận thì bấm lại đúng ca đó để huỷ, ca sẽ mở lại cho bạn khác.</p>
+      </div>
+
+      <div class="hv-cua-toi" id="hvMineBox" style="display:none">
+        <h3 id="hvMineTieuDe">📌 Lịch sắp tới của bạn</h3>
+        <div class="hv-mine" id="hvMine"></div>
+      </div>
+
+      <div class="hv-tuan">
+        <button class="hv-nut" id="hvTruoc">‹ Tuần trước</button>
+        <b id="hvNhanTuan">—</b>
+        <button class="hv-nut" id="hvSau">Tuần sau ›</button>
+      </div>
+
+      <div class="hv-han" id="hvHan" style="display:none"></div>
+      <div class="hv-ngays" id="hvNgays"></div>
+      <div class="hv-msg" id="hvMsg"></div>
+      <p class="hv-chu" id="hvChu" style="display:none">
+        <b>Cách dùng:</b> bấm một ca để mở cho học viên đặt, bấm lại để đóng.
+        Cần giờ khác ba ca sẵn có thì bấm <b>＋ giờ khác</b> rồi nhập kiểu <b>19:30-21:00</b>.
+        Ca đã có người đặt thì không đóng được — muốn huỷ phải bấm vào ca đó và xác nhận,
+        nhớ báo lại cho bạn học viên.
+      </p>
+    </div>
+
   </div>
 </div>
 
@@ -1247,7 +1742,7 @@ var CACHE_KEY = 'tmxk_cfg_v1';
 var FALLBACK = {
   cohort:{number:3,status:'open',openText:'Đang mở đăng ký',startDate:'đang chốt lịch'},
   slots:{max:15,base:0,registered:0},
-  pricing:{earlyBird:2000000,regular:3000000},
+  pricing:{earlyBird:3000000,regular:4000000},
   schedule:{days:'Tối Thứ 5',time:'20:00–22:00',platform:'MS Teams',weeks:4,sessions:4},
   zalo:{groupUrl:''},
   stats:{cohortsDone:2,students:'30+'},
@@ -1550,6 +2045,14 @@ function validateField(el){
   return ok;
 }
 
+/* Link video mẫu chưa điền thì giấu đi, khỏi hiện nút bấm vào không ra gì */
+function anLinkTrong(){
+  $$('.dang-xem').forEach(function(a){
+    var h=(a.getAttribute('href')||'').trim();
+    if(!h || h==='#') a.style.display='none';
+  });
+}
+
 function initForm(){
   $$('#regForm .inp').forEach(function(el){
     el.addEventListener('blur',function(){ if(el.value) validateField(el) });
@@ -1786,9 +2289,625 @@ function initAdmin(){
     .catch(function(){});
 }
 
+/* ══════════════ KHU HỌC VIÊN ══════════════ */
+
+var HV = {token:'', ten:'', vaitro:'', tuan:'', nhac:6, toiDa:0, daDat:0, demo:false};
+var HV_KEY = 'tmxk_hv';
+
+/* ---- ngày giờ, tất cả theo múi giờ máy người dùng ---- */
+function hvISO(d){
+  return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);
+}
+function hvThuHai(iso){
+  var d = new Date(iso+'T12:00:00');
+  d.setDate(d.getDate() - ((d.getDay()+6)%7));
+  return hvISO(d);
+}
+function hvCong(iso, n){
+  var d = new Date(iso+'T12:00:00'); d.setDate(d.getDate()+n); return hvISO(d);
+}
+function hvGon(iso){ return iso.slice(8,10)+'/'+iso.slice(5,7); }
+function hvGioNay(){
+  var d = new Date();
+  return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
+}
+function hvThu(iso){
+  return ['CN','T2','T3','T4','T5','T6','T7'][new Date(iso+'T12:00:00').getDay()];
+}
+/* cắt họ, giữ tên đệm + tên — giống hệt cách backend làm */
+function hvTenGoi(hoTen){
+  var q = String(hoTen||'').trim().replace(/\s+/g,' ').split(' ');
+  return q.length <= 1 ? (q[0]||'') : q.slice(1).join(' ');
+}
+
+/* ---- gọi backend ---- */
+function hvGoi(action, data){
+  if (HV.demo) return Promise.resolve(hvGiaLap(action, data));
+  var body = {action:action};
+  for (var k in data) body[k] = data[k];
+  return fetch(API, {method:'POST',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body:JSON.stringify(body)}).then(function(r){ return r.json() });
+}
+
+/* ---- dữ liệu giả cho bản xem thử ---- */
+var HV_CA = [{ma:'s',ten:'Sáng',batdau:'09:00',ketthuc:'11:00'},
+             {ma:'c',ten:'Chiều',batdau:'14:00',ketthuc:'16:00'},
+             {ma:'t',ten:'Tối',  batdau:'20:00',ketthuc:'22:00'}];
+var HV_DEMO_CA = {};     // id "ngày|giờ bắt đầu" → {ngay,batdau,ketthuc,dat,hvTen}
+var HV_DEMO_VAI = 'hv';
+var HV_DEMO_TOIDA = 2;
+
+function hvGiaLap(action, d){
+  if (action === 'hv_signup') return {ok:true, cho:true};
+  if (action === 'hv_login'){
+    HV_DEMO_VAI = /mentor/i.test(d.email||'') ? 'mentor' : 'hv';
+    return {ok:true, token:'demo', vaitro:HV_DEMO_VAI, ten:hvTenGoi('Nguyễn Văn An')};
+  }
+  if (action === 'hv_book'){
+    var o = HV_DEMO_CA[d.slotId];
+    if (!o) return {ok:false, error:'khong_thay'};
+    var tuanO = hvThuHai(o.ngay), demO = 0;
+    Object.keys(HV_DEMO_CA).forEach(function(k){
+      var x = HV_DEMO_CA[k];
+      if (x.dat && hvThuHai(x.ngay) === tuanO) demO++;
+    });
+    if (HV_DEMO_TOIDA > 0 && demO >= HV_DEMO_TOIDA)
+      return {ok:false, error:'qua_nhieu', toiDa:HV_DEMO_TOIDA, daDat:demO};
+    o.dat = true; o.hvTen = HV.ten;
+    return {ok:true};
+  }
+  if (action === 'hv_cancel'){
+    var c = HV_DEMO_CA[d.slotId];
+    if (c){ c.dat = false; c.hvTen = ''; }
+    return {ok:true};
+  }
+  if (action === 'hv_mo_ca'){
+    var g = d.caMa ? HV_CA.filter(function(c){ return c.ma === d.caMa })[0]
+                   : {batdau:d.batdau, ketthuc:d.ketthuc};
+    if (!g) return {ok:false, error:'ca_la'};
+    var id = d.ngay+'|'+g.batdau;
+    if (HV_DEMO_CA[id]){
+      if (HV_DEMO_CA[id].dat) return {ok:false, error:'da_co_nguoi'};
+      delete HV_DEMO_CA[id]; return {ok:true, mo:false};
+    }
+    HV_DEMO_CA[id] = {ngay:d.ngay, batdau:g.batdau, ketthuc:g.ketthuc, dat:false, hvTen:''};
+    return {ok:true, mo:true};
+  }
+  if (action === 'hv_xoa_ca'){ delete HV_DEMO_CA[d.slotId]; return {ok:true}; }
+  if (action !== 'hv_slots') return {ok:false, error:'unknown_action'};
+
+  var dau = d.tuan ? hvThuHai(d.tuan) : hvThuHai(hvISO(new Date()));
+  var bay = hvISO(new Date()), ngays = [];
+  for (var i=0;i<7;i++){
+    var n = hvCong(dau,i), slots = [];
+    if (HV_DEMO_VAI === 'mentor'){
+      // mentor chỉ thấy đúng những ca mình đã mở
+      Object.keys(HV_DEMO_CA).forEach(function(id){
+        var o = HV_DEMO_CA[id];
+        if (o.ngay !== n) return;
+        slots.push({id:id, batdau:o.batdau, ketthuc:o.ketthuc, dat:o.dat,
+                    hvTen:o.hvTen||'', hvEmail:o.dat?'an@gmail.com':'', qua:n < bay});
+      });
+    } else {
+      // học viên: bịa sẵn vài ca mentor đã mở, cộng thêm ca mình vừa đặt
+      HV_CA.forEach(function(c, j){
+        var id = n+'|'+c.batdau;
+        var o = HV_DEMO_CA[id];
+        if (!o && (i+j) % 3 !== 0) return;
+        if (!o){
+          o = HV_DEMO_CA[id] = {ngay:n, batdau:c.batdau, ketthuc:c.ketthuc, dat:false, hvTen:''};
+        }
+        slots.push({id:id, mentor:(i%2 ? 'Tiểu My' : 'Minh Toàn'),
+                    batdau:o.batdau, ketthuc:o.ketthuc,
+                    dat:o.dat, cuaToi:o.dat, qua:n < bay});
+      });
+    }
+    slots.sort(function(a,c){ return a.batdau < c.batdau ? -1 : 1 });
+    ngays.push({ngay:n, thu:hvThu(n), gon:hvGon(n), qua:n < bay, slots:slots});
+  }
+  var demTuan = 0;
+  Object.keys(HV_DEMO_CA).forEach(function(k){
+    var x = HV_DEMO_CA[k];
+    if (x.dat && hvThuHai(x.ngay) === dau) demTuan++;
+  });
+  return {ok:true, ten:HV.ten||'Văn An', vaitro:HV_DEMO_VAI, tuan:dau,
+          ngays:ngays, ca:HV_CA, nhacTruoc:6,
+          toiDa: HV_DEMO_VAI==='mentor' ? 0 : HV_DEMO_TOIDA,
+          daDat: HV_DEMO_VAI==='mentor' ? 0 : demTuan};
+}
+
+/* ---- mở / đóng khu học viên ---- */
+function hvKhoiTrang(an){
+  Array.prototype.forEach.call(document.body.children, function(el){
+    if (el.id === 'khuhv' || el.id === 'admin' || el.tagName === 'SCRIPT') return;
+    el.style.display = an ? 'none' : '';
+  });
+}
+function hvMo(){
+  hvKhoiTrang(true);
+  $('#khuhv').classList.add('on');
+  document.body.classList.add('hv-mode');
+  if (location.hash !== '#hocvien') history.replaceState(null,'','#hocvien');
+  window.scrollTo(0,0);
+  if (HV.token) hvTai('');
+}
+function hvDong(){
+  $('#khuhv').classList.remove('on');
+  hvKhoiTrang(false);
+  document.body.classList.remove('hv-mode');
+  if (location.hash === '#hocvien') history.replaceState(null,'',location.pathname);
+  window.scrollTo(0,0);
+}
+
+function hvBao(el, text, tot){
+  var m = $(el);
+  m.innerHTML = text;
+  m.className = 'hv-msg on ' + (tot ? 'good' : 'bad');
+  if (tot) setTimeout(function(){ m.className = 'hv-msg' }, 5000);
+}
+
+/* ---- nhớ phiên ---- */
+function hvNhoPhien(){
+  try{
+    var o = JSON.parse(localStorage.getItem(HV_KEY) || 'null');
+    if (o && o.token){ HV.token = o.token; HV.ten = o.ten||''; HV.vaitro = o.vaitro||'hv'; }
+  }catch(e){}
+}
+function hvLuuPhien(){
+  try{ localStorage.setItem(HV_KEY,
+    JSON.stringify({token:HV.token, ten:HV.ten, vaitro:HV.vaitro})); }catch(e){}
+}
+function hvQuenPhien(){
+  HV.token=''; HV.ten=''; HV.vaitro='';
+  try{ localStorage.removeItem(HV_KEY); }catch(e){}
+}
+
+/* ---- đổi giao diện theo vai trò ---- */
+var laMentor = function(){ return HV.vaitro === 'mentor' };
+
+function hvVaoTrong(){
+  $('#hvLogin').style.display = 'none';
+  $('#hvApp').style.display   = 'block';
+  $('#hvWho').style.display   = '';
+  $('#hvThoat').style.display = '';
+  $('#hvWho').innerHTML = 'Chào <b>' + esc(HV.ten || 'bạn') + '</b>';
+
+  var m = laMentor();
+  $('#hvVai').style.display = m ? '' : 'none';
+  $('#hvTenKhu').textContent = m ? 'Khu mentor' : 'Khu học viên';
+  $('#hvTieuDe').textContent = m ? 'Lịch rảnh của bạn' : 'Đặt lịch kèm 1:1';
+  $('#hvMoTa').textContent = m
+    ? 'Bấm vào ca bạn rảnh là mở cho học viên đặt. Học viên đặt xong bạn thấy tên họ ngay tại ca đó, và bot cũng báo về nhóm.'
+    : 'Chọn một ca trống là xong — mentor nhận thông báo ngay. Bận thì bấm lại đúng ca đó để huỷ, ca sẽ mở lại cho bạn khác.';
+  $('#hvMineTieuDe').textContent = m ? '📌 Buổi đã có người đặt' : '📌 Lịch sắp tới của bạn';
+  $('#hvChu').style.display = m ? 'block' : 'none';
+}
+function hvRaNgoai(){
+  $('#hvLogin').style.display = 'block';
+  $('#hvApp').style.display   = 'none';
+  $('#hvWho').style.display   = 'none';
+  $('#hvVai').style.display   = 'none';
+  $('#hvThoat').style.display = 'none';
+  $('#hvTenKhu').textContent  = 'Khu học viên';
+}
+
+/* ---- chuyển tab đăng nhập / đăng ký ---- */
+function hvTab(ky){
+  $('#hvTabVao').classList.toggle('on', !ky);
+  $('#hvTabKy').classList.toggle('on', ky);
+  $('#hvPanelVao').style.display = ky ? 'none' : 'block';
+  $('#hvPanelKy').style.display  = ky ? 'block' : 'none';
+}
+
+/* ---- kiểm tra ô nhập ---- */
+function hvSoat(cap){
+  var xau = false;
+  cap.forEach(function(x){
+    var el = $(x[0]);
+    el.classList.toggle('bad', !x[1]);
+    el.parentNode.classList.toggle('invalid', !x[1]);
+    if (!x[1]) xau = true;
+  });
+  return !xau;
+}
+
+/* ---- tạo tài khoản ---- */
+function hvDangKy(){
+  var btn = $('#hvKy');
+  if (btn.classList.contains('busy')) return;
+  var ten   = ($('#ky-ten').value||'').trim();
+  var email = ($('#ky-email').value||'').trim();
+  var pass  = $('#ky-pass').value||'';
+
+  if (!hvSoat([
+    ['#ky-ten',   ten.replace(/\s+/g,' ').split(' ').length >= 2],
+    ['#ky-email', /^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(email)],
+    ['#ky-pass',  pass.length >= 6]
+  ])) return;
+
+  btn.classList.add('busy');
+  $('#hvKyMsg').className = 'hv-msg';
+  hvGoi('hv_signup', {ten:ten, email:email, pass:pass}).then(function(r){
+    btn.classList.remove('busy');
+    if (r && r.ok){
+      $('#hvPanelKy').innerHTML =
+        '<h2>Gửi xong rồi 🎉</h2>' +
+        '<p class="sub">Tụi mình vừa nhận được đăng ký của <b>' + esc(hvTenGoi(ten)) + '</b>.</p>' +
+        '<div class="hv-cho">Duyệt xong bạn quay lại đây, bấm <b>Đăng nhập</b> với chính ' +
+        'email <b>' + esc(email) + '</b> và mật khẩu vừa đặt là vào được.<br><br>' +
+        'Thường trong ngày là xong. Lâu quá thì nhắn cho tụi mình trong group Zalo nhé.</div>';
+    } else {
+      hvBao('#hvKyMsg', {
+        da_ton_tai:'Email này đăng ký rồi. Bấm <b>Đăng nhập</b> ở trên, quên mật khẩu thì nhắn mentor cấp lại.',
+        email_sai:'Email chưa đúng định dạng.',
+        mk_ngan:'Mật khẩu cần ít nhất 6 ký tự.',
+        ten_ngan:'Ghi đầy đủ họ và tên giúp mình (VD: Nguyễn Văn An).',
+        thieu:'Điền đủ ba ô giúp mình.'
+      }[r && r.error] || 'Không gửi được, thử lại giúp mình.');
+    }
+  }).catch(function(){
+    btn.classList.remove('busy');
+    hvBao('#hvKyMsg','Không nối được máy chủ — kiểm tra mạng rồi thử lại.');
+  });
+}
+
+/* ---- đăng nhập ---- */
+function hvDangNhap(){
+  var btn = $('#hvVao');
+  if (btn.classList.contains('busy')) return;
+  var email = ($('#hv-email').value||'').trim();
+  var pass  = $('#hv-pass').value||'';
+
+  if (!hvSoat([
+    ['#hv-email', /^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(email)],
+    ['#hv-pass',  pass.length >= 1]
+  ])) return;
+
+  btn.classList.add('busy');
+  $('#hvLoginMsg').className = 'hv-msg';
+  hvGoi('hv_login', {email:email, pass:pass}).then(function(r){
+    btn.classList.remove('busy');
+    if (r && r.ok){
+      HV.token = r.token; HV.ten = r.ten || email; HV.vaitro = r.vaitro || 'hv';
+      $('#hv-pass').value = '';
+      hvLuuPhien(); hvVaoTrong(); hvTai('');
+    } else {
+      hvBao('#hvLoginMsg', {
+        sai:'Email hoặc mật khẩu chưa đúng.',
+        cho_duyet:'Tài khoản đúng rồi, nhưng tụi mình chưa duyệt xong. Chờ chút nhé — thường trong ngày là xong.',
+        khoa_tam:'Sai nhiều lần quá — chờ 10 phút rồi thử lại nhé.',
+        thieu:'Điền cả email lẫn mật khẩu giúp mình.'
+      }[r && r.error] || 'Không đăng nhập được, thử lại giúp mình.');
+    }
+  }).catch(function(){
+    btn.classList.remove('busy');
+    hvBao('#hvLoginMsg','Không nối được máy chủ — kiểm tra mạng rồi thử lại.');
+  });
+}
+
+/* ---- tải lịch tuần ---- */
+function hvTai(tuan){
+  hvBoCho();
+  $('#hvNgays').innerHTML = '<div class="hv-trong">Đang tải lịch…</div>';
+  hvGoi('hv_slots', {token:HV.token, tuan:tuan||''}).then(function(r){
+    if (!r || !r.ok){
+      if (r && r.error === 'het_phien'){
+        hvQuenPhien(); hvRaNgoai();
+        hvBao('#hvLoginMsg','Phiên đăng nhập hết hạn, bạn đăng nhập lại nhé.');
+        return;
+      }
+      $('#hvNgays').innerHTML = '';
+      hvBao('#hvMsg','Không tải được lịch, thử lại giúp mình.');
+      return;
+    }
+    HV.tuan = r.tuan;
+    HV.nhac = r.nhacTruoc || HV.nhac;
+    HV.toiDa = Number(r.toiDa || 0);
+    HV.daDat = Number(r.daDat || 0);
+    if (r.ca && r.ca.length) HV_CA = r.ca;
+    if (r.vaitro && r.vaitro !== HV.vaitro){   // Toàn vừa đổi vai → đổi luôn giao diện
+      HV.vaitro = r.vaitro; hvLuuPhien(); hvVaoTrong();
+    }
+    if (r.ten){ HV.ten = r.ten; $('#hvWho').innerHTML = 'Chào <b>'+esc(r.ten)+'</b>'; }
+    if (laMentor()) hvVeMentor(r); else hvVeHocVien(r);
+  }).catch(function(){
+    $('#hvNgays').innerHTML = '';
+    hvBao('#hvMsg','Không nối được máy chủ.');
+  });
+}
+
+function hvKhungTuan(r){
+  $('#hvNhanTuan').textContent = 'Tuần ' + hvGon(r.tuan) + ' – ' + hvGon(hvCong(r.tuan,6));
+  $('#hvTruoc').disabled = hvCong(r.tuan,-7) < hvThuHai(hvISO(new Date()));
+}
+function hvKhungNgay(d, bay, trong, cas){
+  return '<div class="hv-ngay'+(d.qua?' qua':'')+(d.ngay===bay?' homnay':'')+'">'+
+    '<div class="hv-d"><b>'+esc(d.thu)+'</b><span>'+esc(d.gon)+'</span>'+
+    (d.ngay===bay?'<i>hôm nay</i>':'')+'</div>'+
+    '<div class="hv-cas">'+(cas || '<span class="hv-trong">'+trong+'</span>')+'</div></div>';
+}
+
+/* ---- màn hình HỌC VIÊN ---- */
+function hvVeHocVien(r){
+  var bay = hvISO(new Date());
+  hvKhungTuan(r);
+
+  var cua = [];
+  r.ngays.forEach(function(d){
+    d.slots.forEach(function(s){ if (s.cuaToi && !s.qua) cua.push({d:d, s:s}); });
+  });
+  $('#hvMineBox').style.display = cua.length ? 'block' : 'none';
+  $('#hvMine').innerHTML = cua.map(function(x){
+    return '<div><span>'+esc(x.d.thu)+' '+esc(x.d.gon)+' · '+esc(x.s.batdau)+'–'+esc(x.s.ketthuc)+
+           '</span><b>'+esc(x.s.mentor||'mentor')+'</b></div>';
+  }).join('');
+
+  // hạn mức: mỗi tuần chỉ giữ được ngần này ca, để còn chỗ cho bạn khác
+  var han = $('#hvHan'), het = HV.toiDa > 0 && HV.daDat >= HV.toiDa;
+  if (HV.toiDa > 0){
+    var cham = '';
+    for (var i=0;i<HV.toiDa;i++) cham += '<i'+(i < HV.daDat ? ' class="xong"' : '')+'></i>';
+    han.style.display = 'flex';
+    han.className = 'hv-han' + (het ? ' het' : '');
+    han.innerHTML = '<span>Tuần này bạn đã đặt <b>'+HV.daDat+'/'+HV.toiDa+'</b> ca'+
+      (het ? ' — hết lượt rồi. Muốn đổi ca thì huỷ một buổi ở trên trước nhé.'
+           : ', còn <b>'+(HV.toiDa-HV.daDat)+'</b> ca.')+
+      '</span><span class="hv-cham">'+cham+'</span>';
+  } else {
+    han.style.display = 'none';
+  }
+
+  $('#hvNgays').innerHTML = r.ngays.map(function(d){
+    var cas = d.slots.map(function(s){
+      if (s.cuaToi)
+        return '<button class="hv-ca cua-toi" data-huy="'+esc(s.id)+'">'+
+               '<b>'+esc(s.batdau)+'–'+esc(s.ketthuc)+'</b> · '+esc(s.mentor||'')+
+               ' <em>— bấm để huỷ</em></button>';
+      if (s.dat || s.qua) return '';
+      return '<button class="hv-ca"'+(het?' disabled':'')+' data-dat="'+esc(s.id)+'">'+
+             '<b>'+esc(s.batdau)+'–'+esc(s.ketthuc)+'</b> <em>'+esc(s.mentor||'')+'</em></button>';
+    }).filter(String).join('');
+    return hvKhungNgay(d, bay, d.qua ? 'đã qua' : 'chưa mentor nào mở ca', cas);
+  }).join('');
+
+  $$('#hvNgays [data-dat]').forEach(function(b){
+    b.addEventListener('click', function(){ hvDat(b.getAttribute('data-dat')) });
+  });
+  $$('#hvNgays [data-huy]').forEach(function(b){
+    b.addEventListener('click', function(){ hvXinHuy(b, b.getAttribute('data-huy')) });
+  });
+}
+
+/* ---- màn hình MENTOR ---- */
+function hvVeMentor(r){
+  var bay = hvISO(new Date());
+  hvKhungTuan(r);
+  $('#hvHan').style.display = 'none';
+
+  var dat = [];
+  r.ngays.forEach(function(d){
+    d.slots.forEach(function(s){ if (s.dat && !s.qua) dat.push({d:d, s:s}); });
+  });
+  $('#hvMineBox').style.display = dat.length ? 'block' : 'none';
+  $('#hvMine').innerHTML = dat.map(function(x){
+    return '<div><span>'+esc(x.d.thu)+' '+esc(x.d.gon)+' · '+esc(x.s.batdau)+'–'+esc(x.s.ketthuc)+
+           '</span><b>'+esc(x.s.hvTen||'học viên')+'</b></div>';
+  }).join('');
+
+  $('#hvNgays').innerHTML = r.ngays.map(function(d){
+    if (d.qua) return hvKhungNgay(d, bay, 'đã qua', '');
+
+    // ba ca mặc định: đối chiếu giờ để biết ca nào đang mở
+    var cas = HV_CA.map(function(c){
+      var co = null;
+      d.slots.forEach(function(s){ if (s.batdau===c.batdau && s.ketthuc===c.ketthuc) co = s; });
+      if (co && co.dat)
+        return '<button class="hv-ca khoa" data-huy="'+esc(co.id)+'">'+
+               '<b>'+esc(c.batdau)+'–'+esc(c.ketthuc)+'</b> 🔒 '+esc(co.hvTen||'đã có người')+'</button>';
+      // hôm nay mà ca đã qua giờ thì máy chủ cũng từ chối — làm mờ luôn cho khỏi bấm hụt
+      var quaGio = d.ngay===bay && c.batdau <= hvGioNay();
+      if (quaGio && !co) return '';
+      return '<button class="hv-ca'+(co?' mo':'')+'" data-ca="'+esc(c.ma)+'" data-ngay="'+esc(d.ngay)+'"'+
+             (quaGio?' disabled':'')+'>'+
+             '<b>'+esc(c.ten)+'</b> '+esc(c.batdau)+'–'+esc(c.ketthuc)+
+             (co ? ' ✓' : '')+'</button>';
+    }).join('');
+
+    // ca giờ lẻ mentor tự thêm
+    var le = d.slots.filter(function(s){
+      return !HV_CA.some(function(c){ return c.batdau===s.batdau && c.ketthuc===s.ketthuc });
+    }).map(function(s){
+      if (s.dat)
+        return '<button class="hv-ca khoa" data-huy="'+esc(s.id)+'">'+
+               '<b>'+esc(s.batdau)+'–'+esc(s.ketthuc)+'</b> 🔒 '+esc(s.hvTen||'đã có người')+'</button>';
+      return '<button class="hv-ca mo" data-go="'+esc(s.id)+'">'+
+             '<b>'+esc(s.batdau)+'–'+esc(s.ketthuc)+'</b> ✓ <em>— bấm để gỡ</em></button>';
+    }).join('');
+
+    var them = '<button class="hv-them" data-them="'+esc(d.ngay)+'">＋ giờ khác</button>';
+    return hvKhungNgay(d, bay, '', cas + le + them);
+  }).join('');
+
+  $$('#hvNgays [data-ca]').forEach(function(b){
+    b.addEventListener('click', function(){
+      hvMoCa({ngay:b.getAttribute('data-ngay'), caMa:b.getAttribute('data-ca')});
+    });
+  });
+  $$('#hvNgays [data-them]').forEach(function(b){
+    b.addEventListener('click', function(){ hvThemGio(b, b.getAttribute('data-them')) });
+  });
+  $$('#hvNgays [data-go]').forEach(function(b){
+    b.addEventListener('click', function(){ hvGoCa(b.getAttribute('data-go')) });
+  });
+  $$('#hvNgays [data-huy]').forEach(function(b){
+    b.addEventListener('click', function(){ hvXinHuy(b, b.getAttribute('data-huy')) });
+  });
+}
+
+function hvKhoa(){ $$('#hvNgays button').forEach(function(b){ b.disabled = true }); }
+
+var HV_LOI = {
+  da_co_nguoi:'Ca này vừa có người đặt mất rồi.',
+  da_qua:'Ca này qua giờ mất rồi.',
+  het_phien:'Phiên hết hạn, bạn đăng nhập lại nhé.',
+  khong_phai_cua_ban:'Đây không phải ca của bạn.',
+  khong_phai_hv:'Chỉ học viên mới đặt được ca.',
+  khong_phai_mentor:'Chỉ mentor mới mở được ca.',
+  gio_sai:'Giờ chưa đúng — nhập kiểu 19:30-21:00 nhé.',
+  khong_thay:'Ca này không còn trên lịch.'
+};
+function hvLoi(el, r, mac){ hvBao(el, HV_LOI[r && r.error] || mac); }
+
+/* ---- học viên: đặt / huỷ ---- */
+function hvDat(id){
+  hvKhoa();
+  hvGoi('hv_book', {token:HV.token, slotId:id}).then(function(r){
+    if (r && r.ok) hvBao('#hvMsg','✅ Đặt xong — mentor đã nhận thông báo, sẽ được nhắc lại trước '+
+                          HV.nhac+' tiếng.', true);
+    else if (r && r.error === 'qua_nhieu')
+      hvBao('#hvMsg','Tuần này bạn giữ đủ <b>'+r.toiDa+' ca</b> rồi — để dành chỗ cho các bạn khác nữa. '+
+                     'Muốn đổi thì huỷ một buổi ở trên rồi đặt lại nhé.');
+    else hvLoi('#hvMsg', r, 'Không đặt được, thử lại giúp mình.');
+    hvTai(HV.tuan);
+  }).catch(function(){ hvBao('#hvMsg','Không nối được máy chủ.'); hvTai(HV.tuan) });
+}
+
+/**
+ * Huỷ hai nhịp: bấm lần đầu nút đổi thành "chắc chưa", bấm lần nữa mới huỷ thật.
+ * Không dùng confirm() vì trình duyệt chặn hộp thoại khi trang chạy trong khung nhúng —
+ * confirm() trả về undefined, lệnh huỷ không bao giờ chạy mà cũng chẳng báo gì.
+ */
+var HV_CHO_HUY = null;   // {id, hen} — ca đang đợi bấm lần hai
+function hvBoCho(){
+  if (!HV_CHO_HUY) return;
+  clearTimeout(HV_CHO_HUY.hen);
+  HV_CHO_HUY = null;
+}
+function hvXinHuy(nut, id){
+  if (HV_CHO_HUY && HV_CHO_HUY.id === id){ hvBoCho(); return hvHuy(id); }
+
+  hvBoCho();
+  $$('#hvNgays .hv-ca.chac').forEach(function(b){ b.classList.remove('chac') });
+  var cu = nut.innerHTML;
+  nut.classList.add('chac');
+  nut.innerHTML = '<b>Huỷ buổi này?</b> <em>bấm lần nữa để xác nhận</em>';
+  hvBao('#hvMsg', laMentor()
+    ? 'Bấm lần nữa vào ca đó để huỷ hẳn. Học viên đã đặt sẽ mất chỗ — nhớ báo lại cho họ.'
+    : 'Bấm lần nữa vào ca đó để huỷ hẳn. Ca sẽ mở lại cho bạn khác đặt.');
+
+  HV_CHO_HUY = {id:id, hen:setTimeout(function(){
+    HV_CHO_HUY = null;
+    if (nut.isConnected){ nut.classList.remove('chac'); nut.innerHTML = cu; }
+    $('#hvMsg').className = 'hv-msg';
+  }, 6000)};
+}
+
+function hvHuy(id){
+  hvKhoa();
+  hvGoi('hv_cancel', {token:HV.token, slotId:id}).then(function(r){
+    if (r && r.ok) hvBao('#hvMsg','Đã huỷ. Bot cũng nhận được thông báo rồi.', true);
+    else hvLoi('#hvMsg', r, 'Không huỷ được, thử lại giúp mình.');
+    hvTai(HV.tuan);
+  }).catch(function(){ hvBao('#hvMsg','Không nối được máy chủ.'); hvTai(HV.tuan) });
+}
+
+/* ---- mentor: mở / đóng / thêm giờ lẻ ---- */
+function hvMoCa(d){
+  hvKhoa();
+  var body = {token:HV.token, ngay:d.ngay};
+  if (d.caMa) body.caMa = d.caMa; else { body.batdau = d.batdau; body.ketthuc = d.ketthuc; }
+  hvGoi('hv_mo_ca', body).then(function(r){
+    if (r && r.ok) hvBao('#hvMsg', r.mo
+      ? '✅ Đã mở ca — học viên thấy và đặt được ngay.'
+      : 'Đã đóng ca này.', true);
+    else hvLoi('#hvMsg', r, 'Không đổi được ca, thử lại giúp mình.');
+    hvTai(HV.tuan);
+  }).catch(function(){ hvBao('#hvMsg','Không nối được máy chủ.'); hvTai(HV.tuan) });
+}
+
+/**
+ * Mở ô nhập giờ ngay tại dòng ngày đó. Không dùng prompt() — cũng bị chặn
+ * khi trang chạy trong khung nhúng, bấm vào là không thấy gì xảy ra.
+ */
+function hvThemGio(nut, ngay){
+  if (nut.nextSibling && nut.nextSibling.className === 'hv-gio') return;
+  var o = document.createElement('div');
+  o.className = 'hv-gio';
+  o.innerHTML = '<input type="time" value="19:30" step="900" aria-label="Giờ bắt đầu">'+
+                '<span>→</span>'+
+                '<input type="time" value="21:00" step="900" aria-label="Giờ kết thúc">'+
+                '<button class="luu">Mở ca</button><button class="bo">Thôi</button>';
+  nut.parentNode.insertBefore(o, nut.nextSibling);
+  nut.style.display = 'none';
+  var oo = o.querySelectorAll('input');
+  oo[0].focus();
+
+  var dong = function(){ o.remove(); nut.style.display = ''; };
+  o.querySelector('.bo').addEventListener('click', dong);
+  o.querySelector('.luu').addEventListener('click', function(){
+    var a = oo[0].value, b = oo[1].value;
+    if (!/^\d{2}:\d{2}$/.test(a) || !/^\d{2}:\d{2}$/.test(b) || a >= b){
+      hvBao('#hvMsg','Giờ chưa đúng — giờ kết thúc phải sau giờ bắt đầu.');
+      return;
+    }
+    dong();
+    hvMoCa({ngay:ngay, batdau:a, ketthuc:b});
+  });
+  Array.prototype.forEach.call(oo, function(i){
+    i.addEventListener('keydown', function(e){
+      if (e.key === 'Enter'){ e.preventDefault(); o.querySelector('.luu').click(); }
+      if (e.key === 'Escape') dong();
+    });
+  });
+}
+
+function hvGoCa(id){
+  hvKhoa();
+  hvGoi('hv_xoa_ca', {token:HV.token, slotId:id}).then(function(r){
+    if (r && r.ok) hvBao('#hvMsg','Đã gỡ ca khỏi lịch.', true);
+    else hvLoi('#hvMsg', r, 'Không gỡ được ca.');
+    hvTai(HV.tuan);
+  }).catch(function(){ hvBao('#hvMsg','Không nối được máy chủ.'); hvTai(HV.tuan) });
+}
+
+function initHV(){
+  HV.demo = !API || API.indexOf('PASTE_') === 0;
+  if (HV.demo) $('#hvDemo').style.display = 'block';
+
+  $$('[data-hv-mo]').forEach(function(b){ b.addEventListener('click', hvMo) });
+  $$('[data-hv-dong]').forEach(function(b){ b.addEventListener('click', hvDong) });
+
+  $('#hvTabVao').addEventListener('click', function(){ hvTab(false) });
+  $('#hvTabKy').addEventListener('click',  function(){ hvTab(true) });
+
+  $('#hvVao').addEventListener('click', hvDangNhap);
+  $('#hvForm').addEventListener('submit', function(e){ e.preventDefault(); hvDangNhap() });
+  $('#hv-pass').addEventListener('keydown', function(e){ if(e.key==='Enter') hvDangNhap() });
+
+  $('#hvKy').addEventListener('click', hvDangKy);
+  $('#hvFormKy').addEventListener('submit', function(e){ e.preventDefault(); hvDangKy() });
+  $('#ky-pass').addEventListener('keydown', function(e){ if(e.key==='Enter') hvDangKy() });
+
+  $('#hvThoat').addEventListener('click', function(){
+    hvQuenPhien(); hvRaNgoai(); hvTab(false); $('#hv-pass').value='';
+  });
+  $('#hvTruoc').addEventListener('click', function(){ hvTai(hvCong(HV.tuan,-7)) });
+  $('#hvSau').addEventListener('click',   function(){ hvTai(hvCong(HV.tuan, 7)) });
+
+  hvNhoPhien();
+  if (HV.token) hvVaoTrong();
+  if (location.hash === '#hocvien') hvMo();
+  window.addEventListener('hashchange', function(){
+    if (location.hash === '#hocvien') hvMo(); else hvDong();
+  });
+}
+
 /* ══════════════ BOOT ══════════════ */
 loadConfig();
+anLinkTrong();
 initForm();
+initHV();
 initChrome();
 observe();
 initAdmin();

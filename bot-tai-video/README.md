@@ -37,7 +37,7 @@ After=network-online.target
 [Service]
 WorkingDirectory=/opt/bot-tai-video
 Environment=BOT_TOKEN=token-cua-ban
-Environment=ALLOWED_IDS=5116087301
+Environment=ALLOWED_IDS=123456789
 ExecStart=/opt/bot-tai-video/venv/bin/python bot.py
 Restart=always
 RestartSec=5
