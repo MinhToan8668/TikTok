@@ -52,22 +52,53 @@ function bang(ten, headers){
     sh = wb.insertSheet(ten);
     sh.appendRow(headers);
     sh.setFrozenRows(1);
+    // Ép TOÀN BỘ cột về văn bản thuần. Không có dòng này, Sheets tự đổi
+    // '2026-09-15' thành Date và '09:00' thành giá trị giờ — đọc ra là
+    // "Mon Sep 15 2026 ..." rồi mọi phép so sánh ngày đều sai.
+    sh.getRange(1, 1, sh.getMaxRows(), headers.length).setNumberFormat('@');
   }
   return sh;
 }
 
-function docBang(ten, headers){
+function docBang(ten, headers, chuan){
   var sh = bang(ten, headers), last = sh.getLastRow();
   if (last < 2) return [];
   return sh.getRange(2,1,last-1,headers.length).getValues().map(function(r,i){
     var o = {row:i+2};
-    headers.forEach(function(h,j){ o[h] = String(r[j]==null?'':r[j]); });
+    headers.forEach(function(h,j){
+      var v = r[j];
+      o[h] = (chuan && chuan[h]) ? chuan[h](v) : String(v==null?'':v);
+    });
     return o;
   });
 }
 
-function moiLich(){ return docBang(SHEET_LICH, LICH_HEADERS); }
-function moiHV(){   return docBang(SHEET_HV,   HV_HEADERS); }
+/* ── Chữa dữ liệu đã lỡ bị Sheets đổi kiểu ──────────────────────────
+   Sheet cũ (tạo trước khi ép định dạng văn bản) có thể đang giữ ngày
+   dưới dạng Date và giờ dưới dạng số thời gian. Đọc ra phải nắn lại,
+   không thì so sánh ngày sai bét và ca biến mất khỏi lịch.            */
+function oNgay(v){
+  if (v instanceof Date) return Utilities.formatDate(v,'GMT+7','yyyy-MM-dd');
+  var s = String(v==null?'':v).trim();
+  var m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  return m ? m[0] : s;
+}
+function oGio(v){
+  if (v instanceof Date) return Utilities.formatDate(v,'GMT+7','HH:mm');
+  var s = String(v==null?'':v).trim();
+  var m = s.match(/^(\d{1,2}):(\d{2})/);
+  return m ? ('0'+m[1]).slice(-2)+':'+m[2] : s;
+}
+function oMoc(v){   // mốc thời gian ISO — giữ để new Date() đọc lại được
+  if (v instanceof Date) return v.toISOString();
+  return String(v==null?'':v).trim();
+}
+
+var CHUAN_LICH = {ngay:oNgay, batdau:oGio, ketthuc:oGio, nhac_luc:oMoc};
+var CHUAN_HV   = {token_han:oMoc};
+
+function moiLich(){ return docBang(SHEET_LICH, LICH_HEADERS, CHUAN_LICH); }
+function moiHV(){   return docBang(SHEET_HV,   HV_HEADERS,   CHUAN_HV); }
 
 function ghiO(tenBang, headers, row, cot, giaTri){
   bang(tenBang, headers).getRange(row, headers.indexOf(cot)+1).setValue(giaTri);
@@ -574,9 +605,10 @@ function apiTongQuan(b){
   });
 
   var hvDaDat = hocvien.filter(function(h){ return h.daDat > 0 }).length;
+  var mentorMoCa = dsMentor.filter(function(m){ return m.mo > 0 }).length;
   return jsonOut({ok:true, tuan:dau, ngays:ds, mentors:dsMentor, hocvien:hocvien,
     toiDa: cfgLich().toiDa,
-    tong:{ mentor:dsMentor.length, caMo:caMo, caDat:caDat,
+    tong:{ mentor:dsMentor.length, mentorMoCa:mentorMoCa, caMo:caMo, caDat:caDat,
            hvTong:hocvien.length, hvDaDat:hvDaDat, hvChua:hocvien.length - hvDaDat }});
 }
 
@@ -904,5 +936,21 @@ function kiemTraLich(){
     return t.getHandlerFunction()==='nhacLich' }).length;
   out.push('Lịch nhắc: '+(n ? '✔ '+n+' trigger' : '✘ chưa có — chạy lichSetup'));
   out.push('Hôm nay: '+homNay()+' · Thứ Hai tuần này: '+thuHai(homNay()));
+
+  // Soi kiểu ô thật trong sheet — nguồn gốc của lỗi "mở ca rồi mà không thấy"
+  var shL = bang(SHEET_LICH, LICH_HEADERS);
+  if (shL.getLastRow() > 1){
+    var o = shL.getRange(2, LICH_HEADERS.indexOf('ngay')+1).getValue();
+    out.push('Ô ngày dòng 2: '+(o instanceof Date
+      ? '⚠️ đang là Date — sheet cũ chưa ép văn bản (code mới vẫn đọc đúng)'
+      : '✔ văn bản "'+o+'"'));
+    var ds = moiLich().filter(function(r){
+      return r.ngay >= thuHai(homNay()) && r.ngay <= congNgay(thuHai(homNay()),6)
+             && r.trangthai !== 'off' });
+    out.push('Ca đọc được trong tuần này: '+ds.length);
+    ds.slice(0,5).forEach(function(r){
+      out.push('  · '+r.ngay+' '+r.batdau+'–'+r.ketthuc+' · '+(r.mentor_ten||'—')+' · '+r.trangthai);
+    });
+  }
   Logger.log(out.join('\n'));
 }
