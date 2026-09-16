@@ -411,6 +411,66 @@ nav.stuck{border-bottom-color:var(--line);background:rgba(249,232,221,.96)}
 .rc-foot{text-align:center;font-size:11.5px;color:var(--faint);margin-top:12px;line-height:1.6}
 
 /* ═══════════ CTA ═══════════ */
+
+/* ══ SỰ THẬT — bốn cột mốc ══ */
+.moc{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(12px,1.8vw,18px);margin-bottom:clamp(26px,4vw,38px)}
+.moc-o{position:relative;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r);
+  padding:clamp(20px,2.4vw,26px) clamp(16px,2vw,22px) clamp(18px,2.4vw,24px);overflow:hidden}
+.moc-o::before{content:'';position:absolute;left:0;right:0;top:0;height:6px;background:var(--lime);opacity:.3}
+.moc-o:nth-child(2)::before{opacity:.5}.moc-o:nth-child(3)::before{opacity:.75}.moc-o:nth-child(4)::before{opacity:1}
+.moc-n{font-family:var(--disp);font-size:clamp(34px,4.4vw,50px);font-weight:800;line-height:1;color:var(--ink);letter-spacing:-.03em;
+  font-variant-numeric:tabular-nums}
+.moc-n small{font-size:14px;font-weight:600;color:var(--quiet);margin-left:5px;letter-spacing:0}
+.moc-kq{font-family:var(--hand);font-style:italic;color:var(--lime-deep);font-size:14.5px;margin:8px 0 12px;line-height:1.4}
+.moc-o p{font-size:13.5px;color:var(--quiet);line-height:1.7}
+.moc-o p b{color:var(--ink);font-weight:600}
+.roi{display:grid;grid-template-columns:1.4fr 1fr;gap:clamp(18px,3vw,36px);align-items:center;
+  background:var(--moss);color:#c8cfb4;border-radius:var(--r);padding:clamp(22px,3.4vw,34px) clamp(20px,3vw,36px)}
+.roi p{font-size:14.5px;line-height:1.8;max-width:56ch}
+.roi p b{color:var(--paper-lt);font-weight:600}
+.roi .hand{font-size:clamp(17px,2.2vw,22px);color:var(--lime);line-height:1.4;display:block;transform:rotate(-1deg)}
+.suthat-chot{margin-top:clamp(22px,3vw,30px);font-size:15px;color:var(--ink-soft);line-height:1.8;max-width:64ch}
+.suthat-chot b{color:var(--ink);font-weight:700}
+@media(max-width:900px){.moc{grid-template-columns:repeat(2,1fr)}.roi{grid-template-columns:1fr}}
+@media(max-width:520px){.moc{grid-template-columns:1fr}}
+
+/* ══ BA GÓC NHÌN ══ */
+.gn{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(14px,2vw,22px)}
+.gn-o{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r);
+  padding:clamp(20px,2.6vw,28px);display:flex;flex-direction:column;gap:14px}
+.gn-n{font-family:var(--hand);font-style:italic;font-size:13.5px;color:var(--lime-deep)}
+.gn-o h3{font-size:clamp(18px,2.2vw,22px);font-weight:800;line-height:1.2}
+.gn-o > p{font-size:14px;color:var(--quiet);line-height:1.75}
+.gn-o p b{color:var(--ink);font-weight:600}
+.gn-vd{display:grid;gap:8px;font-size:13px;line-height:1.55}
+.gn-vd span{display:flex;gap:9px;padding:9px 12px;border-radius:var(--r-sm);background:var(--paper-lt);
+  border:1px solid var(--line);color:var(--ink-soft)}
+.gn-vd span i{font-style:normal;font-weight:800;flex-shrink:0;font-family:var(--hand)}
+.gn-vd .x i{color:var(--red)}.gn-vd .v i{color:var(--lime-deep)}
+.gn-vd .v{background:var(--lime-wash);border-color:transparent;color:var(--ink)}
+.gn-lam{margin-top:auto;padding-top:14px;border-top:1.5px dashed var(--line);font-size:13.5px;color:var(--ink-soft);line-height:1.7}
+.gn-lam b{display:block;font-family:var(--hand);font-style:italic;font-weight:600;color:var(--lime-deep);margin-bottom:4px;font-size:14px}
+.gn-lam strong{color:var(--ink);font-weight:600}
+.gn-note{text-align:center;margin-top:clamp(26px,4vw,38px);font-family:var(--hand);font-style:italic;
+  font-size:clamp(16px,2vw,19px);color:var(--lime-deep);line-height:1.5;text-wrap:balance}
+@media(max-width:900px){.gn{grid-template-columns:1fr}}
+
+/* ══ KHÔNG HỢP VỚI AI ══ */
+.kh{display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(20px,3.4vw,44px);align-items:start}
+.kh-ds{list-style:none;display:flex;flex-direction:column}
+.kh-ds li{display:grid;grid-template-columns:26px 1fr;gap:12px;padding:16px 0;border-top:1.5px solid var(--line);
+  font-size:15px;color:var(--ink-soft);line-height:1.7}
+.kh-ds li:last-child{border-bottom:1.5px solid var(--line)}
+.kh-ds li i{font-style:normal;font-family:var(--hand);font-weight:700;color:var(--red);font-size:20px;line-height:1.15}
+.kh-ds li b{color:var(--ink);font-weight:600}
+.kh-con{background:var(--lime);color:#1c2600;border-radius:var(--r);padding:clamp(22px,3vw,30px);
+  box-shadow:0 8px 0 rgba(95,140,0,.35);transform:rotate(-.6deg)}
+.kh-con .kicker{color:#3a4a00;display:block;margin-bottom:10px}
+.kh-con p{font-size:15.5px;line-height:1.7;font-weight:500}
+.kh-con p b{font-weight:800}
+.kh-note{margin-top:18px;font-family:var(--hand);font-style:italic;font-size:14px;color:var(--quiet);line-height:1.6}
+@media(max-width:820px){.kh{grid-template-columns:1fr}.kh-con{transform:none}}
+
 .cta{text-align:center;position:relative;overflow:hidden;padding:clamp(76px,10vw,128px) 0;
   background:var(--moss)}
 .cta::before{content:'';position:absolute;inset:auto -10% -55% -10%;height:80%;
@@ -1000,8 +1060,10 @@ body.hv-mode{padding-bottom:0}
   </div>
   <div id="drawer">
     <a href="#letter">Thư ngỏ</a>
+    <a href="#suthat">Sự thật về 30 video đầu</a>
     <a href="#tuan">Một tuần trong lớp</a>
     <a href="#lotrinh">Lộ trình 30 ngày</a>
+    <a href="#gocnhin">Ba góc nhìn</a>
     <a href="#dangvideo">5 dạng video</a>
     <a href="#cogi">Nhận được gì</a>
     <a href="#mentors">Người dạy</a>
@@ -1103,6 +1165,41 @@ body.hv-mode{padding-bottom:0}
   </div>
 </div></section>
 
+<!-- ════════ SỰ THẬT VỀ 30 VIDEO ĐẦU ════════ -->
+<section class="sec" id="suthat" style="padding-top:0"><div class="shell">
+  <div class="sec-head rv">
+    <span class="kicker">chuyện người ta không kể cho người mới</span>
+    <h2 class="h2">Ba mươi video đầu flop<br>là <em>bình thường.</em></h2>
+    <p class="lead">Không phải bạn không có duyên. Đây là đường cong gần như ai làm kênh cũng đi qua — chỉ là chẳng ai nói trước, nên phần lớn bỏ đúng lúc sắp qua được.</p>
+  </div>
+  <div class="moc">
+    <div class="moc-o rv">
+      <div class="moc-n">10<small>video</small></div>
+      <div class="moc-kq">100–500 view mỗi cái</div>
+      <p>Mười video đầu <b>không phải để viral</b>. Thuật toán đang thử đưa video của bạn cho nhiều nhóm người khác nhau, xem nhóm nào ở lại lâu nhất. Nản ở đây là nản sớm.</p>
+    </div>
+    <div class="moc-o rv">
+      <div class="moc-n">30<small>video</small></div>
+      <div class="moc-kq">1–2 video vượt 1.000 view</div>
+      <p>Đây là lúc <b>mổ</b>. Cái video 1.000 view đó khác 29 cái kia ở đâu — câu mở? góc máy? tiêu đề? Tìm ra rồi làm lại đúng cái đó ở video tiếp theo.</p>
+    </div>
+    <div class="moc-o rv">
+      <div class="moc-n">50<small>video</small></div>
+      <div class="moc-kq">video đầu tiên chạm 10.000</div>
+      <p>Thường rơi vào khoảng video 40–60. Không phải vì 10K là nhiều, mà vì nó <b>chứng minh bạn đang đi đúng hướng</b>. Giờ mới là lúc nhân bản.</p>
+    </div>
+    <div class="moc-o rv">
+      <div class="moc-n">100<small>video</small></div>
+      <div class="moc-kq">bạn biết trước video nào sẽ lên</div>
+      <p>Không phải cái nào cũng triệu view. Là <b>biết kiểu video nào ra bao nhiêu view</b>, cách kể nào giữ chân người xem. Đích của xây kênh là chỗ này, không phải một video ăn may.</p>
+    </div>
+  </div>
+  <div class="roi rv">
+    <p>Tuần một ai cũng hăng, đăng lia lịa. Tuần ba bắt đầu có người bỏ. Tháng hai còn chừng <b>một, hai phần mười</b>. Tháng ba còn <b>vài phần trăm</b> — và gần như ai còn trụ tới đó cũng có kết quả. Không phải vì họ giỏi hơn số còn lại, mà vì họ làm đủ lâu để thuật toán tin họ.</p>
+    <span class="hand">30 ngày của lớp nằm đúng vào đoạn người ta hay bỏ nhất. Đó là lý do tụi mình dí.</span>
+  </div>
+  <p class="suthat-chot rv"><b>Thay vì đếm view, đếm bài học.</b> Mỗi video đăng xong ghi một dòng: vì sao nó lên, vì sao nó không. Bốn mươi video lẹt đẹt không phải công cốc — đó là bốn mươi dòng ghi chú để video thứ bốn mươi mốt không còn phải cầu may. Trong lớp, tụi mình bắt bạn ghi dòng đó.</p>
+</div></section>
 <!-- ════════ 3 NGUYÊN TẮC ════════ -->
 <section class="sec" style="padding-top:0"><div class="shell">
   <div class="sec-head rv">
@@ -1114,7 +1211,7 @@ body.hv-mode{padding-bottom:0}
       <div class="rule-n">một,</div>
       <div>
         <h3>Nhận định nào cũng phải có số đi kèm</h3>
-        <p>Trong lớp không có kiểu "video này hay vì… cảm giác nó cuốn". Hay là hay ở đâu — <b>hook giữ được bao nhiêu phần trăm, người xem rớt ở giây thứ mấy</b> — mở số liệu ra nói chuyện. Bạn sẽ quen dần với việc tự chấm video của mình bằng dữ liệu, thay vì ngồi đợi may.</p>
+        <p>Trong lớp không có kiểu "video này hay vì… cảm giác nó cuốn". Hay là hay ở đâu — <b>hook giữ được bao nhiêu phần trăm, người xem rớt ở giây thứ mấy</b> — mở số liệu ra nói chuyện. Vòng lặp của lớp đơn giản tới mức nhàm: <b>đăng → mở số → ghi một dòng vì sao → đổi đúng một thứ → đăng tiếp</b>. Nhàm, nhưng đây là thứ tách kênh trăm nghìn follow với kênh mãi dưới một nghìn.</p>
       </div>
     </div>
     <div class="rule rv">
@@ -1128,7 +1225,7 @@ body.hv-mode{padding-bottom:0}
       <div class="rule-n">ba,</div>
       <div>
         <h3>Ra khóa là bạn tự chạy được</h3>
-        <p>Thước đo thành công của lớp không phải một video ăn may triệu view, mà là bạn cầm được <b>một quy trình lặp lại được</b>: từ ý tưởng, kịch bản, quay, dựng đến đọc số — và không cần tụi mình đứng cạnh nữa.</p>
+        <p>Thước đo thành công của lớp không phải một video ăn may triệu view, mà là bạn cầm được <b>một quy trình lặp lại được</b>: từ ý tưởng, kịch bản, quay, dựng đến đọc số — và không cần tụi mình đứng cạnh nữa. Viral mà không biết vì sao thì lần sau không làm lại được; thuật toán đổi một cái là hết.</p>
       </div>
     </div>
   </div>
@@ -1168,10 +1265,11 @@ body.hv-mode{padding-bottom:0}
         <p>Tuần đầu chưa vội quay chụp gì nhiều. Việc quan trọng nhất là hiểu thuật toán thật sự đo cái gì, rồi chốt ngách và định vị — chọn sai ở bước này thì ba tuần sau có cố mấy cũng ngược gió.</p>
         <ul>
           <li>Thuật toán phân phối video kiểu gì, và vì sao "đăng đều" chưa đủ</li>
-          <li>Chọn ngách từ chuyên môn + hoàn cảnh sống của chính bạn, không chọn theo trend</li>
+          <li>Chọn ngách từ chuyên môn + hoàn cảnh sống của chính bạn, không chọn theo trend — thứ gần bạn nhất, xuất hiện mỗi ngày, làm năm năm cũng không cạn</li>
           <li>Dựng bộ mặt kênh: tên, bio, avatar, video ghim</li>
           <li>Cuối tuần: video đầu tiên lên sóng — quay cùng mentor nếu bạn run</li>
         </ul>
+        <span class="hand">ra khỏi tuần 1: một trang định hướng kênh + video đầu tiên đã đăng</span>
       </div>
     </article>
     <article class="stop rv">
@@ -1185,6 +1283,7 @@ body.hv-mode{padding-bottom:0}
           <li>Đọc hook rate, watch time, retention trên chính video tuần 1 của bạn</li>
           <li>Tối trong tuần: ra 2–3 video theo công thức, mentor kèm từng cái</li>
         </ul>
+        <span class="hand">ra khỏi tuần 2: 3–4 video đã đăng + bảng ghi số của từng cái</span>
       </div>
     </article>
     <article class="stop rv">
@@ -1198,6 +1297,7 @@ body.hv-mode{padding-bottom:0}
           <li>Từng người được chấm video bằng số liệu thật của video đó</li>
           <li>Tối trong tuần: buổi edit kèm 1:1 sâu nhất của cả khóa</li>
         </ul>
+        <span class="hand">ra khỏi tuần 3: một video dựng sạch bằng điện thoại, chấm theo checklist</span>
       </div>
     </article>
     <article class="stop rv">
@@ -1217,6 +1317,47 @@ body.hv-mode{padding-bottom:0}
   </div>
 </div></section>
 
+<!-- ════════ BA GÓC NHÌN ════════ -->
+<section class="sec" id="gocnhin" style="padding-top:0"><div class="shell">
+  <div class="sec-head rv">
+    <span class="kicker">học tuần đầu, dùng tới lúc bỏ nghề</span>
+    <h2 class="h2">Ba góc nhìn đổi cách bạn<br>bấm nút <em>quay.</em></h2>
+    <p class="lead">Kỹ thuật thì tuần nào cũng học thêm được. Còn ba cái này, hiểu một lần là nhìn video nào cũng thấy khác — của người ta lẫn của mình.</p>
+  </div>
+  <div class="gn">
+    <article class="gn-o rv">
+      <span class="gn-n">góc nhìn 01</span>
+      <h3>Người xem cho bạn đúng một giây, qua hai cửa</h3>
+      <p>Lướt tới video của bạn, người ta quyết định ở lại hay đi trong khoảng <b>một giây</b>. Một giây đó chỉ có hai đường vào: <b>mắt</b> — dòng chữ to đầu video, mặt và biểu cảm của bạn, cái gì đang ở sau lưng; và <b>tai</b> — nhạc nhanh hay chậm, giọng bạn có sức sống hay đều đều. Nội dung hay đến mấy mà thua ở giây này thì không ai kịp biết nó hay.</p>
+      <div class="gn-vd">
+        <span class="x"><i>✕</i>"Xin chào mọi người, hôm nay mình sẽ chia sẻ về cách…"</span>
+        <span class="v"><i>✓</i>"Ba tháng đầu mình đăng 40 video, cái nào cũng dưới 300 view. Rồi mình đổi đúng một thứ."</span>
+      </div>
+      <div class="gn-lam"><b>Làm thử tối nay</b>Tắt tiếng, lướt 20 video liền. Cái nào làm tay bạn dừng, ghi lại <strong>mắt thấy gì ở khung hình đầu</strong>. Đó là bài học về hook rẻ nhất bạn có được.</div>
+    </article>
+    <article class="gn-o rv">
+      <span class="gn-n">góc nhìn 02</span>
+      <h3>Quay cái mệt, đừng quay cái làm</h3>
+      <p>Đa số vlog quay <b>hành động</b>: nấu ăn, dọn nhà, đi làm, về nhà. Đẹp, gọn, xem xong không nhớ gì. Cùng cảnh đó mà quay <b>cảm xúc trong hành động</b> thì khác hẳn — và người xem không cần ai giải thích, họ tự cảm được. Họ không đồng cảm với kết quả đẹp. Họ đồng cảm với <b>sự cố gắng để tới được đó</b>.</p>
+      <div class="gn-vd">
+        <span class="x"><i>✕</i>Cảnh nấu bữa tối: rửa rau, xào, bày ra bàn, ăn.</span>
+        <span class="v"><i>✓</i>Sáu rưỡi tối, con khóc phòng bên. Tay trái đảo chảo, tay phải với bình sữa. Cơm vừa chín thì con ngủ — bạn ngồi ăn một mình, món còn nóng.</span>
+      </div>
+      <div class="gn-lam"><b>Làm thử tuần này</b>Chọn một việc bạn làm mỗi ngày. Quay nó ba lần, mỗi lần bắt thêm <strong>một chi tiết mệt hoặc vui</strong> mà lần trước bạn bỏ qua. Tới lần ba, video bắt đầu có người ở trong đó.</div>
+    </article>
+    <article class="gn-o rv">
+      <span class="gn-n">góc nhìn 03</span>
+      <h3>Bạn có nhiều vốn hơn bạn nghĩ</h3>
+      <p>Câu tụi mình nghe nhiều nhất buổi đầu: <i>"em chẳng có gì đặc biệt"</i>. Sai ở chỗ này: người xem của bạn không phải người đứng trên đỉnh, mà là <b>chính bạn của một, hai năm trước</b>. Người vừa thi đậu bằng lái chỉ cho người sắp thi dễ hiểu hơn thầy dạy hai mươi năm — vì họ còn nhớ mình từng vướng chỗ nào. Đây là <b>kể lại trải nghiệm</b>, không phải đóng vai chuyên gia. Cách bạn nấu mì gói đã khác người ta rồi; cả cách bạn <i>kể</i> chuyện nấu mì gói cũng là vốn.</p>
+      <div class="gn-vd">
+        <span class="x"><i>✕</i>"Đợi em giỏi hơn đã rồi em làm kênh."</span>
+        <span class="v"><i>✓</i>"Ba năm trước em kẹt đúng chỗ này. Đây là cái em ước có người nói cho em hồi đó."</span>
+      </div>
+      <div class="gn-lam"><b>Làm thử ngay</b>Viết ra 5 bước ngoặt lớn nhất đời bạn, đáy hay đỉnh đều được. Rồi trả lời một câu: <strong>nếu gặp lại mình 3 năm trước, bạn nói gì?</strong> Câu trả lời đó thường chính là video đầu tiên.</div>
+    </article>
+  </div>
+  <p class="gn-note rv">Đích của xây kênh không phải một video viral. Là biết vì sao nó viral — để làm lại được lần hai, lần ba.</p>
+</div></section>
 <!-- ════════ 5 DẠNG VIDEO ════════ -->
 <section class="sec" id="dangvideo"><div class="shell">
   <div class="sec-head rv">
@@ -1496,6 +1637,29 @@ body.hv-mode{padding-bottom:0}
 </div></section>
 
 <!-- ════════ CTA ════════ -->
+<!-- ════════ KHÔNG HỢP VỚI AI ════════ -->
+<section class="sec" id="khonghop" style="padding-top:0"><div class="shell">
+  <div class="sec-head rv">
+    <span class="kicker">nói thẳng trước khi bạn điền form</span>
+    <h2 class="h2">Lớp này <em>không</em> hợp với bạn,<br>nếu…</h2>
+  </div>
+  <div class="kh">
+    <ul class="kh-ds rv">
+      <li><i>✕</i><span>bạn cần người <b>cầm tay bấm từng click</b> suốt 30 ngày. Mentor ngồi cạnh, sửa trực tiếp trên video của bạn — nhưng tay bấm phải là tay bạn.</span></li>
+      <li><i>✕</i><span>bạn chỉ muốn <b>nghe giảng</b>. Lý thuyết gói trong một buổi tối mỗi tuần; còn lại là làm, và bị dí.</span></li>
+      <li><i>✕</i><span>bạn không dành nổi <b>chừng một tiếng mỗi ngày</b>. Kênh không lên bằng cuối tuần làm bù.</span></li>
+      <li><i>✕</i><span>bạn kỳ vọng <b>hai tuần lên 10K follow</b> hoặc ra tiền ngay. Đọc lại đường cong ở trên — tụi mình không hứa thứ mình không kiểm soát được.</span></li>
+      <li><i>✕</i><span>bạn muốn <b>giật tít, câu view</b> bằng chuyện không có thật. Lên nhanh, sập nhanh, và tụi mình không làm cái đó.</span></li>
+    </ul>
+    <div>
+      <div class="kh-con rv">
+        <span class="kicker">còn nếu…</span>
+        <p>bạn đã đăng vài video rồi mà <b>chưa cái nào lên</b>, hoặc chưa dám đăng cái nào vì <b>sợ người quen thấy</b> — thì đúng chỗ rồi. Hai khóa trước, đây là nhóm đông nhất, và cũng là nhóm ra kết quả rõ nhất.</p>
+      </div>
+      <p class="kh-note">Thà lớp thiếu một người, còn hơn có một người vào với kỳ vọng lệch rồi cả hai cùng mệt. Buổi gọi tư vấn trước khi đóng phí là để lọc chuyện này — cho cả hai bên.</p>
+    </div>
+  </div>
+</div></section>
 <section class="cta" id="dangky">
   <div class="shell cta-in">
     <span class="kicker">tới đoạn quyết định rồi</span>
@@ -1876,6 +2040,10 @@ var FALLBACK = {
 var FAQS = [
   {q:'Mình chưa từng đăng video nào, học nổi không?',
    a:'Nổi — và thật ra đây là nhóm đông nhất trong hai khóa trước. Tuần 1 bắt đầu từ con số 0: dựng kênh, chọn ngách, quay video đầu tiên (quay cùng mentor nếu bạn run). Cần đúng một chiếc điện thoại và vài buổi tối mỗi tuần.'},
+  {q:'Em chẳng có gì đặc biệt để làm kênh thì sao?',
+   a:'Câu này khóa nào cũng có người hỏi, và gần như lần nào cũng sai. Người xem của bạn không phải người đứng trên đỉnh — là <strong>bạn của một, hai năm trước</strong>, người vừa qua được đúng cái họ đang kẹt. Bài đầu tiên trong lớp là ngồi lôi ra: nghề bạn đang làm, chuyện bạn từng vượt qua, thứ người quen hay khen bạn. Chưa ai đi ra khỏi buổi đó với tờ giấy trắng cả.'},
+  {q:'Mình đăng 20 video rồi chưa cái nào lên, có phải làm sai gì không?',
+   a:'Chưa chắc sai. 30–50 video đầu lẹt đẹt là chuyện thường của nghề — chỉ là không ai nói trước. Câu hỏi đúng không phải "sai gì" mà là <strong>video nào nhỉnh hơn một chút, và nó khác gì</strong>. Bạn có kênh sẵn thì vào lớp việc đầu tiên là mở số 20 video đó ra so cạnh nhau — thường công thức riêng của bạn đã nằm sẵn trong đó rồi, chỉ chưa ai chỉ cho bạn thấy.'},
   {q:'Lịch học cụ thể ra sao?',
    a:'Buổi live cố định duy nhất là <strong>{{computed.scheduleShort}}</strong> hằng tuần, qua {{schedule.platform}}, trong {{schedule.weeks}} tuần. Các buổi edit kèm buổi tối thì hẹn linh hoạt theo lịch của bạn với mentor — người đi làm sắp xếp thoải mái.'},
   {q:'"Edit kèm 1:1" nghĩa là thế nào?',
