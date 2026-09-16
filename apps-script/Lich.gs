@@ -189,6 +189,34 @@ function luuLich(khoa, giaTri){
   _cfgLich = null;
 }
 
+/**
+ * Gộp các dòng trùng nhau khi HIỂN THỊ (cùng mentor, cùng ngày, cùng giờ).
+ * Lỗi đọc giờ lệch 7 phút hồi trước đã đẻ ra mấy dòng như vậy: bấm ba lần
+ * là ba dòng y hệt. Code đã sửa nên không đẻ thêm nữa, nhưng dòng cũ vẫn
+ * nằm trong Sheet — gộp ở đây để không ai phải đi dọn tay mới xem đúng.
+ * Giữ lại dòng đã có người đặt; không ai đặt thì giữ dòng đầu tiên.
+ * KHÔNG dùng trong /donlich — chỗ đó cần nhìn thấy đủ dòng trùng để xoá.
+ *
+ * Dòng đã đóng ('off') phải bỏ qua HẲN, không tính vào nhóm: mở ca rồi
+ * đóng rồi mở lại là chuyện bình thường, để lại một dòng 'off' cũ cùng
+ * khung giờ — gom nhầm nó vào là nó che mất ca đang mở.
+ */
+function gomTrung(ds){
+  var giu = {}, ra = [];
+  ds.forEach(function(r){
+    if (r.trangthai === 'off') return;
+    var k = r.mentor_ma+'|'+r.ngay+'|'+r.batdau+'|'+r.ketthuc;
+    var cu = giu[k];
+    if (!cu){ giu[k] = r; ra.push(r); return; }
+    // đã có dòng cùng khung giờ: chỉ thay nếu dòng mới có người đặt còn dòng cũ thì không
+    if (r.trangthai === 'booked' && cu.trangthai !== 'booked'){
+      ra[ra.indexOf(cu)] = r;
+      giu[k] = r;
+    }
+  });
+  return ra;
+}
+
 /** Học viên này đã giữ mấy ca trong tuần chứa ngày đó */
 function demCaTuan(hvMa, ngayTrongTuan, ds){
   var dau = thuHai(ngayTrongTuan), cuoi = congNgay(dau, 6), n = 0;
@@ -457,7 +485,7 @@ function duLieuTuan(me, tuanXin, dsLich){
     ngays[n] = {ngay:n, thu:tenThu(n), gon:ngayGon(n), qua:(n < bay), slots:[]};
   }
 
-  var tatCa = dsLich || moiLich();
+  var tatCa = gomTrung(dsLich || moiLich());
   tatCa.forEach(function(r){
     if (r.ngay < dau || r.ngay > cuoi) return;
     if (r.trangthai === 'off') return;
@@ -728,7 +756,7 @@ function apiTongQuan(b){
   // gom theo mentor và theo học viên trong tuần này
   var mentors = {}, datCua = {};
   var caMo = 0, caDat = 0;
-  moiLich().forEach(function(r){
+  gomTrung(moiLich()).forEach(function(r){
     if (r.ngay < dau || r.ngay > cuoi || r.trangthai === 'off') return;
     var daDat = r.trangthai === 'booked';
     ngays[r.ngay].slots.push({
@@ -997,7 +1025,7 @@ function datToiDa(chatId, arg){
 /* ── xem lịch cả tuần trong bot (chỉ đọc) ── */
 function xemLichTuan(chatId, arg){
   var dau = thuHai(String(arg||'').match(/^\d{4}-\d{2}-\d{2}$/) ? arg : homNay());
-  var ds = moiLich().filter(function(r){
+  var ds = gomTrung(moiLich()).filter(function(r){
     return r.ngay >= dau && r.ngay <= congNgay(dau,6) && r.trangthai !== 'off';
   });
   if (!ds.length)
