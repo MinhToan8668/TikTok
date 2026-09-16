@@ -254,6 +254,23 @@ lần lượt.
 Muốn tự kiểm: chạy tay hàm `kiemTraLich` — nếu vẫn chậm, xem trong Apps Script
 **Executions**, cột thời lượng của `doPost`. Trên một giây là có gì đó sai.
 
+**Trang hay báo "máy chủ bận" / "máy chủ gặp lỗi"** — ba nguồn, xem theo thứ tự:
+
+1. *Mình tự gây* (đã sửa): khi học viên đặt ca hoặc ai đó đăng ký tài khoản,
+   code gọi Telegram **trong lúc đang giữ khoá script**. Telegram có lúc chậm
+   5–10 giây → suốt thời gian đó mọi người khác bấm gì cũng dính `busy`.
+   Nay ghi Sheet xong, nhả khoá, rồi mới báo Telegram.
+2. *Google trượt một nhịp* (không sửa được, chỉ đỡ được): Apps Script miễn
+   phí thỉnh thoảng ném `Service Spreadsheets failed while accessing document`
+   hoặc mất 5–10 giây "thức dậy" sau lúc rảnh. Trang nay **tự thử lại một
+   lần** sau 1,5 giây cho các lượt gọi làm lại không hại gì (xem lịch, tổng
+   quan, lưu ca, huỷ ca, đăng nhập). Đặt ca cố ý không thử lại — lỡ lượt đầu
+   đã ghi mà mất phản hồi, thử lại sẽ báo sai — đường đó tải lại lịch.
+3. *Lỗi thật trong code*: mọi lỗi bị bắt đều nằm trong sheet **Log** kèm giờ
+   và chỗ xảy ra. Gõ **`/loi`** trong bot để xem 8 lỗi gần nhất (`/loi 20`
+   để xem nhiều hơn) — khỏi phải mở Apps Script. Trang cũng nói rõ là `busy`
+   hay `internal` thay vì một câu chung chung.
+
 **Khu học viên báo "Không nối được máy chủ"** — chưa deploy version mới, hoặc
 `API` trong `index.html` trỏ vào deployment cũ.
 
