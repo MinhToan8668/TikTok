@@ -216,7 +216,12 @@ mấy ca trùng lặp.
 Nay `oNgay` / `oGio` đọc bằng đúng `ss().getSpreadsheetTimeZone()` — chính múi
 giờ Sheets đã dùng khi cất — và làm tròn về phút gần nhất.
 
-Dòng đã lỡ tạo thì dọn tay một lần bằng **`/donlich`**:
+Dòng đã lỡ tạo **không còn hiện lên nữa**: phần hiển thị (lịch mentor, tổng
+quan lớp, `/lichtuan`) tự gộp các dòng cùng mentor + cùng ngày + cùng giờ,
+ưu tiên giữ dòng đã có người đặt. Nên không phải dọn mới xem đúng.
+
+Muốn dọn hẳn trong Sheet cho gọn thì dùng **`/donlich`** (`/donlich` cố ý
+KHÔNG gộp — nó cần nhìn thấy đủ dòng trùng thì mới xoá được):
 - `/donlich` → xem có bao nhiêu ca, bao nhiêu ca trùng
 - nhắn `trung` → chỉ gỡ bản thừa, giữ lại một ca mỗi khung giờ
 - nhắn `tatca` → xoá sạch ca trống, **giữ nguyên ca đã có người đặt**
