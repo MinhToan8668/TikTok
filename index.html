@@ -2447,13 +2447,34 @@ function hvTenGoi(hoTen){
 }
 
 /* ---- gọi backend ---- */
+/**
+ * Gọi máy chủ. Apps Script thỉnh thoảng trượt một lượt vì lý do không phải
+ * của mình — máy chủ mới thức dậy, Google Sheets lắc một nhịp ("Service
+ * Spreadsheets failed"), hay hai người bấm cùng lúc dính khoá ("busy").
+ * Với những lượt gọi làm lại không hại gì, tự thử lại MỘT lần sau 1,5 giây
+ * thay vì bắt người dùng đọc lỗi rồi bấm lại. Đặt ca (hv_book) cố ý
+ * KHÔNG thử lại: lỡ lượt đầu đã ghi xong mà mất phản hồi, thử lại sẽ báo
+ * "có người đặt mất rồi" — sai. Đường đó tải lại lịch để thấy sự thật.
+ */
+var HV_THU_LAI = {hv_slots:1, hv_tongquan:1, hv_luu_ca:1, hv_cancel:1, hv_xoa_ca:1, hv_login:1};
+
 function hvGoi(action, data){
   if (HV.demo) return Promise.resolve(hvGiaLap(action, data));
   var body = {action:action};
   for (var k in data) body[k] = data[k];
-  return fetch(API, {method:'POST',
-    headers:{'Content-Type':'text/plain;charset=utf-8'},
-    body:JSON.stringify(body)}).then(function(r){ return r.json() });
+  var goi = function(){
+    return fetch(API, {method:'POST',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify(body)}).then(function(r){ return r.json() });
+  };
+  if (!HV_THU_LAI[action]) return goi();
+  var thoangQua = function(r){ return r && (r.error === 'busy' || r.error === 'internal') };
+  return goi().then(function(r){
+    if (!thoangQua(r)) return r;
+    return new Promise(function(ok){ setTimeout(ok, 1500) }).then(goi);
+  }, function(){
+    return new Promise(function(ok){ setTimeout(ok, 1500) }).then(goi);
+  });
 }
 
 /* ---- dữ liệu giả cho bản xem thử ---- */
@@ -3178,7 +3199,9 @@ var HV_LOI = {
   khong_phai_hv:'Chỉ học viên mới đặt được ca.',
   khong_phai_mentor:'Chỉ mentor mới mở được ca.',
   gio_sai:'Giờ chưa đúng — nhập kiểu 19:30-21:00 nhé.',
-  khong_thay:'Ca này không còn trên lịch.'
+  khong_thay:'Ca này không còn trên lịch.',
+  busy:'Máy chủ đang bận (có người khác vừa bấm cùng lúc) — đợi vài giây rồi thử lại nhé.',
+  internal:'Máy chủ gặp lỗi và đã ghi lại. Thử lại giúp mình; vẫn lỗi thì báo Toàn gõ /loi trong bot.'
 };
 function hvLoi(el, r, mac){ hvBao(el, HV_LOI[r && r.error] || mac); }
 

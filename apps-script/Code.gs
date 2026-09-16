@@ -298,7 +298,7 @@ function isNotify(chatId){
 }
 
 /* Lệnh group chỉ-xem được phép dùng — muốn siết/nới thì sửa mảng này */
-var LENH_XEM = ['trangthai','status','danhsach','ds','menu','start','help','id'];
+var LENH_XEM = ['trangthai','status','danhsach','ds','menu','start','help','id','loi','log'];
 
 /* ═══════════════ CHỐNG XỬ LÝ TRÙNG ═══════════════
    Telegram gửi lại đúng update đó nếu không nhận được phản hồi kịp.
@@ -578,6 +578,7 @@ function handleTelegram(update){
         '*🖼 Đồ họa*',
         '🖼 /nen `Minh Toàn` — bot vẽ nền gọi Teams rồi gửi file (thêm `| toi` cho nền tối)','',
         '*⚙️ Khác*',
+        '🩺 /loi — xem lỗi máy chủ gần nhất (trang báo lỗi thì xem ở đây)',
         '🏫 /sokhoa `2` — số khóa đã dạy',
         '🎓 /hocvien `30+` — số học viên hiển thị'
       ].join('\n'));
@@ -758,12 +759,34 @@ function handleTelegram(update){
       return;
     }
 
+    case 'loi': case 'log': return xemLoi(chatId, arg);
     case 'sheet': return tgSend(chatId,'📄 '+ss().getUrl());
     case 'id':    return tgSend(chatId,'Chat ID: `'+chatId+'`');
 
     default:
       tgSend(chatId,'Không hiểu lệnh /'+cmd+' — gõ /menu để xem danh sách.');
   }
+}
+
+/* ── /loi: xem những lỗi máy chủ gần nhất, khỏi phải mở Apps Script ──
+   Mọi lỗi bị bắt trong doGet/doPost/lichApi đều được ghiLoi() cất vào
+   sheet Log kèm giờ và chỗ xảy ra. Đây là chỗ đầu tiên cần nhìn khi trang
+   báo "máy chủ gặp lỗi".                                                  */
+function xemLoi(chatId, arg){
+  var n = Math.min(30, Math.max(1, Number(String(arg||'').replace(/\D/g,'')) || 8));
+  var sh = ss().getSheetByName(LOG_SHEET);
+  if (!sh || sh.getLastRow() < 1)
+    return tgSend(chatId,'✅ Sheet Log trống — máy chủ chưa ghi nhận lỗi nào.');
+  var last = sh.getLastRow(), dau = Math.max(1, last - n + 1);
+  var rows = sh.getRange(dau, 1, last - dau + 1, 3).getValues().reverse();
+  var dong = ['🩺 *'+rows.length+' lỗi gần nhất* (tổng '+last+' dòng trong sheet Log)',''];
+  rows.forEach(function(r){
+    var luc = r[0] instanceof Date ? Utilities.formatDate(r[0],'GMT+7','dd/MM HH:mm') : String(r[0]);
+    dong.push('• `'+luc+'` *'+String(r[1])+'*');
+    dong.push('   '+String(r[2]).replace(/[`*_]/g,'').slice(0,200));
+  });
+  dong.push('', '_Xem nhiều hơn: /loi 20 · Sheet: /sheet_');
+  return tgSend(chatId, dong.join('\n'));
 }
 
 /* Bấm nút ✅ Duyệt / ❌ Từ chối ngay trên tin báo đăng ký */
@@ -1041,6 +1064,7 @@ function setup(){
     {command:'nhactruoc',  description:'⏰ Nhắc trước mấy tiếng — /nhactruoc 6'},
     {command:'toida',      description:'🎫 Mỗi HV tối đa mấy ca/tuần — /toida 2'},
     {command:'donlich',    description:'🧹 Dọn ca trùng / xoá sạch ca trống'},
+    {command:'loi',        description:'🩺 Lỗi máy chủ gần nhất'},
     {command:'huy',        description:'👌 Hủy câu hỏi đang chờ'},
     {command:'sheet',      description:'📄 Link Google Sheet'},
     {command:'menu',       description:'⚙️ Danh sách đầy đủ lệnh'}

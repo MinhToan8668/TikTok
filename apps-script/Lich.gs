@@ -353,6 +353,7 @@ function apiDangKy(b){
   if (pass.length < MK_TOI_THIEU)return jsonOut({ok:false, error:'mk_ngan'});
   if (ten.split(' ').length < 2) return jsonOut({ok:false, error:'ten_ngan'});
 
+  var ma, goi;
   var lock = LockService.getScriptLock();
   if (!lock.tryLock(8000)) return jsonOut({ok:false, error:'busy'});
   try{
@@ -360,30 +361,31 @@ function apiDangKy(b){
     ds.forEach(function(r){ if (chuanEmail(r.email)===email) da = r });
     if (da) return jsonOut({ok:false, error:'da_ton_tai'});
 
-    var ma = maTaiKhoan(ds);
+    ma = maTaiKhoan(ds);
     var salt = chuoiNgauNhien(16);
-    var goi = tenGoi(ten);
+    goi = tenGoi(ten);
 
     bang(SHEET_HV, HV_HEADERS).appendRow([
       ma, email, ten, goi, salt, bamMK(pass, salt),
       'cho', 'active', '', '', nowVN(), ''
     ]);
-
-    tgBroadcastKb([
-      '🙋 *Có người vừa đăng ký tài khoản*','',
-      '👤 *'+ten+'*   _(gọi là '+goi+')_',
-      '📧 `'+email+'`',
-      '🕐 '+nowVN(),'',
-      'Chọn vai trò để mở khoá tài khoản này:'
-    ].join('\n'), [[
-      {text:'🎓 Học viên', callback_data:'l:v:h:'+ma},
-      {text:'🧑‍🏫 Mentor',  callback_data:'l:v:m:'+ma}
-    ],[
-      {text:'🚫 Từ chối · xoá', callback_data:'l:v:x:'+ma}
-    ]]);
-
-    return jsonOut({ok:true, cho:true});
   } finally { lock.releaseLock(); }
+
+  // báo Toàn sau khi nhả khoá — lý do như ở apiDatLich
+  tgBroadcastKb([
+    '🙋 *Có người vừa đăng ký tài khoản*','',
+    '👤 *'+ten+'*   _(gọi là '+goi+')_',
+    '📧 `'+email+'`',
+    '🕐 '+nowVN(),'',
+    'Chọn vai trò để mở khoá tài khoản này:'
+  ].join('\n'), [[
+    {text:'🎓 Học viên', callback_data:'l:v:h:'+ma},
+    {text:'🧑‍🏫 Mentor',  callback_data:'l:v:m:'+ma}
+  ],[
+    {text:'🚫 Từ chối · xoá', callback_data:'l:v:x:'+ma}
+  ]]);
+
+  return jsonOut({ok:true, cho:true});
 }
 
 /* ── đăng nhập ── */
@@ -559,18 +561,21 @@ function apiDatLich(b){
                nhac_luc:nhac.toISOString(), da_nhac:''};
     ghiDong(SHEET_LICH, LICH_HEADERS, slot, moi);
     for (var c in moi) slot[c] = moi[c];   // giữ bản trong bộ nhớ khớp với sheet
-
-    tgBroadcast([
-      '📅 *'+goi+' vừa đặt lịch kèm 1:1*','',
-      '👤 '+me.ten+'   _(gọi là '+goi+')_',
-      '📧 `'+me.email+'`',
-      '🗓 '+tenThu(slot.ngay)+' '+ngayGon(slot.ngay)+' · '+slot.batdau+'–'+slot.ketthuc,
-      '🧑‍🏫 Mentor: '+(slot.mentor_ten||'—'),'',
-      '_Sẽ nhắc lại trước '+cfgLich().nhacTruoc+' tiếng._'
-    ].join('\n'));
-
-    return jsonOut({ok:true, lich: duLieuTuan(me, slot.ngay, tatCa)});
   } finally { lock.releaseLock(); }
+
+  // Báo Telegram SAU khi đã nhả khoá. Trước đây gọi bên trong khoá: Telegram
+  // mà chậm (có lúc 5–10 giây) là mọi người khác bấm gì cũng nhận "busy".
+  // Sheet đã ghi xong rồi, tin báo có chậm cũng không ảnh hưởng ai.
+  tgBroadcast([
+    '📅 *'+goi+' vừa đặt lịch kèm 1:1*','',
+    '👤 '+me.ten+'   _(gọi là '+goi+')_',
+    '📧 `'+me.email+'`',
+    '🗓 '+tenThu(slot.ngay)+' '+ngayGon(slot.ngay)+' · '+slot.batdau+'–'+slot.ketthuc,
+    '🧑‍🏫 Mentor: '+(slot.mentor_ten||'—'),'',
+    '_Sẽ nhắc lại trước '+cfgLich().nhacTruoc+' tiếng._'
+  ].join('\n'));
+
+  return jsonOut({ok:true, lich: duLieuTuan(me, slot.ngay, tatCa)});
 }
 
 /* ── huỷ ca: học viên huỷ ca mình đặt, mentor huỷ ca trên lịch mình ── */
