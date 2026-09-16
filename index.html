@@ -456,6 +456,20 @@ nav.stuck{border-bottom-color:var(--line);background:rgba(249,232,221,.96)}
   margin-top:clamp(26px,3.6vw,36px);padding-top:22px;border-top:1.5px dashed var(--line-dk)}
 @media(max-width:560px){.duo-sig .btn{width:100%}}
 
+/* ══ GROUP CỘNG ĐỒNG ══ */
+.cd{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(14px,2vw,22px)}
+.cd-o{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r);padding:clamp(20px,2.6vw,28px)}
+.cd-o.em{border:2px solid var(--lime-deep);background:var(--lime-wash)}
+.cd-ic{font-size:24px;line-height:1;display:block;margin-bottom:12px}
+.cd-o h3{font-size:clamp(17px,2vw,20px);font-weight:800;line-height:1.25;margin-bottom:8px}
+.cd-o p{font-size:14px;color:var(--quiet);line-height:1.75}
+.cd-o p b{color:var(--ink);font-weight:700}
+.cd-o.em p{color:var(--ink-soft)}
+.cd-chot{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;margin-top:clamp(22px,3vw,30px)}
+.cd-chot .hand{font-size:clamp(16px,2vw,19px)}
+@media(max-width:900px){.cd{grid-template-columns:1fr}}
+@media(max-width:560px){.cd-chot .btn{width:100%}}
+
 /* ══ KHÔNG HỢP VỚI AI ══ */
 .kh{max-width:720px}
 .kh-ds{list-style:none;display:flex;flex-direction:column}
@@ -1043,6 +1057,7 @@ body.hv-mode{padding-bottom:0}
       <button class="nav-link" data-go="tuan">Một tuần trong lớp</button>
       <button class="nav-link" data-go="lotrinh">Lộ trình</button>
       <button class="nav-link" data-go="mentors">Người dạy</button>
+      <button class="nav-link" data-go="congdong">Cộng đồng</button>
       <button class="nav-link" data-go="hocphi">Học phí</button>
       <button class="nav-link" data-go="faq">Hỏi đáp</button>
     </div>
@@ -1062,6 +1077,7 @@ body.hv-mode{padding-bottom:0}
     <a href="#lotrinh">Lộ trình 30 ngày</a>
     <a href="#dangvideo">5 dạng video</a>
     <a href="#mentors">Người dạy</a>
+    <a href="#congdong">Group cộng đồng</a>
     <a href="#hocphi">Học phí</a>
     <a href="#faq">Hỏi đáp</a>
     <button class="btn btn-lime btn-md" data-hv-mo style="margin-top:18px">Khu học viên →</button>
@@ -1603,6 +1619,36 @@ body.hv-mode{padding-bottom:0}
     </ul>
   </div>
 </div></section>
+<!-- ════════ GROUP CỘNG ĐỒNG ════════ -->
+<section class="sec" id="congdong" style="padding-top:0"><div class="shell">
+  <div class="sec-head rv">
+    <span class="kicker">miễn phí · dành cho mọi người đã đăng ký giữ chỗ</span>
+    <h2 class="h2">Chưa vào lớp cũng được.<br>Vào <em>group cộng đồng</em> trước đã.</h2>
+    <p class="lead">Đăng ký giữ chỗ xong là bạn có link vào group cộng đồng Tự Mình Xây Kênh — <strong>không mất phí, không cần chờ tới ngày khai giảng</strong>. Trong group, mỗi ngày tụi mình làm ba việc:</p>
+  </div>
+  <div class="cd">
+    <div class="cd-o rv">
+      <span class="cd-ic">📚</span>
+      <h3>Chia sẻ kiến thức, free</h3>
+      <p>Mỗi ngày một bài ngắn từ chính kênh tụi mình đang chạy: hook nào vừa ăn, video nào vừa flop và vì sao, thuật toán tuần này đổi gì. Đọc là dùng được ngay.</p>
+    </div>
+    <div class="cd-o rv">
+      <span class="cd-ic">🧭</span>
+      <h3>Định hướng, free</h3>
+      <p>Chưa biết làm ngách gì, đang kẹt ở đâu, nên quay dạng nào — hỏi thẳng trong group. Mentor trả lời trong ngày, không phải trả lời cho có.</p>
+    </div>
+    <div class="cd-o em rv">
+      <span class="cd-ic">🔍</span>
+      <h3>Khám kênh từng người, hằng ngày</h3>
+      <p>Gửi link kênh của bạn, mentor mở lên xem thật và chỉ ra <b>đúng một thứ nên sửa trước</b>. Ngày nào cũng có lượt khám, ai gửi cũng được xem.</p>
+    </div>
+  </div>
+  <div class="cd-chot rv">
+    <span class="hand">vào group không mất gì. Vào lớp hay không, tính sau.</span>
+    <button class="btn btn-ink btn-md" data-open data-cta>Giữ chỗ &amp; nhận link group <span class="arw">→</span></button>
+  </div>
+</div></section>
+
 <section class="cta" id="dangky">
   <div class="shell cta-in">
     <span class="kicker">tới đoạn quyết định rồi</span>
@@ -1616,7 +1662,7 @@ body.hv-mode{padding-bottom:0}
       <div class="prog" id="ctaProg"><i></i></div>
     </div>
     <button class="btn btn-lime btn-xl" data-open data-cta>Đăng ký giữ chỗ <span class="arw">→</span></button>
-    <p class="cta-sub" data-tpl="{{computed.scheduleShort}} · điền xong nhận ngay link group Zalo của lớp"></p>
+    <p class="cta-sub" data-tpl="{{computed.scheduleShort}} · điền xong nhận ngay link group cộng đồng, miễn phí"></p>
     <div class="cta-live"><span class="dot"></span><span id="ctaLive">—</span></div>
   </div>
 </section>
@@ -1769,7 +1815,7 @@ body.hv-mode{padding-bottom:0}
 
     <div id="formView">
       <h2 id="mTitle">Đăng ký giữ chỗ</h2>
-      <p class="modal-sub"><b id="mCohort">—</b><br>Bốn bước ngắn để tụi mình hiểu kênh của bạn trước khi lớp bắt đầu. Điền xong nhận ngay link group Zalo lớp.</p>
+      <p class="modal-sub"><b id="mCohort">—</b><br>Bốn bước ngắn để tụi mình hiểu kênh của bạn trước khi lớp bắt đầu. Điền xong nhận ngay link group cộng đồng Tự Mình Xây Kênh, miễn phí.</p>
       <form class="fields" id="regForm" novalidate>
         <div class="prog"><i id="progBar" style="width:25%"></i></div>
         <div class="prog-lbl"><b id="stepNo">BƯỚC 1/4</b><span id="stepName">về bạn</span></div>
@@ -1916,7 +1962,7 @@ body.hv-mode{padding-bottom:0}
         <button class="btn btn-line btn-md" id="btnBack" type="button" style="display:none">← Quay lại</button>
         <button class="btn btn-ink btn-lg" id="btnNext" type="button">Tiếp tục →</button>
         <button class="btn btn-ink btn-lg" id="btnSubmit" style="display:none">
-          <span class="spin"></span><span class="lbl">Gửi đăng ký &amp; nhận link Zalo →</span></button>
+          <span class="spin"></span><span class="lbl">Gửi đăng ký &amp; nhận link group →</span></button>
       </div>
       <p class="privacy">Thông tin chỉ dùng để tư vấn và xếp lớp · Không chia sẻ cho bên thứ ba</p>
     </div>
@@ -1926,9 +1972,9 @@ body.hv-mode{padding-bottom:0}
       <h3 id="doneTitle">Đã nhận đăng ký!</h3>
       <p id="doneBody">Tụi mình sẽ gọi tư vấn định hướng qua SĐT trong vòng <strong>24 giờ</strong>.</p>
       <div class="zalo-box" id="zaloBox" style="display:none">
-        <h4>💬 Bước tiếp theo: vào group Zalo lớp</h4>
-        <p>Lịch học, tài liệu, hỏi đáp — tất cả nằm trong group này. Vào ngay kẻo lỡ thông tin nhé.</p>
-        <a class="btn btn-ink btn-md" id="zaloBtn" href="#" target="_blank" rel="noopener">Tham gia group Zalo →</a>
+        <h4>💬 Bước tiếp theo: vào group cộng đồng Tự Mình Xây Kênh</h4>
+        <p>Miễn phí, không cần chờ đóng phí. Kiến thức, định hướng và khám kênh mỗi ngày đều ở trong này — vào ngay nhé.</p>
+        <a class="btn btn-ink btn-md" id="zaloBtn" href="#" target="_blank" rel="noopener">Vào group cộng đồng →</a>
       </div>
       <span class="pill gold" id="donePill">⏳ Đang chờ xác nhận</span>
       <div style="margin-top:24px"><button class="btn btn-line btn-md" data-close>Đóng</button></div>
@@ -1987,6 +2033,8 @@ var FAQS = [
    a:'Câu này khóa nào cũng có người hỏi, và gần như lần nào cũng sai. Người xem của bạn không phải người đứng trên đỉnh — là <strong>bạn của một, hai năm trước</strong>, người vừa qua được đúng cái họ đang kẹt. Bài đầu tiên trong lớp là ngồi lôi ra: nghề bạn đang làm, chuyện bạn từng vượt qua, thứ người quen hay khen bạn. Chưa ai đi ra khỏi buổi đó với tờ giấy trắng cả.'},
   {q:'Mình đăng 20 video rồi chưa cái nào lên, có phải làm sai gì không?',
    a:'Chưa chắc sai — thường là thiếu một vòng đọc số. Câu hỏi đúng không phải "sai gì" mà là <strong>video nào nhỉnh hơn một chút, và nó khác gì</strong>. Bạn có kênh sẵn thì vào lớp việc đầu tiên là mở số 20 video đó ra so cạnh nhau — thường công thức riêng của bạn đã nằm sẵn trong đó rồi, chỉ chưa ai chỉ cho bạn thấy.'},
+  {q:'Group cộng đồng khác gì group lớp?',
+   a:'Group cộng đồng <strong>miễn phí</strong>, ai đăng ký giữ chỗ là vào được ngay, chưa cần đóng phí: mỗi ngày có bài chia sẻ, hỏi định hướng được trả lời và gửi kênh để mentor khám. Group lớp chỉ dành cho học viên đã đóng phí — lịch học, tài liệu, edit kèm 1:1 nằm ở đó. Vào cộng đồng trước, thấy hợp rồi mới vào lớp cũng không muộn.'},
   {q:'Lịch học cụ thể ra sao?',
    a:'Buổi live cố định duy nhất là <strong>{{computed.scheduleShort}}</strong> hằng tuần, qua {{schedule.platform}}, trong {{schedule.weeks}} tuần. Ca edit kèm thì bạn tự chọn trong khu học viên theo lịch mentor mở, có cả ca cuối tuần — người đi làm sắp xếp thoải mái.'},
   {q:'"Edit kèm 1:1" nghĩa là thế nào?',
