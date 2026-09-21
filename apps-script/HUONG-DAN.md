@@ -65,6 +65,18 @@ var API = 'PASTE_APPS_SCRIPT_URL_HERE';
 
 thay bằng URL `/exec` của bạn. Đây là **chỗ duy nhất** cần sửa trong file HTML.
 
+## Form "Soi kênh miễn phí" (tab `SoiKenh`)
+
+Landing page có thêm form **gửi video, tụi mình soi** (mục `#soikenh`). Form gọi
+cùng URL `/exec` với `action:'soi'`, không cần deploy riêng — chỉ cần **New
+version** sau khi dán `Code.gs` mới.
+
+- Mỗi lượt gửi → một dòng trong tab `SoiKenh` (tự tạo lần đầu), trạng thái `moi`.
+- Bot báo về mọi chat trong `ADMIN_CHAT_IDS` và `NOTIFY_CHAT_IDS`, kèm dòng
+  **có cho phép đưa lên kênh hay không**. Không tick = chỉ trả lời riêng qua Zalo,
+  tuyệt đối không dùng làm ca sửa công khai.
+- Trả lời xong thì sửa tay cột `Trạng thái` thành `da_tra_loi` để biết ai còn nợ.
+
 ## Bước 7 — Đặt link group Zalo
 
 Nhắn cho bot:

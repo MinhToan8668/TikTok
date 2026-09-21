@@ -470,6 +470,43 @@ nav.stuck{border-bottom-color:var(--line);background:rgba(249,232,221,.96)}
 @media(max-width:900px){.cd{grid-template-columns:1fr}}
 @media(max-width:560px){.cd-chot .btn{width:100%}}
 
+/* ══ SOI KÊNH ══ */
+.tl-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(10px,1.6vw,16px);margin-bottom:clamp(30px,4vw,44px)}
+.tl{text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r);
+  padding:clamp(16px,2vw,22px);display:flex;flex-direction:column;gap:10px;cursor:pointer;
+  transition:transform .18s var(--ease),border-color .18s,box-shadow .22s;color:var(--ink-soft)}
+.tl:hover{transform:translateY(-2px);border-color:var(--lime-deep)}
+.tl.on{border:2px solid var(--lime-deep);background:var(--lime-wash);box-shadow:0 6px 0 rgba(95,140,0,.18)}
+.tl-q{font-family:var(--disp);font-weight:800;font-size:clamp(15px,1.6vw,17px);line-height:1.3;color:var(--ink);letter-spacing:-.01em}
+.tl-a{font-size:13.5px;line-height:1.65;color:var(--quiet)}
+.tl.on .tl-a{color:var(--ink-soft)}
+.soi{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,460px);gap:clamp(24px,4vw,56px);
+  background:var(--moss);color:#c8cfb4;border-radius:var(--r);padding:clamp(24px,3.6vw,44px);position:relative}
+.soi-left h3{font-size:clamp(24px,3vw,34px);font-weight:800;line-height:1.1;color:var(--paper-lt);margin:6px 0 14px}
+.soi-left p{font-size:15px;line-height:1.75;max-width:48ch}
+.soi-left b{color:var(--lime);font-weight:700}
+.soi-ds{list-style:none;margin-top:18px;display:flex;flex-direction:column;gap:10px}
+.soi-ds li{position:relative;padding-left:22px;font-size:13.5px;line-height:1.65;color:#aab39a}
+.soi-ds li::before{content:'↳';position:absolute;left:0;top:0;font-family:var(--hand);color:var(--lime)}
+.soi-ds li b{color:var(--paper-lt);font-weight:600}
+.soi-form{display:flex;flex-direction:column;gap:14px;background:var(--card);border-radius:var(--r);
+  padding:clamp(18px,2.4vw,26px);color:var(--ink-soft)}
+.soi-form .btn{width:100%}
+.soi-tl{min-height:38px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.soi-tl-empty{font-size:12.5px;color:var(--faint);font-style:italic}
+.soi-tl .pick{display:inline-flex;align-items:center;gap:8px;background:var(--lime);color:#1c2600;
+  border-radius:99px;padding:8px 12px;font-size:13px;font-weight:600;line-height:1.2}
+.soi-tl .pick button{font-size:15px;line-height:1;opacity:.7;padding:0 2px}
+.soi-ok{display:grid;grid-template-columns:18px 1fr;gap:10px;align-items:start;font-size:12.5px;line-height:1.55;color:var(--quiet);cursor:pointer}
+.soi-ok input{width:16px;height:16px;margin-top:2px;accent-color:var(--lime-deep)}
+.soi-done{grid-column:2;background:var(--card);border-radius:var(--r);padding:clamp(22px,3vw,32px);color:var(--ink-soft);text-align:center}
+.soi-done h3{font-size:22px;font-weight:800;color:var(--ink);margin:8px 0 10px}
+.soi-done p{font-size:14.5px;line-height:1.75;color:var(--quiet);margin-bottom:18px}
+.soi-done b{color:var(--ink)}
+@media(max-width:1000px){.tl-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:900px){.soi{grid-template-columns:1fr}.soi-done{grid-column:1}}
+@media(max-width:520px){.tl-grid{grid-template-columns:1fr}}
+
 /* ══ KHÔNG HỢP VỚI AI ══ */
 .kh{max-width:720px}
 .kh-ds{list-style:none;display:flex;flex-direction:column}
@@ -613,6 +650,8 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 @keyframes spin{to{transform:rotate(360deg)}}
 #btnSubmit.busy .spin{display:block}
 #btnSubmit.busy .lbl{opacity:.7}
+#soiBtn.busy .spin{display:block}
+#soiBtn.busy .lbl{opacity:.7}
 
 #doneView{display:none;text-align:center;padding:10px 0}
 .done-ic{width:70px;height:70px;border-radius:50%;background:var(--lime-wash);
@@ -1052,6 +1091,7 @@ body.hv-mode{padding-bottom:0}
       <b>Tự Mình Xây Kênh</b><span>lớp 30 ngày</span>
     </a>
     <div class="nav-links">
+      <button class="nav-link" data-go="soikenh">Soi kênh free</button>
       <button class="nav-link" data-go="cogi">Gói học</button>
       <button class="nav-link" data-go="editkem">Edit kèm</button>
       <button class="nav-link" data-go="ketqua">Học viên cũ</button>
@@ -1070,13 +1110,13 @@ body.hv-mode{padding-bottom:0}
     </div>
   </div>
   <div id="drawer">
+    <a href="#soikenh">Soi kênh miễn phí</a>
     <a href="#cogi">Nhận được gì</a>
     <a href="#editkem">Edit kèm 1:1</a>
     <a href="#ketqua">Học viên cũ</a>
     <a href="#nguyentac">Lớp dạy kiểu gì</a>
     <a href="#tuan">Một tuần trong lớp</a>
     <a href="#lotrinh">Lộ trình 30 ngày</a>
-    <a href="#dangvideo">5 dạng video</a>
     <a href="#mentors">Người dạy</a>
     <a href="#congdong">Group cộng đồng</a>
     <a href="#hocphi">Học phí</a>
@@ -1098,13 +1138,13 @@ body.hv-mode{padding-bottom:0}
       <p class="lead rv">Lớp học xây kênh TikTok <strong>30 ngày</strong> do đội ngũ sáng lập kênh Tự Mình Xây Kênh trực tiếp đứng lớp. Mỗi tuần một buổi live <strong>chốt hướng đi cho kênh của bạn</strong>, xuyên suốt khóa mentor mở máy <strong>dựng video chung với bạn</strong> — tới khi bạn tự tin bấm nút đăng. Mọi thứ dạy bằng số liệu thật: watch time, retention, hook rate. Không dạy mẹo may rủi.</p>
       <div class="hero-actions rv">
         <button class="btn btn-ink btn-lg" data-open data-cta>Đăng ký giữ chỗ <span class="arw">→</span></button>
-        <button class="btn btn-lime btn-lg" data-open data-cta>🎁 Group cộng đồng Free</button>
+        <button class="btn btn-lime btn-lg" data-go="soikenh">🔍 Soi kênh miễn phí</button>
         <button class="btn btn-line btn-lg" data-go="editkem">Xem lớp kèm edit ra sao ↓</button>
       </div>
       <div class="hero-chips rv">
         <span class="hero-chip" data-tpl="🎓 {{schedule.sessions}} buổi live · {{computed.scheduleShort}}"></span>
         <span class="hero-chip">✂️ Edit kèm 1:1 xuyên suốt khóa</span>
-        <span class="hero-chip">🧰 Bộ kịch bản + hướng dẫn quay 5 dạng video</span>
+        <span class="hero-chip">🧰 Bộ kịch bản + hướng dẫn quay theo từng dạng video</span>
         <span class="hero-chip" data-tpl="🪑 Lớp tối đa {{slots.max}} người"></span>
       </div>
     </div>
@@ -1138,6 +1178,73 @@ body.hv-mode{padding-bottom:0}
   </div>
 </div>
 
+<!-- ════════ SOI KÊNH MIỄN PHÍ (chỗ hứng lead) ════════ -->
+<section class="sec" id="soikenh" style="padding-top:clamp(44px,6vw,72px)"><div class="shell">
+  <div class="sec-head rv">
+    <span class="kicker">miễn phí · không cần vào lớp · gửi xong nhận luôn link group cộng đồng</span>
+    <h2 class="h2">Bạn đang tự nói câu nào<br>trong <em>đầu?</em></h2>
+    <p class="lead">Người tới với tụi mình gần như ai cũng mắc ở một trong tám câu này. Chọn câu giống bạn nhất, dán link một video, tụi mình mở lên xem thật và trả lời <strong>đúng một chỗ nên sửa trước</strong> qua Zalo. Không bán gì trong tin nhắn đó.</p>
+  </div>
+
+  <div class="tl-grid" id="tlGrid">
+    <button type="button" class="tl rv" data-tl="Tôi đăng 30 video rồi mà vẫn 200 view"><span class="tl-q">"Tôi đăng 30 video rồi mà vẫn 200 view"</span><span class="tl-a">Thường là lặp đúng một lỗi 30 lần vì không ai chỉ. Sửa một chỗ, không cần làm lại từ đầu.</span></button>
+    <button type="button" class="tl rv" data-tl="Chắc TikTok bóp kênh tôi"><span class="tl-q">"Chắc TikTok bóp kênh tôi"</span><span class="tl-a">Không có sổ đen. TikTok thử mỗi video với vài trăm người lạ; họ lướt thì dừng. Nhìn 3 giây đầu là biết.</span></button>
+    <button type="button" class="tl rv" data-tl="Mỗi người dạy một kiểu, biết tin ai"><span class="tl-q">"Mỗi người dạy một kiểu, biết tin ai"</span><span class="tl-a">Đừng tin lời khuyên. Tin số liệu trên chính video của bạn: giữ chân bao nhiêu, rớt ở giây mấy.</span></button>
+    <button type="button" class="tl rv" data-tl="Đồng nghiệp mà thấy thì ngại chết"><span class="tl-q">"Đồng nghiệp mà thấy thì ngại chết"</span><span class="tl-a">Họ không cười bạn lâu đâu. Họ hỏi "học ở đâu vậy" sớm hơn bạn nghĩ. My từng y hệt.</span></button>
+    <button type="button" class="tl rv" data-tl="Tôi đâu có ăn ảnh, giọng lại vùng miền"><span class="tl-q">"Tôi đâu có ăn ảnh, giọng lại vùng miền"</span><span class="tl-a">TikTok thưởng cho sự thật hơn sự đẹp. Học viên quay điện thoại cũ, giọng nặng, vẫn lên.</span></button>
+    <button type="button" class="tl rv" data-tl="Tôi có gì đặc biệt đâu mà chia sẻ"><span class="tl-q">"Tôi có gì đặc biệt đâu mà chia sẻ"</span><span class="tl-a">Bạn không cần đặc biệt. Bạn cần cụ thể. Nói nghề của bạn, tụi mình tìm ra 5 video trong 60 giây.</span></button>
+    <button type="button" class="tl rv" data-tl="Làm 6 tháng rồi công cốc thì sao"><span class="tl-q">"Làm 6 tháng rồi công cốc thì sao"</span><span class="tl-a">Không đo bằng cảm giác. Đo bằng bốn con số mỗi tuần, thấy tiến độ thật trước khi thấy view.</span></button>
+    <button type="button" class="tl rv" data-tl="Lại một ông dạy làm giàu nữa"><span class="tl-q">"Lại một ông dạy làm giàu nữa"</span><span class="tl-a">Tụi mình không hứa số. Kênh học viên ở ngay dưới, bấm vào kiểm chứng được.</span></button>
+  </div>
+
+  <div class="soi rv" id="soiBox">
+    <div class="soi-left">
+      <span class="kicker">gửi video, tụi mình soi</span>
+      <h3>Dán link một video.<br>Nhận đúng một chỗ nên sửa.</h3>
+      <p>Không cần video hay. Video flop càng tốt — đó mới là cái đáng xem. Tụi mình trả lời qua Zalo trong <b>48 giờ</b>, chỉ một chỗ, có lý do, có cách sửa. Gửi xong bạn nhận ngay <b>link group cộng đồng</b>, miễn phí, chưa cần vào lớp.</p>
+      <ul class="soi-ds">
+        <li>Bạn chọn được cho phép đưa video lên kênh Tự Mình Xây Kênh làm ca sửa công khai hay không. <b>Không tick là không dùng.</b></li>
+        <li>Không có video? Dán link kênh cũng được, tụi mình xem video gần nhất.</li>
+        <li>Chưa dám đăng video nào? Chọn câu trong đầu bạn ở trên, viết vài dòng, tụi mình vẫn trả lời.</li>
+      </ul>
+    </div>
+    <form class="soi-form" id="soiForm" novalidate>
+      <div class="fg"><label class="fl" for="s-video">Link video TikTok (hoặc link kênh) *</label>
+        <input class="inp" id="s-video" name="video" inputmode="url" placeholder="https://www.tiktok.com/@ban/video/… hoặc @tenkenh">
+        <span class="err">Dán giúp mình link video hoặc kênh nhé</span></div>
+      <div class="fi2">
+        <div class="fg"><label class="fl" for="s-name">Tên gọi *</label>
+          <input class="inp" id="s-name" name="name" autocomplete="name" placeholder="Tên hoặc @tengoi">
+          <span class="err">Cho mình biết tên bạn</span></div>
+        <div class="fg"><label class="fl" for="s-phone">Zalo / SĐT *</label>
+          <input class="inp" id="s-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="09xx xxx xxx">
+          <span class="err">Số chưa hợp lệ</span></div>
+      </div>
+      <div class="fg"><label class="fl">Câu bạn đang nói trong đầu</label>
+        <input type="hidden" id="s-tl" name="pain_tag">
+        <div class="soi-tl" id="soiTl"><span class="soi-tl-empty">chọn một ô ở trên, hoặc bỏ qua</span></div></div>
+      <div class="fg"><label class="fl" for="s-note">Bạn muốn được soi gì nhất?</label>
+        <textarea class="inp" id="s-note" name="note" rows="2" placeholder="VD: video này mình thấy ổn mà 190 view / không biết cắt chỗ nào / hook có sai không…"></textarea></div>
+      <label class="soi-ok"><input type="checkbox" id="s-consent" name="consent" value="Đồng ý"><span>Cho phép Tự Mình Xây Kênh dùng video này làm ca sửa công khai trên kênh (che tên nếu bạn muốn). Không bắt buộc.</span></label>
+      <div class="hp" aria-hidden="true"><label>Để trống ô này<input type="text" id="s-website" name="website" tabindex="-1" autocomplete="off"></label></div>
+      <div class="form-msg" id="soiMsg"></div>
+      <button class="btn btn-ink btn-lg" id="soiBtn" type="submit"><span class="spin"></span><span class="lbl">Gửi video &amp; nhận link group →</span></button>
+      <p class="privacy">Chỉ dùng để trả lời bạn · Không chia sẻ cho bên thứ ba</p>
+    </form>
+    <div class="soi-done" id="soiDone" hidden>
+      <div class="done-ic">👀</div>
+      <h3>Đã nhận. Tụi mình mở lên xem.</h3>
+      <p>Trong vòng <b>48 giờ</b> bạn nhận một tin Zalo: video rớt ở giây mấy, vì sao, sửa đúng một chỗ nào trước. Muốn được sửa tới khi ra video thì lớp ở bên dưới, còn không thì cứ dùng tin nhắn đó thôi.</p>
+      <div class="zalo-box" id="soiZalo" style="display:none">
+        <h4>💬 Trong lúc chờ: vào group cộng đồng Tự Mình Xây Kênh</h4>
+        <p>Miễn phí. Mỗi ngày có bài chia sẻ, hỏi định hướng được trả lời trong ngày, và lượt khám kênh cho mọi người.</p>
+        <a class="btn btn-ink btn-md" id="soiZaloBtn" href="#" target="_blank" rel="noopener">Vào group cộng đồng →</a>
+      </div>
+      <button class="btn btn-line btn-md" type="button" data-go="ketqua" style="margin-top:14px">Xem kênh học viên cũ ↓</button>
+    </div>
+  </div>
+</div></section>
+
 <!-- ════════ TRONG GÓI CÓ GÌ ════════ -->
 <section class="sec" id="cogi" style="padding-top:clamp(44px,6vw,72px)"><div class="shell">
   <div class="sec-head rv" style="text-align:center">
@@ -1166,7 +1273,7 @@ body.hv-mode{padding-bottom:0}
       <ul class="goi-list">
         <li><b>Khung kịch bản viral</b> theo từng dạng video — điền nội dung của bạn vào là ra bài</li>
         <li><b>Bộ hook mở đầu</b> đã chạy có số, phân theo ngách</li>
-        <li><b>Hướng dẫn quay 5 dạng content</b> — talking head, vlog, POV một ngày, review, kể chuyện — kèm video mẫu từng dạng</li>
+        <li><b>Hướng dẫn quay theo từng dạng video</b> — talking head, vlog, POV một ngày, review, kể chuyện — kèm video mẫu từng dạng</li>
         <li><b>Checklist trước khi đăng</b> — soát 10 giây, tránh mấy lỗi làm video chết ngay từ đầu</li>
         <li>Bản ghi toàn bộ buổi live, xem lại bao nhiêu lần cũng được</li>
       </ul>
@@ -1404,119 +1511,6 @@ body.hv-mode{padding-bottom:0}
   </div>
 </div></section>
 
-<!-- ════════ 5 DẠNG VIDEO ════════ -->
-<section class="sec" id="dangvideo"><div class="shell">
-  <div class="sec-head rv">
-    <span class="kicker">có sẵn trong gói, phát ngay buổi đầu</span>
-    <h2 class="h2">Năm dạng video,<br>quay <em>kiểu gì cho đúng?</em></h2>
-    <p class="lead">Mỗi dạng tụi mình đưa bạn ba thứ: cách đặt máy và lấy sáng bằng đúng cái điện thoại đang có, khung kịch bản có mốc giây điền vào là ra bài, và video mẫu để coi trước khi bấm quay. Kèm cả lỗi hay gặp nhất của dạng đó — biết trước thì khỏi mất một buổi quay. Dưới đây là bản rút gọn.</p>
-  </div>
-
-  <div class="chung rv">
-    <div class="chung-o">
-      <span class="chung-n">đúng cho mọi dạng · 01</span>
-      <h4>Ba giây đầu quyết định cả video</h4>
-      <p>Khoảng <b>7 trên 10 người xem</b> quyết định lướt hay ở lại ngay trong 3 giây đầu. Muốn TikTok đẩy đi xa, video cần giữ được tầm <b>70% người xem qua giây thứ 3</b>, 60% ở giây 15, 50% ở giây 30. Nên bỏ hết chào hỏi, logo, intro chậm — vào thẳng phần đắt nhất.</p>
-    </div>
-    <div class="chung-o">
-      <span class="chung-n">đúng cho mọi dạng · 02</span>
-      <h4>Quay 1080p 30fps, đừng quay 4K</h4>
-      <p>TikTok nén về 1080p hết, quay 4K chỉ làm file nặng chứ lên hình không đẹp hơn. Dùng <b>camera sau</b> (nét hơn camera trước), <b>chạm giữ vào mặt để khoá nét và khoá sáng</b> trước khi bấm quay. Lúc đăng nhớ bật "cho phép tải lên chất lượng cao" và đăng khi đang có wifi.</p>
-    </div>
-    <div class="chung-o">
-      <span class="chung-n">đúng cho mọi dạng · 03</span>
-      <h4>Không có phụ đề là mất một nửa người xem</h4>
-      <p>Phần lớn người lướt TikTok <b>để tắt tiếng</b> — trong lớp, trên xe, chỗ đông người. Video có phụ đề tăng thời lượng xem <b>12–40%</b>. Trước khi đăng, tắt tiếng coi lại một lượt: nếu không hiểu video nói gì thì chưa đăng được.</p>
-    </div>
-  </div>
-
-  <div class="dangs">
-
-    <article class="dang rv">
-      <div class="dang-top"><span class="dang-n">01</span><h3>Talking head</h3>
-        <span class="dang-ai">hợp với người có chuyên môn</span></div>
-      <div><span class="dang-lb">Quay thế nào</span>
-        <ul>
-          <li>Máy <b>ngang tầm mắt</b>, chừa trống khoảng một đốt ngón tay phía trên đầu, cách mặt 60–80cm</li>
-          <li>Ngồi <b>cách tường ít nhất một mét</b> — sát tường là đổ bóng cứng sau gáy, nhìn rất nghiệp dư</li>
-          <li>Sáng: quay mặt về phía cửa sổ. Có đèn ring thì <b>hất chéo 45°</b>, để chính diện là mặt bẹt như ảnh thẻ</li>
-          <li>Tiếng quan trọng hơn hình — phòng vang thì cắm tai nghe có dây, mic cách miệng chừng một gang tay</li>
-        </ul></div>
-      <div class="dang-khung"><b>Khung:</b> <b>0–3s</b> chốt luôn kết luận, không rào đón →
-        <b>3–15s</b> vì sao lại vậy → <b>15–40s</b> một ví dụ có thật của chính bạn →
-        <b>5s cuối</b> hỏi ngược người xem để kéo bình luận</div>
-      <div class="dang-loi"><b>Lỗi hay gặp:</b> để điện thoại thấp hơn mặt. Lên hình thành cằm to, mắt nhìn xuống — người xem thấy kẻ cả dù bạn không hề có ý đó.</div>
-      <a class="dang-xem" href="" target="_blank" rel="noopener">Xem video mẫu →</a>
-    </article>
-
-    <article class="dang rv">
-      <div class="dang-top"><span class="dang-n">02</span><h3>Vlog đời thường</h3>
-        <span class="dang-ai">hợp với người ngại nói thẳng vào cam</span></div>
-      <div><span class="dang-lb">Quay thế nào</span>
-        <ul>
-          <li>Học đúng một chuỗi: <b>rộng → trung → cận</b>. Rộng cho biết đang ở đâu, trung cho biết đang làm gì, cận cho thấy bàn tay hoặc chi tiết. Ba cảnh này ghép lại là xong một đoạn</li>
-          <li>Tới chỗ mới thì <b>quay cảnh rộng trước đã</b> — người xem cần biết bối cảnh rồi mới quan tâm chi tiết</li>
-          <li>Mỗi cảnh bấm quay <b>8–10 giây dù chỉ định dùng 2–3 giây</b>, dư đầu dư cuối mới cắt vào đúng nhịp được</li>
-          <li>Vừa đi vừa quay thì chùng gối, hai tay ôm máy sát ngực, mắt nhìn thẳng — đừng lia máy trong lúc đang bước</li>
-        </ul></div>
-      <div class="dang-khung"><b>Khung:</b> mở bằng cảnh đắt nhất trong ngày (đừng mở bằng cảnh ngủ dậy)
-        → trình tự việc → một khoảnh khắc thật, kể cả lúc hỏng → chốt bằng cảm nghĩ ngắn</div>
-      <div class="dang-loi"><b>Lỗi hay gặp:</b> quay một cảnh dài ba phút rồi tính về cắt. Không có cảnh khác để cắt sang thì video đứng hình, người xem lướt ở giây thứ tám.</div>
-      <a class="dang-xem" href="" target="_blank" rel="noopener">Xem video mẫu →</a>
-    </article>
-
-    <article class="dang rv">
-      <div class="dang-top"><span class="dang-n">03</span><h3>POV một ngày</h3>
-        <span class="dang-ai">hợp với nghề lạ, lịch sinh hoạt có nhịp</span></div>
-      <div><span class="dang-lb">Quay thế nào</span>
-        <ul>
-          <li>Trước khi quay, <b>viết ra 5–6 mốc</b> trong ngày rồi chỉ quay đúng mấy mốc đó. Quay bừa rồi mới ngồi nghĩ là cách nhanh nhất để bỏ cả buổi</li>
-          <li>Mỗi mốc <b>ghi giờ lên màn hình</b> — người xem bám được nhịp nên ở lại lâu hơn hẳn</li>
-          <li>Vài cảnh lặp lại hằng ngày (pha cà phê, mở máy) thì giữ <b>nguyên một góc cố định</b> suốt cả tuần — lâu dần thành chữ ký của kênh</li>
-          <li>Sau một chuỗi cảnh nhanh thì <b>xen một cảnh chậm</b>. Nhanh đều từ đầu tới cuối thì xem 30 giây là mệt</li>
-        </ul></div>
-      <div class="dang-khung"><b>Khung:</b> giờ dậy → việc căng nhất trong ngày →
-        một chi tiết trong nghề ít ai biết → kết lúc hết ngày, để lại một câu tự hỏi</div>
-      <div class="dang-loi"><b>Lỗi hay gặp:</b> dồn quay cả ngày vào một buổi rồi diễn lại. Ánh sáng không khớp với giờ ghi trên màn — người xem nhận ra ngay và mất luôn niềm tin vào cả kênh.</div>
-      <a class="dang-xem" href="" target="_blank" rel="noopener">Xem video mẫu →</a>
-    </article>
-
-    <article class="dang rv">
-      <div class="dang-top"><span class="dang-n">04</span><h3>Review &amp; mở hộp</h3>
-        <span class="dang-ai">hợp với bán hàng, affiliate</span></div>
-      <div><span class="dang-lb">Quay thế nào</span>
-        <ul>
-          <li>Kẹp máy <b>chiếu thẳng từ trên xuống</b>, quay góc nhìn bàn tay. Người xem thấy như chính tay mình đang mở — tin hơn hẳn góc ngang</li>
-          <li>Sáng phải đủ và mềm: quay cận mà thiếu sáng là <b>vỡ hạt ngay</b>. Đèn đừng dội thẳng vào mặt hộp bóng, hất chéo cho đọc được chữ trên vỏ</li>
-          <li>Quay chi tiết thì <b>lùi máy ra 20–30cm rồi mới zoom</b> — dí sát ống kính là máy rà nét liên tục, xem rất nhức mắt</li>
-          <li>Đủ ba cảnh: <b>tổng thể · cận chi tiết · đang dùng thật</b>. Thiếu cảnh thứ ba là mất tin</li>
-        </ul></div>
-      <div class="dang-khung"><b>Khung:</b> nói điểm dở trước, điểm hay sau →
-        ai nên mua, ai đừng mua → giá và mua ở đâu. Chê trước thì lời khen mới có trọng lượng</div>
-      <div class="dang-loi"><b>Lỗi hay gặp:</b> khen từ đầu tới cuối. Bình luận đầu tiên sẽ là "được trả tiền hả" — và video chết ở đúng bình luận đó.</div>
-      <a class="dang-xem" href="" target="_blank" rel="noopener">Xem video mẫu →</a>
-    </article>
-
-    <article class="dang rv">
-      <div class="dang-top"><span class="dang-n">05</span><h3>Kể chuyện</h3>
-        <span class="dang-ai">dạng dễ viral nhất, ai cũng làm được</span></div>
-      <div><span class="dang-lb">Quay thế nào</span>
-        <ul>
-          <li>Câu đầu phải là <b>chỗ gay cấn nhất và để hở phần kết</b> — người xem phải ở lại mới biết chuyện ra sao. Đó là thứ kéo tỉ lệ xem hết lên</li>
-          <li><b>Đừng kể xuôi theo thời gian.</b> Vào thẳng khúc căng, xong mới quay lại kể bối cảnh — đây là lỗi phổ biến nhất của người mới</li>
-          <li>Quay một mạch từ đầu tới cuối, sai thì <b>làm lại nguyên câu</b>. Chắp vá từng chữ nghe gượng lắm</li>
-          <li>Cứ <b>3–5 giây đổi hình một lần</b>: chèn ảnh chụp màn hình, clip tư liệu, hoặc đổi góc máy. Mắt có cái mới thì tay không lướt</li>
-        </ul></div>
-      <div class="dang-khung"><b>Khung:</b> <b>0–3s</b> thả ngay tình huống gay cấn →
-        <b>4–15s</b> bối cảnh vừa đủ để chuyện có sức nặng → <b>16–45s</b> cao trào →
-        <b>5s cuối</b> bài học rút ra, rồi cắt luôn</div>
-      <div class="dang-loi"><b>Lỗi hay gặp:</b> kết bằng "cảm ơn mọi người đã xem". Nói hết phần hay rồi còn lê thêm mấy giây là tỉ lệ xem hết rơi thẳng — hết chuyện thì cắt.</div>
-      <a class="dang-xem" href="" target="_blank" rel="noopener">Xem video mẫu →</a>
-    </article>
-
-  </div>
-  <p class="dangs-note">↳ vào lớp bạn nhận bản đầy đủ: kịch bản mẫu từng dạng, bộ hook mở đầu và danh sách video tham khảo</p>
-</div></section>
 
 <!-- ════════ NGƯỜI DẠY (gộp thư ngỏ) ════════ -->
 <section class="sec" id="mentors"><div class="shell">
@@ -1588,7 +1582,7 @@ body.hv-mode{padding-bottom:0}
       <div class="rc-sec">bộ tài nguyên</div>
       <div class="rc-row"><span>Khung kịch bản viral theo từng dạng video</span><b>✓</b></div>
       <div class="rc-row"><span>Bộ hook mở đầu đã chạy có số</span><b>✓</b></div>
-      <div class="rc-row"><span>Hướng dẫn quay 5 dạng content + video mẫu</span><b>✓</b></div>
+      <div class="rc-row"><span>Hướng dẫn quay theo từng dạng video + video mẫu</span><b>✓</b></div>
       <div class="rc-row"><span>Checklist soát video trước khi đăng</span><b>✓</b></div>
       <div class="rc-row"><span>Bản ghi toàn bộ buổi live, xem lại mãi</span><b>✓</b></div>
       <div class="rc-sec">mang về sau khóa</div>
@@ -1642,7 +1636,7 @@ body.hv-mode{padding-bottom:0}
     <div class="cd-o em rv">
       <span class="cd-ic">🔍</span>
       <h3>Khám kênh từng người, hằng ngày</h3>
-      <p>Gửi link kênh của bạn, mentor mở lên xem thật và chỉ ra <b>đúng một thứ nên sửa trước</b>. Ngày nào cũng có lượt khám, ai gửi cũng được xem.</p>
+      <p>Gửi link kênh của bạn, mentor mở lên xem thật và chỉ ra <b>đúng một thứ nên sửa trước</b>. Ngày nào cũng có lượt khám, ai gửi cũng được xem. Chưa vào group thì gửi ở <a href="#soikenh" style="color:var(--lime-deep);font-weight:600">mục soi kênh</a> phía trên cũng được.</p>
     </div>
   </div>
   <div class="cd-chot rv">
@@ -2029,6 +2023,10 @@ var FALLBACK = {
 };
 
 var FAQS = [
+  {q:'Soi kênh miễn phí có thật không, hay gửi xong bị chào mua khóa?',
+   a:'Thật, và tin nhắn trả lời không có link mua gì hết. Tụi mình mở video lên xem, nói <strong>một chỗ nên sửa trước, vì sao, sửa thế nào</strong>, xong. Lý do làm miễn phí rất thực dụng: đây đúng là việc tụi mình làm trong lớp mỗi tối, nên cho bạn thử trước một lần thì bạn biết có hợp hay không, còn tụi mình có thêm một ca thật để học. Muốn vào lớp hay không là chuyện sau.'},
+  {q:'Video mình gửi có bị đưa lên kênh của tụi mình không?',
+   a:'Chỉ khi bạn <strong>tự tick ô cho phép</strong> trong form. Không tick là không dùng, không nhắc tên, không chụp màn hình. Nếu tick, tụi mình vẫn nhắn hỏi lại trước khi đăng và che tên kênh nếu bạn muốn.'},
   {q:'Mình chưa từng đăng video nào, học nổi không?',
    a:'Nổi — và thật ra đây là nhóm đông nhất trong hai khóa trước. Tuần 1 bắt đầu từ con số 0: dựng kênh, chọn ngách, quay video đầu tiên (quay cùng mentor nếu bạn run). Cần đúng một chiếc điện thoại và vài buổi tối mỗi tuần.'},
   {q:'Em chẳng có gì đặc biệt để làm kênh thì sao?',
@@ -2514,6 +2512,67 @@ function initChrome(){
     burger.setAttribute('aria-expanded',String(on));
   });
   $$('#drawer a').forEach(function(a){a.addEventListener('click',closeDrawer)});
+
+  /* ── Soi kênh: chọn câu tâm lý + gửi video ── */
+  (function(){
+    var grid=$('#tlGrid'), form=$('#soiForm'); if(!grid||!form) return;
+    var hid=$('#s-tl'), box=$('#soiTl');
+    function paintPick(){
+      var v=hid.value;
+      box.innerHTML = v
+        ? '<span class="pick">'+esc(v)+'<button type="button" aria-label="Bỏ chọn">×</button></span>'
+        : '<span class="soi-tl-empty">chọn một ô ở trên, hoặc bỏ qua</span>';
+      var x=box.querySelector('button');
+      if(x) x.addEventListener('click',function(){ hid.value=''; $$('.tl',grid).forEach(function(t){t.classList.remove('on')}); paintPick(); });
+    }
+    $$('.tl',grid).forEach(function(t){
+      t.addEventListener('click',function(){
+        var on=t.classList.contains('on');
+        $$('.tl',grid).forEach(function(x){x.classList.remove('on')});
+        if(!on){ t.classList.add('on'); hid.value=t.getAttribute('data-tl'); }
+        else hid.value='';
+        paintPick();
+        if(!on) $('#soiBox').scrollIntoView({behavior:'smooth',block:'start'});
+      });
+    });
+    function smsg(t){ var m=$('#soiMsg'); m.textContent=t; m.className='form-msg'+(t?' on bad':''); }
+    form.addEventListener('submit',function(e){
+      e.preventDefault();
+      var bad=null;
+      [['#s-video',function(v){return v.length>3}],['#s-name',function(v){return !!v}],
+       ['#s-phone',function(v){var d=v.replace(/\D/g,'');return d.length>=9&&d.length<=12}]].forEach(function(c){
+        var el=$(c[0]), ok=c[1](el.value.trim());
+        el.classList.toggle('bad',!ok);
+        var er=el.parentNode.querySelector('.err'); if(er) er.style.display=ok?'':'block';
+        if(!ok&&!bad) bad=el;
+      });
+      if(bad){ bad.focus(); smsg('Bạn xem lại giúp mình mấy ô tô đỏ nhé.'); return; }
+      smsg('');
+      if($('#s-website').value.trim()){ done(); return; }
+      var data={action:'soi',source:'web',
+        video:$('#s-video').value.trim(), name:$('#s-name').value.trim(), phone:$('#s-phone').value.trim(),
+        pain_tag:hid.value, note:$('#s-note').value.trim(),
+        consent:$('#s-consent').checked?'Đồng ý':'', website:''};
+      var btn=$('#soiBtn'); btn.classList.add('busy');
+      if(!API || API.indexOf('PASTE_')===0){ btn.classList.remove('busy'); done(); return; }
+      fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(data)})
+        .then(function(r){return r.json()})
+        .then(function(res){
+          btn.classList.remove('busy');
+          if(res&&res.ok) done(); else smsg(errText(res&&res.error));
+        })
+        .catch(function(){
+          btn.classList.remove('busy');
+          smsg('Không gửi được — bạn kiểm tra mạng rồi thử lại nhé. Hoặc nhắn thẳng TikTok: '+(CFG?CFG.contact.tiktok:''));
+        });
+    });
+    function done(){
+      form.style.display='none'; var d=$('#soiDone'); d.hidden=false; d.classList.add('rv','in');
+      var zurl=CFG && CFG.zalo && CFG.zalo.groupUrl, zb=$('#soiZalo');
+      if(zurl){ $('#soiZaloBtn').href=zurl; zb.style.display='block'; } else zb.style.display='none';
+      d.scrollIntoView({behavior:'smooth',block:'center'});
+    }
+  })();
 
   $$('[data-open]').forEach(function(b){
     b.addEventListener('click',function(){ closeDrawer(); openModal() });

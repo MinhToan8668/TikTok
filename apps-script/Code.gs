@@ -5,6 +5,7 @@
  *  Một file làm 3 việc:
  *   1. GET  ?action=config      → trả config cho landing page
  *   2. POST {action:'register'} → lưu đăng ký vào Sheet + báo Telegram
+ *   2b. POST {action:'soi'}     → lưu yêu cầu soi kênh miễn phí (tab SoiKenh) + báo Telegram
  *   3. POST từ Telegram webhook → bot admin đổi giá / lịch / sĩ số /
  *      link Zalo / thông báo / duyệt học viên
  *
@@ -42,6 +43,7 @@ function cfgProp(name){
 }
 
 var SHEET_NAME = 'DangKy';
+var SOI_SHEET  = 'SoiKenh';   // lead từ form "gửi video, tụi mình soi"
 var LOG_SHEET  = 'Log';
 var HEADERS = ['id','time','cohort','name','phone','age','gender','job','strength',
                'goals','timeline','audience','aud_age','aud_gender','pain',
@@ -361,6 +363,7 @@ function doPost(e){
     }
 
     if (body.action === 'register') return handleRegister(body);
+    if (body.action === 'soi')      return handleSoi(body);
 
     // Khu học viên: đăng nhập / xem lịch / đặt / hủy  (xem Lich.gs)
     // lichApi đã tự đóng gói JSON rồi — bọc thêm jsonOut là ra chuỗi rỗng
@@ -384,6 +387,60 @@ function maNgan(daCo){
     if (!dung[m]) return m;
   }
   return String(new Date().getTime()).slice(-5);   // dự phòng, gần như không tới
+}
+
+/* ═══════════════ SOI KÊNH MIỄN PHÍ ═══════════════
+   Chỗ hứng lead của kênh: người xem dán link video, chọn câu tâm lý,
+   tick (hoặc không) cho phép dùng làm ca sửa công khai.
+   Lưu tab riêng để không lẫn với đăng ký lớp; trạng thái 'moi' → admin
+   trả lời qua Zalo rồi tự sửa thành 'da_tra_loi' trên Sheet.          */
+var SOI_HEADERS = ['Mã','Thời gian','Tên','SĐT','Link video/kênh','Câu tâm lý',
+                   'Muốn soi gì','Cho phép đưa lên kênh','Nguồn','Trạng thái'];
+function soiSheet(){
+  var wb = ss();
+  var sh = wb.getSheetByName(SOI_SHEET);
+  if (!sh){
+    sh = wb.insertSheet(SOI_SHEET);
+    sh.appendRow(SOI_HEADERS);
+    sh.setFrozenRows(1);
+  }
+  return sh;
+}
+function handleSoi(d){
+  if (d.website) return jsonOut({ok:true});          // honeypot
+  var name  = String(d.name||'').trim();
+  var phone = String(d.phone||'').trim();
+  var video = String(d.video||'').trim();
+  if (!name || !phone || !video) return jsonOut({ok:false, error:'missing_fields'});
+  var digits = phone.replace(/\D/g,'');
+  if (digits.length < 9 || digits.length > 12) return jsonOut({ok:false, error:'invalid_phone'});
+
+  var lock = LockService.getScriptLock();
+  if (!lock.tryLock(8000)) return jsonOut({ok:false, error:'busy'});
+  try{
+    var id = 'S'+maNgan([]);
+    var time = nowVN();
+    var consent = String(d.consent||'').trim();
+    soiSheet().appendRow([id, time, name, "'"+phone, video, String(d.pain_tag||''),
+      String(d.note||''), consent||'Không', String(d.source||'web'), 'moi']);
+
+    var tin = [
+      '👀 *Soi kênh mới — gửi video*','',
+      '👤 *'+name+'*   ·   mã `'+id+'`',
+      '📱 `'+phone+'`',
+      '🎬 '+video,
+      d.pain_tag ? '🧠 Câu trong đầu: _"'+d.pain_tag+'"_' : '',
+      d.note ? '💭 Muốn soi: _"'+d.note+'"_' : '',
+      consent ? '✅ *Cho phép đưa lên kênh làm ca sửa*' : '🔒 Không cho phép đưa lên kênh — chỉ trả lời riêng',
+      '',
+      '🕐 '+time+' · trả lời qua Zalo trong 48h'
+    ].filter(function(x){return x!==''}).join('\n');
+    tgBroadcast(tin);
+    return jsonOut({ok:true, id:id});
+  }catch(err){
+    ghiLoi('handleSoi', err);
+    return jsonOut({ok:false, error:'internal'});
+  }finally{ lock.releaseLock(); }
 }
 
 /* ═══════════════ ĐĂNG KÝ ═══════════════ */
