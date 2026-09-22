@@ -471,15 +471,6 @@ nav.stuck{border-bottom-color:var(--line);background:rgba(249,232,221,.96)}
 @media(max-width:560px){.cd-chot .btn{width:100%}}
 
 /* ══ SOI KÊNH ══ */
-.tl-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(10px,1.6vw,16px);margin-bottom:clamp(30px,4vw,44px)}
-.tl{text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r);
-  padding:clamp(16px,2vw,22px);display:flex;flex-direction:column;gap:10px;cursor:pointer;
-  transition:transform .18s var(--ease),border-color .18s,box-shadow .22s;color:var(--ink-soft)}
-.tl:hover{transform:translateY(-2px);border-color:var(--lime-deep)}
-.tl.on{border:2px solid var(--lime-deep);background:var(--lime-wash);box-shadow:0 6px 0 rgba(95,140,0,.18)}
-.tl-q{font-family:var(--disp);font-weight:800;font-size:clamp(15px,1.6vw,17px);line-height:1.3;color:var(--ink);letter-spacing:-.01em}
-.tl-a{font-size:13.5px;line-height:1.65;color:var(--quiet)}
-.tl.on .tl-a{color:var(--ink-soft)}
 .soi{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,460px);gap:clamp(24px,4vw,56px);
   background:var(--moss);color:#c8cfb4;border-radius:var(--r);padding:clamp(24px,3.6vw,44px);position:relative}
 .soi-left h3{font-size:clamp(24px,3vw,34px);font-weight:800;line-height:1.1;color:var(--paper-lt);margin:6px 0 14px}
@@ -492,20 +483,13 @@ nav.stuck{border-bottom-color:var(--line);background:rgba(249,232,221,.96)}
 .soi-form{display:flex;flex-direction:column;gap:14px;background:var(--card);border-radius:var(--r);
   padding:clamp(18px,2.4vw,26px);color:var(--ink-soft)}
 .soi-form .btn{width:100%}
-.soi-tl{min-height:38px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.soi-tl-empty{font-size:12.5px;color:var(--faint);font-style:italic}
-.soi-tl .pick{display:inline-flex;align-items:center;gap:8px;background:var(--lime);color:#1c2600;
-  border-radius:99px;padding:8px 12px;font-size:13px;font-weight:600;line-height:1.2}
-.soi-tl .pick button{font-size:15px;line-height:1;opacity:.7;padding:0 2px}
 .soi-ok{display:grid;grid-template-columns:18px 1fr;gap:10px;align-items:start;font-size:12.5px;line-height:1.55;color:var(--quiet);cursor:pointer}
 .soi-ok input{width:16px;height:16px;margin-top:2px;accent-color:var(--lime-deep)}
 .soi-done{grid-column:2;background:var(--card);border-radius:var(--r);padding:clamp(22px,3vw,32px);color:var(--ink-soft);text-align:center}
 .soi-done h3{font-size:22px;font-weight:800;color:var(--ink);margin:8px 0 10px}
 .soi-done p{font-size:14.5px;line-height:1.75;color:var(--quiet);margin-bottom:18px}
 .soi-done b{color:var(--ink)}
-@media(max-width:1000px){.tl-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:900px){.soi{grid-template-columns:1fr}.soi-done{grid-column:1}}
-@media(max-width:520px){.tl-grid{grid-template-columns:1fr}}
 
 /* ══ KHÔNG HỢP VỚI AI ══ */
 .kh{max-width:720px}
@@ -1180,23 +1164,6 @@ body.hv-mode{padding-bottom:0}
 
 <!-- ════════ SOI KÊNH MIỄN PHÍ (chỗ hứng lead) ════════ -->
 <section class="sec" id="soikenh" style="padding-top:clamp(44px,6vw,72px)"><div class="shell">
-  <div class="sec-head rv">
-    <span class="kicker">miễn phí · không cần vào lớp · gửi xong nhận luôn link group cộng đồng</span>
-    <h2 class="h2">Bạn đang tự nói câu nào<br>trong <em>đầu?</em></h2>
-    <p class="lead">Người tới với tụi mình gần như ai cũng mắc ở một trong tám câu này. Chọn câu giống bạn nhất, dán link một video, tụi mình mở lên xem thật và trả lời <strong>đúng một chỗ nên sửa trước</strong> qua Zalo. Không bán gì trong tin nhắn đó.</p>
-  </div>
-
-  <div class="tl-grid" id="tlGrid">
-    <button type="button" class="tl rv" data-tl="Tôi đăng 30 video rồi mà vẫn 200 view"><span class="tl-q">"Tôi đăng 30 video rồi mà vẫn 200 view"</span><span class="tl-a">Thường là lặp đúng một lỗi 30 lần vì không ai chỉ. Sửa một chỗ, không cần làm lại từ đầu.</span></button>
-    <button type="button" class="tl rv" data-tl="Chắc TikTok bóp kênh tôi"><span class="tl-q">"Chắc TikTok bóp kênh tôi"</span><span class="tl-a">Không có sổ đen. TikTok thử mỗi video với vài trăm người lạ; họ lướt thì dừng. Nhìn 3 giây đầu là biết.</span></button>
-    <button type="button" class="tl rv" data-tl="Mỗi người dạy một kiểu, biết tin ai"><span class="tl-q">"Mỗi người dạy một kiểu, biết tin ai"</span><span class="tl-a">Đừng tin lời khuyên. Tin số liệu trên chính video của bạn: giữ chân bao nhiêu, rớt ở giây mấy.</span></button>
-    <button type="button" class="tl rv" data-tl="Đồng nghiệp mà thấy thì ngại chết"><span class="tl-q">"Đồng nghiệp mà thấy thì ngại chết"</span><span class="tl-a">Họ không cười bạn lâu đâu. Họ hỏi "học ở đâu vậy" sớm hơn bạn nghĩ. My từng y hệt.</span></button>
-    <button type="button" class="tl rv" data-tl="Tôi đâu có ăn ảnh, giọng lại vùng miền"><span class="tl-q">"Tôi đâu có ăn ảnh, giọng lại vùng miền"</span><span class="tl-a">TikTok thưởng cho sự thật hơn sự đẹp. Học viên quay điện thoại cũ, giọng nặng, vẫn lên.</span></button>
-    <button type="button" class="tl rv" data-tl="Tôi có gì đặc biệt đâu mà chia sẻ"><span class="tl-q">"Tôi có gì đặc biệt đâu mà chia sẻ"</span><span class="tl-a">Bạn không cần đặc biệt. Bạn cần cụ thể. Nói nghề của bạn, tụi mình tìm ra 5 video trong 60 giây.</span></button>
-    <button type="button" class="tl rv" data-tl="Làm 6 tháng rồi công cốc thì sao"><span class="tl-q">"Làm 6 tháng rồi công cốc thì sao"</span><span class="tl-a">Không đo bằng cảm giác. Đo bằng bốn con số mỗi tuần, thấy tiến độ thật trước khi thấy view.</span></button>
-    <button type="button" class="tl rv" data-tl="Lại một ông dạy làm giàu nữa"><span class="tl-q">"Lại một ông dạy làm giàu nữa"</span><span class="tl-a">Tụi mình không hứa số. Kênh học viên ở ngay dưới, bấm vào kiểm chứng được.</span></button>
-  </div>
-
   <div class="soi rv" id="soiBox">
     <div class="soi-left">
       <span class="kicker">gửi video, tụi mình soi</span>
@@ -1205,7 +1172,7 @@ body.hv-mode{padding-bottom:0}
       <ul class="soi-ds">
         <li>Bạn chọn được cho phép đưa video lên kênh Tự Mình Xây Kênh làm ca sửa công khai hay không. <b>Không tick là không dùng.</b></li>
         <li>Không có video? Dán link kênh cũng được, tụi mình xem video gần nhất.</li>
-        <li>Chưa dám đăng video nào? Chọn câu trong đầu bạn ở trên, viết vài dòng, tụi mình vẫn trả lời.</li>
+        <li>Chưa dám đăng video nào? Viết vài dòng bạn đang kẹt ở đâu, tụi mình vẫn trả lời.</li>
       </ul>
     </div>
     <form class="soi-form" id="soiForm" novalidate>
@@ -1220,9 +1187,7 @@ body.hv-mode{padding-bottom:0}
           <input class="inp" id="s-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="09xx xxx xxx">
           <span class="err">Số chưa hợp lệ</span></div>
       </div>
-      <div class="fg"><label class="fl">Câu bạn đang nói trong đầu</label>
-        <input type="hidden" id="s-tl" name="pain_tag">
-        <div class="soi-tl" id="soiTl"><span class="soi-tl-empty">chọn một ô ở trên, hoặc bỏ qua</span></div></div>
+      <input type="hidden" id="s-tl" name="pain_tag">
       <div class="fg"><label class="fl" for="s-note">Bạn muốn được soi gì nhất?</label>
         <textarea class="inp" id="s-note" name="note" rows="2" placeholder="VD: video này mình thấy ổn mà 190 view / không biết cắt chỗ nào / hook có sai không…"></textarea></div>
       <label class="soi-ok"><input type="checkbox" id="s-consent" name="consent" value="Đồng ý"><span>Cho phép Tự Mình Xây Kênh dùng video này làm ca sửa công khai trên kênh (che tên nếu bạn muốn). Không bắt buộc.</span></label>
@@ -2515,26 +2480,8 @@ function initChrome(){
 
   /* ── Soi kênh: chọn câu tâm lý + gửi video ── */
   (function(){
-    var grid=$('#tlGrid'), form=$('#soiForm'); if(!grid||!form) return;
-    var hid=$('#s-tl'), box=$('#soiTl');
-    function paintPick(){
-      var v=hid.value;
-      box.innerHTML = v
-        ? '<span class="pick">'+esc(v)+'<button type="button" aria-label="Bỏ chọn">×</button></span>'
-        : '<span class="soi-tl-empty">chọn một ô ở trên, hoặc bỏ qua</span>';
-      var x=box.querySelector('button');
-      if(x) x.addEventListener('click',function(){ hid.value=''; $$('.tl',grid).forEach(function(t){t.classList.remove('on')}); paintPick(); });
-    }
-    $$('.tl',grid).forEach(function(t){
-      t.addEventListener('click',function(){
-        var on=t.classList.contains('on');
-        $$('.tl',grid).forEach(function(x){x.classList.remove('on')});
-        if(!on){ t.classList.add('on'); hid.value=t.getAttribute('data-tl'); }
-        else hid.value='';
-        paintPick();
-        if(!on) $('#soiBox').scrollIntoView({behavior:'smooth',block:'start'});
-      });
-    });
+    var form=$('#soiForm'); if(!form) return;
+    var hid=$('#s-tl');
     function smsg(t){ var m=$('#soiMsg'); m.textContent=t; m.className='form-msg'+(t?' on bad':''); }
     form.addEventListener('submit',function(e){
       e.preventDefault();
