@@ -483,8 +483,7 @@ nav.stuck{border-bottom-color:var(--line);background:rgba(249,232,221,.96)}
 .soi-form{display:flex;flex-direction:column;gap:14px;background:var(--card);border-radius:var(--r);
   padding:clamp(18px,2.4vw,26px);color:var(--ink-soft)}
 .soi-form .btn{width:100%}
-.soi-ok{display:grid;grid-template-columns:18px 1fr;gap:10px;align-items:start;font-size:12.5px;line-height:1.55;color:var(--quiet);cursor:pointer}
-.soi-ok input{width:16px;height:16px;margin-top:2px;accent-color:var(--lime-deep)}
+.soi-luuy{font-size:12.5px;line-height:1.55;color:var(--quiet)}
 .soi-done{grid-column:2;background:var(--card);border-radius:var(--r);padding:clamp(22px,3vw,32px);color:var(--ink-soft);text-align:center}
 .soi-done h3{font-size:22px;font-weight:800;color:var(--ink);margin:8px 0 10px}
 .soi-done p{font-size:14.5px;line-height:1.75;color:var(--quiet);margin-bottom:18px}
@@ -1168,9 +1167,9 @@ body.hv-mode{padding-bottom:0}
     <div class="soi-left">
       <span class="kicker">gửi video, tụi mình soi</span>
       <h3>Dán link một video.<br>Nhận đúng một chỗ nên sửa.</h3>
-      <p>Không cần video hay. Video flop càng tốt — đó mới là cái đáng xem. Tụi mình trả lời qua Zalo trong <b>48 giờ</b>, chỉ một chỗ, có lý do, có cách sửa. Gửi xong bạn nhận ngay <b>link group cộng đồng</b>, miễn phí, chưa cần vào lớp.</p>
+      <p>Bạn có biết video hay kênh của bạn đang có vấn đề gì chưa? Tụi mình sẽ hỗ trợ trả lời qua Zalo trong <b>48 giờ</b>: sửa video và phân tích cho bạn những điểm cần chú ý, kèm định hướng cải thiện. Gửi xong bạn nhận ngay <b>link group cộng đồng xây kênh</b>, miễn phí.</p>
       <ul class="soi-ds">
-        <li>Bạn chọn được cho phép đưa video lên kênh Tự Mình Xây Kênh làm ca sửa công khai hay không. <b>Không tick là không dùng.</b></li>
+        <li>Lưu ý: nội dung video có thể được dùng làm ca sửa công khai trên kênh Tự Mình Xây Kênh, <b>có che tên kênh nếu bạn muốn</b>.</li>
         <li>Không có video? Dán link kênh cũng được, tụi mình xem video gần nhất.</li>
         <li>Chưa dám đăng video nào? Viết vài dòng bạn đang kẹt ở đâu, tụi mình vẫn trả lời.</li>
       </ul>
@@ -1190,7 +1189,7 @@ body.hv-mode{padding-bottom:0}
       <input type="hidden" id="s-tl" name="pain_tag">
       <div class="fg"><label class="fl" for="s-note">Bạn muốn được soi gì nhất?</label>
         <textarea class="inp" id="s-note" name="note" rows="2" placeholder="VD: video này mình thấy ổn mà 190 view / không biết cắt chỗ nào / hook có sai không…"></textarea></div>
-      <label class="soi-ok"><input type="checkbox" id="s-consent" name="consent" value="Đồng ý"><span>Cho phép Tự Mình Xây Kênh dùng video này làm ca sửa công khai trên kênh (che tên nếu bạn muốn). Không bắt buộc.</span></label>
+      <p class="soi-luuy">Lưu ý: video bạn gửi có thể được dùng làm ca sửa công khai trên kênh Tự Mình Xây Kênh. Muốn che tên kênh thì ghi vào ô trên.</p>
       <div class="hp" aria-hidden="true"><label>Để trống ô này<input type="text" id="s-website" name="website" tabindex="-1" autocomplete="off"></label></div>
       <div class="form-msg" id="soiMsg"></div>
       <button class="btn btn-ink btn-lg" id="soiBtn" type="submit"><span class="spin"></span><span class="lbl">Gửi video &amp; nhận link group →</span></button>
@@ -1991,7 +1990,7 @@ var FAQS = [
   {q:'Soi kênh miễn phí có thật không, hay gửi xong bị chào mua khóa?',
    a:'Thật, và tin nhắn trả lời không có link mua gì hết. Tụi mình mở video lên xem, nói <strong>một chỗ nên sửa trước, vì sao, sửa thế nào</strong>, xong. Lý do làm miễn phí rất thực dụng: đây đúng là việc tụi mình làm trong lớp mỗi tối, nên cho bạn thử trước một lần thì bạn biết có hợp hay không, còn tụi mình có thêm một ca thật để học. Muốn vào lớp hay không là chuyện sau.'},
   {q:'Video mình gửi có bị đưa lên kênh của tụi mình không?',
-   a:'Chỉ khi bạn <strong>tự tick ô cho phép</strong> trong form. Không tick là không dùng, không nhắc tên, không chụp màn hình. Nếu tick, tụi mình vẫn nhắn hỏi lại trước khi đăng và che tên kênh nếu bạn muốn.'},
+   a:'Có thể. Video bạn gửi có thể được dùng làm <strong>ca sửa công khai</strong> trên kênh Tự Mình Xây Kênh để nhiều người cùng học. Muốn che tên kênh thì ghi vào form hoặc nhắn Zalo, tụi mình che.'},
   {q:'Mình chưa từng đăng video nào, học nổi không?',
    a:'Nổi — và thật ra đây là nhóm đông nhất trong hai khóa trước. Tuần 1 bắt đầu từ con số 0: dựng kênh, chọn ngách, quay video đầu tiên (quay cùng mentor nếu bạn run). Cần đúng một chiếc điện thoại và vài buổi tối mỗi tuần.'},
   {q:'Em chẳng có gì đặc biệt để làm kênh thì sao?',
@@ -2499,7 +2498,7 @@ function initChrome(){
       var data={action:'soi',source:'web',
         video:$('#s-video').value.trim(), name:$('#s-name').value.trim(), phone:$('#s-phone').value.trim(),
         pain_tag:hid.value, note:$('#s-note').value.trim(),
-        consent:$('#s-consent').checked?'Đồng ý':'', website:''};
+        consent:'Mặc định', website:''};
       var btn=$('#soiBtn'); btn.classList.add('busy');
       if(!API || API.indexOf('PASTE_')===0){ btn.classList.remove('busy'); done(); return; }
       fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(data)})
