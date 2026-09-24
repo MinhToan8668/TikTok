@@ -301,7 +301,7 @@
           <label style="font-size:12.5px;color:var(--muted);display:flex;gap:6px;align-items:center"><input type="checkbox" id="showUi" checked> Hiện khung UI</label>
         </div>
         <div class="seg" id="platform" role="group" aria-label="Nền tảng" style="margin-top:8px;flex-wrap:wrap">
-          <button data-v="all" aria-pressed="true">Cả 3</button>
+          <button data-v="all" aria-pressed="true">Cả 3 (mock TikTok)</button>
           <button data-v="tiktok" aria-pressed="false">TikTok</button>
           <button data-v="meta" aria-pressed="false">IG / FB Reels</button>
           <button data-v="metaads" aria-pressed="false">Meta Ads</button>
@@ -712,16 +712,68 @@ function zoneRects(H) { const sc = H / 1920; const out = []; for (const k of PLA
 function drawUiLayer(H) {
   const cv = $('#uiLayer'); cv.width = BASE_W; cv.height = H; const g = cv.getContext('2d'); g.clearRect(0, 0, BASE_W, H);
   if (!state.showUi) return;
-  for (const r of zoneRects(H)) {
-    g.fillStyle = 'rgba(220,60,40,.18)'; g.fillRect(r.x, r.y, r.w, r.h);
-    g.save(); g.beginPath(); g.rect(r.x, r.y, r.w, r.h); g.clip(); g.strokeStyle = 'rgba(220,60,40,.35)'; g.lineWidth = 3;
-    for (let d = -H; d < BASE_W + H; d += 48) { g.beginPath(); g.moveTo(r.x + d, r.y); g.lineTo(r.x + d + r.h, r.y + r.h); g.stroke(); } g.restore();
-    g.strokeStyle = 'rgba(220,60,40,.7)'; g.lineWidth = 3; g.setLineDash([12, 10]); g.strokeRect(r.x + 1.5, r.y + 1.5, r.w - 3, r.h - 3); g.setLineDash([]);
+  const sc = H / 1920; const W = BASE_W;
+  const ink = 'rgba(255,255,255,.82)', soft = 'rgba(255,255,255,.55)', faint = 'rgba(255,255,255,.28)';
+  const plat = state.platform === 'all' ? 'tiktok' : state.platform;
+  // làm mờ nhẹ vùng UI như CapCut: dải xám trong suốt, không viền đỏ
+  const zr = zoneRects(H);
+  for (const r of zr) { g.fillStyle = 'rgba(20,20,20,.28)'; g.fillRect(r.x, r.y, r.w, r.h); }
+  if (state.platform === 'all') { g.strokeStyle = 'rgba(255,255,255,.18)'; g.lineWidth = 2; g.setLineDash([6, 10]); for (const r of zr) g.strokeRect(r.x + 1, r.y + 1, r.w - 2, r.h - 2); g.setLineDash([]); }
+  g.textBaseline = 'alphabetic';
+  const px = v => v * sc;
+  const round = (x, y, w, h, r, fill) => { g.fillStyle = fill; rrect(g, x, y, w, h, r); g.fill(); };
+  const circle = (x, y, r, fill, stroke) => { g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); if (fill) { g.fillStyle = fill; g.fill(); } if (stroke) { g.strokeStyle = stroke; g.lineWidth = px(5); g.stroke(); } };
+  const heart = (x, y, r) => { g.fillStyle = ink; g.beginPath(); g.moveTo(x, y + r * 0.9); g.bezierCurveTo(x - r * 1.6, y - r * 0.3, x - r * 0.9, y - r * 1.3, x, y - r * 0.45); g.bezierCurveTo(x + r * 0.9, y - r * 1.3, x + r * 1.6, y - r * 0.3, x, y + r * 0.9); g.fill(); };
+  const bubble = (x, y, r) => { g.fillStyle = ink; g.beginPath(); g.ellipse(x, y, r * 1.15, r, 0, 0, Math.PI * 2); g.fill(); g.beginPath(); g.moveTo(x - r * 0.5, y + r * 0.7); g.lineTo(x - r * 0.9, y + r * 1.4); g.lineTo(x + r * 0.1, y + r * 0.85); g.fill(); };
+  const bookmark = (x, y, r) => { g.fillStyle = ink; g.beginPath(); g.moveTo(x - r * 0.8, y - r); g.lineTo(x + r * 0.8, y - r); g.lineTo(x + r * 0.8, y + r); g.lineTo(x, y + r * 0.4); g.lineTo(x - r * 0.8, y + r); g.closePath(); g.fill(); };
+  const share = (x, y, r) => { g.strokeStyle = ink; g.lineWidth = px(9); g.lineJoin = 'round'; g.lineCap = 'round'; g.beginPath(); g.moveTo(x - r, y + r * 0.7); g.quadraticCurveTo(x - r * 0.3, y - r * 0.6, x + r * 0.9, y - r * 0.4); g.stroke(); g.beginPath(); g.moveTo(x + r * 0.2, y - r * 1.1); g.lineTo(x + r, y - r * 0.4); g.lineTo(x + r * 0.2, y + r * 0.3); g.stroke(); };
+  const line = (x, y, w, h, a = .5) => round(x, y, w, h, h / 2, `rgba(255,255,255,${a})`);
+  // thanh trạng thái
+  g.fillStyle = ink; g.font = `600 ${px(40)}px "Be Vietnam Pro", system-ui, sans-serif`; g.textAlign = 'left'; g.fillText('9:41', px(60), px(72));
+  round(W - px(120), px(40), px(60), px(30), px(7), ink); round(W - px(56), px(49), px(8), px(12), 2, soft); round(W - px(230), px(44), px(34), px(24), 4, soft); round(W - px(182), px(40), px(38), px(30), 4, soft);
+  if (plat === 'tiktok') {
+    g.font = `600 ${px(36)}px "Be Vietnam Pro", system-ui, sans-serif`; g.textAlign = 'center';
+    g.fillStyle = soft; g.fillText('Following', W / 2 - px(120), px(128)); g.fillStyle = ink; g.fillText('For You', W / 2 + px(110), px(128));
+    line(W / 2 + px(60), px(140), px(100), px(6), .85);
+    g.strokeStyle = ink; g.lineWidth = px(6); circle(W - px(92), px(112), px(20), null, ink); g.beginPath(); g.moveTo(W - px(78), px(126)); g.lineTo(W - px(62), px(142)); g.stroke();
+    g.beginPath(); g.moveTo(px(60), px(96)); g.lineTo(px(120), px(96)); g.moveTo(px(60), px(112)); g.lineTo(px(120), px(112)); g.moveTo(px(60), px(128)); g.lineTo(px(120), px(128)); g.stroke();
+    // cột icon phải
+    const cx = W - px(80); let y = px(1010);
+    circle(cx, y, px(46), 'rgba(255,255,255,.35)', ink); circle(cx, y + px(52), px(18), '#ff2d55'); g.fillStyle = '#fff'; g.font = `800 ${px(28)}px sans-serif`; g.textAlign = 'center'; g.fillText('+', cx, y + px(62));
+    y += px(150); heart(cx, y, px(34)); g.fillStyle = ink; g.font = `600 ${px(26)}px "Be Vietnam Pro", system-ui, sans-serif`; g.fillText('12.4K', cx, y + px(70));
+    y += px(140); bubble(cx, y, px(30)); g.fillText('318', cx, y + px(70));
+    y += px(140); bookmark(cx, y, px(32)); g.fillText('1,024', cx, y + px(70));
+    y += px(140); share(cx, y, px(30)); g.fillText('Share', cx, y + px(70));
+    y += px(130); circle(cx, y, px(40), 'rgba(0,0,0,.5)', soft); circle(cx, y, px(16), '#999');
+    // caption dưới
+    g.textAlign = 'left'; g.fillStyle = ink; g.font = `700 ${px(32)}px "Be Vietnam Pro", system-ui, sans-serif`; g.fillText('@tuminhxaykenh', px(40), px(1560));
+    line(px(40), px(1590), px(700), px(20), .5); line(px(40), px(1628), px(560), px(20), .5); line(px(40), px(1666), px(300), px(20), .35);
+    g.fillStyle = ink; g.font = `500 ${px(28)}px "Be Vietnam Pro", system-ui, sans-serif`; g.fillText('♫', px(40), px(1730)); line(px(90), px(1712), px(420), px(18), .5);
+    line(px(40), px(1800), W - px(80), px(50), .12); g.fillStyle = soft; g.font = `400 ${px(26)}px "Be Vietnam Pro", system-ui, sans-serif`; g.fillText('Add comment...', px(70), px(1834));
+  } else if (plat === 'meta' || plat === 'metaads') {
+    g.fillStyle = ink; g.font = `700 ${px(44)}px "Be Vietnam Pro", system-ui, sans-serif`; g.textAlign = 'left'; g.fillText('Reels', px(48), px(170));
+    g.strokeStyle = ink; g.lineWidth = px(6); rrect(g, W - px(120), px(128), px(60), px(48), px(10)); g.stroke(); circle(W - px(90), px(152), px(12), null, ink);
+    const cx = W - px(78); let y = px(1180);
+    heart(cx, y, px(32)); g.fillStyle = ink; g.font = `600 ${px(26)}px "Be Vietnam Pro", system-ui, sans-serif`; g.textAlign = 'center'; g.fillText('8,921', cx, y + px(66));
+    y += px(150); bubble(cx, y, px(28)); g.fillText('204', cx, y + px(66));
+    y += px(150); share(cx, y, px(28));
+    y += px(140); g.fillStyle = ink; g.font = `800 ${px(40)}px sans-serif`; g.fillText('···', cx, y + px(14));
+    y += px(120); round(cx - px(30), y - px(30), px(60), px(60), px(10), 'rgba(255,255,255,.35)'); g.strokeStyle = ink; g.lineWidth = px(5); rrect(g, cx - px(30), y - px(30), px(60), px(60), px(10)); g.stroke();
+    g.textAlign = 'left'; circle(px(72), px(1600), px(36), 'rgba(255,255,255,.35)', ink); g.fillStyle = ink; g.font = `700 ${px(30)}px "Be Vietnam Pro", system-ui, sans-serif`; g.fillText('tuminhxaykenh', px(130), px(1612));
+    round(px(400), px(1578), px(160), px(50), px(10), 'transparent'); g.strokeStyle = ink; g.lineWidth = px(3); rrect(g, px(400), px(1578), px(160), px(50), px(10)); g.stroke(); g.fillStyle = ink; g.font = `600 ${px(26)}px "Be Vietnam Pro", system-ui, sans-serif`; g.fillText('Follow', px(438), px(1612));
+    line(px(40), px(1660), px(720), px(20), .5); line(px(40), px(1698), px(480), px(20), .4);
+    g.fillStyle = ink; g.font = `500 ${px(28)}px "Be Vietnam Pro", system-ui, sans-serif`; g.fillText('♫', px(40), px(1770)); line(px(90), px(1752), px(400), px(18), .5);
+    if (plat === 'metaads') { g.fillStyle = soft; g.font = `600 ${px(26)}px "Be Vietnam Pro", system-ui, sans-serif`; g.textAlign = 'center'; g.fillText('Vùng dưới 35% dành cho CTA quảng cáo', W / 2, px(1290)); }
+  } else {
+    g.fillStyle = ink; g.font = `700 ${px(40)}px "Be Vietnam Pro", system-ui, sans-serif`; g.textAlign = 'left'; g.fillText('Shorts', px(48), px(120));
+    const cx = W - px(78); let y = px(1060);
+    for (const [fn, lbl] of [[heart, '5.2K'], [() => { g.fillStyle = ink; g.font = `800 ${px(44)}px sans-serif`; g.textAlign = 'center'; g.fillText('👎', cx, y + px(14)); }, 'Dislike'], [bubble, '96'], [share, 'Share']]) { fn(cx, y, px(30)); g.fillStyle = ink; g.font = `600 ${px(24)}px "Be Vietnam Pro", system-ui, sans-serif`; g.textAlign = 'center'; g.fillText(lbl, cx, y + px(66)); y += px(140); }
+    g.textAlign = 'left'; circle(px(72), px(1560), px(34), 'rgba(255,255,255,.35)', ink); g.fillStyle = ink; g.font = `700 ${px(30)}px "Be Vietnam Pro", system-ui, sans-serif`; g.fillText('@tuminhxaykenh', px(126), px(1572));
+    round(px(500), px(1536), px(190), px(50), px(25), ink); g.fillStyle = '#222'; g.font = `700 ${px(26)}px "Be Vietnam Pro", system-ui, sans-serif`; g.fillText('Subscribe', px(530), px(1570));
+    line(px(40), px(1630), px(760), px(22), .5); line(px(40), px(1672), px(520), px(22), .4);
+    g.fillStyle = ink; g.font = `500 ${px(28)}px "Be Vietnam Pro", system-ui, sans-serif`; g.fillText('♫', px(40), px(1750)); line(px(90), px(1732), px(420), px(18), .5);
   }
-  // nhãn gọn ở mép
-  g.font = '700 26px "Be Vietnam Pro", system-ui, sans-serif'; g.fillStyle = 'rgba(220,60,40,.9)'; g.textAlign = 'left';
-  const top = Math.max(...zoneRects(H).filter(r => r.y === 0 && r.w === BASE_W).map(r => r.h), 0); if (top) g.fillText('vùng UI trên', 24, top - 14);
-  const bot = zoneRects(H).filter(r => r.y + r.h >= H - 1 && r.w === BASE_W).map(r => r.y); if (bot.length) g.fillText('vùng caption / nút', 24, Math.min(...bot) + 34);
+  g.textAlign = 'left';
 }
 function checkSafe(bbox, H) {
   const el = $('#safeStatus'); if (!bbox) { el.textContent = ''; el.className = 'safe-status'; return; }
