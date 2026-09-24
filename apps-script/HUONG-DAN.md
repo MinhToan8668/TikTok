@@ -127,33 +127,47 @@ Trang `tools/hook-text.html` có hai gói. Free chạy hết trên trình duyệ
 1. Học viên đăng nhập khu học viên trên landing page. Trình duyệt lưu phiên ở `localStorage` với khóa `tmxk_hv`.
 2. Trang tool nằm cùng địa chỉ với landing page nên đọc được phiên đó, gọi `hook_status` để mở Pro và hiện số lượt còn lại.
 3. Bấm "Phân tích Pro": trang gửi `hook_ai` kèm token, câu hook và ảnh frame đã thu nhỏ.
-4. `HookAI.gs` kiểm tra token bằng `aiDay()` của Lich.gs, trừ một lượt, gọi Claude bằng key trong Script Properties, rồi trả về điểm hook, 5 hook viết lại, 3 bố cục, caption và hashtag.
-5. Lỗi phía AI thì lượt được hoàn lại. Mỗi lần gọi ghi một dòng vào tab **HookAI** trong Sheet: ai dùng, câu hook, số token.
+4. `HookAI.gs` kiểm tra token bằng `aiDay()` của Lich.gs, trừ một lượt, gọi AI bằng key trong Script Properties, rồi trả về điểm hook, 5 hook viết lại, 3 bố cục, caption và hashtag.
+5. Lỗi phía AI thì lượt được hoàn lại. Mỗi lần gọi ghi một dòng vào tab **HookAI** trong Sheet: ai dùng, câu hook, số token, model.
 
 Key AI không bao giờ ra tới trình duyệt. Người không đăng nhập chỉ thấy bản Free và màn hình mời mở Pro.
 
+### Hai nhà cung cấp AI
+
+| | Gemini (mặc định) | Claude |
+|---|---|---|
+| Chi phí | Bậc miễn phí, đủ cho một lớp | Trả theo lượt, Haiku 4.5 khoảng 270đ/lượt, Opus 5 khoảng 1.300đ/lượt |
+| Chất lượng tiếng Việt | Khá | Tốt hơn, nhất là phần viết lại hook |
+| Dữ liệu | Bậc miễn phí cho phép Google dùng nội dung để cải thiện sản phẩm | Không dùng để huấn luyện |
+| Giới hạn | Có hạn mức lượt mỗi phút và mỗi ngày, xem ở aistudio.google.com/rate-limit | Theo credit đã nạp |
+
+Đổi qua lại chỉ bằng thuộc tính `HOOK_AI_PROVIDER`, không cần sửa code hay deploy lại.
+
 ### Cài đặt một lần
 
-1. Lấy API key ở console.anthropic.com → API Keys. Nạp sẵn credit.
+1. **Lấy key Gemini miễn phí:** vào aistudio.google.com, đăng nhập Google, bấm **Get API key** → **Create API key**. Không cần thẻ. Key bắt đầu bằng `AIza`.
 2. Apps Script → **Project Settings** → **Script properties** → thêm:
 
-   | Thuộc tính | Giá trị | Bắt buộc |
+   | Thuộc tính | Giá trị | Ghi chú |
    |---|---|---|
-   | `ANTHROPIC_API_KEY` | `sk-ant-...` | có |
-   | `HOOK_AI_DAILY` | số lượt mỗi học viên mỗi ngày, mặc định `20` | không |
-   | `HOOK_AI_MODEL` | mặc định `claude-opus-5` | không |
+   | `GEMINI_API_KEY` | `AIza...` | bắt buộc khi dùng Gemini |
+   | `HOOK_AI_PROVIDER` | `gemini` | bỏ trống cũng là gemini; đổi `claude` khi muốn |
+   | `HOOK_AI_MODEL` | bỏ trống | mặc định `gemini-2.5-flash`; thử `gemini-3.5-flash` nếu tài khoản bạn có |
+   | `HOOK_AI_DAILY` | `20` | số lượt mỗi học viên mỗi ngày |
+   | `ANTHROPIC_API_KEY` | `sk-ant-...` | chỉ cần khi đổi sang Claude |
 
-3. Thêm file `HookAI.gs` vào project (Files → + → Script), dán nội dung file cùng tên trong repo.
+3. Thêm file `HookAI.gs` vào project (Files → + → Script), dán nội dung file cùng tên trong repo. Thay `Code.gs` bằng bản trong repo, vì `doPost` có thêm hai dòng định tuyến `hook_ai` và `hook_status`.
 4. **Deploy → Manage deployments → Edit → New version → Deploy.** Giữ nguyên URL `/exec` cũ.
 
 ### Kiểm tra
 
 - Mở `https://minhtoan8668.github.io/TikTok/tools/hook-text.html` khi chưa đăng nhập: thấy bản Free và thẻ mời mở Pro.
 - Đăng nhập khu học viên, quay lại trang tool: góc trên hiện "Chào tên · gói Pro", thẻ Pro hiện "Còn 20/20 lượt hôm nay".
-- Bấm Phân tích Pro: sau 15 đến 40 giây có kết quả, tab HookAI trong Sheet có thêm một dòng.
+- Bấm Phân tích Pro: sau 10 đến 30 giây có kết quả, tab HookAI trong Sheet có thêm một dòng với cột model là `gemini-2.5-flash`.
+- Nếu báo "AI đang quá tải", đó là chạm hạn mức miễn phí của Gemini theo phút. Đợi một phút rồi thử lại, hoặc giảm `HOOK_AI_DAILY`.
 
-Mentor không bị giới hạn lượt. Muốn đổi số lượt thì sửa `HOOK_AI_DAILY`, không cần deploy lại.
+Mentor không bị giới hạn lượt.
 
-### Chi phí ước tính
+### Khi nào nên chuyển sang Claude
 
-Mỗi lần phân tích gửi một ảnh khoảng 1000px và nhận về khoảng 1.500 token. Theo giá Claude Opus 5 hiện tại là vài trăm đồng mỗi lượt. Xem chính xác ở cột token của tab HookAI.
+Khi lớp đông và hay chạm hạn mức miễn phí, hoặc khi muốn phần viết lại hook mượt hơn. Nạp credit ở console.anthropic.com, thêm `ANTHROPIC_API_KEY`, đặt `HOOK_AI_PROVIDER` = `claude` và `HOOK_AI_MODEL` = `claude-haiku-4-5` để rẻ nhất. Không cần deploy lại.

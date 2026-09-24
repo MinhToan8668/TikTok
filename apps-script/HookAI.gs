@@ -8,11 +8,17 @@
  *     3. gọi Claude              → key nằm trong Script Properties, trình duyệt không bao giờ thấy
  *     4. ghi log vào tab HookAI  → biết ai dùng, dùng bao nhiêu, tốn bao nhiêu token
  *
+ * Nhà cung cấp AI chọn bằng thuộc tính HOOK_AI_PROVIDER:
+ *   gemini (mặc định)  → Google Gemini, có bậc miễn phí. Cần GEMINI_API_KEY (lấy ở aistudio.google.com).
+ *   claude             → Anthropic Claude, trả tiền theo lượt. Cần ANTHROPIC_API_KEY.
+ *
  * Cài đặt (một lần):
  *   Project Settings → Script properties → thêm
- *     ANTHROPIC_API_KEY   sk-ant-...            (bắt buộc)
- *     HOOK_AI_DAILY       20                    (tuỳ chọn, mặc định 20)
- *     HOOK_AI_MODEL       claude-opus-5         (tuỳ chọn)
+ *     GEMINI_API_KEY      AIza...               (bắt buộc khi dùng gemini)
+ *     ANTHROPIC_API_KEY   sk-ant-...            (bắt buộc khi dùng claude)
+ *     HOOK_AI_PROVIDER    gemini | claude       (tuỳ chọn, mặc định gemini)
+ *     HOOK_AI_MODEL       tên model             (tuỳ chọn; gemini mặc định gemini-2.5-flash, claude mặc định claude-opus-5)
+ *     HOOK_AI_DAILY       20                    (tuỳ chọn, số lượt mỗi học viên mỗi ngày)
  *   Rồi Deploy → Manage deployments → Edit → New version → Deploy.
  */
 
@@ -25,7 +31,8 @@ function hookAi(b){
   var me = aiDay(b.token);
   if (!me) return jsonOut({ok:false, error:'het_phien'});
 
-  var key = cfgProp('ANTHROPIC_API_KEY');
+  var provider = (cfgProp('HOOK_AI_PROVIDER') || 'gemini').toLowerCase();
+  var key = provider === 'claude' ? cfgProp('ANTHROPIC_API_KEY') : cfgProp('GEMINI_API_KEY');
   if (!key) return jsonOut({ok:false, error:'chua_cai_key'});
 
   var text = String(b.text || '').slice(0, 1500).trim();
@@ -39,16 +46,69 @@ function hookAi(b){
   var con = hookTruLuot(me.ma, han, khongGioiHan);
   if (con < 0) return jsonOut({ok:false, error:'het_luot', han:han});
 
-  // ── gọi Claude ──
+  // ── gọi AI ──
+  var prompt = hookPrompt(text, b, !!img);
+  var kq = provider === 'claude' ? goiClaude(key, img, prompt) : goiGemini(key, img, prompt);
+  if (!kq.ok){
+    hookHoanLuot(me.ma, khongGioiHan);
+    hookLog(me, text, false, kq.loi, kq.vin || 0, kq.vout || 0, kq.model);
+    return jsonOut({ok:false, error: kq.error});
+  }
+  var data = kq.data;
+
+  hookLog(me, text, true, '', kq.vin || 0, kq.vout || 0, kq.model);
+  return jsonOut({ok:true, data:data, con: khongGioiHan ? null : con, han:han, ten: me.ten_goi || me.ten});
+}
+
+/* ── Gemini: bậc miễn phí, dữ liệu có thể được Google dùng để cải thiện sản phẩm ── */
+function goiGemini(key, img, prompt){
+  var model = cfgProp('HOOK_AI_MODEL') || 'gemini-2.5-flash';
+  var parts = [];
+  if (img) parts.push({inline_data:{mime_type:'image/jpeg', data:img}});
+  parts.push({text: prompt});
+  var req = {
+    contents: [{role:'user', parts: parts}],
+    generationConfig: {
+      responseMimeType: 'application/json',
+      responseJsonSchema: HOOK_SCHEMA,
+      maxOutputTokens: 6000,
+      temperature: 0.7,
+      thinkingConfig: {thinkingBudget: 0}
+    }
+  };
+  var res, ma, raw;
+  try{
+    res = UrlFetchApp.fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':generateContent', {
+      method:'post', contentType:'application/json', muteHttpExceptions:true,
+      headers:{ 'x-goog-api-key': key },
+      payload: JSON.stringify(req)
+    });
+    ma = res.getResponseCode(); raw = res.getContentText();
+  }catch(err){ return {ok:false, error:'loi_mang', loi:'mang: '+err, model:model}; }
+  if (ma !== 200){
+    var e429 = ma === 429 || ma === 503;
+    return {ok:false, error: e429 ? 'ban_qua' : 'loi_ai', loi:'http '+ma+': '+String(raw).slice(0,300), model:model};
+  }
+  var j; try{ j = JSON.parse(raw); }catch(err){ return {ok:false, error:'loi_ai', loi:'json ngoai: '+String(raw).slice(0,200), model:model}; }
+  var u = j.usageMetadata || {}; var vin = u.promptTokenCount || 0, vout = u.candidatesTokenCount || 0;
+  var cand = (j.candidates || [])[0];
+  if (!cand){ return {ok:false, error:'tu_choi', loi:'khong co candidate: '+JSON.stringify(j.promptFeedback||{}).slice(0,200), vin:vin, vout:vout, model:model}; }
+  if (cand.finishReason && cand.finishReason !== 'STOP' && cand.finishReason !== 'MAX_TOKENS'){
+    return {ok:false, error:'tu_choi', loi:'finish '+cand.finishReason, vin:vin, vout:vout, model:model};
+  }
+  var chu = ((cand.content || {}).parts || []).map(function(p){ return p.text || '' }).join('');
+  var data; try{ data = JSON.parse(chu); }catch(err){ return {ok:false, error:'loi_ai', loi:'json: '+chu.slice(0,200), vin:vin, vout:vout, model:model}; }
+  return {ok:true, data:data, vin:vin, vout:vout, model:model};
+}
+
+/* ── Claude: trả tiền theo lượt, chất lượng tiếng Việt tốt hơn ── */
+function goiClaude(key, img, prompt){
   var model = cfgProp('HOOK_AI_MODEL') || 'claude-opus-5';
   var noiDung = [];
   if (img) noiDung.push({type:'image', source:{type:'base64', media_type:'image/jpeg', data:img}});
-  noiDung.push({type:'text', text: hookPrompt(text, b, !!img)});
-
+  noiDung.push({type:'text', text: prompt});
   var req = {
-    model: model,
-    max_tokens: 6000,
-    fallbacks: 'default',
+    model: model, max_tokens: 6000, fallbacks: 'default',
     output_config: { effort: 'low', format: { type:'json_schema', schema: HOOK_SCHEMA } },
     messages: [{ role:'user', content: noiDung }]
   };
@@ -56,40 +116,17 @@ function hookAi(b){
   try{
     res = UrlFetchApp.fetch('https://api.anthropic.com/v1/messages', {
       method:'post', contentType:'application/json', muteHttpExceptions:true,
-      headers:{ 'x-api-key':key, 'anthropic-version':'2023-06-01',
-                'anthropic-beta':'server-side-fallback-2026-07-01' },
+      headers:{ 'x-api-key':key, 'anthropic-version':'2023-06-01', 'anthropic-beta':'server-side-fallback-2026-07-01' },
       payload: JSON.stringify(req)
     });
     ma = res.getResponseCode(); raw = res.getContentText();
-  }catch(err){
-    hookHoanLuot(me.ma, khongGioiHan);
-    hookLog(me, text, false, 'mang: '+err, 0, 0, model);
-    return jsonOut({ok:false, error:'loi_mang'});
-  }
-
-  if (ma !== 200){
-    hookHoanLuot(me.ma, khongGioiHan);
-    hookLog(me, text, false, 'http '+ma+': '+String(raw).slice(0,300), 0, 0, model);
-    return jsonOut({ok:false, error: ma === 429 || ma === 529 ? 'ban_qua' : 'loi_ai'});
-  }
-
-  var j = JSON.parse(raw);
-  var u = j.usage || {};
-  if (j.stop_reason === 'refusal'){
-    hookHoanLuot(me.ma, khongGioiHan);
-    hookLog(me, text, false, 'refusal', u.input_tokens||0, u.output_tokens||0, model);
-    return jsonOut({ok:false, error:'tu_choi'});
-  }
+  }catch(err){ return {ok:false, error:'loi_mang', loi:'mang: '+err, model:model}; }
+  if (ma !== 200) return {ok:false, error: (ma === 429 || ma === 529) ? 'ban_qua' : 'loi_ai', loi:'http '+ma+': '+String(raw).slice(0,300), model:model};
+  var j = JSON.parse(raw); var u = j.usage || {};
+  if (j.stop_reason === 'refusal') return {ok:false, error:'tu_choi', loi:'refusal', vin:u.input_tokens||0, vout:u.output_tokens||0, model:model};
   var chu = (j.content || []).filter(function(c){ return c.type === 'text' }).map(function(c){ return c.text }).join('');
-  var data;
-  try{ data = JSON.parse(chu); }catch(err){
-    hookHoanLuot(me.ma, khongGioiHan);
-    hookLog(me, text, false, 'json: '+chu.slice(0,200), u.input_tokens||0, u.output_tokens||0, model);
-    return jsonOut({ok:false, error:'loi_ai'});
-  }
-
-  hookLog(me, text, true, '', u.input_tokens||0, u.output_tokens||0, model);
-  return jsonOut({ok:true, data:data, con: khongGioiHan ? null : con, han:han, ten: me.ten_goi || me.ten});
+  var data; try{ data = JSON.parse(chu); }catch(err){ return {ok:false, error:'loi_ai', loi:'json: '+chu.slice(0,200), vin:u.input_tokens||0, vout:u.output_tokens||0, model:model}; }
+  return {ok:true, data:data, vin:u.input_tokens||0, vout:u.output_tokens||0, model:model};
 }
 
 /* Xem còn bao nhiêu lượt mà không trừ — trang tool gọi lúc mở để hiện "còn N lượt" */
