@@ -1018,6 +1018,10 @@ const HV_KEY = 'tmxk_hv';
 const PRO_TPL = new Set(['editorial', 'glass', 'timeline', 'list', 'knockout', 'lowerthird', 'quote', 'pov', 'outline']);
 const FREE_TPL = ['highlight', 'bubbles', 'sticker', 'chips', 'titlecard'];
 state.pro = false; state.proName = ''; let aiBusy = false;
+
+/* ---------- chế độ demo: thêm #demo-pro vào cuối link để xem giao diện Pro với dữ liệu mẫu ---------- */
+const DEMO = /demo-pro/.test(location.hash);
+const DEMO_DATA = { face: { top_pct: 30, bottom_pct: 55, background: 'tường sáng, đơn giản' }, score: { total: 58, hook: 14, clarity: 20, length: 16, keyword: 8, verdict: 'Rõ ý nhưng chưa cho người xem lý do phải xem tiếp.' }, fixes: ['Đưa con số lên đầu câu để mắt bắt ngay', 'Nói rõ người xem mất gì nếu lướt qua'], hooks: [{ formula: 'Con số cụ thể', text: '**3 giây** đầu\nquyết định 90% lượt xem' }, { formula: 'Nỗi đau', text: 'Video mãi 200 view?\nLỗi nằm ở **3 giây đầu**' }, { formula: 'Phản trực giác', text: 'Quay đẹp **không cứu**\nđược một hook dở' }, { formula: 'POV', text: 'POV: bạn sửa **3 giây đầu**\nvà view tăng gấp 10' }, { formula: 'Câu hỏi', text: 'Người xem cho bạn\nbao nhiêu giây? **Ba.**' }], layouts: [{ template: 'highlight', y_pct: 13, size: 70, text: '**3 giây** đầu quyết định\n90% lượt xem của bạn', why: 'Nền phía trên sáng và trống, hook ngắn nên vệt highlight đọc nhanh nhất.' }, { template: 'pov', y_pct: 13, size: 72, kicker: 'POV', text: 'bạn sửa **3 giây đầu**\n\nvà view tăng gấp 10', why: 'Ba tầng chữ hợp kiểu kể chuyện trước sau.' }, { template: 'titlecard', y_pct: 40, size: 86, text: '**3 giây**\nquyết định tất cả', why: 'Dùng làm khung mở đầu 2 giây trước khi vào video.' }], caption: 'Bạn đang mất bao nhiêu người xem ở 3 giây đầu? Comment "HOOK" để nhận checklist 5 câu mở đầu.', hashtags: ['#tuminhxaykenh', '#xaykenhtiktok', '#hookvideo', '#tiktoktips', '#lamcontent'] };
 function hvToken() { try { const o = JSON.parse(ls.get(HV_KEY) || 'null'); return o && o.token ? o.token : ''; } catch { return ''; } }
 async function callApi(body) {
   const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) });
@@ -1035,6 +1039,7 @@ function setPro(on, name, con, han) {
 }
 function showQuota(con, han) { $('#quota').textContent = con == null ? 'Không giới hạn lượt' : `Còn ${con}/${han} lượt hôm nay`; }
 async function checkPro() {
+  if (DEMO) { setPro(true, 'bạn (bản demo)', 20, 20); $('#proHello').textContent = 'Bản demo: bấm Phân tích Pro để xem kết quả mẫu. Chưa gọi AI thật, không tốn lượt.'; return; }
   const t = hvToken(); if (!t) { setPro(false); return; }
   try {
     const r = await callApi({ action: 'hook_status', token: t });
@@ -1053,6 +1058,7 @@ async function runAI() {
   if (aiBusy || !state.frame) return;
   const text = $('#text').value.trim(); if (!text) { setStatus('Nhập câu hook ở bước 2 trước đã.', 'err'); return; }
   aiBusy = true; $('#btnAI').disabled = true; $('#proResult').innerHTML = '';
+  if (DEMO) { setStatus('<span class="spinner"></span>Bản demo đang dựng kết quả mẫu...'); await new Promise(r => setTimeout(r, 1200)); setStatus('Bản demo: kết quả mẫu cố định, chưa gọi AI thật. Đã áp dụng bố cục số 1.', 'ok'); showResult(DEMO_DATA); aiBusy = false; $('#btnAI').disabled = false; return; }
   const t0 = Date.now(); const tick = setInterval(() => setStatus(`<span class="spinner"></span>AI đang xem frame và viết đề xuất · ${Math.round((Date.now() - t0) / 1000)} giây`), 500);
   try {
     const r = await callApi({ action: 'hook_ai', token: hvToken(), text, image: await frameB64(), platform: state.platform, facePos: state.facePos });
