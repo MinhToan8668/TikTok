@@ -97,6 +97,7 @@
   .phone{background:#000;border-radius:22px;padding:8px;box-shadow:var(--shadow)}
   .phone canvas{width:100%;height:auto;display:block;border-radius:16px;background:#111}
   .strip{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:10px}
+  .strip button{aspect-ratio:9/16}
   .strip button{border:1px solid var(--line);background:transparent;border-radius:8px;padding:3px;cursor:pointer}
   .strip button[aria-pressed="true"]{border-color:var(--accent)}
   .strip canvas{width:100%;height:auto;display:block;border-radius:5px;background:#111}
@@ -173,13 +174,16 @@
       <section class="card">
         <h2><span class="n">2</span>Nội dung hook</h2>
         <p class="hint">Dùng <code>**từ khóa**</code> để nhấn màu, <code>_cụm chốt_</code> để dùng chữ serif nghiêng. Xuống dòng để ngắt dòng, cách một dòng trống để tách khối.</p>
-        <textarea id="text" spellcheck="false">mình có **1 đôi giày rách**
-vì đi làm ngân hàng!?</textarea>
+        <textarea id="text" spellcheck="false">3 giây đầu quyết định
+**90% lượt xem** của bạn</textarea>
         <div class="row" style="margin-top:10px">
           <button class="btn sm" id="btnQuick">Gợi ý nhanh (không AI)</button>
           <button class="btn sm" id="btnSample1">Ví dụ: hook ngắn</button>
           <button class="btn sm" id="btnSample2">Ví dụ: tâm sự dài</button>
           <button class="btn sm" id="btnSample3">Ví dụ: từ A sang B</button>
+          <button class="btn sm" id="btnSample4">Ví dụ: danh sách</button>
+          <button class="btn sm" id="btnSample5">Ví dụ: trích dẫn</button>
+          <button class="btn sm" id="btnSample6">Ví dụ: POV</button>
         </div>
       </section>
 
@@ -322,13 +326,20 @@ const TEMPLATES = {
   bubbles:   { name: 'Hộp chữ', desc: 'Hộp đen từng dòng kiểu TikTok. Text dài, tâm sự.', size: 46, y: 52 },
   timeline:  { name: 'Mốc song song', desc: '3 mốc màu nhấn bên trái. Ba ý, ba bước.', size: 40, y: 55 },
   chips:     { name: 'Từ A sang B', desc: 'Hai chip nối mũi tên. Chuyển đổi, hành trình.', size: 60, y: 10 },
+  titlecard: { name: 'Thẻ tiêu đề', desc: 'Phủ tối toàn khung, một câu thật to. Frame đầu tiên, 5 đến 8 từ.', size: 84, y: 40 },
+  list:      { name: 'Danh sách số', desc: 'Số trong tròn màu nhấn, mỗi dòng một ý. Kiểu "3 điều...".', size: 46, y: 50 },
+  knockout:  { name: 'Chữ đục lỗ', desc: 'Dải tối, chữ khoét thấy video phía sau. Tạp chí, thời trang.', size: 110, y: 12 },
+  lowerthird:{ name: 'Lower third', desc: 'Thanh tên góc dưới trái, dòng nhỏ + dòng đậm. Giới thiệu, phỏng vấn.', size: 50, y: 64 },
+  quote:     { name: 'Trích dẫn', desc: 'Dấu ngoặc kép to, serif nghiêng, dòng ký tên. Cảm xúc, chiêm nghiệm.', size: 60, y: 56 },
+  pov:       { name: 'Nhãn POV', desc: 'Chip nhãn nhỏ phía trên, câu to, dòng phụ nhỏ. Phân cấp 3 tầng.', size: 72, y: 9 },
+  outline:   { name: 'Chữ viền rỗng', desc: 'Chữ chỉ có viền trắng, từ khóa tô đặc màu nhấn. Táo bạo, trẻ.', size: 96, y: 10 },
 };
 const state = {
   frame: null, frameName: '', facePos: 'mid',
   template: 'highlight', ypct: 8, size: 66, maxw: 86, align: 'center', dim: 'auto',
-  brand: { ...TMXK }, kicker: 'Chuyện đi làm ngân hàng', tilt: -2.5,
-  rows: [['1 ngày', 'làm bank quần quật'], ['1 buổi', 'connect'], ['9h tối', 'vẫn sửa bài học viên']],
-  chips: ['KHCN', 'KHDN'], lead: 'Vy được chuyển từ',
+  brand: { ...TMXK }, kicker: 'Chuyện làm kênh', tilt: -2.5,
+  rows: [['Tuần 1', 'quay 1 video mỗi ngày, không cần đẹp'], ['Tuần 2', 'xem lại 7 video, giữ đúng 1 format lên nhất'], ['Tuần 3', 'lặp format đó với 5 hook khác nhau']],
+  chips: ['0', '10K'], lead: 'Kênh mình đi từ',
   tier: 'free',
 };
 const ls = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} } };
@@ -540,7 +551,113 @@ T.chips = (c, ov) => {
   if (c.blocks.length && c.blocks[0].trim()) { const s2 = c.px(62); const fonts = { plain: F(800, s2), key: F(800, s2), italic: F(900, Math.round(s2 * 1.2), true) }; const colors = { plain: c.b.light, key: c.b.accent, italic: c.b.accent }; for (const para of c.blocks) y = renderLines(ov, wrap(ov, parse(para), fonts, c.maxw), fonts, colors, y, Math.round(s2 * 1.35), 'center', 0, c.W, { blur: c.px(12), off: c.px(6) }); }
   c.notes.push(`Chip trái đen 92%, chip phải ${c.b.accent}, chữ Be Vietnam Pro Black ${size}px, mũi tên trắng; dòng dưới ExtraBold 62px.`);
 };
-const DEFAULT_DIM = { highlight: ['top', .28, .35], editorial: ['top', .30, .55], chips: ['top', .28, .47], timeline: ['bottom', .55, .6], bubbles: null, glass: null, sticker: null };
+
+T.titlecard = (c, ov) => {
+  ov.fillStyle = hexA(c.b.dark, .8); ov.fillRect(0, 0, c.W, c.H);
+  const s0 = c.px(c.s.size); const mk = z => ({ plain: F(900, z), key: F(900, z), italic: F(800, Math.round(z * 1.15), true) });
+  const size = fitSize(ov, c.blocks, mk, c.maxw, s0); const fonts = mk(size); const lh = Math.round(size * 1.18);
+  const colors = { plain: c.b.light, key: c.b.accent, italic: c.b.accent };
+  let lines = []; for (const para of c.blocks) for (const p of para.split('\n')) lines = lines.concat(wrap(ov, parse(p), fonts, c.maxw));
+  const total = lines.length * lh; let y = Math.round(c.H * c.s.ypct / 100) - total / 2;
+  y = renderLines(ov, lines, fonts, colors, y, lh, 'center', 0, c.W, null);
+  ov.fillStyle = c.b.accent; rrect(ov, c.W / 2 - c.px(36), y + c.px(24), c.px(72), c.px(6), 3); ov.fill();
+  const k = (c.s.kicker || '').trim(); if (k) { ov.font = fontStr(F(600, c.px(26))); ov.fillStyle = hexA(c.b.light, .7); ov.textAlign = 'center'; ov.fillText(k.toUpperCase().split('').join(' '), c.W / 2, y + c.px(80)); ov.textAlign = 'left'; }
+  c.notes.push(`Phủ ${c.b.dark} 80% toàn khung (thẻ tiêu đề mở đầu, giữ 1.5 đến 2.5 giây rồi cắt sang video). Be Vietnam Pro Black ${size}px trắng, từ khóa ${c.b.accent}, căn giữa theo trục dọc tại ${c.s.ypct}%.`);
+};
+T.list = (c, ov) => {
+  const size = c.px(c.s.size); const lh = Math.round(size * 1.3); const xL = Math.round(c.W * 0.09); const r = Math.round(size * 0.62);
+  const fonts = { plain: F(600, size), key: F(800, size), italic: F(800, size, true) }; const colors = { plain: c.b.light, key: c.b.accent, italic: c.b.accent };
+  let y = c.y0; let items = []; let head = null;
+  for (const para of c.blocks) for (const p of para.split('\n')) { if (!head && /[:：]$/.test(p.trim()) && items.length === 0) head = p.trim(); else items.push(p); }
+  if (head) { const fh = F(900, Math.round(size * 1.25)); const hl = wrap(ov, parse(head), { plain: fh, key: F(900, Math.round(size * 1.25)), italic: F(800, Math.round(size * 1.4), true) }, c.W - xL * 2); y = renderLines(ov, hl, { plain: fh, key: fh, italic: F(800, Math.round(size * 1.4), true) }, { plain: c.b.light, key: c.b.accent, italic: c.b.accent }, y, Math.round(size * 1.5), 'left', xL, c.W, { blur: c.px(10), off: c.px(5) }); y += c.px(14); }
+  items.forEach((it, i) => {
+    const lines = wrap(ov, parse(it), fonts, c.W - xL - r * 2 - c.px(30) - c.W * 0.08);
+    ov.save(); ov.shadowColor = 'rgba(0,0,0,.35)'; ov.shadowBlur = c.px(10); ov.shadowOffsetY = c.px(4); ov.fillStyle = c.b.accent; ov.beginPath(); ov.arc(xL + r, y + lh / 2, r, 0, Math.PI * 2); ov.fill(); ov.restore();
+    ov.font = fontStr(F(900, Math.round(size * 0.9))); ov.fillStyle = c.b.dark; ov.textAlign = 'center'; ov.fillText(String(i + 1), xL + r, y + lh / 2 + size * 0.32); ov.textAlign = 'left';
+    const y2 = renderLines(ov, lines, fonts, colors, y + (lh - lh) , lh, 'left', xL + r * 2 + c.px(30), c.W, { blur: c.px(10), off: c.px(5) });
+    y = Math.max(y + lh, y2) + c.px(22);
+  });
+  c.notes.push(`Số trong hình tròn ${c.b.accent} đường kính ${r * 2}px, chữ số Black ${Math.round(size * 0.9)}px màu ${c.b.dark}. Ý: Be Vietnam Pro SemiBold ${size}px trắng, từ khóa ExtraBold ${c.b.accent}. Trong video cho từng ý hiện lần lượt, mỗi ý giữ ít nhất 2 giây.`);
+};
+T.knockout = (c, ov) => {
+  const s0 = c.px(c.s.size); const mk = z => ({ plain: F(900, z), key: F(900, z), italic: F(800, z, true) });
+  const size = fitSize(ov, c.blocks, mk, c.maxw, s0); const fonts = mk(size); const lh = Math.round(size * 1.05);
+  let lines = []; for (const para of c.blocks) for (const p of para.split('\n')) lines = lines.concat(wrap(ov, parse(p), fonts, c.maxw));
+  const bandH = lines.length * lh + c.px(70); const y0 = c.y0;
+  ov.fillStyle = hexA(c.b.dark, .88); ov.fillRect(0, y0, c.W, bandH);
+  let y = y0 + c.px(35);
+  for (const ln of lines) {
+    const w = lineWidth(ov, ln, fonts); let x = (c.W - w) / 2;
+    for (const [t, k] of ln) {
+      ov.font = fontStr(fonts[k]);
+      if (k === 'plain') { ov.save(); ov.globalCompositeOperation = 'destination-out'; ov.fillStyle = '#000'; ov.fillText(t, x, y + size * 0.82); ov.restore(); }
+      else { ov.fillStyle = c.b.accent; ov.fillText(t, x, y + size * 0.82); }
+      x += ov.measureText(t).width;
+    }
+    y += lh;
+  }
+  ov.fillStyle = c.b.accent; ov.fillRect(0, y0, c.W, c.px(6)); ov.fillRect(0, y0 + bandH - c.px(6), c.W, c.px(6));
+  c.notes.push(`Dải ${c.b.dark} 88% cao ${bandH}px, viền trên dưới ${c.b.accent}. Chữ Be Vietnam Pro Black ${size}px được khoét rỗng để lộ video (CapCut: Text → Blend mode Screen trên nền đen, hoặc dùng PNG này). Từ khóa tô đặc màu nhấn.`);
+};
+T.lowerthird = (c, ov) => {
+  const size = c.px(c.s.size); const xL = Math.round(c.W * 0.07); const y0 = c.y0;
+  const kicker = (c.s.kicker || '').trim(); const fk = F(600, c.px(28)); const fonts = { plain: F(800, size), key: F(800, size), italic: F(800, Math.round(size * 1.1), true) };
+  let lines = []; for (const para of c.blocks) for (const p of para.split('\n')) lines = lines.concat(wrap(ov, parse(p), fonts, c.W * 0.78));
+  const w = Math.max(...lines.map(l => lineWidth(ov, l, fonts)), kicker ? tlen(ov, kicker.toUpperCase().split('').join(' '), fk) : 0) + c.px(70);
+  const h = (kicker ? c.px(48) : 0) + lines.length * Math.round(size * 1.25) + c.px(44);
+  ov.save(); ov.shadowColor = 'rgba(0,0,0,.4)'; ov.shadowBlur = c.px(20); ov.shadowOffsetY = c.px(8); ov.fillStyle = hexA(c.b.dark, .82); rrect(ov, xL, y0, w, h, c.px(14)); ov.fill(); ov.restore();
+  ov.fillStyle = c.b.accent; rrect(ov, xL, y0, c.px(12), h, [c.px(14), 0, 0, c.px(14)]); ov.fill();
+  let y = y0 + c.px(30);
+  if (kicker) { ov.font = fontStr(fk); ov.fillStyle = c.b.accent; ov.fillText(kicker.toUpperCase().split('').join(' '), xL + c.px(40), y + c.px(20)); y += c.px(48); }
+  renderLines(ov, lines, fonts, { plain: c.b.light, key: c.b.accent, italic: c.b.accent }, y, Math.round(size * 1.25), 'left', xL + c.px(40), c.W, null);
+  c.notes.push(`Thanh lower third tại ${c.s.ypct}% chiều cao: nền ${c.b.dark} 82% bo góc 14, vạch trái ${c.b.accent} 12px. Dòng nhỏ SemiBold 28px giãn chữ màu nhấn, dòng chính ExtraBold ${size}px trắng. Hiện 3 đến 5 giây khi giới thiệu người hoặc chủ đề.`);
+};
+T.quote = (c, ov) => {
+  const size = c.px(c.s.size); const fq = { family: 'Playfair Display', weight: 700, size, style: 'italic' };
+  const fonts = { plain: fq, key: { ...fq, weight: 800 }, italic: { ...fq, weight: 800 } }; const colors = { plain: c.b.cream, key: c.b.accent, italic: c.b.accent };
+  let lines = []; let by = null;
+  for (const para of c.blocks) for (const p of para.split('\n')) { if (/^[-–—]\s*/.test(p.trim())) by = p.trim().replace(/^[-–—]\s*/, ''); else lines = lines.concat(wrap(ov, parse(p), fonts, c.maxw - c.px(60))); }
+  let y = c.y0;
+  ov.font = fontStr({ family: 'Playfair Display', weight: 800, size: Math.round(size * 2.6), style: 'italic' }); ov.fillStyle = c.b.accent; ov.textAlign = 'center';
+  ov.shadowColor = 'rgba(0,0,0,.5)'; ov.shadowBlur = c.px(14); ov.shadowOffsetY = c.px(6); ov.fillText('“', c.W / 2, y + size * 1.4); ov.shadowColor = 'transparent'; ov.textAlign = 'left';
+  y += Math.round(size * 1.35);
+  y = renderLines(ov, lines, fonts, colors, y, Math.round(size * 1.4), 'center', 0, c.W, { blur: c.px(14), off: c.px(6) });
+  if (by) { y += c.px(10); ov.fillStyle = c.b.accent; ov.fillRect(c.W / 2 - c.px(24), y, c.px(48), c.px(3)); const fb = F(500, Math.round(size * 0.55)); ov.font = fontStr(fb); ov.fillStyle = hexA(c.b.light, .85); ov.textAlign = 'center'; ov.shadowColor = 'rgba(0,0,0,.5)'; ov.shadowBlur = c.px(10); ov.fillText(by, c.W / 2, y + c.px(20) + fb.size * 0.85); ov.shadowColor = 'transparent'; ov.textAlign = 'left'; }
+  c.notes.push(`Dấu ngoặc kép Playfair Display Italic 800 ${Math.round(size * 2.6)}px màu nhấn. Câu: Playfair Display Italic 700 ${size}px màu ${c.b.cream}, từ khóa 800 màu nhấn. Dòng ký tên (bắt đầu bằng dấu gạch) Be Vietnam Pro Medium ${Math.round(size * 0.55)}px. Đặt xa mặt, thường nửa dưới.`);
+};
+T.pov = (c, ov) => {
+  const size = c.px(c.s.size); const label = (c.s.kicker || 'POV').trim(); let y = c.y0;
+  const fl = F(800, c.px(30)); ov.font = fontStr(fl); const lw = ov.measureText(label.toUpperCase()).width + c.px(44); const lh0 = c.px(54);
+  ov.save(); ov.shadowColor = 'rgba(0,0,0,.35)'; ov.shadowBlur = c.px(12); ov.shadowOffsetY = c.px(5); ov.fillStyle = c.b.accent; rrect(ov, (c.W - lw) / 2, y, lw, lh0, c.px(12)); ov.fill(); ov.restore();
+  ov.fillStyle = c.b.dark; ov.font = fontStr(fl); ov.textAlign = 'center'; ov.fillText(label.toUpperCase(), c.W / 2, y + lh0 * 0.68); ov.textAlign = 'left'; y += lh0 + c.px(22);
+  const mk = z => ({ plain: F(900, z), key: F(900, z), italic: F(800, Math.round(z * 1.1), true) });
+  const [head, ...rest] = c.blocks; const hs = fitSize(ov, [head], mk, c.maxw, size); const hf = mk(hs);
+  for (const p of head.split('\n')) y = renderLines(ov, wrap(ov, parse(p), hf, c.maxw), hf, { plain: c.b.light, key: c.b.accent, italic: c.b.accent }, y, Math.round(hs * 1.15), 'center', 0, c.W, { blur: c.px(12), off: c.px(6) });
+  if (rest.length) { y += c.px(10); const sf = { plain: F(400, Math.round(size * 0.5)), key: F(700, Math.round(size * 0.5)), italic: F(700, Math.round(size * 0.55), true) }; for (const para of rest) for (const p of para.split('\n')) y = renderLines(ov, wrap(ov, parse(p), sf, c.maxw * 0.9), sf, { plain: hexA(c.b.light, .9), key: c.b.accent, italic: c.b.accent }, y, Math.round(size * 0.5 * 1.4), 'center', 0, c.W, { blur: c.px(10), off: c.px(5) }); }
+  c.notes.push(`Ba tầng: chip nhãn "${label}" nền ${c.b.accent} chữ ${c.b.dark} ExtraBold 30px; câu chính Black ${hs}px trắng; dòng phụ (khối thứ hai) Regular ${Math.round(size * 0.5)}px. Đổi nhãn ở ô "Dòng chủ đề".`);
+};
+T.outline = (c, ov) => {
+  const s0 = c.px(c.s.size); const mk = z => ({ plain: F(900, z), key: F(900, z), italic: F(800, z, true) });
+  const size = fitSize(ov, c.blocks, mk, c.maxw, s0); const fonts = mk(size); const lh = Math.round(size * 1.08); let y = c.y0;
+  for (const para of c.blocks) for (const p of para.split('\n')) {
+    const lines = wrap(ov, parse(p), fonts, c.maxw);
+    for (const ln of lines) {
+      const w = lineWidth(ov, ln, fonts); let x = (c.W - w) / 2;
+      for (const [t, k] of ln) {
+        ov.font = fontStr(fonts[k]); ov.lineJoin = 'round';
+        ov.shadowColor = 'rgba(0,0,0,.5)'; ov.shadowBlur = c.px(14); ov.shadowOffsetY = c.px(6);
+        if (k === 'plain') { ov.lineWidth = Math.max(2, Math.round(size * 0.045)); ov.strokeStyle = c.b.light; ov.strokeText(t, x, y + size * 0.82); }
+        else { ov.fillStyle = c.b.accent; ov.fillText(t, x, y + size * 0.82); }
+        ov.shadowColor = 'transparent'; x += ov.measureText(t).width;
+      }
+      y += lh;
+    }
+  }
+  c.notes.push(`Chữ viền rỗng: Be Vietnam Pro Black ${size}px, viền trắng ${Math.max(2, Math.round(size * 0.045))}px không tô; từ khóa tô đặc ${c.b.accent}. Bóng đen 50% blur 14. CapCut: Text → Style → bật Stroke, tắt Fill.`);
+};
+
+const DEFAULT_DIM = { highlight: ['top', .28, .35], editorial: ['top', .30, .55], chips: ['top', .28, .47], timeline: ['bottom', .55, .6], bubbles: null, glass: null, sticker: null,
+  titlecard: null, list: ['bottom', .6, .62], knockout: null, lowerthird: null, quote: ['bottom', .6, .6], pov: ['top', .32, .5], outline: ['top', .3, .45] };
 
 /* ---------- render pipeline ---------- */
 let fontsReady = false;
@@ -608,7 +725,8 @@ function renderStrip() {
   }
 }
 function autoY(key) {
-  const low = ['bubbles', 'timeline'].includes(key);
+  const low = ['bubbles', 'timeline', 'list', 'lowerthird', 'quote'].includes(key);
+  if (key === 'titlecard') return 40;
   if (state.facePos === 'top') return low ? 60 : 62;      // mặt ở trên: đẩy chữ xuống ngực
   if (state.facePos === 'low') return low ? 8 : 8;        // mặt ở dưới: chữ ở trên
   return low ? 52 : TEMPLATES[key].y;                     // mặt ở giữa
@@ -639,7 +757,10 @@ function syncSliders() { $('#ypct').value = state.ypct; $('#ypctOut').textConten
 function renderExtra() {
   const box = $('#tplExtra'); box.innerHTML = '';
   const add = (label, id, val, ph) => { const l = document.createElement('label'); l.className = 'lbl'; l.textContent = label; l.htmlFor = id; const i = document.createElement('input'); i.type = 'text'; i.id = id; i.value = val; i.placeholder = ph || ''; box.append(l, i); return i; };
-  if (state.template === 'glass') add('Dòng chủ đề (kicker)', 'xKicker', state.kicker, 'Chuyện đi làm ngân hàng').addEventListener('input', e => { state.kicker = e.target.value; scheduleRender(); });
+  if (['glass', 'titlecard', 'lowerthird'].includes(state.template)) add('Dòng chủ đề (kicker)', 'xKicker', state.kicker, 'Tự Mình Xây Kênh').addEventListener('input', e => { state.kicker = e.target.value; scheduleRender(); });
+  if (state.template === 'pov') add('Nhãn trên chip (POV, SỰ THẬT, LƯU Ý...)', 'xKicker', state.kicker === 'Chuyện làm kênh' ? 'POV' : state.kicker, 'POV').addEventListener('input', e => { state.kicker = e.target.value; scheduleRender(); });
+  if (state.template === 'quote') { const p = document.createElement('p'); p.className = 'hint'; p.textContent = 'Dòng ký tên: bắt đầu bằng dấu gạch, ví dụ "- Toàn, mentor TMXK".'; box.append(p); }
+  if (state.template === 'list') { const p = document.createElement('p'); p.className = 'hint'; p.textContent = 'Dòng đầu kết thúc bằng dấu hai chấm sẽ thành tiêu đề, các dòng sau tự đánh số.'; box.append(p); }
   if (state.template === 'sticker') { const i = add('Độ nghiêng (độ, âm là nghiêng trái)', 'xTilt', state.tilt); i.addEventListener('input', e => { state.tilt = parseFloat(e.target.value) || 0; scheduleRender(); }); }
   if (state.template === 'chips') {
     add('Dòng dẫn phía trên', 'xLead', state.lead).addEventListener('input', e => { state.lead = e.target.value; scheduleRender(); });
@@ -691,7 +812,7 @@ function aiPrompt(text) {
 1. Xác định mặt người chiếm từ bao nhiêu % đến bao nhiêu % chiều cao khung (top_pct, bottom_pct, số 0-100), và mô tả nền ở vùng trống bằng vài từ (background: sáng/tối, đơn giản/rối).
 2. Viết lại hook cho gọn nếu cần (rewrite): tối đa 2 dòng cho hook mở đầu, giữ giọng của tác giả, mở viết tắt khó hiểu, đổi "m" thành "mình". Nếu text đã ổn, giữ nguyên.
 3. Đề xuất đúng 3 bố cục khác tinh thần nhau từ danh sách mẫu, mỗi cái gồm: template, y_pct (mép trên khối chữ theo % chiều cao, phải nằm ngoài vùng mặt, cách mép trên ít nhất 5%, không thấp hơn 60%), size (px trên khung rộng 1080; hook ngắn 56-72, text dài 40-48), text (nội dung đã ngắt dòng bằng \\n, tách khối bằng dòng trống, đánh dấu 1-2 từ khóa bằng **từ khóa**, cụm chốt cảm xúc bằng _cụm_), why (1 câu vì sao hợp).
-Mẫu: highlight (chữ trắng, từ khóa trong vệt highlight; hook ngắn, nền đơn giản), editorial (sans nhẹ + serif nghiêng cho cụm _..._; kể chuyện, cần nền tối), glass (thẻ kính mờ, có kicker là dòng chủ đề ngắn; nền rối, series), sticker (thẻ đen nghiêng; hài, đời thường), bubbles (hộp đen từng dòng; text dài nhiều đoạn, đặt ở ngực), timeline (rows: danh sách [mốc, nội dung] cho 3 ý song song; text là đoạn chốt), chips (chips: [A, B] hai từ ngắn viết hoa + lead là dòng dẫn; nội dung "từ A sang B").
+Mẫu: highlight (chữ trắng, từ khóa trong vệt highlight; hook ngắn, nền đơn giản), editorial (sans nhẹ + serif nghiêng cho cụm _..._; kể chuyện, cần nền tối), glass (thẻ kính mờ, có kicker là dòng chủ đề ngắn; nền rối, series), sticker (thẻ đen nghiêng; hài, đời thường), bubbles (hộp đen từng dòng; text dài nhiều đoạn, đặt ở ngực), timeline (rows: danh sách [mốc, nội dung] cho 3 ý song song; text là đoạn chốt), chips (chips: [A, B] hai từ ngắn viết hoa + lead là dòng dẫn; nội dung "từ A sang B"), titlecard (phủ tối toàn khung, một câu 5-8 từ thật to; frame đầu tiên), list (dòng đầu kết thúc bằng dấu hai chấm là tiêu đề, các dòng sau là ý được đánh số), knockout (chữ khoét lỗ trên dải tối; 1-3 từ rất ngắn), lowerthird (thanh góc dưới trái với kicker; giới thiệu người hoặc chủ đề), quote (câu trích dẫn serif nghiêng, dòng cuối bắt đầu bằng dấu gạch là ký tên), pov (kicker là nhãn chip như POV; khối 1 là câu chính, khối 2 là dòng phụ), outline (chữ viền rỗng, từ khóa tô đặc; 1-2 dòng ngắn).
 Text của người dùng:
 """${text}"""
 Trả về duy nhất một JSON theo dạng: {"face":{"top_pct":30,"bottom_pct":55,"background":"sáng, đơn giản"},"rewrite":"...","variants":[{"template":"highlight","y_pct":8,"size":66,"text":"...","why":"..."}]}`;
@@ -809,9 +930,12 @@ function sampleFrame() {
   $('#btnSaveBrand').addEventListener('click', () => { ls.set('hook.brand', JSON.stringify(state.brand)); buildPresets(); toast('Đã lưu màu kênh của bạn'); });
   $('#btnResetBrand').addEventListener('click', () => { state.brand = { ...TMXK }; applyBrandInputs(); scheduleRender(); });
   $('#btnQuick').addEventListener('click', quickSuggest);
-  $('#btnSample1').addEventListener('click', () => { $('#text').value = 'mình có **1 đôi giày rách**\nvì đi làm ngân hàng!?'; selectTemplate('highlight', true); });
-  $('#btnSample2').addEventListener('click', () => { $('#text').value = '1 ngày làm bank **quần quật,**\n1 buổi **connect,**\n9h tối vẫn lọ mọ sửa bài học viên\n\nT đâu phải người giời mà không biết mệt,\nnhưng trao giá trị cho 1 người **"cầu tiến"**\nquý hơn cầm tiền của 1 người **"lười"**\n\nCòn mối quan hệ nào cũng phải **quy ra tiền**\nthì bạn nghĩ nó đi được _bao xa?_'; selectTemplate('bubbles', true); });
-  $('#btnSample3').addEventListener('click', () => { $('#text').value = 'chỉ nhờ **mối quan hệ**'; state.chips = ['KHCN', 'KHDN']; state.lead = 'Vy được chuyển từ'; selectTemplate('chips', true); });
+  $('#btnSample1').addEventListener('click', () => { $('#text').value = '3 giây đầu quyết định\n**90% lượt xem** của bạn'; selectTemplate('highlight', true); });
+  $('#btnSample2').addEventListener('click', () => { $('#text').value = 'Mình đăng **30 video** đầu tiên,\nkhông cái nào qua 500 view.\n\nKhông phải vì quay xấu,\nmà vì mỗi video mình nói về **một chủ đề khác nhau**,\nthuật toán không biết đưa mình cho ai.\n\nVideo thứ 31 mình chỉ đổi **một thứ:**\nnói đúng một chuyện, cho đúng _một kiểu người._'; selectTemplate('bubbles', true); });
+  $('#btnSample3').addEventListener('click', () => { $('#text').value = 'trong **60 ngày**, không chạy quảng cáo'; state.chips = ['0', '10K']; state.lead = 'Kênh mình đi từ'; selectTemplate('chips', true); });
+  $('#btnSample4').addEventListener('click', () => { $('#text').value = '3 lỗi khiến video mãi 200 view:\nQuay xong **mới nghĩ hook**\nNói 15 giây **mới vào ý chính**\nCaption dài hơn cả video'; selectTemplate('list', true); });
+  $('#btnSample5').addEventListener('click', () => { $('#text').value = 'Kênh không lên không phải vì bạn kém,\nmà vì bạn chưa **đăng đủ nhiều** để biết mình giỏi gì.\n- Toàn, mentor Tự Mình Xây Kênh'; selectTemplate('quote', true); });
+  $('#btnSample6').addEventListener('click', () => { $('#text').value = 'bạn đăng video thứ 30\nvà vẫn **200 view**\n\nđây là 3 thứ mình đổi ngay tuần đó'; state.kicker = 'POV'; selectTemplate('pov', true); });
   $('#tierFree').addEventListener('click', () => setTier('free')); $('#tierPro').addEventListener('click', () => setTier('pro'));
   $('#btnAI').addEventListener('click', runAI); $('#btnAIStop').addEventListener('click', () => aiCtl?.abort());
   $('#btnPng').addEventListener('click', exportPng); $('#btnJpg').addEventListener('click', exportJpg); $('#btnCopy').addEventListener('click', copyGuide);
