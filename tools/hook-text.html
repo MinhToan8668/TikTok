@@ -1,0 +1,824 @@
+<title>Hook Text Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@1,700;1,800&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F9E8DD; --ink:#26210F; --lime:#99DF00; --moss:#1B220D;
+    --bg:#F4E9DF; --surface:#FDF7F1; --surface-2:#F1E4D6; --line:#DCCDBC; --line-strong:#B9A891;
+    --text:#26210F; --muted:#6F6553; --accent:#99DF00; --accent-ink:#26210F; --accent-soft:#E9F7C4;
+    --pro:#26210F; --pro-text:#F9E8DD; --danger:#B4432A; --ok:#3E7D1F;
+    --radius:14px; --shadow:0 10px 30px rgba(38,33,15,.10);
+    --font-ui:'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --font-display:'Bricolage Grotesque', 'Be Vietnam Pro', system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme:dark;
+      --bg:#161B0B; --surface:#1F2610; --surface-2:#283016; --line:#3A4322; --line-strong:#5A6636;
+      --text:#F1EBDD; --muted:#B4AC95; --accent:#99DF00; --accent-ink:#1B220D; --accent-soft:#2E3A12;
+      --pro:#99DF00; --pro-text:#1B220D; --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme:dark;
+    --bg:#161B0B; --surface:#1F2610; --surface-2:#283016; --line:#3A4322; --line-strong:#5A6636;
+    --text:#F1EBDD; --muted:#B4AC95; --accent:#99DF00; --accent-ink:#1B220D; --accent-soft:#2E3A12;
+    --pro:#99DF00; --pro-text:#1B220D; --shadow:0 10px 30px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size:14.5px;line-height:1.5}
+  .wrap{max-width:1240px;margin:0 auto;padding-inline:16px;padding-block:18px 60px}
+  header.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .brand .mark{width:38px;height:38px;border-radius:10px;background:var(--accent);display:grid;place-items:center;color:var(--accent-ink);font-family:var(--font-display);font-weight:800;font-size:18px}
+  .brand h1{font-family:var(--font-display);font-weight:800;font-size:22px;margin:0;letter-spacing:-.01em}
+  .brand p{margin:0;color:var(--muted);font-size:13px}
+  .tier{display:flex;background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:3px}
+  .tier button{border:0;background:transparent;color:var(--muted);font:inherit;font-weight:600;padding:7px 16px;border-radius:999px;cursor:pointer}
+  .tier button[aria-pressed="true"]{background:var(--pro);color:var(--pro-text)}
+  .tier button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+  .grid{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:20px;align-items:start}
+  @media (max-width:900px){.grid{grid-template-columns:1fr}.preview-col{position:static!important}}
+  .col{display:flex;flex-direction:column;gap:14px;min-width:0}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+  .card h2{font-family:var(--font-display);font-weight:700;font-size:15px;margin:0 0 10px;display:flex;align-items:center;gap:8px;letter-spacing:.01em}
+  .card h2 .n{width:22px;height:22px;border-radius:7px;background:var(--surface-2);border:1px solid var(--line);display:grid;place-items:center;font-size:12px;color:var(--muted)}
+  .hint{color:var(--muted);font-size:13px;margin:0 0 10px}
+  label.lbl{display:block;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:10px 0 6px}
+  textarea,input[type=text],input[type=password],select{width:100%;font:inherit;color:var(--text);background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+  textarea{min-height:120px;resize:vertical;line-height:1.5}
+  textarea:focus,input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .row > *{min-width:0}
+  .btn{font:inherit;font-weight:600;border:1px solid var(--line-strong);background:var(--surface);color:var(--text);border-radius:10px;padding:9px 14px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+  .btn:hover{background:var(--surface-2)}
+  .btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .btn.primary{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+  .btn.primary:hover{filter:brightness(.96)}
+  .btn.pro{background:var(--pro);color:var(--pro-text);border-color:transparent}
+  .btn:disabled{opacity:.55;cursor:not-allowed}
+  .btn.sm{padding:6px 10px;font-size:13px}
+
+  .drop{display:block;border:1.5px dashed var(--line-strong);border-radius:12px;padding:16px;text-align:center;color:var(--muted);cursor:pointer;background:var(--surface-2)}
+  .drop.on{border-color:var(--accent);background:var(--accent-soft)}
+  .drop strong{color:var(--text)}
+  .drop input{display:none}
+
+  .templates{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+  .tpl{border:1px solid var(--line);background:var(--surface-2);border-radius:10px;padding:8px;cursor:pointer;text-align:left;font:inherit;color:var(--text);display:flex;flex-direction:column;gap:6px}
+  .tpl[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+  .tpl canvas{width:100%;aspect-ratio:9/6;border-radius:6px;background:#111;display:block}
+  .tpl b{font-size:13px}
+  .tpl small{color:var(--muted);font-size:11.5px;line-height:1.3}
+
+  .slider{display:grid;grid-template-columns:110px 1fr 48px;gap:10px;align-items:center;margin:6px 0}
+  .slider span{font-size:13px;color:var(--muted)}
+  .slider output{font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .seg button{font:inherit;font-size:13px;border:0;background:var(--surface-2);color:var(--muted);padding:7px 12px;cursor:pointer}
+  .seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);font-weight:600}
+
+  .swatches{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .sw{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
+  .sw input[type=color]{width:100%;height:36px;border:1px solid var(--line);border-radius:8px;background:transparent;padding:2px;cursor:pointer}
+  .presets{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+  .preset{border:1px solid var(--line);background:var(--surface-2);border-radius:999px;padding:5px 10px 5px 6px;display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:12.5px;cursor:pointer;color:var(--text)}
+  .preset i{width:14px;height:14px;border-radius:50%;display:inline-block;border:1px solid rgba(0,0,0,.15)}
+
+  .preview-col{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px)}
+  .phone{background:#000;border-radius:22px;padding:8px;box-shadow:var(--shadow)}
+  .phone canvas{width:100%;height:auto;display:block;border-radius:16px;background:#111}
+  .strip{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:10px}
+  .strip button{border:1px solid var(--line);background:transparent;border-radius:8px;padding:3px;cursor:pointer}
+  .strip button[aria-pressed="true"]{border-color:var(--accent)}
+  .strip canvas{width:100%;height:auto;display:block;border-radius:5px;background:#111}
+  .meta{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin-top:8px;font-variant-numeric:tabular-nums}
+
+  .out-actions{display:flex;gap:8px;flex-wrap:wrap}
+  .guide{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:12px;font-size:13px;white-space:pre-wrap;max-height:260px;overflow:auto;line-height:1.55}
+  .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:999px;font-size:13px;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity .2s}
+  .toast.show{opacity:1}
+
+  .pro-card{border:1px solid var(--line);border-radius:var(--radius);padding:16px;background:linear-gradient(135deg,var(--surface),var(--surface-2))}
+  .pro-card h2{margin:0 0 4px;font-family:var(--font-display);font-weight:800;font-size:16px;display:flex;gap:8px;align-items:center}
+  .badge{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:var(--pro);color:var(--pro-text);padding:3px 8px;border-radius:999px}
+  .sugs{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+  .sug{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--surface);display:flex;gap:10px;align-items:flex-start;justify-content:space-between}
+  .sug b{display:block;font-size:13.5px}
+  .sug p{margin:2px 0 0;color:var(--muted);font-size:12.5px}
+  .status{font-size:13px;color:var(--muted);margin-top:8px;min-height:1.2em}
+  .status.err{color:var(--danger)}
+  .status.ok{color:var(--ok)}
+
+  .plans{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+  @media (max-width:640px){.plans{grid-template-columns:1fr}}
+  .plan{border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--surface)}
+  .plan.pro{border-color:var(--pro);background:var(--surface-2)}
+  .plan h3{margin:0 0 6px;font-family:var(--font-display);font-size:15px;font-weight:800}
+  .plan ul{margin:6px 0 0;padding-left:18px;color:var(--muted);font-size:13px}
+  .plan ul li{margin:3px 0}
+  .plan .price{font-size:12px;color:var(--muted)}
+  .img-modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;place-items:center;padding:20px;z-index:9}
+  .img-modal.show{display:grid}
+  .img-modal .box{background:var(--surface);border-radius:14px;padding:14px;max-width:420px;width:100%;text-align:center}
+  .img-modal img{max-width:100%;max-height:60vh;border-radius:8px;background:repeating-conic-gradient(#8883 0 25%,transparent 0 50%) 0 0/16px 16px}
+  details.help summary{cursor:pointer;color:var(--muted);font-size:13px}
+  code{background:var(--surface-2);border:1px solid var(--line);border-radius:5px;padding:1px 5px;font-size:12.5px}
+  @media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="mark">Hk</div>
+      <div>
+        <h1>Hook Text Studio</h1>
+        <p>Đặt chữ hook lên video theo bố cục có sẵn. Chạy ngay trên trình duyệt, không cần cài gì.</p>
+      </div>
+    </div>
+    <div class="tier" role="group" aria-label="Gói">
+      <button id="tierFree" aria-pressed="true">Free</button>
+      <button id="tierPro" aria-pressed="false">Pro · có AI</button>
+    </div>
+  </header>
+
+  <div class="grid">
+    <div class="col">
+      <section class="card">
+        <h2><span class="n">1</span>Frame video</h2>
+        <label class="drop" id="drop">
+          <input type="file" id="file" accept="image/*">
+          <strong>Kéo thả ảnh cap màn hình vào đây</strong> hoặc bấm để chọn.<br>
+          <span id="fileName">Đang dùng frame mẫu. Cap từ video gốc sẽ cho kết quả đúng nhất.</span>
+        </label>
+        <div class="row" style="margin-top:10px">
+          <span class="hint" style="margin:0">Mặt người đang ở:</span>
+          <div class="seg" id="facePos" role="group" aria-label="Vị trí mặt">
+            <button data-v="top" aria-pressed="false">Trên</button>
+            <button data-v="mid" aria-pressed="true">Giữa</button>
+            <button data-v="low" aria-pressed="false">Dưới</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2><span class="n">2</span>Nội dung hook</h2>
+        <p class="hint">Dùng <code>**từ khóa**</code> để nhấn màu, <code>_cụm chốt_</code> để dùng chữ serif nghiêng. Xuống dòng để ngắt dòng, cách một dòng trống để tách khối.</p>
+        <textarea id="text" spellcheck="false">mình có **1 đôi giày rách**
+vì đi làm ngân hàng!?</textarea>
+        <div class="row" style="margin-top:10px">
+          <button class="btn sm" id="btnQuick">Gợi ý nhanh (không AI)</button>
+          <button class="btn sm" id="btnSample1">Ví dụ: hook ngắn</button>
+          <button class="btn sm" id="btnSample2">Ví dụ: tâm sự dài</button>
+          <button class="btn sm" id="btnSample3">Ví dụ: từ A sang B</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2><span class="n">3</span>Mẫu bố cục</h2>
+        <div class="templates" id="templates"></div>
+        <div id="tplExtra" style="margin-top:10px"></div>
+      </section>
+
+      <section class="card">
+        <h2><span class="n">4</span>Tinh chỉnh</h2>
+        <div class="slider"><span>Vị trí dọc</span><input type="range" id="ypct" min="3" max="80" value="8"><output id="ypctOut">8%</output></div>
+        <div class="slider"><span>Cỡ chữ</span><input type="range" id="size" min="30" max="110" value="66"><output id="sizeOut">66px</output></div>
+        <div class="slider"><span>Bề rộng tối đa</span><input type="range" id="maxw" min="60" max="96" value="86"><output id="maxwOut">86%</output></div>
+        <div class="row" style="margin-top:6px">
+          <span class="hint" style="margin:0">Căn:</span>
+          <div class="seg" id="align" role="group" aria-label="Căn lề"><button data-v="center" aria-pressed="true">Giữa</button><button data-v="left" aria-pressed="false">Trái</button></div>
+          <span class="hint" style="margin:0 0 0 8px">Phủ tối:</span>
+          <div class="seg" id="dim" role="group" aria-label="Phủ tối"><button data-v="auto" aria-pressed="true">Tự động</button><button data-v="off" aria-pressed="false">Tắt</button></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2><span class="n">5</span>Màu kênh</h2>
+        <p class="hint">Mặc định là màu Tự Mình Xây Kênh. Đổi theo kênh riêng của bạn, bấm Lưu để lần sau tự nhớ.</p>
+        <div class="swatches">
+          <label class="sw">Màu nhấn<input type="color" id="cAccent" value="#99DF00"></label>
+          <label class="sw">Màu tối<input type="color" id="cDark" value="#26210F"></label>
+          <label class="sw">Chữ sáng<input type="color" id="cLight" value="#FFFFFF"></label>
+          <label class="sw">Chữ kem<input type="color" id="cCream" value="#F9E8DD"></label>
+        </div>
+        <div class="presets" id="presets"></div>
+        <div class="row" style="margin-top:10px">
+          <button class="btn sm" id="btnSaveBrand">Lưu làm màu kênh của tôi</button>
+          <button class="btn sm" id="btnResetBrand">Về màu TMXK</button>
+        </div>
+      </section>
+
+      <section class="pro-card" id="proPanel">
+        <h2>Gợi ý bố cục bằng AI <span class="badge">Pro</span></h2>
+        <p class="hint" id="proHint">AI xem frame, xác định vị trí mặt và vùng trống, đề xuất 3 bố cục kèm ngắt dòng, từ khóa nên nhấn và cách viết lại hook cho gọn. Bạn bấm Áp dụng là xong.</p>
+        <div id="proKeyRow" hidden>
+          <label class="lbl" for="apiKey">Anthropic API key (chỉ lưu trên máy bạn)</label>
+          <input type="password" id="apiKey" placeholder="sk-ant-...">
+        </div>
+        <div class="row" style="margin-top:10px">
+          <button class="btn pro" id="btnAI">Phân tích frame và đề xuất</button>
+          <button class="btn sm" id="btnAIStop" hidden>Dừng</button>
+        </div>
+        <div class="status" id="aiStatus"></div>
+        <div class="sugs" id="sugs"></div>
+      </section>
+
+      <section class="card">
+        <h2><span class="n">6</span>Xuất và hướng dẫn dựng</h2>
+        <div class="out-actions">
+          <button class="btn primary" id="btnPng">Tải PNG chữ (nền trong suốt)</button>
+          <button class="btn" id="btnJpg">Tải ảnh preview</button>
+          <button class="btn" id="btnCopy">Sao chép hướng dẫn</button>
+        </div>
+        <label class="lbl">Thông số để tự dựng trong CapCut</label>
+        <div class="guide" id="guide"></div>
+        <details class="help" style="margin-top:10px">
+          <summary>Các bước trong CapCut</summary>
+          <div class="guide" style="max-height:none;margin-top:8px">1. Overlay → Add overlay → chọn file PNG vừa tải. Kéo cho khớp mép khung (PNG cùng tỉ lệ với video).
+2. Cắt độ dài overlay bằng đúng thời gian nói câu hook, thường 2 đến 4 giây.
+3. Animation → In: Fade 0.3s hoặc Slide up 0.4s. Out: Fade 0.3s. Không dùng hiệu ứng nảy, xoay.
+4. Nếu mẫu có phủ tối: thêm hình chữ nhật đen (Stickers → Shapes), kéo che vùng chữ, Opacity 40 đến 55%, Mask → Linear để mờ dần, đặt dưới lớp chữ.
+5. Muốn gõ chữ trực tiếp thay vì dùng PNG: Text → Add text, font Be Vietnam Pro (CapCut có sẵn), cỡ và màu theo thông số trên, Shadow đen 60 đến 70%, Blur 10 đến 12.
+6. Vùng an toàn: cách mép trên 6%, cách mép dưới 22% (nơi TikTok đặt caption và nút). Không đè chữ lên mặt.</div>
+        </details>
+      </section>
+
+      <section class="card">
+        <h2>Hai gói</h2>
+        <div class="plans">
+          <div class="plan">
+            <h3>Free</h3>
+            <div class="price">Không cần tài khoản, không gọi AI</div>
+            <ul>
+              <li>7 mẫu bố cục, màu kênh tùy chỉnh</li>
+              <li>Gợi ý nhanh theo luật: chọn mẫu theo độ dài và kiểu nội dung</li>
+              <li>Xuất PNG trong suốt, ảnh preview, hướng dẫn CapCut</li>
+              <li>Bạn tự đặt vị trí để tránh mặt</li>
+            </ul>
+          </div>
+          <div class="plan pro">
+            <h3>Pro</h3>
+            <div class="price">Dùng AI, tính theo lượt phân tích</div>
+            <ul>
+              <li>Tất cả của Free</li>
+              <li>AI nhìn frame: tìm mặt, vùng trống, độ sáng nền, tự đặt vị trí và cỡ chữ</li>
+              <li>Đề xuất 3 bố cục khác tinh thần, giải thích vì sao</li>
+              <li>Viết lại hook gọn hơn, chọn từ khóa nên nhấn, mở viết tắt</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <aside class="col preview-col">
+      <div class="phone"><canvas id="preview" width="1080" height="1920"></canvas></div>
+      <div class="strip" id="strip"></div>
+      <div class="meta"><span id="metaSize">1080 × 1920</span><span id="metaTpl">highlight</span></div>
+    </aside>
+  </div>
+</div>
+
+<div class="img-modal" id="imgModal" role="dialog" aria-modal="true">
+  <div class="box">
+    <p style="margin:0 0 8px;font-weight:600" id="imgModalTitle">Nhấn giữ hoặc chuột phải vào ảnh để lưu</p>
+    <img id="imgModalImg" alt="Ảnh xuất">
+    <div class="row" style="justify-content:center;margin-top:10px"><button class="btn sm" id="imgModalClose">Đóng</button></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   Hook Text Studio — Tự Mình Xây Kênh
+   Free: render hoàn toàn trên trình duyệt. Pro: gọi AI qua
+   claude.use("sample") (khi mở trong claude.ai) hoặc API key.
+   ========================================================= */
+const $ = (s) => document.querySelector(s);
+const BASE_W = 1080;
+const TMXK = { accent: '#99DF00', dark: '#26210F', light: '#FFFFFF', cream: '#F9E8DD' };
+const PRESETS = [
+  { name: 'TMXK lime', c: TMXK },
+  { name: 'Đỏ san hô', c: { accent: '#FF5A5F', dark: '#1A1A1A', light: '#FFFFFF', cream: '#FFF3E6' } },
+  { name: 'Vàng nghệ', c: { accent: '#FFC53D', dark: '#1F1B14', light: '#FFFFFF', cream: '#FFF8E7' } },
+  { name: 'Xanh bạc hà', c: { accent: '#5EE7C6', dark: '#0F1F1B', light: '#FFFFFF', cream: '#EAFBF6' } },
+  { name: 'Hồng neon', c: { accent: '#FF6FB5', dark: '#1D1020', light: '#FFFFFF', cream: '#FFEFF7' } },
+  { name: 'Xanh dương', c: { accent: '#4DA3FF', dark: '#0E1626', light: '#FFFFFF', cream: '#EEF5FF' } },
+];
+const TEMPLATES = {
+  highlight: { name: 'Vệt bút dạ', desc: 'Chữ trắng, từ khóa trong vệt highlight. Mặc định cho kênh.', size: 66, y: 8 },
+  editorial: { name: 'Editorial', desc: 'Sans nhẹ, cụm chốt serif nghiêng to. Sang, kể chuyện.', size: 58, y: 8 },
+  glass:     { name: 'Kính mờ', desc: 'Thẻ blur nền, có dòng chủ đề. Hợp nền rối, series.', size: 56, y: 7 },
+  sticker:   { name: 'Sticker', desc: 'Thẻ đen nghiêng, chữ kem. Hài, đời thường.', size: 58, y: 9 },
+  bubbles:   { name: 'Hộp chữ', desc: 'Hộp đen từng dòng kiểu TikTok. Text dài, tâm sự.', size: 46, y: 52 },
+  timeline:  { name: 'Mốc song song', desc: '3 mốc màu nhấn bên trái. Ba ý, ba bước.', size: 40, y: 55 },
+  chips:     { name: 'Từ A sang B', desc: 'Hai chip nối mũi tên. Chuyển đổi, hành trình.', size: 60, y: 10 },
+};
+const state = {
+  frame: null, frameName: '', facePos: 'mid',
+  template: 'highlight', ypct: 8, size: 66, maxw: 86, align: 'center', dim: 'auto',
+  brand: { ...TMXK }, kicker: 'Chuyện đi làm ngân hàng', tilt: -2.5,
+  rows: [['1 ngày', 'làm bank quần quật'], ['1 buổi', 'connect'], ['9h tối', 'vẫn sửa bài học viên']],
+  chips: ['KHCN', 'KHDN'], lead: 'Vy được chuyển từ',
+  tier: 'free',
+};
+const ls = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} } };
+
+/* ---------- markup, wrap ---------- */
+const ARROWS = '→←↑↓➜⇒';
+function parse(text) {
+  const out = []; const re = /(\*\*.+?\*\*|_.+?_)/g; let last = 0, m;
+  while ((m = re.exec(text))) {
+    if (m.index > last) out.push([text.slice(last, m.index), 'plain']);
+    const t = m[0];
+    if (t.startsWith('**')) out.push([t.slice(2, -2), 'key']); else out.push([t.slice(1, -1), 'italic']);
+    last = m.index + t.length;
+  }
+  if (last < text.length) out.push([text.slice(last), 'plain']);
+  return out;
+}
+function fontStr(f) { return `${f.style || ''} ${f.weight} ${f.size}px "${f.family}"`.trim(); }
+function tlen(ctx, t, f) { ctx.font = fontStr(f); return ctx.measureText(t).width; }
+function wrap(ctx, segs, fonts, maxW) {
+  const tokens = [];
+  for (const [t, kind] of segs) {
+    const parts = t.split(' ');
+    parts.forEach((w, i) => {
+      if (w === '') { if (i === parts.length - 1 && tokens.length) tokens[tokens.length - 1].spAfter = true; return; }
+      const sp = i > 0 || t.startsWith(' ') || (tokens.length && tokens[tokens.length - 1].spAfter);
+      tokens.push({ w, kind, sp: !!sp, spAfter: false });
+    });
+  }
+  const lines = []; let cur = [], curW = 0;
+  for (const tk of tokens) {
+    const f = fonts[tk.kind]; const spW = tlen(ctx, ' ', f);
+    let ww = tlen(ctx, tk.w, f) + (tk.sp && cur.length ? spW : 0);
+    if (cur.length && curW + ww > maxW) { lines.push(cur); cur = []; curW = 0; ww = tlen(ctx, tk.w, f); cur.push({ ...tk, sp: false }); }
+    else cur.push({ ...tk, sp: tk.sp && cur.length > 0 });
+    curW += ww;
+  }
+  if (cur.length) lines.push(cur);
+  return lines.map(ln => {
+    const m = [];
+    for (const { w, kind, sp } of ln) {
+      if (m.length && m[m.length - 1][1] === kind) m[m.length - 1][0] += (sp ? ' ' : '') + w;
+      else { if (m.length && sp) m[m.length - 1][0] += ' '; m.push([w, kind]); }
+    }
+    return m;
+  });
+}
+function lineWidth(ctx, line, fonts) { return line.reduce((s, [t, k]) => s + tlen(ctx, t, fonts[k]), 0); }
+
+/* ---------- drawing helpers ---------- */
+function rrect(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.roundRect(x, y, w, h, r); }
+function hexA(hex, a = 1) { const n = parseInt(hex.slice(1), 16); return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`; }
+function drawSegs(ctx, x, y, line, fonts, colors, base, shadow) {
+  for (const [t, k] of line) {
+    const f = fonts[k]; ctx.font = fontStr(f); ctx.textBaseline = 'alphabetic';
+    const dy = k === 'italic' ? -(f.size - base) * 0.12 : 0;
+    if (shadow) { ctx.shadowColor = 'rgba(0,0,0,.62)'; ctx.shadowBlur = shadow.blur; ctx.shadowOffsetY = shadow.off; } else { ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0; }
+    ctx.fillStyle = colors[k];
+    ctx.fillText(t, x, y + dy); x += ctx.measureText(t).width;
+  }
+  ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+}
+function renderLines(ctx, lines, fonts, colors, y, lh, align, xLeft, W, shadow, gap = 0) {
+  const base = fonts.plain.size;
+  for (const ln of lines) {
+    const w = lineWidth(ctx, ln, fonts); const x = align === 'center' ? (W - w) / 2 : xLeft;
+    drawSegs(ctx, x, y + base * 0.82, ln, fonts, colors, base, shadow); y += lh + gap;
+  }
+  return y;
+}
+function dimLayer(ctx, W, H, where, pct, strength) {
+  const n = H * pct; const g = where === 'top' ? ctx.createLinearGradient(0, 0, 0, n) : ctx.createLinearGradient(0, H, 0, H - n);
+  g.addColorStop(0, `rgba(0,0,0,${strength})`); g.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = g; ctx.fillRect(0, where === 'top' ? 0 : H - n, W, n);
+}
+const F = (weight, size, italic = false) => italic ? { family: 'Playfair Display', weight: 800, size, style: 'italic' } : { family: 'Be Vietnam Pro', weight, size };
+function fitSize(ctx, paras, mk, maxW, size, floor = 0.7) {
+  const start = size;
+  while (size > 8) {
+    const fonts = mk(size); let widest = 0;
+    for (const p of paras) for (const ln of p.split('\n')) widest = Math.max(widest, lineWidth(ctx, parse(ln), fonts));
+    if (widest <= maxW || size <= start * floor) return size; size -= 2;
+  }
+  return size;
+}
+
+/* ---------- templates: each draws into ov (overlay) and may touch fr (frame) ---------- */
+function ctxOf(s, W, H, frameCanvas) {
+  const px = v => Math.round(v * W / BASE_W);
+  return { W, H, px, s, y0: Math.round(H * s.ypct / 100), maxw: Math.round(W * s.maxw / 100), b: s.brand, blocks: s.blocks, notes: [], frame: frameCanvas };
+}
+const T = {};
+T.highlight = (c, ov) => {
+  const s0 = c.px(c.s.size); const mk = z => ({ plain: F(500, z), key: F(800, z), italic: F(800, z, true) });
+  const size = fitSize(ov, c.blocks, mk, c.maxw, s0); const fonts = mk(size); const lh = Math.round(size * 1.35);
+  const colors = { plain: c.b.light, key: c.b.dark, italic: c.b.accent }; let y = c.y0;
+  for (const para of c.blocks) {
+    for (const p of para.split('\n')) {
+      const lines = wrap(ov, parse(p), fonts, c.maxw); let yy = y;
+      for (const ln of lines) {
+        const w = lineWidth(ov, ln, fonts); let x = c.s.align === 'center' ? (c.W - w) / 2 : c.W * 0.08;
+        for (const [t, k] of ln) {
+          const tw = tlen(ov, t, fonts[k]);
+          if (k === 'key') { ov.save(); ov.translate(x + tw / 2, yy + size * 0.55); ov.rotate(-1.5 * Math.PI / 180); ov.fillStyle = hexA(c.b.accent, .93); rrect(ov, -tw / 2 - c.px(18), -size * 0.62, tw + c.px(36), size * 1.25, c.px(10)); ov.fill(); ov.restore(); }
+          x += tw;
+        }
+        yy += lh;
+      }
+      y = renderLines(ov, lines, fonts, colors, y, lh, c.s.align, c.W * 0.08, c.W, { blur: c.px(12), off: c.px(6) });
+    }
+    y += lh * 0.5;
+  }
+  c.notes.push(`Be Vietnam Pro Medium ${size}px trắng, từ khóa ExtraBold màu ${c.b.dark} trên vệt ${c.b.accent} nghiêng 1.5°, bóng đen 62% blur 12 lệch 6px.`);
+};
+T.editorial = (c, ov) => {
+  const s0 = c.px(c.s.size); const mk = z => ({ plain: F(400, z), key: F(900, Math.round(z * 1.45)), italic: F(900, Math.round(z * 1.9), true) });
+  const size = fitSize(ov, c.blocks, mk, c.maxw, s0); const fonts = mk(size); const lh = Math.round(size * 1.35);
+  const colors = { plain: c.b.light, key: c.b.light, italic: c.b.accent }; let y = c.y0;
+  for (const para of c.blocks) {
+    for (const p of para.split('\n')) {
+      const segs = parse(p); const kinds = new Set(segs.map(x => x[1])); const lines = wrap(ov, segs, fonts, c.maxw);
+      const thisLh = kinds.has('italic') ? Math.round(fonts.italic.size * 1.05) : kinds.has('key') ? Math.round(fonts.key.size * 1.2) : lh;
+      const yOff = kinds.has('italic') ? fonts.italic.size * 0.25 : kinds.has('key') ? fonts.key.size * 0.2 : 0;
+      renderLines(ov, lines, fonts, colors, y + yOff, thisLh, 'center', 0, c.W, { blur: c.px(12), off: c.px(6) }); y += thisLh * lines.length + yOff;
+    }
+    y += lh * 0.35;
+  }
+  ov.fillStyle = c.b.accent; rrect(ov, c.W / 2 - c.px(50), y + c.px(10), c.px(100), c.px(4), 2); ov.fill();
+  c.notes.push(`Be Vietnam Pro Regular ${size}px trắng; dòng nhấn Black ${fonts.key.size}px; cụm nghiêng Playfair Display Italic 800 ${fonts.italic.size}px màu ${c.b.accent}; bóng mềm; phủ tối 50% phần trên.`);
+};
+T.glass = (c, ov) => {
+  const s0 = c.px(c.s.size); const pw = Math.round(c.W * c.s.maxw / 100); const pxx = Math.round((c.W - pw) / 2); const py = c.y0;
+  const mk = z => ({ plain: F(300, z), key: F(700, z), italic: F(700, Math.round(z * 1.15), true) });
+  const size = fitSize(ov, c.blocks, mk, pw - c.px(130), s0); const fonts = mk(size); const lh = Math.round(size * 1.4);
+  const colors = { plain: c.b.light, key: c.b.light, italic: c.b.accent };
+  let lines = []; for (const para of c.blocks) for (const p of para.split('\n')) lines = lines.concat(wrap(ov, parse(p), fonts, pw - c.px(130)));
+  const kicker = (c.s.kicker || '').trim();
+  const ph = c.px(48) + (kicker ? c.px(56) : 0) + lines.length * lh + c.px(30); const r = c.px(28);
+  if (c.frame) { // blur behind, only on preview
+    const fr = c.frame.getContext('2d'); fr.save(); rrect(fr, pxx, py, pw, ph, r); fr.clip(); fr.filter = `blur(${c.px(14)}px)`; fr.drawImage(c.frame, 0, 0); fr.filter = 'none'; fr.restore();
+    fr.save(); fr.shadowColor = 'rgba(0,0,0,.45)'; fr.shadowBlur = c.px(30); fr.shadowOffsetY = c.px(14); fr.fillStyle = 'rgba(0,0,0,0.01)'; rrect(fr, pxx, py, pw, ph, r); fr.fill(); fr.restore();
+  }
+  ov.fillStyle = 'rgba(15,15,15,.58)'; rrect(ov, pxx, py, pw, ph, r); ov.fill();
+  ov.strokeStyle = 'rgba(255,255,255,.25)'; ov.lineWidth = 2; rrect(ov, pxx + 1, py + 1, pw - 2, ph - 2, r); ov.stroke();
+  ov.fillStyle = c.b.accent; rrect(ov, pxx + c.px(40), py + c.px(44), c.px(6), ph - c.px(88), 3); ov.fill();
+  let y = py + c.px(44); const inner = pxx + c.px(74);
+  if (kicker) { ov.font = fontStr(F(600, c.px(26))); ov.fillStyle = c.b.accent; ov.fillText(kicker.toUpperCase().split('').join(' '), inner, y + c.px(26)); y += c.px(56); }
+  renderLines(ov, lines, fonts, colors, y, lh, 'left', inner, c.W, null);
+  c.notes.push(`Panel kính mờ: blur nền 14, phủ đen 58%, bo góc 28, viền trắng 25%, vạch dọc ${c.b.accent}. Chữ Be Vietnam Pro Light ${size}px, từ khóa Bold${kicker ? `, kicker SemiBold 26px giãn chữ` : ''}.`);
+};
+T.sticker = (c, ov) => {
+  const s0 = c.px(c.s.size); const mk = z => ({ plain: F(800, z), key: F(900, Math.round(z * 1.25)), italic: F(900, Math.round(z * 1.3), true) });
+  const size = fitSize(ov, c.blocks, mk, c.maxw - c.px(120), s0); const fonts = mk(size); const lh = Math.round(size * 1.35);
+  const colors = { plain: c.b.cream, key: c.b.accent, italic: c.b.accent };
+  let lines = []; for (const para of c.blocks) for (const p of para.split('\n')) lines = lines.concat(wrap(ov, parse(p), fonts, c.maxw - c.px(120)));
+  const cw = Math.max(...lines.map(l => lineWidth(ov, l, fonts))) + c.px(120); const ch = lines.length * lh + c.px(70);
+  const draw = (g) => {
+    g.fillStyle = c.b.dark; rrect(g, -cw / 2, -ch / 2, cw, ch, c.px(32)); g.fill();
+    let y = -ch / 2 + c.px(32);
+    for (const ln of lines) { const w = lineWidth(g, ln, fonts); drawSegs(g, -w / 2, y + size * 0.82, ln, fonts, colors, size, null); y += lh; }
+  };
+  ov.save(); ov.translate(c.W / 2, c.y0 + ch / 2); ov.rotate((c.s.tilt || -2.5) * Math.PI / 180);
+  ov.shadowColor = 'rgba(0,0,0,.45)'; ov.shadowBlur = c.px(20); ov.shadowOffsetY = c.px(14); ov.fillStyle = c.b.dark; rrect(ov, -cw / 2, -ch / 2, cw, ch, c.px(32)); ov.fill(); ov.shadowColor = 'transparent';
+  draw(ov); ov.restore();
+  c.notes.push(`Thẻ ${c.b.dark} bo góc 32 nghiêng ${c.s.tilt || -2.5}°, bóng đổ mềm. Chữ Be Vietnam Pro ExtraBold ${size}px màu ${c.b.cream}, từ khóa Black ${fonts.key.size}px màu ${c.b.accent}.`);
+};
+T.bubbles = (c, ov) => {
+  const size = c.px(c.s.size); const lh = Math.round(size * 1.35); const gap = c.px(6);
+  const fonts = { plain: F(600, size), key: F(700, size), italic: F(900, Math.round(size * 1.15), true) };
+  const colors = { plain: c.b.light, key: c.b.accent, italic: c.b.accent }; let y = c.y0;
+  const padx = c.px(26), pady = c.px(12); const maxw = Math.round(c.W * Math.max(c.s.maxw, 94) / 100) - 2 * padx;
+  for (const para of c.blocks) {
+    let lines = []; for (const p of para.split('\n')) lines = lines.concat(wrap(ov, parse(p), fonts, maxw));
+    let yy = y; ov.fillStyle = 'rgba(0,0,0,.6)';
+    for (const ln of lines) { const w = lineWidth(ov, ln, fonts); const x = c.s.align === 'center' ? (c.W - w) / 2 : c.W * 0.08; rrect(ov, x - padx, yy - pady, w + 2 * padx, lh + 2 * pady - c.px(4), c.px(18)); ov.fill(); yy += lh + gap; }
+    y = renderLines(ov, lines, fonts, colors, y, lh, c.s.align, c.W * 0.08, c.W, null, gap); y += c.px(26);
+  }
+  c.notes.push(`Hộp đen 60% bo góc 18 theo từng dòng, Be Vietnam Pro SemiBold ${size}px trắng, từ khóa Bold ${c.b.accent}. Mỗi khối hiện theo lời nói, khối trước mờ 40%.`);
+};
+T.timeline = (c, ov) => {
+  const size = c.px(c.s.size); const big = c.px(Math.round(c.s.size * 1.45));
+  const fk = F(900, big), fs = F(500, size); const xL = Math.round(c.W * 0.085); let y = c.y0;
+  for (const [k, v] of c.s.rows) {
+    ov.fillStyle = c.b.accent; rrect(ov, xL, y + c.px(6), c.px(8), big - c.px(6), 4); ov.fill();
+    ov.font = fontStr(fk); ov.fillStyle = c.b.accent; ov.fillText(k, xL + c.px(30), y + big * 0.82);
+    const tx = xL + c.px(30) + ov.measureText(k).width + c.px(18);
+    const lines = wrap(ov, parse(v), { plain: fs, key: F(700, size), italic: F(700, size, true) }, c.W - tx - c.W * 0.06);
+    let yy = y + (big - size) * 0.5;
+    for (const ln of lines) { drawSegs(ov, tx, yy + size * 0.82, ln, { plain: fs, key: F(700, size), italic: F(700, size, true) }, { plain: c.b.light, key: c.b.accent, italic: c.b.accent }, size, null); yy += Math.round(size * 1.2); }
+    y += Math.max(big, yy - y) + Math.round(big * 0.55);
+  }
+  if (c.blocks.length && c.blocks[0].trim()) {
+    y += c.px(10); ov.fillStyle = 'rgba(255,255,255,.5)'; ov.fillRect(xL, y, c.px(120), 2); y += c.px(34);
+    const fonts = { plain: F(300, size), key: F(600, size), italic: F(900, Math.round(size * 1.5), true) }; const colors = { plain: c.b.light, key: c.b.accent, italic: c.b.accent };
+    for (const para of c.blocks) { for (const p of para.split('\n')) y = renderLines(ov, wrap(ov, parse(p), fonts, c.W - xL - c.W * 0.08), fonts, colors, y, Math.round(size * 1.45), 'left', xL, c.W, null); y += c.px(24); }
+  }
+  c.notes.push(`Mốc: Be Vietnam Pro Black ${big}px màu ${c.b.accent} với vạch dọc; nội dung Medium ${size}px trắng; đoạn dưới Light, từ khóa SemiBold; phủ tối 55% vùng chữ.`);
+};
+T.chips = (c, ov) => {
+  const [a, b] = c.s.chips; const size = c.px(c.s.size); const fc = F(900, size); let y = c.y0;
+  if ((c.s.lead || '').trim()) { const f = F(500, c.px(54)); ov.font = fontStr(f); ov.fillStyle = c.b.light; ov.shadowColor = 'rgba(0,0,0,.6)'; ov.shadowBlur = c.px(12); ov.shadowOffsetY = c.px(6); ov.fillText(c.s.lead, (c.W - ov.measureText(c.s.lead).width) / 2, y + c.px(44)); ov.shadowColor = 'transparent'; y += c.px(80); }
+  ov.font = fontStr(fc); const cw = Math.max(ov.measureText(a).width, ov.measureText(b).width) + c.px(80); const ch = Math.round(size * 1.75); const gap = c.px(110); const x0 = (c.W - (2 * cw + gap)) / 2;
+  ov.save(); ov.shadowColor = 'rgba(0,0,0,.5)'; ov.shadowBlur = c.px(14); ov.shadowOffsetY = c.px(10);
+  ov.fillStyle = 'rgba(30,30,30,.92)'; rrect(ov, x0, y, cw, ch, c.px(24)); ov.fill(); ov.fillStyle = c.b.accent; rrect(ov, x0 + cw + gap, y, cw, ch, c.px(24)); ov.fill(); ov.restore();
+  ov.font = fontStr(fc); ov.fillStyle = c.b.light; ov.fillText(a, x0 + (cw - ov.measureText(a).width) / 2, y + ch * 0.68); ov.fillStyle = c.b.dark; ov.fillText(b, x0 + cw + gap + (cw - ov.measureText(b).width) / 2, y + ch * 0.68);
+  const ax = x0 + cw + gap / 2, ay = y + ch / 2; ov.strokeStyle = c.b.light; ov.lineWidth = c.px(8); ov.lineCap = 'round'; ov.beginPath(); ov.moveTo(ax - c.px(30), ay); ov.lineTo(ax + c.px(20), ay); ov.stroke();
+  ov.fillStyle = c.b.light; ov.beginPath(); ov.moveTo(ax + c.px(32), ay); ov.lineTo(ax + c.px(8), ay - c.px(20)); ov.lineTo(ax + c.px(8), ay + c.px(20)); ov.closePath(); ov.fill();
+  y += ch + c.px(40);
+  if (c.blocks.length && c.blocks[0].trim()) { const s2 = c.px(62); const fonts = { plain: F(800, s2), key: F(800, s2), italic: F(900, Math.round(s2 * 1.2), true) }; const colors = { plain: c.b.light, key: c.b.accent, italic: c.b.accent }; for (const para of c.blocks) y = renderLines(ov, wrap(ov, parse(para), fonts, c.maxw), fonts, colors, y, Math.round(s2 * 1.35), 'center', 0, c.W, { blur: c.px(12), off: c.px(6) }); }
+  c.notes.push(`Chip trái đen 92%, chip phải ${c.b.accent}, chữ Be Vietnam Pro Black ${size}px, mũi tên trắng; dòng dưới ExtraBold 62px.`);
+};
+const DEFAULT_DIM = { highlight: ['top', .28, .35], editorial: ['top', .30, .55], chips: ['top', .28, .47], timeline: ['bottom', .55, .6], bubbles: null, glass: null, sticker: null };
+
+/* ---------- render pipeline ---------- */
+let fontsReady = false;
+async function ensureFonts() {
+  if (fontsReady) return;
+  const list = [300, 400, 500, 600, 700, 800, 900].map(w => `${w} 40px "Be Vietnam Pro"`).concat(['italic 800 40px "Playfair Display"']);
+  try { await Promise.all(list.map(f => document.fonts.load(f))); } catch {}
+  fontsReady = true;
+}
+function blocksFromText(t) { return t.replace(/\r/g, '').split(/\n\s*\n/).map(s => s.trim()).filter(Boolean); }
+function renderTo(frameImg, opts, W) {
+  const H = Math.round(frameImg.height * W / frameImg.width);
+  const fr = document.createElement('canvas'); fr.width = W; fr.height = H;
+  const ov = document.createElement('canvas'); ov.width = W; ov.height = H;
+  const g = fr.getContext('2d'); g.drawImage(frameImg, 0, 0, W, H);
+  const dm = opts.dim === 'off' ? null : DEFAULT_DIM[opts.template];
+  if (dm) dimLayer(g, W, H, ...dm);
+  const c = ctxOf(opts, W, H, fr);
+  T[opts.template](c, ov.getContext('2d'));
+  return { fr, ov, notes: c.notes, dm };
+}
+function currentOpts(overrides = {}) {
+  const o = { ...state, blocks: blocksFromText($('#text').value), ...overrides };
+  if (!o.blocks.length) o.blocks = [' '];
+  return o;
+}
+let renderTimer = null; let lastRender = null;
+function scheduleRender() { clearTimeout(renderTimer); renderTimer = setTimeout(render, 60); }
+async function render() {
+  if (!state.frame) return; await ensureFonts();
+  const opts = currentOpts();
+  const { fr, ov, notes, dm } = renderTo(state.frame, opts, BASE_W);
+  const pv = $('#preview'); pv.width = fr.width; pv.height = fr.height;
+  const g = pv.getContext('2d'); g.drawImage(fr, 0, 0); g.drawImage(ov, 0, 0);
+  lastRender = { fr, ov, notes, dm, opts };
+  $('#metaSize').textContent = `${fr.width} × ${fr.height}`; $('#metaTpl').textContent = TEMPLATES[opts.template].name;
+  const bbox = alphaBBox(ov); writeGuide(opts, notes, dm, bbox, fr.height);
+  renderStrip();
+}
+function alphaBBox(cv) {
+  const g = cv.getContext('2d'); const { width: w, height: h } = cv; const d = g.getImageData(0, 0, w, h).data;
+  let top = h, bot = 0, left = w, right = 0;
+  for (let y = 0; y < h; y += 4) for (let x = 0; x < w; x += 4) if (d[(y * w + x) * 4 + 3] > 20) { if (y < top) top = y; if (y > bot) bot = y; if (x < left) left = x; if (x > right) right = x; }
+  return top > bot ? null : { top, bot, left, right };
+}
+function writeGuide(opts, notes, dm, bbox, H) {
+  const lines = [`Khung ${BASE_W}x${H}. Mẫu: ${TEMPLATES[opts.template].name} (${opts.template}).`];
+  if (bbox) lines.push(`Vùng chữ: từ ${Math.round(bbox.top / H * 100)}% đến ${Math.round(bbox.bot / H * 100)}% chiều cao, rộng ${Math.round((bbox.right - bbox.left) / BASE_W * 100)}% khung, căn ${opts.align === 'center' ? 'giữa' : 'trái'}.`);
+  if (dm) lines.push(`Phủ tối: gradient đen từ mép ${dm[0] === 'top' ? 'trên' : 'dưới'} vào ${Math.round(dm[1] * 100)}% khung, đậm nhất ${Math.round(dm[2] * 100)}%.`);
+  lines.push(...notes);
+  lines.push(`Màu: nhấn ${opts.brand.accent}, tối ${opts.brand.dark}, chữ sáng ${opts.brand.light}, kem ${opts.brand.cream}.`);
+  lines.push(`Font: Be Vietnam Pro và Playfair Display Italic (Google Fonts, miễn phí, đủ dấu tiếng Việt).`);
+  $('#guide').textContent = lines.join('\n');
+}
+/* thumbnails of all 7 templates */
+const stripCanvases = {};
+function renderStrip() {
+  if (!state.frame) return;
+  for (const key of Object.keys(TEMPLATES)) {
+    const cv = stripCanvases[key]; if (!cv) continue;
+    const o = currentOpts({ template: key, size: state.template === key ? state.size : TEMPLATES[key].size, ypct: state.template === key ? state.ypct : autoY(key) });
+    const { fr, ov } = renderTo(state.frame, o, 360);
+    cv.width = fr.width; cv.height = fr.height; const g = cv.getContext('2d'); g.drawImage(fr, 0, 0); g.drawImage(ov, 0, 0);
+    const tc = document.querySelector(`.tpl[data-k="${key}"] canvas`); if (tc) { tc.width = 360; tc.height = 240; const gg = tc.getContext('2d'); const sy = Math.max(0, Math.round((o.ypct / 100) * fr.height) - 40); gg.drawImage(fr, 0, sy, 360, 240, 0, 0, 360, 240); gg.drawImage(ov, 0, sy, 360, 240, 0, 0, 360, 240); }
+  }
+}
+function autoY(key) {
+  const low = ['bubbles', 'timeline'].includes(key);
+  if (state.facePos === 'top') return low ? 60 : 62;      // mặt ở trên: đẩy chữ xuống ngực
+  if (state.facePos === 'low') return low ? 8 : 8;        // mặt ở dưới: chữ ở trên
+  return low ? 52 : TEMPLATES[key].y;                     // mặt ở giữa
+}
+
+/* ---------- UI wiring ---------- */
+function setSeg(id, v) { document.querySelectorAll(`#${id} button`).forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === v))); }
+function bindSeg(id, cb) { document.querySelectorAll(`#${id} button`).forEach(b => b.addEventListener('click', () => { setSeg(id, b.dataset.v); cb(b.dataset.v); })); }
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), 2200); }
+function buildTemplates() {
+  const box = $('#templates');
+  for (const [k, t] of Object.entries(TEMPLATES)) {
+    const b = document.createElement('button'); b.className = 'tpl'; b.dataset.k = k; b.setAttribute('aria-pressed', String(k === state.template));
+    b.innerHTML = `<canvas width="360" height="240" aria-hidden="true"></canvas><b>${t.name}</b><small>${t.desc}</small>`;
+    b.addEventListener('click', () => selectTemplate(k, true)); box.appendChild(b);
+  }
+  const strip = $('#strip');
+  for (const k of Object.keys(TEMPLATES)) { const b = document.createElement('button'); b.dataset.k = k; b.title = TEMPLATES[k].name; b.setAttribute('aria-pressed', String(k === state.template)); const cv = document.createElement('canvas'); cv.width = 360; cv.height = 640; b.appendChild(cv); stripCanvases[k] = cv; b.addEventListener('click', () => selectTemplate(k, true)); strip.appendChild(b); }
+}
+function selectTemplate(k, resetSize) {
+  state.template = k;
+  document.querySelectorAll('.tpl').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.k === k)));
+  document.querySelectorAll('#strip button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.k === k)));
+  if (resetSize) { state.size = TEMPLATES[k].size; state.ypct = autoY(k); syncSliders(); }
+  renderExtra(); scheduleRender();
+}
+function syncSliders() { $('#ypct').value = state.ypct; $('#ypctOut').textContent = state.ypct + '%'; $('#size').value = state.size; $('#sizeOut').textContent = state.size + 'px'; $('#maxw').value = state.maxw; $('#maxwOut').textContent = state.maxw + '%'; }
+function renderExtra() {
+  const box = $('#tplExtra'); box.innerHTML = '';
+  const add = (label, id, val, ph) => { const l = document.createElement('label'); l.className = 'lbl'; l.textContent = label; l.htmlFor = id; const i = document.createElement('input'); i.type = 'text'; i.id = id; i.value = val; i.placeholder = ph || ''; box.append(l, i); return i; };
+  if (state.template === 'glass') add('Dòng chủ đề (kicker)', 'xKicker', state.kicker, 'Chuyện đi làm ngân hàng').addEventListener('input', e => { state.kicker = e.target.value; scheduleRender(); });
+  if (state.template === 'sticker') { const i = add('Độ nghiêng (độ, âm là nghiêng trái)', 'xTilt', state.tilt); i.addEventListener('input', e => { state.tilt = parseFloat(e.target.value) || 0; scheduleRender(); }); }
+  if (state.template === 'chips') {
+    add('Dòng dẫn phía trên', 'xLead', state.lead).addEventListener('input', e => { state.lead = e.target.value; scheduleRender(); });
+    add('Chip trái', 'xChipA', state.chips[0]).addEventListener('input', e => { state.chips[0] = e.target.value; scheduleRender(); });
+    add('Chip phải', 'xChipB', state.chips[1]).addEventListener('input', e => { state.chips[1] = e.target.value; scheduleRender(); });
+    const p = document.createElement('p'); p.className = 'hint'; p.style.marginTop = '8px'; p.textContent = 'Ô nội dung ở bước 2 sẽ thành dòng dưới hai chip.'; box.append(p);
+  }
+  if (state.template === 'timeline') {
+    const p = document.createElement('p'); p.className = 'hint'; p.textContent = 'Mỗi dòng một mốc, dạng "mốc | nội dung". Ô nội dung ở bước 2 thành đoạn dưới các mốc.'; box.append(p);
+    const ta = document.createElement('textarea'); ta.id = 'xRows'; ta.style.minHeight = '80px'; ta.value = state.rows.map(r => r.join(' | ')).join('\n');
+    ta.addEventListener('input', e => { state.rows = e.target.value.split('\n').map(l => l.split('|').map(s => s.trim())).filter(r => r[0]).map(r => [r[0], r[1] || '']); scheduleRender(); }); box.append(ta);
+  }
+}
+function applyBrandInputs() { $('#cAccent').value = state.brand.accent; $('#cDark').value = state.brand.dark; $('#cLight').value = state.brand.light; $('#cCream').value = state.brand.cream; }
+function buildPresets() {
+  const box = $('#presets');
+  const saved = ls.get('hook.brand'); const list = [...PRESETS]; if (saved) { try { list.unshift({ name: 'Màu kênh của tôi', c: JSON.parse(saved) }); } catch {} }
+  box.innerHTML = '';
+  for (const p of list) { const b = document.createElement('button'); b.className = 'preset'; b.innerHTML = `<i style="background:${p.c.accent}"></i>${p.name}`; b.addEventListener('click', () => { state.brand = { ...p.c }; applyBrandInputs(); scheduleRender(); }); box.appendChild(b); }
+}
+function setTier(t) { state.tier = t; $('#tierFree').setAttribute('aria-pressed', String(t === 'free')); $('#tierPro').setAttribute('aria-pressed', String(t === 'pro')); $('#proPanel').style.opacity = t === 'pro' ? '1' : '.6'; $('#btnAI').disabled = t !== 'pro'; if (t === 'pro') $('#proPanel').scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+
+/* ---------- Free: gợi ý nhanh theo luật ---------- */
+function quickSuggest() {
+  const raw = $('#text').value.trim(); const blocks = blocksFromText(raw); const lines = raw.split('\n').filter(Boolean);
+  const total = raw.replace(/[*_]/g, '').length; let pick, why;
+  if (/→|->| sang | qua | thành /i.test(raw) && lines.length <= 3) { pick = 'chips'; why = 'Nội dung có dạng chuyển từ A sang B.'; const m = raw.match(/(\S+)\s*(?:→|->|sang)\s*(\S+)/i); if (m) state.chips = [m[1].replace(/[*_,.!?]/g, '').toUpperCase(), m[2].replace(/[*_,.!?]/g, '').toUpperCase()]; }
+  else if (blocks.length >= 3 || total > 220) { pick = 'bubbles'; why = 'Text dài nhiều đoạn, hộp chữ đặt ở ngực đọc dễ nhất.'; }
+  else if (lines.length === 3 && lines.every(l => /^\d/.test(l))) { pick = 'timeline'; why = 'Ba dòng đều bắt đầu bằng số, hợp dạng mốc.'; }
+  else if (total <= 60) { pick = raw.includes('_') ? 'editorial' : 'highlight'; why = 'Hook ngắn, ưu tiên mẫu đọc nhanh và nhất quán.'; }
+  else { pick = 'glass'; why = 'Hook trung bình, thẻ kính mờ giữ chữ rõ trên mọi nền.'; }
+  if (!/\*\*/.test(raw) && pick !== 'bubbles' && pick !== 'chips') {
+    // tự nhấn 2 từ cuối của dòng đầu
+    const first = lines[0] || ''; const ws = first.split(' '); if (ws.length >= 3) { const n = Math.min(3, ws.length - 1); const kw = ws.slice(-n).join(' '); lines[0] = ws.slice(0, -n).join(' ') + ' **' + kw + '**'; $('#text').value = raw.replace(first, lines[0]); }
+  }
+  selectTemplate(pick, true); toast(`Gợi ý: ${TEMPLATES[pick].name}. ${why}`);
+}
+
+/* ---------- Pro: AI ---------- */
+let sampleFn = null, downloadsNs = null, aiCtl = null;
+const AI_SCHEMA = { type: 'object', additionalProperties: false, required: ['face', 'rewrite', 'variants'], properties: {
+  face: { type: 'object', additionalProperties: false, required: ['top_pct', 'bottom_pct', 'background'], properties: { top_pct: { type: 'number' }, bottom_pct: { type: 'number' }, background: { type: 'string' } } },
+  rewrite: { type: 'string' },
+  variants: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['template', 'y_pct', 'size', 'text', 'why'], properties: {
+    template: { type: 'string', enum: Object.keys(TEMPLATES) }, y_pct: { type: 'number' }, size: { type: 'number' }, text: { type: 'string' }, why: { type: 'string' },
+    kicker: { type: 'string' }, lead: { type: 'string' }, chips: { type: 'array', items: { type: 'string' } }, rows: { type: 'array', items: { type: 'array', items: { type: 'string' } } } } } } } };
+function aiPrompt(text) {
+  return `Bạn là designer chữ hook cho video TikTok dọc. Ảnh kèm theo là một frame của video. Hãy:
+1. Xác định mặt người chiếm từ bao nhiêu % đến bao nhiêu % chiều cao khung (top_pct, bottom_pct, số 0-100), và mô tả nền ở vùng trống bằng vài từ (background: sáng/tối, đơn giản/rối).
+2. Viết lại hook cho gọn nếu cần (rewrite): tối đa 2 dòng cho hook mở đầu, giữ giọng của tác giả, mở viết tắt khó hiểu, đổi "m" thành "mình". Nếu text đã ổn, giữ nguyên.
+3. Đề xuất đúng 3 bố cục khác tinh thần nhau từ danh sách mẫu, mỗi cái gồm: template, y_pct (mép trên khối chữ theo % chiều cao, phải nằm ngoài vùng mặt, cách mép trên ít nhất 5%, không thấp hơn 60%), size (px trên khung rộng 1080; hook ngắn 56-72, text dài 40-48), text (nội dung đã ngắt dòng bằng \\n, tách khối bằng dòng trống, đánh dấu 1-2 từ khóa bằng **từ khóa**, cụm chốt cảm xúc bằng _cụm_), why (1 câu vì sao hợp).
+Mẫu: highlight (chữ trắng, từ khóa trong vệt highlight; hook ngắn, nền đơn giản), editorial (sans nhẹ + serif nghiêng cho cụm _..._; kể chuyện, cần nền tối), glass (thẻ kính mờ, có kicker là dòng chủ đề ngắn; nền rối, series), sticker (thẻ đen nghiêng; hài, đời thường), bubbles (hộp đen từng dòng; text dài nhiều đoạn, đặt ở ngực), timeline (rows: danh sách [mốc, nội dung] cho 3 ý song song; text là đoạn chốt), chips (chips: [A, B] hai từ ngắn viết hoa + lead là dòng dẫn; nội dung "từ A sang B").
+Text của người dùng:
+"""${text}"""
+Trả về duy nhất một JSON theo dạng: {"face":{"top_pct":30,"bottom_pct":55,"background":"sáng, đơn giản"},"rewrite":"...","variants":[{"template":"highlight","y_pct":8,"size":66,"text":"...","why":"..."}]}`;
+}
+async function frameBlob() { const cv = document.createElement('canvas'); const s = 900 / Math.max(state.frame.width, state.frame.height); cv.width = Math.round(state.frame.width * s); cv.height = Math.round(state.frame.height * s); cv.getContext('2d').drawImage(state.frame, 0, 0, cv.width, cv.height); return new Promise(r => cv.toBlob(r, 'image/jpeg', .85)); }
+async function blobToB64(b) { return new Promise(r => { const fr = new FileReader(); fr.onload = () => r(String(fr.result).split(',')[1]); fr.readAsDataURL(b); }); }
+async function askViaApiKey(key, text, signal) {
+  const img = await blobToB64(await frameBlob());
+  const res = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', signal, headers: {
+      'content-type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01',
+      'anthropic-beta': 'server-side-fallback-2026-07-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+    body: JSON.stringify({ model: 'claude-opus-5', max_tokens: 4000, fallbacks: 'default',
+      output_config: { format: { type: 'json_schema', schema: AI_SCHEMA } },
+      messages: [{ role: 'user', content: [{ type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: img } }, { type: 'text', text: aiPrompt(text) }] }] }) });
+  if (!res.ok) { const e = await res.text().catch(() => ''); throw { code: 'http_' + res.status, message: e.slice(0, 300) }; }
+  const j = await res.json();
+  if (j.stop_reason === 'refusal') throw { code: 'refused', message: j.stop_details?.explanation || '' };
+  const t = (j.content || []).filter(b => b.type === 'text').map(b => b.text).join('');
+  return JSON.parse(t);
+}
+function setStatus(msg, cls = '') { const s = $('#aiStatus'); s.textContent = msg; s.className = 'status ' + cls; }
+async function runAI() {
+  if (!state.frame) return;
+  const text = $('#text').value.trim(); if (!text) { setStatus('Nhập nội dung hook trước đã.', 'err'); return; }
+  const btn = $('#btnAI'); btn.disabled = true; $('#btnAIStop').hidden = false; $('#sugs').innerHTML = ''; setStatus('Đang xem frame và nghĩ bố cục, thường mất 10 đến 40 giây...');
+  aiCtl = new AbortController();
+  try {
+    let data;
+    if (sampleFn) {
+      const caps = await sampleFn.limits().catch(() => null);
+      const opts = { signal: aiCtl.signal, modelTier: 'default', cache: false };
+      if (caps?.images) opts.images = await frameBlob(); else setStatus('Trình xem này không gửi được ảnh, AI chỉ đọc text. Hãy chọn đúng vị trí mặt ở bước 1.');
+      data = await sampleFn.json(aiPrompt(text) + (caps?.images ? '' : `\n(Không có ảnh. Người dùng cho biết mặt ở vị trí: ${state.facePos === 'top' ? 'phần trên' : state.facePos === 'low' ? 'phần dưới' : 'giữa khung'}.)`), opts);
+    } else {
+      const key = $('#apiKey').value.trim(); if (!key) { setStatus('Nhập API key để dùng gói Pro ngoài claude.ai, hoặc mở bản này trong claude.ai để dùng tài khoản Claude của bạn.', 'err'); return; }
+      ls.set('hook.apikey', key); data = await askViaApiKey(key, text, aiCtl.signal);
+    }
+    showSuggestions(data);
+  } catch (e) {
+    const code = e?.code || 'upstream_error';
+    const map = { cancelled: 'Đã dừng.', not_granted: 'Bạn chưa cho phép trang này dùng Claude. Gói Pro cần quyền đó.', rate_limited: 'Gọi hơi dày, chờ một lát rồi thử lại.', invalid_json: 'AI trả lời không đúng định dạng, bấm thử lại.', refused: 'AI từ chối nội dung này, thử đổi cách viết.', images_unavailable: 'Trình xem này không gửi được ảnh.', http_401: 'API key sai hoặc hết hạn.', http_400: 'Yêu cầu không hợp lệ: ' + (e.message || '') };
+    setStatus(map[code] || ('Có lỗi: ' + (e.message || code)), code === 'cancelled' ? '' : 'err');
+  } finally { btn.disabled = state.tier !== 'pro'; $('#btnAIStop').hidden = true; aiCtl = null; }
+}
+function showSuggestions(d) {
+  const box = $('#sugs'); box.innerHTML = '';
+  const face = d.face || {}; setStatus(`Mặt: ${Math.round(face.top_pct ?? 0)}% đến ${Math.round(face.bottom_pct ?? 0)}% khung. Nền: ${face.background || 'không rõ'}.`, 'ok');
+  if (d.rewrite && d.rewrite.trim() && d.rewrite.trim() !== $('#text').value.trim()) {
+    const el = document.createElement('div'); el.className = 'sug'; el.innerHTML = `<div><b>Viết lại gọn hơn</b><p style="white-space:pre-wrap;color:var(--text)"></p></div>`; el.querySelector('p').textContent = d.rewrite;
+    const b = document.createElement('button'); b.className = 'btn sm'; b.textContent = 'Dùng bản này'; b.addEventListener('click', () => { $('#text').value = d.rewrite; scheduleRender(); toast('Đã thay nội dung'); }); el.appendChild(b); box.appendChild(el);
+  }
+  for (const v of (d.variants || []).slice(0, 3)) {
+    if (!TEMPLATES[v.template]) continue;
+    const el = document.createElement('div'); el.className = 'sug';
+    el.innerHTML = `<div><b>${TEMPLATES[v.template].name} · vị trí ${Math.round(v.y_pct)}% · ${Math.round(v.size)}px</b><p></p></div>`; el.querySelector('p').textContent = v.why || '';
+    const b = document.createElement('button'); b.className = 'btn sm primary'; b.textContent = 'Áp dụng';
+    b.addEventListener('click', () => {
+      $('#text').value = v.text || $('#text').value; state.ypct = Math.min(80, Math.max(3, Math.round(v.y_pct))); state.size = Math.min(110, Math.max(30, Math.round(v.size)));
+      if (v.kicker) state.kicker = v.kicker; if (v.lead) state.lead = v.lead; if (Array.isArray(v.chips) && v.chips.length === 2) state.chips = v.chips; if (Array.isArray(v.rows) && v.rows.length) state.rows = v.rows.map(r => [String(r[0] || ''), String(r[1] || '')]);
+      selectTemplate(v.template, false); syncSliders(); toast('Đã áp dụng đề xuất');
+    }); el.appendChild(b); box.appendChild(el);
+  }
+}
+
+/* ---------- export ---------- */
+function canvasBlob(cv, type, q) { return new Promise(r => cv.toBlob(r, type, q)); }
+async function saveBlob(blob, filename) {
+  if (downloadsNs) { try { await downloadsNs.save({ filename, data: blob }); toast('Đã lưu ' + filename); return; } catch (e) { if (e?.code === 'cancelled' || e?.code === 'declined') return; } }
+  if (!window.claude) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); toast('Đang tải ' + filename); return; }
+  const url = URL.createObjectURL(blob); $('#imgModalImg').src = url; $('#imgModal').classList.add('show');
+}
+async function exportPng() { if (!lastRender) return; const b = await canvasBlob(lastRender.ov, 'image/png'); saveBlob(b, `hook-${state.template}-overlay.png`); }
+async function exportJpg() { if (!lastRender) return; const cv = document.createElement('canvas'); cv.width = lastRender.fr.width; cv.height = lastRender.fr.height; const g = cv.getContext('2d'); g.drawImage(lastRender.fr, 0, 0); g.drawImage(lastRender.ov, 0, 0); const b = await canvasBlob(cv, 'image/jpeg', .92); saveBlob(b, `hook-${state.template}-preview.jpg`); }
+async function copyGuide() { const t = $('#guide').textContent; try { await navigator.clipboard.writeText(t); toast('Đã sao chép hướng dẫn'); } catch { const r = document.createRange(); r.selectNodeContents($('#guide')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); toast('Chọn sẵn rồi, nhấn Ctrl/Cmd+C'); } }
+
+/* ---------- frame loading ---------- */
+function loadFrameFile(file) {
+  if (!file || !file.type.startsWith('image/')) return;
+  const img = new Image(); img.onload = () => { state.frame = img; state.frameName = file.name; $('#fileName').textContent = `${file.name} · ${img.width}×${img.height}`; scheduleRender(); URL.revokeObjectURL(img.src); }; img.src = URL.createObjectURL(file);
+}
+function sampleFrame() {
+  // frame mẫu: người quay talking-head, tường sáng, vẽ bằng canvas để không phải nhúng ảnh
+  const cv = document.createElement('canvas'); cv.width = 1080; cv.height = 1920; const g = cv.getContext('2d');
+  const bg = g.createLinearGradient(0, 0, 0, 1920); bg.addColorStop(0, '#cfd9df'); bg.addColorStop(1, '#8f9ba3'); g.fillStyle = bg; g.fillRect(0, 0, 1080, 1920);
+  g.fillStyle = '#e6ebee'; g.fillRect(0, 0, 1080, 900); g.fillStyle = '#b9c4cb'; g.fillRect(760, 120, 320, 700);
+  g.fillStyle = '#5b6770'; g.beginPath(); g.ellipse(540, 1500, 430, 520, 0, 0, Math.PI * 2); g.fill();   // vai
+  g.fillStyle = '#c99a7a'; g.beginPath(); g.ellipse(540, 820, 190, 240, 0, 0, Math.PI * 2); g.fill();     // mặt
+  g.fillStyle = '#2b2b2b'; g.beginPath(); g.ellipse(540, 640, 210, 130, 0, Math.PI, 0); g.fill();       // tóc
+  g.fillStyle = 'rgba(0,0,0,.35)'; g.font = '600 34px "Be Vietnam Pro", sans-serif'; g.textAlign = 'center'; g.fillText('FRAME MẪU · thay bằng ảnh cap của bạn', 540, 1860);
+  const img = new Image(); img.onload = () => { if (!state.frame) { state.frame = img; scheduleRender(); } }; img.src = cv.toDataURL('image/jpeg', .8);
+}
+
+/* ---------- boot ---------- */
+(function init() {
+  buildTemplates(); buildPresets(); renderExtra(); syncSliders(); applyBrandInputs();
+  const savedBrand = ls.get('hook.brand'); if (savedBrand) { try { state.brand = { ...TMXK, ...JSON.parse(savedBrand) }; applyBrandInputs(); } catch {} }
+  const savedText = ls.get('hook.text'); if (savedText) $('#text').value = savedText;
+  const savedKey = ls.get('hook.apikey'); if (savedKey) $('#apiKey').value = savedKey;
+  sampleFrame();
+
+  const drop = $('#drop'); $('#file').addEventListener('change', e => loadFrameFile(e.target.files[0]));
+  ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('on'); }));
+  ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('on'); }));
+  drop.addEventListener('drop', e => loadFrameFile(e.dataTransfer.files[0]));
+  document.addEventListener('paste', e => { const f = [...(e.clipboardData?.files || [])][0]; if (f) loadFrameFile(f); });
+
+  bindSeg('facePos', v => { state.facePos = v; state.ypct = autoY(state.template); syncSliders(); scheduleRender(); });
+  bindSeg('align', v => { state.align = v; scheduleRender(); });
+  bindSeg('dim', v => { state.dim = v; scheduleRender(); });
+  $('#text').addEventListener('input', () => { ls.set('hook.text', $('#text').value); scheduleRender(); });
+  $('#ypct').addEventListener('input', e => { state.ypct = +e.target.value; $('#ypctOut').textContent = state.ypct + '%'; scheduleRender(); });
+  $('#size').addEventListener('input', e => { state.size = +e.target.value; $('#sizeOut').textContent = state.size + 'px'; scheduleRender(); });
+  $('#maxw').addEventListener('input', e => { state.maxw = +e.target.value; $('#maxwOut').textContent = state.maxw + '%'; scheduleRender(); });
+  for (const [id, k] of [['cAccent', 'accent'], ['cDark', 'dark'], ['cLight', 'light'], ['cCream', 'cream']]) $('#' + id).addEventListener('input', e => { state.brand[k] = e.target.value.toUpperCase(); scheduleRender(); });
+  $('#btnSaveBrand').addEventListener('click', () => { ls.set('hook.brand', JSON.stringify(state.brand)); buildPresets(); toast('Đã lưu màu kênh của bạn'); });
+  $('#btnResetBrand').addEventListener('click', () => { state.brand = { ...TMXK }; applyBrandInputs(); scheduleRender(); });
+  $('#btnQuick').addEventListener('click', quickSuggest);
+  $('#btnSample1').addEventListener('click', () => { $('#text').value = 'mình có **1 đôi giày rách**\nvì đi làm ngân hàng!?'; selectTemplate('highlight', true); });
+  $('#btnSample2').addEventListener('click', () => { $('#text').value = '1 ngày làm bank **quần quật,**\n1 buổi **connect,**\n9h tối vẫn lọ mọ sửa bài học viên\n\nT đâu phải người giời mà không biết mệt,\nnhưng trao giá trị cho 1 người **"cầu tiến"**\nquý hơn cầm tiền của 1 người **"lười"**\n\nCòn mối quan hệ nào cũng phải **quy ra tiền**\nthì bạn nghĩ nó đi được _bao xa?_'; selectTemplate('bubbles', true); });
+  $('#btnSample3').addEventListener('click', () => { $('#text').value = 'chỉ nhờ **mối quan hệ**'; state.chips = ['KHCN', 'KHDN']; state.lead = 'Vy được chuyển từ'; selectTemplate('chips', true); });
+  $('#tierFree').addEventListener('click', () => setTier('free')); $('#tierPro').addEventListener('click', () => setTier('pro'));
+  $('#btnAI').addEventListener('click', runAI); $('#btnAIStop').addEventListener('click', () => aiCtl?.abort());
+  $('#btnPng').addEventListener('click', exportPng); $('#btnJpg').addEventListener('click', exportJpg); $('#btnCopy').addEventListener('click', copyGuide);
+  $('#imgModalClose').addEventListener('click', () => $('#imgModal').classList.remove('show'));
+  setTier('free');
+
+  // Khả năng runtime khi mở trong claude.ai: hỏi Claude bằng tài khoản người xem, lưu file qua hộp thoại
+  (async () => {
+    if (!window.claude?.use) { $('#proKeyRow').hidden = false; return; }
+    try { sampleFn = await window.claude.use('sample'); } catch { sampleFn = null; }
+    try { downloadsNs = await window.claude.use('downloads'); } catch { downloadsNs = null; }
+    if (!sampleFn) { $('#proKeyRow').hidden = false; $('#proHint').textContent += ' Trình xem này không hỗ trợ hỏi Claude trực tiếp, bạn có thể dùng API key.'; }
+    else $('#proHint').textContent += ' Bản này chạy bằng tài khoản Claude của bạn, lần đầu bấm sẽ hỏi quyền.';
+  })();
+})();
+</script>
