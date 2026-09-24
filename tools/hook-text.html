@@ -102,6 +102,13 @@
   .strip button[aria-pressed="true"]{border-color:var(--accent)}
   .strip canvas{width:100%;height:auto;display:block;border-radius:5px;background:#111}
   .meta{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin-top:8px;font-variant-numeric:tabular-nums}
+  .safe{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--surface)}
+  .safe .row{gap:6px}
+  .safe-status{font-size:12.5px;margin-top:8px;line-height:1.45}
+  .safe-status.bad{color:var(--danger);font-weight:600}
+  .safe-status.good{color:var(--ok);font-weight:600}
+  .phone{position:relative}
+  .phone canvas#uiLayer{position:absolute;inset:8px;width:calc(100% - 16px);height:calc(100% - 16px);pointer-events:none;border-radius:16px;background:transparent}
 
   .out-actions{display:flex;gap:8px;flex-wrap:wrap}
   .guide{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:12px;font-size:13px;white-space:pre-wrap;max-height:260px;overflow:auto;line-height:1.55}
@@ -195,9 +202,9 @@
 
       <section class="card">
         <h2><span class="n">4</span>Tinh chỉnh</h2>
-        <div class="slider"><span>Vị trí dọc</span><input type="range" id="ypct" min="3" max="80" value="8"><output id="ypctOut">8%</output></div>
+        <div class="slider"><span>Vị trí dọc</span><input type="range" id="ypct" min="3" max="80" value="13"><output id="ypctOut">13%</output></div>
         <div class="slider"><span>Cỡ chữ</span><input type="range" id="size" min="30" max="110" value="66"><output id="sizeOut">66px</output></div>
-        <div class="slider"><span>Bề rộng tối đa</span><input type="range" id="maxw" min="60" max="96" value="86"><output id="maxwOut">86%</output></div>
+        <div class="slider"><span>Bề rộng tối đa</span><input type="range" id="maxw" min="60" max="96" value="80"><output id="maxwOut">80%</output></div>
         <div class="row" style="margin-top:6px">
           <span class="hint" style="margin:0">Căn:</span>
           <div class="seg" id="align" role="group" aria-label="Căn lề"><button data-v="center" aria-pressed="true">Giữa</button><button data-v="left" aria-pressed="false">Trái</button></div>
@@ -253,7 +260,7 @@
 3. Animation → In: Fade 0.3s hoặc Slide up 0.4s. Out: Fade 0.3s. Không dùng hiệu ứng nảy, xoay.
 4. Nếu mẫu có phủ tối: thêm hình chữ nhật đen (Stickers → Shapes), kéo che vùng chữ, Opacity 40 đến 55%, Mask → Linear để mờ dần, đặt dưới lớp chữ.
 5. Muốn gõ chữ trực tiếp thay vì dùng PNG: Text → Add text, font Be Vietnam Pro (CapCut có sẵn), cỡ và màu theo thông số trên, Shadow đen 60 đến 70%, Blur 10 đến 12.
-6. Vùng an toàn: cách mép trên 6%, cách mép dưới 22% (nơi TikTok đặt caption và nút). Không đè chữ lên mặt.</div>
+6. Vùng an toàn: trên 150px, dưới 484px, cột phải 140px trên khung 1080x1920 (TikTok); IG/FB Reels trên 220px, dưới 430px; Meta Ads trên 14%, dưới 35%, hai bên 6%. Bật "Hiện khung UI" bên preview để soi. Không đè chữ lên mặt.</div>
         </details>
       </section>
 
@@ -285,9 +292,24 @@
     </div>
 
     <aside class="col preview-col">
-      <div class="phone"><canvas id="preview" width="1080" height="1920"></canvas></div>
+      <div class="phone"><canvas id="preview" width="1080" height="1920"></canvas><canvas id="uiLayer" width="1080" height="1920" aria-hidden="true"></canvas></div>
       <div class="strip" id="strip"></div>
       <div class="meta"><span id="metaSize">1080 × 1920</span><span id="metaTpl">highlight</span></div>
+      <div class="safe">
+        <div class="row" style="justify-content:space-between">
+          <b style="font-size:13px">Vùng an toàn</b>
+          <label style="font-size:12.5px;color:var(--muted);display:flex;gap:6px;align-items:center"><input type="checkbox" id="showUi" checked> Hiện khung UI</label>
+        </div>
+        <div class="seg" id="platform" role="group" aria-label="Nền tảng" style="margin-top:8px;flex-wrap:wrap">
+          <button data-v="all" aria-pressed="true">Cả 3</button>
+          <button data-v="tiktok" aria-pressed="false">TikTok</button>
+          <button data-v="meta" aria-pressed="false">IG / FB Reels</button>
+          <button data-v="metaads" aria-pressed="false">Meta Ads</button>
+          <button data-v="shorts" aria-pressed="false">Shorts</button>
+        </div>
+        <div class="safe-status" id="safeStatus"></div>
+        <div class="row" style="margin-top:8px"><button class="btn sm" id="btnFit">Đẩy chữ vào vùng an toàn</button></div>
+      </div>
     </aside>
   </div>
 </div>
@@ -319,24 +341,24 @@ const PRESETS = [
   { name: 'Xanh dương', c: { accent: '#4DA3FF', dark: '#0E1626', light: '#FFFFFF', cream: '#EEF5FF' } },
 ];
 const TEMPLATES = {
-  highlight: { name: 'Vệt bút dạ', desc: 'Chữ trắng, từ khóa trong vệt highlight. Mặc định cho kênh.', size: 66, y: 8 },
-  editorial: { name: 'Editorial', desc: 'Sans nhẹ, cụm chốt serif nghiêng to. Sang, kể chuyện.', size: 58, y: 8 },
-  glass:     { name: 'Kính mờ', desc: 'Thẻ blur nền, có dòng chủ đề. Hợp nền rối, series.', size: 56, y: 7 },
-  sticker:   { name: 'Sticker', desc: 'Thẻ đen nghiêng, chữ kem. Hài, đời thường.', size: 58, y: 9 },
-  bubbles:   { name: 'Hộp chữ', desc: 'Hộp đen từng dòng kiểu TikTok. Text dài, tâm sự.', size: 46, y: 52 },
-  timeline:  { name: 'Mốc song song', desc: '3 mốc màu nhấn bên trái. Ba ý, ba bước.', size: 40, y: 55 },
-  chips:     { name: 'Từ A sang B', desc: 'Hai chip nối mũi tên. Chuyển đổi, hành trình.', size: 60, y: 10 },
+  highlight: { name: 'Vệt bút dạ', desc: 'Chữ trắng, từ khóa trong vệt highlight. Mặc định cho kênh.', size: 66, y: 13 },
+  editorial: { name: 'Editorial', desc: 'Sans nhẹ, cụm chốt serif nghiêng to. Sang, kể chuyện.', size: 58, y: 13 },
+  glass:     { name: 'Kính mờ', desc: 'Thẻ blur nền, có dòng chủ đề. Hợp nền rối, series.', size: 56, y: 13 },
+  sticker:   { name: 'Sticker', desc: 'Thẻ đen nghiêng, chữ kem. Hài, đời thường.', size: 58, y: 13 },
+  bubbles:   { name: 'Hộp chữ', desc: 'Hộp đen từng dòng kiểu TikTok. Text dài, tâm sự.', size: 46, y: 50 },
+  timeline:  { name: 'Mốc song song', desc: '3 mốc màu nhấn bên trái. Ba ý, ba bước.', size: 40, y: 50 },
+  chips:     { name: 'Từ A sang B', desc: 'Hai chip nối mũi tên. Chuyển đổi, hành trình.', size: 60, y: 13 },
   titlecard: { name: 'Thẻ tiêu đề', desc: 'Phủ tối toàn khung, một câu thật to. Frame đầu tiên, 5 đến 8 từ.', size: 84, y: 40 },
   list:      { name: 'Danh sách số', desc: 'Số trong tròn màu nhấn, mỗi dòng một ý. Kiểu "3 điều...".', size: 46, y: 50 },
-  knockout:  { name: 'Chữ đục lỗ', desc: 'Dải tối, chữ khoét thấy video phía sau. Tạp chí, thời trang.', size: 110, y: 12 },
-  lowerthird:{ name: 'Lower third', desc: 'Thanh tên góc dưới trái, dòng nhỏ + dòng đậm. Giới thiệu, phỏng vấn.', size: 50, y: 64 },
-  quote:     { name: 'Trích dẫn', desc: 'Dấu ngoặc kép to, serif nghiêng, dòng ký tên. Cảm xúc, chiêm nghiệm.', size: 60, y: 56 },
-  pov:       { name: 'Nhãn POV', desc: 'Chip nhãn nhỏ phía trên, câu to, dòng phụ nhỏ. Phân cấp 3 tầng.', size: 72, y: 9 },
-  outline:   { name: 'Chữ viền rỗng', desc: 'Chữ chỉ có viền trắng, từ khóa tô đặc màu nhấn. Táo bạo, trẻ.', size: 96, y: 10 },
+  knockout:  { name: 'Chữ đục lỗ', desc: 'Dải tối, chữ khoét thấy video phía sau. Tạp chí, thời trang.', size: 110, y: 14 },
+  lowerthird:{ name: 'Lower third', desc: 'Thanh tên góc dưới trái, dòng nhỏ + dòng đậm. Giới thiệu, phỏng vấn.', size: 50, y: 60 },
+  quote:     { name: 'Trích dẫn', desc: 'Dấu ngoặc kép to, serif nghiêng, dòng ký tên. Cảm xúc, chiêm nghiệm.', size: 60, y: 50 },
+  pov:       { name: 'Nhãn POV', desc: 'Chip nhãn nhỏ phía trên, câu to, dòng phụ nhỏ. Phân cấp 3 tầng.', size: 72, y: 13 },
+  outline:   { name: 'Chữ viền rỗng', desc: 'Chữ chỉ có viền trắng, từ khóa tô đặc màu nhấn. Táo bạo, trẻ.', size: 96, y: 13 },
 };
 const state = {
   frame: null, frameName: '', facePos: 'mid',
-  template: 'highlight', ypct: 8, size: 66, maxw: 86, align: 'center', dim: 'auto',
+  template: 'highlight', ypct: 13, size: 66, maxw: 80, align: 'center', dim: 'auto',
   brand: { ...TMXK }, kicker: 'Chuyện làm kênh', tilt: -2.5,
   rows: [['Tuần 1', 'quay 1 video mỗi ngày, không cần đẹp'], ['Tuần 2', 'xem lại 7 video, giữ đúng 1 format lên nhất'], ['Tuần 3', 'lặp format đó với 5 hook khác nhau']],
   chips: ['0', '10K'], lead: 'Kênh mình đi từ',
@@ -659,6 +681,79 @@ T.outline = (c, ov) => {
 const DEFAULT_DIM = { highlight: ['top', .28, .35], editorial: ['top', .30, .55], chips: ['top', .28, .47], timeline: ['bottom', .55, .6], bubbles: null, glass: null, sticker: null,
   titlecard: null, list: ['bottom', .6, .62], knockout: null, lowerthird: null, quote: ['bottom', .6, .6], pov: ['top', .32, .5], outline: ['top', .3, .45] };
 
+/* ---------- vùng an toàn theo nền tảng (khung 1080x1920) ---------- */
+// Nguồn: template safe zone quảng cáo TikTok (trên 130, dưới 484, phải 140, trái 44);
+// Meta Reels IG/FB tổ chức: trên 220, dưới 430, phải 130; Meta Ads chính thức: trên 14%, dưới 35%, hai bên 6%;
+// YouTube Shorts: trên 150, dưới 450, phải 150.
+const ZONES = {
+  tiktok: { name: 'TikTok', rects: [
+    { n: 'thanh trên (Following / For You)', x: 0, y: 0, w: 1080, h: 150 },
+    { n: 'caption, tên kênh, nhạc', x: 0, y: 1436, w: 1080, h: 484 },
+    { n: 'cột icon like, comment, share', x: 940, y: 980, w: 140, h: 470 },
+    { n: 'mép trái', x: 0, y: 0, w: 44, h: 1920 } ] },
+  meta: { name: 'IG / FB Reels', rects: [
+    { n: 'tiêu đề Reels, camera', x: 0, y: 0, w: 1080, h: 220 },
+    { n: 'caption, tên tài khoản, audio', x: 0, y: 1490, w: 1080, h: 430 },
+    { n: 'cột icon like, comment, share', x: 950, y: 1130, w: 130, h: 600 },
+    { n: 'mép trái', x: 0, y: 0, w: 60, h: 1920 } ] },
+  metaads: { name: 'Meta Ads (Reels, Stories)', rects: [
+    { n: 'vùng trên 14%', x: 0, y: 0, w: 1080, h: 269 },
+    { n: 'vùng dưới 35% (CTA, caption)', x: 0, y: 1248, w: 1080, h: 672 },
+    { n: 'mép trái 6%', x: 0, y: 0, w: 65, h: 1920 },
+    { n: 'mép phải 6%', x: 1015, y: 0, w: 65, h: 1920 } ] },
+  shorts: { name: 'YouTube Shorts', rects: [
+    { n: 'thanh trên', x: 0, y: 0, w: 1080, h: 150 },
+    { n: 'tiêu đề, kênh, nhạc', x: 0, y: 1470, w: 1080, h: 450 },
+    { n: 'cột icon', x: 930, y: 1000, w: 150, h: 560 } ] },
+};
+const PLATFORM_SETS = { all: ['tiktok', 'meta', 'shorts'], tiktok: ['tiktok'], meta: ['meta'], metaads: ['metaads'], shorts: ['shorts'] };
+state.platform = 'all'; state.showUi = true;
+function zoneRects(H) { const sc = H / 1920; const out = []; for (const k of PLATFORM_SETS[state.platform]) for (const r of ZONES[k].rects) out.push({ ...r, x: r.x, y: r.y * sc, w: r.w, h: r.h * sc, plat: ZONES[k].name }); return out; }
+function drawUiLayer(H) {
+  const cv = $('#uiLayer'); cv.width = BASE_W; cv.height = H; const g = cv.getContext('2d'); g.clearRect(0, 0, BASE_W, H);
+  if (!state.showUi) return;
+  for (const r of zoneRects(H)) {
+    g.fillStyle = 'rgba(220,60,40,.18)'; g.fillRect(r.x, r.y, r.w, r.h);
+    g.save(); g.beginPath(); g.rect(r.x, r.y, r.w, r.h); g.clip(); g.strokeStyle = 'rgba(220,60,40,.35)'; g.lineWidth = 3;
+    for (let d = -H; d < BASE_W + H; d += 48) { g.beginPath(); g.moveTo(r.x + d, r.y); g.lineTo(r.x + d + r.h, r.y + r.h); g.stroke(); } g.restore();
+    g.strokeStyle = 'rgba(220,60,40,.7)'; g.lineWidth = 3; g.setLineDash([12, 10]); g.strokeRect(r.x + 1.5, r.y + 1.5, r.w - 3, r.h - 3); g.setLineDash([]);
+  }
+  // nhãn gọn ở mép
+  g.font = '700 26px "Be Vietnam Pro", system-ui, sans-serif'; g.fillStyle = 'rgba(220,60,40,.9)'; g.textAlign = 'left';
+  const top = Math.max(...zoneRects(H).filter(r => r.y === 0 && r.w === BASE_W).map(r => r.h), 0); if (top) g.fillText('vùng UI trên', 24, top - 14);
+  const bot = zoneRects(H).filter(r => r.y + r.h >= H - 1 && r.w === BASE_W).map(r => r.y); if (bot.length) g.fillText('vùng caption / nút', 24, Math.min(...bot) + 34);
+}
+function checkSafe(bbox, H) {
+  const el = $('#safeStatus'); if (!bbox) { el.textContent = ''; el.className = 'safe-status'; return; }
+  const hits = []; const seen = new Set();
+  for (const r of zoneRects(H)) { const ix = Math.min(bbox.right, r.x + r.w) - Math.max(bbox.left, r.x); const iy = Math.min(bbox.bot, r.y + r.h) - Math.max(bbox.top, r.y); if (ix > 6 && iy > 6) { const key = r.plat + ': ' + r.n; if (!seen.has(key)) { seen.add(key); hits.push(key); } } }
+  const zr = zoneRects(H); const topZ = Math.max(...zr.filter(r => r.y === 0 && r.w === BASE_W).map(r => r.h), 0); const botZ = Math.min(...zr.filter(r => r.y + r.h >= H - 1 && r.w === BASE_W).map(r => r.y), H);
+  const tooTall = (bbox.bot - bbox.top) > (botZ - topZ - 24);
+  if (hits.length) { el.className = 'safe-status bad'; el.textContent = 'Chữ đang lẹm vào ' + hits.join(' · ') + (tooTall ? '. Khối chữ cao hơn cả vùng an toàn: giảm cỡ chữ hoặc tách thành nhiều khối hiện lần lượt.' : '. Bấm nút bên dưới hoặc kéo thanh Vị trí dọc.'); }
+  else { el.className = 'safe-status good'; el.textContent = `Sạch. Chữ nằm ngoài mọi vùng UI của ${PLATFORM_SETS[state.platform].map(k => ZONES[k].name).join(', ')}.`; }
+  return hits.length;
+}
+function fitToSafe() {
+  if (!lastRender) return; const H = lastRender.fr.height; const bbox = alphaBBox(lastRender.ov); if (!bbox) return;
+  const zr = zoneRects(H); const topZ = Math.max(...zr.filter(r => r.y === 0 && r.w === BASE_W).map(r => r.h), 0);
+  const botZ = Math.min(...zr.filter(r => r.y + r.h >= H - 1 && r.w === BASE_W).map(r => r.y), H);
+  const rightCol = zr.filter(r => r.x + r.w >= BASE_W - 1 && r.h < H); const leftM = Math.max(...zr.filter(r => r.x === 0 && r.h >= H - 1).map(r => r.w), 0);
+  const textH = bbox.bot - bbox.top; const pad = 16;
+  // 1) co bề rộng để né cột icon phải và mép trái
+  const rightM = rightCol.length ? Math.max(...rightCol.map(r => r.w)) : Math.max(...zr.filter(r => r.x + r.w >= BASE_W - 1).map(r => r.w), 0);
+  const allowW = BASE_W - 2 * Math.max(leftM, rightM) - 2 * pad; const newMaxw = Math.max(60, Math.min(state.maxw, Math.floor(allowW / BASE_W * 100)));
+  // 2) chọn vị trí: giữ ở nửa đang đứng (trên hoặc dưới), đẩy vào trong
+  const curTop = bbox.top; let newTop;
+  const upperBand = [topZ + pad, Math.min(...rightCol.map(r => r.y), botZ) - pad];   // trên cột icon
+  const lowerBand = [Math.max(...rightCol.map(r => r.y + r.h), topZ) + pad, botZ - pad]; // dưới cột icon (chỉ khi né được)
+  const fitsUpper = textH <= upperBand[1] - upperBand[0]; const fitsLower = rightCol.length && textH <= lowerBand[1] - lowerBand[0];
+  if (curTop < H / 2) newTop = fitsUpper ? Math.min(Math.max(curTop, upperBand[0]), upperBand[1] - textH) : topZ + pad;
+  else newTop = (fitsLower ? Math.min(Math.max(curTop, lowerBand[0]), lowerBand[1] - textH) : Math.max(topZ + pad, botZ - pad - textH));
+  const shift = newTop - bbox.top; state.ypct = Math.round(Math.min(80, Math.max(3, state.ypct + shift / H * 100)));
+  if (newMaxw < state.maxw) state.maxw = newMaxw;
+  syncSliders(); render().then(() => { const n = checkSafe(alphaBBox(lastRender.ov), lastRender.fr.height); toast(n ? 'Đã đẩy vào, còn vướng một chút: giảm cỡ chữ hoặc bớt dòng.' : 'Đã đưa vào vùng an toàn.'); });
+}
+
 /* ---------- render pipeline ---------- */
 let fontsReady = false;
 async function ensureFonts() {
@@ -695,6 +790,7 @@ async function render() {
   lastRender = { fr, ov, notes, dm, opts };
   $('#metaSize').textContent = `${fr.width} × ${fr.height}`; $('#metaTpl').textContent = TEMPLATES[opts.template].name;
   const bbox = alphaBBox(ov); writeGuide(opts, notes, dm, bbox, fr.height);
+  drawUiLayer(fr.height); checkSafe(bbox, fr.height);
   renderStrip();
 }
 function alphaBBox(cv) {
@@ -709,6 +805,7 @@ function writeGuide(opts, notes, dm, bbox, H) {
   if (dm) lines.push(`Phủ tối: gradient đen từ mép ${dm[0] === 'top' ? 'trên' : 'dưới'} vào ${Math.round(dm[1] * 100)}% khung, đậm nhất ${Math.round(dm[2] * 100)}%.`);
   lines.push(...notes);
   lines.push(`Màu: nhấn ${opts.brand.accent}, tối ${opts.brand.dark}, chữ sáng ${opts.brand.light}, kem ${opts.brand.cream}.`);
+  lines.push(`Vùng an toàn đã kiểm tra: ${PLATFORM_SETS[state.platform].map(k => ZONES[k].name).join(', ')}. Quy tắc chung: trên 150px, dưới 484px, cột phải 140px trên khung 1080x1920 (Meta Ads chặt hơn: trên 14%, dưới 35%, hai bên 6%).`);
   lines.push(`Font: Be Vietnam Pro và Playfair Display Italic (Google Fonts, miễn phí, đủ dấu tiếng Việt).`);
   $('#guide').textContent = lines.join('\n');
 }
@@ -727,9 +824,9 @@ function renderStrip() {
 function autoY(key) {
   const low = ['bubbles', 'timeline', 'list', 'lowerthird', 'quote'].includes(key);
   if (key === 'titlecard') return 40;
-  if (state.facePos === 'top') return low ? 60 : 62;      // mặt ở trên: đẩy chữ xuống ngực
-  if (state.facePos === 'low') return low ? 8 : 8;        // mặt ở dưới: chữ ở trên
-  return low ? 52 : TEMPLATES[key].y;                     // mặt ở giữa
+  if (state.facePos === 'top') return low ? 50 : 52;      // mặt ở trên: đẩy chữ xuống ngực
+  if (state.facePos === 'low') return 13;        // mặt ở dưới: chữ ở trên
+  return low ? 50 : TEMPLATES[key].y;                     // mặt ở giữa
 }
 
 /* ---------- UI wiring ---------- */
@@ -919,6 +1016,9 @@ function sampleFrame() {
   drop.addEventListener('drop', e => loadFrameFile(e.dataTransfer.files[0]));
   document.addEventListener('paste', e => { const f = [...(e.clipboardData?.files || [])][0]; if (f) loadFrameFile(f); });
 
+  bindSeg('platform', v => { state.platform = v; if (lastRender) { drawUiLayer(lastRender.fr.height); checkSafe(alphaBBox(lastRender.ov), lastRender.fr.height); } });
+  $('#showUi').addEventListener('change', e => { state.showUi = e.target.checked; if (lastRender) drawUiLayer(lastRender.fr.height); });
+  $('#btnFit').addEventListener('click', fitToSafe);
   bindSeg('facePos', v => { state.facePos = v; state.ypct = autoY(state.template); syncSliders(); scheduleRender(); });
   bindSeg('align', v => { state.align = v; scheduleRender(); });
   bindSeg('dim', v => { state.dim = v; scheduleRender(); });

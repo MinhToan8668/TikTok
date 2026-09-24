@@ -20,7 +20,8 @@ Nếu thiếu một trong hai, hỏi đúng thứ thiếu rồi dừng.
 
 Xem ảnh và ghi nhận:
 - **Vị trí mặt và thân người** theo % chiều cao (ví dụ mặt từ 30% đến 55%). Chữ không được đè mặt.
-- **Vùng trống**: thường là phía trên đầu (5% đến 25%) hoặc ngực/tay (55% đến 78%). Vùng dưới 78% là chỗ TikTok đặt caption và nút, tránh.
+- **Vùng trống**: thường là phía trên đầu (12% đến 28%) hoặc ngực/tay (50% đến 74%).
+- **Vùng UI của nền tảng, bắt buộc né** (khung 1080x1920): TikTok trên 150px (8%), dưới 484px (từ 75% trở xuống), cột icon phải 140px trong khoảng 51% đến 76% chiều cao; IG/FB Reels trên 220px (11.5%), dưới 430px (từ 78%), cột icon phải 130px trong khoảng 59% đến 90%; Meta Ads chặt hơn: trên 14%, dưới 35%, hai bên 6%. Vì học viên đăng chéo nền tảng, mặc định né cả TikTok lẫn Reels: bắt đầu chữ từ 12% trở xuống, kết thúc trước 74%, và không để chữ chạm mép phải khi nằm trong dải 51% đến 76%.
 - **Nền vùng trống**: sáng hay tối, đơn giản hay rối. Nền sáng đơn giản thì chữ trắng cần phủ tối nhẹ. Nền rối (kệ đồ, bàn thờ, cửa sổ nhiều chi tiết) thì nên dùng mẫu có nền chữ (`glass`, `bubbles`, `sticker`).
 - **Tỉ lệ khung**: 9:16, 3:4 hay 4:5. Script tự giữ tỉ lệ.
 
@@ -58,13 +59,13 @@ python3 .claude/skills/hook-text/scripts/render.py spec.json
 
 Script cần Pillow và numpy. Nếu thiếu: `pip install pillow numpy`.
 
-Đặt `y_pct` theo vùng trống đã xác định ở bước 1. Với hook ở trên: 0.07 đến 0.10. Với text ở ngực: 0.50 đến 0.58.
+Đặt `y_pct` theo vùng trống đã xác định ở bước 1. Với hook ở trên: 0.12 đến 0.14. Với text ở ngực: 0.48 đến 0.52. `max_width_pct` để 0.80 khi căn giữa để không chạm cột icon phải.
 
 ### Bước 5: Kiểm tra trước khi gửi
 
 Mở `contact-sheet.jpg` và soát từng điểm. Sai bất kỳ điểm nào thì sửa spec và render lại, không gửi bản lỗi kèm lời xin lỗi.
 
-- Chữ không chạm mặt, không tràn mép, không rơi xuống dưới 78% chiều cao.
+- Chữ không chạm mặt, không tràn mép. Script in dòng `!!` nếu chữ lẹm vùng UI của TikTok, IG/FB Reels hoặc Shorts; có dòng đó là phải sửa, không được gửi.
 - Không mất khoảng trắng giữa chữ thường và từ khóa.
 - Ngắt dòng hợp nghĩa, không có dòng lẻ một từ.
 - Từ khóa nhấn đúng chỗ người dùng muốn.

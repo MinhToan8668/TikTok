@@ -364,6 +364,25 @@ TEMPLATES = {'highlight': t_highlight, 'sticker': t_sticker, 'glass': t_glass, '
 DEFAULT_DIM = {'highlight': ('top', 0.28, 90), 'editorial': ('top', 0.30, 140), 'bubbles': None, 'timeline': ('bottom', 0.55, 150),
                'chips': ('top', 0.28, 120), 'glass': None, 'sticker': None}
 
+
+# Vùng UI các nền tảng trên khung 1080x1920 (tỉ lệ theo chiều cao khi khung khác).
+# TikTok: template safe zone quảng cáo (trên 130-150, dưới 484, cột phải 140, trái 44).
+# IG/FB Reels tổ chức: trên 220, dưới 430, cột phải 130. Meta Ads: trên 14%, dưới 35%, hai bên 6%.
+SAFE_ZONES = {
+    'TikTok': [('thanh trên', 0, 0, 1080, 150), ('caption và tên kênh', 0, 1436, 1080, 484), ('cột icon phải', 940, 980, 140, 470), ('mép trái', 0, 0, 44, 1920)],
+    'IG/FB Reels': [('tiêu đề Reels', 0, 0, 1080, 220), ('caption và audio', 0, 1490, 1080, 430), ('cột icon phải', 950, 1130, 130, 600), ('mép trái', 0, 0, 60, 1920)],
+    'YouTube Shorts': [('thanh trên', 0, 0, 1080, 150), ('tiêu đề và kênh', 0, 1470, 1080, 450), ('cột icon phải', 930, 1000, 150, 560)],
+}
+def safe_zone_hits(bbox, W, H):
+    """Trả về danh sách 'Nền tảng: vùng' mà hộp chữ lẹm vào."""
+    sx, sy = W / 1080, H / 1920; hits = []
+    for plat, rects in SAFE_ZONES.items():
+        for n, x, y, w, h in rects:
+            x, y, w, h = x * sx, y * sy, w * sx, h * sy
+            ix = min(bbox[2], x + w) - max(bbox[0], x); iy = min(bbox[3], y + h) - max(bbox[1], y)
+            if ix > 6 and iy > 6: hits.append(f'{plat}: {n}')
+    return hits
+
 # ---------------------------------------------------------------- main
 def run(spec):
     out = spec.get('out_dir', 'out'); os.makedirs(out, exist_ok=True)
@@ -389,6 +408,12 @@ def run(spec):
         guide.append(f"## {pid} — mẫu `{v['template']}`\n")
         guide.append(f"- Vùng chữ: từ {top_pct:.0f}% đến {bot_pct:.0f}% chiều cao khung, rộng {(bbox[2]-bbox[0])/frame.width*100:.0f}% khung, căn {'giữa' if v.get('align','center')=='center' else 'trái'}.")
         if dm: guide.append(f"- Phủ tối: gradient đen từ mép {'trên' if dm[0]=='top' else 'dưới'} vào {int(dm[1]*100)}% khung, đậm nhất {int(dm[2]/255*100)}%.")
+        hits = safe_zone_hits(bbox, frame.width, frame.height)
+        if hits:
+            guide.append(f"- CẢNH BÁO lẹm vùng UI: {' · '.join(hits)}. Sửa y_pct hoặc giảm size/max_width_pct rồi render lại.")
+            print(f'!! {pid}: lẹm vùng UI -> ' + ' · '.join(hits))
+        else:
+            guide.append("- Vùng an toàn: sạch trên TikTok, IG/FB Reels và YouTube Shorts.")
         for n in ctx.notes: guide.append(f"- {n}")
         guide.append(f"- File: `{pid}-overlay.png` (nền trong suốt) thả thẳng lên timeline, hoặc dựng tay theo thông số trên.\n")
     # contact sheet
@@ -420,7 +445,7 @@ CAPCUT_STEPS = """
 6. Căn vị trí theo % chiều cao đã ghi. Bật lưới (Ruler/Grid) để căn giữa.
 
 **Quy tắc luôn giữ**
-- Không đè chữ lên mặt. Vùng an toàn: cách mép trên 6%, cách mép dưới 22% (nơi TikTok đặt caption và nút).
+- Không đè chữ lên mặt. Vùng an toàn trên khung 1080x1920: TikTok trên 150px, dưới 484px, cột icon phải 140px; IG/FB Reels trên 220px, dưới 430px; Meta Ads chặt hơn: trên 14%, dưới 35%, hai bên 6%. Script tự báo nếu chữ lẹm.
 - Tối đa 2 dòng cho hook mở đầu, cỡ chữ không nhỏ hơn 40px trên khung 1080.
 - Một video chỉ một màu nhấn. Ở đây là màu accent của brand.
 - Hook phải đọc được trong 1 giây đầu: thử tắt tiếng, lướt qua trên điện thoại, nếu không nắm được ý thì cỡ chữ đang nhỏ hoặc câu đang dài.

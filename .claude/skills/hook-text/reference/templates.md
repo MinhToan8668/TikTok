@@ -9,9 +9,9 @@ Trường chung cho mọi variant trong spec:
 | `id` | tên file đầu ra | bắt buộc |
 | `template` | một trong 7 mẫu dưới | bắt buộc |
 | `blocks` | danh sách đoạn text, mỗi đoạn là một khối; trong đoạn dùng `\n` để ngắt dòng | bắt buộc, trừ `timeline` và `chips` có thể để `[]` |
-| `y_pct` | mép trên của khối chữ, tính theo % chiều cao khung (0.08 = 8%) | 0.08 |
+| `y_pct` | mép trên của khối chữ, tính theo % chiều cao khung (0.12 = 12%). Hook ở trên: 0.12 đến 0.14 để né thanh trên của Reels; text ở ngực: 0.48 đến 0.52 để kết thúc trước 74% | 0.08 |
 | `size` | cỡ chữ cơ bản (px trên khung 1080) | tùy mẫu |
-| `max_width_pct` | bề rộng tối đa của chữ so với khung | 0.86 |
+| `max_width_pct` | bề rộng tối đa của chữ so với khung; 0.80 khi căn giữa để không chạm cột icon phải | 0.86 |
 | `align` | `center` hoặc `left` (chỉ `highlight` và `bubbles`) | center |
 | `dim` | phủ tối: `["top" hoặc "bottom", tỉ lệ chiều cao, độ đậm 0-255]`, hoặc `null` để tắt | tùy mẫu |
 

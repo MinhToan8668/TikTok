@@ -12,86 +12,91 @@
     {
       "id": "A-highlight",
       "template": "highlight",
-      "y_pct": 0.09,
+      "y_pct": 0.13,
       "size": 66,
       "blocks": [
-        "mình có **1 đôi giày rách**\nvì đi làm ngân hàng!?"
-      ]
+        "3 giây đầu quyết định\n**90% lượt xem** của bạn"
+      ],
+      "max_width_pct": 0.8
     },
     {
       "id": "B-editorial",
       "template": "editorial",
-      "y_pct": 0.08,
+      "y_pct": 0.13,
       "size": 58,
       "blocks": [
-        "mình có 1 đôi\n_giày rách_\nvì đi làm ngân hàng!?"
-      ]
+        "kênh không lên\n_không phải vì bạn kém_\nmà vì chưa đăng đủ nhiều"
+      ],
+      "max_width_pct": 0.8
     },
     {
       "id": "C-glass",
       "template": "glass",
-      "y_pct": 0.07,
-      "kicker": "Chuyện đi làm ngân hàng",
+      "y_pct": 0.13,
+      "kicker": "Chuyện làm kênh",
       "size": 56,
       "blocks": [
-        "mình có 1 đôi giày rách\n**vì đi làm ngân hàng!?**"
-      ]
+        "30 video đầu không qua 500 view\n**video 31 mình chỉ đổi một thứ**"
+      ],
+      "max_width_pct": 0.8
     },
     {
       "id": "D-bubbles",
       "template": "bubbles",
       "y_pct": 0.5,
-      "size": 42,
+      "size": 44,
       "blocks": [
-        "1 ngày làm bank **quần quật,**\n1 buổi **connect,**\n9h tối vẫn lọ mọ sửa bài học viên\ntừng thứ một trong modeling",
-        "T đâu phải người giời mà không biết mệt,\nnhưng trao giá trị cho 1 người **\"cầu tiến\"**\nquý hơn nhiều so với\ncầm tiền của 1 người **\"lười\"**",
-        "Còn mối quan hệ nào cũng phải **quy ra tiền**\nthì bạn nghĩ nó đi được _bao xa?_"
-      ]
+        "Mình đăng **30 video** đầu tiên,\nkhông cái nào qua 500 view.\nKhông phải vì quay xấu,\nmà vì mỗi video **một chủ đề khác nhau.**"
+      ],
+      "max_width_pct": 0.8
     },
     {
       "id": "E-timeline",
       "template": "timeline",
-      "y_pct": 0.55,
+      "y_pct": 0.5,
       "rows": [
         [
-          "1 ngày",
-          "làm bank quần quật"
+          "Tuần 1",
+          "quay 1 video mỗi ngày"
         ],
         [
-          "1 buổi",
-          "connect"
+          "Tuần 2",
+          "giữ đúng 1 format lên nhất"
         ],
         [
-          "9h tối",
-          "vẫn lọ mọ sửa bài học viên từng thứ một trong modeling"
+          "Tuần 3",
+          "lặp format với 5 hook khác"
         ]
       ],
       "blocks": [
-        "T đâu phải người giời mà không biết mệt,\nnhưng trao giá trị cho 1 người **\"cầu tiến\"**\nquý hơn cầm tiền của 1 người **\"lười\".**",
-        "Còn mối quan hệ nào cũng phải quy ra tiền\n_thì nó đi được bao xa?_"
-      ]
+        "Kênh lên không nhờ may,\n_nhờ lặp đúng một thứ._"
+      ],
+      "size": 38,
+      "size_big": 54
     },
     {
       "id": "F-chips",
       "template": "chips",
-      "y_pct": 0.1,
-      "lead": "Vy được chuyển từ",
+      "y_pct": 0.13,
+      "lead": "Kênh mình đi từ",
       "chips": [
-        "KHCN",
-        "KHDN"
+        "0",
+        "10K"
       ],
       "blocks": [
-        "chỉ nhờ **mối quan hệ**"
-      ]
+        "trong **60 ngày**, không chạy quảng cáo"
+      ],
+      "max_width_pct": 0.8
     },
     {
       "id": "G-sticker",
       "template": "sticker",
-      "y_pct": 0.09,
+      "y_pct": 0.13,
       "size": 58,
       "blocks": [
-        "mình có 1 đôi giày rách\nvì đi làm **NGÂN HÀNG!?**"
-      ]
+        "đăng video thứ 30\nvẫn **200 VIEW!?**"
+      ],
+      "max_width_pct": 0.8
     }
   ]
 }
