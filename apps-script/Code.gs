@@ -6,6 +6,7 @@
  *   1. GET  ?action=config      → trả config cho landing page
  *   2. POST {action:'register'} → lưu đăng ký vào Sheet + báo Telegram
  *   2b. POST {action:'soi'}     → lưu yêu cầu soi kênh miễn phí (tab SoiKenh) + báo Telegram
+ *   2c. POST {action:'hook_ai'} → gói Pro của Hook Text Studio, gọi Claude (HookAI.gs)
  *   3. POST từ Telegram webhook → bot admin đổi giá / lịch / sĩ số /
  *      link Zalo / thông báo / duyệt học viên
  *
@@ -368,6 +369,10 @@ function doPost(e){
     // Khu học viên: đăng nhập / xem lịch / đặt / hủy  (xem Lich.gs)
     // lichApi đã tự đóng gói JSON rồi — bọc thêm jsonOut là ra chuỗi rỗng
     if (String(body.action||'').indexOf('hv_') === 0) return lichApi(body);
+
+    // Hook Text Studio gói Pro (xem HookAI.gs)
+    if (body.action === 'hook_ai')     return hookAi(body);
+    if (body.action === 'hook_status') return hookTrangThai(body);
 
 
     return jsonOut({ok:false, error:'unknown_action'});

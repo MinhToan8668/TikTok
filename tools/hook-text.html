@@ -139,8 +139,47 @@
   .img-modal .box{background:var(--surface);border-radius:14px;padding:14px;max-width:420px;width:100%;text-align:center}
   .img-modal img{max-width:100%;max-height:60vh;border-radius:8px;background:repeating-conic-gradient(#8883 0 25%,transparent 0 50%) 0 0/16px 16px}
   details.help summary{cursor:pointer;color:var(--muted);font-size:13px}
+  .acct{display:flex;align-items:center;gap:8px;background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:4px 4px 4px 12px;font-size:13px}
+  .acct b{font-weight:700}
+  .acct .pill{border-radius:999px;padding:6px 12px;font-weight:700;font-size:12.5px;border:0;cursor:pointer;font:inherit}
+  .acct .pill.free{background:var(--surface);color:var(--muted);border:1px solid var(--line)}
+  .acct .pill.pro{background:var(--pro);color:var(--pro-text)}
+  .tpl{position:relative}
+  .tpl .lock{position:absolute;top:12px;right:12px;background:var(--pro);color:var(--pro-text);font-size:10.5px;font-weight:800;letter-spacing:.08em;padding:3px 7px;border-radius:999px}
+  .strip button{position:relative}
+  .strip button .lock{position:absolute;top:4px;right:4px;background:var(--pro);color:var(--pro-text);font-size:8.5px;font-weight:800;padding:1px 4px;border-radius:5px}
+  .feat{list-style:none;margin:10px 0 12px;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  @media (max-width:640px){.feat{grid-template-columns:1fr}}
+  .feat li{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.4}
+  .feat li b{display:block;font-size:13.5px;margin-bottom:2px}
+  .res{display:flex;flex-direction:column;gap:12px;margin-top:12px}
+  .res-block{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px}
+  .res-block h3{margin:0 0 8px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .score{display:grid;grid-template-columns:96px 1fr;gap:14px;align-items:center}
+  .ring{width:96px;height:96px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--ring) calc(var(--v)*1%),var(--surface-2) 0);position:relative}
+  .ring::after{content:"";position:absolute;inset:9px;border-radius:50%;background:var(--surface)}
+  .ring span{position:relative;z-index:1;font-family:var(--font-display);font-weight:800;font-size:28px;font-variant-numeric:tabular-nums}
+  .bars{display:flex;flex-direction:column;gap:6px}
+  .bar{display:grid;grid-template-columns:86px 1fr 34px;gap:8px;align-items:center;font-size:12.5px;color:var(--muted)}
+  .bar i{height:8px;border-radius:99px;background:var(--surface-2);overflow:hidden;display:block}
+  .bar i em{display:block;height:100%;background:var(--accent);border-radius:99px}
+  .bar b{text-align:right;color:var(--text);font-variant-numeric:tabular-nums}
+  .verdict{margin:10px 0 0;font-size:13.5px}
+  .fixes{margin:8px 0 0;padding-left:18px;font-size:13px;color:var(--muted)}
+  .alt{display:flex;gap:10px;align-items:flex-start;justify-content:space-between;border-top:1px solid var(--line);padding:10px 0 0;margin-top:10px}
+  .alt:first-of-type{border-top:0;margin-top:0;padding-top:0}
+  .alt small{display:inline-block;background:var(--accent-soft);color:var(--text);border-radius:6px;padding:1px 7px;font-size:11.5px;font-weight:700;margin-bottom:4px}
+  .alt p{margin:0;white-space:pre-wrap;font-size:14px;font-weight:600}
+  .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .tags span{background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:3px 9px;font-size:12.5px}
+  .spinner{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .8s linear infinite;vertical-align:-2px;margin-right:6px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .upsell{position:fixed;inset:0;background:rgba(20,18,8,.6);display:none;place-items:center;padding:20px;z-index:10}
+  .upsell.show{display:grid}
+  .upsell .box{background:var(--surface);border-radius:16px;padding:20px;max-width:440px;width:100%;box-shadow:var(--shadow)}
+  .upsell h3{margin:0 0 6px;font-family:var(--font-display);font-size:19px;font-weight:800}
   code{background:var(--surface-2);border:1px solid var(--line);border-radius:5px;padding:1px 5px;font-size:12.5px}
-  @media (prefers-reduced-motion: reduce){*{transition:none!important}}
+  @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
@@ -153,10 +192,7 @@
         <p>Đặt chữ hook lên video theo bố cục có sẵn. Chạy ngay trên trình duyệt, không cần cài gì.</p>
       </div>
     </div>
-    <div class="tier" role="group" aria-label="Gói">
-      <button id="tierFree" aria-pressed="true">Free</button>
-      <button id="tierPro" aria-pressed="false">Pro · có AI</button>
-    </div>
+    <div class="acct" id="acct"><span id="acctText">Bạn đang dùng bản <b>Free</b></span><button class="pill pro" id="acctBtn">Mở Pro</button></div>
   </header>
 
   <div class="grid">
@@ -230,18 +266,32 @@
       </section>
 
       <section class="pro-card" id="proPanel">
-        <h2>Gợi ý bố cục bằng AI <span class="badge">Pro</span></h2>
-        <p class="hint" id="proHint">AI xem frame, xác định vị trí mặt và vùng trống, đề xuất 3 bố cục kèm ngắt dòng, từ khóa nên nhấn và cách viết lại hook cho gọn. Bạn bấm Áp dụng là xong.</p>
-        <div id="proKeyRow" hidden>
-          <label class="lbl" for="apiKey">Anthropic API key (chỉ lưu trên máy bạn)</label>
-          <input type="password" id="apiKey" placeholder="sk-ant-...">
+        <h2>Trợ lý hook <span class="badge">Pro</span></h2>
+        <div id="proLocked">
+          <p class="hint">Một lần bấm, AI xem frame và câu hook của bạn rồi trả về trọn bộ:</p>
+          <ul class="feat">
+            <li><b>Chấm điểm hook /100</b>Theo 4 tiêu chí: gây tò mò, dễ hiểu, độ dài, từ khóa. Kèm việc cần sửa.</li>
+            <li><b>5 hook viết lại</b>Mỗi bản một công thức: con số, nỗi đau, phản trực giác, POV, câu hỏi.</li>
+            <li><b>Tự tìm mặt, tự đặt chữ</b>AI nhìn frame, né mặt và né nút TikTok, Reels, Shorts.</li>
+            <li><b>3 bố cục bấm là xong</b>Chọn mẫu, cỡ chữ, vị trí, từ khóa nhấn cho từng phương án.</li>
+            <li><b>Caption và hashtag</b>Viết sẵn caption kêu gọi comment kèm 5 hashtag.</li>
+            <li><b>Mở khoá 9 mẫu Pro, bỏ logo</b>Danh sách số, trích dẫn, POV, kính mờ, lower third... xuất file sạch.</li>
+          </ul>
+          <div class="row">
+            <a class="btn pro" id="btnLogin" href="../index.html#hocvien">Đăng nhập khu học viên để mở Pro</a>
+            <a class="btn sm" href="../index.html">Chưa là học viên? Xem khóa học</a>
+          </div>
+          <p class="status" id="proLockMsg">Pro đi kèm khóa Tự Mình Xây Kênh. Đăng nhập xong quay lại trang này là tự mở.</p>
         </div>
-        <div class="row" style="margin-top:10px">
-          <button class="btn pro" id="btnAI">Phân tích frame và đề xuất</button>
-          <button class="btn sm" id="btnAIStop" hidden>Dừng</button>
+        <div id="proOpen" hidden>
+          <p class="hint" id="proHello"></p>
+          <div class="row">
+            <button class="btn pro" id="btnAI">Phân tích Pro</button>
+            <span class="hint" style="margin:0" id="quota"></span>
+          </div>
+          <div class="status" id="aiStatus"></div>
+          <div class="res" id="proResult"></div>
         </div>
-        <div class="status" id="aiStatus"></div>
-        <div class="sugs" id="sugs"></div>
       </section>
 
       <section class="card">
@@ -265,26 +315,27 @@
       </section>
 
       <section class="card">
-        <h2>Hai gói</h2>
+        <h2>Free và Pro</h2>
         <div class="plans">
           <div class="plan">
             <h3>Free</h3>
-            <div class="price">Không cần tài khoản, không gọi AI</div>
+            <div class="price">Ai cũng dùng được, không cần đăng nhập</div>
             <ul>
-              <li>7 mẫu bố cục, màu kênh tùy chỉnh</li>
-              <li>Gợi ý nhanh theo luật: chọn mẫu theo độ dài và kiểu nội dung</li>
-              <li>Xuất PNG trong suốt, ảnh preview, hướng dẫn CapCut</li>
-              <li>Bạn tự đặt vị trí để tránh mặt</li>
+              <li>5 mẫu cơ bản, xem thử cả 14 mẫu</li>
+              <li>Màu kênh riêng, khung vùng an toàn TikTok, Reels, Shorts</li>
+              <li>Gợi ý nhanh theo luật, không dùng AI</li>
+              <li>Xuất PNG kèm logo nhỏ Hook Text Studio</li>
             </ul>
           </div>
           <div class="plan pro">
             <h3>Pro</h3>
-            <div class="price">Dùng AI, tính theo lượt phân tích</div>
+            <div class="price">Đi kèm khóa Tự Mình Xây Kênh</div>
             <ul>
-              <li>Tất cả của Free</li>
-              <li>AI nhìn frame: tìm mặt, vùng trống, độ sáng nền, tự đặt vị trí và cỡ chữ</li>
-              <li>Đề xuất 3 bố cục khác tinh thần, giải thích vì sao</li>
-              <li>Viết lại hook gọn hơn, chọn từ khóa nên nhấn, mở viết tắt</li>
+              <li>Cả 14 mẫu, xuất file sạch không logo</li>
+              <li>AI chấm điểm hook /100 và chỉ chỗ cần sửa</li>
+              <li>5 hook viết lại theo 5 công thức viral</li>
+              <li>AI nhìn frame, tự né mặt và né nút của từng nền tảng</li>
+              <li>3 bố cục áp dụng một chạm, caption và hashtag viết sẵn</li>
             </ul>
           </div>
         </div>
@@ -319,6 +370,17 @@
     <p style="margin:0 0 8px;font-weight:600" id="imgModalTitle">Nhấn giữ hoặc chuột phải vào ảnh để lưu</p>
     <img id="imgModalImg" alt="Ảnh xuất">
     <div class="row" style="justify-content:center;margin-top:10px"><button class="btn sm" id="imgModalClose">Đóng</button></div>
+  </div>
+</div>
+<div class="upsell" id="upsell" role="dialog" aria-modal="true" aria-labelledby="upTitle">
+  <div class="box">
+    <h3 id="upTitle">Mẫu này thuộc gói Pro</h3>
+    <p class="hint" id="upText">Bạn cứ xem thử thoải mái. Để xuất file, đăng nhập khu học viên là mở cả 14 mẫu, bỏ logo và dùng được trợ lý AI.</p>
+    <div class="row" style="margin-top:12px">
+      <a class="btn pro" href="../index.html#hocvien">Đăng nhập để mở Pro</a>
+      <button class="btn sm" id="upFree">Đổi sang mẫu Free</button>
+      <button class="btn sm" id="upClose">Để sau</button>
+    </div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -889,14 +951,15 @@ function buildTemplates() {
   const box = $('#templates');
   for (const [k, t] of Object.entries(TEMPLATES)) {
     const b = document.createElement('button'); b.className = 'tpl'; b.dataset.k = k; b.setAttribute('aria-pressed', String(k === state.template));
-    b.innerHTML = `<canvas width="360" height="240" aria-hidden="true"></canvas><b>${t.name}</b><small>${t.desc}</small>`;
+    b.innerHTML = `<canvas width="360" height="240" aria-hidden="true"></canvas><b>${t.name}</b><small>${t.desc}</small>` + (PRO_TPL.has(k) ? '<span class="lock">PRO</span>' : '');
     b.addEventListener('click', () => selectTemplate(k, true)); box.appendChild(b);
   }
   const strip = $('#strip');
-  for (const k of Object.keys(TEMPLATES)) { const b = document.createElement('button'); b.dataset.k = k; b.title = TEMPLATES[k].name; b.setAttribute('aria-pressed', String(k === state.template)); const cv = document.createElement('canvas'); cv.width = 360; cv.height = 640; b.appendChild(cv); stripCanvases[k] = cv; b.addEventListener('click', () => selectTemplate(k, true)); strip.appendChild(b); }
+  for (const k of Object.keys(TEMPLATES)) { const b = document.createElement('button'); b.dataset.k = k; b.title = TEMPLATES[k].name; b.setAttribute('aria-pressed', String(k === state.template)); const cv = document.createElement('canvas'); cv.width = 360; cv.height = 640; b.appendChild(cv); if (PRO_TPL.has(k)) { const lk = document.createElement('span'); lk.className = 'lock'; lk.textContent = 'PRO'; b.appendChild(lk); } stripCanvases[k] = cv; b.addEventListener('click', () => selectTemplate(k, true)); strip.appendChild(b); }
 }
 function selectTemplate(k, resetSize) {
   state.template = k;
+  if (PRO_TPL.has(k) && !state.pro && resetSize) toast('Mẫu Pro: xem thử thoải mái, xuất file cần mở Pro');
   document.querySelectorAll('.tpl').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.k === k)));
   document.querySelectorAll('#strip button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.k === k)));
   if (resetSize) { state.size = TEMPLATES[k].size; state.ypct = autoY(k); syncSliders(); }
@@ -930,7 +993,6 @@ function buildPresets() {
   box.innerHTML = '';
   for (const p of list) { const b = document.createElement('button'); b.className = 'preset'; b.innerHTML = `<i style="background:${p.c.accent}"></i>${p.name}`; b.addEventListener('click', () => { state.brand = { ...p.c }; applyBrandInputs(); scheduleRender(); }); box.appendChild(b); }
 }
-function setTier(t) { state.tier = t; $('#tierFree').setAttribute('aria-pressed', String(t === 'free')); $('#tierPro').setAttribute('aria-pressed', String(t === 'pro')); $('#proPanel').style.opacity = t === 'pro' ? '1' : '.6'; $('#btnAI').disabled = t !== 'pro'; if (t === 'pro') $('#proPanel').scrollIntoView({ behavior: 'smooth', block: 'center' }); }
 
 /* ---------- Free: gợi ý nhanh theo luật ---------- */
 function quickSuggest() {
@@ -948,93 +1010,128 @@ function quickSuggest() {
   selectTemplate(pick, true); toast(`Gợi ý: ${TEMPLATES[pick].name}. ${why}`);
 }
 
-/* ---------- Pro: AI ---------- */
-let sampleFn = null, downloadsNs = null, aiCtl = null;
-const AI_SCHEMA = { type: 'object', additionalProperties: false, required: ['face', 'rewrite', 'variants'], properties: {
-  face: { type: 'object', additionalProperties: false, required: ['top_pct', 'bottom_pct', 'background'], properties: { top_pct: { type: 'number' }, bottom_pct: { type: 'number' }, background: { type: 'string' } } },
-  rewrite: { type: 'string' },
-  variants: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['template', 'y_pct', 'size', 'text', 'why'], properties: {
-    template: { type: 'string', enum: Object.keys(TEMPLATES) }, y_pct: { type: 'number' }, size: { type: 'number' }, text: { type: 'string' }, why: { type: 'string' },
-    kicker: { type: 'string' }, lead: { type: 'string' }, chips: { type: 'array', items: { type: 'string' } }, rows: { type: 'array', items: { type: 'array', items: { type: 'string' } } } } } } } };
-function aiPrompt(text) {
-  return `Bạn là designer chữ hook cho video TikTok dọc. Ảnh kèm theo là một frame của video. Hãy:
-1. Xác định mặt người chiếm từ bao nhiêu % đến bao nhiêu % chiều cao khung (top_pct, bottom_pct, số 0-100), và mô tả nền ở vùng trống bằng vài từ (background: sáng/tối, đơn giản/rối).
-2. Viết lại hook cho gọn nếu cần (rewrite): tối đa 2 dòng cho hook mở đầu, giữ giọng của tác giả, mở viết tắt khó hiểu, đổi "m" thành "mình". Nếu text đã ổn, giữ nguyên.
-3. Đề xuất đúng 3 bố cục khác tinh thần nhau từ danh sách mẫu, mỗi cái gồm: template, y_pct (mép trên khối chữ theo % chiều cao, phải nằm ngoài vùng mặt, cách mép trên ít nhất 5%, không thấp hơn 60%), size (px trên khung rộng 1080; hook ngắn 56-72, text dài 40-48), text (nội dung đã ngắt dòng bằng \\n, tách khối bằng dòng trống, đánh dấu 1-2 từ khóa bằng **từ khóa**, cụm chốt cảm xúc bằng _cụm_), why (1 câu vì sao hợp).
-Mẫu: highlight (chữ trắng, từ khóa trong vệt highlight; hook ngắn, nền đơn giản), editorial (sans nhẹ + serif nghiêng cho cụm _..._; kể chuyện, cần nền tối), glass (thẻ kính mờ, có kicker là dòng chủ đề ngắn; nền rối, series), sticker (thẻ đen nghiêng; hài, đời thường), bubbles (hộp đen từng dòng; text dài nhiều đoạn, đặt ở ngực), timeline (rows: danh sách [mốc, nội dung] cho 3 ý song song; text là đoạn chốt), chips (chips: [A, B] hai từ ngắn viết hoa + lead là dòng dẫn; nội dung "từ A sang B"), titlecard (phủ tối toàn khung, một câu 5-8 từ thật to; frame đầu tiên), list (dòng đầu kết thúc bằng dấu hai chấm là tiêu đề, các dòng sau là ý được đánh số), knockout (chữ khoét lỗ trên dải tối; 1-3 từ rất ngắn), lowerthird (thanh góc dưới trái với kicker; giới thiệu người hoặc chủ đề), quote (câu trích dẫn serif nghiêng, dòng cuối bắt đầu bằng dấu gạch là ký tên), pov (kicker là nhãn chip như POV; khối 1 là câu chính, khối 2 là dòng phụ), outline (chữ viền rỗng, từ khóa tô đặc; 1-2 dòng ngắn).
-Text của người dùng:
-"""${text}"""
-Trả về duy nhất một JSON theo dạng: {"face":{"top_pct":30,"bottom_pct":55,"background":"sáng, đơn giản"},"rewrite":"...","variants":[{"template":"highlight","y_pct":8,"size":66,"text":"...","why":"..."}]}`;
+/* ---------- Pro: dùng tài khoản khu học viên ---------- */
+// Cùng địa chỉ với landing page nên đọc được phiên đăng nhập 'tmxk_hv'.
+// Trang không giữ key AI nào: backend Apps Script kiểm tra phiên, trừ lượt, rồi mới gọi Claude.
+const API = 'https://script.google.com/macros/s/AKfycbyxe1nWupAl6VheDZHaU3Ojm-d6c8F_khhUMtkehNCLh5OnGW6f2uF0PKPYZ4eYUqyGjQ/exec';
+const HV_KEY = 'tmxk_hv';
+const PRO_TPL = new Set(['editorial', 'glass', 'timeline', 'list', 'knockout', 'lowerthird', 'quote', 'pov', 'outline']);
+const FREE_TPL = ['highlight', 'bubbles', 'sticker', 'chips', 'titlecard'];
+state.pro = false; state.proName = ''; let aiBusy = false;
+function hvToken() { try { const o = JSON.parse(ls.get(HV_KEY) || 'null'); return o && o.token ? o.token : ''; } catch { return ''; } }
+async function callApi(body) {
+  const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) });
+  return r.json();
 }
-async function frameBlob() { const cv = document.createElement('canvas'); const s = 900 / Math.max(state.frame.width, state.frame.height); cv.width = Math.round(state.frame.width * s); cv.height = Math.round(state.frame.height * s); cv.getContext('2d').drawImage(state.frame, 0, 0, cv.width, cv.height); return new Promise(r => cv.toBlob(r, 'image/jpeg', .85)); }
-async function blobToB64(b) { return new Promise(r => { const fr = new FileReader(); fr.onload = () => r(String(fr.result).split(',')[1]); fr.readAsDataURL(b); }); }
-async function askViaApiKey(key, text, signal) {
-  const img = await blobToB64(await frameBlob());
-  const res = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', signal, headers: {
-      'content-type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01',
-      'anthropic-beta': 'server-side-fallback-2026-07-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-    body: JSON.stringify({ model: 'claude-opus-5', max_tokens: 4000, fallbacks: 'default',
-      output_config: { format: { type: 'json_schema', schema: AI_SCHEMA } },
-      messages: [{ role: 'user', content: [{ type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: img } }, { type: 'text', text: aiPrompt(text) }] }] }) });
-  if (!res.ok) { const e = await res.text().catch(() => ''); throw { code: 'http_' + res.status, message: e.slice(0, 300) }; }
-  const j = await res.json();
-  if (j.stop_reason === 'refusal') throw { code: 'refused', message: j.stop_details?.explanation || '' };
-  const t = (j.content || []).filter(b => b.type === 'text').map(b => b.text).join('');
-  return JSON.parse(t);
+function setPro(on, name, con, han) {
+  state.pro = on; state.proName = name || '';
+  $('#proLocked').hidden = on; $('#proOpen').hidden = !on;
+  $('#acctText').innerHTML = on ? `Chào <b></b> · gói <b>Pro</b>` : 'Bạn đang dùng bản <b>Free</b>';
+  if (on) $('#acctText').querySelector('b').textContent = name || 'bạn';
+  $('#acctBtn').textContent = on ? 'Trợ lý Pro' : 'Mở Pro';
+  $('#acctBtn').className = 'pill ' + (on ? 'pro' : 'pro');
+  if (on) { $('#proHello').textContent = 'Nhập hook ở bước 2, chọn frame ở bước 1 rồi bấm Phân tích Pro. Mất khoảng 15 đến 40 giây.'; showQuota(con, han); }
+  document.querySelectorAll('.lock').forEach(el => el.hidden = on);
 }
-function setStatus(msg, cls = '') { const s = $('#aiStatus'); s.textContent = msg; s.className = 'status ' + cls; }
-async function runAI() {
-  if (!state.frame) return;
-  const text = $('#text').value.trim(); if (!text) { setStatus('Nhập nội dung hook trước đã.', 'err'); return; }
-  const btn = $('#btnAI'); btn.disabled = true; $('#btnAIStop').hidden = false; $('#sugs').innerHTML = ''; setStatus('Đang xem frame và nghĩ bố cục, thường mất 10 đến 40 giây...');
-  aiCtl = new AbortController();
+function showQuota(con, han) { $('#quota').textContent = con == null ? 'Không giới hạn lượt' : `Còn ${con}/${han} lượt hôm nay`; }
+async function checkPro() {
+  const t = hvToken(); if (!t) { setPro(false); return; }
   try {
-    let data;
-    if (sampleFn) {
-      const caps = await sampleFn.limits().catch(() => null);
-      const opts = { signal: aiCtl.signal, modelTier: 'default', cache: false };
-      if (caps?.images) opts.images = await frameBlob(); else setStatus('Trình xem này không gửi được ảnh, AI chỉ đọc text. Hãy chọn đúng vị trí mặt ở bước 1.');
-      data = await sampleFn.json(aiPrompt(text) + (caps?.images ? '' : `\n(Không có ảnh. Người dùng cho biết mặt ở vị trí: ${state.facePos === 'top' ? 'phần trên' : state.facePos === 'low' ? 'phần dưới' : 'giữa khung'}.)`), opts);
-    } else {
-      const key = $('#apiKey').value.trim(); if (!key) { setStatus('Nhập API key để dùng gói Pro ngoài claude.ai, hoặc mở bản này trong claude.ai để dùng tài khoản Claude của bạn.', 'err'); return; }
-      ls.set('hook.apikey', key); data = await askViaApiKey(key, text, aiCtl.signal);
+    const r = await callApi({ action: 'hook_status', token: t });
+    if (r.ok) setPro(true, r.ten, r.con, r.han);
+    else { setPro(false); if (r.error === 'het_phien') $('#proLockMsg').textContent = 'Phiên đăng nhập đã hết hạn. Đăng nhập lại khu học viên rồi quay về đây.'; }
+  } catch { setPro(false); $('#proLockMsg').textContent = 'Chưa kết nối được máy chủ. Kiểm tra mạng rồi tải lại trang.'; }
+}
+async function frameB64() {
+  const cv = document.createElement('canvas'); const k = 1000 / Math.max(state.frame.width, state.frame.height);
+  cv.width = Math.round(state.frame.width * k); cv.height = Math.round(state.frame.height * k);
+  cv.getContext('2d').drawImage(state.frame, 0, 0, cv.width, cv.height);
+  return cv.toDataURL('image/jpeg', .82).split(',')[1];
+}
+function setStatus(msg, cls = '') { const s = $('#aiStatus'); s.innerHTML = msg; s.className = 'status ' + cls; }
+async function runAI() {
+  if (aiBusy || !state.frame) return;
+  const text = $('#text').value.trim(); if (!text) { setStatus('Nhập câu hook ở bước 2 trước đã.', 'err'); return; }
+  aiBusy = true; $('#btnAI').disabled = true; $('#proResult').innerHTML = '';
+  const t0 = Date.now(); const tick = setInterval(() => setStatus(`<span class="spinner"></span>AI đang xem frame và viết đề xuất · ${Math.round((Date.now() - t0) / 1000)} giây`), 500);
+  try {
+    const r = await callApi({ action: 'hook_ai', token: hvToken(), text, image: await frameB64(), platform: state.platform, facePos: state.facePos });
+    clearInterval(tick);
+    if (!r.ok) {
+      const map = { het_phien: 'Phiên đăng nhập đã hết hạn. Đăng nhập lại khu học viên nhé.', het_luot: `Bạn đã dùng hết ${r.han || ''} lượt hôm nay. Mai quay lại nhé.`, chua_cai_key: 'Máy chủ chưa được cài khóa AI. Báo mentor giúp mình.', ban_qua: 'AI đang quá tải, thử lại sau một phút.', tu_choi: 'AI không xử lý được nội dung này, thử diễn đạt khác.', anh_qua_lon: 'Ảnh quá lớn, chọn ảnh nhỏ hơn.', thieu_text: 'Nhập câu hook trước đã.' };
+      setStatus(map[r.error] || 'Có lỗi khi gọi AI, thử lại sau.', 'err'); if (r.error === 'het_phien') setPro(false); return;
     }
-    showSuggestions(data);
-  } catch (e) {
-    const code = e?.code || 'upstream_error';
-    const map = { cancelled: 'Đã dừng.', not_granted: 'Bạn chưa cho phép trang này dùng Claude. Gói Pro cần quyền đó.', rate_limited: 'Gọi hơi dày, chờ một lát rồi thử lại.', invalid_json: 'AI trả lời không đúng định dạng, bấm thử lại.', refused: 'AI từ chối nội dung này, thử đổi cách viết.', images_unavailable: 'Trình xem này không gửi được ảnh.', http_401: 'API key sai hoặc hết hạn.', http_400: 'Yêu cầu không hợp lệ: ' + (e.message || '') };
-    setStatus(map[code] || ('Có lỗi: ' + (e.message || code)), code === 'cancelled' ? '' : 'err');
-  } finally { btn.disabled = state.tier !== 'pro'; $('#btnAIStop').hidden = true; aiCtl = null; }
+    setStatus(`Xong sau ${Math.round((Date.now() - t0) / 1000)} giây. Đã áp dụng bố cục số 1, xem các lựa chọn khác bên dưới.`, 'ok');
+    if (r.con !== undefined) showQuota(r.con, r.han);
+    showResult(r.data);
+  } catch (e) { clearInterval(tick); setStatus('Không kết nối được máy chủ. Kiểm tra mạng rồi thử lại.', 'err'); }
+  finally { aiBusy = false; $('#btnAI').disabled = false; }
 }
-function showSuggestions(d) {
-  const box = $('#sugs'); box.innerHTML = '';
-  const face = d.face || {}; setStatus(`Mặt: ${Math.round(face.top_pct ?? 0)}% đến ${Math.round(face.bottom_pct ?? 0)}% khung. Nền: ${face.background || 'không rõ'}.`, 'ok');
-  if (d.rewrite && d.rewrite.trim() && d.rewrite.trim() !== $('#text').value.trim()) {
-    const el = document.createElement('div'); el.className = 'sug'; el.innerHTML = `<div><b>Viết lại gọn hơn</b><p style="white-space:pre-wrap;color:var(--text)"></p></div>`; el.querySelector('p').textContent = d.rewrite;
-    const b = document.createElement('button'); b.className = 'btn sm'; b.textContent = 'Dùng bản này'; b.addEventListener('click', () => { $('#text').value = d.rewrite; scheduleRender(); toast('Đã thay nội dung'); }); el.appendChild(b); box.appendChild(el);
+function el(tag, cls, txt) { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+function applyLayout(v) {
+  if (!TEMPLATES[v.template]) return;
+  $('#text').value = v.text || $('#text').value; ls.set('hook.text', $('#text').value);
+  state.ypct = Math.min(80, Math.max(3, Math.round(v.y_pct))); state.size = Math.min(110, Math.max(30, Math.round(v.size)));
+  if (v.kicker) state.kicker = v.kicker; if (v.lead) state.lead = v.lead;
+  if (Array.isArray(v.chips) && v.chips.length === 2) state.chips = v.chips.map(String);
+  if (Array.isArray(v.rows) && v.rows.length) state.rows = v.rows.map(r => [String(r[0] || ''), String(r[1] || '')]);
+  selectTemplate(v.template, false); syncSliders();
+}
+function showResult(d) {
+  const box = $('#proResult'); box.innerHTML = '';
+  const f = d.face || {};
+  if (f.top_pct != null) { const mid = (f.top_pct + f.bottom_pct) / 2; state.facePos = mid < 38 ? 'top' : mid > 62 ? 'low' : 'mid'; setSeg('facePos', state.facePos); }
+  // điểm
+  const sc = d.score || {}; const tot = Math.max(0, Math.min(100, Math.round(sc.total || 0)));
+  const b1 = el('div', 'res-block'); b1.append(el('h3', null, 'Điểm hook gốc'));
+  const g = el('div', 'score'); const ring = el('div', 'ring'); ring.style.setProperty('--v', tot); ring.style.setProperty('--ring', tot >= 75 ? 'var(--ok)' : tot >= 50 ? '#D9A400' : 'var(--danger)'); ring.append(el('span', null, String(tot)));
+  const bars = el('div', 'bars');
+  for (const [k, lb] of [['hook', 'Gây tò mò'], ['clarity', 'Dễ hiểu'], ['length', 'Độ dài'], ['keyword', 'Từ khóa']]) { const v = Math.max(0, Math.min(25, Math.round(sc[k] || 0))); const row = el('div', 'bar'); row.append(el('span', null, lb)); const i = el('i'); const em = el('em'); em.style.width = (v * 4) + '%'; i.append(em); row.append(i, el('b', null, v + '/25')); bars.append(row); }
+  g.append(ring, bars); b1.append(g); if (sc.verdict) b1.append(el('p', 'verdict', sc.verdict));
+  if (Array.isArray(d.fixes) && d.fixes.length) { const ul = el('ul', 'fixes'); d.fixes.forEach(x => ul.append(el('li', null, x))); b1.append(ul); }
+  if (f.background) b1.append(el('p', 'hint', `Mặt người ${Math.round(f.top_pct)}% đến ${Math.round(f.bottom_pct)}% khung · nền ${f.background}`));
+  box.append(b1);
+  // hook viết lại
+  if (Array.isArray(d.hooks) && d.hooks.length) {
+    const b2 = el('div', 'res-block'); b2.append(el('h3', null, '5 hook viết lại'));
+    d.hooks.forEach(h => { const r = el('div', 'alt'); const l = el('div'); l.append(el('small', null, h.formula || 'Hook'), el('p', null, String(h.text || '').replace(/\*\*/g, ''))); const bt = el('button', 'btn sm', 'Dùng'); bt.onclick = () => { $('#text').value = h.text; ls.set('hook.text', h.text); scheduleRender(); toast('Đã thay câu hook'); }; r.append(l, bt); b2.append(r); });
+    box.append(b2);
   }
-  for (const v of (d.variants || []).slice(0, 3)) {
-    if (!TEMPLATES[v.template]) continue;
-    const el = document.createElement('div'); el.className = 'sug';
-    el.innerHTML = `<div><b>${TEMPLATES[v.template].name} · vị trí ${Math.round(v.y_pct)}% · ${Math.round(v.size)}px</b><p></p></div>`; el.querySelector('p').textContent = v.why || '';
-    const b = document.createElement('button'); b.className = 'btn sm primary'; b.textContent = 'Áp dụng';
-    b.addEventListener('click', () => {
-      $('#text').value = v.text || $('#text').value; state.ypct = Math.min(80, Math.max(3, Math.round(v.y_pct))); state.size = Math.min(110, Math.max(30, Math.round(v.size)));
-      if (v.kicker) state.kicker = v.kicker; if (v.lead) state.lead = v.lead; if (Array.isArray(v.chips) && v.chips.length === 2) state.chips = v.chips; if (Array.isArray(v.rows) && v.rows.length) state.rows = v.rows.map(r => [String(r[0] || ''), String(r[1] || '')]);
-      selectTemplate(v.template, false); syncSliders(); toast('Đã áp dụng đề xuất');
-    }); el.appendChild(b); box.appendChild(el);
+  // bố cục
+  if (Array.isArray(d.layouts) && d.layouts.length) {
+    const b3 = el('div', 'res-block'); b3.append(el('h3', null, '3 bố cục đề xuất'));
+    d.layouts.slice(0, 3).forEach((v, i) => { if (!TEMPLATES[v.template]) return; const r = el('div', 'alt'); const l = el('div'); l.append(el('small', null, `${i + 1} · ${TEMPLATES[v.template].name} · ${Math.round(v.y_pct)}%`), el('p', null, v.why || '')); l.querySelector('p').style.fontWeight = '500'; const bt = el('button', 'btn sm primary', 'Áp dụng'); bt.onclick = () => { applyLayout(v); toast('Đã áp dụng bố cục ' + (i + 1)); }; r.append(l, bt); b3.append(r); });
+    box.append(b3); applyLayout(d.layouts[0]);
+  }
+  // caption
+  if (d.caption) {
+    const b4 = el('div', 'res-block'); b4.append(el('h3', null, 'Caption đăng kèm'));
+    const cap = el('p', null, d.caption); cap.style.margin = '0'; b4.append(cap);
+    const tg = el('div', 'tags'); (d.hashtags || []).forEach(h => tg.append(el('span', null, h.startsWith('#') ? h : '#' + h))); b4.append(tg);
+    const bt = el('button', 'btn sm', 'Sao chép caption'); bt.style.marginTop = '10px'; bt.onclick = async () => { const t = d.caption + '\n\n' + (d.hashtags || []).map(h => h.startsWith('#') ? h : '#' + h).join(' '); try { await navigator.clipboard.writeText(t); toast('Đã sao chép caption'); } catch { toast('Không sao chép được, bôi đen để copy'); } }; b4.append(bt);
+    box.append(b4);
   }
 }
+function openUpsell(msg) { if (msg) $('#upText').textContent = msg; $('#upsell').classList.add('show'); }
 
 /* ---------- export ---------- */
 function canvasBlob(cv, type, q) { return new Promise(r => cv.toBlob(r, type, q)); }
-async function saveBlob(blob, filename) {
-  if (downloadsNs) { try { await downloadsNs.save({ filename, data: blob }); toast('Đã lưu ' + filename); return; } catch (e) { if (e?.code === 'cancelled' || e?.code === 'declined') return; } }
-  if (!window.claude) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); toast('Đang tải ' + filename); return; }
-  const url = URL.createObjectURL(blob); $('#imgModalImg').src = url; $('#imgModal').classList.add('show');
+function saveBlob(blob, filename) {
+  if (window.claude) { $('#imgModalImg').src = URL.createObjectURL(blob); $('#imgModal').classList.add('show'); return; }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); toast('Đang tải ' + filename);
 }
-async function exportPng() { if (!lastRender) return; const b = await canvasBlob(lastRender.ov, 'image/png'); saveBlob(b, `hook-${state.template}-overlay.png`); }
-async function exportJpg() { if (!lastRender) return; const cv = document.createElement('canvas'); cv.width = lastRender.fr.width; cv.height = lastRender.fr.height; const g = cv.getContext('2d'); g.drawImage(lastRender.fr, 0, 0); g.drawImage(lastRender.ov, 0, 0); const b = await canvasBlob(cv, 'image/jpeg', .92); saveBlob(b, `hook-${state.template}-preview.jpg`); }
+function withMark(src) {
+  const cv = document.createElement('canvas'); cv.width = src.width; cv.height = src.height; const g = cv.getContext('2d'); g.drawImage(src, 0, 0);
+  if (state.pro) return cv;
+  const k = cv.width / BASE_W; g.font = `600 ${Math.round(24 * k)}px "Be Vietnam Pro", system-ui, sans-serif`; g.fillStyle = 'rgba(255,255,255,.62)'; g.shadowColor = 'rgba(0,0,0,.5)'; g.shadowBlur = 6 * k;
+  g.fillText('Hook Text Studio · #tuminhxaykenh', Math.round(60 * k), Math.round(cv.height * 0.735)); return cv;
+}
+function gateExport() {
+  if (PRO_TPL.has(state.template) && !state.pro) { openUpsell(`Mẫu "${TEMPLATES[state.template].name}" thuộc gói Pro. Xem thử thoải mái, còn xuất file thì cần đăng nhập khu học viên. Hoặc đổi sang một mẫu Free.`); return false; }
+  return true;
+}
+async function exportPng() { if (!lastRender || !gateExport()) return; const b = await canvasBlob(withMark(lastRender.ov), 'image/png'); saveBlob(b, `hook-${state.template}-overlay.png`); }
+async function exportJpg() { if (!lastRender || !gateExport()) return; const cv = document.createElement('canvas'); cv.width = lastRender.fr.width; cv.height = lastRender.fr.height; const g = cv.getContext('2d'); g.drawImage(lastRender.fr, 0, 0); g.drawImage(withMark(lastRender.ov), 0, 0); const b = await canvasBlob(cv, 'image/jpeg', .92); saveBlob(b, `hook-${state.template}-preview.jpg`); }
 async function copyGuide() { const t = $('#guide').textContent; try { await navigator.clipboard.writeText(t); toast('Đã sao chép hướng dẫn'); } catch { const r = document.createRange(); r.selectNodeContents($('#guide')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); toast('Chọn sẵn rồi, nhấn Ctrl/Cmd+C'); } }
 
 /* ---------- frame loading ---------- */
@@ -1059,7 +1156,6 @@ function sampleFrame() {
   buildTemplates(); buildPresets(); renderExtra(); syncSliders(); applyBrandInputs();
   const savedBrand = ls.get('hook.brand'); if (savedBrand) { try { state.brand = { ...TMXK, ...JSON.parse(savedBrand) }; applyBrandInputs(); } catch {} }
   const savedText = ls.get('hook.text'); if (savedText) $('#text').value = savedText;
-  const savedKey = ls.get('hook.apikey'); if (savedKey) $('#apiKey').value = savedKey;
   sampleFrame();
 
   const drop = $('#drop'); $('#file').addEventListener('change', e => loadFrameFile(e.target.files[0]));
@@ -1088,20 +1184,14 @@ function sampleFrame() {
   $('#btnSample4').addEventListener('click', () => { $('#text').value = '3 lỗi khiến video mãi 200 view:\nQuay xong **mới nghĩ hook**\nNói 15 giây **mới vào ý chính**\nCaption dài hơn cả video'; selectTemplate('list', true); });
   $('#btnSample5').addEventListener('click', () => { $('#text').value = 'Kênh không lên không phải vì bạn kém,\nmà vì bạn chưa **đăng đủ nhiều** để biết mình giỏi gì.\n- Toàn, mentor Tự Mình Xây Kênh'; selectTemplate('quote', true); });
   $('#btnSample6').addEventListener('click', () => { $('#text').value = 'bạn đăng video thứ 30\nvà vẫn **200 view**\n\nđây là 3 thứ mình đổi ngay tuần đó'; state.kicker = 'POV'; selectTemplate('pov', true); });
-  $('#tierFree').addEventListener('click', () => setTier('free')); $('#tierPro').addEventListener('click', () => setTier('pro'));
-  $('#btnAI').addEventListener('click', runAI); $('#btnAIStop').addEventListener('click', () => aiCtl?.abort());
+  $('#btnAI').addEventListener('click', runAI);
+  $('#acctBtn').addEventListener('click', () => $('#proPanel').scrollIntoView({ behavior: 'smooth', block: 'start' }));
+  $('#upClose').addEventListener('click', () => $('#upsell').classList.remove('show'));
+  $('#upFree').addEventListener('click', () => { $('#upsell').classList.remove('show'); selectTemplate('highlight', true); });
+  window.addEventListener('focus', () => { if (!state.pro) checkPro(); });
   $('#btnPng').addEventListener('click', exportPng); $('#btnJpg').addEventListener('click', exportJpg); $('#btnCopy').addEventListener('click', copyGuide);
   $('#imgModalClose').addEventListener('click', () => $('#imgModal').classList.remove('show'));
-  setTier('free');
-
-  // Khả năng runtime khi mở trong claude.ai: hỏi Claude bằng tài khoản người xem, lưu file qua hộp thoại
-  (async () => {
-    if (!window.claude?.use) { $('#proKeyRow').hidden = false; return; }
-    try { sampleFn = await window.claude.use('sample'); } catch { sampleFn = null; }
-    try { downloadsNs = await window.claude.use('downloads'); } catch { downloadsNs = null; }
-    if (!sampleFn) { $('#proKeyRow').hidden = false; $('#proHint').textContent += ' Trình xem này không hỗ trợ hỏi Claude trực tiếp, bạn có thể dùng API key.'; }
-    else $('#proHint').textContent += ' Bản này chạy bằng tài khoản Claude của bạn, lần đầu bấm sẽ hỏi quyền.';
-  })();
+  checkPro();
 })();
 </script>
 </body>

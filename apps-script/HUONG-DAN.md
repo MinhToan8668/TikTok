@@ -115,3 +115,45 @@ màn hình cảm ơn.
 
 Mở `https://<trang-cua-ban>/?admin=<ADMIN_KEY>` để xem danh sách đăng ký ngay
 trên web (chỉ xem — mọi thao tác làm qua bot).
+
+---
+
+## Hook Text Studio · gói Pro (HookAI.gs)
+
+Trang `tools/hook-text.html` có hai gói. Free chạy hết trên trình duyệt. Pro gọi AI qua chính Web App này, dùng lại tài khoản khu học viên nên không ai phải nhập API key.
+
+### Cơ chế
+
+1. Học viên đăng nhập khu học viên trên landing page. Trình duyệt lưu phiên ở `localStorage` với khóa `tmxk_hv`.
+2. Trang tool nằm cùng địa chỉ với landing page nên đọc được phiên đó, gọi `hook_status` để mở Pro và hiện số lượt còn lại.
+3. Bấm "Phân tích Pro": trang gửi `hook_ai` kèm token, câu hook và ảnh frame đã thu nhỏ.
+4. `HookAI.gs` kiểm tra token bằng `aiDay()` của Lich.gs, trừ một lượt, gọi Claude bằng key trong Script Properties, rồi trả về điểm hook, 5 hook viết lại, 3 bố cục, caption và hashtag.
+5. Lỗi phía AI thì lượt được hoàn lại. Mỗi lần gọi ghi một dòng vào tab **HookAI** trong Sheet: ai dùng, câu hook, số token.
+
+Key AI không bao giờ ra tới trình duyệt. Người không đăng nhập chỉ thấy bản Free và màn hình mời mở Pro.
+
+### Cài đặt một lần
+
+1. Lấy API key ở console.anthropic.com → API Keys. Nạp sẵn credit.
+2. Apps Script → **Project Settings** → **Script properties** → thêm:
+
+   | Thuộc tính | Giá trị | Bắt buộc |
+   |---|---|---|
+   | `ANTHROPIC_API_KEY` | `sk-ant-...` | có |
+   | `HOOK_AI_DAILY` | số lượt mỗi học viên mỗi ngày, mặc định `20` | không |
+   | `HOOK_AI_MODEL` | mặc định `claude-opus-5` | không |
+
+3. Thêm file `HookAI.gs` vào project (Files → + → Script), dán nội dung file cùng tên trong repo.
+4. **Deploy → Manage deployments → Edit → New version → Deploy.** Giữ nguyên URL `/exec` cũ.
+
+### Kiểm tra
+
+- Mở `https://minhtoan8668.github.io/TikTok/tools/hook-text.html` khi chưa đăng nhập: thấy bản Free và thẻ mời mở Pro.
+- Đăng nhập khu học viên, quay lại trang tool: góc trên hiện "Chào tên · gói Pro", thẻ Pro hiện "Còn 20/20 lượt hôm nay".
+- Bấm Phân tích Pro: sau 15 đến 40 giây có kết quả, tab HookAI trong Sheet có thêm một dòng.
+
+Mentor không bị giới hạn lượt. Muốn đổi số lượt thì sửa `HOOK_AI_DAILY`, không cần deploy lại.
+
+### Chi phí ước tính
+
+Mỗi lần phân tích gửi một ảnh khoảng 1000px và nhận về khoảng 1.500 token. Theo giá Claude Opus 5 hiện tại là vài trăm đồng mỗi lượt. Xem chính xác ở cột token của tab HookAI.
