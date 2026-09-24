@@ -1,0 +1,97 @@
+{
+  "frame": "frame-ban-lam-viec.png",
+  "out_dir": "out-example",
+  "width": 1080,
+  "brand": {
+    "accent": "#99DF00",
+    "dark": "#26210F",
+    "light": "#FFFFFF",
+    "cream": "#F9E8DD"
+  },
+  "variants": [
+    {
+      "id": "A-highlight",
+      "template": "highlight",
+      "y_pct": 0.09,
+      "size": 66,
+      "blocks": [
+        "mình có **1 đôi giày rách**\nvì đi làm ngân hàng!?"
+      ]
+    },
+    {
+      "id": "B-editorial",
+      "template": "editorial",
+      "y_pct": 0.08,
+      "size": 58,
+      "blocks": [
+        "mình có 1 đôi\n_giày rách_\nvì đi làm ngân hàng!?"
+      ]
+    },
+    {
+      "id": "C-glass",
+      "template": "glass",
+      "y_pct": 0.07,
+      "kicker": "Chuyện đi làm ngân hàng",
+      "size": 56,
+      "blocks": [
+        "mình có 1 đôi giày rách\n**vì đi làm ngân hàng!?**"
+      ]
+    },
+    {
+      "id": "D-bubbles",
+      "template": "bubbles",
+      "y_pct": 0.5,
+      "size": 42,
+      "blocks": [
+        "1 ngày làm bank **quần quật,**\n1 buổi **connect,**\n9h tối vẫn lọ mọ sửa bài học viên\ntừng thứ một trong modeling",
+        "T đâu phải người giời mà không biết mệt,\nnhưng trao giá trị cho 1 người **\"cầu tiến\"**\nquý hơn nhiều so với\ncầm tiền của 1 người **\"lười\"**",
+        "Còn mối quan hệ nào cũng phải **quy ra tiền**\nthì bạn nghĩ nó đi được _bao xa?_"
+      ]
+    },
+    {
+      "id": "E-timeline",
+      "template": "timeline",
+      "y_pct": 0.55,
+      "rows": [
+        [
+          "1 ngày",
+          "làm bank quần quật"
+        ],
+        [
+          "1 buổi",
+          "connect"
+        ],
+        [
+          "9h tối",
+          "vẫn lọ mọ sửa bài học viên từng thứ một trong modeling"
+        ]
+      ],
+      "blocks": [
+        "T đâu phải người giời mà không biết mệt,\nnhưng trao giá trị cho 1 người **\"cầu tiến\"**\nquý hơn cầm tiền của 1 người **\"lười\".**",
+        "Còn mối quan hệ nào cũng phải quy ra tiền\n_thì nó đi được bao xa?_"
+      ]
+    },
+    {
+      "id": "F-chips",
+      "template": "chips",
+      "y_pct": 0.1,
+      "lead": "Vy được chuyển từ",
+      "chips": [
+        "KHCN",
+        "KHDN"
+      ],
+      "blocks": [
+        "chỉ nhờ **mối quan hệ**"
+      ]
+    },
+    {
+      "id": "G-sticker",
+      "template": "sticker",
+      "y_pct": 0.09,
+      "size": 58,
+      "blocks": [
+        "mình có 1 đôi giày rách\nvì đi làm **NGÂN HÀNG!?**"
+      ]
+    }
+  ]
+}
