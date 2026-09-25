@@ -120,7 +120,7 @@ function goiGemini(key, img, prompt){
       }
       loiCuoi = model+'/'+kieu[ki].ten+' http '+ma+': '+String(raw).slice(0,400);
       if (ma === 429 || ma === 503) return {ok:false, error:'ban_qua', loi:loiCuoi, model:model};
-      if (ma === 401 || ma === 403) return {ok:false, error:'loi_ai', loi:loiCuoi, model:model};   // key sai: thử tiếp vô ích
+      if (ma === 401 || ma === 403 || /API_KEY_INVALID|API key not valid/.test(raw)) return {ok:false, error:'sai_key', loi:loiCuoi, model:model};   // key sai: thử tiếp vô ích
       if (ma === 404) break;                                                                       // model không có: sang model khác
       // 400: định dạng không hợp → thử kiểu kế tiếp
     }
