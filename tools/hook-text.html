@@ -180,8 +180,11 @@
   .upsell h3{margin:0 0 6px;font-family:var(--font-display);font-size:19px;font-weight:800}
   /* studio chỉnh chữ — giao diện tối như app edit */
   .phone canvas#selLayer{position:absolute;inset:8px;width:calc(100% - 16px);height:calc(100% - 16px);pointer-events:none;border-radius:16px;background:transparent}
-  .studio{--st-bg:#15171A;--st-panel:#1E2125;--st-tile:#2A2E33;--st-line:#383D44;--st-text:#EEF0F2;--st-muted:#9BA1A8;background:var(--st-bg);border-color:#000;color:var(--st-text);padding:14px 14px 16px}
+  .studio{--st-bg:var(--surface);--st-panel:var(--surface-2);--st-tile:var(--line);--st-line:var(--line);--st-text:var(--text);--st-muted:var(--muted);padding:14px 14px 16px}
   .studio [hidden]{display:none!important}
+  .studio .templates{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}
+  .theme-btn{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--surface-2);color:var(--text);font-size:18px;cursor:pointer}
+  .layers-out{margin-top:12px;border-top:1px dashed var(--line);padding-top:12px}
   .studio h2{color:var(--st-text);margin:0}
   .studio h2 .n{background:var(--st-tile);border-color:var(--st-line);color:var(--st-muted)}
   .st-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
@@ -205,7 +208,7 @@
   .tb:hover{background:var(--st-tile)}
   .tb small{font-size:12.5px;font-weight:600}
   .tb .kdot{width:16px;height:16px;border-radius:50%;display:inline-block;box-shadow:0 0 0 2px rgba(255,255,255,.25)}
-  .tb.danger{color:#FF8A7A}
+  .tb.danger{color:var(--danger)}
   .tools .sp{flex:1;min-width:6px}
   .tpl-note{margin-top:10px;background:var(--st-panel);border-radius:12px;padding:10px 12px;font-size:13px;color:var(--st-muted);line-height:1.5}
   .tpl-note b{color:var(--st-text)}
@@ -220,21 +223,20 @@
   .pst-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px}
   .pst{position:relative;border:2px solid transparent;border-radius:12px;background:var(--st-panel);padding:12px 4px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;font:inherit;color:var(--st-text)}
   .pst:hover{background:var(--st-tile)}
-  .pst[aria-pressed="true"]{border-color:#fff}
-  .pst-sw{font-size:28px;line-height:1.15}
-  .pst-sw.tq{font-size:14px;font-weight:800;text-align:center;line-height:1.25}
-  .pst small{color:var(--st-muted);font-size:11px;line-height:1.25;text-align:center}
+  .pst[aria-pressed="true"]{border-color:var(--text)}
+  .pst-sw{font-size:26px;line-height:1.3;background:#3A3F45;border-radius:8px;width:100%;text-align:center;padding:4px 0}
+    .pst small{color:var(--st-muted);font-size:11px;line-height:1.25;text-align:center}
   .studio .lock{position:absolute;top:5px;right:5px;background:var(--accent);color:#1B220D;font-size:9px;font-weight:800;padding:1px 5px;border-radius:5px;font-family:var(--font-ui);font-style:normal}
   .font-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px;max-height:236px;overflow:auto;padding-right:2px}
   .fnt{position:relative;height:60px;border-radius:12px;border:2px solid transparent;background:var(--st-panel);color:var(--st-text);font-size:16px;cursor:pointer;padding:0 8px;line-height:1.1}
   .fnt:hover{background:var(--st-tile)}
-  .fnt[aria-pressed="true"]{border-color:#fff}
+  .fnt[aria-pressed="true"]{border-color:var(--text)}
   .chips{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 4px}
   .chip{border:0;background:var(--st-panel);color:var(--st-text);border-radius:999px;padding:7px 12px;font:inherit;font-size:13px;cursor:pointer}
   .chip[aria-pressed="true"]{background:var(--st-text);color:var(--st-bg)}
   .dots{display:flex;gap:10px;align-items:center;overflow-x:auto;padding:5px 5px 9px;scrollbar-width:none}
   .dot{flex:none;width:34px;height:34px;border-radius:50%;border:0;cursor:pointer;position:relative;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);padding:0}
-  .dot[aria-pressed="true"],.dot.rainbow.on{box-shadow:0 0 0 3px var(--st-bg),0 0 0 5px #fff}
+  .dot[aria-pressed="true"],.dot.rainbow.on{box-shadow:0 0 0 3px var(--st-bg),0 0 0 5px var(--text)}
   .dot.none{background:var(--st-panel)}
   .dot.none::after{content:"";position:absolute;inset:8px;border:2.5px solid var(--st-muted);border-radius:50%;background:linear-gradient(135deg,transparent 44%,var(--st-muted) 44%,var(--st-muted) 56%,transparent 56%)}
   .dot.rainbow{background:conic-gradient(#ff4d4d,#ffd84d,#6dff6d,#4dd8ff,#6d6dff,#ff4dd8,#ff4d4d);display:block}
@@ -244,7 +246,7 @@
   .rowlbl{font-size:12px;color:var(--st-muted);margin:4px 0 2px}
   .studio .slider{grid-template-columns:92px 1fr 44px;margin:8px 0}
   .studio .slider span,.studio .slider output{color:var(--st-muted)}
-  .studio input[type=range]{accent-color:#fff}
+  .studio input[type=range]{accent-color:var(--accent)}
   .tgl{display:inline-flex;cursor:pointer;position:relative}
   .tgl input{position:absolute;opacity:0;width:1px;height:1px}
   .tgl span{background:var(--st-panel);color:var(--st-text);border-radius:999px;padding:7px 12px;font-size:13px}
@@ -259,8 +261,8 @@
   .ai-btn:hover{background:var(--st-tile)}
   .ai-btn:disabled{opacity:.5}
   .studio .status{color:var(--st-muted)}
-  .studio .status.ok{color:#B9F06B}
-  .studio .status.err{color:#FF8A7A}
+  .studio .status.ok{color:var(--ok)}
+  .studio .status.err{color:var(--danger)}
   .st-empty{color:var(--st-muted);font-size:13px;background:var(--st-panel);border-radius:12px;padding:14px;margin-top:10px}
   .st-foot{margin-top:14px;border-top:1px solid var(--st-line);padding-top:10px}
   .st-foot summary{color:var(--st-muted);font-size:13px;cursor:pointer}
@@ -281,7 +283,10 @@
         <p>Đặt chữ hook lên video theo bố cục có sẵn. Chạy ngay trên trình duyệt, không cần cài gì.</p>
       </div>
     </div>
+    <div class="row" style="gap:8px">
+    <button class="theme-btn" id="themeBtn" type="button" aria-label="Đổi giao diện sáng hoặc tối" title="Đổi giao diện sáng / tối">◐</button>
     <div class="acct" id="acct"><span id="acctText">Bạn đang dùng bản <b>Free</b></span><button class="pill pro" id="acctBtn">Mở Pro</button></div>
+    </div>
   </header>
 
   <div class="grid">
@@ -331,20 +336,49 @@
             <button class="tb" type="button" data-f="small" data-free title="Thu nhỏ phần chữ chọn" aria-label="Thu nhỏ chữ">A<sup>−</sup></button>
             <button class="tb" type="button" data-f="clear" title="Bỏ màu, đậm, nghiêng của phần chữ chọn"><small>Xoá kiểu</small></button>
             <span class="sp"></span>
+            <button class="tb" type="button" id="btnDlLayer" title="Tải riêng lớp này (PNG nền trong suốt)" aria-label="Tải riêng lớp này">⤓</button>
             <button class="tb" type="button" id="btnDupSel" data-free title="Nhân bản lớp" aria-label="Nhân bản lớp">⧉</button>
             <button class="tb danger" type="button" id="btnDelSel" title="Xoá lớp" aria-label="Xoá lớp">🗑</button>
           </div>
-          <div class="tpl-note" data-tplonly hidden>Câu hook này đang trình bày theo mẫu <b id="tplName"></b>. Bôi đen chữ rồi chạm <b>Nhấn màu</b> hoặc <b>I</b> để đổi kiểu. Kéo trên khung để dời lên xuống, kéo chấm xanh để phóng to.<br><button class="addchip main" id="btnSplit" type="button">Chỉnh tự do từng chữ (font, màu, viền, bóng)</button></div>
+          <div class="tpl-note" data-tplonly hidden><span id="tplOn">Câu hook đang trình bày theo mẫu <b id="tplName"></b>. Bôi đen chữ rồi chạm <b>Nhấn màu</b> hoặc <b>I</b>. Kéo trên khung để dời lên xuống, kéo chấm xanh để phóng to. Đổi bố cục ở tab <b>Mẫu</b>, vị trí và phủ tối ở tab <b>Tinh chỉnh</b>.</span><span id="tplOff" hidden>Câu hook này chưa dùng mẫu nào nên không hiện trên video. Chọn một bố cục ở tab <b>Mẫu</b> bên dưới.</span><br><button class="addchip main" id="btnSplit" type="button">Chỉnh tự do từng chữ (font, màu, viền, bóng)</button></div>
           <div class="tabs" id="edTabs" role="tablist">
             <button type="button" data-t="style" aria-selected="true">Mẫu</button>
             <button type="button" data-t="font" data-free aria-selected="false">Phông chữ</button>
             <button type="button" data-t="look" data-free aria-selected="false">Phong cách</button>
             <button type="button" data-t="pos" data-free aria-selected="false">Vị trí</button>
+            <button type="button" data-t="tune" data-tplonly aria-selected="false">Tinh chỉnh</button>
+            <button type="button" data-t="brand" aria-selected="false">Màu kênh</button>
             <button type="button" data-t="ai" aria-selected="false">AI ✦</button>
           </div>
           <div class="pane" data-t="style">
             <div class="pst-grid" id="presetGrid" data-free></div>
-            <div class="pst-grid" id="tplGrid" data-tplonly hidden></div>
+            <div class="templates" id="templates" data-tplonly hidden></div>
+          </div>
+          <div class="pane" data-t="tune" hidden>
+            <div id="tplExtra" style="margin-bottom:6px"></div>
+        <div class="slider"><span>Vị trí dọc</span><input type="range" id="ypct" min="3" max="80" value="13"><output id="ypctOut">13%</output></div>
+        <div class="slider"><span>Cỡ chữ</span><input type="range" id="size" min="30" max="110" value="66"><output id="sizeOut">66px</output></div>
+        <div class="slider"><span>Bề rộng tối đa</span><input type="range" id="maxw" min="60" max="96" value="80"><output id="maxwOut">80%</output></div>
+        <div class="row" style="margin-top:6px">
+          <span class="hint" style="margin:0">Căn:</span>
+          <div class="seg" id="align" role="group" aria-label="Căn lề"><button data-v="center" aria-pressed="true">Giữa</button><button data-v="left" aria-pressed="false">Trái</button></div>
+          <span class="hint" style="margin:0 0 0 8px">Phủ tối:</span>
+          <div class="seg" id="dim" role="group" aria-label="Phủ tối"><button data-v="auto" aria-pressed="true">Tự động</button><button data-v="off" aria-pressed="false">Tắt</button></div>
+        </div>
+          </div>
+          <div class="pane" data-t="brand" hidden>
+        <p class="hint">Mặc định là màu Tự Mình Xây Kênh. Đổi theo kênh riêng của bạn, bấm Lưu để lần sau tự nhớ.</p>
+        <div class="swatches">
+          <label class="sw">Màu nhấn<input type="color" id="cAccent" value="#99DF00"></label>
+          <label class="sw">Màu tối<input type="color" id="cDark" value="#26210F"></label>
+          <label class="sw">Chữ sáng<input type="color" id="cLight" value="#FFFFFF"></label>
+          <label class="sw">Chữ kem<input type="color" id="cCream" value="#F9E8DD"></label>
+        </div>
+        <div class="presets" id="presets"></div>
+        <div class="row" style="margin-top:10px">
+          <button class="btn sm" id="btnSaveBrand">Lưu làm màu kênh của tôi</button>
+          <button class="btn sm" id="btnResetBrand">Về màu TMXK</button>
+        </div>
           </div>
           <div class="pane" data-t="font" hidden>
             <div class="font-grid" id="fontGrid"></div>
@@ -435,43 +469,6 @@
         </details>
       </section>
 
-      <section class="card">
-        <h2><span class="n">3</span>Mẫu bố cục</h2>
-        <p class="hint">Chạm một mẫu để trình bày nhanh câu hook. Muốn chỉnh từng chữ tự do, chọn mẫu Tự do hoặc bấm "Chỉnh tự do từng chữ" ở bước 2.</p>
-        <div class="templates" id="templates"></div>
-        <div id="tplExtra" style="margin-top:10px"></div>
-      </section>
-
-
-      <section class="card">
-        <h2><span class="n">4</span>Tinh chỉnh mẫu</h2>
-        <div class="slider"><span>Vị trí dọc</span><input type="range" id="ypct" min="3" max="80" value="13"><output id="ypctOut">13%</output></div>
-        <div class="slider"><span>Cỡ chữ</span><input type="range" id="size" min="30" max="110" value="66"><output id="sizeOut">66px</output></div>
-        <div class="slider"><span>Bề rộng tối đa</span><input type="range" id="maxw" min="60" max="96" value="80"><output id="maxwOut">80%</output></div>
-        <div class="row" style="margin-top:6px">
-          <span class="hint" style="margin:0">Căn:</span>
-          <div class="seg" id="align" role="group" aria-label="Căn lề"><button data-v="center" aria-pressed="true">Giữa</button><button data-v="left" aria-pressed="false">Trái</button></div>
-          <span class="hint" style="margin:0 0 0 8px">Phủ tối:</span>
-          <div class="seg" id="dim" role="group" aria-label="Phủ tối"><button data-v="auto" aria-pressed="true">Tự động</button><button data-v="off" aria-pressed="false">Tắt</button></div>
-        </div>
-      </section>
-
-      <section class="card">
-        <h2><span class="n">5</span>Màu kênh</h2>
-        <p class="hint">Mặc định là màu Tự Mình Xây Kênh. Đổi theo kênh riêng của bạn, bấm Lưu để lần sau tự nhớ.</p>
-        <div class="swatches">
-          <label class="sw">Màu nhấn<input type="color" id="cAccent" value="#99DF00"></label>
-          <label class="sw">Màu tối<input type="color" id="cDark" value="#26210F"></label>
-          <label class="sw">Chữ sáng<input type="color" id="cLight" value="#FFFFFF"></label>
-          <label class="sw">Chữ kem<input type="color" id="cCream" value="#F9E8DD"></label>
-        </div>
-        <div class="presets" id="presets"></div>
-        <div class="row" style="margin-top:10px">
-          <button class="btn sm" id="btnSaveBrand">Lưu làm màu kênh của tôi</button>
-          <button class="btn sm" id="btnResetBrand">Về màu TMXK</button>
-        </div>
-      </section>
-
       <section class="pro-card" id="proPanel">
         <h2>Trợ lý hook <span class="badge">Pro</span></h2>
         <div id="proLocked">
@@ -504,11 +501,15 @@
       </section>
 
       <section class="card">
-        <h2><span class="n">6</span>Xuất và hướng dẫn dựng</h2>
+        <h2><span class="n">3</span>Xuất và hướng dẫn dựng</h2>
         <div class="out-actions">
           <button class="btn primary" id="btnPng">Tải PNG chữ (nền trong suốt)</button>
           <button class="btn" id="btnJpg">Tải ảnh preview</button>
           <button class="btn" id="btnCopy">Sao chép hướng dẫn</button>
+        </div>
+        <div class="layers-out">
+          <button class="btn pro" id="btnLayersZip">Tải từng lớp chữ riêng (ZIP)</button>
+          <p class="hint" style="margin:6px 0 0">Mỗi lớp chữ là một file PNG nền trong suốt, cùng kích thước khung video, chữ đã nằm đúng chỗ. Kéo từng file vào CapCut, Premiere hay VN làm overlay, để full khung là khớp. Nhờ tách lớp, bạn cho từng câu hiện ở thời điểm khác nhau và gắn hiệu ứng riêng. Trong ZIP có thêm file vị trí và hướng dẫn.</p>
         </div>
         <label class="lbl">Thông số để tự dựng trong CapCut</label>
         <div class="guide" id="guide"></div>
@@ -534,7 +535,7 @@
               <li>Màu kênh riêng, khung vùng an toàn TikTok, Reels, Shorts</li>
               <li>Gợi ý nhanh theo luật, không dùng AI</li>
               <li>Chỉnh chữ tự do: bôi đen để tô màu từng chữ, thêm chữ, kéo, xoay, viền, rực sáng, nền, bóng với 6 font và 5 kiểu có sẵn</li>
-              <li>Xuất PNG kèm logo nhỏ Hook Text Studio</li>
+              <li>Xuất PNG, cả bản tách từng lớp chữ, kèm logo nhỏ Hook Text Studio</li>
             </ul>
           </div>
           <div class="plan pro">
@@ -1502,7 +1503,7 @@ function newLayer(text, over = {}) {
 /* lớp "Hook": câu hook ở ô ẩn #text, vẽ bằng mẫu đang chọn */
 const TPL = { id: 'TPL', tpl: true, _box: null };
 function tplActive() { return state.template !== 'blank'; }
-function selLayer() { if (state.sel === 'TPL') return tplActive() ? TPL : null; return state.layers.find(l => l.id === state.sel) || null; }
+function selLayer() { if (state.sel === 'TPL') return TPL; return state.layers.find(l => l.id === state.sel) || null; }
 function tplRuns() { return markupToRuns($('#text').value); }
 function setTplRuns(runs) { $('#text').value = runsToMarkup(runs); ls.set('hook.text', $('#text').value); }
 
@@ -1666,11 +1667,11 @@ let undoT = null; function pushUndoSoon() { clearTimeout(undoT); undoT = setTime
 function addLayer(text, over, preset) {
   const L = newLayer(text, over); if (preset) { applyPreset(L, preset); Object.assign(L, over); }
   state.layers.push(L); state.sel = L.id; pushUndo(); syncLayerPanel(); linkEditorFonts(); scheduleRender();
-  setTimeout(() => { const e = ed(); e.focus(); selectAllIn(e); }, 50);
+  const e = ed(); e.focus(); selectAllIn(e);
 }
 function delSelected() {
   const L = selLayer(); if (!L) return;
-  if (L.tpl) { state.sel = null; selectTemplate('blank', false); toast('Đã bỏ chữ theo mẫu. Chọn lại một mẫu ở bước 3 nếu muốn.'); return; }
+  if (L.tpl) { if (!tplActive()) return toast('Câu hook đang không hiện trên video.'); selectTemplate('blank', false); toast('Đã ẩn câu hook theo mẫu. Chọn lại một mẫu ở tab Mẫu nếu muốn.'); return; }
   state.layers = state.layers.filter(l => l !== L); state.sel = null; pushUndo(); syncLayerPanel(); scheduleRender();
 }
 function dupLayer(id) { const L = state.layers.find(l => l.id === id); if (!L) return; const { _box, ...r } = L; const C = JSON.parse(JSON.stringify(r)); C.id = 'L' + (layerSeq++); C.x = Math.min(.95, L.x + .03); C.y = Math.min(.95, L.y + .03); state.layers.splice(state.layers.indexOf(L) + 1, 0, C); state.sel = C.id; pushUndo(); syncLayerPanel(); scheduleRender(); }
@@ -1811,7 +1812,7 @@ function buildLayerList() {
     if (!L.tpl && (L.pro || !FREE_FONTS.has(L.font))) { const t = el('span', 'lock', 'PRO'); t.hidden = state.pro; b.append(t); }
     box.append(b);
   };
-  if (tplActive()) chip(TPL, 'Hook · mẫu ' + TEMPLATES[state.template].name);
+  chip(TPL, tplActive() ? 'Hook · mẫu ' + TEMPLATES[state.template].name : 'Hook · chưa dùng mẫu');
   state.layers.forEach(L => chip(L, (runsText(L.runs).split('\n')[0].trim() || '(trống)').slice(0, 26), L.font));
 }
 let llT = null; function buildLayerListSoon() { clearTimeout(llT); llT = setTimeout(buildLayerList, 250); }
@@ -1878,16 +1879,6 @@ function buildFontUI(L) {
   const row = $('#weightRow'); row.innerHTML = '';
   fw.forEach(w => { const b = el('button', 'chip', WNAME[w] || w); b.type = 'button'; b.style.fontFamily = `"${L.font}", system-ui`; b.style.fontWeight = w; b.setAttribute('aria-pressed', String(+L.weight === w)); b.onclick = () => { L.weight = w; pushUndo(); buildFontUI(L); renderEditor(); scheduleRender(); }; row.append(b); });
 }
-function buildTplGrid() {
-  const box = $('#tplGrid'); box.innerHTML = '';
-  for (const [k, t] of Object.entries(TEMPLATES)) {
-    if (k === 'blank') continue;
-    const b = el('button', 'pst tplq'); b.type = 'button'; b.setAttribute('aria-pressed', String(k === state.template));
-    b.append(el('span', 'pst-sw tq', t.name), el('small', null, t.desc.split('.')[0]));
-    if (PRO_TPL.has(k)) { const lk = el('span', 'lock', 'PRO'); lk.hidden = state.pro; b.append(lk); }
-    b.onclick = () => selectTemplate(k, true); box.append(b);
-  }
-}
 function syncLayerPanel() {
   const L = selLayer(); edSel = null;
   $('#layerProps').hidden = !L; $('#layerEmpty').hidden = !!L; buildLayerList();
@@ -1895,9 +1886,9 @@ function syncLayerPanel() {
   const isT = !!L.tpl;
   document.querySelectorAll('#editorCard [data-free]').forEach(x => x.hidden = isT);
   document.querySelectorAll('#editorCard [data-tplonly]').forEach(x => x.hidden = !isT);
-  if (isT) { $('#tplName').textContent = TEMPLATES[state.template].name; buildTplGrid(); showTab(['style', 'ai'].includes(curTab) ? curTab : 'style'); }
+  if (isT) { $('#tplName').textContent = TEMPLATES[state.template].name; $('#tplOn').hidden = !tplActive(); $('#tplOff').hidden = tplActive(); $('#btnSplit').hidden = !tplActive(); showTab(['style', 'tune', 'brand', 'ai'].includes(curTab) ? curTab : 'style'); }
   else {
-    showTab(curTab); showSub(curSub); buildFontUI(L);
+    showTab(curTab === 'tune' ? 'style' : curTab); showSub(curSub); buildFontUI(L);
     document.querySelectorAll('#lAlign button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === L.align)));
     document.querySelectorAll('#bgMode button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === L.bg.mode)));
     document.querySelectorAll('#presetGrid .pst').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.n === L.preset)));
@@ -2001,17 +1992,17 @@ function buildEditorUI() {
       state.layers = saved; lastSnap = snapshot(); linkEditorFonts();
     }
   } catch {}
-  state.sel = tplActive() ? 'TPL' : (state.layers[0] || {}).id || null;
+  state.sel = tplActive() || !state.layers.length ? 'TPL' : state.layers[0].id;
   syncLayerPanel();
 }
 /* gọi sau mỗi lần render: đồng bộ bảng lớp khi mẫu hoặc câu hook đổi từ chỗ khác */
-let lastTplKey = null;
+let lastTplKey = null, lastAccent = null;
 function afterRenderEditor() {
-  if (state.template !== lastTplKey) {
-    lastTplKey = state.template;
-    if (tplActive() && (!state.sel || state.sel === 'TPL')) state.sel = 'TPL';
-    syncLayerPanel(); return;
-  }
+  const accentChanged = state.brand.accent !== lastAccent, tplChanged = state.template !== lastTplKey;
+  lastAccent = state.brand.accent; lastTplKey = state.template;
+  if (accentChanged) buildRows();
+  if (tplChanged && !state.sel) state.sel = 'TPL';
+  if (accentChanged || tplChanged) { syncLayerPanel(); return; }
   if (state.sel === 'TPL' && document.activeElement !== ed() && lastEdText !== $('#text').value) renderEditor();
 }
 function layersUsePro() { return state.layers.some(L => !L.hidden && (L.pro || !FREE_FONTS.has(L.font))); }
@@ -2053,6 +2044,66 @@ function layerNotes() {
   });
 }
 
+/* ---------- xuất từng lớp chữ riêng ---------- */
+function slug(t) { return String(t).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[đĐ]/g, 'd').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 30) || 'chu'; }
+function layerCanvas(L) {
+  const { fr } = lastRender; const cv = document.createElement('canvas'); cv.width = fr.width; cv.height = fr.height; const g = cv.getContext('2d');
+  if (L.tpl) g.drawImage(lastRender.ovTpl, 0, 0); else drawLayer(g, L, cv.width, cv.height);
+  return withMark(cv);
+}
+function hasInk(cv) { return !!alphaBBox(cv); }
+async function exportOneLayer() {
+  const L = selLayer(); if (!L || !lastRender || !gateExport()) return;
+  if (L.tpl && !tplActive()) return toast('Câu hook đang không dùng mẫu nên không có gì để tải');
+  const name = L.tpl ? 'hook-' + state.template : slug(runsText(L.runs));
+  saveBlob(await canvasBlob(layerCanvas(L), 'image/png'), `lop-${name}.png`);
+}
+const CRC_T = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+function crc32(u8) { let c = 0xFFFFFFFF; for (let i = 0; i < u8.length; i++) c = CRC_T[(c ^ u8[i]) & 255] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+/* ZIP không nén (PNG vốn đã nén), đủ cho mọi máy giải nén */
+function makeZip(files) {
+  const enc = new TextEncoder(), parts = [], central = []; let off = 0;
+  for (const f of files) {
+    const nm = enc.encode(f.name), crc = crc32(f.data), sz = f.data.length;
+    const h = new DataView(new ArrayBuffer(30));
+    h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint16(6, 0x0800, true); h.setUint16(12, 0x21, true);
+    h.setUint32(14, crc, true); h.setUint32(18, sz, true); h.setUint32(22, sz, true); h.setUint16(26, nm.length, true);
+    parts.push(new Uint8Array(h.buffer), nm, f.data);
+    const c = new DataView(new ArrayBuffer(46));
+    c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true); c.setUint16(8, 0x0800, true); c.setUint16(14, 0x21, true);
+    c.setUint32(16, crc, true); c.setUint32(20, sz, true); c.setUint32(24, sz, true); c.setUint16(28, nm.length, true); c.setUint32(42, off, true);
+    central.push(new Uint8Array(c.buffer), nm);
+    off += 30 + nm.length + sz;
+  }
+  const cd = central.reduce((a, b) => a + b.length, 0);
+  const e = new DataView(new ArrayBuffer(22)); e.setUint32(0, 0x06054b50, true); e.setUint16(8, files.length, true); e.setUint16(10, files.length, true); e.setUint32(12, cd, true); e.setUint32(16, off, true);
+  return new Blob([...parts, ...central, new Uint8Array(e.buffer)], { type: 'application/zip' });
+}
+async function exportLayersZip() {
+  if (!lastRender || !gateExport()) return;
+  const btn = $('#btnLayersZip'); btn.disabled = true;
+  try {
+    const H = lastRender.fr.height, W = lastRender.fr.width, files = [], pos = [];
+    const add = async (name, cv) => files.push({ name, data: new Uint8Array(await (await canvasBlob(cv, 'image/png')).arrayBuffer()) });
+    let n = 1; const num = () => String(n++).padStart(2, '0');
+    const where = cv => { const b = alphaBBox(cv); return b ? `từ ${Math.round(b.top / H * 100)}% đến ${Math.round(b.bot / H * 100)}% chiều cao, ${Math.round(b.left / W * 100)}% đến ${Math.round(b.right / W * 100)}% chiều ngang` : ''; };
+    if (tplActive()) { const cv = layerCanvas(TPL); if (hasInk(lastRender.ovTpl)) { const nm = `${num()}-hook-${state.template}.png`; await add(nm, cv); pos.push(`${nm}: câu hook theo mẫu ${TEMPLATES[state.template].name}, ${where(lastRender.ovTpl)}.`); } }
+    for (const L of state.layers) {
+      if (L.hidden || !runsText(L.runs).trim()) continue;
+      const cv = layerCanvas(L); const nm = `${num()}-${slug(runsText(L.runs))}.png`; await add(nm, cv);
+      pos.push(`${nm}: "${runsText(L.runs).replace(/\n/g, ' / ')}", ${where(cv)}.`);
+    }
+    if (!files.length) { toast('Chưa có lớp chữ nào để xuất'); return; }
+    await add('00-tat-ca-chu.png', withMark(lastRender.ov));
+    const guide = ['HOOK TEXT STUDIO · TỰ MÌNH XÂY KÊNH', '', `Khung ${W}x${H}. Mọi file PNG cùng kích thước khung, nền trong suốt, chữ đã nằm đúng vị trí.`, '',
+      'CÁCH DÙNG TRONG CAPCUT', '1. Overlay → Add overlay → chọn từng file 01, 02, 03... Mỗi file một track riêng.', '2. Kéo overlay cho phủ đúng full khung (cùng tỉ lệ nên chỉ cần phóng vừa mép).', '3. Kéo đầu cuối từng track để câu nào hiện đúng lúc người nói tới câu đó.', '4. Animation → In: Fade 0.3s hoặc Pop, Out: Fade 0.3s. Mỗi lớp có thể chọn hiệu ứng khác nhau.', '5. File 00-tat-ca-chu.png là bản gộp mọi lớp, dùng khi muốn hiện tất cả cùng lúc.', '',
+      'PREMIERE / VN / CANVA: kéo file vào timeline phía trên video, đặt Scale để vừa khung, vị trí giữa.', '',
+      'VỊ TRÍ TỪNG LỚP', ...pos, '', 'THÔNG SỐ ĐỂ TỰ GÕ LẠI', $('#guide').textContent];
+    files.push({ name: 'huong-dan.txt', data: new TextEncoder().encode('﻿' + guide.join('\r\n')) });
+    saveBlob(makeZip(files), 'hook-cac-lop-chu.zip');
+  } finally { btn.disabled = false; }
+}
+
 /* ---------- boot ---------- */
 (function init() {
   buildTemplates(); buildPresets(); renderExtra(); syncSliders(); applyBrandInputs(); buildEditorUI(); linkEditorFonts();
@@ -2091,6 +2142,10 @@ function layerNotes() {
   $('#upClose').addEventListener('click', () => $('#upsell').classList.remove('show'));
   $('#upFree').addEventListener('click', () => { $('#upsell').classList.remove('show'); selectTemplate('highlight', true); });
   window.addEventListener('focus', () => { if (!state.pro) checkPro(); });
+  $('#btnLayersZip').addEventListener('click', exportLayersZip); $('#btnDlLayer').addEventListener('click', exportOneLayer);
+  const applyTheme = t => { if (t) document.documentElement.dataset.theme = t; else delete document.documentElement.dataset.theme; const dark = t ? t === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; $('#themeBtn').textContent = dark ? '☀' : '☾'; $('#themeBtn').title = dark ? 'Chuyển sang giao diện sáng' : 'Chuyển sang giao diện tối'; };
+  applyTheme(ls.get('hook.theme'));
+  $('#themeBtn').addEventListener('click', () => { const dark = document.documentElement.dataset.theme ? document.documentElement.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; const t = dark ? 'light' : 'dark'; applyTheme(t); ls.set('hook.theme', t); if (lastRender) drawUiLayer(lastRender.fr.height); });
   $('#btnPng').addEventListener('click', exportPng); $('#btnJpg').addEventListener('click', exportJpg); $('#btnCopy').addEventListener('click', copyGuide);
   $('#imgModalClose').addEventListener('click', () => $('#imgModal').classList.remove('show'));
   checkPro();
