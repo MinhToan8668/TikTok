@@ -79,6 +79,14 @@
   .tpl b{font-size:13px}
   .tpl small{color:var(--muted);font-size:11.5px;line-height:1.3}
 
+  .tpl-custom{margin:10px 0 4px;padding:10px 12px;border:1px solid var(--line);border-radius:14px;background:var(--surface-2)}
+  .tc-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}
+  .tc-head b{font-size:13px}
+  .tc-head .lock{position:static!important;display:inline-block;margin-left:4px;vertical-align:1px}
+  .tc-cols{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px 10px;margin-bottom:4px}
+  .tc-col{display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer}
+  .tc-col input{width:34px;height:28px;border:1px solid var(--line);border-radius:8px;padding:0;background:none;cursor:pointer;flex:none}
+  .pst-more{margin-top:8px;width:100%;justify-content:center}
   .slider{display:grid;grid-template-columns:110px 1fr 48px;gap:10px;align-items:center;margin:6px 0}
   .slider span{font-size:13px;color:var(--muted)}
   .slider output{font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
@@ -542,11 +550,13 @@
               <div class="rowlbl">Bố cục</div>
               <div class="templates" id="templates"></div>
               <div id="tplExtra"></div>
+              <div class="tpl-custom" id="tplCustom" hidden></div>
               <div class="row face-row"><span class="rowlbl" style="margin:0">Mặt người trong ảnh ở:</span><div class="seg" id="facePos" role="group" aria-label="Vị trí mặt"><button type="button" data-v="top" aria-pressed="false">Trên</button><button type="button" data-v="mid" aria-pressed="true">Giữa</button><button type="button" data-v="low" aria-pressed="false">Dưới</button></div></div>
               <div class="rowlbl" style="margin-top:12px">Kiểu chữ nhanh <span class="lock">PRO</span></div>
             </div>
             <div class="pro-note" data-promo data-free><span>✦ Kiểu chữ nhanh là tính năng Pro. Chạm thử để xem trên khung, xuất file cần mở Pro.</span><button type="button" class="chip" data-upsell>Mở Pro</button></div>
             <div class="pst-grid" id="presetGrid"></div>
+            <button class="chip pst-more" type="button" id="btnPresetEdit">✎ Tuỳ chỉnh kiểu chữ: màu, viền, bóng, rực sáng, nền →</button>
           </div>
 
           <div class="pane" data-t="font" hidden>
@@ -977,8 +987,28 @@ function fitSize(ctx, paras, mk, maxW, size, floor = 0.7) {
 /* ---------- templates: each draws into ov (overlay) and may touch fr (frame) ---------- */
 function ctxOf(s, W, H, frameCanvas) {
   const px = v => Math.round(v * W / BASE_W);
-  return { W, H, px, s, y0: Math.round(H * s.ypct / 100), maxw: Math.round(W * s.maxw / 100), b: s.brand, blocks: s.blocks, notes: [], frame: frameCanvas };
+  const ed = (s.tplOpt && s.tplOpt[s.template]) || {}, E = TPL_EDIT[s.template] || {};
+  return { W, H, px, s, y0: Math.round(H * s.ypct / 100), maxw: Math.round(W * s.maxw / 100), b: { ...s.brand, box: E.box || '#000000', ...(ed.c || {}) },
+    o: (k, d) => (ed.n && ed.n[k] != null ? ed.n[k] : d), blocks: s.blocks, notes: [], frame: frameCanvas };
 }
+/* Tuỳ chỉnh bố cục: mỗi thành phần của mẫu gắn với một màu (brand) hoặc một thông số.
+   c: màu, tên thành phần hiện cho người dùng · n: [khoá, nhãn, min, max, bước, mặc định] */
+const TPL_EDIT = {
+  highlight:  { c: { light: 'Chữ thường', accent: 'Vệt bút dạ', dark: 'Chữ trong vệt' }, n: [['markA', 'Độ đậm vệt', .3, 1, .01, .93], ['markH', 'Độ dày vệt', .8, 1.6, .05, 1.25], ['markTilt', 'Nghiêng vệt', -8, 8, .5, -1.5], ['markR', 'Bo góc vệt', 0, 40, 1, 10]] },
+  editorial:  { c: { light: 'Chữ', accent: 'Cụm nghiêng + gạch' } },
+  glass:      { c: { light: 'Chữ', accent: 'Vạch dọc + nhấn' }, n: [['boxA', 'Độ đậm thẻ', .1, 1, .01, .58], ['radius', 'Bo góc', 0, 60, 1, 28]] },
+  sticker:    { c: { dark: 'Nền thẻ', cream: 'Chữ', accent: 'Từ khoá' }, n: [['tilt', 'Nghiêng thẻ', -10, 10, .5, -2.5], ['radius', 'Bo góc', 0, 60, 1, 32]] },
+  bubbles:    { box: '#000000', c: { box: 'Hộp chữ', light: 'Chữ', accent: 'Từ khoá' }, n: [['boxA', 'Độ đậm hộp', .1, 1, .01, .6], ['radius', 'Bo góc', 0, 40, 1, 18]] },
+  timeline:   { c: { accent: 'Mốc + vạch', light: 'Chữ' } },
+  chips:      { box: '#1E1E1E', c: { box: 'Chip trái', light: 'Chữ chip trái', accent: 'Chip phải', dark: 'Chữ chip phải' } },
+  titlecard:  { c: { dark: 'Màu phủ', light: 'Chữ', accent: 'Từ khoá + gạch' }, n: [['boxA', 'Độ phủ', 0, 1, .01, .8]] },
+  list:       { c: { accent: 'Vòng tròn số', dark: 'Chữ số', light: 'Chữ' } },
+  knockout:   { c: { dark: 'Dải nền', accent: 'Viền + từ khoá' }, n: [['boxA', 'Độ đậm dải', .2, 1, .01, .88], ['border', 'Dày viền', 0, 20, 1, 6]] },
+  lowerthird: { c: { dark: 'Nền thanh', accent: 'Vạch + dòng nhỏ', light: 'Chữ' }, n: [['boxA', 'Độ đậm nền', .2, 1, .01, .82], ['radius', 'Bo góc', 0, 40, 1, 14]] },
+  quote:      { c: { accent: 'Ngoặc kép + nhấn', cream: 'Chữ' } },
+  pov:        { c: { accent: 'Chip nhãn', dark: 'Chữ trong chip', light: 'Chữ' } },
+  outline:    { c: { light: 'Viền chữ', accent: 'Từ khoá tô đặc' }, n: [['strokeW', 'Dày viền', .02, .1, .005, .045]] },
+};
 const T = {};
 T.highlight = (c, ov) => {
   const s0 = c.px(c.s.size); const mk = z => ({ plain: F(500, z), key: F(800, z), italic: F(800, z, true) });
@@ -991,7 +1021,7 @@ T.highlight = (c, ov) => {
         const w = lineWidth(ov, ln, fonts); let x = c.s.align === 'center' ? (c.W - w) / 2 : c.W * 0.08;
         for (const [t, k] of ln) {
           const tw = tlen(ov, t, fonts[k]);
-          if (k === 'key') { ov.save(); ov.translate(x + tw / 2, yy + size * 0.55); ov.rotate(-1.5 * Math.PI / 180); ov.fillStyle = hexA(c.b.accent, .93); rrect(ov, -tw / 2 - c.px(18), -size * 0.62, tw + c.px(36), size * 1.25, c.px(10)); ov.fill(); ov.restore(); }
+          if (k === 'key') { const mh = size * c.o('markH', 1.25); ov.save(); ov.translate(x + tw / 2, yy + size * 0.55); ov.rotate(c.o('markTilt', -1.5) * Math.PI / 180); ov.fillStyle = hexA(c.b.accent, c.o('markA', .93)); rrect(ov, -tw / 2 - c.px(18), -mh / 2, tw + c.px(36), mh, c.px(c.o('markR', 10))); ov.fill(); ov.restore(); }
           x += tw;
         }
         yy += lh;
@@ -1027,12 +1057,12 @@ T.glass = (c, ov) => {
   const kicker = (c.s.kicker || '').trim();
   const needW = Math.max(...lines.map(l => lineWidth(ov, l, fonts)), kicker ? tlen(ov, kicker.toUpperCase().split('').join(' '), F(600, c.px(26))) : 0) + c.px(130);
   if (needW < pw) { pw = Math.round(needW); pxx = Math.round((c.W - pw) / 2); }
-  const ph = c.px(48) + (kicker ? c.px(56) : 0) + lines.length * lh + c.px(30); const r = c.px(28);
+  const ph = c.px(48) + (kicker ? c.px(56) : 0) + lines.length * lh + c.px(30); const r = c.px(c.o('radius', 28));
   if (c.frame) { // blur behind, only on preview
     const fr = c.frame.getContext('2d'); fr.save(); rrect(fr, pxx, py, pw, ph, r); fr.clip(); fr.filter = `blur(${c.px(14)}px)`; fr.drawImage(c.frame, 0, 0); fr.filter = 'none'; fr.restore();
     fr.save(); fr.shadowColor = 'rgba(0,0,0,.45)'; fr.shadowBlur = c.px(30); fr.shadowOffsetY = c.px(14); fr.fillStyle = 'rgba(0,0,0,0.01)'; rrect(fr, pxx, py, pw, ph, r); fr.fill(); fr.restore();
   }
-  ov.fillStyle = 'rgba(15,15,15,.58)'; rrect(ov, pxx, py, pw, ph, r); ov.fill();
+  ov.fillStyle = hexA('#0F0F0F', c.o('boxA', .58)); rrect(ov, pxx, py, pw, ph, r); ov.fill();
   ov.strokeStyle = 'rgba(255,255,255,.25)'; ov.lineWidth = 2; rrect(ov, pxx + 1, py + 1, pw - 2, ph - 2, r); ov.stroke();
   ov.fillStyle = c.b.accent; rrect(ov, pxx + c.px(40), py + c.px(44), c.px(6), ph - c.px(88), 3); ov.fill();
   let y = py + c.px(44); const inner = pxx + c.px(74);
@@ -1047,12 +1077,12 @@ T.sticker = (c, ov) => {
   let lines = []; for (const para of c.blocks) for (const p of para.split('\n')) lines = lines.concat(wrap(ov, parse(p), fonts, c.maxw - c.px(120)));
   const cw = Math.max(...lines.map(l => lineWidth(ov, l, fonts))) + c.px(120); const ch = lines.length * lh + c.px(70);
   const draw = (g) => {
-    g.fillStyle = c.b.dark; rrect(g, -cw / 2, -ch / 2, cw, ch, c.px(32)); g.fill();
+    g.fillStyle = c.b.dark; rrect(g, -cw / 2, -ch / 2, cw, ch, c.px(c.o('radius', 32))); g.fill();
     let y = -ch / 2 + c.px(32);
     for (const ln of lines) { const w = lineWidth(g, ln, fonts); drawSegs(g, -w / 2, y + size * 0.82, ln, fonts, colors, size, null); y += lh; }
   };
-  ov.save(); ov.translate(c.W / 2, c.y0 + ch / 2); ov.rotate((c.s.tilt || -2.5) * Math.PI / 180);
-  ov.shadowColor = 'rgba(0,0,0,.45)'; ov.shadowBlur = c.px(20); ov.shadowOffsetY = c.px(14); ov.fillStyle = c.b.dark; rrect(ov, -cw / 2, -ch / 2, cw, ch, c.px(32)); ov.fill(); ov.shadowColor = 'transparent';
+  ov.save(); ov.translate(c.W / 2, c.y0 + ch / 2); ov.rotate(c.o('tilt', c.s.tilt || -2.5) * Math.PI / 180);
+  ov.shadowColor = 'rgba(0,0,0,.45)'; ov.shadowBlur = c.px(20); ov.shadowOffsetY = c.px(14); ov.fillStyle = c.b.dark; rrect(ov, -cw / 2, -ch / 2, cw, ch, c.px(c.o('radius', 32))); ov.fill(); ov.shadowColor = 'transparent';
   draw(ov); ov.restore();
   c.notes.push(`Thẻ ${c.b.dark} bo góc 32 nghiêng ${c.s.tilt || -2.5}°, bóng đổ mềm. Chữ Be Vietnam Pro ExtraBold ${size}px màu ${c.b.cream}, từ khóa Black ${fonts.key.size}px màu ${c.b.accent}.`);
 };
@@ -1063,8 +1093,8 @@ T.bubbles = (c, ov) => {
   const padx = c.px(26), pady = c.px(12); const maxw = Math.round(c.W * Math.max(c.s.maxw, 94) / 100) - 2 * padx;
   for (const para of c.blocks) {
     let lines = []; for (const p of para.split('\n')) lines = lines.concat(wrap(ov, parse(p), fonts, maxw));
-    let yy = y; ov.fillStyle = 'rgba(0,0,0,.6)';
-    for (const ln of lines) { const w = lineWidth(ov, ln, fonts); const x = c.s.align === 'center' ? (c.W - w) / 2 : c.W * 0.08; rrect(ov, x - padx, yy - pady, w + 2 * padx, lh + 2 * pady - c.px(4), c.px(18)); ov.fill(); yy += lh + gap; }
+    let yy = y; ov.fillStyle = hexA(c.b.box, c.o('boxA', .6));
+    for (const ln of lines) { const w = lineWidth(ov, ln, fonts); const x = c.s.align === 'center' ? (c.W - w) / 2 : c.W * 0.08; rrect(ov, x - padx, yy - pady, w + 2 * padx, lh + 2 * pady - c.px(4), c.px(c.o('radius', 18))); ov.fill(); yy += lh + gap; }
     y = renderLines(ov, lines, fonts, colors, y, lh, c.s.align, c.W * 0.08, c.W, null, gap); y += c.px(26);
   }
   c.notes.push(`Hộp đen 60% bo góc 18 theo từng dòng, Be Vietnam Pro SemiBold ${size}px trắng, từ khóa Bold ${c.b.accent}. Mỗi khối hiện theo lời nói, khối trước mờ 40%.`);
@@ -1093,7 +1123,7 @@ T.chips = (c, ov) => {
   if ((c.s.lead || '').trim()) { const f = F(500, c.px(54)); ov.font = fontStr(f); ov.fillStyle = c.b.light; ov.shadowColor = 'rgba(0,0,0,.6)'; ov.shadowBlur = c.px(12); ov.shadowOffsetY = c.px(6); ov.fillText(c.s.lead, (c.W - ov.measureText(c.s.lead).width) / 2, y + c.px(44)); ov.shadowColor = 'transparent'; y += c.px(80); }
   ov.font = fontStr(fc); const cw = Math.max(ov.measureText(a).width, ov.measureText(b).width) + c.px(80); const ch = Math.round(size * 1.75); const gap = c.px(110); const x0 = (c.W - (2 * cw + gap)) / 2;
   ov.save(); ov.shadowColor = 'rgba(0,0,0,.5)'; ov.shadowBlur = c.px(14); ov.shadowOffsetY = c.px(10);
-  ov.fillStyle = 'rgba(30,30,30,.92)'; rrect(ov, x0, y, cw, ch, c.px(24)); ov.fill(); ov.fillStyle = c.b.accent; rrect(ov, x0 + cw + gap, y, cw, ch, c.px(24)); ov.fill(); ov.restore();
+  ov.fillStyle = hexA(c.b.box, .92); rrect(ov, x0, y, cw, ch, c.px(24)); ov.fill(); ov.fillStyle = c.b.accent; rrect(ov, x0 + cw + gap, y, cw, ch, c.px(24)); ov.fill(); ov.restore();
   ov.font = fontStr(fc); ov.fillStyle = c.b.light; ov.fillText(a, x0 + (cw - ov.measureText(a).width) / 2, y + ch * 0.68); ov.fillStyle = c.b.dark; ov.fillText(b, x0 + cw + gap + (cw - ov.measureText(b).width) / 2, y + ch * 0.68);
   const ax = x0 + cw + gap / 2, ay = y + ch / 2; ov.strokeStyle = c.b.light; ov.lineWidth = c.px(8); ov.lineCap = 'round'; ov.beginPath(); ov.moveTo(ax - c.px(30), ay); ov.lineTo(ax + c.px(20), ay); ov.stroke();
   ov.fillStyle = c.b.light; ov.beginPath(); ov.moveTo(ax + c.px(32), ay); ov.lineTo(ax + c.px(8), ay - c.px(20)); ov.lineTo(ax + c.px(8), ay + c.px(20)); ov.closePath(); ov.fill();
@@ -1103,7 +1133,7 @@ T.chips = (c, ov) => {
 };
 
 T.titlecard = (c, ov) => {
-  ov.fillStyle = hexA(c.b.dark, .8); ov.fillRect(0, 0, c.W, c.H);
+  ov.fillStyle = hexA(c.b.dark, c.o('boxA', .8)); ov.fillRect(0, 0, c.W, c.H);
   const s0 = c.px(c.s.size); const mk = z => ({ plain: F(900, z), key: F(900, z), italic: F(800, Math.round(z * 1.15), true) });
   const size = fitSize(ov, c.blocks, mk, c.maxw, s0); const fonts = mk(size); const lh = Math.round(size * 1.18);
   const colors = { plain: c.b.light, key: c.b.accent, italic: c.b.accent };
@@ -1135,7 +1165,7 @@ T.knockout = (c, ov) => {
   let lines = []; for (const para of c.blocks) for (const p of para.split('\n')) lines = lines.concat(wrap(ov, parse(p), fonts, c.maxw));
   const bandH = lines.length * lh + c.px(70); const y0 = c.y0;
   const bandW = Math.min(c.W, Math.max(...lines.map(l => lineWidth(ov, l, fonts))) + c.px(110)); const bx = Math.round((c.W - bandW) / 2);
-  ov.fillStyle = hexA(c.b.dark, .88); ov.fillRect(bx, y0, bandW, bandH);
+  ov.fillStyle = hexA(c.b.dark, c.o('boxA', .88)); ov.fillRect(bx, y0, bandW, bandH);
   let y = y0 + c.px(35);
   for (const ln of lines) {
     const w = lineWidth(ov, ln, fonts); let x = (c.W - w) / 2;
@@ -1147,7 +1177,7 @@ T.knockout = (c, ov) => {
     }
     y += lh;
   }
-  ov.fillStyle = c.b.accent; ov.fillRect(bx, y0, bandW, c.px(6)); ov.fillRect(bx, y0 + bandH - c.px(6), bandW, c.px(6));
+  const bd = c.px(c.o('border', 6)); ov.fillStyle = c.b.accent; if (bd > 0) { ov.fillRect(bx, y0, bandW, bd); ov.fillRect(bx, y0 + bandH - bd, bandW, bd); }
   c.notes.push(`Dải ${c.b.dark} 88% rộng ${bandW}px cao ${bandH}px, viền trên dưới ${c.b.accent}. Chữ Be Vietnam Pro Black ${size}px được khoét rỗng để lộ video (CapCut: Text → Blend mode Screen trên nền đen, hoặc dùng PNG này). Từ khóa tô đặc màu nhấn.`);
 };
 T.lowerthird = (c, ov) => {
@@ -1156,8 +1186,8 @@ T.lowerthird = (c, ov) => {
   let lines = []; for (const para of c.blocks) for (const p of para.split('\n')) lines = lines.concat(wrap(ov, parse(p), fonts, c.W * 0.78));
   const w = Math.max(...lines.map(l => lineWidth(ov, l, fonts)), kicker ? tlen(ov, kicker.toUpperCase().split('').join(' '), fk) : 0) + c.px(70);
   const h = (kicker ? c.px(48) : 0) + lines.length * Math.round(size * 1.25) + c.px(44);
-  ov.save(); ov.shadowColor = 'rgba(0,0,0,.4)'; ov.shadowBlur = c.px(20); ov.shadowOffsetY = c.px(8); ov.fillStyle = hexA(c.b.dark, .82); rrect(ov, xL, y0, w, h, c.px(14)); ov.fill(); ov.restore();
-  ov.fillStyle = c.b.accent; rrect(ov, xL, y0, c.px(12), h, [c.px(14), 0, 0, c.px(14)]); ov.fill();
+  ov.save(); ov.shadowColor = 'rgba(0,0,0,.4)'; ov.shadowBlur = c.px(20); ov.shadowOffsetY = c.px(8); const lr = c.px(c.o('radius', 14)); ov.fillStyle = hexA(c.b.dark, c.o('boxA', .82)); rrect(ov, xL, y0, w, h, lr); ov.fill(); ov.restore();
+  ov.fillStyle = c.b.accent; rrect(ov, xL, y0, c.px(12), h, [lr, 0, 0, lr]); ov.fill();
   let y = y0 + c.px(30);
   if (kicker) { ov.font = fontStr(fk); ov.fillStyle = c.b.accent; ov.fillText(kicker.toUpperCase().split('').join(' '), xL + c.px(40), y + c.px(20)); y += c.px(48); }
   renderLines(ov, lines, fonts, { plain: c.b.light, key: c.b.accent, italic: c.b.accent }, y, Math.round(size * 1.25), 'left', xL + c.px(40), c.W, null);
@@ -1200,7 +1230,7 @@ T.outline = (c, ov) => {
       for (const [t, k] of ln) {
         ov.font = fontStr(fonts[k]); ov.lineJoin = 'round';
         ov.shadowColor = 'rgba(0,0,0,.5)'; ov.shadowBlur = c.px(14); ov.shadowOffsetY = c.px(6);
-        if (k === 'plain') { ov.lineWidth = Math.max(2, Math.round(size * 0.045)); ov.strokeStyle = c.b.light; ov.strokeText(t, x, y + size * 0.82); }
+        if (k === 'plain') { ov.lineWidth = Math.max(2, Math.round(size * c.o('strokeW', .045))); ov.strokeStyle = c.b.light; ov.strokeText(t, x, y + size * 0.82); }
         else { ov.fillStyle = c.b.accent; ov.fillText(t, x, y + size * 0.82); }
         ov.shadowColor = 'transparent'; x += ov.measureText(t).width;
       }
@@ -1343,6 +1373,7 @@ const TPL_STYLE_DEFAULT = () => ({ font: 'Be Vietnam Pro', upper: false, opacity
   stroke: { on: false, color: '#000000', width: 8 }, glow: { on: false, color: '#99DF00', alpha: .9, blur: 24 },
   shadow: { on: false, color: '#000000', alpha: .6, blur: 14, x: 0, y: 6 }, bg: { on: false, mode: 'block', color: '#000000', alpha: .6, radius: 24, pad: 30 }, pro: false });
 state.tplStyle = TPL_STYLE_DEFAULT();
+state.tplOpt = {}; try { state.tplOpt = JSON.parse(ls.get('hook.tplOpt') || '{}') || {}; } catch {}
 // bản cũ có thể đã lưu kiểu chữ nhanh lên bản mẫu: dọn một lần để mọi người về đúng mẫu màu TMXK
 try {
   if (ls.get('hook.v') !== '4') {
@@ -1490,8 +1521,39 @@ function selectTemplate(k, resetSize) {
   if (resetSize) { state.size = TEMPLATES[k].size; state.ypct = autoY(k); syncSliders(); }
   renderExtra(); scheduleRender();
 }
+/* màu đang dùng của bố cục hiện tại: màu tự chỉnh, không có thì màu TMXK */
+function tplCol(k) { const o = state.tplOpt[state.template]; return (o && o.c && o.c[k]) || state.brand[k]; }
+function setTplCol(k, v) { const o = state.tplOpt[state.template] = state.tplOpt[state.template] || {}; (o.c = o.c || {})[k] = v; saveTplOpt(); buildTplCustom(); }
+function saveTplOpt() { ls.set('hook.tplOpt', JSON.stringify(state.tplOpt)); }
+function tplCustomized(t = state.template) { const o = state.tplOpt[t]; return !!o && (Object.keys(o.c || {}).length + Object.keys(o.n || {}).length) > 0; }
 function syncSliders() { $('#ypct').value = state.ypct; $('#ypctOut').textContent = state.ypct + '%'; $('#size').value = state.size; $('#sizeOut').textContent = state.size + 'px'; $('#maxw').value = state.maxw; $('#maxwOut').textContent = state.maxw + '%'; }
+function buildTplCustom() {
+  const box = $('#tplCustom'); if (!box) return; box.innerHTML = '';
+  const t = state.template, E = TPL_EDIT[t]; if (!E) { box.hidden = true; return; } box.hidden = false;
+  const cur = state.tplOpt[t] || {};
+  const head = el('div', 'tc-head'); const hb = el('b'); hb.innerHTML = `Tuỳ chỉnh bố cục "${TEMPLATES[t].name}" <span class="lock">PRO</span>`;
+  const rs = el('button', 'chip', 'Về màu TMXK'); rs.type = 'button'; rs.hidden = !tplCustomized(t);
+  rs.onclick = () => { delete state.tplOpt[t]; saveTplOpt(); buildTplCustom(); scheduleRender(); };
+  head.append(hb, rs); box.append(head);
+  const set = (grp, k, v) => { const o = state.tplOpt[t] = state.tplOpt[t] || {}; (o[grp] = o[grp] || {})[k] = v; saveTplOpt(); rs.hidden = false; if (!state.pro && !proToasted) { proToasted = true; toast('Tuỳ chỉnh bố cục là Pro: xem thử thoải mái, xuất file cần mở Pro'); } scheduleRender(); };
+  const cols = el('div', 'tc-cols');
+  for (const [k, label] of Object.entries(E.c || {})) {
+    const l = el('label', 'tc-col'); const i = document.createElement('input'); i.type = 'color';
+    i.value = (cur.c && cur.c[k]) || (k === 'box' ? E.box || '#000000' : state.brand[k]);
+    i.addEventListener('input', () => set('c', k, i.value)); l.append(i, el('span', null, label)); cols.append(l);
+  }
+  box.append(cols);
+  for (const [k, label, mn, mx, st, d] of E.n || []) {
+    const row = el('div', 'slider'); const i = document.createElement('input'); i.type = 'range'; i.min = mn; i.max = mx; i.step = st;
+    const v = cur.n && cur.n[k] != null ? cur.n[k] : d; i.value = v; const out = el('output', null, fmtN(v, k));
+    i.addEventListener('input', () => { out.textContent = fmtN(+i.value, k); set('n', k, +i.value); });
+    row.append(el('span', null, label), i, out); box.append(row);
+  }
+  box.querySelectorAll('.lock').forEach(e => e.hidden = state.pro);
+}
+function fmtN(v, k) { return /A$/.test(k) ? Math.round(v * 100) + '%' : /Tilt|tilt/.test(k) ? v + '°' : k === 'markH' ? '×' + v : k === 'strokeW' ? Math.round(v * 1000) / 10 + '%' : v + 'px'; }
 function renderExtra() {
+  buildTplCustom();
   const box = $('#tplExtra'); box.innerHTML = '';
   const add = (label, id, val, ph) => { const l = document.createElement('label'); l.className = 'lbl'; l.textContent = label; l.htmlFor = id; const i = document.createElement('input'); i.type = 'text'; i.id = id; i.value = val; i.placeholder = ph || ''; box.append(l, i); return i; };
   if (['glass', 'titlecard', 'lowerthird'].includes(state.template)) add('Dòng chủ đề (kicker)', 'xKicker', state.kicker, 'Tự Mình Xây Kênh').addEventListener('input', e => { state.kicker = e.target.value; scheduleRender(); });
@@ -1685,6 +1747,7 @@ function proUsed() {
   const why = [];
   if (PRO_TPL.has(state.template)) why.push(`bố cục "${TEMPLATES[state.template].name}"`);
   if (tplActive() && state.tplStyle && (state.tplStyle.pro || !FREE_FONTS.has(state.tplStyle.font))) why.push('tuỳ biến câu hook');
+  if (tplActive() && tplCustomized()) why.push('tuỳ chỉnh bố cục');
   if (state.layers.some(L => !L.hidden && (L.pro || !FREE_FONTS.has(L.font) || L.runs.some(r => r.c || r.b || r.i || (r.s && r.s !== 1))))) why.push('tuỳ biến lớp chữ');
   if (tplActive() && /(^|[^*])_[^_]+_/.test($('#text').value)) why.push('chữ nghiêng');
   return why;
@@ -1702,6 +1765,7 @@ function drawProMark(g, W, H) {
   g.restore();
 }
 function dropPro() {
+  if (tplCustomized()) { delete state.tplOpt[state.template]; saveTplOpt(); buildTplCustom(); }
   if (PRO_TPL.has(state.template)) selectTemplate('highlight', true);
   if (state.tplStyle.pro || !FREE_FONTS.has(state.tplStyle.font)) {
     state.tplStyle = { ...TPL_STYLE_DEFAULT(), dx: state.tplStyle.dx };
@@ -2129,7 +2193,7 @@ function selectAllIn(e) { const r = document.createRange(); r.selectNodeContents
 function renderEditor() {
   const L = selLayer(), e = ed(); if (!L) { e.innerHTML = ''; return; }
   const runs = L.tpl ? tplRuns() : L.runs;
-  const base = L.tpl ? state.brand.light : L.color, key = L.tpl ? state.brand.accent : L.keyColor;
+  const base = L.tpl ? tplCol('light') : L.color, key = L.tpl ? tplCol('accent') : L.keyColor;
   e.style.fontFamily = `"${tgt(L).font}", system-ui, sans-serif`;
   e.style.fontWeight = L.tpl ? 700 : L.weight; e.style.fontStyle = !L.tpl && L.italic ? 'italic' : 'normal';
   e.style.textTransform = tgt(L).upper ? 'uppercase' : 'none';
@@ -2214,7 +2278,7 @@ const PALETTE = ['#99DF00', '#FFFFFF', '#C9C9C9', '#8A8A8A', '#3D3D3D', '#000000
 const onOff = key => ({ none: true, get: L => tgt(L)[key].on ? tgt(L)[key].color : null, set: (L, c) => { const o = tgt(L)[key]; if (c == null) o.on = false; else { o.on = true; o.color = c; if (key === 'stroke' && !o.width) o.width = 8; } } });
 const ROWS = {
   rowText:   { get: L => L.tpl ? state.brand.light : L.color, set: (L, c) => { if (L.tpl) { state.brand.light = c; state.brand.cream = c; applyBrandInputs(); } else fmt('c', c); }, self: L => !L.tpl },
-  rowKey:    { get: L => L.tpl ? state.brand.accent : L.keyColor, set: (L, c) => { if (L.tpl) { state.brand.accent = c; applyBrandInputs(); } else L.keyColor = c; } },
+  rowKey:    { get: L => L.tpl ? tplCol('accent') : L.keyColor, set: (L, c) => { if (L.tpl) setTplCol('accent', c); else L.keyColor = c; } },
   rowBox:    { get: () => state.brand.dark, set: (L, c) => { state.brand.dark = c; applyBrandInputs(); } },
   rowStroke: onOff('stroke'), rowGlow: onOff('glow'), rowBg: onOff('bg'), rowShadow: onOff('shadow'),
 };
@@ -2242,7 +2306,7 @@ function markRows() {
     const rb = box.querySelector('.rainbow'); rb.classList.toggle('on', !hit && cur != null); if (cur) { rb.querySelector('input').value = cur; rb.style.setProperty('--cur', cur); }
   }
   document.querySelectorAll('#styleSub button').forEach(b => { const g = { stroke: 'rowStroke', glow: 'rowGlow', bg: 'rowBg', shadow: 'rowShadow' }[b.dataset.s]; b.classList.toggle('lit', !!g && ROWS[g].get(L) != null); });
-  $('#fmtKeyDot').style.background = L.tpl ? state.brand.accent : L.keyColor;
+  $('#fmtKeyDot').style.background = L.tpl ? tplCol('accent') : L.keyColor;
 }
 const WNAME = { 400: 'Thường', 500: 'Vừa', 600: 'Hơi đậm', 700: 'Đậm', 800: 'Rất đậm', 900: 'Đen' };
 function buildFontUI(L) {
@@ -2374,8 +2438,8 @@ function buildEditorUI() {
 /* gọi sau mỗi lần render: đồng bộ bảng lớp khi mẫu hoặc câu hook đổi từ chỗ khác */
 let lastTplKey = null, lastAccent = null;
 function afterRenderEditor() {
-  const accentChanged = state.brand.accent !== lastAccent, tplChanged = state.template !== lastTplKey;
-  lastAccent = state.brand.accent; lastTplKey = state.template;
+  const accentChanged = tplCol('accent') !== lastAccent, tplChanged = state.template !== lastTplKey;
+  lastAccent = tplCol('accent'); lastTplKey = state.template;
   if (tplChanged && !state.sel) state.sel = 'TPL';
   if (tplChanged) { syncLayerPanel(); return; }
   if (accentChanged) { markRows(); if (document.activeElement !== ed()) renderEditor(); }
@@ -2626,6 +2690,7 @@ function bindAcctUI() {
   });
   $('#upMain').addEventListener('click', () => { $('#upsell').classList.remove('show'); openAcct(state.acct ? 'upgrade' : 'signup'); });
   $('#upBuy').addEventListener('click', wantBuy);
+  $('#btnPresetEdit').addEventListener('click', () => { const b = document.querySelector('#edTabs [data-t="look"]'); if (b) b.click(); });
   // Đăng ký học viên: mở form ngay trong Viral Studio, không rời trang edit
   document.querySelectorAll('a[href$="#dangky"]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); openHvForm(); }));
   $('#hvSheetClose').addEventListener('click', closeHvForm);
