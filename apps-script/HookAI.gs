@@ -67,10 +67,37 @@ function hookAi(b){
 /* ── Gemini: bậc miễn phí, dữ liệu có thể được Google dùng để cải thiện sản phẩm ──
    Tự thử lần lượt: schema JSON đầy đủ → schema rút gọn (responseSchema) → không schema.
    Model không có thì thử model kế tiếp. Lỗi cuối cùng được trả về nguyên văn để soi. */
-var GEMINI_MODELS_DU_PHONG = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.5-flash-lite', 'gemini-flash-latest'];
+var GEMINI_MODELS_DU_PHONG = ['gemini-3.5-flash', 'gemini-2.5-flash', 'gemini-flash-latest', 'gemini-3.5-flash-lite', 'gemini-2.5-flash-lite', 'gemini-2.0-flash'];
+
+/* Hỏi Google xem key này gọi được những model flash nào, xếp mới nhất lên đầu. Nhớ 6 giờ. */
+function geminiModels(key){
+  var cache = CacheService.getScriptCache(), k = 'gm_list_v2';
+  try{ var c = cache.get(k); if (c) return JSON.parse(c); }catch(e){}
+  var ds = [];
+  try{
+    var r = UrlFetchApp.fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=1000', {
+      muteHttpExceptions:true, headers:{ 'x-goog-api-key': key } });
+    if (r.getResponseCode() === 200){
+      (JSON.parse(r.getContentText()).models || []).forEach(function(m){
+        var ten = String(m.name || '').replace(/^models\//, '');
+        var goi = m.supportedGenerationMethods || [];
+        if (ten.indexOf('gemini') !== 0 || ten.indexOf('flash') < 0 || goi.indexOf('generateContent') < 0) return;
+        if (/tts|image|live|audio|embed|robotics|computer|thinking|exp/.test(ten)) return;
+        ds.push(ten);
+      });
+    }
+  }catch(e){}
+  function diem(t){
+    var so = parseFloat((t.match(/gemini-(\d+(?:\.\d+)?)/) || [0, 0])[1]) || (t.indexOf('latest') >= 0 ? 2.6 : 0);
+    return so * 10 - (t.indexOf('lite') >= 0 ? 3 : 0) - (t.indexOf('preview') >= 0 ? 1 : 0) - (/\d{3}$/.test(t) ? 0.5 : 0);
+  }
+  ds.sort(function(x, y){ return diem(y) - diem(x) });
+  if (!ds.length) ds = GEMINI_MODELS_DU_PHONG.slice();
+  try{ cache.put(k, JSON.stringify(ds), 21600); }catch(e){}
+  return ds;
+}
 
 function schemaRutGon(sc){
-  // responseSchema của Gemini là tập con OpenAPI: bỏ additionalProperties, giữ type/properties/required/items/enum
   if (Array.isArray(sc)) return sc.map(schemaRutGon);
   if (!sc || typeof sc !== 'object') return sc;
   var o = {};
@@ -82,8 +109,10 @@ function schemaRutGon(sc){
 }
 
 function goiGemini(key, img, prompt){
-  var cauHinh = cfgProp('HOOK_AI_MODEL');
-  var models = cauHinh ? [cauHinh].concat(GEMINI_MODELS_DU_PHONG.filter(function(m){ return m !== cauHinh })) : GEMINI_MODELS_DU_PHONG;
+  var cauHinh = hookCfg('HOOK_AI_MODEL');
+  var coSan = geminiModels(key);
+  var models = cauHinh ? [cauHinh].concat(coSan.filter(function(m){ return m !== cauHinh })) : coSan;
+  models = models.slice(0, 5);                         // tối đa 5 model để không quá thời gian của Apps Script
   var parts = [];
   if (img) parts.push({inline_data:{mime_type:'image/jpeg', data:img}});
   parts.push({text: prompt});
@@ -92,10 +121,12 @@ function goiGemini(key, img, prompt){
     {ten:'schema',     gc:{responseMimeType:'application/json', responseSchema: schemaRutGon(HOOK_SCHEMA), maxOutputTokens: 6000, temperature: 0.7}},
     {ten:'tudo',       gc:{responseMimeType:'application/json', maxOutputTokens: 6000, temperature: 0.7}}
   ];
-  var loiCuoi = '', modelCuoi = models[0];
+  var loiCuoi = '', modelCuoi = models[0], quaTai = false, batDau = Date.now();
   for (var mi = 0; mi < models.length; mi++){
     var model = models[mi]; modelCuoi = model;
+    var daChoLai = false;
     for (var ki = 0; ki < kieu.length; ki++){
+      if (Date.now() - batDau > 240000) return {ok:false, error: quaTai ? 'ban_qua' : 'loi_ai', loi:'het gio · ' + loiCuoi, model:model};
       var req = { contents:[{role:'user', parts:parts}], generationConfig: kieu[ki].gc };
       var res, ma, raw;
       try{
@@ -119,13 +150,17 @@ function goiGemini(key, img, prompt){
         return {ok:true, data:data, vin:vin, vout:vout, model:model+'/'+kieu[ki].ten};
       }
       loiCuoi = model+'/'+kieu[ki].ten+' http '+ma+': '+String(raw).slice(0,400);
-      if (ma === 429 || ma === 503) return {ok:false, error:'ban_qua', loi:loiCuoi, model:model};
-      if (ma === 401 || ma === 403 || /API_KEY_INVALID|API key not valid/.test(raw)) return {ok:false, error:'sai_key', loi:loiCuoi, model:model};   // key sai: thử tiếp vô ích
-      if (ma === 404) break;                                                                       // model không có: sang model khác
-      // 400: định dạng không hợp → thử kiểu kế tiếp
+      if (ma === 401 || ma === 403 || /API_KEY_INVALID|API key not valid/.test(raw)) return {ok:false, error:'sai_key', loi:loiCuoi, model:model};
+      if (ma === 429 || ma === 503 || ma === 500){
+        quaTai = true;
+        if (!daChoLai){ daChoLai = true; Utilities.sleep(2000); ki--; continue; }   // chờ 2 giây, thử lại đúng kiểu này một lần
+        break;                                                                          // vẫn bận: sang model khác
+      }
+      if (ma === 404) break;                                                            // model không có: sang model khác
+      // 400 khác: định dạng không hợp → thử kiểu kế tiếp
     }
   }
-  return {ok:false, error:'loi_ai', loi:loiCuoi, model:modelCuoi};
+  return {ok:false, error: quaTai ? 'ban_qua' : 'loi_ai', loi:loiCuoi, model:modelCuoi};
 }
 
 /* ── Claude: trả tiền theo lượt, chất lượng tiếng Việt tốt hơn ── */
@@ -246,6 +281,7 @@ var HOOK_SCHEMA = {
 
 /* Chạy thử trong trình soạn Apps Script: chọn thuHookAI → Run → xem Execution log. Không trừ lượt. */
 function thuHookAI(){
+  Logger.log('Model key này dùng được: ' + geminiModels(hookCfg('GEMINI_API_KEY')).join(', '));
   var kq = goiGemini(
     hookCfg('GEMINI_API_KEY'), '',
     hookPrompt('3 giây đầu quyết định 90% lượt xem của bạn', {platform:'all', facePos:'mid'}, false)
