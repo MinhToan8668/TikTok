@@ -499,7 +499,7 @@
             <button class="st-ic" id="btnRedo" title="Làm lại (Ctrl+Shift+Z)" aria-label="Làm lại">↷</button>
           </div>
         </div>
-        <p class="st-hint">Chạm chữ trên khung để chọn và kéo. Chấm xanh: phóng to, chấm trắng: xoay.</p>
+        <p class="st-hint">Chạm chữ trên khung để chọn và kéo. Chấm xanh: phóng to, chấm trắng: xoay, hai thanh ở cạnh: kéo bề ngang khung chữ.</p>
         <div class="st-layers">
           <div id="layerList" style="display:contents"></div>
           <button class="addchip main" id="btnAddText" type="button">+ Thêm chữ</button>
@@ -618,8 +618,8 @@
             <div class="slider" data-free><span>Dọc</span><input type="range" data-p="y" data-scale="100" data-unit="%" min="0" max="100"><output></output></div>
             <div class="slider" data-tplonly><span>Dọc</span><input type="range" id="ypct" min="3" max="80" value="13"><output id="ypctOut">13%</output></div>
             <div class="slider"><span>Xoay</span><input type="range" data-p="rotate" data-unit="°" min="-180" max="180"><output></output></div>
-            <div class="slider" data-free><span>Bề rộng</span><input type="range" data-p="maxw" data-unit="%" min="20" max="100"><output></output></div>
-            <div class="slider" data-tplonly><span>Bề rộng</span><input type="range" id="maxw" min="60" max="96" value="80"><output id="maxwOut">80%</output></div>
+            <div class="slider" data-free><span>Bề rộng</span><input type="range" data-p="maxw" data-unit="%" min="8" max="100"><output></output></div>
+            <div class="slider" data-tplonly><span>Bề rộng</span><input type="range" id="maxw" min="25" max="100" value="80"><output id="maxwOut">80%</output></div>
             <div class="st-actions">
               <button class="chip" type="button" id="btnCenterX">Căn giữa khung</button>
               <button class="chip" type="button" id="btnUp" data-free>Đưa lên trên</button>
@@ -1019,12 +1019,14 @@ T.editorial = (c, ov) => {
   c.notes.push(`Be Vietnam Pro Regular ${size}px trắng; dòng nhấn Black ${fonts.key.size}px; cụm nghiêng Playfair Display Italic 800 ${fonts.italic.size}px màu ${c.b.accent}; bóng mềm; phủ tối 50% phần trên.`);
 };
 T.glass = (c, ov) => {
-  const s0 = c.px(c.s.size); const pw = Math.round(c.W * c.s.maxw / 100); const pxx = Math.round((c.W - pw) / 2); const py = c.y0;
+  const s0 = c.px(c.s.size); let pw = Math.round(c.W * c.s.maxw / 100); let pxx = Math.round((c.W - pw) / 2); const py = c.y0;
   const mk = z => ({ plain: F(300, z), key: F(700, z), italic: F(700, Math.round(z * 1.15), true) });
   const size = fitSize(ov, c.blocks, mk, pw - c.px(130), s0); const fonts = mk(size); const lh = Math.round(size * 1.4);
   const colors = { plain: c.b.light, key: c.b.light, italic: c.b.accent };
   let lines = []; for (const para of c.blocks) for (const p of para.split('\n')) lines = lines.concat(wrap(ov, parse(p), fonts, pw - c.px(130)));
   const kicker = (c.s.kicker || '').trim();
+  const needW = Math.max(...lines.map(l => lineWidth(ov, l, fonts)), kicker ? tlen(ov, kicker.toUpperCase().split('').join(' '), F(600, c.px(26))) : 0) + c.px(130);
+  if (needW < pw) { pw = Math.round(needW); pxx = Math.round((c.W - pw) / 2); }
   const ph = c.px(48) + (kicker ? c.px(56) : 0) + lines.length * lh + c.px(30); const r = c.px(28);
   if (c.frame) { // blur behind, only on preview
     const fr = c.frame.getContext('2d'); fr.save(); rrect(fr, pxx, py, pw, ph, r); fr.clip(); fr.filter = `blur(${c.px(14)}px)`; fr.drawImage(c.frame, 0, 0); fr.filter = 'none'; fr.restore();
@@ -1132,7 +1134,8 @@ T.knockout = (c, ov) => {
   const size = fitSize(ov, c.blocks, mk, c.maxw, s0); const fonts = mk(size); const lh = Math.round(size * 1.05);
   let lines = []; for (const para of c.blocks) for (const p of para.split('\n')) lines = lines.concat(wrap(ov, parse(p), fonts, c.maxw));
   const bandH = lines.length * lh + c.px(70); const y0 = c.y0;
-  ov.fillStyle = hexA(c.b.dark, .88); ov.fillRect(0, y0, c.W, bandH);
+  const bandW = Math.min(c.W, Math.max(...lines.map(l => lineWidth(ov, l, fonts))) + c.px(110)); const bx = Math.round((c.W - bandW) / 2);
+  ov.fillStyle = hexA(c.b.dark, .88); ov.fillRect(bx, y0, bandW, bandH);
   let y = y0 + c.px(35);
   for (const ln of lines) {
     const w = lineWidth(ov, ln, fonts); let x = (c.W - w) / 2;
@@ -1144,8 +1147,8 @@ T.knockout = (c, ov) => {
     }
     y += lh;
   }
-  ov.fillStyle = c.b.accent; ov.fillRect(0, y0, c.W, c.px(6)); ov.fillRect(0, y0 + bandH - c.px(6), c.W, c.px(6));
-  c.notes.push(`Dải ${c.b.dark} 88% cao ${bandH}px, viền trên dưới ${c.b.accent}. Chữ Be Vietnam Pro Black ${size}px được khoét rỗng để lộ video (CapCut: Text → Blend mode Screen trên nền đen, hoặc dùng PNG này). Từ khóa tô đặc màu nhấn.`);
+  ov.fillStyle = c.b.accent; ov.fillRect(bx, y0, bandW, c.px(6)); ov.fillRect(bx, y0 + bandH - c.px(6), bandW, c.px(6));
+  c.notes.push(`Dải ${c.b.dark} 88% rộng ${bandW}px cao ${bandH}px, viền trên dưới ${c.b.accent}. Chữ Be Vietnam Pro Black ${size}px được khoét rỗng để lộ video (CapCut: Text → Blend mode Screen trên nền đen, hoặc dùng PNG này). Từ khóa tô đặc màu nhấn.`);
 };
 T.lowerthird = (c, ov) => {
   const size = c.px(c.s.size); const xL = Math.round(c.W * 0.07); const y0 = c.y0;
@@ -1945,6 +1948,8 @@ function drawSelection() {
   const b = L._box; g.save(); g.translate(b.cx, b.cy); g.rotate(b.rot);
   g.strokeStyle = '#FFFFFF'; g.lineWidth = 1.2 * k; g.setLineDash([5 * k, 4 * k]); g.strokeRect(-b.w / 2, -b.h / 2, b.w, b.h); g.setLineDash([]);
   const dot = (x, y, fill) => { g.beginPath(); g.arc(x, y, 8 * k, 0, Math.PI * 2); g.fillStyle = fill; g.fill(); g.lineWidth = 1.6 * k; g.strokeStyle = '#26210F'; g.stroke(); };
+  const side = x => { g.fillStyle = '#FFFFFF'; g.strokeStyle = '#26210F'; g.lineWidth = 1.6 * k; rrect(g, x - 5 * k, -13 * k, 10 * k, 26 * k, 5 * k); g.fill(); g.stroke(); };
+  side(-b.w / 2); side(b.w / 2);   // kéo hai cạnh để đổi bề ngang khung chữ
   dot(b.w / 2, b.h / 2, '#99DF00');
   g.strokeStyle = '#FFFFFF'; g.lineWidth = 1.2 * k; g.beginPath(); g.moveTo(0, -b.h / 2); g.lineTo(0, -b.h / 2 - 18 * k); g.stroke(); dot(0, -b.h / 2 - 26 * k, '#FFFFFF');
   g.restore();
@@ -1955,7 +1960,8 @@ function hitLayer(px, py) {
   const L = selLayer(), k = uiK();
   if (L && L._box && !L.hidden) { const p = toLocal(L, px, py), b = L._box;
     if (Math.hypot(p.x - b.w / 2, p.y - b.h / 2) < 16 * k) return { L, mode: 'scale' };
-    if (Math.hypot(p.x, p.y + b.h / 2 + 26 * k) < 16 * k) return { L, mode: 'rotate' }; }
+    if (Math.hypot(p.x, p.y + b.h / 2 + 26 * k) < 16 * k) return { L, mode: 'rotate' };
+    if (Math.abs(Math.abs(p.x) - b.w / 2) < 14 * k && Math.abs(p.y) < Math.max(18 * k, b.h / 2 - 16 * k)) return { L, mode: 'width' }; }
   for (let i = state.layers.length - 1; i >= 0; i--) { const M = state.layers[i]; if (M._box && !M.hidden && inBox(M, px, py)) return { L: M, mode: 'move' }; }
   if (tplActive() && TPL._box && inBox(TPL, px, py)) return { L: TPL, mode: 'move' };
   return null;
@@ -1969,12 +1975,12 @@ function onDown(e) {
   e.preventDefault(); $('#preview').setPointerCapture(e.pointerId);
   selectLayer(hit.L.id);
   const L = hit.L, b = L._box;
-  drag = { mode: hit.mode, L, sx: p.x, sy: p.y, ox: L.tpl ? state.tplStyle.dx : L.x, oy: L.tpl ? state.ypct : L.y, size: L.tpl ? state.size : L.size, dist: Math.hypot(p.x - b.cx, p.y - b.cy), W: lastRender.fr.width, H: lastRender.fr.height, moved: false };
+  drag = { mode: hit.mode, L, sx: p.x, sy: p.y, ox: L.tpl ? state.tplStyle.dx : L.x, oy: L.tpl ? state.ypct : L.y, size: L.tpl ? state.size : L.size, dist: Math.hypot(p.x - b.cx, p.y - b.cy), cx: b.cx, W: lastRender.fr.width, H: lastRender.fr.height, moved: false };
   drawSelection();
 }
 function onMove(e) {
   const pv = $('#preview');
-  if (!drag) { if (!lastRender) return; const p = canvasPoint(e); const h = hitLayer(p.x, p.y); pv.style.cursor = !h ? 'default' : h.mode === 'scale' ? 'nwse-resize' : h.mode === 'rotate' ? 'grab' : 'move'; return; }
+  if (!drag) { if (!lastRender) return; const p = canvasPoint(e); const h = hitLayer(p.x, p.y); pv.style.cursor = !h ? 'default' : h.mode === 'scale' ? 'nwse-resize' : h.mode === 'width' ? 'ew-resize' : h.mode === 'rotate' ? 'grab' : 'move'; return; }
   const p = canvasPoint(e), L = drag.L; drag.moved = true;
   if (L.tpl) {
     const S = state.tplStyle;
@@ -1982,6 +1988,7 @@ function onMove(e) {
       state.ypct = Math.round(Math.min(80, Math.max(3, drag.oy + (p.y - drag.sy) / drag.H * 100)));
       let nx = drag.ox + (p.x - drag.sx) / drag.W; guides.v = Math.abs(nx) < .012; if (guides.v) nx = 0; S.dx = Math.round(Math.min(.4, Math.max(-.4, nx)) * 1000) / 1000;
     } else if (drag.mode === 'scale') state.size = Math.round(Math.min(110, Math.max(30, drag.size * Math.hypot(p.x - L._box.cx, p.y - L._box.cy) / Math.max(1, drag.dist))));
+    else if (drag.mode === 'width') state.maxw = Math.round(Math.min(100, Math.max(25, Math.abs(p.x - drag.cx) * 2 / drag.W * 100 - 4)));
     else { let a = Math.atan2(p.y - L._box.cy, p.x - L._box.cx) * 180 / Math.PI + 90; if (a > 180) a -= 360; for (const snap of [0, 90, -90, 180, -180]) if (Math.abs(a - snap) < 4) a = snap; S.rotate = Math.round(a); }
     syncSliders(); syncProps(true); renderLive(); return;
   }
@@ -1995,6 +2002,9 @@ function onMove(e) {
   } else if (drag.mode === 'rotate') {
     let a = Math.atan2(p.y - L._box.cy, p.x - L._box.cx) * 180 / Math.PI + 90; if (a > 180) a -= 360;
     for (const snap of [0, 90, -90, 180, -180]) if (Math.abs(a - snap) < 4) a = snap; L.rotate = Math.round(a);
+  } else if (drag.mode === 'width') {
+    const q = toLocal(L, p.x, p.y), kk = drag.W / BASE_W, extra = ((L.bg.on ? L.bg.pad * 2 : 0) + 16) * kk;
+    L.maxw = Math.round(Math.min(100, Math.max(8, (Math.abs(q.x) * 2 - extra) / drag.W * 100)));
   }
   fastCompose(); syncProps(true);
 }
