@@ -3,7 +3,8 @@
  *
  * Luồng:
  *   trang tool  ──POST {action:'hook_ai', token, text, image, ...}──▶  Apps Script (file này)
- *     1. aiDay(token)            → phải là học viên hoặc mentor đang đăng nhập (Lich.gs)
+ *     1. hookNguoi(b)            → học viên / mentor / vai pro (Lich.gs), người dùng Viral Studio (Studio.gs),
+ *                                  hoặc khách chưa có tài khoản: 3 lượt thử theo mã thiết bị (b.thu)
  *     2. trừ lượt trong ngày     → HOOK_AI_DAILY lượt / người / ngày (mentor không giới hạn)
  *     3. gọi Claude              → key nằm trong Script Properties, trình duyệt không bao giờ thấy
  *     4. ghi log vào tab HookAI  → biết ai dùng, dùng bao nhiêu, tốn bao nhiêu token
@@ -29,6 +30,8 @@ var GEMINI_KEY_MAC_DINH = '';
 var HOOK_AI_PROVIDER_MAC_DINH = 'gemini';
 var HOOK_AI_MODEL_MAC_DINH = '';          // để trống: tự dò model key này dùng được
 var HOOK_AI_DAILY_MAC_DINH = '20';
+var HOOK_THU_HAN   = 3;           // người lạ chưa có tài khoản: thử 3 lượt AI trọn đời theo thiết bị
+var HOOK_THU_SHEET = 'HookThu';   // tab ghi lượt thử: thiết bị · số lượt · lần đầu · lần cuối
 
 function hookCfg(name){
   var v = cfgProp(name);
@@ -48,29 +51,33 @@ var HOOK_HEADERS   = ['thoi_gian','ma','ten','vaitro','hook','ok','loi','input_t
 var HOOK_TEMPLATES = ['highlight','editorial','glass','sticker','bubbles','timeline','chips',
                       'titlecard','list','knockout','lowerthird','quote','pov','outline'];
 
-/* Ai đang gọi: học viên (Lich.gs) hoặc người dùng Viral Studio (Studio.gs).
-   loai: 'hv' học viên · 'pro' người dùng đã mua Pro · 'free' người dùng đang dùng thử */
-function hookNguoi(token){
-  var hv = aiDay(token);
+/* Ai đang gọi: học viên hoặc tài khoản vai pro (Lich.gs), người dùng Viral Studio (Studio.gs), hoặc khách.
+   loai: 'hv' học viên/mentor/vai pro · 'pro' người dùng đã mua Pro · 'free' người dùng đang dùng 5 lượt thử
+         · 'khach' chưa có tài khoản, 3 lượt AI thử theo thiết bị */
+function hookNguoi(b){
+  var hv = aiDay(b.token);
   if (hv) return {me:hv, loai:'hv'};
   if (typeof ndTuToken === 'function'){
-    var nd = ndTuToken(token);
+    var nd = ndTuToken(b.token);
     if (nd) return {me:{ma:'U'+nd.ma, ten:nd.ten, ten_goi:nd.ten, vaitro:'nd'}, loai: ndLaPro(nd) ? 'pro' : 'free', nd:nd};
   }
+  if (!b.token){ var k = hookKhach(b); if (k) return {me:k, loai:'khach'}; }   // khách chưa có tài khoản: 3 lượt thử theo thiết bị
   return null;
 }
 /* Trừ lượt: người dùng thử trừ vào 5 lượt thử, còn lại trừ hạn mức theo ngày */
 function hookTru(ai, han){
+  if (ai.loai === 'khach') return hookThuTru(ai.me.ma);
   if (ai.loai === 'free') return stTruLuotThu(ai.nd.ma);
   return hookTruLuot(ai.me.ma, han, ai.me.vaitro === 'mentor');
 }
 function hookHoan(ai){
+  if (ai.loai === 'khach') return hookThuHoan(ai.me.ma);
   if (ai.loai === 'free') return stHoanLuotThu(ai.nd.ma);
   return hookHoanLuot(ai.me.ma, ai.me.vaitro === 'mentor');
 }
 
 function hookAi(b){
-  var ai = hookNguoi(b.token);
+  var ai = hookNguoi(b);
   if (!ai) return jsonOut({ok:false, error:'het_phien'});
   var me = ai.me;
 
@@ -78,7 +85,10 @@ function hookAi(b){
   var key = provider === 'claude' ? cfgProp('ANTHROPIC_API_KEY') : hookCfg('GEMINI_API_KEY');
   if (!key) return jsonOut({ok:false, error:'chua_cai_key'});
 
-  if (b.mode === 'layer') return hookLayer(b, ai, provider, key);
+  if (b.mode === 'layer'){
+    if (ai.loai === 'khach') return jsonOut({ok:false, error:'can_pro'});   // chỉnh từng lớp cần tài khoản
+    return hookLayer(b, ai, provider, key);
+  }
 
   var text = String(b.text || '').slice(0, 1500).trim();
   if (!text) return jsonOut({ok:false, error:'thieu_text'});
@@ -86,10 +96,10 @@ function hookAi(b){
   if (img.length > 1500000) return jsonOut({ok:false, error:'anh_qua_lon'});
 
   // ── lượt trong ngày ──
-  var han = ai.loai === 'free' ? ST_LUOT_THU : (parseInt(hookCfg('HOOK_AI_DAILY') || '20', 10) || 20);
+  var han = ai.loai === 'khach' ? HOOK_THU_HAN : ai.loai === 'free' ? ST_LUOT_THU : (parseInt(hookCfg('HOOK_AI_DAILY') || '20', 10) || 20);
   var khongGioiHan = me.vaitro === 'mentor';
   var con = hookTru(ai, han);
-  if (con < 0) return jsonOut({ok:false, error: ai.loai === 'free' ? 'het_luot_thu' : 'het_luot', han:han});
+  if (con < 0) return jsonOut({ok:false, error: ai.loai === 'khach' ? 'het_thu' : ai.loai === 'free' ? 'het_luot_thu' : 'het_luot', han:han});
 
   // ── gọi AI ──
   var prompt = hookPrompt(text, b, !!img);
@@ -102,7 +112,51 @@ function hookAi(b){
   var data = kq.data;
 
   hookLog(me, text, true, '', kq.vin || 0, kq.vout || 0, kq.model);
-  return jsonOut({ok:true, data:data, con: khongGioiHan ? null : con, han:han, loai:ai.loai, ten: me.ten_goi || me.ten});
+  return jsonOut({ok:true, data:data, con: khongGioiHan ? null : con, han:han, loai:ai.loai, ten: me.ten_goi || me.ten, thu: ai.loai === 'khach' || undefined});
+}
+
+/* ── khách thử: nhận diện bằng mã thiết bị trang tool tự sinh (b.thu) ──
+   Không có tài khoản nên chỉ có mã này để đếm. Xoá dữ liệu trình duyệt là
+   có mã mới — chấp nhận, vì 3 lượt AI chỉ là mồi để người ta thấy Pro làm gì. */
+function hookKhach(b){
+  var dev = String(b.thu || '').replace(/[^A-Za-z0-9_-]/g,'').slice(0, 64);
+  if (dev.length < 8) return null;
+  return {ma:'thu:' + dev, ten:'Khách thử', ten_goi:'Khách thử', vaitro:'thu'};
+}
+function hookThuSheet(){
+  var sh = ss().getSheetByName(HOOK_THU_SHEET);
+  if (!sh){ sh = ss().insertSheet(HOOK_THU_SHEET); sh.appendRow(['thiet_bi','so_luot','lan_dau','lan_cuoi']); sh.setFrozenRows(1); }
+  return sh;
+}
+function hookThuTim(sh, ma){
+  var last = sh.getLastRow();
+  if (last < 2) return null;
+  var vals = sh.getRange(2, 1, last - 1, 2).getValues();
+  for (var i = 0; i < vals.length; i++)
+    if (String(vals[i][0]) === ma) return {row: i + 2, dem: Number(vals[i][1]) || 0};
+  return null;
+}
+function hookThuDem(ma){
+  var r = hookThuTim(hookThuSheet(), ma);
+  return r ? r.dem : 0;
+}
+/** Trừ một lượt thử; trả về số lượt còn lại, -1 nếu đã hết. */
+function hookThuTru(ma){
+  var lock = LockService.getScriptLock(); lock.waitLock(10000);
+  try{
+    var sh = hookThuSheet(), r = hookThuTim(sh, ma), luc = nowVN();
+    if (!r){ sh.appendRow([ma, 1, luc, luc]); return HOOK_THU_HAN - 1; }
+    if (r.dem >= HOOK_THU_HAN) return -1;
+    sh.getRange(r.row, 2, 1, 3).setValues([[r.dem + 1, sh.getRange(r.row, 3).getValue(), luc]]);
+    return HOOK_THU_HAN - r.dem - 1;
+  } finally { lock.releaseLock(); }
+}
+function hookThuHoan(ma){
+  var lock = LockService.getScriptLock(); lock.waitLock(10000);
+  try{
+    var sh = hookThuSheet(), r = hookThuTim(sh, ma);
+    if (r && r.dem > 0) sh.getRange(r.row, 2).setValue(r.dem - 1);
+  } finally { lock.releaseLock(); }
 }
 
 /* ── Gemini: bậc miễn phí, dữ liệu có thể được Google dùng để cải thiện sản phẩm ──
@@ -295,9 +349,10 @@ function hookLayer(b, ai, provider, key){
 
 /* Xem còn bao nhiêu lượt mà không trừ — trang tool gọi lúc mở để hiện "còn N lượt" */
 function hookTrangThai(b){
-  var ai = hookNguoi(b.token);
+  var ai = hookNguoi(b);
   if (!ai) return jsonOut({ok:false, error:'het_phien'});
   var me = ai.me;
+  if (ai.loai === 'khach') return jsonOut({ok:true, thu:true, ten:'', con: Math.max(0, HOOK_THU_HAN - hookThuDem(me.ma)), han: HOOK_THU_HAN, loai:'khach'});
   if (ai.loai === 'free') return jsonOut({ok:true, ten: me.ten, con: ndLuotCon(ai.nd), han: ST_LUOT_THU, loai:'free'});
   var han = parseInt(hookCfg('HOOK_AI_DAILY') || '20', 10) || 20;
   if (me.vaitro === 'mentor') return jsonOut({ok:true, ten: me.ten_goi || me.ten, con:null, han:han, loai:ai.loai});

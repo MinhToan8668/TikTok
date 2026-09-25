@@ -6,7 +6,8 @@
  *   • Người dùng tự đăng ký (email + SĐT + mật khẩu): có ngay 5 lượt dùng thử Pro.
  *     Hết lượt thì mua Pro bằng chuyển khoản.
  *   • Người dùng đã mua Pro: dùng Pro tới ngày hết hạn, AI 20 lượt mỗi ngày.
- *   • Học viên Tự Mình Xây Kênh (bảng HocVien trong Lich.gs): Pro không giới hạn.
+ *   • Học viên Tự Mình Xây Kênh và tài khoản vai 'pro' (bảng HocVien trong Lich.gs): Pro không giới hạn.
+ *   • Khách chưa có tài khoản: 3 lượt AI thử theo thiết bị (HookAI.gs, tab HookThu).
  *
  *  Mở Pro sau khi chuyển khoản, hai cách chạy song song:
  *   • Tự động: nối webhook SePay hoặc Casso vào  <URL web app>?pay=<ST_WEBHOOK_KEY>
@@ -26,8 +27,8 @@ var ST_STK_MD          = '';   // số tài khoản nhận tiền
 var ST_CHU_TK_MD       = '';   // tên chủ tài khoản, IN HOA KHÔNG DẤU
 var ST_WEBHOOK_KEY_MD  = '';   // chuỗi bí mật tự đặt (20 ký tự trở lên) cho webhook SePay/Casso
 var ST_GOI_MD = [
-  {ma:'m1', ten:'Pro 1 tháng', gia:99000,  ngay:30},
-  {ma:'m3', ten:'Pro 3 tháng', gia:249000, ngay:90}
+  {ma:'m1', ten:'Pro 1 tháng', gia:50000, ngay:30}
+  // thêm gói dài hơn nếu muốn, ví dụ: ,{ma:'m3', ten:'Pro 3 tháng', gia:129000, ngay:90}
 ];
 var ST_LUOT_THU = 5;           // số lượt dùng thử Pro cho mỗi tài khoản mới
 
@@ -144,7 +145,7 @@ function stDangNhap(b){
   var hv = hvTheoEmail(email);
   if (hv && hv.trangthai !== 'off' && bangNhau(bamMK(pass, hv.salt), hv.hash)){
     cache.remove(khoa);
-    if (hv.vaitro !== 'hv' && hv.vaitro !== 'mentor') return jsonOut({ok:false, error:'cho_duyet'});
+    if (hv.vaitro !== 'hv' && hv.vaitro !== 'mentor' && hv.vaitro !== 'pro') return jsonOut({ok:false, error:'cho_duyet'});
     // cùng kiểu token với khu học viên (Lich.gs) để hai trang dùng chung phiên
     var token = hv.ma + '.' + chuoiNgauNhien(40);
     var han = new Date(); han.setDate(han.getDate() + PHIEN_NGAY);

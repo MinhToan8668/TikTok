@@ -180,17 +180,17 @@ Trang `tools/hook-text.html` có tài khoản riêng cho người dùng ngoài l
 
 | Loại | Được gì |
 |---|---|
-| Khách (chưa đăng nhập) | Bố cục Free, xem thử mọi tính năng Pro, xuất PNG có logo |
+| Khách (chưa đăng nhập) | Bố cục Free, xem thử mọi tính năng Pro, 3 lượt AI thử theo thiết bị, xuất PNG có logo |
 | Người dùng Free (đăng ký email + SĐT) | 5 lượt dùng thử Pro. Mỗi lần AI phân tích, AI chỉnh chữ, hoặc xuất file có tính năng Pro dùng 1 lượt (xuất lại trong 15 phút không tính thêm) |
 | Người dùng Pro (đã chuyển khoản) | Mọi tính năng Pro tới ngày hết hạn, AI 20 lượt mỗi ngày |
-| Học viên (tab HocVien) | Pro không giới hạn, đăng nhập bằng tài khoản khu học viên ngay trên trang |
+| Học viên và vai `pro` (tab HocVien) | Pro không giới hạn, đăng nhập bằng tài khoản khu học viên ngay trên trang |
 
 ### Cài đặt
 1. Apps Script → **+** → Script → đặt tên `Studio` → dán nội dung `Studio.gs`.
 2. Điền đầu file `Studio.gs` (hoặc đặt Script properties cùng tên):
    - `ST_NGAN_HANG_MD`: mã ngân hàng VietQR, ví dụ `MB`, `VCB`, `TCB`, `ACB`.
    - `ST_STK_MD`: số tài khoản nhận tiền. `ST_CHU_TK_MD`: tên chủ tài khoản, IN HOA KHÔNG DẤU.
-   - `ST_GOI_MD`: tên gói, giá, số ngày. Muốn đổi giá không cần sửa code thì đặt Script property `ST_GOI` dạng JSON.
+   - `ST_GOI_MD`: tên gói, giá, số ngày (mặc định Pro 1 tháng 50.000đ). Muốn đổi giá không cần sửa code thì đặt Script property `ST_GOI` dạng JSON.
 3. Thêm 3 dòng vào `Code.gs` (đã có sẵn trong bản trên GitHub):
    - trong `doPost`, ngay trước dòng `// Update từ Telegram webhook`:
      `if (e.parameter && e.parameter.pay) return studioWebhook(e, body);`
