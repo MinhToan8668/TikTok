@@ -52,7 +52,7 @@ function hookAi(b){
   if (!kq.ok){
     hookHoanLuot(me.ma, khongGioiHan);
     hookLog(me, text, false, kq.loi, kq.vin || 0, kq.vout || 0, kq.model);
-    return jsonOut({ok:false, error: kq.error});
+    return jsonOut({ok:false, error: kq.error, chi_tiet: me.vaitro === 'mentor' ? String(kq.loi || '').slice(0, 400) : undefined});
   }
   var data = kq.data;
 
@@ -60,45 +60,68 @@ function hookAi(b){
   return jsonOut({ok:true, data:data, con: khongGioiHan ? null : con, han:han, ten: me.ten_goi || me.ten});
 }
 
-/* ── Gemini: bậc miễn phí, dữ liệu có thể được Google dùng để cải thiện sản phẩm ── */
+/* ── Gemini: bậc miễn phí, dữ liệu có thể được Google dùng để cải thiện sản phẩm ──
+   Tự thử lần lượt: schema JSON đầy đủ → schema rút gọn (responseSchema) → không schema.
+   Model không có thì thử model kế tiếp. Lỗi cuối cùng được trả về nguyên văn để soi. */
+var GEMINI_MODELS_DU_PHONG = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.5-flash-lite', 'gemini-flash-latest'];
+
+function schemaRutGon(sc){
+  // responseSchema của Gemini là tập con OpenAPI: bỏ additionalProperties, giữ type/properties/required/items/enum
+  if (Array.isArray(sc)) return sc.map(schemaRutGon);
+  if (!sc || typeof sc !== 'object') return sc;
+  var o = {};
+  Object.keys(sc).forEach(function(k){
+    if (k === 'additionalProperties') return;
+    o[k] = (k === 'properties') ? (function(p){ var q = {}; Object.keys(p).forEach(function(n){ q[n] = schemaRutGon(p[n]) }); return q; })(sc[k]) : schemaRutGon(sc[k]);
+  });
+  return o;
+}
+
 function goiGemini(key, img, prompt){
-  var model = cfgProp('HOOK_AI_MODEL') || 'gemini-2.5-flash';
+  var cauHinh = cfgProp('HOOK_AI_MODEL');
+  var models = cauHinh ? [cauHinh].concat(GEMINI_MODELS_DU_PHONG.filter(function(m){ return m !== cauHinh })) : GEMINI_MODELS_DU_PHONG;
   var parts = [];
   if (img) parts.push({inline_data:{mime_type:'image/jpeg', data:img}});
   parts.push({text: prompt});
-  var req = {
-    contents: [{role:'user', parts: parts}],
-    generationConfig: {
-      responseMimeType: 'application/json',
-      responseJsonSchema: HOOK_SCHEMA,
-      maxOutputTokens: 6000,
-      temperature: 0.7,
-      thinkingConfig: {thinkingBudget: 0}
+  var kieu = [
+    {ten:'jsonschema', gc:{responseMimeType:'application/json', responseJsonSchema: HOOK_SCHEMA, maxOutputTokens: 6000, temperature: 0.7}},
+    {ten:'schema',     gc:{responseMimeType:'application/json', responseSchema: schemaRutGon(HOOK_SCHEMA), maxOutputTokens: 6000, temperature: 0.7}},
+    {ten:'tudo',       gc:{responseMimeType:'application/json', maxOutputTokens: 6000, temperature: 0.7}}
+  ];
+  var loiCuoi = '', modelCuoi = models[0];
+  for (var mi = 0; mi < models.length; mi++){
+    var model = models[mi]; modelCuoi = model;
+    for (var ki = 0; ki < kieu.length; ki++){
+      var req = { contents:[{role:'user', parts:parts}], generationConfig: kieu[ki].gc };
+      var res, ma, raw;
+      try{
+        res = UrlFetchApp.fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':generateContent', {
+          method:'post', contentType:'application/json', muteHttpExceptions:true,
+          headers:{ 'x-goog-api-key': key }, payload: JSON.stringify(req)
+        });
+        ma = res.getResponseCode(); raw = res.getContentText();
+      }catch(err){ return {ok:false, error:'loi_mang', loi:'mang: '+err, model:model}; }
+
+      if (ma === 200){
+        var j; try{ j = JSON.parse(raw); }catch(err){ loiCuoi = model+'/'+kieu[ki].ten+' json ngoai: '+String(raw).slice(0,200); continue; }
+        var u = j.usageMetadata || {}; var vin = u.promptTokenCount || 0, vout = u.candidatesTokenCount || 0;
+        var cand = (j.candidates || [])[0];
+        if (!cand) return {ok:false, error:'tu_choi', loi:model+' khong co candidate: '+JSON.stringify(j.promptFeedback||{}).slice(0,200), vin:vin, vout:vout, model:model};
+        if (cand.finishReason && cand.finishReason !== 'STOP' && cand.finishReason !== 'MAX_TOKENS')
+          return {ok:false, error:'tu_choi', loi:model+' finish '+cand.finishReason, vin:vin, vout:vout, model:model};
+        var chu = ((cand.content || {}).parts || []).map(function(p){ return p.text || '' }).join('');
+        var data; try{ data = JSON.parse(chu.replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'')); }
+        catch(err){ loiCuoi = model+'/'+kieu[ki].ten+' json: '+chu.slice(0,200); continue; }
+        return {ok:true, data:data, vin:vin, vout:vout, model:model+'/'+kieu[ki].ten};
+      }
+      loiCuoi = model+'/'+kieu[ki].ten+' http '+ma+': '+String(raw).slice(0,400);
+      if (ma === 429 || ma === 503) return {ok:false, error:'ban_qua', loi:loiCuoi, model:model};
+      if (ma === 401 || ma === 403) return {ok:false, error:'loi_ai', loi:loiCuoi, model:model};   // key sai: thử tiếp vô ích
+      if (ma === 404) break;                                                                       // model không có: sang model khác
+      // 400: định dạng không hợp → thử kiểu kế tiếp
     }
-  };
-  var res, ma, raw;
-  try{
-    res = UrlFetchApp.fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':generateContent', {
-      method:'post', contentType:'application/json', muteHttpExceptions:true,
-      headers:{ 'x-goog-api-key': key },
-      payload: JSON.stringify(req)
-    });
-    ma = res.getResponseCode(); raw = res.getContentText();
-  }catch(err){ return {ok:false, error:'loi_mang', loi:'mang: '+err, model:model}; }
-  if (ma !== 200){
-    var e429 = ma === 429 || ma === 503;
-    return {ok:false, error: e429 ? 'ban_qua' : 'loi_ai', loi:'http '+ma+': '+String(raw).slice(0,300), model:model};
   }
-  var j; try{ j = JSON.parse(raw); }catch(err){ return {ok:false, error:'loi_ai', loi:'json ngoai: '+String(raw).slice(0,200), model:model}; }
-  var u = j.usageMetadata || {}; var vin = u.promptTokenCount || 0, vout = u.candidatesTokenCount || 0;
-  var cand = (j.candidates || [])[0];
-  if (!cand){ return {ok:false, error:'tu_choi', loi:'khong co candidate: '+JSON.stringify(j.promptFeedback||{}).slice(0,200), vin:vin, vout:vout, model:model}; }
-  if (cand.finishReason && cand.finishReason !== 'STOP' && cand.finishReason !== 'MAX_TOKENS'){
-    return {ok:false, error:'tu_choi', loi:'finish '+cand.finishReason, vin:vin, vout:vout, model:model};
-  }
-  var chu = ((cand.content || {}).parts || []).map(function(p){ return p.text || '' }).join('');
-  var data; try{ data = JSON.parse(chu); }catch(err){ return {ok:false, error:'loi_ai', loi:'json: '+chu.slice(0,200), vin:vin, vout:vout, model:model}; }
-  return {ok:true, data:data, vin:vin, vout:vout, model:model};
+  return {ok:false, error:'loi_ai', loi:loiCuoi, model:modelCuoi};
 }
 
 /* ── Claude: trả tiền theo lượt, chất lượng tiếng Việt tốt hơn ── */
