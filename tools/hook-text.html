@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Viral Studio · Hook text · Tự Mình Xây Kênh</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Cg%20transform%3D%22rotate%28-9%2032%2017%29%22%3E%3Crect%20x%3D%2219%22%20y%3D%2211%22%20width%3D%2226%22%20height%3D%2212%22%20rx%3D%223%22%20fill%3D%22%2399df00%22/%3E%3Cpath%20d%3D%22M30%2014.4v5.2a1%201%200%200%200%201.52.86l4.6-2.6a1%201%200%200%200%200-1.72l-4.6-2.6A1%201%200%200%200%2030%2014.4z%22%20fill%3D%22%2326210f%22/%3E%3C/g%3E%3Crect%20x%3D%2219%22%20y%3D%2228%22%20width%3D%2226%22%20height%3D%2212%22%20rx%3D%223%22%20fill%3D%22%2326210f%22/%3E%3Crect%20x%3D%224%22%20%20y%3D%2244%22%20width%3D%2226%22%20height%3D%2212%22%20rx%3D%223%22%20fill%3D%22%2326210f%22/%3E%3Crect%20x%3D%2234%22%20y%3D%2244%22%20width%3D%2226%22%20height%3D%2212%22%20rx%3D%223%22%20fill%3D%22%2326210f%22/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@1,700;1,800&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&display=swap" rel="stylesheet">
@@ -1325,6 +1326,8 @@ const TPL_STYLE_DEFAULT = () => ({ font: 'Be Vietnam Pro', upper: false, opacity
   stroke: { on: false, color: '#000000', width: 8 }, glow: { on: false, color: '#99DF00', alpha: .9, blur: 24 },
   shadow: { on: false, color: '#000000', alpha: .6, blur: 14, x: 0, y: 6 }, bg: { on: false, mode: 'block', color: '#000000', alpha: .6, radius: 24, pad: 30 }, pro: false });
 state.tplStyle = TPL_STYLE_DEFAULT();
+// bản cũ có thể đã lưu kiểu chữ nhanh lên bản mẫu: dọn một lần để mọi người về đúng mẫu màu TMXK
+try { if (ls.get('hook.v') !== '3') { localStorage.removeItem('hook.tplStyle'); localStorage.removeItem('hook.brand'); ls.set('hook.v', '3'); } } catch {}
 try { const t = JSON.parse(ls.get('hook.tplStyle') || 'null'); if (t) { const d = TPL_STYLE_DEFAULT(); state.tplStyle = { ...d, ...t, stroke: { ...d.stroke, ...t.stroke }, glow: { ...d.glow, ...t.glow }, shadow: { ...d.shadow, ...t.shadow }, bg: { ...d.bg, ...t.bg } }; } } catch {}
 function tintCanvas(src, color) { const c = document.createElement('canvas'); c.width = src.width; c.height = src.height; const g = c.getContext('2d'); g.drawImage(src, 0, 0); g.globalCompositeOperation = 'source-in'; g.fillStyle = color; g.fillRect(0, 0, c.width, c.height); return c; }
 function tplFx(src, W) {
