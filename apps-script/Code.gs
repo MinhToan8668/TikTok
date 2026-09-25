@@ -577,6 +577,8 @@ function handleTelegram(update){
   }
   // Lệnh của khu lịch mentor (Lich.gs) — tách riêng cho gọn
   if (quanTri && lichCoLenh(cmd)) return lichLenh(cmd, arg, chatId, msg);
+  // Lệnh bán Pro của Viral Studio (Studio.gs): /studio /stk /giapro /luotthu ...
+  if (quanTri && studioCoLenh(cmd)) return studioLenh(cmd, arg, chatId);
 
   var cfg = getConfig();
 
@@ -639,6 +641,8 @@ function handleTelegram(update){
         '⏰ /nhactruoc `6` — nhắc trước mấy tiếng',
         '🎫 /toida `2` — mỗi học viên tối đa mấy ca một tuần (`0` = bỏ giới hạn)',
         '🧹 /donlich — dọn ca trùng hoặc xoá sạch ca trống','',
+        '*🎬 Viral Studio*',
+        '🎬 /studio — STK nhận tiền, giá Pro, lượt AI, giao dịch chờ','',
         '*🖼 Đồ họa*',
         '🖼 /nen `Minh Toàn` — bot vẽ nền gọi Teams rồi gửi file (thêm `| toi` cho nền tối)','',
         '*⚙️ Khác*',
@@ -1122,6 +1126,8 @@ function setup(){
     {command:'duyet',      description:'✅ Duyệt — /duyet AB12'},
     {command:'tuchoi',     description:'❌ Từ chối — /tuchoi AB12'},
     {command:'nen',        description:'🖼 Vẽ nền Teams — /nen Minh Toàn'},
+    {command:'studio',     description:'🎬 Viral Studio: STK, giá Pro, lượt AI'},
+    {command:'dsck',       description:'🧾 Viral Studio: giao dịch chờ mở Pro'},
     {command:'lichtuan',   description:'📆 Lịch kèm 1:1 cả tuần + ai đã đặt'},
     {command:'dstk',       description:'👥 Tài khoản: chờ duyệt · mentor · học viên'},
     {command:'vaitro',     description:'🎚 Phân vai — /vaitro mail hv · mentor · pro'},

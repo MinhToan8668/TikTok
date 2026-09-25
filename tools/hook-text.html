@@ -675,7 +675,7 @@
             <div class="price">Ai cũng dùng được</div>
             <ul>
               <li>5 bố cục cơ bản</li>
-              <li>Tạo tài khoản miễn phí: 5 lượt dùng thử mọi tính năng Pro</li>
+              <li>Tạo tài khoản miễn phí: <span data-luot>10</span> lượt AI phân tích hook</li>
               <li>Gõ chữ, nhấn màu từ khoá, thêm chữ, kéo thả trên khung</li>
               <li>Khung vùng an toàn TikTok, Reels, Shorts</li>
               <li>Xuất PNG kèm logo nhỏ</li>
@@ -741,7 +741,7 @@
       <li><b>14 bố cục, 19 font Việt, 12 kiểu chữ</b> · tuỳ biến sâu · <b>xuất sạch không logo</b></li>
     </ul>
     <div class="up-cta">
-      <button class="btn pro wide" id="upMain" type="button">Tạo tài khoản · dùng thử 5 lượt Pro</button>
+      <button class="btn pro wide" id="upMain" type="button">Tạo tài khoản · <span data-luot>10</span> lượt AI miễn phí</button>
       <div class="up-two">
         <button class="up-opt" id="upBuy" type="button"><b>✦ Mua Pro <span data-price>50k</span></b><small>Chuyển khoản, admin mở Pro trong vài phút</small></button>
         <a class="up-opt hv" href="../index.html#dangky"><b>🎓 Đăng ký học viên</b><small>Bao trọn gói khoá học, có sẵn Pro</small></a>
@@ -762,13 +762,13 @@
     <div id="acctOut">
       <div class="seg acct-tabs" id="acctTabs" role="group" aria-label="Đăng ký hoặc đăng nhập"><button type="button" data-v="signup" aria-pressed="true">Tạo tài khoản</button><button type="button" data-v="login" aria-pressed="false">Đăng nhập</button></div>
       <form id="fSignup" class="af" novalidate>
-        <p class="gift">🎁 Miễn phí. Có ngay <b>5 lượt dùng thử</b> mọi tính năng Pro, kể cả AI.</p>
+        <p class="gift">🎁 Miễn phí. Có ngay <b><span data-luot>10</span> lượt AI phân tích hook</b>: chấm điểm, viết lại 5 bản, gợi ý bố cục.</p>
         <label>Họ và tên<input name="ten" autocomplete="name" required></label>
         <label>Email<input name="email" type="email" inputmode="email" autocomplete="email" required></label>
         <label>Số điện thoại (Zalo)<input name="sdt" type="tel" inputmode="tel" autocomplete="tel" required></label>
         <label>Mật khẩu, ít nhất 6 ký tự<input name="pass" type="password" autocomplete="new-password" minlength="6" required></label>
         <input type="text" name="website" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true">
-        <button class="btn pro wide" type="submit">Tạo tài khoản, nhận 5 lượt Pro</button>
+        <button class="btn pro wide" type="submit">Tạo tài khoản, nhận <span data-luot>10</span> lượt AI</button>
         <p class="status" data-msg></p>
       </form>
       <form id="fLogin" class="af" novalidate hidden>
@@ -1527,10 +1527,10 @@ function setTrial(con, han) {
   const b = $('#btnTrial'); b.hidden = false;
   b.textContent = con > 0 ? `Phân tích thử (còn ${con}/${han})` : 'Hết lượt thử';
   b.disabled = con <= 0;
-  $('#quota').textContent = con > 0 ? `Khách thử: ${con}/${han} lượt AI miễn phí, không cần tài khoản` : `Đã dùng hết ${han} lượt thử. Tạo tài khoản để có thêm 5 lượt Pro.`;
+  $('#quota').textContent = con > 0 ? `Khách thử: ${con}/${han} lượt AI miễn phí, không cần tài khoản` : `Đã dùng hết ${han} lượt thử. Tạo tài khoản để có thêm ${luotThu()} lượt AI miễn phí.`;
   $('#proHello').textContent = con > 0
     ? 'Thử AI ngay, không cần tài khoản: chấm điểm hook /100, viết lại 5 bản, tự đặt bố cục né mặt.'
-    : 'Bạn đã thấy AI làm gì rồi. Tạo tài khoản miễn phí để có thêm 5 lượt Pro, hoặc mở Pro 50k.';
+    : `Bạn đã thấy AI làm gì rồi. Tạo tài khoản miễn phí để có thêm ${luotThu()} lượt AI, hoặc mua Pro.`;
 }
 async function callApi(body) {
   const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) });
@@ -1553,8 +1553,8 @@ async function runAI() {
     const r = await callApi({ action: 'hook_ai', token: authToken(), thu: authToken() ? undefined : devId(), text, image: await frameB64(), platform: state.platform, facePos: state.facePos });
     clearInterval(tick);
     if (!r.ok) {
-      if (r.error === 'het_thu') { setTrial(0, r.han || 3); openUpsell('Bạn đã dùng hết 3 lượt AI thử. Tạo tài khoản miễn phí để có thêm 5 lượt Pro, hoặc mở Pro 50k.'); }
-      const map = { het_thu: 'Hết 3 lượt AI thử miễn phí.', can_pro: 'Chỉnh chữ bằng AI cần tài khoản.', het_phien: 'Phiên đăng nhập đã hết hạn. Đăng nhập lại nhé.', het_luot_thu: 'Bạn đã dùng hết 5 lượt Pro dùng thử. Mua Pro hoặc đăng ký học viên để dùng tiếp.', het_luot: `Bạn đã dùng hết ${r.han || ''} lượt hôm nay. Mai quay lại nhé.`, chua_cai_key: 'Máy chủ chưa được cài khóa AI (GEMINI_API_KEY). Báo mentor giúp mình.', loi_mang: 'Máy chủ không gọi được AI. Chụp mã lỗi bên dưới gửi mentor.', loi_ai: 'AI trả lỗi. Chụp mã lỗi bên dưới gửi mentor.', sai_key: 'Khóa AI trên máy chủ không hợp lệ hoặc đã bị xoá. Báo mentor thay khóa mới.', ban_qua: 'AI đang bận hoặc chạm hạn mức theo phút. Đợi khoảng một phút rồi bấm lại.', tu_choi: 'AI không xử lý được nội dung này, thử diễn đạt khác.', anh_qua_lon: 'Ảnh quá lớn, chọn ảnh nhỏ hơn.', thieu_text: 'Nhập câu hook trước đã.' };
+      if (r.error === 'het_thu') { setTrial(0, r.han || 3); openUpsell(`Bạn đã dùng hết 3 lượt AI thử. Tạo tài khoản miễn phí để có thêm ${luotThu()} lượt AI, hoặc mua Pro.`); }
+      const map = { het_thu: 'Hết 3 lượt AI thử miễn phí.', can_pro: 'Chỉnh chữ bằng AI cần tài khoản.', het_phien: 'Phiên đăng nhập đã hết hạn. Đăng nhập lại nhé.', het_luot_thu: 'Bạn đã dùng hết lượt AI miễn phí. Mua Pro hoặc đăng ký học viên để dùng tiếp.', het_luot: `Bạn đã dùng hết ${r.han || ''} lượt hôm nay. Mai quay lại nhé.`, chua_cai_key: 'Máy chủ chưa được cài khóa AI (GEMINI_API_KEY). Báo mentor giúp mình.', loi_mang: 'Máy chủ không gọi được AI. Chụp mã lỗi bên dưới gửi mentor.', loi_ai: 'AI trả lỗi. Chụp mã lỗi bên dưới gửi mentor.', sai_key: 'Khóa AI trên máy chủ không hợp lệ hoặc đã bị xoá. Báo mentor thay khóa mới.', ban_qua: 'AI đang bận hoặc chạm hạn mức theo phút. Đợi khoảng một phút rồi bấm lại.', tu_choi: 'AI không xử lý được nội dung này, thử diễn đạt khác.', anh_qua_lon: 'Ảnh quá lớn, chọn ảnh nhỏ hơn.', thieu_text: 'Nhập câu hook trước đã.' };
       setStatus((map[r.error] || 'Có lỗi khi gọi AI, thử lại sau.') + (r.chi_tiet ? `<br><small style="font-weight:400;opacity:.85">Mã lỗi: ${String(r.chi_tiet).replace(/</g,'&lt;')}</small>` : ''), 'err'); if (r.error === 'het_phien') setPro(false); if (r.error === 'het_luot_thu') { state.acct && (state.acct.luot_con = 0); setAcct(state.acct); openUpsell('Mua Pro hoặc đăng ký học viên để AI phân tích không giới hạn.'); } return;
     }
     setStatus(`Xong sau ${Math.round((Date.now() - t0) / 1000)} giây. Đã áp dụng bố cục số 1.`, 'ok');
@@ -1613,7 +1613,7 @@ function openSheet(demo) { $('#aiSheetNote').hidden = !demo; $('#aiSheetTitle').
 function closeSheet() { $('#aiSheet').classList.remove('show'); }
 function openUpsell(msg) {
   const plan = planOf(state.acct), out = plan === 'free' && !state.trial;
-  $('#upTitle').textContent = plan === 'guest' ? '✦ Dùng thử Pro miễn phí' : out ? 'Bạn đã dùng hết 5 lượt thử' : '✦ Nâng cấp Pro';
+  $('#upTitle').textContent = plan === 'guest' ? '✦ Dùng thử AI miễn phí' : out ? `Bạn đã dùng hết ${luotThu()} lượt AI miễn phí` : '✦ Nâng cấp Pro';
   $('#upText').textContent = msg || (out ? 'Chọn một cách để dùng Pro tiếp:' : 'Làm hook như editor chuyên nghiệp, có AI kèm bên cạnh.');
   $('#upMain').hidden = plan !== 'guest';
   $('#upLogin').hidden = plan !== 'guest';
@@ -1626,7 +1626,9 @@ async function loadPrice() {
   if (!stCfgCache || !stCfgCache.goi || !stCfgCache.goi.length) return;
   const g = stCfgCache.goi.reduce((a, b) => (b.gia < a.gia ? b : a)); const k = g.gia % 1000 ? g.gia.toLocaleString('vi-VN') + 'đ' : g.gia / 1000 + 'k';
   document.querySelectorAll('[data-price]').forEach(e => e.textContent = k);
+  if (stCfgCache.luot_thu != null) document.querySelectorAll('[data-luot]').forEach(e => e.textContent = stCfgCache.luot_thu);
 }
+setTimeout(loadPrice, 1500);
 function wantBuy() { $('#upsell').classList.remove('show'); if (state.acct) openAcct('upgrade'); else { state.afterSignup = 'upgrade'; openAcct('signup'); toast('Tạo tài khoản trước để nhận mã chuyển khoản'); } }
 
 /* ---------- export ---------- */
@@ -2341,7 +2343,7 @@ function layersUsePro() { return proUsed().length > 0; }
 const DEMO_LAYER = { manh: '**3 giây** đầu\nquyết định cả video', gon: '**3 giây** quyết định tất cả', cotnha: 'ủa alo, **3 giây** đầu\nmà cũng lười nghĩ hả trời', xanhchin: '3 giây đầu **luôn quyết định**\nvideo sống hay chết', nhan: '3 giây đầu quyết định\n**90% lượt xem** của bạn' };
 async function runLayerAI(ask) {
   const L = selLayer(); if (!L) return;
-  if (!state.pro && !(state.trial > 0)) { openUpsell(state.acct ? 'Mua Pro hoặc đăng ký học viên để AI chỉnh chữ không giới hạn.' : 'AI chỉnh chữ là tính năng Pro. Tạo tài khoản miễn phí để có 5 lượt dùng thử.'); return; }
+  if (!state.pro) { openUpsell('AI chỉnh chữ là tính năng Pro. Mua Pro hoặc đăng ký học viên để dùng.'); return; }
   const text = L.tpl ? $('#text').value : runsToMarkup(L.runs);
   if (!text.trim()) return toast('Chưa có chữ để AI chỉnh');
   const out = $('#layerAiOut'); out.className = 'status'; out.innerHTML = '<span class="spinner"></span>AI đang chỉnh...';
@@ -2350,7 +2352,7 @@ async function runLayerAI(ask) {
     let r;
     if (DEMO) { await new Promise(z => setTimeout(z, 800)); r = { ok: true, data: ask === 'style' ? { text, preset: 'Vàng viral', note: 'Bản demo: câu ngắn, có con số, hợp kiểu chữ vàng viền đen đọc nhanh nhất.' } : { text: DEMO_LAYER[ask] || text, preset: '', note: 'Bản demo: kết quả mẫu cố định.' } }; }
     else r = await callApi({ action: 'hook_ai', mode: 'layer', token: authToken(), text, ask, presets: STYLE_PRESETS.map(p => p.n) });
-    if (!r.ok) { out.className = 'status err'; out.textContent = ({ het_luot_thu: 'Hết 5 lượt Pro dùng thử. Mua Pro hoặc đăng ký học viên để dùng tiếp.', het_luot: 'Hết lượt AI hôm nay.', het_phien: 'Phiên đăng nhập hết hạn, đăng nhập lại nhé.', ban_qua: 'AI đang bận, thử lại sau một phút.', sai_key: 'Khóa AI trên máy chủ không hợp lệ. Báo mentor.' }[r.error] || 'AI chưa chỉnh được.') + (r.chi_tiet ? ' Mã lỗi: ' + r.chi_tiet : ''); return; }
+    if (!r.ok) { out.className = 'status err'; out.textContent = ({ can_pro: 'AI chỉnh chữ là tính năng Pro.', het_luot_thu: 'AI chỉnh chữ là tính năng Pro.', het_luot: 'Hết lượt AI hôm nay.', het_phien: 'Phiên đăng nhập hết hạn, đăng nhập lại nhé.', ban_qua: 'AI đang bận, thử lại sau một phút.', sai_key: 'Khóa AI trên máy chủ không hợp lệ. Báo mentor.' }[r.error] || 'AI chưa chỉnh được.') + (r.chi_tiet ? ' Mã lỗi: ' + r.chi_tiet : ''); return; }
     const d = r.data || {};
     if (d.text === undefined && d.preset === undefined) { out.className = 'status err'; out.textContent = 'Máy chủ đang chạy HookAI.gs bản cũ nên chưa có AI chỉnh chữ. Mentor dán HookAI.gs mới vào Apps Script rồi Deploy, chọn New version là dùng được.'; if (r.con !== undefined) showQuota(r.con, r.han); return; }
     if (String(d.text || '').trim() === text.trim() && ask !== 'style') { out.className = 'status ok'; out.textContent = (d.note || '') + ' AI giữ nguyên câu vì thấy đã ổn.'; if (r.con !== undefined) showQuota(r.con, r.han); return; }
@@ -2379,10 +2381,11 @@ function layerNotes() {
 /* ---------- xuất từng lớp chữ riêng ---------- */
 /* =========================================================
    TÀI KHOẢN VIRAL STUDIO
-   Khách: xem thử Pro. Tài khoản Free: 5 lượt dùng thử Pro.
+   Khách: 3 lượt AI thử. Tài khoản Free: 10 lượt AI phân tích (số lượt chỉnh bằng bot /luotthu).
    Pro: mua bằng chuyển khoản. Học viên TMXK: Pro không giới hạn.
    ========================================================= */
 const ND_KEY = 'vs_user';
+function luotThu() { return (state.acct && state.acct.luot_thu) || (stCfgCache && stCfgCache.luot_thu) || 10; }
 function ndToken() { try { const o = JSON.parse(ls.get(ND_KEY) || 'null'); return o && o.token ? o.token : ''; } catch { return ''; } }
 function authToken() { return hvToken() || ndToken(); }
 function logoutLocal() { try { localStorage.removeItem(ND_KEY); localStorage.removeItem(HV_KEY); } catch {} }
@@ -2408,12 +2411,12 @@ function setAcct(a) {
   $('#proLocked').hidden = aiOk; $('#proOpen').hidden = !aiOk;
   const tx = $('#acctText'), bt = $('#acctBtn');
   if (plan === 'guest') { tx.textContent = ''; bt.textContent = 'Tài khoản'; }
-  else { tx.textContent = (a.ten || '').trim().split(' ').slice(-1)[0] || 'bạn'; bt.textContent = plan === 'hv' ? (a.vaitro === 'pro' ? '✦ Pro' : 'Học viên · Pro') : plan === 'pro' ? '✦ Pro' : `Free · còn ${state.trial} lượt`; }
+  else { tx.textContent = (a.ten || '').trim().split(' ').slice(-1)[0] || 'bạn'; bt.textContent = plan === 'hv' ? (a.vaitro === 'pro' ? '✦ Pro' : 'Học viên · Pro') : plan === 'pro' ? '✦ Pro' : `Free · còn ${state.trial} lượt AI`; }
   $('#btnUnlock').textContent = plan === 'guest' ? 'Dùng thử miễn phí' : 'Mua Pro';
   $('#proHello').textContent = aiOk
-    ? (plan === 'free' ? `AI chấm điểm, viết lại 5 bản, tự đặt bố cục. Mỗi lần phân tích dùng 1 lượt thử, còn ${state.trial}.` : 'AI xem ảnh và câu hook, trả về điểm, 5 bản viết lại, 3 bố cục và caption. Khoảng 15 đến 40 giây.')
-    : (plan === 'guest' ? 'Tạo tài khoản miễn phí để có 5 lượt dùng thử mọi tính năng Pro, kể cả AI.' : 'Bạn đã dùng hết 5 lượt thử. Mua Pro hoặc đăng ký học viên để dùng tiếp.');
-  if (plan === 'free') $('#quota').textContent = `Còn ${state.trial}/${a.luot_thu || 5} lượt Pro dùng thử`;
+    ? (plan === 'free' ? `AI chấm điểm, viết lại 5 bản, tự đặt bố cục. Mỗi lần phân tích dùng 1 lượt miễn phí, còn ${state.trial}.` : 'AI xem ảnh và câu hook, trả về điểm, 5 bản viết lại, 3 bố cục và caption. Khoảng 15 đến 40 giây.')
+    : (plan === 'guest' ? `Tạo tài khoản miễn phí để có ${luotThu()} lượt AI phân tích hook.` : `Bạn đã dùng hết ${luotThu()} lượt AI miễn phí. Mua Pro hoặc đăng ký học viên để dùng tiếp.`);
+  if (plan === 'free') $('#quota').textContent = `Còn ${state.trial}/${luotThu()} lượt AI miễn phí`;
   else if (plan === 'guest') $('#quota').textContent = '';
   document.querySelectorAll('.lock, [data-promo]').forEach(e => e.hidden = pro);
   renderAcctSheet(); scheduleRender();
@@ -2421,7 +2424,7 @@ function setAcct(a) {
 function setPro(on, name, con, han) { setAcct(on ? { loai: 'hv', ten: name || 'bạn', pro: true } : null); if (on) showQuota(con, han); }
 function showQuota(con, han) {
   const free = planOf(state.acct) === 'free';
-  $('#quota').textContent = con == null ? 'Không giới hạn lượt' : free ? `Còn ${con}/${han} lượt Pro dùng thử` : `Còn ${con}/${han} lượt AI hôm nay`;
+  $('#quota').textContent = con == null ? 'Không giới hạn lượt' : free ? `Còn ${con}/${han} lượt AI miễn phí` : `Còn ${con}/${han} lượt AI hôm nay`;
   if (free && con != null) { const prev = state.trial; state.acct.luot_con = con; if (con !== prev) setAcct(state.acct); }
 }
 async function checkPro() {
@@ -2450,18 +2453,6 @@ async function gateExport(kind) {
   const why = proUsed(); if (kind === 'layers') why.unshift('tách từng lớp chữ');
   if (state.pro) return 'clean';
   if (!why.length) return 'mark';
-  const plan = planOf(state.acct);
-  if (plan === 'guest') { openUpsell(`Bạn đang dùng ${why.join(', ')} của gói Pro. Tạo tài khoản miễn phí là có 5 lượt dùng thử Pro, xuất file sạch không logo.`); return false; }
-  if (Date.now() < (state.cleanUntil || 0)) return 'clean';   // vừa dùng 1 lượt: xuất lại thoải mái trong 15 phút
-  if (state.trial > 0) {
-    if (!confirm(`Bản này có ${why.join(', ')} (Pro). Xuất sẽ dùng 1 lượt thử (còn ${state.trial}), sau đó xuất lại thoải mái trong 15 phút. Tiếp tục?`)) return false;
-    try {
-      const r = await callApi({ action: 'st_use', token: authToken(), kind });
-      if (r.ok) { state.cleanUntil = Date.now() + 15 * 60 * 1000; if (r.luot_con != null) { state.acct.luot_con = Math.max(0, r.luot_con); setAcct(state.acct); } return 'clean'; }
-      if (r.error === 'het_luot_thu') { state.acct.luot_con = 0; setAcct(state.acct); }
-      else { toast(ACCT_ERR[r.error] || 'Chưa trừ được lượt, thử lại sau.'); return false; }
-    } catch { toast('Không kết nối được máy chủ.'); return false; }
-  }
   openUpsell(`Bản này có ${why.join(', ')} của gói Pro. Chọn một cách để xuất sạch, hoặc bấm "Bỏ phần Pro" để xuất bản Free.`);
   return false;
 }
@@ -2485,11 +2476,11 @@ function renderAcctSheet() {
   const pl = $('#mePlan'); pl.textContent = plan === 'hv' ? (a.vaitro === 'pro' ? 'Pro' : 'Học viên') : plan === 'pro' ? 'Pro' : 'Free'; pl.className = 'me-plan ' + plan;
   $('#meQuota').innerHTML = plan === 'hv' ? (a.vaitro === 'pro' ? 'Tài khoản Pro: dùng mọi tính năng Pro, AI 20 lượt mỗi ngày.' : 'Học viên Tự Mình Xây Kênh: dùng Pro không giới hạn, AI 20 lượt mỗi ngày.')
     : plan === 'pro' ? `Pro tới hết ngày <b>${fmtDate(a.pro_han)}</b>. AI 20 lượt mỗi ngày.`
-    : `Còn <b>${a.luot_con}/${a.luot_thu || 5}</b> lượt dùng thử Pro. Mỗi lần AI phân tích hoặc xuất file có tính năng Pro dùng 1 lượt.`;
+    : `Còn <b>${a.luot_con}/${luotThu()}</b> lượt AI phân tích miễn phí. Font, tuỳ biến sâu, AI chỉnh chữ và xuất sạch không logo cần Pro.`;
   $('#goUpgrade').hidden = plan === 'hv'; $('#goHv').hidden = plan === 'hv';
   $('#goUpgrade').querySelector('b').firstChild.textContent = plan === 'pro' ? '✦ Gia hạn Pro ' : '✦ Mua Pro ';
   $('#goUpgrade').classList.toggle('hot', plan === 'free' && !a.luot_con);
-  if (plan === 'free' && !a.luot_con) $('#meQuota').innerHTML = 'Bạn đã dùng hết <b>' + (a.luot_thu || 5) + ' lượt thử</b>. Mua Pro hoặc đăng ký học viên để dùng tiếp.';
+  if (plan === 'free' && !a.luot_con) $('#meQuota').innerHTML = 'Bạn đã dùng hết <b>' + luotThu() + ' lượt AI miễn phí</b>. Mua Pro hoặc đăng ký học viên để dùng tiếp.';
   loadPrice();
 }
 async function loadPlans() {
@@ -2544,7 +2535,7 @@ function bindAcctUI() {
       busy(f, false);
       if (!r.ok) return fail(f, ACCT_ERR[r.error] || 'Chưa tạo được tài khoản, thử lại sau.');
       ls.set(ND_KEY, JSON.stringify({ token: r.token })); f.reset(); setAcct(r.ho_so); acctView(state.afterSignup || 'home'); state.afterSignup = null;
-      toast(`Chào ${r.ho_so.ten}! Bạn có ${r.ho_so.luot_con} lượt dùng thử Pro.`);
+      toast(`Chào ${r.ho_so.ten}! Bạn có ${r.ho_so.luot_con} lượt AI miễn phí.`);
     } catch { busy(f, false); fail(f, 'Không kết nối được máy chủ.'); }
   });
   $('#fLogin').addEventListener('submit', async e => {

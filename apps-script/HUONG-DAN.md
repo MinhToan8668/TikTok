@@ -181,23 +181,36 @@ Trang `tools/hook-text.html` có tài khoản riêng cho người dùng ngoài l
 | Loại | Được gì |
 |---|---|
 | Khách (chưa đăng nhập) | Bố cục Free, xem thử mọi tính năng Pro, 3 lượt AI thử theo thiết bị, xuất PNG có logo |
-| Người dùng Free (đăng ký email + SĐT) | 5 lượt dùng thử Pro. Mỗi lần AI phân tích, AI chỉnh chữ, hoặc xuất file có tính năng Pro dùng 1 lượt (xuất lại trong 15 phút không tính thêm) |
-| Người dùng Pro (đã chuyển khoản) | Mọi tính năng Pro tới ngày hết hạn, AI 20 lượt mỗi ngày |
+| Người dùng Free (đăng ký email + SĐT) | 10 lượt AI phân tích hook (đổi bằng `/luotthu`). Font, tuỳ biến sâu, AI chỉnh chữ, xuất sạch cần Pro |
+| Người dùng Pro (đã chuyển khoản) | Mọi tính năng Pro tới ngày hết hạn, AI 20 lượt mỗi ngày (đổi bằng `/luotai`) |
 | Học viên và vai `pro` (tab HocVien) | Pro không giới hạn, đăng nhập bằng tài khoản khu học viên ngay trên trang |
 
 ### Cài đặt
 1. Apps Script → **+** → Script → đặt tên `Studio` → dán nội dung `Studio.gs`.
-2. Điền đầu file `Studio.gs` (hoặc đặt Script properties cùng tên):
-   - `ST_NGAN_HANG_MD`: mã ngân hàng VietQR, ví dụ `MB`, `VCB`, `TCB`, `ACB`.
-   - `ST_STK_MD`: số tài khoản nhận tiền. `ST_CHU_TK_MD`: tên chủ tài khoản, IN HOA KHÔNG DẤU.
-   - `ST_GOI_MD`: tên gói, giá, số ngày (mặc định Pro 1 tháng 50.000đ). Muốn đổi giá không cần sửa code thì đặt Script property `ST_GOI` dạng JSON.
-3. Thêm 2 dòng vào `Code.gs` (đã có sẵn trong bản trên GitHub):
+2. Thêm 3 dòng vào `Code.gs` (đã có sẵn trong bản trên GitHub):
+   - trong `handleTelegram`, ngay sau dòng `if (quanTri && lichCoLenh(cmd)) ...`:
+     `if (quanTri && studioCoLenh(cmd)) return studioLenh(cmd, arg, chatId);`
    - trong `doPost`, ngay sau dòng `if (body.action === 'hook_status') ...`:
      `if (String(body.action||'').indexOf('st_') === 0) return studioApi(body);`
    - trong `handleCallback`, ngay sau dòng `... return lichCallback(cb);`:
      `if (String(cb.data||'').indexOf('s:') === 0) return studioCallback(cb);`
-4. Dán `HookAI.gs` bản mới (đã nhận tài khoản người dùng).
-5. Deploy → Manage deployments → Edit → New version → Deploy.
+3. Dán `HookAI.gs` bản mới (đã nhận tài khoản người dùng).
+4. Deploy → Manage deployments → Edit → New version → Deploy.
+
+5. Nhắn bot `/stk Vietcombank | 0123456789 | Nguyễn Văn A`. Bot đổi tên ngân hàng ra mã VietQR, bỏ dấu tên chủ tài khoản và gửi QR thử để bạn quét kiểm tra.
+
+### Lệnh bot (chat riêng với bot)
+| Lệnh | Việc |
+|---|---|
+| `/studio` | Xem STK, giá, số lượt, số người dùng, giao dịch chờ |
+| `/stk Ngân hàng \| STK \| Tên` | Tài khoản nhận tiền |
+| `/giapro 50000` · `/ngaypro 30` | Giá và số ngày của gói Pro |
+| `/luotthu 10` | Lượt AI phân tích miễn phí cho tài khoản Free |
+| `/luotai 20` | Lượt AI mỗi ngày của Pro và học viên |
+| `/dsck` | Giao dịch chưa mở Pro, kèm nút mở |
+| `/timnd mail` · `/mopro mail 30` · `/tatpro mail` | Xem, mở tay, tắt Pro một người |
+
+Gõ lệnh trơn (ví dụ `/stk`) thì bot hỏi lại, bạn chỉ cần nhắn nội dung. Mọi thứ lưu vào Script properties, không cần deploy lại.
 
 ### Mở Pro sau khi chuyển khoản
 - Người dùng quét QR chuyển khoản rồi bấm "Tôi đã chuyển khoản" → bot Telegram nhắn kèm nút **✅ Đã nhận tiền · mở Pro**. Bấm là người dùng thấy Pro mở trong vài giây (trang tự kiểm tra 8 giây một lần).

@@ -2,9 +2,9 @@
  * ═══════════════════════════════════════════════════════════════
  *  Studio.gs — tài khoản NGƯỜI DÙNG của Viral Studio (tools/hook-text.html)
  * ═══════════════════════════════════════════════════════════════
- *  Ba loại người dùng Pro:
- *   • Người dùng tự đăng ký (email + SĐT + mật khẩu): có ngay 5 lượt dùng thử Pro.
- *     Hết lượt thì mua Pro bằng chuyển khoản.
+ *  Các loại người dùng:
+ *   • Người dùng tự đăng ký (email + SĐT + mật khẩu): 10 lượt AI phân tích hook miễn phí.
+ *     Các tính năng Pro khác (font, tuỳ biến sâu, AI chỉnh chữ, xuất sạch) cần mua Pro.
  *   • Người dùng đã mua Pro: dùng Pro tới ngày hết hạn, AI 20 lượt mỗi ngày.
  *   • Học viên Tự Mình Xây Kênh và tài khoản vai 'pro' (bảng HocVien trong Lich.gs): Pro không giới hạn.
  *   • Khách chưa có tài khoản: 3 lượt AI thử theo thiết bị (HookAI.gs, tab HookThu).
@@ -14,12 +14,16 @@
  *   • Bot Telegram nhắn về kèm nút "Đã nhận tiền · mở Pro". Bấm là Pro mở,
  *     tool của người dùng tự nhận trong vài giây.
  *
- *  Cần thêm 2 dòng vào Code.gs (xem HUONG-DAN.md, mục Viral Studio).
+ *  STK, giá, số lượt: chỉnh bằng bot Telegram, gõ /studio để xem lệnh.
+ *  Bot lưu vào Script properties, nên không cần sửa code hay deploy lại.
+ *
+ *  Cần thêm 3 dòng vào Code.gs (xem HUONG-DAN.md, mục Viral Studio).
  * ═══════════════════════════════════════════════════════════════
  */
 
 /* ═══════ CẤU HÌNH BÁN PRO ═══════
-   Điền thẳng vào đây, hoặc đặt Script properties cùng tên (ưu tiên Script properties).
+   Cách dễ nhất: nhắn bot /stk, /giapro, /luotthu... (bot ghi vào Script properties, ưu tiên hơn giá trị ở đây).
+   Để trống ở đây cũng được.
    Mã ngân hàng theo VietQR: VCB, MB, TCB, ACB, BIDV, VPB, TPB, VIB, STB, OCB, ICB (VietinBank)... */
 var ST_NGAN_HANG_MD    = '';   // vd 'MB'
 var ST_STK_MD          = '';   // số tài khoản nhận tiền
@@ -28,7 +32,8 @@ var ST_GOI_MD = [
   {ma:'m1', ten:'Pro 1 tháng', gia:50000, ngay:30}
   // thêm gói dài hơn nếu muốn, ví dụ: ,{ma:'m3', ten:'Pro 3 tháng', gia:129000, ngay:90}
 ];
-var ST_LUOT_THU = 5;           // số lượt dùng thử Pro cho mỗi tài khoản mới
+var ST_LUOT_THU_MD = 10;       // số lượt AI phân tích miễn phí cho mỗi tài khoản mới (bot: /luotthu)
+var ST_LUOT_THU = stSo('ST_LUOT_THU', ST_LUOT_THU_MD);
 
 var ST_SHEET       = 'NguoiDung';
 var ST_HEADERS     = ['ma','email','sdt','ten','salt','hash','goi','pro_han','luot_dung',
@@ -41,6 +46,7 @@ function stCfg(k){
   var v = cfgProp(k); if (v) return v;
   return ({ST_NGAN_HANG:ST_NGAN_HANG_MD, ST_STK:ST_STK_MD, ST_CHU_TK:ST_CHU_TK_MD})[k] || '';
 }
+function stSo(k, macDinh){ var v = parseInt(PropertiesService.getScriptProperties().getProperty(k), 10); return isNaN(v) ? macDinh : v; }
 function stGoi(){
   try{ var v = cfgProp('ST_GOI'); if (v) return JSON.parse(v); }catch(e){}
   return ST_GOI_MD;
@@ -121,7 +127,7 @@ function stDangKy(b){
   } finally { lock.releaseLock(); }
 
   var token = ndCapToken(nd);
-  try{ tgBroadcast(['🆕 *Người dùng Viral Studio mới*','','👤 *'+ten+'*','📧 `'+email+'`','📱 `'+sdt+'`','🎁 '+ST_LUOT_THU+' lượt Pro dùng thử','🕐 '+nowVN()].join('\n')); }catch(e){}
+  try{ tgBroadcast(['🆕 *Người dùng Viral Studio mới*','','👤 *'+ten+'*','📧 `'+email+'`','📱 `'+sdt+'`','🎁 '+ST_LUOT_THU+' lượt AI phân tích miễn phí','🕐 '+nowVN()].join('\n')); }catch(e){}
   nd.luot_dung = '0';
   return jsonOut({ok:true, token:token, ho_so: ndHoSo(nd)});
 }
@@ -269,4 +275,129 @@ function studioCallback(cb){
   }
   tgAnswer(cb.id, nhan);
   tgApi('editMessageReplyMarkup', {chat_id:chatId, message_id:msgId, reply_markup:{inline_keyboard:[[{text:nhan, callback_data:'xong'}]]}});
+}
+
+/* ═══════ LỆNH BOT TELEGRAM (chỉ chat quản trị) ═══════
+   Code.gs gọi:  if (quanTri && studioCoLenh(cmd)) return studioLenh(cmd, arg, chatId);  */
+var LENH_STUDIO = ['studio','stk','giapro','ngaypro','luotthu','luotai','mopro','tatpro','dsck','timnd'];
+function studioCoLenh(cmd){ return LENH_STUDIO.indexOf(cmd) > -1; }
+
+var ST_MA_NH = {vietcombank:'VCB', vcb:'VCB', mb:'MB', mbbank:'MB', quandoi:'MB', techcombank:'TCB', tcb:'TCB',
+  acb:'ACB', bidv:'BIDV', vietinbank:'ICB', vietin:'ICB', ctg:'ICB', icb:'ICB', vpbank:'VPB', vpb:'VPB',
+  tpbank:'TPB', tpb:'TPB', sacombank:'STB', stb:'STB', agribank:'VBA', vba:'VBA', vib:'VIB', ocb:'OCB',
+  hdbank:'HDB', hdb:'HDB', shb:'SHB', msb:'MSB', maritimebank:'MSB', seabank:'SEAB', seab:'SEAB',
+  eximbank:'EIB', eib:'EIB', lpbank:'LPB', lienvietpostbank:'LPB', lpb:'LPB', namabank:'NAB', nab:'NAB',
+  shinhan:'SHBVN', shinhanbank:'SHBVN', cake:'CAKE', ubank:'UBANK', timo:'TIMO', abbank:'ABB', abb:'ABB',
+  bacabank:'BAB', bab:'BAB', pvcombank:'PVCB', pvcb:'PVCB', kienlongbank:'KLB', klb:'KLB', vietabank:'VAB',
+  scb:'SCB', ncb:'NCB', saigonbank:'SGICB', gpbank:'GPB', oceanbank:'Oceanbank', baovietbank:'BVB', vikki:'VIKKI'};
+function stMaNganHang(s){
+  var k = khongDau(s).replace(/[^a-z0-9]/g, '').replace(/^ngan?hang/, '');
+  return ST_MA_NH[k] || ST_MA_NH[k.replace(/bank$/, '')] || String(s).trim().toUpperCase();
+}
+function stDatGoi(sua){
+  var goi = stGoi(); if (!goi.length) goi = [{ma:'m1', ten:'Pro 1 tháng', gia:50000, ngay:30}];
+  sua(goi[0]);
+  goi[0].ten = goi[0].ngay % 30 === 0 ? 'Pro ' + (goi[0].ngay / 30) + ' tháng' : 'Pro ' + goi[0].ngay + ' ngày';
+  props().setProperty('ST_GOI', JSON.stringify(goi));
+  return goi[0];
+}
+function stTien(n){ return Number(n).toLocaleString('vi-VN') + 'đ'; }
+function stHan(d){ return d ? Utilities.formatDate(new Date(d), 'GMT+7', 'dd/MM/yyyy') : ''; }
+
+function studioLenh(cmd, arg, chatId){
+  var P = props();
+  var hoi = function(cau){ datCho(chatId, cmd); return tgSend(chatId, cau + '\n\n_Đổi ý thì /huy._'); };
+
+  if (cmd === 'studio'){
+    var bank = stNganHang(), g = stGoi()[0] || {}, ds = moiND(), pay = moiPay();
+    var soPro = ds.filter(ndLaPro).length, cho = pay.filter(function(p){ return p.trangthai === 'cho' }).length;
+    return tgSend(chatId, [
+      '🎬 *Viral Studio · cài đặt bán Pro*','',
+      '🏦 Nhận tiền: ' + (bank.stk ? '*' + bank.ngan_hang + '* · `' + bank.stk + '` · ' + bank.chu_tk : '⚠️ _chưa cài, người dùng chưa mua được_'),
+      '💰 Gói: *' + (g.ten || '?') + '* · *' + stTien(g.gia || 0) + '*',
+      '🎁 Tài khoản mới: *' + ST_LUOT_THU + '* lượt AI phân tích miễn phí',
+      '🤖 Pro và học viên: *' + (parseInt((typeof hookCfg === 'function' ? hookCfg('HOOK_AI_DAILY') : cfgProp('HOOK_AI_DAILY')) || '20', 10)) + '* lượt AI mỗi ngày',
+      '👥 ' + ds.length + ' người dùng · ' + soPro + ' đang Pro · ' + cho + ' giao dịch chờ','',
+      '*Lệnh*',
+      '🏦 /stk `MB | 0123456789 | NGUYEN VAN A` — tài khoản nhận tiền',
+      '💰 /giapro `50000` — giá gói Pro',
+      '📆 /ngaypro `30` — gói dùng bao nhiêu ngày',
+      '🎁 /luotthu `10` — số lượt AI miễn phí cho tài khoản mới',
+      '🤖 /luotai `20` — lượt AI mỗi ngày của Pro và học viên',
+      '🧾 /dsck — giao dịch đang chờ, bấm nút để mở Pro',
+      '🔎 /timnd `email` — xem một người dùng',
+      '✅ /mopro `email 30` — tự mở Pro cho ai đó (số ngày, bỏ trống = 1 gói)',
+      '⛔ /tatpro `email` — tắt Pro'
+    ].join('\n'));
+  }
+
+  if (cmd === 'stk'){
+    if (!arg) return hoi('🏦 Gửi tài khoản nhận tiền theo mẫu:\n`Ngân hàng | Số tài khoản | Tên chủ tài khoản`\nVí dụ: `Vietcombank | 0123456789 | Nguyễn Văn A`');
+    var x = arg.split(/\s*[|\n]\s*/).filter(function(t){ return t });
+    if (x.length < 3) return hoi('Chưa đủ 3 phần. Gửi lại theo mẫu:\n`MB | 0123456789 | NGUYEN VAN A`');
+    var nh = stMaNganHang(x[0]), so = x[1].replace(/\s/g, ''), chu = x.slice(2).join(' ').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[đĐ]/g, 'D').toUpperCase().replace(/[^A-Z0-9 ]/g, '').replace(/\s+/g, ' ').trim();
+    if (!/^[0-9A-Za-z]{4,20}$/.test(so)) return hoi('Số tài khoản chỉ gồm chữ số (4–20 ký tự). Gửi lại nhé.');
+    P.setProperties({ST_NGAN_HANG: nh, ST_STK: so, ST_CHU_TK: chu});
+    var qr = stQr({ngan_hang:nh, stk:so, chu_tk:chu}, (stGoi()[0] || {}).gia || 50000, 'VSTHU');
+    tgSend(chatId, '✅ Đã lưu tài khoản nhận tiền\n🏦 *' + nh + '* · `' + so + '`\n👤 ' + chu + '\n\nBot gửi QR thử bên dưới: quét bằng app ngân hàng, thấy đúng tên là ổn (đừng chuyển).');
+    try { tgApi('sendPhoto', {chat_id: chatId, photo: qr, caption: 'QR thử · ' + nh + ' ' + so}); } catch(e){}
+    return;
+  }
+
+  if (cmd === 'giapro'){
+    if (!arg) return hoi('💰 Giá gói Pro bao nhiêu? Ví dụ `50000` hoặc `50k`');
+    var tien = docTien(arg); if (!tien || tien < 1000) return hoi('Chưa hiểu số tiền. Gửi lại, ví dụ `50000`.');
+    var g1 = stDatGoi(function(g){ g.gia = tien });
+    return tgSend(chatId, '✅ Gói *' + g1.ten + '* giờ là *' + stTien(g1.gia) + '*. Tool cập nhật ngay lần mở sau.');
+  }
+  if (cmd === 'ngaypro'){
+    if (!arg) return hoi('📆 Mỗi gói Pro dùng bao nhiêu ngày? Ví dụ `30`');
+    var ngay = parseInt(arg, 10); if (!ngay || ngay < 1) return hoi('Gửi một con số, ví dụ `30`.');
+    var g2 = stDatGoi(function(g){ g.ngay = ngay });
+    return tgSend(chatId, '✅ Gói giờ là *' + g2.ten + '* (' + g2.ngay + ' ngày) · ' + stTien(g2.gia));
+  }
+  if (cmd === 'luotthu'){
+    if (!arg) return hoi('🎁 Mỗi tài khoản mới được bao nhiêu lượt AI phân tích miễn phí? Ví dụ `10`');
+    var n = parseInt(arg, 10); if (isNaN(n) || n < 0 || n > 1000) return hoi('Gửi một con số từ 0 đến 1000.');
+    P.setProperty('ST_LUOT_THU', String(n));
+    return tgSend(chatId, '✅ Tài khoản Free giờ có *' + n + '* lượt AI phân tích miễn phí (áp dụng cho cả người đã đăng ký, tính theo số lượt họ đã dùng).');
+  }
+  if (cmd === 'luotai'){
+    if (!arg) return hoi('🤖 Pro và học viên được bao nhiêu lượt AI mỗi ngày? Ví dụ `20`');
+    var d = parseInt(arg, 10); if (!d || d < 1 || d > 1000) return hoi('Gửi một con số từ 1 đến 1000.');
+    P.setProperty('HOOK_AI_DAILY', String(d));
+    return tgSend(chatId, '✅ Pro và học viên giờ có *' + d + '* lượt AI mỗi ngày.');
+  }
+
+  if (cmd === 'dsck'){
+    var chos = moiPay().filter(function(p){ return p.trangthai === 'cho' || p.trangthai === 'chua_thay' });
+    if (!chos.length) return tgSend(chatId, '🧾 Không có giao dịch nào đang chờ.');
+    tgSend(chatId, '🧾 *' + chos.length + ' giao dịch chưa mở Pro* (mới nhất ở dưới)');
+    chos.slice(-10).forEach(function(p){
+      tgSend(chatId, ['🧾 `' + p.ma_ck + '` · ' + (p.trangthai === 'cho' ? (String(p.nguon).indexOf('nguoi_dung_bao') === 0 ? '💸 đã báo chuyển' : '⏳ chưa báo') : '❌ đã bấm chưa thấy'),
+        '👤 *' + p.ten + '* · `' + p.email + '` · `' + p.sdt + '`', '💰 ' + stTien(p.so_tien) + ' · tạo ' + p.tao].join('\n'),
+        [[{text:'✅ Đã nhận tiền · mở Pro', callback_data:'s:ok:' + p.ma_ck}]]);
+    });
+    return;
+  }
+
+  // các lệnh theo email
+  if (!arg) return hoi('Gửi email người dùng' + (cmd === 'mopro' ? ', kèm số ngày nếu muốn (ví dụ `ban@gmail.com 30`)' : '') + '.');
+  var em = arg.split(/\s+/)[0], nd = ndTheoEmail(em);
+  if (!nd) return tgSend(chatId, '🔎 Không thấy người dùng Viral Studio có email `' + em + '`.');
+  if (cmd === 'timnd'){
+    return tgSend(chatId, ['👤 *' + nd.ten + '* · `' + nd.ma + '`', '📧 `' + nd.email + '` · 📱 `' + nd.sdt + '`',
+      ndLaPro(nd) ? '✦ Pro tới ' + stHan(nd.pro_han) : '🆓 Free · còn ' + ndLuotCon(nd) + '/' + ST_LUOT_THU + ' lượt AI',
+      '🕐 Tạo ' + nd.tao + (nd.dangnhap_cuoi ? ' · đăng nhập ' + nd.dangnhap_cuoi : '')].join('\n'));
+  }
+  if (cmd === 'mopro'){
+    var so2 = parseInt(arg.split(/\s+/)[1], 10) || (stGoi()[0] || {}).ngay || 30;
+    var goc = ndLaPro(nd) ? new Date(nd.pro_han) : new Date(); goc.setDate(goc.getDate() + so2);
+    ghiDong(ST_SHEET, ST_HEADERS, nd, {goi:'pro', pro_han: goc.toISOString()});
+    return tgSend(chatId, '✅ Đã mở Pro cho *' + nd.ten + '* thêm ' + so2 + ' ngày, tới *' + stHan(goc) + '*.');
+  }
+  if (cmd === 'tatpro'){
+    ghiDong(ST_SHEET, ST_HEADERS, nd, {goi:'free', pro_han: ''});
+    return tgSend(chatId, '⛔ Đã tắt Pro của *' + nd.ten + '*.');
+  }
 }

@@ -52,7 +52,7 @@ var HOOK_TEMPLATES = ['highlight','editorial','glass','sticker','bubbles','timel
                       'titlecard','list','knockout','lowerthird','quote','pov','outline'];
 
 /* Ai đang gọi: học viên hoặc tài khoản vai pro (Lich.gs), người dùng Viral Studio (Studio.gs), hoặc khách.
-   loai: 'hv' học viên/mentor/vai pro · 'pro' người dùng đã mua Pro · 'free' người dùng đang dùng 5 lượt thử
+   loai: 'hv' học viên/mentor/vai pro · 'pro' người dùng đã mua Pro · 'free' người dùng đang dùng lượt AI miễn phí
          · 'khach' chưa có tài khoản, 3 lượt AI thử theo thiết bị */
 function hookNguoi(b){
   var hv = aiDay(b.token);
@@ -86,7 +86,7 @@ function hookAi(b){
   if (!key) return jsonOut({ok:false, error:'chua_cai_key'});
 
   if (b.mode === 'layer'){
-    if (ai.loai === 'khach') return jsonOut({ok:false, error:'can_pro'});   // chỉnh từng lớp cần tài khoản
+    if (ai.loai === 'khach' || ai.loai === 'free') return jsonOut({ok:false, error:'can_pro'});   // AI chỉnh chữ chỉ dành cho Pro và học viên
     return hookLayer(b, ai, provider, key);
   }
 
