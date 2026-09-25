@@ -140,6 +140,9 @@ nav.stuck{border-bottom-color:var(--line);background:rgba(249,232,221,.96)}
 .nav-link{font-size:13.5px;color:var(--quiet);padding:10px 10px;border-radius:10px;white-space:nowrap;
   min-height:40px;display:inline-flex;align-items:center;transition:color .2s;font-weight:500}
 .nav-link:hover{color:var(--ink)}
+.nav-link.hot{color:var(--ink);font-weight:700}
+.nav-link.hot i{font-style:normal;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+  background:var(--lime);color:#1c2600;border-radius:999px;padding:2px 6px;margin-left:4px;vertical-align:2px}
 .nav-cta{display:flex;align-items:center;gap:14px}
 .nav-slots{font-size:12px;color:var(--quiet);display:flex;align-items:center;gap:6px;white-space:nowrap}
 .nav-slots b{color:var(--lime-deep);font-weight:700}
@@ -489,6 +492,43 @@ nav.stuck{border-bottom-color:var(--line);background:rgba(249,232,221,.96)}
 .soi-done p{font-size:14.5px;line-height:1.75;color:var(--quiet);margin-bottom:18px}
 .soi-done b{color:var(--ink)}
 @media(max-width:900px){.soi{grid-template-columns:1fr}.soi-done{grid-column:1}}
+
+/* ══ TOOL VIRAL — Viral Studio ══ */
+.tv{background:var(--lime);color:#1c2600;position:relative;overflow:hidden}
+.tv::before{content:'';position:absolute;inset:0;opacity:.08;pointer-events:none;
+  background-image:linear-gradient(#1c2600 2px,transparent 2px),linear-gradient(90deg,#1c2600 2px,transparent 2px);
+  background-size:100% 92px,184px 100%;-webkit-mask-image:radial-gradient(ellipse at 70% 40%,transparent 30%,#000 100%);mask-image:radial-gradient(ellipse at 70% 40%,transparent 30%,#000 100%)}
+.tv .shell{position:relative}
+.tv .h2{color:#1c2600}
+.tv .h2 em{font-style:italic;color:#1c2600;background:linear-gradient(transparent 62%,rgba(255,255,255,.55) 62%)}
+.tv .lead{color:#33420a;max-width:56ch}
+.tv .lead strong{color:#1c2600}
+.tv-tag{display:inline-block;font-family:var(--disp);font-weight:800;font-size:12px;letter-spacing:.1em;text-transform:uppercase;
+  background:var(--ink);color:var(--lime);border-radius:999px;padding:7px 14px;margin-bottom:16px;transform:rotate(-1.2deg)}
+.tv-tag.toi{background:var(--lime);color:#1c2600;margin-bottom:10px}
+.tv-khung{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(300px,.9fr);gap:clamp(28px,4vw,60px);align-items:center}
+.tv-ds{list-style:none;display:grid;gap:10px;margin:22px 0 26px}
+.tv-ds li{position:relative;padding-left:26px;font-size:15px;line-height:1.6;color:#2a3608}
+.tv-ds li::before{content:'✓';position:absolute;left:0;top:0;font-weight:800;color:#1c2600}
+.tv-ds b{color:#1c2600;font-weight:700}
+.tv-nut{display:flex;gap:12px;flex-wrap:wrap}
+.tv .btn-line{border-color:rgba(28,38,0,.45);color:#1c2600}
+.tv .btn-line:hover{border-color:#1c2600}
+.tv-phai{display:flex;flex-direction:column;align-items:center;gap:14px}
+.tv-phone{width:min(390px,100%);aspect-ratio:390/760;background:var(--ink);border-radius:38px;padding:12px;
+  box-shadow:0 24px 60px rgba(28,38,0,.35),0 0 0 2px rgba(255,255,255,.25) inset;transform:rotate(1.2deg)}
+.tv-phone iframe{width:100%;height:100%;border:0;border-radius:28px;background:#111;display:block}
+.tv-phai .hand{color:#1c2600;font-size:16px}
+.tv-gia{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(12px,1.8vw,20px);margin-top:clamp(36px,5vw,60px)}
+.tv-g{background:rgba(255,255,255,.55);border:1.5px solid rgba(28,38,0,.18);border-radius:var(--r);padding:clamp(18px,2.4vw,26px);display:flex;flex-direction:column;gap:6px}
+.tv-g small{font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:#4a5a12}
+.tv-g b{font-family:var(--disp);font-size:clamp(30px,3.6vw,42px);font-weight:800;line-height:1;color:#1c2600;letter-spacing:-.02em}
+.tv-g span{font-size:13.5px;line-height:1.65;color:#33420a}
+.tv-g.em{background:var(--ink);color:var(--paper-lt);border-color:var(--ink);transform:rotate(-.8deg);box-shadow:0 12px 0 rgba(28,38,0,.25)}
+.tv-g.em small{color:var(--lime)}.tv-g.em b{color:var(--lime)}.tv-g.em span{color:#d9dcc6}
+.tv-g.em .btn{margin-top:12px;background:var(--lime);color:#1c2600;box-shadow:0 5px 0 rgba(0,0,0,.35);align-self:flex-start}
+@media(max-width:960px){.tv-khung{grid-template-columns:1fr}.tv-phai{order:2}.tv-gia{grid-template-columns:1fr}.tv-g.em{transform:none}}
+@media(max-width:520px){.tv-phone{transform:none;border-radius:30px;padding:9px}.tv-nut .btn{width:100%}}
 
 /* ══ KHÔNG HỢP VỚI AI ══ */
 .kh{max-width:720px}
@@ -989,7 +1029,7 @@ body.hv-mode{padding-bottom:0}
 
 /* ═══════════ RESPONSIVE ═══════════ */
 @media(max-width:1440px){.nav-slots{display:none}.nav-link{padding:9px 8px;font-size:13px}}
-@media(max-width:1240px){.nav-link.phu{display:none}.brand span{display:none}}
+@media(max-width:1240px){.brand span{display:none}}
 @media(max-width:1000px){.nav-links{display:none}.burger{display:flex}}
 @media(max-width:1000px){
   .hero-in{grid-template-columns:1fr;gap:34px}
@@ -1074,16 +1114,12 @@ body.hv-mode{padding-bottom:0}
       <b>Tự Mình Xây Kênh</b><span>lớp 30 ngày</span>
     </a>
     <div class="nav-links">
-      <button class="nav-link" data-go="soikenh">Soi kênh free</button>
-      <button class="nav-link" data-go="cogi">Gói học</button>
+      <button class="nav-link hot" data-go="toolviral">Tool viral <i>free</i></button>
+      <button class="nav-link hot" data-go="soikenh">Soi kênh <i>free</i></button>
       <button class="nav-link" data-go="editkem">Edit kèm</button>
       <button class="nav-link" data-go="ketqua">Học viên cũ</button>
-      <button class="nav-link phu" data-go="tuan">Lịch tuần</button>
-      <button class="nav-link phu" data-go="lotrinh">Lộ trình</button>
-      <button class="nav-link" data-go="mentors">Người dạy</button>
+      <button class="nav-link" data-go="lotrinh">Lộ trình</button>
       <button class="nav-link" data-go="congdong">Cộng đồng</button>
-      <button class="nav-link" data-go="hocphi">Học phí</button>
-      <button class="nav-link" data-go="faq">Hỏi đáp</button>
     </div>
     <div class="nav-cta">
       <div class="nav-slots"><span class="dot"></span>còn <b data-bind="computed.remaining">—</b> chỗ</div>
@@ -1093,6 +1129,7 @@ body.hv-mode{padding-bottom:0}
     </div>
   </div>
   <div id="drawer">
+    <a href="#toolviral">Tool viral free</a>
     <a href="#soikenh">Soi kênh miễn phí</a>
     <a href="#cogi">Nhận được gì</a>
     <a href="#editkem">Edit kèm 1:1</a>
@@ -1161,10 +1198,54 @@ body.hv-mode{padding-bottom:0}
   </div>
 </div>
 
+<!-- ════════ TOOL VIRAL FREE — Viral Studio ════════ -->
+<section class="sec tv" id="toolviral"><div class="shell">
+  <div class="tv-khung">
+    <div class="tv-trai rv">
+      <span class="tv-tag">FREE · dùng ngay, không cần tài khoản</span>
+      <h2 class="h2">Viral Studio.<br>Đặt chữ hook lên video,<br>có <em>AI chấm hook</em> cho bạn.</h2>
+      <p class="lead">Dán câu hook, chọn frame video, tool tự xếp chữ theo những bố cục đang chạy tốt trên TikTok, xuất PNG kéo thẳng vào CapCut. Bản Pro có AI xem đúng frame của bạn: <strong>chấm hook trên 100, viết lại 5 bản, tự né mặt, viết sẵn caption</strong>. Mọi thứ tụi mình dạy trong lớp về hook được nhét vào con AI này.</p>
+      <ul class="tv-ds">
+        <li><b>14 bố cục hook</b> kiểu highlight, báo đỏ, POV, timeline, sticker… chọn là ra</li>
+        <li><b>19 font Việt, 12 kiểu chữ</b>: neon, 3D, viết tay, chữ rỗng, màu theo kênh của bạn</li>
+        <li><b>Trợ lý AI</b> chấm điểm hook, chỉ chỗ yếu, viết lại 5 bản theo công thức</li>
+        <li><b>Xuất PNG</b> tách từng lớp chữ, kéo vào CapCut là xong</li>
+      </ul>
+      <div class="tv-nut">
+        <a class="btn btn-ink btn-lg" href="tools/hook-text.html" target="_blank" rel="noopener">Mở tool · thử 3 lượt AI free ↗</a>
+        <a class="btn btn-line btn-lg" href="tools/hook-text.html#demo-pro" target="_blank" rel="noopener">Xem bản Pro mẫu</a>
+      </div>
+    </div>
+    <div class="tv-phai rv">
+      <div class="tv-phone">
+        <iframe src="tools/hook-text.html#demo-pro" loading="lazy" title="Xem thử Viral Studio" referrerpolicy="no-referrer"></iframe>
+      </div>
+      <span class="hand">↑ bản chạy thật, bấm thử ngay trong khung này</span>
+    </div>
+  </div>
+
+  <div class="tv-gia rv">
+    <div class="tv-g">
+      <small>Khách ghé chơi</small><b>3 lượt AI</b>
+      <span>Không cần tài khoản. Đủ để thấy AI sửa hook của bạn thành cái gì.</span>
+    </div>
+    <div class="tv-g">
+      <small>Gói Pro</small><b>50k</b>
+      <span>AI dùng mỗi ngày, đủ 14 bố cục, xuất sạch không logo. Tạo tài khoản ở khu học viên, nhắn Zalo là mở trong ngày.</span>
+    </div>
+    <div class="tv-g em">
+      <small>Học viên khoá</small><b>Free</b>
+      <span>Vào lớp là có Pro sẵn, cộng thêm mentor ngồi sửa video cùng bạn suốt 30 ngày.</span>
+      <button class="btn btn-ink btn-md" data-open data-cta>Đăng ký giữ chỗ →</button>
+    </div>
+  </div>
+</div></section>
+
 <!-- ════════ SOI KÊNH MIỄN PHÍ (chỗ hứng lead) ════════ -->
-<section class="sec" id="soikenh" style="padding-top:clamp(44px,6vw,72px)"><div class="shell">
+<section class="sec" id="soikenh"><div class="shell">
   <div class="soi rv" id="soiBox">
     <div class="soi-left">
+      <span class="tv-tag toi">FREE · trả lời qua Zalo trong 48 giờ</span>
       <span class="kicker">gửi video, tụi mình soi</span>
       <h3>Dán link một video.<br>Nhận đúng một chỗ nên sửa.</h3>
       <p>Bạn có biết video hay kênh của bạn đang có vấn đề gì chưa? Tụi mình sẽ hỗ trợ trả lời qua Zalo trong <b>48 giờ</b>: sửa video và phân tích cho bạn những điểm cần chú ý, kèm định hướng cải thiện. Gửi xong bạn nhận ngay <b>link group cộng đồng xây kênh</b>, miễn phí.</p>
@@ -1731,9 +1812,9 @@ body.hv-mode{padding-bottom:0}
       </div>
 
       <div class="hv-cua-toi" id="hvTools">
-        <h3>🧰 Công cụ cho học viên</h3>
-        <p style="margin:6px 0 10px">Hook Text Studio: đặt chữ hook lên frame video theo 7 mẫu bố cục, màu theo kênh của bạn, xuất PNG kéo thẳng vào CapCut.</p>
-        <a class="hv-nut" href="tools/hook-text.html" target="_blank" rel="noopener">Mở Hook Text Studio ↗</a>
+        <h3>🧰 Viral Studio · bản Pro của bạn</h3>
+        <p style="margin:6px 0 10px">Đặt chữ hook lên frame video theo 14 bố cục, AI chấm hook và viết lại 5 bản, xuất PNG sạch kéo thẳng vào CapCut. Đăng nhập ở đây rồi thì bên tool tự nhận Pro.</p>
+        <a class="hv-nut" href="tools/hook-text.html" target="_blank" rel="noopener">Mở Viral Studio ↗</a>
       </div>
 
       <div class="hv-chedo" id="hvCheDo" style="display:none">
@@ -2003,6 +2084,8 @@ var FAQS = [
    a:'Câu này khóa nào cũng có người hỏi, và gần như lần nào cũng sai. Người xem của bạn không phải người đứng trên đỉnh — là <strong>bạn của một, hai năm trước</strong>, người vừa qua được đúng cái họ đang kẹt. Bài đầu tiên trong lớp là ngồi lôi ra: nghề bạn đang làm, chuyện bạn từng vượt qua, thứ người quen hay khen bạn. Chưa ai đi ra khỏi buổi đó với tờ giấy trắng cả.'},
   {q:'Mình đăng 20 video rồi chưa cái nào lên, có phải làm sai gì không?',
    a:'Chưa chắc sai — thường là thiếu một vòng đọc số. Câu hỏi đúng không phải "sai gì" mà là <strong>video nào nhỉnh hơn một chút, và nó khác gì</strong>. Bạn có kênh sẵn thì vào lớp việc đầu tiên là mở số 20 video đó ra so cạnh nhau — thường công thức riêng của bạn đã nằm sẵn trong đó rồi, chỉ chưa ai chỉ cho bạn thấy.'},
+  {q:'Viral Studio là gì, có mất tiền không?',
+   a:'Là tool của tụi mình để đặt chữ hook lên video và có AI chấm hook. Ai vào cũng dùng được bản Free và <strong>thử 3 lượt AI không cần tài khoản</strong>. Muốn AI dùng mỗi ngày thì gói Pro <strong>50k</strong>: tạo tài khoản ở khu học viên, nhắn Zalo cho tụi mình là mở trong ngày. <strong>Học viên khoá được Pro miễn phí</strong>, có sẵn khi đăng nhập.'},
   {q:'Group cộng đồng khác gì group lớp?',
    a:'Group cộng đồng <strong>miễn phí</strong>, ai đăng ký giữ chỗ là vào được ngay, chưa cần đóng phí: mỗi ngày có bài chia sẻ, hỏi định hướng được trả lời và gửi kênh để mentor khám. Group lớp chỉ dành cho học viên đã đóng phí — lịch học, tài liệu, edit kèm 1:1 nằm ở đó. Vào cộng đồng trước, thấy hợp rồi mới vào lớp cũng không muộn.'},
   {q:'Lịch học cụ thể ra sao?',
@@ -2854,6 +2937,17 @@ function hvVaoTrong(){
   $('#hvWho').innerHTML = 'Chào <b>' + esc(HV.ten || 'bạn') + '</b>';
 
   var m = laMentor();
+  var pro = HV.vaitro === 'pro';           // mua Viral Studio Pro, không học khoá → chỉ có tool
+  ['#hvCheDo','#hvMineBox','#hvHan','#hvNgays','#hvLuu','#hvTQ','#hvChu'].forEach(function(s){
+    var e=$(s); if(e) e.style.display = pro ? 'none' : ''; });
+  var tuanBar = $('#hvTruoc') && $('#hvTruoc').parentNode; if (tuanBar) tuanBar.style.display = pro ? 'none' : '';
+  if (pro){
+    $('#hvVai').style.display = 'none';
+    $('#hvTenKhu').textContent = 'Viral Studio Pro';
+    $('#hvTieuDe').textContent = 'Tài khoản Pro của bạn đã mở';
+    $('#hvMoTa').textContent = 'Mở Viral Studio bên dưới là AI chạy ở bản Pro, đăng nhập đã được nhớ trên máy này. Lịch kèm 1:1 chỉ dành cho học viên khoá — muốn có mentor ngồi sửa video cùng thì xem lớp ở trang chính.';
+    return;
+  }
   $('#hvVai').style.display = m ? '' : 'none';
   $('#hvTenKhu').textContent = m ? 'Khu mentor' : 'Khu học viên';
   $('#hvTieuDe').textContent = m ? 'Lịch rảnh của bạn' : 'Đặt lịch kèm 1:1';
@@ -2983,6 +3077,7 @@ function hvDangNhap(){
 
 /* ---- tải lịch tuần ---- */
 function hvTai(tuan){
+  if (HV.vaitro === 'pro') return;         // tài khoản Pro không có lịch
   hvBoCho();
   if (laMentor() && HV.cheDo === 'tq') return hvTaiTongQuan(tuan);
   $('#hvTQ').style.display = 'none';
@@ -3369,6 +3464,7 @@ var HV_LOI = {
   het_phien:'Phiên hết hạn, bạn đăng nhập lại nhé.',
   khong_phai_cua_ban:'Đây không phải ca của bạn.',
   khong_phai_hv:'Chỉ học viên mới đặt được ca.',
+  chi_pro:'Tài khoản Pro chỉ dùng được Viral Studio, không đặt lịch kèm.',
   khong_phai_mentor:'Chỉ mentor mới mở được ca.',
   gio_sai:'Giờ chưa đúng — nhập kiểu 19:30-21:00 nhé.',
   khong_thay:'Ca này không còn trên lịch.',
