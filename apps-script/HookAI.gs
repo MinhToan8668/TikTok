@@ -362,7 +362,7 @@ var HOOK_DESIGN_LUAT = [
   '2. Mỗi dòng một vai trò, tạo nhịp nhỏ → to → nhỏ → to cho mắt đọc:',
   '   - "dan": dòng dẫn nhỏ (ai, bối cảnh). Sans thường 500-600, cỡ 40-60, trắng.',
   '   - "dinh": dòng đinh to nhất, chứa ý gây sốc/tò mò (nơi chốn, con số, kết quả). Sans đậm 800-900 hoặc Anton, cỡ 96-150. Chỉ 1 dòng đinh.',
-  '   - "nhan": cụm cảm xúc/bất ngờ (theo chồng, mối quan hệ?, giày rách). Serif NGHIÊNG (Playfair Display, Lora, Noto Serif) hoặc viết tay (Dancing Script, Pacifico), MÀU NHẤN, cỡ 72-120. Tối đa 1 đến 2 dòng.',
+  '   - "nhan": cụm cảm xúc/bất ngờ (ví dụ: không lộ mặt, vẫn ra đơn?, từ con số 0). Serif NGHIÊNG (Playfair Display, Lora, Noto Serif) hoặc viết tay (Dancing Script, Pacifico), MÀU NHẤN, cỡ 72-120. Tối đa 1 đến 2 dòng.',
   '   - "phu": dòng phụ nhỏ cuối (giải thích, câu hỏi phụ). Sans 500, cỡ 36-54, trắng, được tô **từ khoá** màu nhấn.',
   '3. Không để 2 dòng cùng vai trò đứng sát nhau (trừ dòng "dan" rất ngắn). Không dòng nào quá 22 ký tự, dòng đinh ≤ 14 ký tự.',
   '4. Màu: chữ chính trắng #FFFFFF. Chọn ĐÚNG MỘT màu nhấn hợp với ảnh: nhìn màu chủ đạo của frame, chọn màu nổi bật nhưng hài hoà (ảnh ấm/gỗ → hồng #FF6FB5 hoặc vàng #FFE14D; ảnh lạnh/trắng xám → hồng #FF4FA3, xanh lá #99DF00, cam #FF9A3C; ảnh tối → vàng #FFE14D, xanh ngọc #5EE7C6). Dòng nhấn dùng màu nhấn; trong dòng phụ có thể tô **từ khoá** bằng màu nhấn.',
@@ -374,9 +374,9 @@ var HOOK_DESIGN_LUAT = [
   '   - label: vlog/cảnh đẹp, tên chủ đề ngắn: nhãn nhỏ VIẾT HOA + tiêu đề grotesk rất to + dòng ký tên serif nghiêng, cả khối MỘT màu (vàng #F5E50A hoặc trắng). 2-3 dòng.',
   '   - minivlog: vlog đời thường nhẹ nhàng: dòng nghiêng nhỏ (mini vlog) + 1-2 dòng chữ thường rất to + dòng nghiêng nhỏ cuối (ngày tháng hoặc câu phụ), căn trái.',
   '   - zigzag: câu kể "một ngày của...": 4-5 cụm, xen kẽ to (màu kem) và nhỏ (trắng), lệch trái phải.',
-  '   - stairs: 2-4 từ ngắn tả trạng thái (một ngày bình thường): mỗi từ một bậc thang to, dòng phụ mảnh giãn chữ phía dưới.',
+  '   - stairs: 2-4 từ ngắn tả nhịp làm việc (quay dựng đăng): mỗi từ một bậc thang to, dòng phụ mảnh giãn chữ phía dưới.',
   '   - serifmix: chủ đề tiền bạc, tuổi tác, cuộc sống trưởng thành: serif nghiêng nhỏ + serif đậm to màu vàng kem + dòng phụ serif nhỏ.',
-  '   - condensed: 2-4 từ cảm xúc (vi lốc cuối tuần): chữ cao hẹp to xếp dọc, màu kem.',
+  '   - condensed: 2-4 từ cảm xúc (kênh nhỏ sống khoẻ): chữ cao hẹp to xếp dọc, màu kem.',
   '   - daily: năng lượng vui, trẻ: 1-2 từ VIẾT HOA béo tròn màu vàng nghiêng.',
   '   - glow: 2-4 từ về cảm xúc/năng lượng: serif phát sáng vàng ấm, hợp ảnh tối.'
 ].join('\n');

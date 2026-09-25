@@ -2598,17 +2598,17 @@ const COMBOS = {
     return { accent: c, top_y: topFor(o, 18), x: .5, lines: parts.map((t, i) => lnD(t, { role: i ? 'phu' : 'dinh', font: 'Noto Serif', weight: 700, size: i ? 64 : 96, color: c, glow: '#FFB800', shadow: false, gap: .95 })) };
   } },
 };
-/* xem trước trong thẻ chọn kiểu */
-const COMBO_PV = {
-  viral: `<i style="font:700 9px 'Be Vietnam Pro'">Gái Đà Nẵng</i><i style="font:italic 800 11px 'Playfair Display';color:#FF6FB5">theo chồng</i><i style="font:900 15px 'Be Vietnam Pro'">Bắc Ninh</i>`,
-  label: `<i style="font:700 6px Inter;color:#F5E50A;text-transform:uppercase">recent favorite</i><i style="font:800 17px 'Bricolage Grotesque';letter-spacing:-.8px;color:#F5E50A">Aktiv</i><i style="font:italic 400 7px 'Playfair Display';color:#F5E50A">with love, ulan</i>`,
-  minivlog: `<i style="font:italic 500 7px 'Playfair Display';align-self:flex-start">mini vlog</i><i style="font:900 15px/0.95 'Be Vietnam Pro';letter-spacing:-.6px;align-self:flex-start">day in<br>my life</i><i style="font:italic 500 6px 'Playfair Display';align-self:flex-start">03.07.26</i>`,
-  zigzag: `<i style="font:800 15px 'Be Vietnam Pro';letter-spacing:-.8px;color:#F6F0C4;margin-right:14px">một ngày</i><i style="font:600 8px 'Be Vietnam Pro';margin-right:22px">của người</i><i style="font:800 15px 'Be Vietnam Pro';letter-spacing:-.8px;color:#F6F0C4;margin-left:14px">đi làm</i>`,
-  stairs: `<i style="font:900 13px/1 'Be Vietnam Pro';margin-right:22px">một</i><i style="font:900 13px/1 'Be Vietnam Pro'">ngày</i><i style="font:900 13px/1 'Be Vietnam Pro';margin-left:22px">bình thường</i>`,
-  serifmix: `<i style="font:italic 500 9px 'Playfair Display';color:#FBF3DA">U30 sống 1 mình</i><i style="font:900 13px 'Playfair Display';color:#F3DF8C">Lương 100 triệu</i><i style="font:500 6px 'Playfair Display';color:#FBF3DA">1 ngày tiêu bao nhiêu?</i>`,
-  condensed: `<i style="font:600 19px/0.95 Oswald;color:#F4E6A6">vi lốc</i><i style="font:600 19px/0.95 Oswald;color:#F4E6A6">cuối tuần</i>`,
-  daily: `<i style="font:400 15px 'Paytone One';color:#FFD60A;transform:rotate(-9deg);text-shadow:0 2px 0 #2A1C00;margin-right:10px">DAILY</i><i style="font:400 15px 'Paytone One';color:#FFD60A;transform:rotate(-9deg);text-shadow:0 2px 0 #2A1C00;margin-left:10px">VLOG</i>`,
-  glow: `<i style="font:700 13px 'Noto Serif';color:#FFE680;text-shadow:0 0 8px #FFB800,0 0 3px #FFB800">Năng lượng</i><i style="font:700 9px 'Noto Serif';color:#FFE680;text-shadow:0 0 8px #FFB800">cao</i>`,
+/* câu mẫu riêng cho ảnh xem trước của từng kiểu (nội dung làm kênh, không mượn video người khác) */
+const COMBO_SAMPLE = {
+  viral: 'kênh 0 follow\n**không lộ mặt**\nlên 10K\nsau 90 ngày',
+  label: 'hành trình\nXây Kênh\ntừ con số 0',
+  minivlog: 'mini vlog\nmột ngày\nquay 5 video\ntừ 7h sáng',
+  zigzag: 'làm content\ntại nhà\nmỗi ngày\n1 tiếng\nvẫn ra đơn',
+  stairs: 'quay dựng đăng\nmỗi ngày một video',
+  serifmix: '25 tuổi làm content\nThu nhập 30 triệu\nnhờ 1 kênh TikTok nhỏ',
+  condensed: 'kênh nhỏ\nsống khoẻ',
+  daily: 'vlog\nlàm kênh',
+  glow: 'Tự Mình\nXây Kênh',
 };
 function buildCombos() {
   const box = $('#templates'); if (!box) return;
@@ -2634,8 +2634,7 @@ let comboThumbT = null, comboFontsOk = false;
 function renderComboThumbsSoon() { clearTimeout(comboThumbT); comboThumbT = setTimeout(renderComboThumbs, 350); }
 async function renderComboThumbs() {
   if (!lastRender || drag) return;
-  const text = hookSource() || 'Một ngày\n**bình thường**\ncủa tôi';
-  const designs = Object.entries(COMBOS).map(([k, c]) => [k, c.make(hookParts(text))]);
+  const designs = Object.entries(COMBOS).map(([k, c]) => [k, c.make(hookParts(COMBO_SAMPLE[k] || 'Tự Mình\nXây Kênh'))]);
   if (!comboFontsOk) { await ensureLayerFonts(designs.flatMap(([, d]) => d.lines.map(l => ({ font: l.font, weight: l.weight, runs: [] })))); comboFontsOk = true; }
   const W = 360, H = 640; const fr = lastRender.fr;
   for (const [k, d] of designs) {
