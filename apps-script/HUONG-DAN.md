@@ -191,9 +191,7 @@ Trang `tools/hook-text.html` có tài khoản riêng cho người dùng ngoài l
    - `ST_NGAN_HANG_MD`: mã ngân hàng VietQR, ví dụ `MB`, `VCB`, `TCB`, `ACB`.
    - `ST_STK_MD`: số tài khoản nhận tiền. `ST_CHU_TK_MD`: tên chủ tài khoản, IN HOA KHÔNG DẤU.
    - `ST_GOI_MD`: tên gói, giá, số ngày (mặc định Pro 1 tháng 50.000đ). Muốn đổi giá không cần sửa code thì đặt Script property `ST_GOI` dạng JSON.
-3. Thêm 3 dòng vào `Code.gs` (đã có sẵn trong bản trên GitHub):
-   - trong `doPost`, ngay trước dòng `// Update từ Telegram webhook`:
-     `if (e.parameter && e.parameter.pay) return studioWebhook(e, body);`
+3. Thêm 2 dòng vào `Code.gs` (đã có sẵn trong bản trên GitHub):
    - trong `doPost`, ngay sau dòng `if (body.action === 'hook_status') ...`:
      `if (String(body.action||'').indexOf('st_') === 0) return studioApi(body);`
    - trong `handleCallback`, ngay sau dòng `... return lichCallback(cb);`:
@@ -202,12 +200,8 @@ Trang `tools/hook-text.html` có tài khoản riêng cho người dùng ngoài l
 5. Deploy → Manage deployments → Edit → New version → Deploy.
 
 ### Mở Pro sau khi chuyển khoản
-- **Bằng tay:** người dùng bấm "Tôi đã chuyển khoản" → bot Telegram nhắn kèm nút **✅ Đã nhận tiền · mở Pro**. Bấm là người dùng thấy Pro mở trong vài giây (trang tự kiểm tra 8 giây một lần).
-- **Tự động (khuyên dùng):** đăng ký [SePay](https://sepay.vn) hoặc Casso, liên kết tài khoản ngân hàng nhận tiền, rồi:
-  1. Đặt `ST_WEBHOOK_KEY_MD` trong `Studio.gs` là một chuỗi bí mật dài, ví dụ 24 ký tự ngẫu nhiên.
-  2. Ở SePay → Webhooks → thêm URL: `<URL web app>?pay=<chuỗi bí mật>`, kiểu xác thực: không cần.
-  3. Tiền vào có nội dung chứa mã `VS...` và đủ số tiền là Pro tự mở, bot báo "💰 tự mở Pro".
-  Thiếu tiền thì bot cảnh báo và không mở.
+- Người dùng quét QR chuyển khoản rồi bấm "Tôi đã chuyển khoản" → bot Telegram nhắn kèm nút **✅ Đã nhận tiền · mở Pro**. Bấm là người dùng thấy Pro mở trong vài giây (trang tự kiểm tra 8 giây một lần).
+- Chưa thấy tiền thì bấm **❌ Chưa thấy tiền**, giao dịch chuyển sang `chua_thay`. Người dùng bấm báo lại thì bot nhắn lại.
 
 Dữ liệu nằm ở hai tab mới: `NguoiDung` (tài khoản, lượt thử, hạn Pro) và `ThanhToan` (từng mã chuyển khoản).
 Muốn tặng thêm lượt hoặc gia hạn tay: sửa cột `luot_dung` (số lượt đã dùng) hoặc `pro_han` (ISO, ví dụ `2026-12-31T16:59:59.000Z`) trong tab `NguoiDung`.

@@ -355,9 +355,6 @@ function doPost(e){
     var body = {};
     try{ body = JSON.parse(e.postData.contents); }catch(err){ body = {}; }
 
-    // Viral Studio: webhook ngân hàng (SePay / Casso) báo tiền vào — xem Studio.gs
-    if (e.parameter && e.parameter.pay) return studioWebhook(e, body);
-
     // Update từ Telegram webhook — mỗi update chỉ xử lý MỘT lần
     if (body.update_id !== undefined){
       if (!daXuLy(body.update_id)){

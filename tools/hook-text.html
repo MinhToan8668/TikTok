@@ -788,7 +788,7 @@
             <dt>Số tiền</dt><dd><span id="payTien"></span> <button class="chip" type="button" data-copy="payTien">Chép</button></dd>
             <dt>Nội dung</dt><dd><b id="payNd"></b> <button class="chip" type="button" data-copy="payNd">Chép</button></dd>
           </dl>
-          <p class="hint">Quét mã QR bằng app ngân hàng là tự điền đủ. Ghi <b>đúng nội dung</b> để hệ thống tự nhận ra và mở Pro.</p>
+          <p class="hint">Quét mã QR bằng app ngân hàng là tự điền đủ. Ghi <b>đúng nội dung</b> để admin đối chiếu. Chuyển xong bấm nút bên dưới.</p>
           <button class="btn pro wide" id="btnPaid" type="button">Tôi đã chuyển khoản</button>
         </div>
         <p class="hint" style="margin-top:10px">Hoặc đăng ký làm <b>học viên Tự Mình Xây Kênh</b>: được duyệt là dùng Pro không giới hạn. <a href="../index.html">Xem khoá học</a></p>
@@ -2539,7 +2539,7 @@ function bindAcctUI() {
     msg.className = 'status'; msg.innerHTML = '<span class="spinner"></span>Đang báo admin...';
     try {
       const r = await callApi({ action: 'st_paid', token: ndToken(), ma_ck: state.pay.ma_ck });
-      if (r.ok) { msg.className = 'status ok'; msg.textContent = r.da_mo ? 'Pro đã mở!' : 'Đã báo. Pro tự mở ngay khi tiền về, thường vài phút. Bạn cứ đóng bảng này và dùng tiếp.'; pollPro(); if (r.da_mo) checkPro(); }
+      if (r.ok) { msg.className = 'status ok'; msg.textContent = r.da_mo ? 'Pro đã mở!' : 'Đã báo admin. Pro mở ngay khi admin xác nhận đã nhận tiền, thường vài phút. Bạn cứ đóng bảng này và dùng tiếp, trang tự cập nhật.'; pollPro(); if (r.da_mo) checkPro(); }
       else { msg.className = 'status err'; msg.textContent = ACCT_ERR[r.error] || 'Chưa báo được, thử lại.'; }
     } catch { msg.className = 'status err'; msg.textContent = 'Không kết nối được máy chủ.'; }
   });

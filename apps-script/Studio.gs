@@ -9,13 +9,12 @@
  *   • Học viên Tự Mình Xây Kênh và tài khoản vai 'pro' (bảng HocVien trong Lich.gs): Pro không giới hạn.
  *   • Khách chưa có tài khoản: 3 lượt AI thử theo thiết bị (HookAI.gs, tab HookThu).
  *
- *  Mở Pro sau khi chuyển khoản, hai cách chạy song song:
- *   • Tự động: nối webhook SePay hoặc Casso vào  <URL web app>?pay=<ST_WEBHOOK_KEY>
- *     Tiền vào có nội dung đúng mã "VS..." và đủ số tiền là mở Pro ngay.
- *   • Bằng tay: người dùng bấm "Tôi đã chuyển khoản", bot Telegram nhắn về
- *     kèm nút "Đã nhận tiền · mở Pro". Bấm là xong.
+ *  Mở Pro sau khi chuyển khoản:
+ *   • Người dùng quét QR chuyển tiền, bấm "Tôi đã chuyển khoản".
+ *   • Bot Telegram nhắn về kèm nút "Đã nhận tiền · mở Pro". Bấm là Pro mở,
+ *     tool của người dùng tự nhận trong vài giây.
  *
- *  Cần thêm 3 dòng vào Code.gs (xem HUONG-DAN.md, mục Viral Studio).
+ *  Cần thêm 2 dòng vào Code.gs (xem HUONG-DAN.md, mục Viral Studio).
  * ═══════════════════════════════════════════════════════════════
  */
 
@@ -25,7 +24,6 @@
 var ST_NGAN_HANG_MD    = '';   // vd 'MB'
 var ST_STK_MD          = '';   // số tài khoản nhận tiền
 var ST_CHU_TK_MD       = '';   // tên chủ tài khoản, IN HOA KHÔNG DẤU
-var ST_WEBHOOK_KEY_MD  = '';   // chuỗi bí mật tự đặt (20 ký tự trở lên) cho webhook SePay/Casso
 var ST_GOI_MD = [
   {ma:'m1', ten:'Pro 1 tháng', gia:50000, ngay:30}
   // thêm gói dài hơn nếu muốn, ví dụ: ,{ma:'m3', ten:'Pro 3 tháng', gia:129000, ngay:90}
@@ -41,8 +39,7 @@ var ST_PAY_HEADERS = ['ma_ck','ma_nd','email','sdt','ten','goi','so_tien','ngay'
 
 function stCfg(k){
   var v = cfgProp(k); if (v) return v;
-  return ({ST_NGAN_HANG:ST_NGAN_HANG_MD, ST_STK:ST_STK_MD, ST_CHU_TK:ST_CHU_TK_MD,
-           ST_WEBHOOK_KEY:ST_WEBHOOK_KEY_MD})[k] || '';
+  return ({ST_NGAN_HANG:ST_NGAN_HANG_MD, ST_STK:ST_STK_MD, ST_CHU_TK:ST_CHU_TK_MD})[k] || '';
 }
 function stGoi(){
   try{ var v = cfgProp('ST_GOI'); if (v) return JSON.parse(v); }catch(e){}
@@ -241,7 +238,7 @@ function stDaChuyen(b){
   return jsonOut({ok:true});
 }
 
-/* ── mở Pro cho một giao dịch (dùng chung cho nút bot và webhook) ── */
+/* ── mở Pro cho một giao dịch (nút bot Telegram) ── */
 function stKichHoat(maCk, nguon){
   var lock = LockService.getScriptLock(); lock.waitLock(15000);
   try{
@@ -272,27 +269,4 @@ function studioCallback(cb){
   }
   tgAnswer(cb.id, nhan);
   tgApi('editMessageReplyMarkup', {chat_id:chatId, message_id:msgId, reply_markup:{inline_keyboard:[[{text:nhan, callback_data:'xong'}]]}});
-}
-
-/* ── webhook ngân hàng: SePay hoặc Casso gọi vào <URL>?pay=<ST_WEBHOOK_KEY> ── */
-function studioWebhook(e, body){
-  var key = stCfg('ST_WEBHOOK_KEY');
-  if (!key || String(e.parameter.pay) !== key) return jsonOut({success:false});
-  var ds = [];
-  if (body && Array.isArray(body.data)) body.data.forEach(function(t){ ds.push({nd: t.description || t.content || '', tien: Number(t.amount) || 0}) });  // Casso
-  else if (body) ds.push({nd: body.content || body.description || '', tien: Number(body.transferAmount || body.amount) || 0, vao: body.transferType !== 'out'});  // SePay
-  ds.forEach(function(t){
-    if (t.vao === false) return;
-    var m = String(t.nd).toUpperCase().replace(/\s+/g, '').match(/VS[A-Z0-9]{8}/);
-    if (!m) return;
-    var p = null; moiPay().forEach(function(x){ if (String(x.ma_ck).toUpperCase() === m[0]) p = x });
-    if (!p || p.trangthai === 'da_nhan') return;
-    if (t.tien < Number(p.so_tien)){
-      tgBroadcast('⚠️ *Viral Studio:* tiền vào mã `'+p.ma_ck+'` là '+t.tien.toLocaleString('vi-VN')+'đ, thiếu so với '+Number(p.so_tien).toLocaleString('vi-VN')+'đ. Chưa mở Pro, kiểm tra giúp.');
-      return;
-    }
-    var kq = stKichHoat(p.ma_ck, 'tu_dong');
-    if (kq.ok && !kq.lap) tgBroadcast('💰 *Viral Studio: tự mở Pro*\n\n👤 *'+p.ten+'* · `'+p.email+'`\n📦 '+p.goi+' · '+t.tien.toLocaleString('vi-VN')+'đ\n🧾 `'+p.ma_ck+'`');
-  });
-  return jsonOut({success:true});
 }
