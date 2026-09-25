@@ -48,15 +48,37 @@ var HOOK_HEADERS   = ['thoi_gian','ma','ten','vaitro','hook','ok','loi','input_t
 var HOOK_TEMPLATES = ['highlight','editorial','glass','sticker','bubbles','timeline','chips',
                       'titlecard','list','knockout','lowerthird','quote','pov','outline'];
 
+/* Ai đang gọi: học viên (Lich.gs) hoặc người dùng Viral Studio (Studio.gs).
+   loai: 'hv' học viên · 'pro' người dùng đã mua Pro · 'free' người dùng đang dùng thử */
+function hookNguoi(token){
+  var hv = aiDay(token);
+  if (hv) return {me:hv, loai:'hv'};
+  if (typeof ndTuToken === 'function'){
+    var nd = ndTuToken(token);
+    if (nd) return {me:{ma:'U'+nd.ma, ten:nd.ten, ten_goi:nd.ten, vaitro:'nd'}, loai: ndLaPro(nd) ? 'pro' : 'free', nd:nd};
+  }
+  return null;
+}
+/* Trừ lượt: người dùng thử trừ vào 5 lượt thử, còn lại trừ hạn mức theo ngày */
+function hookTru(ai, han){
+  if (ai.loai === 'free') return stTruLuotThu(ai.nd.ma);
+  return hookTruLuot(ai.me.ma, han, ai.me.vaitro === 'mentor');
+}
+function hookHoan(ai){
+  if (ai.loai === 'free') return stHoanLuotThu(ai.nd.ma);
+  return hookHoanLuot(ai.me.ma, ai.me.vaitro === 'mentor');
+}
+
 function hookAi(b){
-  var me = aiDay(b.token);
-  if (!me) return jsonOut({ok:false, error:'het_phien'});
+  var ai = hookNguoi(b.token);
+  if (!ai) return jsonOut({ok:false, error:'het_phien'});
+  var me = ai.me;
 
   var provider = (hookCfg('HOOK_AI_PROVIDER') || 'gemini').toLowerCase();
   var key = provider === 'claude' ? cfgProp('ANTHROPIC_API_KEY') : hookCfg('GEMINI_API_KEY');
   if (!key) return jsonOut({ok:false, error:'chua_cai_key'});
 
-  if (b.mode === 'layer') return hookLayer(b, me, provider, key);
+  if (b.mode === 'layer') return hookLayer(b, ai, provider, key);
 
   var text = String(b.text || '').slice(0, 1500).trim();
   if (!text) return jsonOut({ok:false, error:'thieu_text'});
@@ -64,23 +86,23 @@ function hookAi(b){
   if (img.length > 1500000) return jsonOut({ok:false, error:'anh_qua_lon'});
 
   // ── lượt trong ngày ──
-  var han = parseInt(hookCfg('HOOK_AI_DAILY') || '20', 10) || 20;
+  var han = ai.loai === 'free' ? ST_LUOT_THU : (parseInt(hookCfg('HOOK_AI_DAILY') || '20', 10) || 20);
   var khongGioiHan = me.vaitro === 'mentor';
-  var con = hookTruLuot(me.ma, han, khongGioiHan);
-  if (con < 0) return jsonOut({ok:false, error:'het_luot', han:han});
+  var con = hookTru(ai, han);
+  if (con < 0) return jsonOut({ok:false, error: ai.loai === 'free' ? 'het_luot_thu' : 'het_luot', han:han});
 
   // ── gọi AI ──
   var prompt = hookPrompt(text, b, !!img);
   var kq = provider === 'claude' ? goiClaude(key, img, prompt) : goiGemini(key, img, prompt);
   if (!kq.ok){
-    hookHoanLuot(me.ma, khongGioiHan);
+    hookHoan(ai);
     hookLog(me, text, false, kq.loi, kq.vin || 0, kq.vout || 0, kq.model);
     return jsonOut({ok:false, error: kq.error, chi_tiet: String(kq.loi || '').slice(0, me.vaitro === 'mentor' ? 400 : 160)});
   }
   var data = kq.data;
 
   hookLog(me, text, true, '', kq.vin || 0, kq.vout || 0, kq.model);
-  return jsonOut({ok:true, data:data, con: khongGioiHan ? null : con, han:han, ten: me.ten_goi || me.ten});
+  return jsonOut({ok:true, data:data, con: khongGioiHan ? null : con, han:han, loai:ai.loai, ten: me.ten_goi || me.ten});
 }
 
 /* ── Gemini: bậc miễn phí, dữ liệu có thể được Google dùng để cải thiện sản phẩm ──
@@ -230,7 +252,8 @@ var HOOK_PRESET_MO_TA = {
   'Editorial serif':'serif nghiêng sang, cảm xúc, chiêm nghiệm', 'Viền rỗng':'chữ rỗng viền trắng, táo bạo',
   'Báo đỏ':'khối đỏ viết hoa, tin nóng, cảnh báo', 'Viết tay':'chữ viết tay, tâm sự, nhẹ nhàng'
 };
-function hookLayer(b, me, provider, key){
+function hookLayer(b, ai, provider, key){
+  var me = ai.me;
   var text = String(b.text || '').slice(0, 400).trim();
   if (!text) return jsonOut({ok:false, error:'thieu_text'});
   var yc = HOOK_LAYER_ASK[b.ask];
@@ -238,10 +261,10 @@ function hookLayer(b, me, provider, key){
   var presets = (Array.isArray(b.presets) ? b.presets : []).map(function(x){ return String(x).slice(0, 30) }).filter(function(x){ return x }).slice(0, 20);
   if (!presets.length) presets = Object.keys(HOOK_PRESET_MO_TA);
 
-  var han = parseInt(hookCfg('HOOK_AI_DAILY') || '20', 10) || 20;
+  var han = ai.loai === 'free' ? ST_LUOT_THU : (parseInt(hookCfg('HOOK_AI_DAILY') || '20', 10) || 20);
   var khongGioiHan = me.vaitro === 'mentor';
-  var con = hookTruLuot(me.ma, han, khongGioiHan);
-  if (con < 0) return jsonOut({ok:false, error:'het_luot', han:han});
+  var con = hookTru(ai, han);
+  if (con < 0) return jsonOut({ok:false, error: ai.loai === 'free' ? 'het_luot_thu' : 'het_luot', han:han});
 
   var prompt = [
     'Bạn là mentor hook cho học viên khóa "Tự Mình Xây Kênh". Học viên đang chỉnh MỘT lớp chữ đặt trên video dọc 9:16. Làm đúng theo hệ kiến thức dưới đây, nói thẳng, không giọng văn AI.',
@@ -260,24 +283,26 @@ function hookLayer(b, me, provider, key){
 
   var kq = provider === 'claude' ? goiClaude(key, '', prompt, schema, 1200) : goiGemini(key, '', prompt, schema, 1200);
   if (!kq.ok){
-    hookHoanLuot(me.ma, khongGioiHan);
+    hookHoan(ai);
     hookLog(me, '[lop:' + b.ask + '] ' + text, false, kq.loi, kq.vin || 0, kq.vout || 0, kq.model);
     return jsonOut({ok:false, error: kq.error, chi_tiet: String(kq.loi || '').slice(0, me.vaitro === 'mentor' ? 400 : 160)});
   }
   var d = kq.data || {};
   var out = { text: String(d.text || text).slice(0, 400), preset: presets.indexOf(d.preset) >= 0 ? d.preset : '', note: String(d.note || '').slice(0, 300) };
   hookLog(me, '[lop:' + b.ask + '] ' + text, true, '', kq.vin || 0, kq.vout || 0, kq.model);
-  return jsonOut({ok:true, data:out, con: khongGioiHan ? null : con, han:han});
+  return jsonOut({ok:true, data:out, con: khongGioiHan ? null : con, han:han, loai:ai.loai});
 }
 
 /* Xem còn bao nhiêu lượt mà không trừ — trang tool gọi lúc mở để hiện "còn N lượt" */
 function hookTrangThai(b){
-  var me = aiDay(b.token);
-  if (!me) return jsonOut({ok:false, error:'het_phien'});
+  var ai = hookNguoi(b.token);
+  if (!ai) return jsonOut({ok:false, error:'het_phien'});
+  var me = ai.me;
+  if (ai.loai === 'free') return jsonOut({ok:true, ten: me.ten, con: ndLuotCon(ai.nd), han: ST_LUOT_THU, loai:'free'});
   var han = parseInt(hookCfg('HOOK_AI_DAILY') || '20', 10) || 20;
-  if (me.vaitro === 'mentor') return jsonOut({ok:true, ten: me.ten_goi || me.ten, con:null, han:han});
+  if (me.vaitro === 'mentor') return jsonOut({ok:true, ten: me.ten_goi || me.ten, con:null, han:han, loai:ai.loai});
   var dem = hookDemHomNay()[me.ma] || 0;
-  return jsonOut({ok:true, ten: me.ten_goi || me.ten, con: Math.max(0, han - dem), han:han});
+  return jsonOut({ok:true, ten: me.ten_goi || me.ten, con: Math.max(0, han - dem), han:han, loai:ai.loai});
 }
 
 /* ── lượt: một thuộc tính mỗi ngày {ma: số lượt}, ngày cũ tự xoá ── */

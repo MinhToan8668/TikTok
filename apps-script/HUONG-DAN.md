@@ -171,3 +171,43 @@ Mentor không bị giới hạn lượt.
 ### Khi nào nên chuyển sang Claude
 
 Khi lớp đông và hay chạm hạn mức miễn phí, hoặc khi muốn phần viết lại hook mượt hơn. Nạp credit ở console.anthropic.com, thêm `ANTHROPIC_API_KEY`, đặt `HOOK_AI_PROVIDER` = `claude` và `HOOK_AI_MODEL` = `claude-haiku-4-5` để rẻ nhất. Không cần deploy lại.
+
+---
+
+## Viral Studio: tài khoản người dùng và bán Pro (Studio.gs)
+
+Trang `tools/hook-text.html` có tài khoản riêng cho người dùng ngoài lớp:
+
+| Loại | Được gì |
+|---|---|
+| Khách (chưa đăng nhập) | Bố cục Free, xem thử mọi tính năng Pro, xuất PNG có logo |
+| Người dùng Free (đăng ký email + SĐT) | 5 lượt dùng thử Pro. Mỗi lần AI phân tích, AI chỉnh chữ, hoặc xuất file có tính năng Pro dùng 1 lượt (xuất lại trong 15 phút không tính thêm) |
+| Người dùng Pro (đã chuyển khoản) | Mọi tính năng Pro tới ngày hết hạn, AI 20 lượt mỗi ngày |
+| Học viên (tab HocVien) | Pro không giới hạn, đăng nhập bằng tài khoản khu học viên ngay trên trang |
+
+### Cài đặt
+1. Apps Script → **+** → Script → đặt tên `Studio` → dán nội dung `Studio.gs`.
+2. Điền đầu file `Studio.gs` (hoặc đặt Script properties cùng tên):
+   - `ST_NGAN_HANG_MD`: mã ngân hàng VietQR, ví dụ `MB`, `VCB`, `TCB`, `ACB`.
+   - `ST_STK_MD`: số tài khoản nhận tiền. `ST_CHU_TK_MD`: tên chủ tài khoản, IN HOA KHÔNG DẤU.
+   - `ST_GOI_MD`: tên gói, giá, số ngày. Muốn đổi giá không cần sửa code thì đặt Script property `ST_GOI` dạng JSON.
+3. Thêm 3 dòng vào `Code.gs` (đã có sẵn trong bản trên GitHub):
+   - trong `doPost`, ngay trước dòng `// Update từ Telegram webhook`:
+     `if (e.parameter && e.parameter.pay) return studioWebhook(e, body);`
+   - trong `doPost`, ngay sau dòng `if (body.action === 'hook_status') ...`:
+     `if (String(body.action||'').indexOf('st_') === 0) return studioApi(body);`
+   - trong `handleCallback`, ngay sau dòng `... return lichCallback(cb);`:
+     `if (String(cb.data||'').indexOf('s:') === 0) return studioCallback(cb);`
+4. Dán `HookAI.gs` bản mới (đã nhận tài khoản người dùng).
+5. Deploy → Manage deployments → Edit → New version → Deploy.
+
+### Mở Pro sau khi chuyển khoản
+- **Bằng tay:** người dùng bấm "Tôi đã chuyển khoản" → bot Telegram nhắn kèm nút **✅ Đã nhận tiền · mở Pro**. Bấm là người dùng thấy Pro mở trong vài giây (trang tự kiểm tra 8 giây một lần).
+- **Tự động (khuyên dùng):** đăng ký [SePay](https://sepay.vn) hoặc Casso, liên kết tài khoản ngân hàng nhận tiền, rồi:
+  1. Đặt `ST_WEBHOOK_KEY_MD` trong `Studio.gs` là một chuỗi bí mật dài, ví dụ 24 ký tự ngẫu nhiên.
+  2. Ở SePay → Webhooks → thêm URL: `<URL web app>?pay=<chuỗi bí mật>`, kiểu xác thực: không cần.
+  3. Tiền vào có nội dung chứa mã `VS...` và đủ số tiền là Pro tự mở, bot báo "💰 tự mở Pro".
+  Thiếu tiền thì bot cảnh báo và không mở.
+
+Dữ liệu nằm ở hai tab mới: `NguoiDung` (tài khoản, lượt thử, hạn Pro) và `ThanhToan` (từng mã chuyển khoản).
+Muốn tặng thêm lượt hoặc gia hạn tay: sửa cột `luot_dung` (số lượt đã dùng) hoặc `pro_han` (ISO, ví dụ `2026-12-31T16:59:59.000Z`) trong tab `NguoiDung`.

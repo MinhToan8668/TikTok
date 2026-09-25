@@ -355,6 +355,9 @@ function doPost(e){
     var body = {};
     try{ body = JSON.parse(e.postData.contents); }catch(err){ body = {}; }
 
+    // Viral Studio: webhook ngân hàng (SePay / Casso) báo tiền vào — xem Studio.gs
+    if (e.parameter && e.parameter.pay) return studioWebhook(e, body);
+
     // Update từ Telegram webhook — mỗi update chỉ xử lý MỘT lần
     if (body.update_id !== undefined){
       if (!daXuLy(body.update_id)){
@@ -373,6 +376,8 @@ function doPost(e){
     // Hook Text Studio gói Pro (xem HookAI.gs)
     if (body.action === 'hook_ai')     return hookAi(body);
     if (body.action === 'hook_status') return hookTrangThai(body);
+    // Viral Studio: tài khoản người dùng, mua Pro (xem Studio.gs)
+    if (String(body.action||'').indexOf('st_') === 0) return studioApi(body);
 
 
     return jsonOut({ok:false, error:'unknown_action'});
@@ -858,6 +863,8 @@ function handleCallback(cb){
 
   // Nút của khu lịch mentor (Lich.gs) đều mang tiền tố "l:"
   if (String(cb.data||'').indexOf('l:') === 0) return lichCallback(cb);
+  // Nút duyệt chuyển khoản Viral Studio (Studio.gs) mang tiền tố "s:"
+  if (String(cb.data||'').indexOf('s:') === 0) return studioCallback(cb);
 
   var p = String(cb.data||'').split(':');
   var act = p[0], ma = p[1];
