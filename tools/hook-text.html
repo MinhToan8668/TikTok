@@ -79,6 +79,8 @@
   .tpl b{font-size:13px}
   .tpl small{color:var(--muted);font-size:11.5px;line-height:1.3}
 
+  .combo-tpl{position:relative}
+  .combo-tpl .tag-new{position:absolute;left:8px;top:8px;background:rgba(20,18,8,.78);color:#fff;font-size:10px;font-weight:700;border-radius:999px;padding:2px 7px}
   .combo-grid{display:grid;grid-auto-flow:column;grid-auto-columns:112px;gap:8px;overflow-x:auto;padding:2px 2px 8px;scrollbar-width:thin}
   .combo{border:1.5px solid var(--line);background:var(--surface-2);border-radius:12px;padding:6px;cursor:pointer;display:grid;gap:5px;font:inherit;color:var(--text);text-align:center}
   .combo:hover{border-color:var(--accent)}
@@ -557,12 +559,10 @@
           </div>
 
           <div class="pane" data-t="style">
-            <div class="rowlbl">Phối font <span class="lock">PRO</span> <small class="rowsub">tách câu thành nhiều dòng, mỗi dòng một kiểu chữ</small></div>
-            <div class="combo-grid" id="comboGrid"></div>
+            <div class="rowlbl">Bố cục <small class="rowsub">mẫu quen thuộc, kéo sang phải có thêm các kiểu phối font nhiều dòng</small></div>
+            <div class="templates" id="templates"></div>
             <div class="status" id="comboOut"></div>
             <div data-tplonly>
-              <div class="rowlbl">Bố cục</div>
-              <div class="templates" id="templates"></div>
               <div id="tplExtra"></div>
               <div class="tpl-custom" id="tplCustom" hidden></div>
               <div class="row face-row"><span class="rowlbl" style="margin:0">Mặt người trong ảnh ở:</span><div class="seg" id="facePos" role="group" aria-label="Vị trí mặt"><button type="button" data-v="top" aria-pressed="false">Trên</button><button type="button" data-v="mid" aria-pressed="true">Giữa</button><button type="button" data-v="low" aria-pressed="false">Dưới</button></div></div>
@@ -1480,7 +1480,7 @@ async function render() {
   $('#metaSize').textContent = `${fr.width} × ${fr.height}`; $('#metaTpl').textContent = TEMPLATES[opts.template].name;
   const bbox = alphaBBox(ov); writeGuide(opts, notes, dm, bbox, fr.height);
   drawUiLayer(fr.height); checkSafe(bbox, fr.height);
-  if (!drag) renderStrip();
+  if (!drag) { renderStrip(); renderComboThumbsSoon(); }
 }
 function alphaBBox(cv) {
   const g = cv.getContext('2d'); const { width: w, height: h } = cv; const d = g.getImageData(0, 0, w, h).data;
@@ -1527,7 +1527,7 @@ function buildTemplates() {
   for (const [k, t] of Object.entries(TEMPLATES)) {
     const b = document.createElement('button'); b.className = 'tpl'; b.dataset.k = k; b.setAttribute('aria-pressed', String(k === state.template));
     b.innerHTML = `<canvas width="360" height="240" aria-hidden="true"></canvas><b>${t.name}</b><small>${t.desc}</small>` + (PRO_TPL.has(k) ? '<span class="lock">PRO</span>' : '');
-    b.addEventListener('click', () => selectTemplate(k, true)); box.appendChild(b);
+    b.addEventListener('click', () => { if (state.combo || state.layers.some(L => L.combo)) { state.layers = state.layers.filter(L => !L.combo); state.combo = null; pushUndo(); $('#comboOut').textContent = ''; } selectTemplate(k, true); state.sel = 'TPL'; syncLayerPanel(); markTplCards(); }); box.appendChild(b);
   }
   const strip = $('#strip');
   for (const k of Object.keys(TEMPLATES)) { if (k === 'blank') continue; const b = document.createElement('button'); b.dataset.k = k; b.title = TEMPLATES[k].name; b.setAttribute('aria-pressed', String(k === state.template)); const cv = document.createElement('canvas'); cv.width = 360; cv.height = 640; b.appendChild(cv); if (PRO_TPL.has(k)) { const lk = document.createElement('span'); lk.className = 'lock'; lk.textContent = 'PRO'; b.appendChild(lk); } stripCanvases[k] = cv; b.addEventListener('click', () => selectTemplate(k, true)); strip.appendChild(b); }
@@ -1535,7 +1535,7 @@ function buildTemplates() {
 function selectTemplate(k, resetSize) {
   state.template = k;
   if (PRO_TPL.has(k) && !state.pro && resetSize) toast('Mẫu Pro: xem thử thoải mái, xuất file cần mở Pro');
-  document.querySelectorAll('.tpl').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.k === k)));
+  markTplCards();
   document.querySelectorAll('#strip button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.k === k)));
   if (resetSize) { state.size = TEMPLATES[k].size; state.ypct = autoY(k); syncSliders(); }
   renderExtra(); scheduleRender();
@@ -2494,75 +2494,106 @@ async function runLayerAI(ask) {
 }
 /* ---------- AI thiết kế bố cục chữ: Gemini nhìn ảnh, trả về từng dòng đã phối ---------- */
 const DESIGN_ROLE = {
-  dan:  { font: 'Be Vietnam Pro', weight: 600, italic: false, size: 54 },
-  dinh: { font: 'Be Vietnam Pro', weight: 900, italic: false, size: 118 },
-  nhan: { font: 'Playfair Display', weight: 800, italic: true, size: 92 },
-  phu:  { font: 'Be Vietnam Pro', weight: 500, italic: false, size: 46 },
+  dan:  { font: 'Be Vietnam Pro', weight: 700, italic: false, size: 60 },
+  dinh: { font: 'Be Vietnam Pro', weight: 900, italic: false, size: 112 },
+  nhan: { font: 'Playfair Display', weight: 800, italic: true, size: 96 },
+  phu:  { font: 'Be Vietnam Pro', weight: 600, italic: false, size: 50 },
 };
 /* ---------- Phối font: công thức học từ các video vlog, hook viral ---------- */
 function hookParts(text) {
   const t = String(text || '').trim(); let parts = t.split(/\n+/).map(x => x.trim()).filter(Boolean);
   return parts.length ? parts : ['Một ngày của tôi'];
 }
-function chunkWords(parts, n) {   // câu một dòng thì tự chia thành n cụm
+function toWords(text) { const out = []; for (const r of markupToRuns(text)) for (const w of r.t.split(/\s+/)) if (w) out.push({ w, key: !!r.key }); return out; }
+function wordsToMarkup(ws) {
+  let s = '', inK = false;
+  ws.forEach((x, i) => { const sp = i ? ' ' : ''; if (x.key && !inK) { s += sp + '**' + x.w; inK = true; } else if (!x.key && inK) { s += '**' + sp + x.w; inK = false; } else s += sp + x.w; });
+  return inK ? s + '**' : s;
+}
+function plainLen(t) { return String(t).replace(/\*\*|_/g, '').length; }
+/* câu một dòng thì tự chia thành khoảng n dòng: cụm từ khoá giữ nguyên một dòng, phần còn lại chia đều, ưu tiên ngắt ở dấu câu */
+function chunkWords(parts, n) {
   if (parts.length >= n) return parts;
-  const w = parts.join(' ').split(/\s+/); const per = Math.max(1, Math.ceil(w.length / n)); const out = [];
-  for (let i = 0; i < w.length; i += per) out.push(w.slice(i, i + per).join(' '));
+  const ws = toWords(parts.join(' ')); if (!ws.length) return parts;
+  const groups = []; for (const x of ws) { const g = groups[groups.length - 1]; if (g && g.key === x.key && !(g.ws.length && /[,.:;!?…]$/.test(g.ws[g.ws.length - 1].w))) g.ws.push(x); else groups.push({ key: x.key, ws: [x] }); }
+  const keyN = groups.filter(g => g.key).length, plainW = groups.filter(g => !g.key).reduce((a, g) => a + g.ws.length, 0);
+  const per = Math.min(4, Math.max(2, Math.ceil(plainW / Math.max(1, n - keyN))));
+  const out = [];
+  for (const g of groups) {
+    if (g.key && g.ws.length <= 3) { out.push(wordsToMarkup(g.ws)); continue; }
+    if (g.key) { const d = g.ws.findIndex((x, i) => i > 0 && /^\d/.test(x.w)); const cutAt = d > 0 ? d : Math.ceil(g.ws.length / 2); out.push(wordsToMarkup(g.ws.slice(0, cutAt)), wordsToMarkup(g.ws.slice(cutAt))); continue; }
+    const m = Math.ceil(g.ws.length / per), sz = Math.ceil(g.ws.length / m);
+    for (let i = 0; i < g.ws.length; i += sz) out.push(wordsToMarkup(g.ws.slice(i, i + sz)));
+  }
+  while (out.length > Math.max(n, 4)) {   // gộp cặp dòng thường liền nhau ngắn nhất cho khỏi vụn
+    let best = -1, bl = 1e9; for (let i = 0; i < out.length - 1; i++) { if (/\*\*/.test(out[i] + out[i + 1])) continue; const l = plainLen(out[i]) + plainLen(out[i + 1]); if (l < bl) { bl = l; best = i; } }
+    if (best < 0) break; out.splice(best, 2, out[best] + ' ' + out[best + 1]);
+  }
   return out;
 }
 const lnD = (text, o) => ({ text, role: 'dan', font: 'Be Vietnam Pro', weight: 700, italic: false, upper: false, size: 60, color: '#FFFFFF', stroke: false, shadow: true, ...o });
 const topFor = (o, dflt) => (o && o.top_y) || (state.facePos === 'top' ? 52 : state.facePos === 'low' ? dflt : Math.min(dflt, 14));   // né mặt: mặt giữa thì chữ lên trên, mặt trên thì chữ xuống dưới
 const COMBOS = {
-  viral: { n: 'Viral phối màu', make: (parts, o = {}) => {
-    const acc = o.accent || '#FF6FB5'; parts = chunkWords(parts, 3).slice(0, 5);
-    const pat = { 1: ['dinh'], 2: ['dan', 'dinh'], 3: ['dan', 'nhan', 'dinh'], 4: ['dan', 'nhan', 'dinh', 'phu'], 5: ['dan', 'nhan', 'dinh', 'phu', 'phu'] }[parts.length];
-    return { accent: acc, top_y: topFor(o, 13), x: .5, lines: parts.map((t, i) => { const r = pat[i], R = DESIGN_ROLE[r]; return lnD(t, { role: r, ...R, color: r === 'nhan' ? acc : '#FFFFFF', stroke: r === 'nhan' }); }) };
+  viral: { n: 'Viral phối màu', d: 'Nhỏ, nghiêng màu, to đậm xen nhau', make: (parts, o = {}) => {
+    const acc = o.accent || '#FF6FB5'; parts = chunkWords(parts, 4).slice(0, 5);
+    const isKey = parts.map(t => /^\*\*[^*]+\*\*$/.test(t.trim())), roles = parts.map(() => null);
+    const kFirst = isKey.indexOf(true); if (kFirst >= 0) roles[kFirst] = 'nhan';                        // cụm từ khoá đầu: nghiêng màu nhấn
+    let dn = parts.findIndex((t, i) => !roles[i] && /\d/.test(t));                                      // dòng có con số: to nhất
+    if (dn < 0 && kFirst >= 0 && kFirst + 1 < parts.length && !isKey[kFirst + 1] && plainLen(parts[kFirst + 1]) <= 14) dn = kFirst + 1;
+    if (dn < 0) { const pool = parts.map((_, i) => i).filter(i => !roles[i] && !isKey[i] && (i > 0 || parts.length === 1)); dn = pool.sort((a, b) => plainLen(parts[a]) - plainLen(parts[b]))[0] ?? -1; }
+    if (dn < 0) dn = parts.findIndex((_, i) => !roles[i]);
+    if (dn >= 0) roles[dn] = 'dinh';
+    if (kFirst < 0 && parts.length >= 3) { const m = roles.findIndex((r, i) => !r && i > 0); if (m > 0) roles[m] = 'nhan'; }
+    let first = true; roles.forEach((r, i) => { if (!r) { roles[i] = first && i < dn ? 'dan' : 'phu'; first = false; } });
+    return { accent: acc, top_y: topFor(o, 13), x: .5, lines: parts.map((t, i) => { const r = roles[i], R = DESIGN_ROLE[r];
+      const nt = t.replace(/\*\*/g, ''); const soft = nt === nt.toUpperCase() && /[A-ZÀ-Ỹ]/.test(nt) ? nt.toLowerCase() : nt;
+      return lnD(r === 'nhan' ? soft : r === 'dinh' ? nt.replace(/[,.;:]$/, '') : t, { role: r, ...R, color: r === 'nhan' ? acc : '#FFFFFF', shadowA: r === 'nhan' ? .6 : .5, shadowBlur: 18 }); }) };
   } },
-  label: { n: 'Nhãn · tiêu đề · ký tên', make: (parts, o = {}) => {
+  label: { n: 'Nhãn · tiêu đề · ký tên', d: 'Nhãn nhỏ, tiêu đề to, ký tên nghiêng', make: (parts, o = {}) => {
     const c = o.accent || '#F5E50A'; const [a, b, ...r] = parts.length === 1 ? ['', parts[0]] : parts;
     const L = []; if (a) L.push(lnD(a, { font: 'Inter', weight: 700, upper: true, size: 40, spacing: -1, color: c, gap: .86, shadowA: .3 }));
     L.push(lnD(b, { role: 'dinh', font: 'Bricolage Grotesque', weight: 800, size: 132, spacing: -5, color: c, gap: .9, shadowA: .3 }));
     if (r.length) L.push(lnD(r.join(' '), { role: 'phu', font: 'Playfair Display', weight: 400, italic: true, size: 46, color: c, shadowA: .3 }));
     return { accent: c, top_y: topFor(o, 38), x: .5, lines: L };
   } },
-  minivlog: { n: 'Mini vlog', make: (parts, o = {}) => {
+  minivlog: { n: 'Mini vlog', d: 'Nghiêng nhỏ, chữ thường rất to', make: (parts, o = {}) => {
     const d = new Date(); const date = [d.getDate(), d.getMonth() + 1, d.getFullYear() % 100].map(v => String(v).padStart(2, '0')).join('.');
     let top = 'mini vlog', mid = parts, bot = date; if (parts.length >= 3) { top = parts[0]; mid = parts.slice(1, -1); bot = parts[parts.length - 1]; }
     mid = chunkWords(mid, 2).slice(0, 3);
     return { accent: o.accent || '#FFFFFF', top_y: topFor(o, 30), anchor: 'left', left: .12, lines: [
-      lnD(top, { font: 'Playfair Display', weight: 500, italic: true, size: 50, gap: .8, shadowA: .45 }),
-      ...mid.map(t => lnD(t.toLowerCase(), { role: 'dinh', font: 'Be Vietnam Pro', weight: 900, size: 124, lineH: .95, gap: .8, shadowA: .45 })),
+      lnD(top, { font: 'Playfair Display', weight: 500, italic: true, size: 50, gap: .92, shadowA: .45 }),
+      ...mid.map(t => lnD(t.toLowerCase(), { role: 'dinh', font: 'Be Vietnam Pro', weight: 900, size: 118, lineH: 1, gap: .88, shadowA: .45 })),
       lnD(bot, { role: 'phu', font: 'Playfair Display', weight: 500, italic: true, size: 44, shadowA: .45 }) ] };
   } },
-  zigzag: { n: 'Zíc zắc', make: (parts, o = {}) => {
+  zigzag: { n: 'Zíc zắc', d: 'To nhỏ xen kẽ, lệch trái phải', make: (parts, o = {}) => {
     const c = o.accent || '#F6F0C4'; parts = chunkWords(parts, 4).slice(0, 5); const dx = [-.1, -.16, .1, -.12, .02];
     return { accent: c, top_y: topFor(o, 12), x: .5, lines: parts.map((t, i) => i % 2 === 0
-      ? lnD(t.toLowerCase(), { role: 'dinh', weight: 800, size: 132, spacing: -6, color: c, dx: dx[i], gap: .82, shadowA: .45 })
-      : lnD(t.toLowerCase(), { weight: 600, size: 62, spacing: -2, dx: dx[i], gap: .9, shadowA: .5 })) };
+      ? lnD(t.toLowerCase(), { role: 'dinh', weight: 800, size: 132, spacing: -6, color: c, dx: dx[i], gap: .9, shadowA: .45 })
+      : lnD(t.toLowerCase(), { weight: 600, size: 62, spacing: -2, dx: dx[i], gap: .94, shadowA: .5 })) };
   } },
-  stairs: { n: 'Bậc thang', make: (parts, o = {}) => {
+  stairs: { n: 'Bậc thang', d: 'Mỗi từ một bậc, dòng phụ mảnh', make: (parts, o = {}) => {
     const words = parts[0].split(/\s+/); const steps = words.length > 5 ? chunkWords([parts[0]], 4) : words; const sub = parts.slice(1).join(' ');
     const n = steps.length, dx = steps.map((_, i) => n > 1 ? -.16 + i * (.32 / (n - 1)) : 0);
-    const L = steps.map((t, i) => lnD(t.toLowerCase(), { role: 'dinh', weight: 900, size: 150, spacing: -3, dx: dx[i], gap: .74, shadowA: .5 }));
+    const L = steps.map((t, i) => lnD(t.toLowerCase(), { role: 'dinh', weight: 900, size: 140, spacing: -3, dx: dx[i], gap: .86, shadowA: .5 }));
     if (sub) L.push(lnD(sub, { role: 'phu', font: 'Inter', weight: 400, size: 44, spacing: 3, gap: 1, shadowA: .6 }));
     return { accent: o.accent || '#FFFFFF', top_y: topFor(o, 16), x: .5, lines: L };
   } },
-  serifmix: { n: 'Serif sang', make: (parts, o = {}) => {
+  serifmix: { n: 'Serif sang', d: 'Serif nghiêng và serif đậm', make: (parts, o = {}) => {
     const c = o.accent || '#F3DF8C'; parts = chunkWords(parts, 3); const [a, b, ...r] = parts.length === 1 ? ['', parts[0]] : parts;
     const L = []; if (a) L.push(lnD(a, { font: 'Playfair Display', weight: 500, italic: true, size: 70, color: '#FBF3DA', gap: .86, stroke: true, strokeW: 1.5 }));
     L.push(lnD(b, { role: 'dinh', font: 'Playfair Display', weight: 900, size: 112, color: c, gap: .9, stroke: true, strokeW: 2 }));
     if (r.length) L.push(lnD(r.join(' '), { role: 'phu', font: 'Playfair Display', weight: 500, size: 44, color: '#FBF3DA', stroke: true, strokeW: 1.2 }));
     return { accent: c, top_y: topFor(o, 40), x: .5, lines: L };
   } },
-  condensed: { n: 'Chữ cao', make: (parts, o = {}) => {
+  condensed: { n: 'Chữ cao', d: 'Chữ cao hẹp xếp dọc', make: (parts, o = {}) => {
     const c = o.accent || '#F4E6A6'; const words = chunkWords(parts, 3).slice(0, 4);
-    return { accent: c, top_y: topFor(o, 12), x: .5, lines: words.map(t => lnD(t.toLowerCase(), { role: 'dinh', font: 'Oswald', weight: 600, size: 176, lineH: .95, color: c, gap: .86, shadowA: .5 })) };
+    return { accent: c, top_y: topFor(o, 12), x: .5, lines: words.map(t => lnD(t.toLowerCase(), { role: 'dinh', font: 'Oswald', weight: 600, size: 168, lineH: 1, color: c, gap: .9, shadowA: .5 })) };
   } },
-  daily: { n: 'Nghiêng vui', make: (parts, o = {}) => {
+  daily: { n: 'Nghiêng vui', d: 'Chữ béo vàng nghiêng', make: (parts, o = {}) => {
     const c = o.accent || '#FFD60A'; parts = chunkWords(parts, 2).slice(0, 3); const dx = [-.07, .07, -.03];
-    return { accent: c, top_y: topFor(o, 40), x: .5, lines: parts.map((t, i) => lnD(t, { role: 'dinh', font: 'Paytone One', weight: 400, upper: true, size: 124, color: c, rotate: -9, dx: dx[i], gap: .82, stroke: true, strokeColor: '#2A1C00', strokeW: 4, shadowA: .6, shadowY: 8 })) };
+    return { accent: c, top_y: topFor(o, 40), x: .5, lines: parts.map((t, i) => lnD(t, { role: 'dinh', font: 'Paytone One', weight: 400, upper: true, size: 124, color: c, rotate: -9, dx: dx[i], gap: .9, stroke: true, strokeColor: '#2A1C00', strokeW: 4, shadowA: .6, shadowY: 8 })) };
   } },
-  glow: { n: 'Phát sáng', make: (parts, o = {}) => {
+  glow: { n: 'Phát sáng', d: 'Serif phát sáng ấm', make: (parts, o = {}) => {
     const c = o.accent || '#FFE680'; parts = chunkWords(parts, 2).slice(0, 3);
     return { accent: c, top_y: topFor(o, 18), x: .5, lines: parts.map((t, i) => lnD(t, { role: i ? 'phu' : 'dinh', font: 'Noto Serif', weight: 700, size: i ? 64 : 96, color: c, glow: '#FFB800', shadow: false, gap: .95 })) };
   } },
@@ -2580,55 +2611,82 @@ const COMBO_PV = {
   glow: `<i style="font:700 13px 'Noto Serif';color:#FFE680;text-shadow:0 0 8px #FFB800,0 0 3px #FFB800">Năng lượng</i><i style="font:700 9px 'Noto Serif';color:#FFE680;text-shadow:0 0 8px #FFB800">cao</i>`,
 };
 function buildCombos() {
-  const box = $('#comboGrid'); if (!box) return; box.innerHTML = '';
+  const box = $('#templates'); if (!box) return;
   for (const [k, c] of Object.entries(COMBOS)) {
-    const b = el('button', 'combo'); b.type = 'button'; b.dataset.k = k;
-    const pv = el('span', 'combo-pv'); pv.innerHTML = COMBO_PV[k]; b.append(pv, el('small', null, c.n));
-    b.onclick = async () => {
-      const text = $('#text').value.trim() || state.layers.map(L => runsText(L.runs)).join('\n').trim();
-      await applyDesign(COMBOS[k].make(hookParts(text)));
-      const o = $('#comboOut'); o.className = 'status ok'; o.innerHTML = '';
-      o.append(el('span', null, `Đã phối kiểu "${c.n}". Mỗi dòng là một lớp chữ, kéo và sửa thoải mái. Muốn tự ngắt dòng thì xuống dòng trong câu hook rồi bấm lại. `));
-      const back = el('button', 'linkbtn', 'Trả lại bố cục cũ'); back.type = 'button'; back.onclick = () => { undoDesign(); o.textContent = 'Đã trả lại bố cục cũ.'; }; o.append(back);
-      if (!state.pro && !proToasted) { proToasted = true; toast('Phối font là Pro: xem thử thoải mái, xuất file cần mở Pro'); }
-    };
-    box.append(b);
+    const b = el('button', 'tpl combo-tpl'); b.type = 'button'; b.dataset.combo = k; b.setAttribute('aria-pressed', 'false');
+    b.innerHTML = `<canvas width="360" height="240" aria-hidden="true"></canvas><b>${c.n}</b><small>Nhiều dòng · ${c.d || ''}</small><span class="lock">PRO</span>`;
+    b.onclick = () => applyCombo(k); box.append(b);
+  }
+}
+function markTplCards() {
+  document.querySelectorAll('#templates .tpl').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.combo ? b.dataset.combo === state.combo : (!state.combo && b.dataset.k === state.template))));
+}
+function hookSource() { return $('#text').value.trim() || state.layers.map(L => runsToMarkup(L.runs)).join('\n').trim(); }
+async function applyCombo(k) {
+  const c = COMBOS[k]; await applyDesign(c.make(hookParts(hookSource())), k);
+  const o = $('#comboOut'); o.className = 'status ok'; o.innerHTML = '';
+  o.append(el('span', null, `Đã phối "${c.n}". Mỗi dòng là một lớp chữ, chạm để sửa. Muốn tự ngắt dòng thì xuống dòng trong câu hook rồi bấm lại. `));
+  const back = el('button', 'linkbtn', 'Trả lại bố cục cũ'); back.type = 'button'; back.onclick = () => { undoDesign(); o.textContent = ''; o.className = 'status'; }; o.append(back);
+  if (!state.pro && !proToasted) { proToasted = true; toast('Kiểu phối nhiều dòng là Pro: xem thử thoải mái, xuất file cần mở Pro'); }
+}
+/* ảnh xem trước cho các kiểu phối: dựng thật trên ảnh của bạn, cắt đúng vùng chữ */
+let comboThumbT = null, comboFontsOk = false;
+function renderComboThumbsSoon() { clearTimeout(comboThumbT); comboThumbT = setTimeout(renderComboThumbs, 350); }
+async function renderComboThumbs() {
+  if (!lastRender || drag) return;
+  const text = hookSource() || 'Một ngày\n**bình thường**\ncủa tôi';
+  const designs = Object.entries(COMBOS).map(([k, c]) => [k, c.make(hookParts(text))]);
+  if (!comboFontsOk) { await ensureLayerFonts(designs.flatMap(([, d]) => d.lines.map(l => ({ font: l.font, weight: l.weight, runs: [] })))); comboFontsOk = true; }
+  const W = 360, H = 640; const fr = lastRender.fr;
+  for (const [k, d] of designs) {
+    const tc = document.querySelector(`.combo-tpl[data-combo="${k}"] canvas`); if (!tc) continue;
+    const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const g = cv.getContext('2d'); g.drawImage(fr, 0, 0, W, H);
+    const Ls = layoutDesign(d, W, H); let top = H, bot = 0, lft = W, rgt = 0;
+    for (const L of Ls) { drawLayer(g, L, W, H); const b = L._box; if (!b) continue; top = Math.min(top, b.cy - b.h / 2); bot = Math.max(bot, b.cy + b.h / 2); lft = Math.min(lft, b.cx - b.w / 2); rgt = Math.max(rgt, b.cx + b.w / 2); }
+    const ch = Math.min(H, Math.max(150, (bot - top) * 1.3, (rgt - lft) * 1.2 / 1.5)), cw = Math.min(W, ch * 1.5);   // phóng vào khối chữ cho dễ nhìn
+    const sx = Math.max(0, Math.min(W - cw, (lft + rgt) / 2 - cw / 2)), sy = Math.max(0, Math.min(H - ch, (top + bot) / 2 - ch / 2));
+    const gg = tc.getContext('2d'); gg.clearRect(0, 0, 360, 240); gg.drawImage(cv, sx, sy, cw, ch, 0, 0, 360, 240);
   }
 }
 /* bản demo và dự phòng: tự tách dòng, gán vai trò theo nhịp nhỏ – nghiêng – to – nhỏ */
 function designLocal(text) { return { ...COMBOS.viral.make(hookParts(text)), note: 'Bản demo: phối theo nhịp nhỏ, nghiêng màu nhấn, to đậm.' }; }
 let designPrev = null;
-async function applyDesign(d) {
-  if (d.combo && COMBOS[d.combo]) d = { ...COMBOS[d.combo].make(d.lines.map(l => l.text), d), note: d.note };   // AI chọn một kiểu phối có sẵn
-  designPrev = { template: state.template, layers: snapshot(), sel: state.sel };
+function layoutDesign(d, W, H) {
   const acc = d.accent || '#FF6FB5';
   const layers = d.lines.map(l => newLayer(l.text, {
     font: l.font, weight: l.weight, italic: !!l.italic, upper: !!l.upper, size: l.size, color: l.color || '#FFFFFF', keyColor: l.keyColor || acc,
-    x: .5, y: .2, maxw: 94, align: l.align || 'center', lineH: l.lineH || 1.08, rotate: l.rotate || 0, preset: '', pro: true,
+    x: .5, y: .2, maxw: 100, align: l.align || 'center', lineH: l.lineH || 1.12, rotate: l.rotate || 0, preset: '', pro: true, combo: true,
     spacing: l.spacing != null ? l.spacing : (l.size >= 100 && /Bricolage|Montserrat|Inter|Be Vietnam/.test(l.font) ? -Math.round(l.size * .025) : 0),
-    stroke: { on: !!l.stroke, color: l.strokeColor || '#1A1410', width: l.strokeW || (l.role === 'nhan' ? 3 : 2.5) },
+    stroke: { on: !!l.stroke, color: l.strokeColor || '#1A1410', width: l.strokeW || 2.5 },
     shadow: { on: l.shadow !== false, color: '#000000', alpha: l.shadowA != null ? l.shadowA : .55, blur: l.shadowBlur || 16, x: 0, y: l.shadowY != null ? l.shadowY : 4 },
     glow: { on: !!l.glow, color: l.glow || acc, alpha: .9, blur: 30 },
     bg: { on: false, mode: 'line', color: '#000000', alpha: .7, radius: 14, pad: 20 },
   }));
-  selectTemplate('blank'); state.layers = layers;
-  await ensureLayerFonts(layers);
-  // đo chiều cao, bề rộng thật của từng dòng rồi xếp chồng khít, bắt đầu từ top_y
-  const W = lastRender ? lastRender.fr.width : BASE_W, H = lastRender ? lastRender.fr.height : Math.round(BASE_W * 16 / 9), k = W / BASE_W;
-  const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const g = cv.getContext('2d');
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const g = cv.getContext('2d'), k = W / BASE_W;
+  const maxW = W * (d.anchor === 'left' ? .76 : .84);
+  layers.forEach(L => { drawLayer(g, L, W, H); if (L._box && L._box.w > maxW) { L.size = Math.max(18, Math.floor(L.size * maxW / L._box.w)); drawLayer(g, L, W, H); } });
   let y = (d.top_y || 14) / 100 * H;
   layers.forEach((L, i) => {
-    const l = d.lines[i]; drawLayer(g, L, W, H); const bw = L._box ? L._box.w : W * .5;
-    const h = L._box ? L._box.h - 12 * k : L.size * k * 1.1;
+    const l = d.lines[i], bw = L._box ? L._box.w : W * .5, h = L._box ? L._box.h - 12 * k : L.size * k * 1.15;
     const cx = d.anchor === 'left' ? (d.left || .1) * W + bw / 2 : (d.x || .5) * W;
     L.x = Math.min(.95, Math.max(.05, cx / W + (l.dx || 0)));
-    L.y = Math.min(.95, (y + h / 2) / H); y += h * (l.gap != null ? l.gap : .97);
+    L.y = Math.min(.95, (y + h / 2) / H); y += h * Math.max(.86, l.gap != null ? l.gap : .98);
   });
+  return layers;
+}
+function resolveDesign(d) { return d.combo && COMBOS[d.combo] ? { ...COMBOS[d.combo].make(d.lines.map(l => l.text), d), note: d.note, combo: d.combo } : d; }
+async function applyDesign(d, comboKey) {
+  d = resolveDesign(d);
+  designPrev = { template: state.template, layers: snapshot(), sel: state.sel };
+  await ensureLayerFonts(d.lines.map(l => ({ font: l.font, weight: l.weight, runs: [] })));
+  const W = lastRender ? lastRender.fr.width : BASE_W, H = lastRender ? lastRender.fr.height : Math.round(BASE_W * 16 / 9);
+  const layers = layoutDesign(d, W, H);
+  selectTemplate('blank'); state.layers = layers; state.combo = comboKey || d.combo || 'ai'; markTplCards();
   state.sel = layers[0].id; syncLayerPanel(); linkEditorFonts(); pushUndo(); scheduleRender();
 }
 function undoDesign() {
   if (!designPrev) return; const p = designPrev; designPrev = null;
-  selectTemplate(p.template); restore(p.layers); state.sel = p.sel; syncLayerPanel(); scheduleRender();
+  state.combo = null; selectTemplate(p.template); restore(p.layers); state.sel = p.sel; syncLayerPanel(); scheduleRender();
   const o = $('#designOut'); o.className = 'status'; o.textContent = 'Đã trả lại bố cục cũ.';
 }
 async function runDesign() {
