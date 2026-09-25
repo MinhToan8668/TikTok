@@ -79,6 +79,9 @@
   .tpl b{font-size:13px}
   .tpl small{color:var(--muted);font-size:11.5px;line-height:1.3}
 
+  .design-card{margin:0 0 12px;padding:12px;border-radius:14px;background:var(--accent-soft);display:grid;gap:6px}
+  .design-card small{color:var(--muted);font-size:12.5px;line-height:1.45}
+  .design-card .status:empty{display:none}
   .tpl-custom{margin:10px 0 4px;padding:10px 12px;border:1px solid var(--line);border-radius:14px;background:var(--surface-2)}
   .tc-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}
   .tc-head b{font-size:13px}
@@ -492,7 +495,7 @@
           <span class="ai-ic" aria-hidden="true">✦</span>
           <div class="ai-txt"><b>Trợ lý hook AI <span class="badge">Pro</span></b><small id="proHello">AI xem ảnh và câu hook: chấm điểm /100, viết lại 5 bản, tự đặt bố cục né mặt, viết sẵn caption.</small></div>
           <div id="proLocked" class="ai-act"><button class="btn sm" id="btnDemoAI" type="button">Xem ví dụ</button><button class="btn pro" id="btnTrial" type="button" hidden>Phân tích thử</button><button class="btn pro" id="btnUnlock" type="button">Mở Pro</button></div>
-          <div id="proOpen" class="ai-act" hidden><button class="btn pro" id="btnAI" type="button">Phân tích</button></div>
+          <div id="proOpen" class="ai-act" hidden><button class="btn" id="btnDesignTop" type="button">✦ Thiết kế chữ</button><button class="btn pro" id="btnAI" type="button">Phân tích</button></div>
         </div>
         <div class="ai-meta"><span id="quota"></span><button class="linkbtn" id="btnAiShow" type="button" hidden>Xem lại kết quả</button></div>
         <div class="status" id="aiStatus"></div>
@@ -639,6 +642,11 @@
           </div>
 
           <div class="pane" data-t="ai" hidden>
+            <div class="design-card">
+              <button class="btn pro wide" id="btnDesign" type="button">✦ AI thiết kế bố cục chữ</button>
+              <small>AI nhìn ảnh của bạn, tách câu thành từng dòng rồi phối font, cỡ, màu nhấn và chỗ đặt như hook viral (nhỏ, to, nghiêng xen nhau). Dùng 1 lượt AI.</small>
+              <div class="status" id="designOut"></div>
+            </div>
             <div class="pro-note" data-promo><span>✦ Tính năng Pro. Cứ chỉnh thử, khung hiện kết quả ngay. Xuất file cần mở Pro.</span><button type="button" class="chip" data-upsell>Mở Pro</button></div>
             <div class="ai-grid" id="layerAi">
               <button type="button" class="ai-btn" data-ask="manh">Viết mạnh hơn<small>Luật 1 giây, từ mạnh lên đầu</small></button>
@@ -2473,6 +2481,79 @@ async function runLayerAI(ask) {
   } catch { out.className = 'status err'; out.textContent = 'Không kết nối được máy chủ.'; }
   finally { document.querySelectorAll('#layerAi button').forEach(b => b.disabled = false); }
 }
+/* ---------- AI thiết kế bố cục chữ: Gemini nhìn ảnh, trả về từng dòng đã phối ---------- */
+const DESIGN_ROLE = {
+  dan:  { font: 'Be Vietnam Pro', weight: 600, italic: false, size: 54 },
+  dinh: { font: 'Be Vietnam Pro', weight: 900, italic: false, size: 118 },
+  nhan: { font: 'Playfair Display', weight: 800, italic: true, size: 92 },
+  phu:  { font: 'Be Vietnam Pro', weight: 500, italic: false, size: 46 },
+};
+/* bản demo và dự phòng: tự tách dòng, gán vai trò theo nhịp nhỏ – nghiêng – to – nhỏ */
+function designLocal(text) {
+  let parts = text.replace(/\*\*/g, '').split(/\n+/).map(x => x.trim()).filter(Boolean);
+  if (parts.length < 2) { const w = parts.join(' ').split(/\s+/); parts = []; for (let i = 0; i < w.length; i += 3) parts.push(w.slice(i, i + 3).join(' ')); }
+  parts = parts.slice(0, 5);
+  const pat = { 1: ['dinh'], 2: ['dan', 'dinh'], 3: ['dan', 'nhan', 'dinh'], 4: ['dan', 'nhan', 'dinh', 'phu'], 5: ['dan', 'nhan', 'dinh', 'phu', 'phu'] }[parts.length];
+  return { accent: '#FF6FB5', top_y: state.facePos === 'top' ? 48 : 13, x: .5, note: 'Bản demo: phối theo nhịp nhỏ, nghiêng màu nhấn, to đậm, nhỏ.',
+    lines: parts.map((t, i) => { const r = pat[i], R = DESIGN_ROLE[r]; return { text: t, role: r, ...R, upper: false, color: r === 'nhan' ? '#FF6FB5' : '#FFFFFF', stroke: r === 'nhan', shadow: true }; }) };
+}
+let designPrev = null;
+async function applyDesign(d) {
+  designPrev = { template: state.template, layers: snapshot(), sel: state.sel };
+  const layers = d.lines.map(l => newLayer(l.text, {
+    font: l.font, weight: l.weight, italic: !!l.italic, upper: !!l.upper, size: l.size, color: l.color || '#FFFFFF', keyColor: d.accent || '#FF6FB5',
+    x: d.x || .5, y: .2, maxw: 90, align: 'center', lineH: 1.08, spacing: 0, preset: '', pro: true,
+    stroke: { on: !!l.stroke, color: '#1A1410', width: l.role === 'nhan' ? 3 : 2.5 },
+    shadow: { on: l.shadow !== false, color: '#000000', alpha: .55, blur: 16, x: 0, y: 4 },
+    glow: { on: false, color: d.accent || '#FF6FB5', alpha: .9, blur: 24 },
+    bg: { on: false, mode: 'line', color: '#000000', alpha: .7, radius: 14, pad: 20 },
+  }));
+  selectTemplate('blank'); state.layers = layers;
+  await ensureLayerFonts(layers);
+  // đo chiều cao thật của từng dòng rồi xếp chồng khít, bắt đầu từ top_y
+  const W = lastRender ? lastRender.fr.width : BASE_W, H = lastRender ? lastRender.fr.height : Math.round(BASE_W * 16 / 9), k = W / BASE_W;
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const g = cv.getContext('2d');
+  let y = (d.top_y || 14) / 100 * H;
+  layers.forEach(L => { drawLayer(g, L, W, H); const h = L._box ? L._box.h - 12 * k : L.size * k * 1.1; L.y = Math.min(.95, (y + h / 2) / H); y += h * 0.97; });
+  state.sel = layers[0].id; syncLayerPanel(); linkEditorFonts(); pushUndo(); scheduleRender();
+}
+function undoDesign() {
+  if (!designPrev) return; const p = designPrev; designPrev = null;
+  selectTemplate(p.template); restore(p.layers); state.sel = p.sel; syncLayerPanel(); scheduleRender();
+  const o = $('#designOut'); o.className = 'status'; o.textContent = 'Đã trả lại bố cục cũ.';
+}
+async function runDesign() {
+  if (aiBusy || !state.frame) return;
+  const text = $('#text').value.trim() || state.layers.map(L => runsText(L.runs)).join('\n').trim();
+  if (!text) return toast('Nhập câu hook trước đã');
+  if (!DEMO && planOf(state.acct) === 'guest') { openUpsell(`AI thiết kế chữ cần tài khoản. Tạo tài khoản miễn phí để có ${luotThu()} lượt AI.`); return; }
+  if (!DEMO && !state.pro && !(state.trial > 0)) { openUpsell('Bạn đã dùng hết lượt AI miễn phí. Mua Pro hoặc đăng ký học viên để AI thiết kế không giới hạn.'); return; }
+  const out = $('#designOut'), btns = [$('#btnDesign'), $('#btnDesignTop')];
+  aiBusy = true; btns.forEach(b => b.disabled = true);
+  const t0 = Date.now(); const tick = setInterval(() => { out.className = 'status'; out.innerHTML = `<span class="spinner"></span>AI đang nhìn ảnh và phối chữ · ${Math.round((Date.now() - t0) / 1000)} giây`; }, 400);
+  try {
+    let r;
+    if (DEMO) { await new Promise(z => setTimeout(z, 900)); r = { ok: true, data: designLocal(text) }; }
+    else r = await callApi({ action: 'hook_ai', mode: 'design', token: authToken(), text, image: await frameB64(), platform: state.platform, facePos: state.facePos });
+    clearInterval(tick);
+    if (!r.ok) {
+      out.className = 'status err';
+      out.textContent = ({ can_pro: 'AI thiết kế chữ cần tài khoản.', het_luot_thu: 'Bạn đã dùng hết lượt AI miễn phí. Mua Pro hoặc đăng ký học viên để dùng tiếp.', het_luot: 'Hết lượt AI hôm nay, mai quay lại nhé.', het_phien: 'Phiên đăng nhập hết hạn, đăng nhập lại nhé.', ban_qua: 'AI đang bận, thử lại sau một phút.', sai_key: 'Khóa AI trên máy chủ không hợp lệ. Báo mentor.', chua_cai_key: 'Máy chủ chưa cài khóa AI. Báo mentor.' }[r.error] || 'AI chưa thiết kế được, thử lại nhé.') + (r.chi_tiet ? ' Mã lỗi: ' + r.chi_tiet : '');
+      if (r.error === 'het_luot_thu') { state.acct && (state.acct.luot_con = 0); setAcct(state.acct); openUpsell(); }
+      return;
+    }
+    const d = r.data || {};
+    if (!Array.isArray(d.lines) || !d.lines.length) { out.className = 'status err'; out.textContent = 'Máy chủ đang chạy HookAI.gs bản cũ nên chưa có AI thiết kế chữ. Mentor dán HookAI.gs mới vào Apps Script rồi Deploy, chọn New version.'; return; }
+    await applyDesign(d);
+    out.className = 'status ok'; out.innerHTML = '';
+    out.append(el('span', null, (d.note ? d.note + ' ' : '') + 'Mỗi dòng là một lớp chữ, chạm vào để sửa tiếp. '));
+    const back = el('button', 'linkbtn', 'Trả lại bố cục cũ'); back.type = 'button'; back.onclick = undoDesign; out.append(back);
+    out.append(el('span', null, ' · '));
+    const again = el('button', 'linkbtn', 'Phối kiểu khác'); again.type = 'button'; again.onclick = () => { if (designPrev) { const p = designPrev; selectTemplate(p.template); restore(p.layers); designPrev = null; } runDesign(); }; out.append(again);
+    if (r.con !== undefined) showQuota(r.con, r.han);
+  } catch { clearInterval(tick); out.className = 'status err'; out.textContent = 'Không kết nối được máy chủ.'; }
+  finally { clearInterval(tick); aiBusy = false; btns.forEach(b => b.disabled = false); }
+}
 function layerNotes() {
   return state.layers.filter(L => !L.hidden && runsText(L.runs).trim()).map((L, i) => {
     const t = [`Lớp chữ ${i + 1} "${runsText(L.runs).replace(/\n/g, ' / ').slice(0, 40)}": font ${L.font} ${L.weight}${L.italic ? ' nghiêng' : ''}${L.upper ? ', viết hoa' : ''}, cỡ ${L.size}px, màu ${L.fillOff ? 'rỗng' : L.color}`];
@@ -2690,6 +2771,8 @@ function bindAcctUI() {
   });
   $('#upMain').addEventListener('click', () => { $('#upsell').classList.remove('show'); openAcct(state.acct ? 'upgrade' : 'signup'); });
   $('#upBuy').addEventListener('click', wantBuy);
+  $('#btnDesign').addEventListener('click', runDesign);
+  $('#btnDesignTop').addEventListener('click', () => { const t = document.querySelector('#edTabs [data-t="ai"]'); if (t) t.click(); runDesign(); $('#designOut').scrollIntoView({ behavior: 'smooth', block: 'center' }); });
   $('#btnPresetEdit').addEventListener('click', () => { const b = document.querySelector('#edTabs [data-t="look"]'); if (b) b.click(); });
   // Đăng ký học viên: mở form ngay trong Viral Studio, không rời trang edit
   document.querySelectorAll('a[href$="#dangky"]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); openHvForm(); }));
