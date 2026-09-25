@@ -94,6 +94,8 @@ function studioApi(b){
     if (act === 'st_use')    return stDungLuot(b);
     if (act === 'st_buy')    return stMua(b);
     if (act === 'st_paid')   return stDaChuyen(b);
+    if (act === 'st_khoa')      return stKhoa(b);          // form đăng ký học viên: có nhận chuyển khoản không
+    if (act === 'st_khoa_paid') return stKhoaDaChuyen(b);  // học viên bấm "Tôi đã chuyển khoản"
     return jsonOut({ok:false, error:'unknown_action'});
   }catch(err){
     ghiLoi('studioApi/'+act, err);
@@ -263,6 +265,7 @@ function stKichHoat(maCk, nguon){
 /* ── nút Telegram "s:ok:MA" / "s:no:MA" ── */
 function studioCallback(cb){
   var p = String(cb.data||'').split(':'), act = p[1], ma = p[2];
+  if (act === 'k' || act === 'kn') return khoaCallback(cb, act, ma);
   var chatId = cb.message.chat.id, msgId = cb.message.message_id, nhan;
   if (act === 'ok'){
     var kq = stKichHoat(ma, 'admin');
@@ -279,7 +282,7 @@ function studioCallback(cb){
 
 /* ═══════ LỆNH BOT TELEGRAM (chỉ chat quản trị) ═══════
    Code.gs gọi:  if (quanTri && studioCoLenh(cmd)) return studioLenh(cmd, arg, chatId);  */
-var LENH_STUDIO = ['studio','stk','giapro','ngaypro','luotthu','luotai','mopro','tatpro','dsck','timnd'];
+var LENH_STUDIO = ['studio','stk','giapro','ngaypro','luotthu','luotai','mopro','tatpro','dsck','timnd','ckkhoa','tienkhoa'];
 function studioCoLenh(cmd){ return LENH_STUDIO.indexOf(cmd) > -1; }
 
 var ST_MA_NH = {vietcombank:'VCB', vcb:'VCB', mb:'MB', mbbank:'MB', quandoi:'MB', techcombank:'TCB', tcb:'TCB',
@@ -317,14 +320,17 @@ function studioLenh(cmd, arg, chatId){
       '💰 Gói: *' + (g.ten || '?') + '* · *' + stTien(g.gia || 0) + '*',
       '🎁 Tài khoản mới: *' + ST_LUOT_THU + '* lượt AI phân tích miễn phí',
       '🤖 Pro và học viên: *' + (parseInt((typeof hookCfg === 'function' ? hookCfg('HOOK_AI_DAILY') : cfgProp('HOOK_AI_DAILY')) || '20', 10)) + '* lượt AI mỗi ngày',
-      '👥 ' + ds.length + ' người dùng · ' + soPro + ' đang Pro · ' + cho + ' giao dịch chờ','',
+      '👥 ' + ds.length + ' người dùng · ' + soPro + ' đang Pro · ' + cho + ' giao dịch chờ',
+      '🎓 Chuyển khoản trong form học viên: ' + (khoaBat() ? '*BẬT* · ' + khoaNhan(khoaTien()).toLowerCase() + ' *' + stTien(khoaTien()) + '*' : '_tắt_'),'',
       '*Lệnh*',
       '🏦 /stk `MB | 0123456789 | NGUYEN VAN A` — tài khoản nhận tiền',
       '💰 /giapro `50000` — giá gói Pro',
       '📆 /ngaypro `30` — gói dùng bao nhiêu ngày',
       '🎁 /luotthu `10` — số lượt AI miễn phí cho tài khoản mới',
       '🤖 /luotai `20` — lượt AI mỗi ngày của Pro và học viên',
-      '🧾 /dsck — giao dịch đang chờ, bấm nút để mở Pro',
+      '🧾 /dsck — giao dịch đang chờ (Pro và học phí), bấm nút để xác nhận',
+      '🎓 /ckkhoa `bat` · `tat` — hiện màn chuyển khoản sau khi học viên điền form',
+      '💵 /tienkhoa `2000000` — số tiền chuyển (`auto` = theo giá ưu đãi của bot)',
       '🔎 /timnd `email` — xem một người dùng',
       '✅ /mopro `email 30` — tự mở Pro cho ai đó (số ngày, bỏ trống = 1 gói)',
       '⛔ /tatpro `email` — tắt Pro'
@@ -369,14 +375,32 @@ function studioLenh(cmd, arg, chatId){
     return tgSend(chatId, '✅ Pro và học viên giờ có *' + d + '* lượt AI mỗi ngày.');
   }
 
+  if (cmd === 'ckkhoa'){
+    var bat = /^(bat|bật|on|mo|mở|1|co|có)$/i.test(arg), tat = /^(tat|tắt|off|dong|đóng|0|khong|không)$/i.test(arg);
+    if (!bat && !tat) return hoi('🎓 Chuyển khoản trong form học viên đang ' + (khoaBat() ? '*BẬT*' : '*tắt*') +
+      '.\nNhắn `bat` để hiện màn chuyển khoản ngay sau khi học viên điền form xong, `tat` để tắt.');
+    P.setProperty('KHOA_CK', bat ? '1' : '0');
+    if (bat && !stNganHang().stk) return tgSend(chatId, '✅ Đã bật, nhưng ⚠️ chưa có tài khoản nhận tiền nên form chưa hiện màn chuyển khoản. Nhắn /stk trước nhé.');
+    return tgSend(chatId, bat ? '✅ Đã *BẬT*. Học viên điền form xong sẽ thấy QR chuyển *' + stTien(khoaTien()) + '* (' + khoaNhan(khoaTien()).toLowerCase() + '), nội dung `TMXK <mã đăng ký>`. Bấm "Tôi đã chuyển khoản" là bot nhắn bạn kèm nút duyệt.'
+                              : '✅ Đã *tắt*. Form đăng ký chỉ ghi nhận thông tin như cũ.');
+  }
+  if (cmd === 'tienkhoa'){
+    if (!arg) return hoi('💵 Học viên chuyển bao nhiêu sau khi điền form? Ví dụ `2000000`, `500k` (đặt cọc), hoặc `auto` để lấy giá ưu đãi hiện tại (' + stTien(khoaTien()) + ').');
+    if (/^auto$/i.test(arg)){ P.deleteProperty('KHOA_TIEN'); return tgSend(chatId, '✅ Số tiền chuyển theo giá ưu đãi: *' + stTien(khoaTien()) + '*. Đổi giá bằng /giasom là tự theo.'); }
+    var tk = docTien(arg); if (!tk || tk < 1000) return hoi('Chưa hiểu số tiền. Gửi lại, ví dụ `2000000` hoặc `500k`.');
+    P.setProperty('KHOA_TIEN', String(tk));
+    return tgSend(chatId, '✅ Học viên sẽ chuyển *' + stTien(tk) + '* (' + khoaNhan(tk).toLowerCase() + ').');
+  }
+
   if (cmd === 'dsck'){
     var chos = moiPay().filter(function(p){ return p.trangthai === 'cho' || p.trangthai === 'chua_thay' });
     if (!chos.length) return tgSend(chatId, '🧾 Không có giao dịch nào đang chờ.');
-    tgSend(chatId, '🧾 *' + chos.length + ' giao dịch chưa mở Pro* (mới nhất ở dưới)');
+    tgSend(chatId, '🧾 *' + chos.length + ' giao dịch chưa xác nhận* (mới nhất ở dưới)');
     chos.slice(-10).forEach(function(p){
       tgSend(chatId, ['🧾 `' + p.ma_ck + '` · ' + (p.trangthai === 'cho' ? (String(p.nguon).indexOf('nguoi_dung_bao') === 0 ? '💸 đã báo chuyển' : '⏳ chưa báo') : '❌ đã bấm chưa thấy'),
-        '👤 *' + p.ten + '* · `' + p.email + '` · `' + p.sdt + '`', '💰 ' + stTien(p.so_tien) + ' · tạo ' + p.tao].join('\n'),
-        [[{text:'✅ Đã nhận tiền · mở Pro', callback_data:'s:ok:' + p.ma_ck}]]);
+        '👤 *' + p.ten + '*' + (p.email ? ' · `' + p.email + '`' : '') + ' · `' + p.sdt + '`', (p.goi === 'khoa' ? '🎓 ' : '✦ Pro · ') + stTien(p.so_tien) + ' · tạo ' + p.tao].join('\n'),
+        p.goi === 'khoa' ? [[{text:'✅ Đã nhận học phí · duyệt học viên', callback_data:'s:k:' + String(p.ma_nd).replace(/^DK:/, '')}]]
+                         : [[{text:'✅ Đã nhận tiền · mở Pro', callback_data:'s:ok:' + p.ma_ck}]]);
     });
     return;
   }
@@ -400,4 +424,68 @@ function studioLenh(cmd, arg, chatId){
     ghiDong(ST_SHEET, ST_HEADERS, nd, {goi:'free', pro_han: ''});
     return tgSend(chatId, '⛔ Đã tắt Pro của *' + nd.ten + '*.');
   }
+}
+
+/* ═══════ NHẬN CHUYỂN KHOẢN HỌC PHÍ NGAY TRONG FORM ĐĂNG KÝ HỌC VIÊN ═══════
+   Bật/tắt bằng bot: /ckkhoa bat · tat. Số tiền: /tienkhoa (mặc định = giá ưu đãi).
+   Nội dung chuyển khoản: "TMXK <mã đăng ký>". Tiền về thì bấm nút trên bot là duyệt luôn học viên. */
+function khoaBat(){ return cfgProp('KHOA_CK') === '1'; }
+function khoaTien(){
+  var v = parseInt(cfgProp('KHOA_TIEN'), 10); if (v > 0) return v;
+  var c = getConfig(); return Number(c.pricing.earlyBird) || Number(c.pricing.regular) || 0;
+}
+function khoaNhan(tien){ var c = getConfig(); return tien < (Number(c.pricing.earlyBird) || 0) ? 'Đặt cọc giữ chỗ' : 'Học phí'; }
+function khoaTimDK(phone){
+  var d = String(phone||'').replace(/\D/g,''); if (d.length < 9) return null;
+  var lbl = cohortLabel(getConfig()), hit = null;
+  allRegs().forEach(function(r){ if (r.cohort === lbl && String(r.phone).replace(/\D/g,'') === d && r.status !== 'rejected') hit = r });
+  return hit;
+}
+function khoaTimMa(ma){ var hit = null; allRegs().forEach(function(r){ if (String(r.id).toUpperCase() === String(ma).toUpperCase()) hit = r }); return hit; }
+function khoaGD(ma){ var k = 'TMXK' + String(ma).toUpperCase(), p = null; moiPay().forEach(function(x){ if (String(x.ma_ck).toUpperCase() === k) p = x }); return p; }
+
+function stKhoa(b){
+  if (!khoaBat()) return jsonOut({ok:true, bat:false});
+  var bank = stNganHang(); if (!bank.ngan_hang || !bank.stk) return jsonOut({ok:true, bat:false});
+  var dk = khoaTimDK(b.phone); if (!dk) return jsonOut({ok:true, bat:false});
+  var tien = khoaTien(); if (!tien) return jsonOut({ok:true, bat:false});
+  var nd = 'TMXK ' + dk.id, gd = khoaGD(dk.id);
+  return jsonOut({ok:true, bat:true, bank:bank, so_tien:tien, nhan:khoaNhan(tien), noi_dung:nd, ma:dk.id,
+                  qr: stQr(bank, tien, nd), da_nhan: !!(gd && gd.trangthai === 'da_nhan')});
+}
+
+function stKhoaDaChuyen(b){
+  var dk = khoaTimDK(b.phone); if (!dk) return jsonOut({ok:false, error:'khong_thay'});
+  var gd = khoaGD(dk.id);
+  if (gd && gd.trangthai === 'da_nhan') return jsonOut({ok:true, da_nhan:true});
+  var cache = CacheService.getScriptCache(), khoa = 'kck_' + dk.id;
+  if (cache.get(khoa)) return jsonOut({ok:true, lap:true});     // bấm liên tục thì chỉ nhắn bot một lần mỗi 2 phút
+  cache.put(khoa, '1', 120);
+  var tien = khoaTien();
+  if (!gd) bang(ST_PAY_SHEET, ST_PAY_HEADERS).appendRow(['TMXK' + dk.id, 'DK:' + dk.id, '', "'" + dk.phone, dk.name, 'khoa', String(tien), '', 'cho', nowVN(), '', 'nguoi_dung_bao ' + nowVN()]);
+  else ghiDong(ST_PAY_SHEET, ST_PAY_HEADERS, gd, {trangthai:'cho', nguon:'nguoi_dung_bao ' + nowVN()});
+  tgBroadcastKb(['🎓💸 *Học viên báo đã chuyển khoản*','',
+    '👤 *' + dk.name + '* · mã `' + dk.id + '`', '📱 `' + dk.phone + '`', '🏫 ' + dk.cohort,
+    '💰 ' + khoaNhan(tien) + ': *' + stTien(tien) + '*', '🧾 Nội dung CK: `TMXK ' + dk.id + '`','',
+    'Kiểm tra tài khoản rồi bấm nút:'].join('\n'),
+    [[{text:'✅ Đã nhận học phí · duyệt học viên', callback_data:'s:k:' + dk.id}],
+     [{text:'❌ Chưa thấy tiền', callback_data:'s:kn:' + dk.id}]]);
+  return jsonOut({ok:true});
+}
+
+function khoaCallback(cb, act, ma){
+  var chatId = cb.message.chat.id, msgId = cb.message.message_id, nhan;
+  var dk = khoaTimMa(ma), gd = khoaGD(ma);
+  if (!dk) return tgAnswer(cb.id, 'Không tìm thấy mã ' + ma);
+  if (act === 'k'){
+    if (gd) ghiDong(ST_PAY_SHEET, ST_PAY_HEADERS, gd, {trangthai:'da_nhan', xac_nhan: nowVN()});
+    else bang(ST_PAY_SHEET, ST_PAY_HEADERS).appendRow(['TMXK' + dk.id, 'DK:' + dk.id, '', "'" + dk.phone, dk.name, 'khoa', String(khoaTien()), '', 'da_nhan', nowVN(), nowVN(), 'admin']);
+    sheet().getRange(dk.row, HEADERS.indexOf('status') + 1).setValue('approved');
+    nhan = '✅ Đã nhận học phí · đã duyệt ' + dk.name;
+  } else {
+    if (gd && gd.trangthai === 'cho') ghiDong(ST_PAY_SHEET, ST_PAY_HEADERS, gd, {trangthai:'chua_thay', xac_nhan: nowVN()});
+    nhan = '❌ Chưa thấy tiền · ' + dk.name;
+  }
+  tgAnswer(cb.id, nhan);
+  tgApi('editMessageReplyMarkup', {chat_id:chatId, message_id:msgId, reply_markup:{inline_keyboard:[[{text:nhan, callback_data:'xong'}]]}});
 }

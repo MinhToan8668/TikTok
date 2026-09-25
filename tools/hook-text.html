@@ -319,6 +319,10 @@
   .sheet.show{display:flex}
   .sheet-box{background:var(--surface);width:100%;max-width:640px;max-height:86vh;overflow:auto;border-radius:20px 20px 0 0;padding:14px 16px 24px;box-shadow:var(--shadow)}
   @media (min-width:901px){.sheet{align-items:center}.sheet-box{border-radius:20px}}
+  .hv-box{padding-bottom:0;overflow:hidden;display:flex;flex-direction:column;height:92vh;height:92dvh;max-height:none}
+  @media (min-width:901px){.hv-box{height:88vh;max-width:620px}}
+  .hv-box iframe{width:100%;flex:1 1 auto;min-height:0;border:0;border-radius:14px 14px 0 0;background:var(--surface)}
+  .hv-load{margin:4px 0 8px}
   .sheet-head{display:flex;justify-content:space-between;align-items:center;position:sticky;top:-14px;background:var(--surface);padding:6px 0;z-index:1}
   .sheet .st-ic{color:var(--text)}
   .up-list{list-style:none;padding:0;margin:10px 0 0;display:flex;flex-direction:column;gap:8px}
@@ -756,6 +760,14 @@
       <button class="linkbtn" id="upClose" type="button">Để sau</button>
     </div>
     <p class="hint" style="margin:10px 0 0">Đã là học viên? Đăng nhập bằng tài khoản khu học viên là có Pro.</p>
+  </div>
+</div>
+
+<div class="sheet" id="hvSheet" role="dialog" aria-modal="true" aria-labelledby="hvSheetTitle">
+  <div class="sheet-box hv-box">
+    <div class="sheet-head"><b id="hvSheetTitle">🎓 Đăng ký học viên Tự Mình Xây Kênh</b><button class="st-ic" id="hvSheetClose" type="button" aria-label="Đóng">✕</button></div>
+    <p class="hint hv-load" id="hvLoad"><span class="spinner"></span>Đang mở form đăng ký...</p>
+    <iframe id="hvFrame" title="Form đăng ký học viên Tự Mình Xây Kênh"></iframe>
   </div>
 </div>
 
@@ -1645,6 +1657,12 @@ async function loadPrice() {
   if (stCfgCache.luot_thu != null) document.querySelectorAll('[data-luot]').forEach(e => e.textContent = stCfgCache.luot_thu);
 }
 setTimeout(loadPrice, 1500);
+function openHvForm() {
+  $('#upsell').classList.remove('show'); $('#acctSheet').classList.remove('show');
+  $('#hvLoad').hidden = false; $('#hvFrame').src = '../index.html?embed=dangky';
+  $('#hvSheet').classList.add('show');
+}
+function closeHvForm() { $('#hvSheet').classList.remove('show'); $('#hvFrame').src = 'about:blank'; }
 function wantBuy() { $('#upsell').classList.remove('show'); if (state.acct) openAcct('upgrade'); else { state.afterSignup = 'upgrade'; openAcct('signup'); toast('Tạo tài khoản trước để nhận mã chuyển khoản'); } }
 
 /* ---------- export ---------- */
@@ -2598,6 +2616,12 @@ function bindAcctUI() {
   });
   $('#upMain').addEventListener('click', () => { $('#upsell').classList.remove('show'); openAcct(state.acct ? 'upgrade' : 'signup'); });
   $('#upBuy').addEventListener('click', wantBuy);
+  // Đăng ký học viên: mở form ngay trong Viral Studio, không rời trang edit
+  document.querySelectorAll('a[href$="#dangky"]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); openHvForm(); }));
+  $('#hvSheetClose').addEventListener('click', closeHvForm);
+  $('#hvSheet').addEventListener('click', e => { if (e.target === e.currentTarget) closeHvForm(); });
+  $('#hvFrame').addEventListener('load', () => { $('#hvLoad').hidden = true; });
+  window.addEventListener('message', e => { if (e.data && e.data.tmxk === 'close') closeHvForm(); });
   $('#upLogin').addEventListener('click', () => { $('#upsell').classList.remove('show'); openAcct('login'); });
 }
 

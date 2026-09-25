@@ -693,6 +693,25 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 .zalo-box p{font-size:13px;color:var(--quiet);margin-bottom:16px}
 .zalo-box .btn{width:100%}
 
+/* chuyển khoản học phí ngay sau form (bật bằng bot /ckkhoa) */
+.pay-khoa{margin:18px 0 6px;padding:20px 18px;border:2px solid var(--ink);border-radius:var(--r);background:var(--card);text-align:left}
+.pay-khoa h4{font-size:16px;font-weight:800;margin-bottom:4px}
+.pay-khoa .pk-sub{font-size:13px;color:var(--quiet);margin-bottom:12px}
+.pay-khoa img{display:block;width:100%;max-width:260px;margin:0 auto 12px;border-radius:12px;background:#fff}
+.pay-khoa dl{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:14px;margin:0 0 12px;align-items:center}
+.pay-khoa dt{color:var(--quiet)}
+.pay-khoa dd{margin:0;font-weight:700;display:flex;gap:8px;align-items:center;flex-wrap:wrap;word-break:break-all}
+.pay-khoa .pk-chep{border:1.5px solid var(--line-dk);background:var(--paper-lt);border-radius:999px;padding:3px 10px;font-size:12px;font-weight:700;cursor:pointer;color:var(--ink)}
+.pay-khoa .btn{width:100%}
+.pay-khoa .pk-msg{font-size:13px;margin-top:10px;color:var(--quiet)}
+.pay-khoa .pk-msg.ok{color:var(--lime-deep);font-weight:700}
+.pay-khoa .pk-msg.bad{color:var(--red)}
+/* mở form trong Viral Studio: chỉ hiện đúng bảng đăng ký */
+html.embed body>*:not(#modal){display:none!important}
+html.embed body{background:var(--paper-lt);padding:0!important}
+html.embed .ov{background:transparent;backdrop-filter:none;padding:0;position:static;display:flex}
+html.embed .modal{border:0;border-radius:0;box-shadow:none;max-width:none;min-height:100vh;animation:none}
+
 /* ═══════════ KHU HỌC VIÊN ═══════════ */
 #khuhv{display:none;min-height:100vh;background:var(--paper)}
 #khuhv.on{display:block}
@@ -2027,6 +2046,20 @@ body.hv-mode{padding-bottom:0}
         <p>Miễn phí, không cần chờ đóng phí. Kiến thức, định hướng và khám kênh mỗi ngày đều ở trong này — vào ngay nhé.</p>
         <a class="btn btn-ink btn-md" id="zaloBtn" href="#" target="_blank" rel="noopener">Vào group cộng đồng →</a>
       </div>
+      <div class="pay-khoa" id="payKhoa" hidden>
+        <h4 id="pkTitle">💳 Chuyển khoản học phí để giữ chỗ</h4>
+        <p class="pk-sub">Quét mã QR bằng app ngân hàng là tự điền đủ. Chuyển xong bấm nút cuối để tụi mình xác nhận.</p>
+        <img id="pkQr" alt="Mã QR chuyển khoản, quét bằng app ngân hàng">
+        <dl>
+          <dt>Ngân hàng</dt><dd id="pkBank"></dd>
+          <dt>Số tài khoản</dt><dd><span id="pkStk"></span><button class="pk-chep" type="button" data-pk="pkStk">Chép</button></dd>
+          <dt>Chủ tài khoản</dt><dd id="pkChu"></dd>
+          <dt id="pkNhan">Học phí</dt><dd><span id="pkTien"></span><button class="pk-chep" type="button" data-pk="pkTien">Chép</button></dd>
+          <dt>Nội dung</dt><dd><span id="pkNd"></span><button class="pk-chep" type="button" data-pk="pkNd">Chép</button></dd>
+        </dl>
+        <button class="btn btn-lime btn-md" id="pkPaid" type="button">Tôi đã chuyển khoản</button>
+        <p class="pk-msg" id="pkMsg"></p>
+      </div>
       <span class="pill gold" id="donePill">⏳ Đang chờ xác nhận</span>
       <div style="margin-top:24px"><button class="btn btn-line btn-md" data-close>Đóng</button></div>
     </div>
@@ -2310,7 +2343,9 @@ function loadConfig(){
 }
 
 /* ══════════════ MODAL + FORM ══════════════ */
-var lastFocus=null;
+var lastFocus=null, LAST_REG=null;
+var EMBED=/[?&]embed=dangky\b/.test(location.search);
+if(EMBED) document.documentElement.classList.add('embed');
 function openModal(){
   if(CFG && CFG.computed.isClosed) return;
   lastFocus=document.activeElement;
@@ -2323,6 +2358,7 @@ function openModal(){
   setTimeout(function(){ var n=$('#f-name'); if(n) n.focus(); },60);
 }
 function closeModal(){
+  if(EMBED){ try{ parent.postMessage({tmxk:'close'},'*'); }catch(e){} return; }
   $('#modal').classList.remove('on');
   document.body.classList.remove('lock');
   if(lastFocus) lastFocus.focus();
@@ -2460,8 +2496,9 @@ function initForm(){
     var trap=$('#f-website');
     if(trap && trap.value.trim()){ showDone(false); return; }
 
-    var data={action:'register',source:'web'};
+    var data={action:'register',source:EMBED?'viral-studio':'web'};
     els.forEach(function(el){ data[el.name]=(el.value||'').trim() });
+    LAST_REG={name:data.name, phone:data.phone};
     MULTI.concat(RADIO).forEach(function(name){ data[name]=groupVal(name) });
     data.website='';
 
@@ -2527,7 +2564,48 @@ function initForm(){
         'để xác nhận chỗ '+esc(C.cohortLabel||'')+'.';
       $('#donePill').textContent='⏳ Đang chờ xác nhận';
     }
+    loadPayKhoa();
+    if(EMBED) window.scrollTo(0,0);
   }
+
+  /* Màn chuyển khoản học phí: chỉ hiện khi admin bật /ckkhoa trên bot */
+  function postApi(body){
+    return fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)})
+      .then(function(r){return r.json()});
+  }
+  function loadPayKhoa(){
+    var box=$('#payKhoa'); box.hidden=true;
+    if(!LAST_REG || !API || API.indexOf('PASTE_')===0) return;
+    postApi({action:'st_khoa', phone:LAST_REG.phone}).then(function(r){
+      if(!r || !r.ok || !r.bat) return;
+      $('#pkTitle').textContent=r.da_nhan ? '✅ Tụi mình đã nhận '+r.nhan.toLowerCase() : '💳 Chuyển khoản '+r.nhan.toLowerCase()+' để giữ chỗ';
+      $('#pkQr').src=r.qr||''; $('#pkQr').style.display=r.qr?'':'none';
+      $('#pkBank').textContent=r.bank.ngan_hang; $('#pkStk').textContent=r.bank.stk; $('#pkChu').textContent=r.bank.chu_tk;
+      $('#pkNhan').textContent=r.nhan;
+      $('#pkTien').textContent=Number(r.so_tien).toLocaleString('vi-VN')+'đ'; $('#pkTien').setAttribute('data-raw',String(r.so_tien));
+      $('#pkNd').textContent=r.noi_dung;
+      $('#pkPaid').style.display=r.da_nhan?'none':'';
+      $('#pkMsg').className='pk-msg'; $('#pkMsg').textContent='';
+      if(!r.da_nhan) $('#donePill').textContent='⏳ Chờ chuyển khoản để giữ chỗ';
+      box.hidden=false;
+    }).catch(function(){});
+  }
+  $('#pkPaid').addEventListener('click',function(){
+    var m=$('#pkMsg'), b=this; if(!LAST_REG) return;
+    b.disabled=true; m.className='pk-msg'; m.textContent='Đang báo tụi mình...';
+    postApi({action:'st_khoa_paid', phone:LAST_REG.phone, name:LAST_REG.name}).then(function(r){
+      b.disabled=false;
+      if(r && r.ok){ m.className='pk-msg ok'; m.textContent=r.da_nhan ? 'Tụi mình đã nhận học phí của bạn rồi nhé!' : 'Đã báo! Tụi mình kiểm tra tài khoản rồi xác nhận qua Zalo/SĐT của bạn sớm nhất.'; }
+      else { m.className='pk-msg bad'; m.textContent='Chưa báo được, bạn thử lại hoặc nhắn tụi mình qua Zalo nhé.'; }
+    }).catch(function(){ b.disabled=false; m.className='pk-msg bad'; m.textContent='Không kết nối được, bạn thử lại nhé.'; });
+  });
+  $$('[data-pk]').forEach(function(b){
+    b.addEventListener('click',function(){
+      var t=$('#'+b.getAttribute('data-pk')), v=t.getAttribute('data-raw')||t.textContent;
+      var xong=function(){ b.textContent='Đã chép'; setTimeout(function(){ b.textContent='Chép' },1500) };
+      if(navigator.clipboard) navigator.clipboard.writeText(v).then(xong,function(){}); else xong();
+    });
+  });
 }
 
 /* ══════════════ REVEAL / NAV / STICKY / TICKER ══════════════ */
@@ -3621,6 +3699,8 @@ initHV();
 initChrome();
 observe();
 initAdmin();
+// mở thẳng bảng đăng ký: nhúng trong Viral Studio, hoặc link có #dangky-form
+if (EMBED || location.hash === '#dangky-form') openModal();
 
 })();
 </script>
