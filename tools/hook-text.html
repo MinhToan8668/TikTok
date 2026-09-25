@@ -178,46 +178,95 @@
   .upsell.show{display:grid}
   .upsell .box{background:var(--surface);border-radius:16px;padding:20px;max-width:440px;width:100%;box-shadow:var(--shadow)}
   .upsell h3{margin:0 0 6px;font-family:var(--font-display);font-size:19px;font-weight:800}
-  /* trình chỉnh chữ tự do */
+  /* studio chỉnh chữ — giao diện tối như app edit */
   .phone canvas#selLayer{position:absolute;inset:8px;width:calc(100% - 16px);height:calc(100% - 16px);pointer-events:none;border-radius:16px;background:transparent}
-  .badge.new{background:var(--accent);color:var(--accent-ink)}
-  .ed-bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-  .ed-bar .sp{flex:1}
-  .btn.icon{padding:6px 10px;min-width:36px;justify-content:center}
-  .ed-grid{display:grid;grid-template-columns:200px minmax(0,1fr);gap:12px;margin-top:12px}
-  @media (max-width:640px){.ed-grid{grid-template-columns:minmax(0,1fr)}}
-  .ed-layers{display:flex;flex-direction:column;gap:6px;min-width:0}
-  .ed-layers .lbl{margin-top:0}
-  .lrow{display:flex;flex-direction:column;gap:4px;border:1px solid var(--line);border-radius:10px;padding:6px 8px;background:var(--surface-2);position:relative}
-  .lrow.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
-  .lname{border:0;background:transparent;color:var(--text);text-align:left;font-size:15px;font-weight:700;padding:2px 34px 2px 0;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .lact{display:flex;gap:2px}
-  .lbtn{border:1px solid transparent;background:transparent;color:var(--muted);border-radius:6px;width:28px;height:26px;cursor:pointer;font:inherit;font-size:13px;display:grid;place-items:center}
-  .lbtn:hover{background:var(--surface);border-color:var(--line);color:var(--text)}
-  .lrow .lock{position:absolute;top:7px;right:8px;background:var(--pro);color:var(--pro-text);font-size:9.5px;font-weight:800;padding:2px 5px;border-radius:5px}
-  .tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin:12px 0 10px;overflow-x:auto;scrollbar-width:none}
-  .tabs button{font:inherit;font-size:13px;font-weight:600;border:0;background:transparent;color:var(--muted);padding:8px 10px;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap}
-  .tabs button[aria-selected="true"]{color:var(--text);border-bottom-color:var(--accent)}
-  .pane[hidden]{display:none}
-  .pst-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:6px}
-  .pst{position:relative;border:1px solid var(--line);border-radius:10px;background:#3a3f45;padding:10px 4px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;font:inherit}
-  .pst[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
-  .pst-sw{font-size:26px;line-height:1.15}
-  .pst small{color:#E9E4DA;font-size:11px;line-height:1.2;text-align:center}
-  .pst .lock{position:absolute;top:4px;right:4px;background:var(--pro);color:var(--pro-text);font-size:8.5px;font-weight:800;padding:1px 4px;border-radius:5px}
-  .frow{display:flex;gap:8px}
-  .frow select{flex:1;min-width:0}
-  .ck-row{margin:8px 0}
-  .ck{display:inline-flex;gap:6px;align-items:center;font-size:13px;cursor:pointer}
-  .ck input{accent-color:var(--accent);width:16px;height:16px}
-  .colors{margin:8px 0}
-  .colors .sw{flex:1;min-width:90px}
-  .colors input[type=color]{width:100%;height:34px;border:1px solid var(--line);border-radius:8px;background:transparent;padding:2px;cursor:pointer}
-  .fx-group{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:8px;background:var(--surface-2)}
-  .fx-group > .row{justify-content:space-between}
-  .ai-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-  .ai-grid .btn{justify-content:center}
-  #lText{min-height:72px;font-size:15px}
+  .studio{--st-bg:#15171A;--st-panel:#1E2125;--st-tile:#2A2E33;--st-line:#383D44;--st-text:#EEF0F2;--st-muted:#9BA1A8;background:var(--st-bg);border-color:#000;color:var(--st-text);padding:14px 14px 16px}
+  .studio [hidden]{display:none!important}
+  .studio h2{color:var(--st-text);margin:0}
+  .studio h2 .n{background:var(--st-tile);border-color:var(--st-line);color:var(--st-muted)}
+  .st-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .st-ic{width:38px;height:38px;border-radius:50%;border:0;background:transparent;color:var(--st-text);font-size:22px;cursor:pointer;display:inline-grid;place-items:center}
+  .st-ic:hover{background:var(--st-tile)}
+  .studio button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .st-hint{color:var(--st-muted);font-size:12.5px;margin:4px 0 10px}
+  .st-layers{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin;align-items:center}
+  .lchip{position:relative;flex:none;max-width:210px;border:1.5px solid var(--st-line);background:var(--st-panel);color:var(--st-text);border-radius:999px;padding:7px 14px;font:inherit;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .lchip.on{border-color:var(--accent);background:var(--st-tile)}
+  .lchip.off{opacity:.45}
+  .studio .lchip .lock{position:static;display:inline-block;margin-left:6px;vertical-align:1px}
+  .addchip{flex:none;border:1.5px dashed var(--st-line);background:transparent;color:var(--st-muted);border-radius:999px;padding:7px 12px;font:inherit;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+  .addchip:hover{color:var(--st-text);border-color:var(--st-muted)}
+  .addchip.main{background:var(--accent);color:#1B220D;border:1.5px solid var(--accent)}
+  #lText{margin-top:10px;min-height:64px;max-height:180px;overflow:auto;padding:12px 14px;border-radius:14px;border:1.5px solid var(--st-line);font-size:21px;line-height:1.35;white-space:pre-wrap;word-break:break-word;outline:none;caret-color:var(--accent)}
+  #lText:focus{border-color:var(--accent)}
+  #lText:empty::before{content:"Gõ chữ ở đây...";color:#8a8f96}
+  .tools{display:flex;gap:4px;align-items:center;margin-top:8px;overflow-x:auto;scrollbar-width:none}
+  .tb{flex:none;min-width:44px;height:44px;border-radius:12px;border:0;background:var(--st-panel);color:var(--st-text);font:inherit;font-size:17px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:0 10px}
+  .tb:hover{background:var(--st-tile)}
+  .tb small{font-size:12.5px;font-weight:600}
+  .tb .kdot{width:16px;height:16px;border-radius:50%;display:inline-block;box-shadow:0 0 0 2px rgba(255,255,255,.25)}
+  .tb.danger{color:#FF8A7A}
+  .tools .sp{flex:1;min-width:6px}
+  .tpl-note{margin-top:10px;background:var(--st-panel);border-radius:12px;padding:10px 12px;font-size:13px;color:var(--st-muted);line-height:1.5}
+  .tpl-note b{color:var(--st-text)}
+  .tpl-note .addchip{margin-top:8px}
+  .tabs{display:flex;gap:2px;border-bottom:1px solid var(--st-line);margin:14px 0 12px;overflow-x:auto;scrollbar-width:none}
+  .tabs button{flex:none;font:inherit;font-size:15px;font-weight:600;border:0;background:transparent;color:var(--st-muted);padding:9px 12px 11px;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap}
+  .tabs button[aria-selected="true"]{color:var(--st-text);border-bottom-color:var(--accent)}
+  .tabs.sub{margin:0 0 10px;border:0}
+  .tabs.sub button{font-size:13.5px;padding:6px 11px;border-radius:999px;border:0}
+  .tabs.sub button[aria-selected="true"]{background:var(--st-tile);color:var(--st-text)}
+  .tabs.sub button.lit::after{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--accent);margin-left:5px;vertical-align:2px}
+  .pst-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px}
+  .pst{position:relative;border:2px solid transparent;border-radius:12px;background:var(--st-panel);padding:12px 4px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;font:inherit;color:var(--st-text)}
+  .pst:hover{background:var(--st-tile)}
+  .pst[aria-pressed="true"]{border-color:#fff}
+  .pst-sw{font-size:28px;line-height:1.15}
+  .pst-sw.tq{font-size:14px;font-weight:800;text-align:center;line-height:1.25}
+  .pst small{color:var(--st-muted);font-size:11px;line-height:1.25;text-align:center}
+  .studio .lock{position:absolute;top:5px;right:5px;background:var(--accent);color:#1B220D;font-size:9px;font-weight:800;padding:1px 5px;border-radius:5px;font-family:var(--font-ui);font-style:normal}
+  .font-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px;max-height:236px;overflow:auto;padding-right:2px}
+  .fnt{position:relative;height:60px;border-radius:12px;border:2px solid transparent;background:var(--st-panel);color:var(--st-text);font-size:16px;cursor:pointer;padding:0 8px;line-height:1.1}
+  .fnt:hover{background:var(--st-tile)}
+  .fnt[aria-pressed="true"]{border-color:#fff}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 4px}
+  .chip{border:0;background:var(--st-panel);color:var(--st-text);border-radius:999px;padding:7px 12px;font:inherit;font-size:13px;cursor:pointer}
+  .chip[aria-pressed="true"]{background:var(--st-text);color:var(--st-bg)}
+  .dots{display:flex;gap:10px;align-items:center;overflow-x:auto;padding:5px 5px 9px;scrollbar-width:none}
+  .dot{flex:none;width:34px;height:34px;border-radius:50%;border:0;cursor:pointer;position:relative;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);padding:0}
+  .dot[aria-pressed="true"],.dot.rainbow.on{box-shadow:0 0 0 3px var(--st-bg),0 0 0 5px #fff}
+  .dot.none{background:var(--st-panel)}
+  .dot.none::after{content:"";position:absolute;inset:8px;border:2.5px solid var(--st-muted);border-radius:50%;background:linear-gradient(135deg,transparent 44%,var(--st-muted) 44%,var(--st-muted) 56%,transparent 56%)}
+  .dot.rainbow{background:conic-gradient(#ff4d4d,#ffd84d,#6dff6d,#4dd8ff,#6d6dff,#ff4dd8,#ff4d4d);display:block}
+  .dot.rainbow.on::after{content:"";position:absolute;inset:9px;border-radius:50%;background:var(--cur,#fff);box-shadow:0 0 0 2px #fff}
+  .dot.rainbow input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;padding:0;border:0}
+  .dot-sep{flex:none;width:1px;height:26px;background:var(--st-line)}
+  .rowlbl{font-size:12px;color:var(--st-muted);margin:4px 0 2px}
+  .studio .slider{grid-template-columns:92px 1fr 44px;margin:8px 0}
+  .studio .slider span,.studio .slider output{color:var(--st-muted)}
+  .studio input[type=range]{accent-color:#fff}
+  .tgl{display:inline-flex;cursor:pointer;position:relative}
+  .tgl input{position:absolute;opacity:0;width:1px;height:1px}
+  .tgl span{background:var(--st-panel);color:var(--st-text);border-radius:999px;padding:7px 12px;font-size:13px}
+  .tgl input:checked + span{background:var(--st-text);color:var(--st-bg)}
+  .tgl input:focus-visible + span{outline:2px solid var(--accent)}
+  .studio .seg{border-color:var(--st-line)}
+  .studio .seg button{background:var(--st-panel);color:var(--st-muted)}
+  .studio .seg button[aria-pressed="true"]{background:var(--st-text);color:var(--st-bg)}
+  .ai-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .ai-btn{border:0;border-radius:12px;background:var(--st-panel);color:var(--st-text);font:inherit;font-size:14px;font-weight:600;padding:12px;cursor:pointer;text-align:left}
+  .ai-btn small{display:block;color:var(--st-muted);font-weight:400;font-size:11.5px;margin-top:2px}
+  .ai-btn:hover{background:var(--st-tile)}
+  .ai-btn:disabled{opacity:.5}
+  .studio .status{color:var(--st-muted)}
+  .studio .status.ok{color:#B9F06B}
+  .studio .status.err{color:#FF8A7A}
+  .st-empty{color:var(--st-muted);font-size:13px;background:var(--st-panel);border-radius:12px;padding:14px;margin-top:10px}
+  .st-foot{margin-top:14px;border-top:1px solid var(--st-line);padding-top:10px}
+  .st-foot summary{color:var(--st-muted);font-size:13px;cursor:pointer}
+  .st-foot .row{margin-top:8px}
+  .st-foot .btn{background:var(--st-panel);border-color:var(--st-line);color:var(--st-text)}
+  .st-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
   code{background:var(--surface-2);border:1px solid var(--line);border-radius:5px;padding:1px 5px;font-size:12.5px}
   @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -254,126 +303,148 @@
         </div>
       </section>
 
-      <section class="card">
-        <h2><span class="n">2</span>Nội dung hook</h2>
-        <p class="hint">Dùng <code>**từ khóa**</code> để nhấn màu, <code>_cụm chốt_</code> để dùng chữ serif nghiêng. Xuống dòng để ngắt dòng, cách một dòng trống để tách khối.</p>
-        <textarea id="text" spellcheck="false">3 giây đầu quyết định
-**90% lượt xem** của bạn</textarea>
-        <div class="row" style="margin-top:10px">
-          <button class="btn sm" id="btnQuick">Gợi ý nhanh (không AI)</button>
-          <button class="btn sm" id="btnSample1">Ví dụ: hook ngắn</button>
-          <button class="btn sm" id="btnSample2">Ví dụ: tâm sự dài</button>
-          <button class="btn sm" id="btnSample3">Ví dụ: từ A sang B</button>
-          <button class="btn sm" id="btnSample4">Ví dụ: danh sách</button>
-          <button class="btn sm" id="btnSample5">Ví dụ: trích dẫn</button>
-          <button class="btn sm" id="btnSample6">Ví dụ: POV</button>
+      <section class="card studio" id="editorCard">
+        <div class="st-head">
+          <h2><span class="n">2</span>Chữ trên video</h2>
+          <div>
+            <button class="st-ic" id="btnUndo" title="Hoàn tác (Ctrl+Z)" aria-label="Hoàn tác">↶</button>
+            <button class="st-ic" id="btnRedo" title="Làm lại (Ctrl+Shift+Z)" aria-label="Làm lại">↷</button>
+          </div>
         </div>
+        <p class="st-hint">Chạm chữ trên khung preview để chọn, kéo để dời. Muốn tô màu vài chữ: bôi đen chữ đó rồi chạm màu.</p>
+        <div class="st-layers">
+          <div id="layerList" style="display:contents"></div>
+          <button class="addchip main" id="btnAddText" type="button">+ Thêm chữ</button>
+          <button class="addchip" id="btnAddTitle" type="button">+ Tiêu đề to</button>
+          <button class="addchip" id="btnAddSub" type="button">+ Dòng phụ</button>
+        </div>
+        <textarea id="text" hidden aria-hidden="true">3 giây đầu quyết định
+**90% lượt xem** của bạn</textarea>
+        <div class="st-empty" id="layerEmpty">Chưa chọn chữ nào. Chạm vào chữ trên khung preview, hoặc bấm "+ Thêm chữ".</div>
+        <div id="layerProps" hidden>
+          <div id="lText" contenteditable="true" spellcheck="false" role="textbox" aria-multiline="true" aria-label="Nội dung chữ"></div>
+          <div class="tools" id="fmtBar" role="toolbar" aria-label="Định dạng phần chữ đang bôi đen">
+            <button class="tb" type="button" data-f="key" title="Tô màu nhấn cho phần chữ đang bôi đen"><span class="kdot" id="fmtKeyDot"></span><small>Nhấn màu</small></button>
+            <button class="tb" type="button" data-f="b" data-free title="In đậm" aria-label="In đậm"><b>B</b></button>
+            <button class="tb" type="button" data-f="i" title="In nghiêng" aria-label="In nghiêng"><i style="font-family:Georgia,serif">I</i></button>
+            <button class="tb" type="button" data-f="big" data-free title="Phóng to phần chữ chọn" aria-label="Phóng to chữ">A<sup>+</sup></button>
+            <button class="tb" type="button" data-f="small" data-free title="Thu nhỏ phần chữ chọn" aria-label="Thu nhỏ chữ">A<sup>−</sup></button>
+            <button class="tb" type="button" data-f="clear" title="Bỏ màu, đậm, nghiêng của phần chữ chọn"><small>Xoá kiểu</small></button>
+            <span class="sp"></span>
+            <button class="tb" type="button" id="btnDupSel" data-free title="Nhân bản lớp" aria-label="Nhân bản lớp">⧉</button>
+            <button class="tb danger" type="button" id="btnDelSel" title="Xoá lớp" aria-label="Xoá lớp">🗑</button>
+          </div>
+          <div class="tpl-note" data-tplonly hidden>Câu hook này đang trình bày theo mẫu <b id="tplName"></b>. Bôi đen chữ rồi chạm <b>Nhấn màu</b> hoặc <b>I</b> để đổi kiểu. Kéo trên khung để dời lên xuống, kéo chấm xanh để phóng to.<br><button class="addchip main" id="btnSplit" type="button">Chỉnh tự do từng chữ (font, màu, viền, bóng)</button></div>
+          <div class="tabs" id="edTabs" role="tablist">
+            <button type="button" data-t="style" aria-selected="true">Mẫu</button>
+            <button type="button" data-t="font" data-free aria-selected="false">Phông chữ</button>
+            <button type="button" data-t="look" data-free aria-selected="false">Phong cách</button>
+            <button type="button" data-t="pos" data-free aria-selected="false">Vị trí</button>
+            <button type="button" data-t="ai" aria-selected="false">AI ✦</button>
+          </div>
+          <div class="pane" data-t="style">
+            <div class="pst-grid" id="presetGrid" data-free></div>
+            <div class="pst-grid" id="tplGrid" data-tplonly hidden></div>
+          </div>
+          <div class="pane" data-t="font" hidden>
+            <div class="font-grid" id="fontGrid"></div>
+            <div class="chips" id="weightRow"></div>
+            <div class="slider"><span>Cỡ</span><input type="range" data-p="size" data-unit="px" min="14" max="260"><output></output></div>
+          </div>
+          <div class="pane" data-t="look" hidden>
+            <div class="tabs sub" id="styleSub" role="tablist">
+              <button type="button" data-s="text" aria-selected="true">Văn bản</button>
+              <button type="button" data-s="stroke" aria-selected="false">Tô viền</button>
+              <button type="button" data-s="glow" aria-selected="false">Rực sáng</button>
+              <button type="button" data-s="bg" aria-selected="false">Phông nền</button>
+              <button type="button" data-s="shadow" aria-selected="false">Bóng</button>
+            </div>
+            <div class="subpane" data-s="text">
+              <div class="dots" id="rowText"></div>
+              <div class="rowlbl">Màu của chữ được nhấn</div>
+              <div class="dots" id="rowKey"></div>
+              <div class="chips">
+                <label class="tgl"><input type="checkbox" data-p="upper"><span>VIẾT HOA</span></label>
+                <label class="tgl"><input type="checkbox" data-p="italic"><span><i>Nghiêng cả lớp</i></span></label>
+                <label class="tgl"><input type="checkbox" data-p="fillOff"><span>Chữ rỗng</span></label>
+              </div>
+              <div class="slider"><span>Độ mờ</span><input type="range" data-p="opacity" data-scale="100" data-unit="%" min="10" max="100"><output></output></div>
+              <div class="slider"><span>Giãn chữ</span><input type="range" data-p="spacing" min="-4" max="30"><output></output></div>
+              <div class="slider"><span>Giãn dòng</span><input type="range" data-p="lineH" data-scale="100" data-unit="%" min="80" max="200"><output></output></div>
+            </div>
+            <div class="subpane" data-s="stroke" hidden>
+              <div class="dots" id="rowStroke"></div>
+              <div class="slider"><span>Độ dày</span><input type="range" data-p="stroke.width" min="0" max="30"><output></output></div>
+            </div>
+            <div class="subpane" data-s="glow" hidden>
+              <div class="dots" id="rowGlow"></div>
+              <div class="slider"><span>Độ lan</span><input type="range" data-p="glow.blur" min="4" max="80"><output></output></div>
+              <div class="slider"><span>Cường độ</span><input type="range" data-p="glow.alpha" data-scale="100" data-unit="%" min="10" max="100"><output></output></div>
+            </div>
+            <div class="subpane" data-s="bg" hidden>
+              <div class="dots" id="rowBg"></div>
+              <div class="seg" id="bgMode" role="group" aria-label="Kiểu nền" style="margin:4px 0"><button type="button" data-v="line">Hộp từng dòng</button><button type="button" data-v="block">Một khối</button></div>
+              <div class="slider"><span>Độ đậm</span><input type="range" data-p="bg.alpha" data-scale="100" data-unit="%" min="0" max="100"><output></output></div>
+              <div class="slider"><span>Bo góc</span><input type="range" data-p="bg.radius" min="0" max="60"><output></output></div>
+              <div class="slider"><span>Đệm</span><input type="range" data-p="bg.pad" min="0" max="60"><output></output></div>
+            </div>
+            <div class="subpane" data-s="shadow" hidden>
+              <div class="dots" id="rowShadow"></div>
+              <div class="slider"><span>Độ đậm</span><input type="range" data-p="shadow.alpha" data-scale="100" data-unit="%" min="0" max="100"><output></output></div>
+              <div class="slider"><span>Độ nhoè</span><input type="range" data-p="shadow.blur" min="0" max="60"><output></output></div>
+              <div class="slider"><span>Lệch ngang</span><input type="range" data-p="shadow.x" min="-40" max="40"><output></output></div>
+              <div class="slider"><span>Lệch dọc</span><input type="range" data-p="shadow.y" min="-40" max="40"><output></output></div>
+            </div>
+          </div>
+          <div class="pane" data-t="pos" hidden>
+            <div class="seg" id="lAlign" role="group" aria-label="Căn chữ"><button type="button" data-v="left">Trái</button><button type="button" data-v="center">Giữa</button><button type="button" data-v="right">Phải</button></div>
+            <div class="slider"><span>Ngang</span><input type="range" data-p="x" data-scale="100" data-unit="%" min="0" max="100"><output></output></div>
+            <div class="slider"><span>Dọc</span><input type="range" data-p="y" data-scale="100" data-unit="%" min="0" max="100"><output></output></div>
+            <div class="slider"><span>Xoay</span><input type="range" data-p="rotate" data-unit="°" min="-180" max="180"><output></output></div>
+            <div class="slider"><span>Bề rộng</span><input type="range" data-p="maxw" data-unit="%" min="20" max="100"><output></output></div>
+            <div class="st-actions">
+              <button class="chip" type="button" id="btnCenterX">Căn giữa khung</button>
+              <button class="chip" type="button" id="btnUp">Đưa lên trên</button>
+              <button class="chip" type="button" id="btnDown">Đưa xuống dưới</button>
+              <button class="chip" type="button" id="btnHide">Ẩn lớp</button>
+            </div>
+          </div>
+          <div class="pane" data-t="ai" hidden>
+            <div class="ai-grid" id="layerAi">
+              <button type="button" class="ai-btn" data-ask="manh">Viết mạnh hơn<small>Luật 1 giây, từ mạnh lên đầu</small></button>
+              <button type="button" class="ai-btn" data-ask="gon">Rút gọn<small>Dưới 10 từ, giữ con số</small></button>
+              <button type="button" class="ai-btn" data-ask="cotnha">Giọng cợt nhả<small>Như nói với bạn thân</small></button>
+              <button type="button" class="ai-btn" data-ask="xanhchin">Kiểu xanh chín<small>Khẳng định chắc nịch</small></button>
+              <button type="button" class="ai-btn" data-ask="nhan">Tự nhấn từ khoá<small>Tô màu 1-2 từ đắt nhất</small></button>
+              <button type="button" class="ai-btn" data-ask="style" data-free>AI chọn kiểu chữ<small>Hợp giọng câu này</small></button>
+            </div>
+            <div class="status" id="layerAiOut"></div>
+          </div>
+        </div>
+        <details class="st-foot">
+          <summary>Câu hook mẫu và gợi ý nhanh</summary>
+          <div class="row">
+            <button class="btn sm" id="btnQuick">Gợi ý nhanh (không AI)</button>
+            <button class="btn sm" id="btnSample1">Hook ngắn</button>
+            <button class="btn sm" id="btnSample2">Tâm sự dài</button>
+            <button class="btn sm" id="btnSample3">Từ A sang B</button>
+            <button class="btn sm" id="btnSample4">Danh sách</button>
+            <button class="btn sm" id="btnSample5">Trích dẫn</button>
+            <button class="btn sm" id="btnSample6">POV</button>
+          </div>
+        </details>
       </section>
 
       <section class="card">
         <h2><span class="n">3</span>Mẫu bố cục</h2>
+        <p class="hint">Chạm một mẫu để trình bày nhanh câu hook. Muốn chỉnh từng chữ tự do, chọn mẫu Tự do hoặc bấm "Chỉnh tự do từng chữ" ở bước 2.</p>
         <div class="templates" id="templates"></div>
         <div id="tplExtra" style="margin-top:10px"></div>
       </section>
 
-      <section class="card" id="editorCard">
-        <h2><span class="n">✎</span>Chỉnh chữ tự do <span class="badge new">kiểu CapCut</span></h2>
-        <p class="hint">Mỗi câu chữ là một lớp riêng. Trên khung preview: <b>kéo</b> để di chuyển, <b>chấm xanh</b> ở góc để phóng to, <b>chấm trắng</b> phía trên để xoay, <b>nháy đúp</b> vào chỗ trống để thêm chữ. Phím tắt: Delete xoá, Ctrl+Z hoàn tác, Ctrl+D nhân bản, phím mũi tên để dịch từng chút.</p>
-        <div class="ed-bar">
-          <button class="btn sm primary" id="btnAddText">+ Thêm chữ</button>
-          <button class="btn sm" id="btnAddTitle">+ Tiêu đề to</button>
-          <button class="btn sm" id="btnAddSub">+ Dòng phụ</button>
-          <button class="btn sm" id="btnSplit" title="Chuyển nội dung bước 2 thành các lớp chữ để kéo thả tự do">Tách chữ bước 2 thành lớp</button>
-          <span class="sp"></span>
-          <button class="btn sm icon" id="btnUndo" title="Hoàn tác (Ctrl+Z)" aria-label="Hoàn tác">↶</button>
-          <button class="btn sm icon" id="btnRedo" title="Làm lại (Ctrl+Shift+Z)" aria-label="Làm lại">↷</button>
-        </div>
-        <div class="ed-grid">
-          <div class="ed-layers">
-            <label class="lbl">Lớp chữ <span id="layerCount"></span></label>
-            <div id="layerList"></div>
-          </div>
-          <div class="ed-props">
-            <p class="hint" id="layerEmpty">Chọn một lớp bên trái hoặc bấm vào chữ trên khung preview để chỉnh.</p>
-            <div id="layerProps" hidden>
-              <textarea id="lText" spellcheck="false" aria-label="Nội dung lớp chữ"></textarea>
-              <p class="hint" style="margin:4px 0 0"><code>**từ**</code> nhấn màu, <code>_cụm_</code> in nghiêng, Enter để xuống dòng.</p>
-              <div class="tabs" id="edTabs" role="tablist">
-                <button type="button" data-t="style" aria-selected="true">Kiểu có sẵn</button>
-                <button type="button" data-t="font" aria-selected="false">Font chữ</button>
-                <button type="button" data-t="fx" aria-selected="false">Viền &amp; bóng</button>
-                <button type="button" data-t="bg" aria-selected="false">Nền chữ</button>
-                <button type="button" data-t="pos" aria-selected="false">Vị trí</button>
-                <button type="button" data-t="ai" aria-selected="false">AI chỉnh ✦</button>
-              </div>
-              <div class="pane" data-t="style"><div class="pst-grid" id="presetGrid"></div></div>
-              <div class="pane" data-t="font" hidden>
-                <div class="frow"><select id="lFont" data-p="font" aria-label="Font chữ"></select><select id="lWeight" data-p="weight" aria-label="Độ đậm" style="max-width:96px"></select></div>
-                <div class="row ck-row">
-                  <label class="ck"><input type="checkbox" id="lItalic" data-p="italic"> Nghiêng</label>
-                  <label class="ck"><input type="checkbox" data-p="upper"> VIẾT HOA</label>
-                  <label class="ck"><input type="checkbox" data-p="fillOff"> Chữ rỗng</label>
-                </div>
-                <div class="row"><span class="hint" style="margin:0">Căn:</span><div class="seg" id="lAlign" role="group" aria-label="Căn chữ"><button type="button" data-v="left">Trái</button><button type="button" data-v="center">Giữa</button><button type="button" data-v="right">Phải</button></div></div>
-                <div class="row colors"><label class="sw">Màu chữ<input type="color" data-p="color"></label><label class="sw">Màu từ nhấn<input type="color" data-p="keyColor"></label></div>
-                <div class="slider"><span>Cỡ chữ</span><input type="range" data-p="size" data-unit="px" min="14" max="260"><output></output></div>
-                <div class="slider"><span>Giãn chữ</span><input type="range" data-p="spacing" min="-4" max="30"><output></output></div>
-                <div class="slider"><span>Giãn dòng</span><input type="range" data-p="lineH" data-scale="100" data-unit="%" min="80" max="200"><output></output></div>
-                <div class="slider"><span>Bề rộng tối đa</span><input type="range" data-p="maxw" data-unit="%" min="20" max="100"><output></output></div>
-              </div>
-              <div class="pane" data-t="fx" hidden>
-                <div class="fx-group">
-                  <div class="row"><label class="ck"><input type="checkbox" data-p="stroke.on"> <b>Viền chữ</b></label><input type="color" data-p="stroke.color" aria-label="Màu viền" style="width:54px;height:30px;border:1px solid var(--line);border-radius:8px;padding:2px;background:transparent"></div>
-                  <div class="slider"><span>Độ dày</span><input type="range" data-p="stroke.width" min="0" max="30"><output></output></div>
-                </div>
-                <div class="fx-group">
-                  <div class="row"><label class="ck"><input type="checkbox" data-p="shadow.on"> <b>Đổ bóng / phát sáng</b></label><input type="color" data-p="shadow.color" aria-label="Màu bóng" style="width:54px;height:30px;border:1px solid var(--line);border-radius:8px;padding:2px;background:transparent"></div>
-                  <div class="slider"><span>Độ đậm</span><input type="range" data-p="shadow.alpha" data-scale="100" data-unit="%" min="0" max="100"><output></output></div>
-                  <div class="slider"><span>Độ nhoè</span><input type="range" data-p="shadow.blur" min="0" max="60"><output></output></div>
-                  <div class="slider"><span>Lệch ngang</span><input type="range" data-p="shadow.x" min="-40" max="40"><output></output></div>
-                  <div class="slider"><span>Lệch dọc</span><input type="range" data-p="shadow.y" min="-40" max="40"><output></output></div>
-                  <p class="hint" style="margin:4px 0 0">Nhoè 0 + lệch 6 đến 8 = bóng khối 3D. Lệch 0 + nhoè 30 + màu sáng = neon.</p>
-                </div>
-              </div>
-              <div class="pane" data-t="bg" hidden>
-                <div class="fx-group">
-                  <div class="row"><label class="ck"><input type="checkbox" data-p="bg.on"> <b>Nền sau chữ</b></label><input type="color" data-p="bg.color" aria-label="Màu nền" style="width:54px;height:30px;border:1px solid var(--line);border-radius:8px;padding:2px;background:transparent"></div>
-                  <div class="row" style="margin:6px 0"><span class="hint" style="margin:0">Kiểu:</span><select data-p="bg.mode" style="width:auto"><option value="line">Hộp từng dòng</option><option value="block">Một khối</option></select></div>
-                  <div class="slider"><span>Độ đậm</span><input type="range" data-p="bg.alpha" data-scale="100" data-unit="%" min="0" max="100"><output></output></div>
-                  <div class="slider"><span>Bo góc</span><input type="range" data-p="bg.radius" min="0" max="60"><output></output></div>
-                  <div class="slider"><span>Đệm</span><input type="range" data-p="bg.pad" min="0" max="60"><output></output></div>
-                </div>
-              </div>
-              <div class="pane" data-t="pos" hidden>
-                <div class="slider"><span>Ngang</span><input type="range" data-p="x" data-scale="100" data-unit="%" min="0" max="100"><output></output></div>
-                <div class="slider"><span>Dọc</span><input type="range" data-p="y" data-scale="100" data-unit="%" min="0" max="100"><output></output></div>
-                <div class="slider"><span>Xoay</span><input type="range" data-p="rotate" data-unit="°" min="-180" max="180"><output></output></div>
-                <div class="slider"><span>Độ hiện</span><input type="range" data-p="opacity" data-scale="100" data-unit="%" min="10" max="100"><output></output></div>
-                <div class="row" style="margin-top:8px">
-                  <button class="btn sm" id="btnCenterX">Căn giữa khung</button>
-                  <button class="btn sm" id="btnDupSel">Nhân bản</button>
-                  <button class="btn sm" id="btnDelSel">Xoá lớp</button>
-                </div>
-              </div>
-              <div class="pane" data-t="ai" hidden>
-                <p class="hint">AI đọc đúng lớp chữ này và chỉnh theo kiến thức hook của Tự Mình Xây Kênh. Mỗi lần bấm tốn 1 lượt Pro. Không ưng thì Ctrl+Z.</p>
-                <div class="ai-grid" id="layerAi">
-                  <button type="button" class="btn sm" data-ask="manh">Viết mạnh hơn</button>
-                  <button type="button" class="btn sm" data-ask="gon">Rút gọn</button>
-                  <button type="button" class="btn sm" data-ask="cotnha">Giọng cợt nhả</button>
-                  <button type="button" class="btn sm" data-ask="xanhchin">Kiểu xanh chín</button>
-                  <button type="button" class="btn sm" data-ask="nhan">Tự nhấn từ khoá</button>
-                  <button type="button" class="btn sm pro" data-ask="style">AI chọn kiểu chữ</button>
-                </div>
-                <div class="status" id="layerAiOut"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       <section class="card">
-        <h2><span class="n">4</span>Tinh chỉnh</h2>
+        <h2><span class="n">4</span>Tinh chỉnh mẫu</h2>
         <div class="slider"><span>Vị trí dọc</span><input type="range" id="ypct" min="3" max="80" value="13"><output id="ypctOut">13%</output></div>
         <div class="slider"><span>Cỡ chữ</span><input type="range" id="size" min="30" max="110" value="66"><output id="sizeOut">66px</output></div>
         <div class="slider"><span>Bề rộng tối đa</span><input type="range" id="maxw" min="60" max="96" value="80"><output id="maxwOut">80%</output></div>
@@ -462,7 +533,7 @@
               <li>5 mẫu cơ bản, xem thử cả 14 mẫu</li>
               <li>Màu kênh riêng, khung vùng an toàn TikTok, Reels, Shorts</li>
               <li>Gợi ý nhanh theo luật, không dùng AI</li>
-              <li>Chỉnh chữ tự do kiểu CapCut: thêm, kéo, xoay, viền, bóng, nền với 6 font và 5 kiểu có sẵn</li>
+              <li>Chỉnh chữ tự do: bôi đen để tô màu từng chữ, thêm chữ, kéo, xoay, viền, rực sáng, nền, bóng với 6 font và 5 kiểu có sẵn</li>
               <li>Xuất PNG kèm logo nhỏ Hook Text Studio</li>
             </ul>
           </div>
@@ -851,7 +922,7 @@ T.quote = (c, ov) => {
   if (by) { y += c.px(10); ov.fillStyle = c.b.accent; ov.fillRect(c.W / 2 - c.px(24), y, c.px(48), c.px(3)); const fb = F(500, Math.round(size * 0.55)); ov.font = fontStr(fb); ov.fillStyle = hexA(c.b.light, .85); ov.textAlign = 'center'; ov.shadowColor = 'rgba(0,0,0,.5)'; ov.shadowBlur = c.px(10); ov.fillText(by, c.W / 2, y + c.px(20) + fb.size * 0.85); ov.shadowColor = 'transparent'; ov.textAlign = 'left'; }
   c.notes.push(`Dấu ngoặc kép Playfair Display Italic 800 ${Math.round(size * 2.6)}px màu nhấn. Câu: Playfair Display Italic 700 ${size}px màu ${c.b.cream}, từ khóa 800 màu nhấn. Dòng ký tên (bắt đầu bằng dấu gạch) Be Vietnam Pro Medium ${Math.round(size * 0.55)}px. Đặt xa mặt, thường nửa dưới.`);
 };
-T.blank = (c) => { if (!state.layers.some(L => !L.hidden && String(L.text).trim())) c.notes.push('Mẫu Tự do: chưa có lớp chữ nào. Thêm chữ ở mục Chỉnh chữ tự do.'); };
+T.blank = (c) => { if (!state.layers.some(L => !L.hidden && runsText(L.runs).trim())) c.notes.push('Mẫu Tự do: chưa có lớp chữ nào. Thêm chữ ở bước 2.'); };
 T.pov = (c, ov) => {
   const size = c.px(c.s.size); const label = String(c.s.povLabel ?? '').trim(); let y = c.y0;
   if (label) {   // ô nhãn để trống thì bỏ hẳn chip
@@ -1050,11 +1121,13 @@ async function render() {
   const pv = $('#preview'); pv.width = fr.width; pv.height = fr.height;
   const g = pv.getContext('2d'); g.drawImage(fr, 0, 0); g.drawImage(ov, 0, 0);
   lastRender = { fr, ov, ovTpl, notes, dm, opts };
-  drawSelection();
+  const tb = tplActive() ? alphaBBox(ovTpl) : null;
+  TPL._box = tb ? { cx: (tb.left + tb.right) / 2, cy: (tb.top + tb.bot) / 2, w: tb.right - tb.left + 28, h: tb.bot - tb.top + 28, rot: 0 } : null;
+  afterRenderEditor(); drawSelection();
   $('#metaSize').textContent = `${fr.width} × ${fr.height}`; $('#metaTpl').textContent = TEMPLATES[opts.template].name;
   const bbox = alphaBBox(ov); writeGuide(opts, notes, dm, bbox, fr.height);
   drawUiLayer(fr.height); checkSafe(bbox, fr.height);
-  renderStrip();
+  if (!drag) renderStrip();
 }
 function alphaBBox(cv) {
   const g = cv.getContext('2d'); const { width: w, height: h } = cv; const d = g.getImageData(0, 0, w, h).data;
@@ -1309,9 +1382,10 @@ function sampleFrame() {
 }
 
 /* =========================================================
-   TRÌNH CHỈNH CHỮ TỰ DO — kiểu CapCut
-   Mỗi lớp chữ là một object trong state.layers, vẽ đè lên mẫu.
-   Kéo để di chuyển, chấm tròn góc để phóng to, chấm trên cùng để xoay.
+   CHỮ TRÊN VIDEO — trình chỉnh chữ như app edit
+   Lớp "Hook" là câu hook vẽ theo mẫu ở bước 3. Các lớp khác là chữ tự do.
+   Chữ lưu thành các đoạn (runs), mỗi đoạn có kiểu riêng: màu nhấn, màu tự chọn,
+   đậm, nghiêng, cỡ. Người dùng chỉ việc bôi đen rồi bấm, không phải gõ ký hiệu.
    ========================================================= */
 const FONTS = [
   { f: 'Be Vietnam Pro', w: [400, 500, 600, 700, 800, 900], free: true },
@@ -1336,6 +1410,7 @@ const FONTS = [
 ];
 const FREE_FONTS = new Set(FONTS.filter(x => x.free).map(x => x.f));
 let fontsLinked = false;
+const loadedFonts = new Set();
 function linkEditorFonts() {
   if (fontsLinked) return; fontsLinked = true;
   const fam = FONTS.filter(x => !['Be Vietnam Pro', 'Playfair Display', 'Bricolage Grotesque'].includes(x.f)).map(x => {
@@ -1344,12 +1419,18 @@ function linkEditorFonts() {
     return x.w.length > 1 ? `family=${n}:wght@${x.w.join(';')}` : `family=${n}`;
   });
   fam.push('family=Playfair+Display:ital,wght@0,400;0,700;0,800;0,900;1,400;1,700;1,800;1,900');
-  const l = document.createElement('link'); l.rel = 'stylesheet'; l.onload = () => { loadedFonts.clear(); scheduleRender(); }; l.href = 'https://fonts.googleapis.com/css2?' + fam.join('&') + '&display=swap'; document.head.appendChild(l);
+  const l = document.createElement('link'); l.rel = 'stylesheet'; l.onload = () => { loadedFonts.clear(); scheduleRender(); };
+  l.href = 'https://fonts.googleapis.com/css2?' + fam.join('&') + '&display=swap'; document.head.appendChild(l);
 }
-const loadedFonts = new Set();
+function fontWeights(L) { return (FONTS.find(x => x.f === L.font) || { w: [400, 700, 900] }).w; }
+function boldW(L) { const ws = fontWeights(L), mx = Math.max(...ws); const want = Math.max(700, +L.weight + 200); return ws.find(w => w >= want) || mx; }
 async function ensureLayerFonts(layers) {
   const need = [];
-  for (const L of layers) { const k = `${L.italic ? 'italic ' : ''}${L.weight} 40px "${L.font}"`; if (!loadedFonts.has(k)) { need.push(k); loadedFonts.add(k); } }
+  for (const L of layers) {
+    const combos = new Set([`${L.italic ? 'italic ' : ''}${L.weight}`]);
+    for (const r of L.runs || []) combos.add(`${L.italic || r.i ? 'italic ' : ''}${r.b ? boldW(L) : L.weight}`);
+    for (const c of combos) { const k = `${c} 40px "${L.font}"`; if (!loadedFonts.has(k)) { need.push(k); loadedFonts.add(k); } }
+  }
   if (need.length) await Promise.all(need.map(k => document.fonts.load(k, 'ÀẤỆỮđ').then(r => { if (!r.length) loadedFonts.delete(k); }, () => loadedFonts.delete(k))));
 }
 
@@ -1359,7 +1440,7 @@ const STYLE_PRESETS = [
   { n: 'Hộp đen', p: { font: 'Be Vietnam Pro', weight: 700, italic: false, color: '#FFFFFF', fillOff: false, stroke: { on: false }, shadow: { on: false }, bg: { on: true, mode: 'line', color: '#000000', alpha: .72, radius: 14, pad: 20 } } },
   { n: 'Bóng mềm', p: { font: 'Be Vietnam Pro', weight: 800, italic: false, color: '#FFFFFF', fillOff: false, stroke: { on: false }, shadow: { on: true, color: '#000000', alpha: .7, blur: 18, x: 0, y: 8 }, bg: { on: false } } },
   { n: 'Tiêu đề Anton', p: { font: 'Anton', weight: 400, italic: false, upper: true, color: '#FFFFFF', fillOff: false, stroke: { on: false }, shadow: { on: true, color: '#000000', alpha: .6, blur: 14, x: 0, y: 6 }, bg: { on: false }, spacing: 2 } },
-  { n: 'Neon', pro: true, p: { font: 'Montserrat', weight: 900, italic: false, color: '#E9FFD0', keyColor: '#99DF00', fillOff: false, stroke: { on: false }, shadow: { on: true, color: '#99DF00', alpha: .95, blur: 32, x: 0, y: 0 }, bg: { on: false } } },
+  { n: 'Neon', pro: true, p: { font: 'Montserrat', weight: 900, italic: false, color: '#F4FFE6', keyColor: '#99DF00', fillOff: false, stroke: { on: false }, shadow: { on: false }, glow: { on: true, color: '#99DF00', alpha: .95, blur: 30 }, bg: { on: false } } },
   { n: 'Bóng 3D', pro: true, p: { font: 'Paytone One', weight: 400, italic: false, color: '#FFFFFF', fillOff: false, stroke: { on: true, color: '#26210F', width: 6 }, shadow: { on: true, color: '#99DF00', alpha: 1, blur: 0, x: 7, y: 7 }, bg: { on: false } } },
   { n: 'Sticker trắng', pro: true, p: { font: 'Baloo 2', weight: 800, italic: false, color: '#26210F', keyColor: '#E8452C', fillOff: false, stroke: { on: false }, shadow: { on: true, color: '#000000', alpha: .35, blur: 16, x: 0, y: 8 }, bg: { on: true, mode: 'block', color: '#FFFFFF', alpha: 1, radius: 26, pad: 26 }, rotate: -3 } },
   { n: 'Editorial serif', pro: true, p: { font: 'Playfair Display', weight: 800, italic: true, color: '#F9E8DD', keyColor: '#99DF00', fillOff: false, stroke: { on: false }, shadow: { on: true, color: '#000000', alpha: .6, blur: 16, x: 0, y: 6 }, bg: { on: false } } },
@@ -1368,61 +1449,127 @@ const STYLE_PRESETS = [
   { n: 'Viết tay', pro: true, p: { font: 'Dancing Script', weight: 700, italic: false, color: '#FFFFFF', keyColor: '#FFE14D', fillOff: false, stroke: { on: false }, shadow: { on: true, color: '#000000', alpha: .65, blur: 14, x: 0, y: 5 }, bg: { on: false } } },
 ];
 
+/* ---------- đoạn chữ có kiểu (runs) ---------- */
+const RUN_KEYS = ['key', 'c', 'b', 'i', 's'];
+function cleanRun(r) { const o = { t: r.t }; if (r.key) o.key = true; if (r.c) o.c = r.c; if (r.b) o.b = true; if (r.i) o.i = true; if (r.s && r.s !== 1) o.s = r.s; return o; }
+function sameStyle(a, b) { return RUN_KEYS.every(k => (a[k] || 0) === (b[k] || 0)); }
+function mergeRuns(rs) { const out = []; for (const r0 of rs) { if (!r0.t) continue; const r = cleanRun(r0); const p = out[out.length - 1]; if (p && sameStyle(p, r)) p.t += r.t; else out.push(r); } return out; }
+function runsText(rs) { return (rs || []).map(r => r.t).join(''); }
+function markupToRuns(text) {
+  const out = [];
+  String(text || '').replace(/\r/g, '').split('\n').forEach((ln, i) => { if (i) out.push({ t: '\n' }); for (const [t, k] of parse(ln)) out.push({ t, key: k === 'key', i: k === 'italic' }); });
+  return mergeRuns(out);
+}
+function runsToMarkup(rs) {
+  let s = '';
+  for (const r of rs || []) r.t.split('\n').forEach((piece, i) => {
+    if (i) s += '\n'; if (!piece) return;
+    const m = piece.match(/^(\s*)([\s\S]*?)(\s*)$/); if (!m[2]) { s += piece; return; }
+    s += m[1] + (r.key ? `**${m[2]}**` : r.i ? `_${m[2]}_` : m[2]) + m[3];
+  });
+  return s;
+}
+function styleRange(runs, s, e, fn) {
+  const out = []; let acc = 0;
+  for (const r of runs) {
+    const a = acc, b = acc + r.t.length; acc = b;
+    if (b <= s || a >= e) { out.push(r); continue; }
+    const x = Math.max(s, a) - a, y = Math.min(e, b) - a;
+    if (x > 0) out.push({ ...r, t: r.t.slice(0, x) });
+    const mid = { ...r, t: r.t.slice(x, y) }; fn(mid); out.push(mid);
+    if (y < r.t.length) out.push({ ...r, t: r.t.slice(y) });
+  }
+  return mergeRuns(out);
+}
+function allInRange(runs, s, e, pred) {
+  let acc = 0, any = false;
+  for (const r of runs) { const a = acc, b = acc + r.t.length; acc = b; if (b <= s || a >= e || !r.t.trim()) continue; any = true; if (!pred(r)) return false; }
+  return any;
+}
+
 state.layers = []; state.sel = null;
 let layerSeq = 1;
 function newLayer(text, over = {}) {
-  return Object.assign({
-    id: 'L' + (layerSeq++), text, x: .5, y: .3, size: 72, font: 'Be Vietnam Pro', weight: 900, italic: false, upper: false,
+  const L = Object.assign({
+    id: 'L' + (layerSeq++), runs: markupToRuns(text), x: .5, y: .3, size: 72, font: 'Be Vietnam Pro', weight: 900, italic: false, upper: false,
     color: '#FFFFFF', keyColor: state.brand.accent, fillOff: false, align: 'center', spacing: 0, lineH: 1.2, maxw: 86, rotate: 0, opacity: 1, hidden: false,
     stroke: { on: true, color: '#000000', width: 10 }, shadow: { on: false, color: '#000000', alpha: .6, blur: 14, x: 0, y: 6 },
+    glow: { on: false, color: state.brand.accent, alpha: .9, blur: 24 },
     bg: { on: false, mode: 'line', color: '#000000', alpha: .7, radius: 14, pad: 20 }, preset: 'TikTok cổ điển', pro: false,
   }, JSON.parse(JSON.stringify(over)));
+  return L;
 }
-function selLayer() { return state.layers.find(l => l.id === state.sel) || null; }
+/* lớp "Hook": câu hook ở ô ẩn #text, vẽ bằng mẫu đang chọn */
+const TPL = { id: 'TPL', tpl: true, _box: null };
+function tplActive() { return state.template !== 'blank'; }
+function selLayer() { if (state.sel === 'TPL') return tplActive() ? TPL : null; return state.layers.find(l => l.id === state.sel) || null; }
+function tplRuns() { return markupToRuns($('#text').value); }
+function setTplRuns(runs) { $('#text').value = runsToMarkup(runs); ls.set('hook.text', $('#text').value); }
 
-/* ---------- vẽ một lớp ---------- */
+/* ---------- vẽ một lớp tự do ---------- */
+function lineSplit(runs) { const lines = [[]]; for (const r of runs) r.t.split('\n').forEach((p, i) => { if (i) lines.push([]); if (p) lines[lines.length - 1].push({ ...r, t: p }); }); return lines; }
+function wrapRuns(g, runs, fontOf, maxW) {
+  const toks = []; let pend = false;
+  for (const r of runs) r.t.split(' ').forEach((w, i) => { if (i) pend = true; if (!w) return; toks.push({ w, r, sp: pend && toks.length > 0 }); pend = false; });
+  const mw = (t, r) => { g.font = fontOf(r); return g.measureText(t).width; };
+  const lines = []; let cur = [], cw = 0;
+  for (const tk of toks) {
+    let ww = mw(tk.w, tk.r) + (tk.sp && cur.length ? mw(' ', tk.r) : 0);
+    if (cur.length && cw + ww > maxW) { lines.push(cur); cur = []; cw = 0; ww = mw(tk.w, tk.r); cur.push({ ...tk, sp: false }); }
+    else cur.push({ ...tk, sp: tk.sp && cur.length > 0 });
+    cw += ww;
+  }
+  if (cur.length) lines.push(cur);
+  return lines.map(ln => { const segs = []; for (const tk of ln) { const p = segs[segs.length - 1]; if (p && sameStyle(p.r, tk.r)) p.t += (tk.sp ? ' ' : '') + tk.w; else { if (p && tk.sp) p.t += ' '; segs.push({ t: tk.w, r: tk.r }); } } return segs; });
+}
 function drawLayer(g, L, W, H) {
-  if (L.hidden || !String(L.text).trim()) { L._box = null; return; }
+  if (L.hidden || !runsText(L.runs).trim()) { L._box = null; return; }
   const k = W / BASE_W, s = L.size * k;
-  const base = { family: L.font, weight: L.weight, size: s, style: L.italic ? 'italic' : '' };
-  const fonts = { plain: base, key: base, italic: { ...base, style: 'italic' } };
+  const fontOf = r => `${L.italic || r.i ? 'italic ' : ''}${r.b ? boldW(L) : L.weight} ${Math.round(s * (r.s || 1) * 100) / 100}px "${L.font}"`;
+  const colorOf = r => r.c || (r.key ? L.keyColor : L.color);
   g.save();
   try { g.letterSpacing = (L.spacing * k) + 'px'; } catch {}
-  const text = L.upper ? L.text.toUpperCase() : L.text;
   const maxW = L.maxw / 100 * W;
   const lines = [];
-  for (const p of text.split('\n')) { if (!p.trim()) lines.push([]); else lines.push(...wrap(g, parse(p), fonts, maxW)); }
-  const lh = s * L.lineH; const ws = lines.map(ln => lineWidth(g, ln, fonts));
-  const bw = Math.max(1, ...ws), bh = lines.length * lh;
+  for (const ln of lineSplit(L.runs)) { if (!ln.length) lines.push([]); else lines.push(...wrapRuns(g, ln.map(r => ({ ...r, t: L.upper ? r.t.toUpperCase() : r.t })), fontOf, maxW)); }
+  const segW = sg => { g.font = fontOf(sg.r); return g.measureText(sg.t).width; };
+  const ws = lines.map(ln => ln.reduce((a, sg) => a + segW(sg), 0));
+  const mx = lines.map(ln => ln.length ? Math.max(...ln.map(sg => s * (sg.r.s || 1))) : s);
+  const lhs = mx.map(m => m * L.lineH);
+  const bw = Math.max(1, ...ws), bh = lhs.reduce((a, b) => a + b, 0);
+  const tops = []; let acc = -bh / 2; for (const h of lhs) { tops.push(acc); acc += h; }
   const cx = L.x * W, cy = L.y * H, rot = L.rotate * Math.PI / 180;
   g.translate(cx, cy); g.rotate(rot); g.globalAlpha = L.opacity;
-  const top = -bh / 2; const pad = L.bg.pad * k;
+  const pad = L.bg.pad * k;
   const xOf = i => L.align === 'left' ? -bw / 2 : L.align === 'right' ? bw / 2 - ws[i] : -ws[i] / 2;
   if (L.bg.on) {
     g.fillStyle = hexA(L.bg.color, L.bg.alpha);
-    if (L.bg.mode === 'block') { rrect(g, -bw / 2 - pad, top - pad * .7, bw + 2 * pad, bh + pad * 1.4, L.bg.radius * k); g.fill(); }
-    else lines.forEach((ln, i) => { if (!ln.length) return; rrect(g, xOf(i) - pad, top + i * lh + lh * .06, ws[i] + 2 * pad, lh * .94, L.bg.radius * k); g.fill(); });
+    if (L.bg.mode === 'block') { rrect(g, -bw / 2 - pad, -bh / 2 - pad * .7, bw + 2 * pad, bh + pad * 1.4, L.bg.radius * k); g.fill(); }
+    else lines.forEach((ln, i) => { if (!ln.length) return; rrect(g, xOf(i) - pad, tops[i] + lhs[i] * .06, ws[i] + 2 * pad, lhs[i] * .94, L.bg.radius * k); g.fill(); });
   }
-  const eachSeg = (fn) => lines.forEach((ln, i) => { let x = xOf(i); const y = top + i * lh + lh / 2 + s * .36; for (const [t, kind] of ln) { g.font = fontStr(fonts[kind]); fn(t, x, y, kind); x += g.measureText(t).width; } });
+  const eachSeg = fn => lines.forEach((ln, i) => { let x = xOf(i); const y = tops[i] + lhs[i] / 2 + mx[i] * .36; for (const sg of ln) { g.font = fontOf(sg.r); fn(sg.t, x, y, sg.r); x += g.measureText(sg.t).width; } });
   g.lineJoin = 'round'; g.miterLimit = 2; g.textBaseline = 'alphabetic';
-  const colorOf = kind => kind === 'plain' ? L.color : L.keyColor;
   const sw = (L.stroke.width || 0) * k * 2;
-  if (L.shadow.on) {
-    g.save(); g.shadowColor = hexA(L.shadow.color, L.shadow.alpha); g.shadowBlur = L.shadow.blur * k; g.shadowOffsetX = L.shadow.x * k; g.shadowOffsetY = L.shadow.y * k;
-    if (L.stroke.on && sw > 0) { g.lineWidth = sw; g.strokeStyle = L.stroke.color; eachSeg((t, x, y) => g.strokeText(t, x, y)); }
-    else eachSeg((t, x, y, kind) => { g.fillStyle = colorOf(kind); g.fillText(t, x, y); });
+  const fillPass = () => eachSeg((t, x, y, r) => { if (L.fillOff && !r.key && !r.c) return; g.fillStyle = colorOf(r); g.fillText(t, x, y); });
+  if (L.glow && L.glow.on) {   // rực sáng: vẽ hai lần bóng không lệch cho đậm
+    g.save(); g.shadowColor = hexA(L.glow.color, L.glow.alpha); g.shadowBlur = L.glow.blur * k; g.shadowOffsetX = 0; g.shadowOffsetY = 0;
+    g.fillStyle = L.glow.color; g.strokeStyle = L.glow.color; g.lineWidth = Math.max(sw, 3 * k);
+    for (let n = 0; n < 2; n++) eachSeg((t, x, y) => L.fillOff ? g.strokeText(t, x, y) : g.fillText(t, x, y));
     g.restore();
   }
-  if (L.stroke.on && sw > 0) { g.lineWidth = sw; g.strokeStyle = L.fillOff ? L.stroke.color : L.stroke.color; eachSeg((t, x, y) => g.strokeText(t, x, y)); }
-  if (!L.fillOff) eachSeg((t, x, y, kind) => { g.fillStyle = colorOf(kind); g.fillText(t, x, y); });
-  else eachSeg((t, x, y, kind) => { if (kind !== 'plain') { g.fillStyle = colorOf(kind); g.fillText(t, x, y); } });
+  if (L.shadow.on) {
+    g.save(); g.shadowColor = hexA(L.shadow.color, L.shadow.alpha); g.shadowBlur = L.shadow.blur * k; g.shadowOffsetX = L.shadow.x * k; g.shadowOffsetY = L.shadow.y * k;
+    if (L.stroke.on && sw > 0) { g.lineWidth = sw; g.strokeStyle = L.stroke.color; eachSeg((t, x, y) => g.strokeText(t, x, y)); } else fillPass();
+    g.restore();
+  }
+  if (L.stroke.on && sw > 0) { g.lineWidth = sw; g.strokeStyle = L.stroke.color; eachSeg((t, x, y) => g.strokeText(t, x, y)); }
+  fillPass();
   g.restore();
-  const extra = L.bg.on ? pad : 0;
-  L._box = { cx, cy, w: bw + extra * 2 + 16 * k, h: bh + (L.bg.on ? pad * 1.4 : 0) + 12 * k, rot };
+  L._box = { cx, cy, w: bw + (L.bg.on ? pad * 2 : 0) + 16 * k, h: bh + (L.bg.on ? pad * 1.4 : 0) + 12 * k, rot };
 }
 function drawLayers(g, W, H) { for (const L of state.layers) drawLayer(g, L, W, H); }
 
-/* ---------- vẽ nhanh khi kéo, không dựng lại mẫu ---------- */
+/* ---------- vẽ nhanh khi kéo lớp tự do, không dựng lại mẫu ---------- */
 let composeCv = null;
 function fastCompose() {
   if (!lastRender || !lastRender.ovTpl) return;
@@ -1432,49 +1579,58 @@ function fastCompose() {
   const pv = $('#preview'); const g = pv.getContext('2d'); g.clearRect(0, 0, pv.width, pv.height); g.drawImage(fr, 0, 0); g.drawImage(composeCv, 0, 0);
   drawSelection();
 }
+let rBusy = false, rAgain = false;
+function renderLive() { if (rBusy) { rAgain = true; return; } rBusy = true; render().finally(() => { rBusy = false; if (rAgain) { rAgain = false; renderLive(); } }); }
 
 /* ---------- khung chọn, tay cầm, đường gióng ---------- */
 let guides = { v: false, h: false };
 function uiK() { const pv = $('#preview'); const w = pv.getBoundingClientRect().width; return w ? pv.width / w : 1; }
 function drawSelection() {
   const cv = $('#selLayer'); const pv = $('#preview'); if (cv.width !== pv.width || cv.height !== pv.height) { cv.width = pv.width; cv.height = pv.height; }
-  const g = cv.getContext('2d'); g.clearRect(0, 0, cv.width, cv.height);
-  if (guides.v) { g.strokeStyle = 'rgba(255,60,172,.9)'; g.lineWidth = 1.2 * uiK(); g.setLineDash([6 * uiK(), 4 * uiK()]); g.beginPath(); g.moveTo(cv.width / 2, 0); g.lineTo(cv.width / 2, cv.height); g.stroke(); g.setLineDash([]); }
-  if (guides.h) { g.strokeStyle = 'rgba(255,60,172,.9)'; g.lineWidth = 1.2 * uiK(); g.setLineDash([6 * uiK(), 4 * uiK()]); g.beginPath(); g.moveTo(0, cv.height / 2); g.lineTo(cv.width, cv.height / 2); g.stroke(); g.setLineDash([]); }
+  const g = cv.getContext('2d'); g.clearRect(0, 0, cv.width, cv.height); const k = uiK();
+  const guide = (x1, y1, x2, y2) => { g.strokeStyle = 'rgba(255,60,172,.9)'; g.lineWidth = 1.2 * k; g.setLineDash([6 * k, 4 * k]); g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke(); g.setLineDash([]); };
+  if (guides.v) guide(cv.width / 2, 0, cv.width / 2, cv.height);
+  if (guides.h) guide(0, cv.height / 2, cv.width, cv.height / 2);
   const L = selLayer(); if (!L || !L._box || L.hidden) return;
-  const b = L._box, k = uiK(); g.save(); g.translate(b.cx, b.cy); g.rotate(b.rot);
+  const b = L._box; g.save(); g.translate(b.cx, b.cy); g.rotate(b.rot);
   g.strokeStyle = '#FFFFFF'; g.lineWidth = 1.2 * k; g.setLineDash([5 * k, 4 * k]); g.strokeRect(-b.w / 2, -b.h / 2, b.w, b.h); g.setLineDash([]);
-  g.strokeStyle = 'rgba(0,0,0,.35)'; g.lineWidth = 1; g.strokeRect(-b.w / 2 - 2, -b.h / 2 - 2, b.w + 4, b.h + 4);
   const dot = (x, y, fill) => { g.beginPath(); g.arc(x, y, 8 * k, 0, Math.PI * 2); g.fillStyle = fill; g.fill(); g.lineWidth = 1.6 * k; g.strokeStyle = '#26210F'; g.stroke(); };
-  dot(b.w / 2, b.h / 2, '#99DF00');                         // phóng to
-  g.strokeStyle = '#FFFFFF'; g.lineWidth = 1.2 * k; g.beginPath(); g.moveTo(0, -b.h / 2); g.lineTo(0, -b.h / 2 - 18 * k); g.stroke();
-  dot(0, -b.h / 2 - 26 * k, '#FFFFFF');                         // xoay
+  dot(b.w / 2, b.h / 2, '#99DF00');
+  if (!L.tpl) { g.strokeStyle = '#FFFFFF'; g.lineWidth = 1.2 * k; g.beginPath(); g.moveTo(0, -b.h / 2); g.lineTo(0, -b.h / 2 - 18 * k); g.stroke(); dot(0, -b.h / 2 - 26 * k, '#FFFFFF'); }
   g.restore();
 }
 function toLocal(L, px, py) { const b = L._box; const dx = px - b.cx, dy = py - b.cy; const c = Math.cos(-b.rot), s = Math.sin(-b.rot); return { x: dx * c - dy * s, y: dx * s + dy * c }; }
+function inBox(L, px, py) { const p = toLocal(L, px, py); return Math.abs(p.x) <= L._box.w / 2 && Math.abs(p.y) <= L._box.h / 2; }
 function hitLayer(px, py) {
-  const L = selLayer();
-  if (L && L._box && !L.hidden) { const p = toLocal(L, px, py), b = L._box, k = uiK();
+  const L = selLayer(), k = uiK();
+  if (L && L._box && !L.hidden) { const p = toLocal(L, px, py), b = L._box;
     if (Math.hypot(p.x - b.w / 2, p.y - b.h / 2) < 16 * k) return { L, mode: 'scale' };
-    if (Math.hypot(p.x, p.y + b.h / 2 + 26 * k) < 16 * k) return { L, mode: 'rotate' }; }
-  for (let i = state.layers.length - 1; i >= 0; i--) { const M = state.layers[i]; if (!M._box || M.hidden) continue; const p = toLocal(M, px, py); if (Math.abs(p.x) <= M._box.w / 2 && Math.abs(p.y) <= M._box.h / 2) return { L: M, mode: 'move' }; }
+    if (!L.tpl && Math.hypot(p.x, p.y + b.h / 2 + 26 * k) < 16 * k) return { L, mode: 'rotate' }; }
+  for (let i = state.layers.length - 1; i >= 0; i--) { const M = state.layers[i]; if (M._box && !M.hidden && inBox(M, px, py)) return { L: M, mode: 'move' }; }
+  if (tplActive() && TPL._box && inBox(TPL, px, py)) return { L: TPL, mode: 'move' };
   return null;
 }
 let drag = null;
 function canvasPoint(e) { const pv = $('#preview'); const r = pv.getBoundingClientRect(); return { x: (e.clientX - r.left) * pv.width / r.width, y: (e.clientY - r.top) * pv.height / r.height }; }
+function selectLayer(id) { if (state.sel === id) return; state.sel = id; syncLayerPanel(); }
 function onDown(e) {
   if (!lastRender) return; const p = canvasPoint(e); const hit = hitLayer(p.x, p.y);
   if (!hit) { if (state.sel) { state.sel = null; syncLayerPanel(); drawSelection(); } return; }
   e.preventDefault(); $('#preview').setPointerCapture(e.pointerId);
-  if (state.sel !== hit.L.id) { state.sel = hit.L.id; syncLayerPanel(); }
-  const L = hit.L, b = L._box, W = lastRender.fr.width, H = lastRender.fr.height;
-  drag = { mode: hit.mode, L, sx: p.x, sy: p.y, ox: L.x, oy: L.y, size: L.size, dist: Math.hypot(p.x - b.cx, p.y - b.cy), W, H, moved: false };
+  selectLayer(hit.L.id);
+  const L = hit.L, b = L._box;
+  drag = { mode: hit.mode, L, sx: p.x, sy: p.y, ox: L.tpl ? 0 : L.x, oy: L.tpl ? state.ypct : L.y, size: L.tpl ? state.size : L.size, dist: Math.hypot(p.x - b.cx, p.y - b.cy), W: lastRender.fr.width, H: lastRender.fr.height, moved: false };
   drawSelection();
 }
 function onMove(e) {
   const pv = $('#preview');
-  if (!drag) { if (!lastRender) return; const p = canvasPoint(e); const h = hitLayer(p.x, p.y); pv.style.cursor = !h ? 'default' : h.mode === 'scale' ? 'nwse-resize' : h.mode === 'rotate' ? 'grab' : 'move'; return; }
+  if (!drag) { if (!lastRender) return; const p = canvasPoint(e); const h = hitLayer(p.x, p.y); pv.style.cursor = !h ? 'default' : h.mode === 'scale' ? 'nwse-resize' : h.mode === 'rotate' ? 'grab' : h.L.tpl ? 'ns-resize' : 'move'; return; }
   const p = canvasPoint(e), L = drag.L; drag.moved = true;
+  if (L.tpl) {
+    if (drag.mode === 'move') state.ypct = Math.round(Math.min(80, Math.max(3, drag.oy + (p.y - drag.sy) / drag.H * 100)));
+    else state.size = Math.round(Math.min(110, Math.max(30, drag.size * Math.hypot(p.x - L._box.cx, p.y - L._box.cy) / Math.max(1, drag.dist))));
+    syncSliders(); renderLive(); return;
+  }
   if (drag.mode === 'move') {
     let nx = drag.ox + (p.x - drag.sx) / drag.W, ny = drag.oy + (p.y - drag.sy) / drag.H;
     guides.v = Math.abs(nx - .5) < .012; if (guides.v) nx = .5;
@@ -1488,58 +1644,181 @@ function onMove(e) {
   }
   fastCompose(); syncProps(true);
 }
-function onUp() { if (!drag) return; const moved = drag.moved; drag = null; guides = { v: false, h: false }; if (moved) { pushUndo(); scheduleRender(); } else drawSelection(); }
+function onUp() {
+  if (!drag) return; const { moved, L } = drag; drag = null; guides = { v: false, h: false };
+  if (!moved) { drawSelection(); return; }
+  if (!L.tpl) pushUndo();
+  scheduleRender();
+}
 
-/* ---------- hoàn tác ---------- */
+/* ---------- hoàn tác (lớp tự do) ---------- */
 const undoStack = [], redoStack = [];
 let lastSnap = '[]';
 function snapshot() { return JSON.stringify(state.layers.map(({ _box, ...r }) => r)); }
 function pushUndo() { const s = snapshot(); if (s === lastSnap) return; undoStack.push(lastSnap); if (undoStack.length > 80) undoStack.shift(); redoStack.length = 0; lastSnap = s; saveLayers(); }
-function restore(s) { state.layers = JSON.parse(s); if (!state.layers.find(l => l.id === state.sel)) state.sel = null; lastSnap = s; saveLayers(); buildLayerList(); syncLayerPanel(); scheduleRender(); }
+function restore(s) { state.layers = JSON.parse(s); if (state.sel !== 'TPL' && !state.layers.find(l => l.id === state.sel)) state.sel = null; lastSnap = s; saveLayers(); syncLayerPanel(); scheduleRender(); }
 function undo() { if (!undoStack.length) return toast('Không còn gì để hoàn tác'); redoStack.push(snapshot()); restore(undoStack.pop()); }
 function redo() { if (!redoStack.length) return; undoStack.push(snapshot()); restore(redoStack.pop()); }
 function saveLayers() { ls.set('hook.layers', snapshot()); }
-let textUndoT = null; function pushUndoSoon() { clearTimeout(textUndoT); textUndoT = setTimeout(pushUndo, 600); }
+let undoT = null; function pushUndoSoon() { clearTimeout(undoT); undoT = setTimeout(pushUndo, 600); }
 
 /* ---------- thao tác lớp ---------- */
-function addLayer(text, over) { const L = newLayer(text, over); state.layers.push(L); state.sel = L.id; pushUndo(); buildLayerList(); syncLayerPanel(); linkEditorFonts(); scheduleRender(); setTimeout(() => { $('#lText').focus(); $('#lText').select(); }, 50); }
-function delLayer(id) { state.layers = state.layers.filter(l => l.id !== id); if (state.sel === id) state.sel = null; pushUndo(); buildLayerList(); syncLayerPanel(); scheduleRender(); }
-function dupLayer(id) { const L = state.layers.find(l => l.id === id); if (!L) return; const { _box, ...r } = L; const C = newLayer(r.text, { ...r, id: undefined }); C.id = 'L' + (layerSeq++); C.x = Math.min(.95, L.x + .03); C.y = Math.min(.95, L.y + .03); state.layers.splice(state.layers.indexOf(L) + 1, 0, C); state.sel = C.id; pushUndo(); buildLayerList(); syncLayerPanel(); scheduleRender(); }
+function addLayer(text, over, preset) {
+  const L = newLayer(text, over); if (preset) { applyPreset(L, preset); Object.assign(L, over); }
+  state.layers.push(L); state.sel = L.id; pushUndo(); syncLayerPanel(); linkEditorFonts(); scheduleRender();
+  setTimeout(() => { const e = ed(); e.focus(); selectAllIn(e); }, 50);
+}
+function delSelected() {
+  const L = selLayer(); if (!L) return;
+  if (L.tpl) { state.sel = null; selectTemplate('blank', false); toast('Đã bỏ chữ theo mẫu. Chọn lại một mẫu ở bước 3 nếu muốn.'); return; }
+  state.layers = state.layers.filter(l => l !== L); state.sel = null; pushUndo(); syncLayerPanel(); scheduleRender();
+}
+function dupLayer(id) { const L = state.layers.find(l => l.id === id); if (!L) return; const { _box, ...r } = L; const C = JSON.parse(JSON.stringify(r)); C.id = 'L' + (layerSeq++); C.x = Math.min(.95, L.x + .03); C.y = Math.min(.95, L.y + .03); state.layers.splice(state.layers.indexOf(L) + 1, 0, C); state.sel = C.id; pushUndo(); syncLayerPanel(); scheduleRender(); }
 function moveLayer(id, d) { const i = state.layers.findIndex(l => l.id === id), j = i + d; if (i < 0 || j < 0 || j >= state.layers.length) return; [state.layers[i], state.layers[j]] = [state.layers[j], state.layers[i]]; pushUndo(); buildLayerList(); scheduleRender(); }
 function applyPreset(L, P) {
-  const base = newLayer(L.text); const keep = { id: L.id, text: L.text, x: L.x, y: L.y, size: L.size, align: L.align, maxw: L.maxw, lineH: L.lineH, opacity: L.opacity, hidden: L.hidden };
-  Object.assign(L, JSON.parse(JSON.stringify({ ...base, ...P.p, stroke: { ...base.stroke, ...(P.p.stroke || {}) }, shadow: { ...base.shadow, ...(P.p.shadow || {}) }, bg: { ...base.bg, ...(P.p.bg || {}) } })), keep);
+  const base = newLayer(''); const keep = { id: L.id, runs: L.runs, x: L.x, y: L.y, size: L.size, align: L.align, maxw: L.maxw, lineH: L.lineH, opacity: L.opacity, hidden: L.hidden };
+  Object.assign(L, JSON.parse(JSON.stringify({ ...base, ...P.p, stroke: { ...base.stroke, ...(P.p.stroke || {}) }, shadow: { ...base.shadow, ...(P.p.shadow || {}) }, glow: { ...base.glow, ...(P.p.glow || {}) }, bg: { ...base.bg, ...(P.p.bg || {}) } })), keep);
+  layerSeq--;   // newLayer('') vừa lấy một số thứ tự, trả lại
   if (!P.p.keyColor) L.keyColor = state.brand.accent;
   L.preset = P.n; L.pro = !!P.pro;
 }
 function templateToLayers() {
-  const blocks = blocksFromText($('#text').value); if (!blocks.length) return toast('Chưa có nội dung ở bước 2');
+  const blocks = blocksFromText($('#text').value); if (!blocks.length) return toast('Chưa có câu hook');
   let y = Math.max(.14, state.ypct / 100 + .04); const created = [];
-  for (const b of blocks) { const lines = b.split('\n').length; const L = newLayer(b, { y, size: Math.max(40, Math.min(84, state.size)), keyColor: state.brand.accent }); applyPreset(L, STYLE_PRESETS[3]); L.size = Math.max(40, Math.min(84, state.size)); state.layers.push(L); created.push(L); y += (lines * L.size * 1.25 + 40) / 1920; }
-  state.sel = created[0].id; selectTemplate('blank', false); pushUndo(); buildLayerList(); syncLayerPanel(); linkEditorFonts(); scheduleRender();
-  toast('Đã tách thành ' + created.length + ' lớp chữ. Kéo trên khung để sắp xếp.');
+  for (const b of blocks) {
+    const size = Math.max(40, Math.min(84, state.size)); const L = newLayer(b, { y }); applyPreset(L, STYLE_PRESETS[3]); L.size = size;
+    state.layers.push(L); created.push(L); y += (b.split('\n').length * size * 1.25 + 40) / 1920;
+  }
+  state.sel = created[0].id; selectTemplate('blank', false); pushUndo(); syncLayerPanel(); linkEditorFonts(); scheduleRender();
+  toast('Đã chuyển thành ' + created.length + ' lớp chữ tự do. Giờ đổi font, màu, bóng thoải mái.');
 }
 
-/* ---------- bảng lớp ---------- */
-function buildLayerList() {
-  const box = $('#layerList'); box.innerHTML = ''; $('#preview').style.touchAction = state.layers.length ? 'none' : ''; $('#layerCount').textContent = state.layers.length ? `(${state.layers.length})` : '';
-  if (!state.layers.length) { box.append(el('p', 'hint', 'Chưa có lớp chữ nào. Bấm "Thêm chữ" hoặc tách mẫu hiện tại thành lớp để chỉnh tự do.')); return; }
-  [...state.layers].reverse().forEach(L => {
-    const r = el('div', 'lrow' + (L.id === state.sel ? ' on' : ''));
-    const name = el('button', 'lname', (L.text.replace(/\*\*|_/g, '').split('\n')[0] || '(trống)').slice(0, 34)); name.style.fontFamily = `"${L.font}", system-ui`; name.onclick = () => { state.sel = L.id; buildLayerList(); syncLayerPanel(); drawSelection(); };
-    const act = el('div', 'lact');
-    const b = (t, title, fn) => { const x = el('button', 'lbtn', t); x.title = title; x.setAttribute('aria-label', title); x.onclick = fn; act.append(x); };
-    b(L.hidden ? '◌' : '●', L.hidden ? 'Hiện lớp' : 'Ẩn lớp', () => { L.hidden = !L.hidden; pushUndo(); buildLayerList(); scheduleRender(); });
-    b('↑', 'Đưa lên trên', () => moveLayer(L.id, 1)); b('↓', 'Đưa xuống dưới', () => moveLayer(L.id, -1));
-    b('⧉', 'Nhân bản', () => dupLayer(L.id)); b('✕', 'Xoá lớp', () => delLayer(L.id));
-    if (L.pro || !FREE_FONTS.has(L.font)) { const t = el('span', 'lock', 'PRO'); t.hidden = state.pro; r.append(t); }
-    r.prepend(name); r.append(act); box.append(r);
-  });
+/* ---------- ô soạn chữ có định dạng ---------- */
+const ed = () => $('#lText');
+let edSel = null, lastEdText = null;
+function esc(t) { return t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+function lum(hex) { const n = parseInt(String(hex).slice(1), 16); return ((n >> 16 & 255) * .299 + (n >> 8 & 255) * .587 + (n & 255) * .114) / 255; }
+function runsToHTML(runs, keyColor, isTpl) {
+  let h = '';
+  for (const r of runs) {
+    const st = []; const col = r.c || (r.key ? keyColor : '');
+    if (col) st.push('color:' + col);
+    if (r.key && isTpl) st.push('background:' + hexA(keyColor, .22), 'border-radius:4px');
+    if (r.b) st.push('font-weight:900');
+    if (r.i) st.push('font-style:italic' + (isTpl ? ';font-family:"Playfair Display",serif' : ''));
+    if (r.s && r.s !== 1) st.push(`font-size:${r.s}em`);
+    const data = (r.key ? ' data-key="1"' : '') + (r.c ? ` data-c="${r.c}"` : '') + (r.b ? ' data-b="1"' : '') + (r.i ? ' data-i="1"' : '') + (r.s && r.s !== 1 ? ` data-s="${r.s}"` : '');
+    const inner = esc(r.t).replace(/\n/g, '<br>');
+    h += data ? `<span${data} style="${st.join(';')}">${inner}</span>` : inner;
+  }
+  if (runsText(runs).endsWith('\n')) h += '<br>';
+  return h;
 }
+function domToRuns(root) {
+  const out = [];
+  const walk = (node, st) => {
+    for (const n of node.childNodes) {
+      if (n.nodeType === 3) { if (n.data) out.push({ ...st, t: n.data.replace(/ /g, ' ') }); }
+      else if (n.nodeName === 'BR') out.push({ ...st, t: '\n' });
+      else if (n.nodeType === 1) {
+        const s2 = { ...st }, d = n.dataset || {};
+        if (d.key) { s2.key = true; delete s2.c; } if (d.c) { s2.c = d.c; delete s2.key; } if (d.b) s2.b = true; if (d.i) s2.i = true; if (d.s) s2.s = +d.s;
+        if (/^(DIV|P)$/.test(n.nodeName) && out.length && !out[out.length - 1].t.endsWith('\n')) out.push({ t: '\n' });
+        walk(n, s2);
+      }
+    }
+  };
+  walk(root, {});
+  let last = root.lastChild; while (last && last.nodeType === 1 && last.nodeName !== 'BR' && last.lastChild) last = last.lastChild;
+  if (last && last.nodeName === 'BR' && out.length && out[out.length - 1].t.endsWith('\n')) out[out.length - 1].t = out[out.length - 1].t.slice(0, -1);
+  return mergeRuns(out);
+}
+function nodeLen(x) { if (x.nodeType === 3) return x.data.length; if (x.nodeName === 'BR') return 1; let n = 0; for (const c of x.childNodes) n += nodeLen(c); return n; }
+function domOffset(root, node, off) {
+  let n = 0, found = false;
+  (function walk(x) {
+    if (x === node) { if (x.nodeType === 3) n += off; else for (let i = 0; i < off && i < x.childNodes.length; i++) n += nodeLen(x.childNodes[i]); found = true; return; }
+    if (x.nodeType === 3) { n += x.data.length; return; } if (x.nodeName === 'BR') { n += 1; return; }
+    for (const c of x.childNodes) { walk(c); if (found) return; }
+  })(root);
+  return n;
+}
+function locate(root, pos) {
+  let acc = 0, res = null;
+  (function walk(x) {
+    for (let i = 0; i < x.childNodes.length && !res; i++) {
+      const c = x.childNodes[i];
+      if (c.nodeType === 3) { if (pos <= acc + c.data.length) { res = [c, pos - acc]; return; } acc += c.data.length; }
+      else if (c.nodeName === 'BR') { if (pos <= acc) { res = [x, i]; return; } acc += 1; }
+      else walk(c);
+    }
+  })(root);
+  return res || [root, root.childNodes.length];
+}
+function setEdSel(s, e) { const root = ed(); const a = locate(root, s), b = locate(root, e); const r = document.createRange(); r.setStart(a[0], a[1]); r.setEnd(b[0], b[1]); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); }
+function selectAllIn(e) { const r = document.createRange(); r.selectNodeContents(e); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
+function renderEditor() {
+  const L = selLayer(), e = ed(); if (!L) { e.innerHTML = ''; return; }
+  const runs = L.tpl ? tplRuns() : L.runs;
+  const base = L.tpl ? state.brand.light : L.color, key = L.tpl ? state.brand.accent : L.keyColor;
+  e.style.fontFamily = L.tpl ? '"Be Vietnam Pro", system-ui, sans-serif' : `"${L.font}", system-ui, sans-serif`;
+  e.style.fontWeight = L.tpl ? 700 : L.weight; e.style.fontStyle = !L.tpl && L.italic ? 'italic' : 'normal';
+  e.style.textTransform = !L.tpl && L.upper ? 'uppercase' : 'none';
+  e.style.color = L.fillOff ? '#FFFFFF' : base; e.style.background = lum(L.fillOff ? '#FFFFFF' : base) > .55 ? '#2B2F33' : '#F3EEE6';
+  e.innerHTML = runsToHTML(runs, key, !!L.tpl);
+  if (L.tpl) lastEdText = $('#text').value;
+}
+function edInput() {
+  const L = selLayer(); if (!L) return;
+  if (ed().querySelector('div,p')) { const runs = domToRuns(ed()); const pos = runsText(runs).length; if (L.tpl) setTplRuns(runs); else L.runs = runs; renderEditor(); setEdSel(pos, pos); }
+  const runs = domToRuns(ed());
+  if (L.tpl) { setTplRuns(runs); lastEdText = $('#text').value; } else { L.runs = runs; pushUndoSoon(); buildLayerListSoon(); }
+  scheduleRender();
+}
+/* áp kiểu cho phần đang bôi đen; không bôi đen thì áp cho cả lớp */
+function fmt(kind, val) {
+  const L = selLayer(); if (!L) return;
+  let runs = L.tpl ? tplRuns() : L.runs; const len = runsText(runs).length;
+  let s = Math.min(edSel ? edSel.s : 0, len), e = Math.min(edSel ? edSel.e : 0, len);
+  const whole = s === e;
+  if (whole) {
+    if (!L.tpl && kind === 'c') { L.color = val; L.runs = L.runs.map(r => { const o = { ...r }; delete o.c; return o; }); pushUndoSoon(); renderEditor(); markRows(); scheduleRender(); return; }
+    if (L.tpl && kind !== 'clear') { toast('Bôi đen phần chữ muốn đổi trước đã'); return; }
+    s = 0; e = len;
+  }
+  const all = pred => allInRange(runs, s, e, pred);
+  if (kind === 'key') { const on = !all(r => r.key); runs = styleRange(runs, s, e, r => { r.key = on; delete r.c; if (on && L.tpl) r.i = false; }); }
+  else if (kind === 'c') runs = styleRange(runs, s, e, r => { r.c = val; r.key = false; });
+  else if (kind === 'b') { const on = !all(r => r.b); runs = styleRange(runs, s, e, r => { r.b = on; }); }
+  else if (kind === 'i') { const on = !all(r => r.i); runs = styleRange(runs, s, e, r => { r.i = on; if (on && L.tpl) r.key = false; }); }
+  else if (kind === 'big' || kind === 'small') runs = styleRange(runs, s, e, r => { r.s = Math.round(Math.min(2.5, Math.max(.5, (r.s || 1) * (kind === 'big' ? 1.2 : 1 / 1.2))) * 100) / 100; });
+  else if (kind === 'clear') runs = styleRange(runs, s, e, r => { r.key = false; r.i = false; r.b = false; delete r.c; delete r.s; });
+  if (L.tpl) setTplRuns(runs); else { L.runs = runs; pushUndoSoon(); buildLayerList(); }
+  renderEditor(); markRows();
+  if (!whole) { ed().focus(); setEdSel(s, e); edSel = { s, e }; }
+  if (!L.tpl) linkEditorFonts();
+  scheduleRender();
+}
+
+/* ---------- bảng lớp và thuộc tính ---------- */
+function buildLayerList() {
+  const box = $('#layerList'); box.innerHTML = '';
+  $('#preview').style.touchAction = state.sel ? 'none' : '';
+  const chip = (L, label, font) => {
+    const b = el('button', 'lchip' + (state.sel === L.id ? ' on' : '') + (L.hidden ? ' off' : ''), label); b.type = 'button';
+    if (font) b.style.fontFamily = `"${font}", system-ui`;
+    b.onclick = () => { state.sel = L.id; syncLayerPanel(); drawSelection(); };
+    if (!L.tpl && (L.pro || !FREE_FONTS.has(L.font))) { const t = el('span', 'lock', 'PRO'); t.hidden = state.pro; b.append(t); }
+    box.append(b);
+  };
+  if (tplActive()) chip(TPL, 'Hook · mẫu ' + TEMPLATES[state.template].name);
+  state.layers.forEach(L => chip(L, (runsText(L.runs).split('\n')[0].trim() || '(trống)').slice(0, 26), L.font));
+}
+let llT = null; function buildLayerListSoon() { clearTimeout(llT); llT = setTimeout(buildLayerList, 250); }
 function getPath(o, p) { return p.split('.').reduce((a, k) => a && a[k], o); }
 function setPath(o, p, v) { const ks = p.split('.'); let a = o; for (let i = 0; i < ks.length - 1; i++) a = a[ks[i]]; a[ks[ks.length - 1]] = v; }
 function syncProps(onlyGeom) {
-  const L = selLayer(); if (!L) return;
+  const L = selLayer(); if (!L || L.tpl) return;
   document.querySelectorAll('#layerProps [data-p]').forEach(inp => {
     const p = inp.dataset.p; if (onlyGeom && !['x', 'y', 'size', 'rotate'].includes(p)) return;
     let v = getPath(L, p); if (inp.dataset.scale) v = Math.round(v * +inp.dataset.scale);
@@ -1547,18 +1826,96 @@ function syncProps(onlyGeom) {
     const out = inp.parentElement.querySelector('output'); if (out) out.textContent = inp.value + (inp.dataset.unit || '');
   });
 }
+let curTab = 'style', curSub = 'text';
+function showTab(t) {
+  document.querySelectorAll('#edTabs button').forEach(x => x.setAttribute('aria-selected', String(x.dataset.t === t)));
+  document.querySelectorAll('#layerProps .pane').forEach(p => p.hidden = p.dataset.t !== t);
+}
+function showSub(t) {
+  document.querySelectorAll('#styleSub button').forEach(x => x.setAttribute('aria-selected', String(x.dataset.s === t)));
+  document.querySelectorAll('#layerProps .subpane').forEach(p => p.hidden = p.dataset.s !== t);
+}
+/* hàng chấm màu tròn kiểu CapCut */
+const PALETTE = ['#FFFFFF', '#C9C9C9', '#8A8A8A', '#3D3D3D', '#000000', '#FFE14D', '#FFB020', '#FF7A1A', '#FF5A5F', '#FF6FB5', '#B07CFF', '#4DA3FF', '#5EE7C6'];
+const ROWS = {
+  rowText:   { get: L => L.color, set: (L, c) => fmt('c', c), self: true },
+  rowKey:    { get: L => L.keyColor, set: (L, c) => { L.keyColor = c; } },
+  rowStroke: { none: true, get: L => L.stroke.on ? L.stroke.color : null, set: (L, c) => { if (c == null) L.stroke.on = false; else Object.assign(L.stroke, { on: true, color: c, width: L.stroke.width || 8 }); } },
+  rowGlow:   { none: true, get: L => L.glow.on ? L.glow.color : null, set: (L, c) => { if (c == null) L.glow.on = false; else Object.assign(L.glow, { on: true, color: c }); } },
+  rowBg:     { none: true, get: L => L.bg.on ? L.bg.color : null, set: (L, c) => { if (c == null) L.bg.on = false; else Object.assign(L.bg, { on: true, color: c }); } },
+  rowShadow: { none: true, get: L => L.shadow.on ? L.shadow.color : null, set: (L, c) => { if (c == null) L.shadow.on = false; else Object.assign(L.shadow, { on: true, color: c }); } },
+};
+function pickRow(id, c) {
+  const L = selLayer(); if (!L || L.tpl) return; const R = ROWS[id];
+  R.set(L, c);
+  if (!R.self) { pushUndoSoon(); renderEditor(); markRows(); syncProps(); scheduleRender(); }
+}
+function buildRows() {
+  const cols = [state.brand.accent.toUpperCase(), ...PALETTE.filter(c => c !== state.brand.accent.toUpperCase())];
+  for (const id of Object.keys(ROWS)) {
+    const box = $('#' + id); if (!box) continue; box.innerHTML = '';
+    const pick = el('label', 'dot rainbow'); pick.title = 'Chọn màu bất kỳ';
+    const ci = document.createElement('input'); ci.type = 'color'; ci.setAttribute('aria-label', 'Chọn màu bất kỳ'); ci.addEventListener('input', () => pickRow(id, ci.value.toUpperCase())); pick.append(ci); box.append(pick);
+    if (ROWS[id].none) { const b = el('button', 'dot none'); b.type = 'button'; b.title = 'Tắt'; b.setAttribute('aria-label', 'Tắt'); b.dataset.c = ''; b.onclick = () => pickRow(id, null); box.append(b); }
+    box.append(el('i', 'dot-sep'));
+    for (const c of cols) { const b = el('button', 'dot'); b.type = 'button'; b.style.background = c; b.title = c; b.setAttribute('aria-label', 'Màu ' + c); b.dataset.c = c; b.onclick = () => pickRow(id, c); box.append(b); }
+    box.addEventListener('mousedown', ev => { if (ev.target.closest('button')) ev.preventDefault(); });   // giữ phần chữ đang bôi đen
+  }
+}
+function markRows() {
+  const L = selLayer(); if (!L || L.tpl) return;
+  for (const id of Object.keys(ROWS)) {
+    const box = $('#' + id); if (!box) continue; const cur = ROWS[id].get(L); let hit = false;
+    box.querySelectorAll('button.dot').forEach(b => { const on = cur == null ? b.dataset.c === '' : String(b.dataset.c).toUpperCase() === String(cur).toUpperCase(); if (on) hit = true; b.setAttribute('aria-pressed', String(on)); });
+    const rb = box.querySelector('.rainbow'); rb.classList.toggle('on', !hit && cur != null); if (cur) { rb.querySelector('input').value = cur; if (!hit) rb.style.setProperty('--cur', cur); }
+  }
+  document.querySelectorAll('#styleSub button').forEach(b => { const g = { stroke: 'rowStroke', glow: 'rowGlow', bg: 'rowBg', shadow: 'rowShadow' }[b.dataset.s]; b.classList.toggle('lit', !!g && ROWS[g].get(L) != null); });
+}
+const WNAME = { 400: 'Thường', 500: 'Vừa', 600: 'Hơi đậm', 700: 'Đậm', 800: 'Rất đậm', 900: 'Đen' };
+function buildFontUI(L) {
+  document.querySelectorAll('#fontGrid .fnt').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.f === L.font)));
+  const fw = fontWeights(L); if (!fw.includes(+L.weight)) L.weight = fw.reduce((a, w) => Math.abs(w - L.weight) < Math.abs(a - L.weight) ? w : a, fw[0]);
+  const row = $('#weightRow'); row.innerHTML = '';
+  fw.forEach(w => { const b = el('button', 'chip', WNAME[w] || w); b.type = 'button'; b.style.fontFamily = `"${L.font}", system-ui`; b.style.fontWeight = w; b.setAttribute('aria-pressed', String(+L.weight === w)); b.onclick = () => { L.weight = w; pushUndo(); buildFontUI(L); renderEditor(); scheduleRender(); }; row.append(b); });
+}
+function buildTplGrid() {
+  const box = $('#tplGrid'); box.innerHTML = '';
+  for (const [k, t] of Object.entries(TEMPLATES)) {
+    if (k === 'blank') continue;
+    const b = el('button', 'pst tplq'); b.type = 'button'; b.setAttribute('aria-pressed', String(k === state.template));
+    b.append(el('span', 'pst-sw tq', t.name), el('small', null, t.desc.split('.')[0]));
+    if (PRO_TPL.has(k)) { const lk = el('span', 'lock', 'PRO'); lk.hidden = state.pro; b.append(lk); }
+    b.onclick = () => selectTemplate(k, true); box.append(b);
+  }
+}
 function syncLayerPanel() {
-  const L = selLayer(); $('#layerProps').hidden = !L; $('#layerEmpty').hidden = !!L; if (!L) { buildLayerList(); return; }
-  $('#lText').value = L.text;
-  const fs = $('#lFont'); fs.value = L.font;
-  const ws = $('#lWeight'); const fw = (FONTS.find(x => x.f === L.font) || FONTS[0]).w; ws.innerHTML = fw.map(w => `<option value="${w}">${w}</option>`).join(''); ws.value = fw.includes(+L.weight) ? L.weight : fw[fw.length - 1]; L.weight = +ws.value;
-  $('#lItalic').disabled = !(FONTS.find(x => x.f === L.font) || {}).it && L.font !== 'Be Vietnam Pro';
-  document.querySelectorAll('#lAlign button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === L.align)));
-  document.querySelectorAll('#presetGrid .pst').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.n === L.preset)));
-  syncProps(false); buildLayerList(); $('#layerAiOut').textContent = '';
+  const L = selLayer(); edSel = null;
+  $('#layerProps').hidden = !L; $('#layerEmpty').hidden = !!L; buildLayerList();
+  if (!L) return;
+  const isT = !!L.tpl;
+  document.querySelectorAll('#editorCard [data-free]').forEach(x => x.hidden = isT);
+  document.querySelectorAll('#editorCard [data-tplonly]').forEach(x => x.hidden = !isT);
+  if (isT) { $('#tplName').textContent = TEMPLATES[state.template].name; buildTplGrid(); showTab(['style', 'ai'].includes(curTab) ? curTab : 'style'); }
+  else {
+    showTab(curTab); showSub(curSub); buildFontUI(L);
+    document.querySelectorAll('#lAlign button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === L.align)));
+    document.querySelectorAll('#bgMode button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === L.bg.mode)));
+    document.querySelectorAll('#presetGrid .pst').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.n === L.preset)));
+    $('#btnHide').textContent = L.hidden ? 'Hiện lớp' : 'Ẩn lớp';
+    syncProps(false); markRows();
+  }
+  $('#fmtKeyDot').style.background = isT ? state.brand.accent : L.keyColor;
+  renderEditor(); $('#layerAiOut').textContent = '';
 }
 function buildEditorUI() {
-  $('#lFont').innerHTML = FONTS.map(x => `<option value="${x.f}" style="font-family:'${x.f}'">${x.f}${x.free ? '' : '  · PRO'}</option>`).join('');
+  const fg = $('#fontGrid');
+  FONTS.forEach(x => {
+    const b = el('button', 'fnt', x.f); b.type = 'button'; b.dataset.f = x.f; b.style.fontFamily = `"${x.f}", system-ui`; b.style.fontWeight = x.w.includes(700) ? 700 : x.w[x.w.length - 1];
+    if (!x.free) b.append(el('span', 'lock', 'PRO'));
+    b.onclick = () => { const L = selLayer(); if (!L || L.tpl) return; L.font = x.f; L.preset = ''; linkEditorFonts(); pushUndo(); buildFontUI(L); buildLayerList(); renderEditor(); scheduleRender(); if (!x.free && !state.pro) toast('Font Pro: xem thử thoải mái, xuất file cần mở Pro'); };
+    fg.append(b);
+  });
+  buildRows();
   const grid = $('#presetGrid');
   STYLE_PRESETS.forEach(P => {
     const b = el('button', 'pst'); b.dataset.n = P.n; b.type = 'button';
@@ -1567,86 +1924,127 @@ function buildEditorUI() {
     sw.style.color = pp.fillOff ? 'transparent' : pp.color; if (pp.stroke?.on) sw.style.webkitTextStroke = `${Math.max(1, Math.round(pp.stroke.width / 5))}px ${pp.stroke.color}`;
     if (pp.shadow?.on) sw.style.textShadow = `${pp.shadow.x / 3}px ${pp.shadow.y / 3}px ${pp.shadow.blur / 3}px ${hexA(pp.shadow.color, pp.shadow.alpha)}`;
     if (pp.bg?.on) { sw.style.background = hexA(pp.bg.color, pp.bg.alpha); sw.style.borderRadius = '6px'; sw.style.padding = '0 6px'; }
-    b.append(sw, el('small', null, P.n)); if (P.pro) { const t = el('span', 'lock', 'PRO'); b.append(t); }
-    b.onclick = () => { const L = selLayer(); if (!L) return; applyPreset(L, P); pushUndo(); linkEditorFonts(); syncLayerPanel(); scheduleRender(); if (P.pro && !state.pro) toast('Kiểu Pro: xem thử thoải mái, xuất file cần mở Pro'); };
+    b.append(sw, el('small', null, P.n)); if (P.pro) b.append(el('span', 'lock', 'PRO'));
+    b.onclick = () => { const L = selLayer(); if (!L || L.tpl) return; applyPreset(L, P); pushUndo(); linkEditorFonts(); syncLayerPanel(); scheduleRender(); if (P.pro && !state.pro) toast('Kiểu Pro: xem thử thoải mái, xuất file cần mở Pro'); };
     grid.append(b);
   });
   document.querySelectorAll('#layerProps [data-p]').forEach(inp => {
     const ev = inp.type === 'checkbox' || inp.tagName === 'SELECT' ? 'change' : 'input';
     inp.addEventListener(ev, () => {
-      const L = selLayer(); if (!L) return; let v;
+      const L = selLayer(); if (!L || L.tpl) return; let v;
       if (inp.type === 'checkbox') v = inp.checked; else if (inp.type === 'range' || inp.type === 'number') v = +inp.value / (inp.dataset.scale ? +inp.dataset.scale : 1); else v = inp.value;
       setPath(L, inp.dataset.p, v);
-      if (inp.dataset.p === 'font') { L.pro = L.pro && STYLE_PRESETS.some(P => P.n === L.preset && P.pro); linkEditorFonts(); syncLayerPanel(); if (!FREE_FONTS.has(v) && !state.pro) toast('Font Pro: xem thử thoải mái, xuất file cần mở Pro'); }
+      if (['color', 'keyColor', 'weight', 'italic', 'upper', 'fillOff'].includes(inp.dataset.p)) { renderEditor(); }
       const out = inp.parentElement.querySelector('output'); if (out) out.textContent = inp.value + (inp.dataset.unit || '');
       pushUndoSoon(); scheduleRender();
     });
   });
-  $('#lText').addEventListener('input', e => { const L = selLayer(); if (!L) return; L.text = e.target.value; pushUndoSoon(); scheduleRender(); buildLayerListSoon(); });
-  document.querySelectorAll('#lAlign button').forEach(b => b.addEventListener('click', () => { const L = selLayer(); if (!L) return; L.align = b.dataset.v; pushUndo(); syncLayerPanel(); scheduleRender(); }));
-  $('#btnAddText').onclick = () => addLayer('Chữ mới **nhấn** ở đây', { y: .3 });
-  $('#btnAddTitle').onclick = () => { const L = newLayer('TIÊU ĐỀ **TO**'); applyPreset(L, STYLE_PRESETS[4]); L.size = 110; L.y = .2; state.layers.push(L); state.sel = L.id; pushUndo(); buildLayerList(); syncLayerPanel(); linkEditorFonts(); scheduleRender(); };
-  $('#btnAddSub').onclick = () => { const L = newLayer('dòng phụ nhỏ ở đây'); applyPreset(L, STYLE_PRESETS[3]); L.size = 42; L.weight = 600; L.y = .4; state.layers.push(L); state.sel = L.id; pushUndo(); buildLayerList(); syncLayerPanel(); scheduleRender(); };
+  // ô soạn chữ
+  const e = ed();
+  e.addEventListener('input', edInput);
+  e.addEventListener('keydown', ev => { if (ev.key === 'Enter') { ev.preventDefault(); document.execCommand('insertLineBreak'); } });
+  e.addEventListener('paste', ev => { ev.preventDefault(); const t = (ev.clipboardData || window.clipboardData).getData('text/plain').replace(/\r/g, ''); t.split('\n').forEach((p, i) => { if (i) document.execCommand('insertLineBreak'); if (p) document.execCommand('insertText', false, p); }); });
+  document.addEventListener('selectionchange', () => {
+    const sel = getSelection(); if (!sel.rangeCount) return; const r = sel.getRangeAt(0);
+    if (!e.contains(r.startContainer) || !e.contains(r.endContainer)) return;
+    const a = domOffset(e, r.startContainer, r.startOffset), b = domOffset(e, r.endContainer, r.endOffset); edSel = { s: Math.min(a, b), e: Math.max(a, b) };
+  });
+  // thanh định dạng
+  document.querySelectorAll('#fmtBar [data-f]').forEach(b => {
+    b.addEventListener('mousedown', ev => ev.preventDefault());   // giữ nguyên phần chữ đang bôi đen
+    b.addEventListener('click', () => fmt(b.dataset.f));
+  });
+  // nút
+  document.querySelectorAll('#edTabs button').forEach(b => b.addEventListener('click', () => { curTab = b.dataset.t; showTab(curTab); }));
+  document.querySelectorAll('#styleSub button').forEach(b => b.addEventListener('click', () => { curSub = b.dataset.s; showSub(curSub); }));
+  document.querySelectorAll('#bgMode button').forEach(b => b.addEventListener('click', () => { const L = selLayer(); if (!L || L.tpl) return; L.bg.mode = b.dataset.v; L.bg.on = true; pushUndo(); syncLayerPanel(); scheduleRender(); }));
+  document.querySelectorAll('#lAlign button').forEach(b => b.addEventListener('click', () => { const L = selLayer(); if (!L || L.tpl) return; L.align = b.dataset.v; pushUndo(); syncLayerPanel(); scheduleRender(); }));
+  $('#btnAddText').onclick = () => addLayer('Chữ mới', { y: .32 });
+  $('#btnAddTitle').onclick = () => addLayer('TIÊU ĐỀ', { y: .2, size: 110 }, STYLE_PRESETS[4]);
+  $('#btnAddSub').onclick = () => addLayer('dòng phụ nhỏ', { y: .4, size: 42, weight: 600 }, STYLE_PRESETS[3]);
   $('#btnSplit').onclick = templateToLayers;
-  document.querySelectorAll('#edTabs button').forEach(b => b.addEventListener('click', () => { document.querySelectorAll('#edTabs button').forEach(x => x.setAttribute('aria-selected', String(x === b))); document.querySelectorAll('#layerProps .pane').forEach(p => p.hidden = p.dataset.t !== b.dataset.t); }));
   $('#btnUndo').onclick = undo; $('#btnRedo').onclick = redo;
-  $('#btnDelSel').onclick = () => state.sel && delLayer(state.sel);
+  $('#btnDelSel').onclick = delSelected;
   $('#btnDupSel').onclick = () => state.sel && dupLayer(state.sel);
-  $('#btnCenterX').onclick = () => { const L = selLayer(); if (!L) return; L.x = .5; pushUndo(); syncProps(); scheduleRender(); };
+  $('#btnUp').onclick = () => state.sel && moveLayer(state.sel, 1);
+  $('#btnDown').onclick = () => state.sel && moveLayer(state.sel, -1);
+  $('#btnHide').onclick = () => { const L = selLayer(); if (!L || L.tpl) return; L.hidden = !L.hidden; pushUndo(); syncLayerPanel(); scheduleRender(); };
+  $('#btnCenterX').onclick = () => { const L = selLayer(); if (!L || L.tpl) return; L.x = .5; pushUndo(); syncProps(); scheduleRender(); };
   document.querySelectorAll('#layerAi button').forEach(b => b.addEventListener('click', () => runLayerAI(b.dataset.ask, b)));
   const pv = $('#preview');
   pv.addEventListener('pointerdown', onDown); pv.addEventListener('pointermove', onMove); pv.addEventListener('pointerup', onUp); pv.addEventListener('pointercancel', onUp);
-  pv.addEventListener('dblclick', e => { const p = canvasPoint(e); const h = hitLayer(p.x, p.y); if (h) { state.sel = h.L.id; syncLayerPanel(); } else if (lastRender) addLayer('Chữ mới', { x: p.x / pv.width, y: p.y / pv.height }); $('#lText').focus(); $('#lText').select(); $('#editorCard').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
-  document.addEventListener('keydown', e => {
-    const tag = (document.activeElement || {}).tagName; if (['INPUT', 'TEXTAREA', 'SELECT'].includes(tag)) return;
-    const mod = e.metaKey || e.ctrlKey;
-    if (mod && e.key.toLowerCase() === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo(); return; }
-    if (mod && e.key.toLowerCase() === 'y') { e.preventDefault(); redo(); return; }
-    const L = selLayer(); if (!L) return;
-    if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); delLayer(L.id); }
-    else if (mod && e.key.toLowerCase() === 'd') { e.preventDefault(); dupLayer(L.id); }
-    else if (e.key === 'Escape') { state.sel = null; syncLayerPanel(); drawSelection(); }
-    else if (e.key.startsWith('Arrow')) { e.preventDefault(); const st = (e.shiftKey ? 10 : 1) / 1080; if (e.key === 'ArrowLeft') L.x -= st; if (e.key === 'ArrowRight') L.x += st; if (e.key === 'ArrowUp') L.y -= st * 1080 / 1920; if (e.key === 'ArrowDown') L.y += st * 1080 / 1920; fastCompose(); syncProps(true); pushUndoSoon(); }
+  pv.addEventListener('dblclick', ev => {
+    const p = canvasPoint(ev); const h = hitLayer(p.x, p.y);
+    if (h) selectLayer(h.L.id); else if (lastRender) { addLayer('Chữ mới', { x: p.x / pv.width, y: p.y / pv.height }); return; }
+    const e2 = ed(); e2.focus(); selectAllIn(e2); $('#editorCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
-  try { const saved = JSON.parse(ls.get('hook.layers') || '[]'); if (Array.isArray(saved) && saved.length) { state.layers = saved; layerSeq = saved.length + 10; saved.forEach(l => l.id = 'L' + (layerSeq++)); lastSnap = snapshot(); linkEditorFonts(); } } catch {}
-  buildLayerList(); syncLayerPanel();
+  document.addEventListener('keydown', ev => {
+    const a = document.activeElement || {}; if (['INPUT', 'TEXTAREA', 'SELECT'].includes(a.tagName) || a.isContentEditable) return;
+    const mod = ev.metaKey || ev.ctrlKey;
+    if (mod && ev.key.toLowerCase() === 'z') { ev.preventDefault(); ev.shiftKey ? redo() : undo(); return; }
+    if (mod && ev.key.toLowerCase() === 'y') { ev.preventDefault(); redo(); return; }
+    const L = selLayer(); if (!L) return;
+    if (ev.key === 'Delete' || ev.key === 'Backspace') { ev.preventDefault(); delSelected(); }
+    else if (mod && ev.key.toLowerCase() === 'd' && !L.tpl) { ev.preventDefault(); dupLayer(L.id); }
+    else if (ev.key === 'Escape') { state.sel = null; syncLayerPanel(); drawSelection(); }
+    else if (ev.key.startsWith('Arrow')) {
+      ev.preventDefault();
+      if (L.tpl) { if (ev.key === 'ArrowUp') state.ypct = Math.max(3, state.ypct - 1); if (ev.key === 'ArrowDown') state.ypct = Math.min(80, state.ypct + 1); syncSliders(); scheduleRender(); return; }
+      const st = (ev.shiftKey ? 10 : 1) / 1080; if (ev.key === 'ArrowLeft') L.x -= st; if (ev.key === 'ArrowRight') L.x += st; if (ev.key === 'ArrowUp') L.y -= st * 1080 / 1920; if (ev.key === 'ArrowDown') L.y += st * 1080 / 1920;
+      fastCompose(); syncProps(true); pushUndoSoon();
+    }
+  });
+  try {
+    const saved = JSON.parse(ls.get('hook.layers') || '[]');
+    if (Array.isArray(saved) && saved.length) {
+      saved.forEach(l => { if (!Array.isArray(l.runs)) l.runs = markupToRuns(l.text || ''); delete l.text; if (!l.glow) l.glow = { on: false, color: state.brand.accent, alpha: .9, blur: 24 }; l.id = 'L' + (layerSeq++); });
+      state.layers = saved; lastSnap = snapshot(); linkEditorFonts();
+    }
+  } catch {}
+  state.sel = tplActive() ? 'TPL' : (state.layers[0] || {}).id || null;
+  syncLayerPanel();
 }
-let llT = null; function buildLayerListSoon() { clearTimeout(llT); llT = setTimeout(buildLayerList, 250); }
+/* gọi sau mỗi lần render: đồng bộ bảng lớp khi mẫu hoặc câu hook đổi từ chỗ khác */
+let lastTplKey = null;
+function afterRenderEditor() {
+  if (state.template !== lastTplKey) {
+    lastTplKey = state.template;
+    if (tplActive() && (!state.sel || state.sel === 'TPL')) state.sel = 'TPL';
+    syncLayerPanel(); return;
+  }
+  if (state.sel === 'TPL' && document.activeElement !== ed() && lastEdText !== $('#text').value) renderEditor();
+}
 function layersUsePro() { return state.layers.some(L => !L.hidden && (L.pro || !FREE_FONTS.has(L.font))); }
 
 /* ---------- AI trên từng lớp chữ (Pro) ---------- */
-const LAYER_ASK = {
-  manh: 'Viết lại câu này mạnh hơn theo luật 1 giây, giữ ý và giọng, tối đa 2 dòng.',
-  gon: 'Rút gọn còn dưới 10 từ, giữ ý chính và con số.',
-  cotnha: 'Đổi sang giọng cợt nhả, gần gũi, như nói với bạn thân (cách làm dị hình thức bằng ngữ điệu).',
-  xanhchin: 'Đổi sang hook "xanh chín": khẳng định chắc nịch, dáng chân lý.',
-  nhan: 'Giữ nguyên chữ, chỉ đánh dấu 1-2 từ khóa quan trọng nhất bằng **...** để nhấn màu.',
-  style: 'Giữ nguyên chữ, chọn kiểu chữ (preset) hợp nhất với giọng câu này và nói vì sao.',
-};
-const DEMO_LAYER = { manh: '**3 giây** đầu\nquyết định cả video', gon: '**3 giây** quyết định tất cả', cotnha: 'ủa alo, **3 giây** đầu\nmà cũng lười nghĩ hả trời', xanhchin: '3 giây đầu **luôn quyết định**\nvideo sống hay chết', nhan: '3 giây đầu quyết định\n**90% lượt xem** của bạn', style: null };
-async function runLayerAI(ask, btn) {
+const DEMO_LAYER = { manh: '**3 giây** đầu\nquyết định cả video', gon: '**3 giây** quyết định tất cả', cotnha: 'ủa alo, **3 giây** đầu\nmà cũng lười nghĩ hả trời', xanhchin: '3 giây đầu **luôn quyết định**\nvideo sống hay chết', nhan: '3 giây đầu quyết định\n**90% lượt xem** của bạn' };
+async function runLayerAI(ask) {
   const L = selLayer(); if (!L) return;
   if (!state.pro) { openUpsell('AI chỉnh chữ thuộc gói Pro. Đăng nhập khu học viên là dùng được ngay.'); return; }
+  const text = L.tpl ? $('#text').value : runsToMarkup(L.runs);
+  if (!text.trim()) return toast('Chưa có chữ để AI chỉnh');
   const out = $('#layerAiOut'); out.className = 'status'; out.innerHTML = '<span class="spinner"></span>AI đang chỉnh...';
   document.querySelectorAll('#layerAi button').forEach(b => b.disabled = true);
   try {
     let r;
-    if (DEMO) { await new Promise(z => setTimeout(z, 800)); r = { ok: true, data: ask === 'style' ? { text: L.text, preset: 'Vàng viral', note: 'Bản demo: câu ngắn, có con số, hợp kiểu chữ vàng viền đen đọc nhanh nhất.' } : { text: DEMO_LAYER[ask] || L.text, preset: '', note: 'Bản demo: kết quả mẫu cố định.' } }; }
-    else r = await callApi({ action: 'hook_ai', mode: 'layer', token: hvToken(), text: L.text, ask, presets: STYLE_PRESETS.map(p => p.n) });
+    if (DEMO) { await new Promise(z => setTimeout(z, 800)); r = { ok: true, data: ask === 'style' ? { text, preset: 'Vàng viral', note: 'Bản demo: câu ngắn, có con số, hợp kiểu chữ vàng viền đen đọc nhanh nhất.' } : { text: DEMO_LAYER[ask] || text, preset: '', note: 'Bản demo: kết quả mẫu cố định.' } }; }
+    else r = await callApi({ action: 'hook_ai', mode: 'layer', token: hvToken(), text, ask, presets: STYLE_PRESETS.map(p => p.n) });
     if (!r.ok) { out.className = 'status err'; out.textContent = ({ het_luot: 'Hết lượt AI hôm nay.', het_phien: 'Phiên đăng nhập hết hạn, đăng nhập lại nhé.', ban_qua: 'AI đang bận, thử lại sau một phút.', sai_key: 'Khóa AI trên máy chủ không hợp lệ. Báo mentor.' }[r.error] || 'AI chưa chỉnh được.') + (r.chi_tiet ? ' Mã lỗi: ' + r.chi_tiet : ''); return; }
     const d = r.data || {};
-    if (d.text && ask !== 'style') L.text = String(d.text);
-    const P = STYLE_PRESETS.find(p => p.n === d.preset); if (P && ask === 'style') applyPreset(L, P);
-    pushUndo(); syncLayerPanel(); linkEditorFonts(); scheduleRender();
-    out.className = 'status ok'; out.textContent = d.note || 'Đã chỉnh.';
+    if (d.text && ask !== 'style') { if (L.tpl) { $('#text').value = String(d.text); ls.set('hook.text', $('#text').value); } else L.runs = markupToRuns(String(d.text)); }
+    const P = STYLE_PRESETS.find(p => p.n === d.preset); if (P && ask === 'style' && !L.tpl) applyPreset(L, P);
+    if (!L.tpl) pushUndo();
+    syncLayerPanel(); linkEditorFonts(); scheduleRender();
+    out.className = 'status ok'; out.textContent = d.note || 'Đã chỉnh. Không ưng thì bấm hoàn tác.';
     if (r.con !== undefined) showQuota(r.con, r.han);
   } catch { out.className = 'status err'; out.textContent = 'Không kết nối được máy chủ.'; }
   finally { document.querySelectorAll('#layerAi button').forEach(b => b.disabled = false); }
 }
-
 function layerNotes() {
-  return state.layers.filter(L => !L.hidden && String(L.text).trim()).map((L, i) => {
-    const t = [`Lớp chữ ${i + 1} "${L.text.replace(/\*\*|_/g, '').replace(/\n/g, ' / ').slice(0, 40)}": font ${L.font} ${L.weight}${L.italic ? ' nghiêng' : ''}${L.upper ? ', viết hoa' : ''}, cỡ ${L.size}px, màu ${L.fillOff ? 'rỗng' : L.color}, từ nhấn ${L.keyColor}`];
+  return state.layers.filter(L => !L.hidden && runsText(L.runs).trim()).map((L, i) => {
+    const t = [`Lớp chữ ${i + 1} "${runsText(L.runs).replace(/\n/g, ' / ').slice(0, 40)}": font ${L.font} ${L.weight}${L.italic ? ' nghiêng' : ''}${L.upper ? ', viết hoa' : ''}, cỡ ${L.size}px, màu ${L.fillOff ? 'rỗng' : L.color}`];
+    const colored = L.runs.filter(r => r.t.trim() && (r.key || r.c)).map(r => `"${r.t.trim().slice(0, 20)}" ${r.c || L.keyColor}`);
+    if (colored.length) t.push('chữ tô riêng: ' + colored.join(', '));
     if (L.stroke.on) t.push(`viền ${L.stroke.color} dày ${L.stroke.width}`);
     if (L.shadow.on) t.push(`bóng ${L.shadow.color} ${Math.round(L.shadow.alpha * 100)}%, blur ${L.shadow.blur}, lệch ${L.shadow.x}/${L.shadow.y}`);
     if (L.bg.on) t.push(`nền ${L.bg.mode === 'block' ? 'khối' : 'từng dòng'} ${L.bg.color} ${Math.round(L.bg.alpha * 100)}%, bo ${L.bg.radius}`);
