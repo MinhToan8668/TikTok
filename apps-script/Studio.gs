@@ -104,7 +104,7 @@ function studioApi(b){
 function stNganHang(){ return {ngan_hang: stCfg('ST_NGAN_HANG'), stk: stCfg('ST_STK'), chu_tk: stCfg('ST_CHU_TK')}; }
 function stCauHinh(){ return jsonOut({ok:true, goi: stGoi(), bank: stNganHang(), luot_thu: ST_LUOT_THU}); }
 
-/* ── đăng ký: không cần duyệt, có ngay 5 lượt thử ── */
+/* ── đăng ký: không cần duyệt, có ngay lượt AI miễn phí ── */
 function stDangKy(b){
   if (b.website) return jsonOut({ok:false, error:'thieu'});        // ô bẫy bot
   var email = chuanEmail(b.email), pass = String(b.pass||''), ten = chuanTen(b.ten), sdt = String(b.sdt||'').trim();
