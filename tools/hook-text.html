@@ -362,7 +362,7 @@
     .out-btn small{display:none}
     .out-btn b{font-size:13.5px}
     .me-actions,.plan-pick{grid-template-columns:1fr}
-    .wchip{font-size:15px;padding:8px 11px}
+    .up-two{grid-template-columns:1fr}
     .pv-bar{margin-top:6px}
     .pv-bar select,.pv-bar .chip,.tgl.sm span{padding:5px 9px;font-size:12px}
     header.top{flex-wrap:nowrap}
@@ -394,11 +394,19 @@
   [hidden]{display:none!important}
   .af input,.af textarea{width:100%;font:inherit;font-size:16px;color:var(--text);background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
   .wide{width:100%;justify-content:center}
-  .wpick{margin-top:8px}
-  .wchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
-  .wchip{border:1.5px solid var(--line);background:var(--surface-2);color:var(--text);border-radius:10px;padding:6px 10px;font:inherit;font-size:14px;font-weight:600;cursor:pointer;-webkit-user-select:none;user-select:none;touch-action:manipulation}
-  .wchip.on{outline:3px solid var(--accent);outline-offset:1px;border-color:transparent}
+  #lText::highlight(edsel){background:rgba(153,223,0,.45)}
   .up-cta{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+  .up-cta .linkbtn{align-self:center;margin-top:2px}
+  .up-two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .up-opt{display:flex;flex-direction:column;gap:3px;text-align:left;border:1.5px solid var(--line);background:var(--surface-2);color:var(--text);border-radius:14px;padding:12px;font:inherit;cursor:pointer;text-decoration:none}
+  .up-opt b{font-size:15px}
+  .up-opt small{color:var(--muted);font-size:12px;line-height:1.35}
+  #upBuy{background:var(--accent);border-color:var(--accent);color:#15171A}
+  #upBuy small{color:#15171A;opacity:.75}
+  .me-act{text-decoration:none}
+  .me-act.buy{border-color:var(--accent)}
+  .me-act.hot{background:var(--accent);color:#15171A}
+  .me-act.hot small{color:#15171A;opacity:.75}
   .af{display:flex;flex-direction:column;gap:10px;margin-top:12px}
   .af label{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600;color:var(--muted)}
   .af input,.af textarea{font-size:16px}
@@ -501,7 +509,6 @@
         <div class="st-empty" id="layerEmpty">Chưa chọn chữ nào. Chạm vào chữ trên khung preview, hoặc bấm "+ Thêm chữ".</div>
         <div id="layerProps" hidden>
           <div id="lText" contenteditable="true" spellcheck="false" role="textbox" aria-multiline="true" aria-label="Nội dung chữ"></div>
-          <div class="wpick"><div class="rowlbl">Chạm một từ để chọn, chạm thêm từ khác để chọn cả cụm, rồi bấm Nhấn màu hoặc màu bên dưới</div><div class="wchips" id="wordPick"></div></div>
           <div class="tools" id="fmtBar" role="toolbar" aria-label="Định dạng phần chữ đang bôi đen">
             <button class="tb" type="button" data-f="key" title="Tô màu nhấn cho phần chữ đang bôi đen"><span class="kdot" id="fmtKeyDot"></span><small>Nhấn màu</small></button>
             <button class="tb" type="button" data-f="b" data-free title="In đậm (Pro)" aria-label="In đậm"><b>B</b></button>
@@ -735,13 +742,17 @@
     </ul>
     <div class="up-cta">
       <button class="btn pro wide" id="upMain" type="button">Tạo tài khoản · dùng thử 5 lượt Pro</button>
-      <button class="btn wide" id="upLogin" type="button">Đã có tài khoản? Đăng nhập</button>
+      <div class="up-two">
+        <button class="up-opt" id="upBuy" type="button"><b>✦ Mua Pro <span data-price>50k</span></b><small>Chuyển khoản, admin mở Pro trong vài phút</small></button>
+        <a class="up-opt hv" href="../index.html#dangky"><b>🎓 Đăng ký học viên</b><small>Bao trọn gói khoá học, có sẵn Pro</small></a>
+      </div>
+      <button class="linkbtn" id="upLogin" type="button">Đã có tài khoản? Đăng nhập</button>
     </div>
     <div class="row" style="margin-top:10px;justify-content:center">
       <button class="linkbtn" id="upFree" type="button">Bỏ phần Pro, xuất bản Free</button>
       <button class="linkbtn" id="upClose" type="button">Để sau</button>
     </div>
-    <p class="hint" style="margin:10px 0 0">Học viên Tự Mình Xây Kênh dùng Pro không giới hạn: đăng nhập bằng tài khoản khu học viên. Muốn làm học viên? <a href="../index.html">Xem khoá học</a></p>
+    <p class="hint" style="margin:10px 0 0">Đã là học viên? Đăng nhập bằng tài khoản khu học viên là có Pro.</p>
   </div>
 </div>
 
@@ -772,11 +783,12 @@
       <div class="me-card"><div class="me-av" id="meAv">T</div><div class="me-info"><b id="meTen"></b><small id="meSub"></small></div><span class="me-plan" id="mePlan">Free</span></div>
       <p class="me-quota" id="meQuota"></p>
       <div class="me-actions">
-        <button class="me-act" id="goUpgrade" type="button"><b>✦ Nâng cấp Pro</b><small>Không giới hạn, xuất sạch, AI 20 lượt mỗi ngày</small></button>
+        <button class="me-act buy" id="goUpgrade" type="button"><b>✦ Mua Pro <span data-price>50k</span></b><small>Không giới hạn, xuất sạch, AI 20 lượt mỗi ngày</small></button>
+        <a class="me-act" id="goHv" href="../index.html#dangky"><b>🎓 Đăng ký học viên</b><small>Bao trọn gói khoá học, được duyệt là có Pro</small></a>
         <button class="me-act" id="goSoi" type="button"><b>👀 Soi kênh miễn phí</b><small>Mentor xem video, chỉ đúng một chỗ nên sửa</small></button>
       </div>
       <div id="paneUpgrade" class="me-pane" hidden>
-        <h4>Chọn gói Pro</h4>
+        <h4>Mua Pro · chuyển khoản</h4>
         <div class="plan-pick" id="planPick"></div>
         <p class="status" id="payMsg"></p>
         <div id="payBox" class="pay-box" hidden>
@@ -791,7 +803,7 @@
           <p class="hint">Quét mã QR bằng app ngân hàng là tự điền đủ. Ghi <b>đúng nội dung</b> để admin đối chiếu. Chuyển xong bấm nút bên dưới.</p>
           <button class="btn pro wide" id="btnPaid" type="button">Tôi đã chuyển khoản</button>
         </div>
-        <p class="hint" style="margin-top:10px">Hoặc đăng ký làm <b>học viên Tự Mình Xây Kênh</b>: được duyệt là dùng Pro không giới hạn. <a href="../index.html">Xem khoá học</a></p>
+        <p class="hint" style="margin-top:10px">Muốn học bài bản? <a href="../index.html#dangky">Đăng ký học viên</a>: bao trọn gói, được duyệt là có Pro luôn.</p>
       </div>
       <div id="paneSoi" class="me-pane" hidden>
         <h4>Soi kênh miễn phí</h4>
@@ -1542,8 +1554,8 @@ async function runAI() {
     clearInterval(tick);
     if (!r.ok) {
       if (r.error === 'het_thu') { setTrial(0, r.han || 3); openUpsell('Bạn đã dùng hết 3 lượt AI thử. Tạo tài khoản miễn phí để có thêm 5 lượt Pro, hoặc mở Pro 50k.'); }
-      const map = { het_thu: 'Hết 3 lượt AI thử miễn phí.', can_pro: 'Chỉnh chữ bằng AI cần tài khoản.', het_phien: 'Phiên đăng nhập đã hết hạn. Đăng nhập lại nhé.', het_luot_thu: 'Bạn đã dùng hết 5 lượt Pro dùng thử. Nâng cấp Pro để dùng tiếp.', het_luot: `Bạn đã dùng hết ${r.han || ''} lượt hôm nay. Mai quay lại nhé.`, chua_cai_key: 'Máy chủ chưa được cài khóa AI (GEMINI_API_KEY). Báo mentor giúp mình.', loi_mang: 'Máy chủ không gọi được AI. Chụp mã lỗi bên dưới gửi mentor.', loi_ai: 'AI trả lỗi. Chụp mã lỗi bên dưới gửi mentor.', sai_key: 'Khóa AI trên máy chủ không hợp lệ hoặc đã bị xoá. Báo mentor thay khóa mới.', ban_qua: 'AI đang bận hoặc chạm hạn mức theo phút. Đợi khoảng một phút rồi bấm lại.', tu_choi: 'AI không xử lý được nội dung này, thử diễn đạt khác.', anh_qua_lon: 'Ảnh quá lớn, chọn ảnh nhỏ hơn.', thieu_text: 'Nhập câu hook trước đã.' };
-      setStatus((map[r.error] || 'Có lỗi khi gọi AI, thử lại sau.') + (r.chi_tiet ? `<br><small style="font-weight:400;opacity:.85">Mã lỗi: ${String(r.chi_tiet).replace(/</g,'&lt;')}</small>` : ''), 'err'); if (r.error === 'het_phien') setPro(false); if (r.error === 'het_luot_thu') { state.acct && (state.acct.luot_con = 0); setAcct(state.acct); openUpsell('Bạn đã dùng hết 5 lượt Pro dùng thử. Nâng cấp Pro để AI phân tích không giới hạn.'); } return;
+      const map = { het_thu: 'Hết 3 lượt AI thử miễn phí.', can_pro: 'Chỉnh chữ bằng AI cần tài khoản.', het_phien: 'Phiên đăng nhập đã hết hạn. Đăng nhập lại nhé.', het_luot_thu: 'Bạn đã dùng hết 5 lượt Pro dùng thử. Mua Pro hoặc đăng ký học viên để dùng tiếp.', het_luot: `Bạn đã dùng hết ${r.han || ''} lượt hôm nay. Mai quay lại nhé.`, chua_cai_key: 'Máy chủ chưa được cài khóa AI (GEMINI_API_KEY). Báo mentor giúp mình.', loi_mang: 'Máy chủ không gọi được AI. Chụp mã lỗi bên dưới gửi mentor.', loi_ai: 'AI trả lỗi. Chụp mã lỗi bên dưới gửi mentor.', sai_key: 'Khóa AI trên máy chủ không hợp lệ hoặc đã bị xoá. Báo mentor thay khóa mới.', ban_qua: 'AI đang bận hoặc chạm hạn mức theo phút. Đợi khoảng một phút rồi bấm lại.', tu_choi: 'AI không xử lý được nội dung này, thử diễn đạt khác.', anh_qua_lon: 'Ảnh quá lớn, chọn ảnh nhỏ hơn.', thieu_text: 'Nhập câu hook trước đã.' };
+      setStatus((map[r.error] || 'Có lỗi khi gọi AI, thử lại sau.') + (r.chi_tiet ? `<br><small style="font-weight:400;opacity:.85">Mã lỗi: ${String(r.chi_tiet).replace(/</g,'&lt;')}</small>` : ''), 'err'); if (r.error === 'het_phien') setPro(false); if (r.error === 'het_luot_thu') { state.acct && (state.acct.luot_con = 0); setAcct(state.acct); openUpsell('Mua Pro hoặc đăng ký học viên để AI phân tích không giới hạn.'); } return;
     }
     setStatus(`Xong sau ${Math.round((Date.now() - t0) / 1000)} giây. Đã áp dụng bố cục số 1.`, 'ok');
     if (r.thu) { state.thuDaChay = true; setTrial(r.con, r.han); } else if (r.con !== undefined) showQuota(r.con, r.han);
@@ -1600,13 +1612,22 @@ function showResult(d, demo) {
 function openSheet(demo) { $('#aiSheetNote').hidden = !demo; $('#aiSheetTitle').textContent = demo ? 'Ví dụ kết quả Trợ lý hook' : 'Kết quả Trợ lý hook'; $('#aiSheet').classList.add('show'); if (!demo) $('#btnAiShow').hidden = false; }
 function closeSheet() { $('#aiSheet').classList.remove('show'); }
 function openUpsell(msg) {
-  const plan = planOf(state.acct);
-  $('#upTitle').textContent = plan === 'guest' ? '✦ Dùng thử Pro miễn phí' : '✦ Nâng cấp Pro';
-  $('#upText').textContent = msg || 'Làm hook như editor chuyên nghiệp, có AI kèm bên cạnh.';
-  $('#upMain').textContent = plan === 'guest' ? 'Tạo tài khoản · dùng thử 5 lượt Pro' : 'Nâng cấp Pro';
+  const plan = planOf(state.acct), out = plan === 'free' && !state.trial;
+  $('#upTitle').textContent = plan === 'guest' ? '✦ Dùng thử Pro miễn phí' : out ? 'Bạn đã dùng hết 5 lượt thử' : '✦ Nâng cấp Pro';
+  $('#upText').textContent = msg || (out ? 'Chọn một cách để dùng Pro tiếp:' : 'Làm hook như editor chuyên nghiệp, có AI kèm bên cạnh.');
+  $('#upMain').hidden = plan !== 'guest';
   $('#upLogin').hidden = plan !== 'guest';
+  loadPrice();
   $('#upsell').classList.add('show');
 }
+/* giá gói rẻ nhất, hiện trên các nút "Mua Pro" */
+async function loadPrice() {
+  try { if (!stCfgCache) { const r = await callApi({ action: 'st_cfg' }); if (r.ok) stCfgCache = r; } } catch {}
+  if (!stCfgCache || !stCfgCache.goi || !stCfgCache.goi.length) return;
+  const g = stCfgCache.goi.reduce((a, b) => (b.gia < a.gia ? b : a)); const k = g.gia % 1000 ? g.gia.toLocaleString('vi-VN') + 'đ' : g.gia / 1000 + 'k';
+  document.querySelectorAll('[data-price]').forEach(e => e.textContent = k);
+}
+function wantBuy() { $('#upsell').classList.remove('show'); if (state.acct) openAcct('upgrade'); else { state.afterSignup = 'upgrade'; openAcct('signup'); toast('Tạo tài khoản trước để nhận mã chuyển khoản'); } }
 
 /* ---------- export ---------- */
 function canvasBlob(cv, type, q) { return new Promise(r => cv.toBlob(r, type, q)); }
@@ -2054,6 +2075,11 @@ function locate(root, pos) {
   return res || [root, root.childNodes.length];
 }
 function setEdSel(s, e) { const root = ed(); const a = locate(root, s), b = locate(root, e); const r = document.createRange(); r.setStart(a[0], a[1]); r.setEnd(b[0], b[1]); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); }
+function showEdSel() {
+  if (!window.Highlight || !CSS.highlights) return;
+  if (!edSel || edSel.e <= edSel.s || !selLayer()) { CSS.highlights.delete('edsel'); return; }
+  try { const root = ed(); const a = locate(root, edSel.s), b = locate(root, edSel.e); const r = new Range(); r.setStart(a[0], a[1]); r.setEnd(b[0], b[1]); CSS.highlights.set('edsel', new Highlight(r)); } catch { CSS.highlights.delete('edsel'); }
+}
 function selectAllIn(e) { const r = document.createRange(); r.selectNodeContents(e); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
 function renderEditor() {
   const L = selLayer(), e = ed(); if (!L) { e.innerHTML = ''; return; }
@@ -2065,14 +2091,13 @@ function renderEditor() {
   e.style.color = L.fillOff ? '#FFFFFF' : base; e.style.background = lum(L.fillOff ? '#FFFFFF' : base) > .55 ? '#2B2F33' : '#F3EEE6';
   e.innerHTML = runsToHTML(runs, key, !!L.tpl);
   if (L.tpl) lastEdText = $('#text').value;
-  buildWordPick();
+  showEdSel();
 }
 function edInput() {
   const L = selLayer(); if (!L) return;
   if (ed().querySelector('div,p')) { const runs = domToRuns(ed()); const pos = runsText(runs).length; if (L.tpl) setTplRuns(runs); else L.runs = runs; renderEditor(); setEdSel(pos, pos); }
   const runs = domToRuns(ed());
   if (L.tpl) { setTplRuns(runs); lastEdText = $('#text').value; } else { L.runs = runs; pushUndoSoon(); buildLayerListSoon(); }
-  buildWordPickSoon();
   scheduleRender();
 }
 /* áp kiểu cho phần đang bôi đen; không bôi đen thì áp cho cả lớp */
@@ -2097,7 +2122,7 @@ function fmt(kind, val) {
   else if (kind === 'clear') runs = styleRange(runs, s, e, r => { r.key = false; r.i = false; r.b = false; delete r.c; delete r.s; });
   if (L.tpl) setTplRuns(runs); else { L.runs = runs; pushUndoSoon(); buildLayerList(); }
   renderEditor(); markRows();
-  if (!whole) { if (hadFocus) { ed().focus(); setEdSel(s, e); } edSel = { s, e }; buildWordPick(); }
+  if (!whole) { if (hadFocus) { ed().focus(); setEdSel(s, e); } edSel = { s, e }; showEdSel(); }
   if (!L.tpl) linkEditorFonts();
   scheduleRender();
 }
@@ -2183,7 +2208,7 @@ function buildFontUI(L) {
   fw.forEach(w => { const b = el('button', 'chip', WNAME[w] || w); b.type = 'button'; b.style.fontFamily = `"${L.font}", system-ui`; b.style.fontWeight = w; b.setAttribute('aria-pressed', String(+L.weight === w)); b.onclick = () => { L.weight = w; markPro(L); pushUndo(); buildFontUI(L); renderEditor(); scheduleRender(); }; row.append(b); });
 }
 function syncLayerPanel() {
-  const L = selLayer(); edSel = null;
+  const L = selLayer(); edSel = null; showEdSel();
   $('#layerProps').hidden = !L; $('#layerEmpty').hidden = !!L; buildLayerList();
   if (!L) return;
   const isT = !!L.tpl;
@@ -2242,11 +2267,12 @@ function buildEditorUI() {
   document.addEventListener('selectionchange', () => {
     const sel = getSelection(); if (!sel.rangeCount) return; const r = sel.getRangeAt(0);
     if (!e.contains(r.startContainer) || !e.contains(r.endContainer)) return;
-    const a = domOffset(e, r.startContainer, r.startOffset), b = domOffset(e, r.endContainer, r.endOffset); edSel = { s: Math.min(a, b), e: Math.max(a, b) };
+    const a = domOffset(e, r.startContainer, r.startOffset), b = domOffset(e, r.endContainer, r.endOffset); edSel = { s: Math.min(a, b), e: Math.max(a, b) }; showEdSel();
   });
   // thanh định dạng
   document.querySelectorAll('#fmtBar [data-f]').forEach(b => {
     b.addEventListener('mousedown', ev => ev.preventDefault());   // giữ nguyên phần chữ đang bôi đen
+    b.addEventListener('pointerdown', ev => ev.preventDefault());
     b.addEventListener('click', () => fmt(b.dataset.f));
   });
   // nút
@@ -2315,7 +2341,7 @@ function layersUsePro() { return proUsed().length > 0; }
 const DEMO_LAYER = { manh: '**3 giây** đầu\nquyết định cả video', gon: '**3 giây** quyết định tất cả', cotnha: 'ủa alo, **3 giây** đầu\nmà cũng lười nghĩ hả trời', xanhchin: '3 giây đầu **luôn quyết định**\nvideo sống hay chết', nhan: '3 giây đầu quyết định\n**90% lượt xem** của bạn' };
 async function runLayerAI(ask) {
   const L = selLayer(); if (!L) return;
-  if (!state.pro && !(state.trial > 0)) { openUpsell(state.acct ? 'Bạn đã dùng hết lượt thử. Nâng cấp Pro để AI chỉnh chữ không giới hạn.' : 'AI chỉnh chữ là tính năng Pro. Tạo tài khoản miễn phí để có 5 lượt dùng thử.'); return; }
+  if (!state.pro && !(state.trial > 0)) { openUpsell(state.acct ? 'Mua Pro hoặc đăng ký học viên để AI chỉnh chữ không giới hạn.' : 'AI chỉnh chữ là tính năng Pro. Tạo tài khoản miễn phí để có 5 lượt dùng thử.'); return; }
   const text = L.tpl ? $('#text').value : runsToMarkup(L.runs);
   if (!text.trim()) return toast('Chưa có chữ để AI chỉnh');
   const out = $('#layerAiOut'); out.className = 'status'; out.innerHTML = '<span class="spinner"></span>AI đang chỉnh...';
@@ -2324,7 +2350,7 @@ async function runLayerAI(ask) {
     let r;
     if (DEMO) { await new Promise(z => setTimeout(z, 800)); r = { ok: true, data: ask === 'style' ? { text, preset: 'Vàng viral', note: 'Bản demo: câu ngắn, có con số, hợp kiểu chữ vàng viền đen đọc nhanh nhất.' } : { text: DEMO_LAYER[ask] || text, preset: '', note: 'Bản demo: kết quả mẫu cố định.' } }; }
     else r = await callApi({ action: 'hook_ai', mode: 'layer', token: authToken(), text, ask, presets: STYLE_PRESETS.map(p => p.n) });
-    if (!r.ok) { out.className = 'status err'; out.textContent = ({ het_luot_thu: 'Hết 5 lượt Pro dùng thử. Nâng cấp Pro để dùng tiếp.', het_luot: 'Hết lượt AI hôm nay.', het_phien: 'Phiên đăng nhập hết hạn, đăng nhập lại nhé.', ban_qua: 'AI đang bận, thử lại sau một phút.', sai_key: 'Khóa AI trên máy chủ không hợp lệ. Báo mentor.' }[r.error] || 'AI chưa chỉnh được.') + (r.chi_tiet ? ' Mã lỗi: ' + r.chi_tiet : ''); return; }
+    if (!r.ok) { out.className = 'status err'; out.textContent = ({ het_luot_thu: 'Hết 5 lượt Pro dùng thử. Mua Pro hoặc đăng ký học viên để dùng tiếp.', het_luot: 'Hết lượt AI hôm nay.', het_phien: 'Phiên đăng nhập hết hạn, đăng nhập lại nhé.', ban_qua: 'AI đang bận, thử lại sau một phút.', sai_key: 'Khóa AI trên máy chủ không hợp lệ. Báo mentor.' }[r.error] || 'AI chưa chỉnh được.') + (r.chi_tiet ? ' Mã lỗi: ' + r.chi_tiet : ''); return; }
     const d = r.data || {};
     if (d.text === undefined && d.preset === undefined) { out.className = 'status err'; out.textContent = 'Máy chủ đang chạy HookAI.gs bản cũ nên chưa có AI chỉnh chữ. Mentor dán HookAI.gs mới vào Apps Script rồi Deploy, chọn New version là dùng được.'; if (r.con !== undefined) showQuota(r.con, r.han); return; }
     if (String(d.text || '').trim() === text.trim() && ask !== 'style') { out.className = 'status ok'; out.textContent = (d.note || '') + ' AI giữ nguyên câu vì thấy đã ổn.'; if (r.con !== undefined) showQuota(r.con, r.han); return; }
@@ -2383,10 +2409,10 @@ function setAcct(a) {
   const tx = $('#acctText'), bt = $('#acctBtn');
   if (plan === 'guest') { tx.textContent = ''; bt.textContent = 'Tài khoản'; }
   else { tx.textContent = (a.ten || '').trim().split(' ').slice(-1)[0] || 'bạn'; bt.textContent = plan === 'hv' ? (a.vaitro === 'pro' ? '✦ Pro' : 'Học viên · Pro') : plan === 'pro' ? '✦ Pro' : `Free · còn ${state.trial} lượt`; }
-  $('#btnUnlock').textContent = plan === 'guest' ? 'Dùng thử miễn phí' : 'Nâng cấp Pro';
+  $('#btnUnlock').textContent = plan === 'guest' ? 'Dùng thử miễn phí' : 'Mua Pro';
   $('#proHello').textContent = aiOk
     ? (plan === 'free' ? `AI chấm điểm, viết lại 5 bản, tự đặt bố cục. Mỗi lần phân tích dùng 1 lượt thử, còn ${state.trial}.` : 'AI xem ảnh và câu hook, trả về điểm, 5 bản viết lại, 3 bố cục và caption. Khoảng 15 đến 40 giây.')
-    : (plan === 'guest' ? 'Tạo tài khoản miễn phí để có 5 lượt dùng thử mọi tính năng Pro, kể cả AI.' : 'Bạn đã dùng hết 5 lượt thử. Nâng cấp Pro để dùng tiếp không giới hạn.');
+    : (plan === 'guest' ? 'Tạo tài khoản miễn phí để có 5 lượt dùng thử mọi tính năng Pro, kể cả AI.' : 'Bạn đã dùng hết 5 lượt thử. Mua Pro hoặc đăng ký học viên để dùng tiếp.');
   if (plan === 'free') $('#quota').textContent = `Còn ${state.trial}/${a.luot_thu || 5} lượt Pro dùng thử`;
   else if (plan === 'guest') $('#quota').textContent = '';
   document.querySelectorAll('.lock, [data-promo]').forEach(e => e.hidden = pro);
@@ -2436,7 +2462,7 @@ async function gateExport(kind) {
       else { toast(ACCT_ERR[r.error] || 'Chưa trừ được lượt, thử lại sau.'); return false; }
     } catch { toast('Không kết nối được máy chủ.'); return false; }
   }
-  openUpsell(`Bạn đã dùng hết lượt thử. Bản này có ${why.join(', ')} của gói Pro. Nâng cấp Pro để xuất sạch không giới hạn, hoặc bấm "Bỏ phần Pro" để xuất bản Free.`);
+  openUpsell(`Bản này có ${why.join(', ')} của gói Pro. Chọn một cách để xuất sạch, hoặc bấm "Bỏ phần Pro" để xuất bản Free.`);
   return false;
 }
 
@@ -2460,8 +2486,11 @@ function renderAcctSheet() {
   $('#meQuota').innerHTML = plan === 'hv' ? (a.vaitro === 'pro' ? 'Tài khoản Pro: dùng mọi tính năng Pro, AI 20 lượt mỗi ngày.' : 'Học viên Tự Mình Xây Kênh: dùng Pro không giới hạn, AI 20 lượt mỗi ngày.')
     : plan === 'pro' ? `Pro tới hết ngày <b>${fmtDate(a.pro_han)}</b>. AI 20 lượt mỗi ngày.`
     : `Còn <b>${a.luot_con}/${a.luot_thu || 5}</b> lượt dùng thử Pro. Mỗi lần AI phân tích hoặc xuất file có tính năng Pro dùng 1 lượt.`;
-  $('#goUpgrade').hidden = plan === 'hv';
-  $('#goUpgrade').querySelector('b').textContent = plan === 'pro' ? '✦ Gia hạn Pro' : '✦ Nâng cấp Pro';
+  $('#goUpgrade').hidden = plan === 'hv'; $('#goHv').hidden = plan === 'hv';
+  $('#goUpgrade').querySelector('b').firstChild.textContent = plan === 'pro' ? '✦ Gia hạn Pro ' : '✦ Mua Pro ';
+  $('#goUpgrade').classList.toggle('hot', plan === 'free' && !a.luot_con);
+  if (plan === 'free' && !a.luot_con) $('#meQuota').innerHTML = 'Bạn đã dùng hết <b>' + (a.luot_thu || 5) + ' lượt thử</b>. Mua Pro hoặc đăng ký học viên để dùng tiếp.';
+  loadPrice();
 }
 async function loadPlans() {
   const box = $('#planPick'); box.innerHTML = '<p class="hint"><span class="spinner"></span>Đang tải các gói...</p>'; $('#payBox').hidden = true; $('#payMsg').textContent = '';
@@ -2474,6 +2503,7 @@ async function loadPlans() {
       if (stCfgCache.goi.length > 1 && i === stCfgCache.goi.length - 1) b.append(el('span', 'plan-tag', 'Lợi nhất'));
       b.onclick = () => buyPlan(g, b); box.append(b);
     });
+    if (stCfgCache.goi.length === 1) buyPlan(stCfgCache.goi[0], box.firstChild);
   } catch (e) { box.innerHTML = ''; box.append(el('p', 'status err', ACCT_ERR[e && e.error] || 'Chưa tải được các gói, thử lại sau.')); }
 }
 async function buyPlan(g, btn) {
@@ -2513,7 +2543,7 @@ function bindAcctUI() {
       const r = await callApi({ action: 'st_signup', ...d, nguon: 'viral-studio' });
       busy(f, false);
       if (!r.ok) return fail(f, ACCT_ERR[r.error] || 'Chưa tạo được tài khoản, thử lại sau.');
-      ls.set(ND_KEY, JSON.stringify({ token: r.token })); f.reset(); setAcct(r.ho_so); acctView('home');
+      ls.set(ND_KEY, JSON.stringify({ token: r.token })); f.reset(); setAcct(r.ho_so); acctView(state.afterSignup || 'home'); state.afterSignup = null;
       toast(`Chào ${r.ho_so.ten}! Bạn có ${r.ho_so.luot_con} lượt dùng thử Pro.`);
     } catch { busy(f, false); fail(f, 'Không kết nối được máy chủ.'); }
   });
@@ -2560,34 +2590,9 @@ function bindAcctUI() {
     } catch { busy(f, false); fail(f, 'Không kết nối được máy chủ.'); }
   });
   $('#upMain').addEventListener('click', () => { $('#upsell').classList.remove('show'); openAcct(state.acct ? 'upgrade' : 'signup'); });
+  $('#upBuy').addEventListener('click', wantBuy);
   $('#upLogin').addEventListener('click', () => { $('#upsell').classList.remove('show'); openAcct('login'); });
 }
-
-/* ---------- chọn từ bằng cách chạm (điện thoại không phải bôi đen) ---------- */
-let chipA = null, chipRange = false, wpT = null;
-function runAt(runs, pos) { let acc = 0; for (const r of runs) { if (pos < acc + r.t.length) return r; acc += r.t.length; } return {}; }
-function wordsOf() { const L = selLayer(); if (!L) return { words: [], runs: [] }; const runs = L.tpl ? tplRuns() : L.runs; const txt = runsText(runs); return { runs, words: [...txt.matchAll(/\S+/g)].map(m => ({ s: m.index, e: m.index + m[0].length, w: m[0] })) }; }
-function buildWordPick() {
-  const box = $('#wordPick'); if (!box) return; box.innerHTML = '';
-  const L = selLayer(); if (!L) return;
-  const { runs, words } = wordsOf(); if (!edSel) { chipA = null; chipRange = false; }
-  const keyCol = L.tpl ? state.brand.accent : L.keyColor;
-  words.forEach((wd, i) => {
-    const r = runAt(runs, wd.s); const b = el('button', 'wchip', wd.w.replace(/[*_]/g, '')); b.type = 'button';
-    if (r.key) { b.style.background = keyCol; b.style.color = '#15171A'; }
-    if (r.c) b.style.color = r.c; if (r.b) b.style.fontWeight = '900'; if (r.i) b.style.fontStyle = 'italic';
-    if (edSel && edSel.e > edSel.s && wd.s >= edSel.s && wd.e <= edSel.e) b.classList.add('on');
-    b.addEventListener('pointerdown', ev => ev.preventDefault());
-    b.addEventListener('click', () => {
-      if (chipA === null || chipRange) { chipA = i; chipRange = false; edSel = { s: wd.s, e: wd.e }; }
-      else if (chipA === i) { chipA = null; edSel = null; }
-      else { const a = words[chipA]; edSel = { s: Math.min(a.s, wd.s), e: Math.max(a.e, wd.e) }; chipRange = true; }
-      buildWordPick();
-    });
-    box.append(b);
-  });
-}
-function buildWordPickSoon() { clearTimeout(wpT); wpT = setTimeout(buildWordPick, 250); }
 
 /* ---------- xuất từng lớp chữ thẳng ra ảnh, không nén ZIP ---------- */
 function slug(t) { return String(t).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[đĐ]/g, 'd').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 30) || 'chu'; }
@@ -2668,7 +2673,7 @@ async function saveAllLayers() {
   $('#btnAI').addEventListener('click', runAI);
   $('#btnTrial').addEventListener('click', runAI);
   $('#acctBtn').addEventListener('click', () => openAcct());
-  $('#btnUnlock').addEventListener('click', () => openAcct(state.acct ? 'upgrade' : 'signup'));
+  $('#btnUnlock').addEventListener('click', () => state.acct ? openUpsell() : openAcct('signup'));
   $('#btnPvSize').addEventListener('click', () => { document.body.classList.toggle('pv-big'); $('#btnPvSize').textContent = document.body.classList.contains('pv-big') ? '⤡' : '⤢'; setTimeout(drawSelection, 250); });
   $('#btnDemoAI').addEventListener('click', () => { showResult(DEMO_DATA, true); openSheet(true); });
   $('#btnAiShow').addEventListener('click', () => openSheet());
