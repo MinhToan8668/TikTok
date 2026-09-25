@@ -227,7 +227,7 @@ function stDaChuyen(b){
   var p = null; moiPay().forEach(function(x){ if (x.ma_ck === String(b.ma_ck||'') && x.ma_nd === nd.ma) p = x });
   if (!p) return jsonOut({ok:false, error:'khong_thay'});
   if (p.trangthai === 'da_nhan') return jsonOut({ok:true, da_mo:true});
-  ghiDong(ST_PAY_SHEET, ST_PAY_HEADERS, p, {nguon:'nguoi_dung_bao ' + nowVN()});
+  ghiDong(ST_PAY_SHEET, ST_PAY_HEADERS, p, {trangthai:'cho', nguon:'nguoi_dung_bao ' + nowVN()});   // báo lại sau khi admin bấm "chưa thấy" thì quay về chờ
   tgBroadcastKb(['💸 *Viral Studio: có người báo đã chuyển khoản*','',
     '👤 *'+nd.ten+'*','📧 `'+nd.email+'`','📱 `'+nd.sdt+'`',
     '📦 '+p.goi+' · *'+Number(p.so_tien).toLocaleString('vi-VN')+'đ*',
