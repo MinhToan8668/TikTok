@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Hook Text Studio · Tự Mình Xây Kênh</title>
+<title>Viral Studio · Hook text · Tự Mình Xây Kênh</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@1,700;1,800&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&display=swap" rel="stylesheet">
@@ -325,7 +325,6 @@
   @media (max-width:900px){
     .wrap{padding-block:10px 40px}
     header.top{margin-bottom:10px;gap:8px}
-    header.top .brand p{display:none}
     .brand .mark{width:32px;height:32px;font-size:15px}
     .brand h1{font-size:18px}
     .acct{font-size:12px}
@@ -337,7 +336,19 @@
     .main-col > .studio{order:2}
     #exportCard{order:3}
     .plans-wrap{order:4}
-    .phone{width:min(100%, calc(38vh * 9 / 16 + 12px));margin:0 auto;padding:6px;border-radius:18px}
+    .phone{width:min(100%, calc(34vh * 9 / 16 + 12px));margin:0 auto;padding:5px;border-radius:16px;transition:width .2s}
+    body.pv-big .phone{width:min(100%, calc(62vh * 9 / 16 + 12px))}
+    .pv-bar .pv-size{display:inline-flex}
+    .safe-status.good{display:none}
+    .feat-tabs{margin:0 0 10px}
+    .tmxk-logo{width:32px;height:32px}
+    .brand p{display:block!important;font-size:11px}
+    .ai-txt small{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .ai-bar{padding:10px 12px}
+    .ai-ic{width:32px;height:32px;font-size:15px}
+    .pv-bar{justify-content:center}
+    .pv-bar select{flex:0 1 auto;max-width:34%}
+    .img-btn span{display:none}
     .pv-bar{margin-top:6px}
     .pv-bar select,.pv-bar .chip,.tgl.sm span{padding:5px 9px;font-size:12px}
     header.top{flex-wrap:nowrap}
@@ -352,6 +363,20 @@
     .ai-act{width:100%}
     .ai-act .btn{flex:1;justify-content:center}
   }
+  .brand{text-decoration:none;color:inherit}
+  .tmxk-logo{width:38px;height:38px;flex:none}
+  .tmxk-logo .ink{fill:var(--text)}
+  .brand p{font-size:12px}
+  .feat-tabs{display:flex;gap:6px;margin:-6px 0 14px;overflow-x:auto;scrollbar-width:none}
+  .ft{flex:none;border-radius:999px;padding:6px 14px;font-size:13px;font-weight:700;text-decoration:none;border:1px solid var(--line);color:var(--muted);background:var(--surface)}
+  .ft.on{background:var(--text);color:var(--surface);border-color:var(--text)}
+  .ft.soon{border-style:dashed;font-weight:600}
+  .img-btn{position:relative;display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-weight:700}
+  .img-btn input{position:absolute;opacity:0;width:1px;height:1px}
+  .img-btn svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .img-btn:focus-within{outline:2px solid var(--accent)}
+  .pv-size{display:none}
+  .rowlbl .lock{position:static!important;display:inline-block;margin-left:4px;vertical-align:1px}
   code{background:var(--surface-2);border:1px solid var(--line);border-radius:5px;padding:1px 5px;font-size:12.5px}
   @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -359,18 +384,23 @@
 <body>
 <div class="wrap">
   <header class="top">
-    <div class="brand">
-      <div class="mark">Hk</div>
+    <a class="brand" href="../index.html" aria-label="Tự Mình Xây Kênh, về trang chủ">
+      <svg class="tmxk-logo" viewBox="0 0 64 64" aria-hidden="true"><g transform="rotate(-9 32 17)"><rect x="19" y="11" width="26" height="12" rx="3" fill="#99df00"/><path d="M30 14.4v5.2a1 1 0 0 0 1.52.86l4.6-2.6a1 1 0 0 0 0-1.72l-4.6-2.6A1 1 0 0 0 30 14.4z" fill="#26210f"/></g><rect class="ink" x="19" y="28" width="26" height="12" rx="3"/><rect class="ink" x="4" y="44" width="26" height="12" rx="3"/><rect class="ink" x="34" y="44" width="26" height="12" rx="3"/></svg>
       <div>
-        <h1>Hook Text Studio</h1>
-        <p>Đặt chữ hook lên video, chuẩn vùng an toàn TikTok, Reels, Shorts.</p>
+        <h1>Viral Studio</h1>
+        <p>by Tự Mình Xây Kênh</p>
       </div>
-    </div>
+    </a>
     <div class="row" style="gap:8px">
       <button class="theme-btn" id="themeBtn" type="button" aria-label="Đổi giao diện sáng hoặc tối" title="Đổi giao diện sáng / tối">◐</button>
       <div class="acct" id="acct"><span id="acctText">Bản <b>Free</b></span><button class="pill pro" id="acctBtn">Mở Pro</button></div>
     </div>
   </header>
+
+  <nav class="feat-tabs" aria-label="Công cụ trong Viral Studio">
+    <a class="ft on" href="#" aria-current="page">Hook text</a>
+    <span class="ft soon" title="Đang làm">Sắp có thêm</span>
+  </nav>
 
   <div class="grid">
     <div class="col main-col">
@@ -413,7 +443,7 @@
           <div class="tools" id="fmtBar" role="toolbar" aria-label="Định dạng phần chữ đang bôi đen">
             <button class="tb" type="button" data-f="key" title="Tô màu nhấn cho phần chữ đang bôi đen"><span class="kdot" id="fmtKeyDot"></span><small>Nhấn màu</small></button>
             <button class="tb" type="button" data-f="b" data-free title="In đậm (Pro)" aria-label="In đậm"><b>B</b></button>
-            <button class="tb" type="button" data-f="i" title="In nghiêng" aria-label="In nghiêng"><i style="font-family:Georgia,serif">I</i></button>
+            <button class="tb" type="button" data-f="i" title="In nghiêng (Pro)" aria-label="In nghiêng"><i style="font-family:Georgia,serif">I</i></button>
             <button class="tb" type="button" data-f="big" data-free title="Phóng to phần chữ chọn" aria-label="Phóng to chữ">A<sup>+</sup></button>
             <button class="tb" type="button" data-f="small" data-free title="Thu nhỏ phần chữ chọn" aria-label="Thu nhỏ chữ">A<sup>−</sup></button>
             <button class="tb" type="button" data-f="clear" title="Bỏ màu, đậm, nghiêng của phần chữ chọn"><small>Xoá kiểu</small></button>
@@ -437,8 +467,9 @@
               <div class="templates" id="templates"></div>
               <div id="tplExtra"></div>
               <div class="row face-row"><span class="rowlbl" style="margin:0">Mặt người trong ảnh ở:</span><div class="seg" id="facePos" role="group" aria-label="Vị trí mặt"><button type="button" data-v="top" aria-pressed="false">Trên</button><button type="button" data-v="mid" aria-pressed="true">Giữa</button><button type="button" data-v="low" aria-pressed="false">Dưới</button></div></div>
-              <div class="rowlbl" style="margin-top:12px">Kiểu chữ nhanh</div>
+              <div class="rowlbl" style="margin-top:12px">Kiểu chữ nhanh <span class="lock">PRO</span></div>
             </div>
+            <div class="pro-note" data-promo data-free><span>✦ Kiểu chữ nhanh là tính năng Pro. Chạm thử để xem trên khung, xuất file cần mở Pro.</span><button type="button" class="chip" data-upsell>Mở Pro</button></div>
             <div class="pst-grid" id="presetGrid"></div>
           </div>
 
@@ -574,7 +605,7 @@
             <h3>Free</h3>
             <div class="price">Ai cũng dùng được</div>
             <ul>
-              <li>5 bố cục cơ bản và 5 kiểu chữ nhanh</li>
+              <li>5 bố cục cơ bản</li>
               <li>Gõ chữ, nhấn màu từ khoá, thêm chữ, kéo thả trên khung</li>
               <li>Khung vùng an toàn TikTok, Reels, Shorts</li>
               <li>Xuất PNG kèm logo nhỏ</li>
@@ -586,8 +617,8 @@
             <ul>
               <li>Trợ lý AI: chấm điểm hook, 5 bản viết lại, tự đặt bố cục né mặt, caption</li>
               <li>AI chỉnh từng câu: mạnh hơn, gọn hơn, đổi giọng, nhấn từ khoá</li>
-              <li>Cả 14 bố cục, 19 font tiếng Việt, 12 kiểu chữ</li>
-              <li>Tuỳ biến sâu: màu từng chữ, viền, rực sáng, nền, bóng, xoay</li>
+              <li>Cả 14 bố cục, 19 font tiếng Việt, 12 kiểu chữ nhanh</li>
+              <li>Tuỳ biến sâu: màu từng chữ, đậm nghiêng, viền, rực sáng, nền, bóng</li>
               <li>Xuất sạch không logo, tách từng lớp chữ cho CapCut</li>
             </ul>
           </div>
@@ -598,15 +629,16 @@
     <aside class="col preview-col" id="previewCol">
       <div class="phone" id="drop">
         <canvas id="preview" width="1080" height="1920"></canvas><canvas id="uiLayer" width="1080" height="1920" aria-hidden="true"></canvas><canvas id="selLayer" width="1080" height="1920" aria-hidden="true"></canvas>
-        <label class="add-img" title="Thêm ảnh cap màn hình video của bạn"><input type="file" id="file" accept="image/*"><span aria-hidden="true">+</span><small>Ảnh</small></label>
         <span id="fileName" hidden></span>
       </div>
       <div class="pv-bar">
+        <label class="chip img-btn" title="Chọn ảnh cap màn hình video của bạn"><input type="file" id="file" accept="image/*"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="9" cy="10" r="1.8"/><path d="M5 17l5-5 3 3 2-2 4 4"/></svg><span>Đổi ảnh</span></label>
         <select id="platformSel" aria-label="Nền tảng để soi vùng an toàn">
           <option value="all">Cả 3 nền tảng</option><option value="tiktok">TikTok</option><option value="meta">IG / FB Reels</option><option value="metaads">Meta Ads</option><option value="shorts">Shorts</option>
         </select>
         <label class="tgl sm"><input type="checkbox" id="showUi" checked><span>Khung UI</span></label>
         <button class="chip" id="btnFit" type="button">Né UI</button>
+        <button class="chip pv-size" id="btnPvSize" type="button" aria-label="Phóng to khung xem" title="Phóng to hoặc thu nhỏ khung xem">⤢</button>
       </div>
       <div class="safe-status" id="safeStatus"></div>
       <div hidden><div class="strip" id="strip"></div><span id="metaSize"></span><span id="metaTpl"></span></div>
@@ -1453,7 +1485,8 @@ function proUsed() {
   const why = [];
   if (PRO_TPL.has(state.template)) why.push(`bố cục "${TEMPLATES[state.template].name}"`);
   if (tplActive() && state.tplStyle && (state.tplStyle.pro || !FREE_FONTS.has(state.tplStyle.font))) why.push('tuỳ biến câu hook');
-  if (state.layers.some(L => !L.hidden && (L.pro || !FREE_FONTS.has(L.font) || L.runs.some(r => r.c || r.b || (r.s && r.s !== 1))))) why.push('tuỳ biến lớp chữ');
+  if (state.layers.some(L => !L.hidden && (L.pro || !FREE_FONTS.has(L.font) || L.runs.some(r => r.c || r.b || r.i || (r.s && r.s !== 1))))) why.push('tuỳ biến lớp chữ');
+  if (tplActive() && /(^|[^*])_[^_]+_/.test($('#text').value)) why.push('chữ nghiêng');
   return why;
 }
 function gateExport() {
@@ -1480,9 +1513,10 @@ function dropPro() {
     let b = { ...TMXK }; try { const sb = ls.get('hook.brand'); if (sb) b = { ...TMXK, ...JSON.parse(sb) }; } catch {}
     state.brand = b; applyBrandInputs();
   }
-  for (const L of state.layers) if (L.pro || !FREE_FONTS.has(L.font) || L.runs.some(r => r.c || r.b || r.s)) {
-    applyPreset(L, STYLE_PRESETS[3]); L.runs = mergeRuns(L.runs.map(r => { const o = { ...r }; delete o.c; delete o.b; delete o.s; return o; }));
+  for (const L of state.layers) if (L.pro || !FREE_FONTS.has(L.font) || L.runs.some(r => r.c || r.b || r.i || r.s)) {
+    applyPreset(L, STYLE_PRESETS[0]); L.pro = false; L.runs = mergeRuns(L.runs.map(r => { const o = { ...r }; delete o.c; delete o.b; delete o.i; delete o.s; return o; }));
   }
+  if (/_[^_]+_/.test($('#text').value)) { $('#text').value = $('#text').value.replace(/(^|[^*])_([^_]+)_/g, '$1$2'); ls.set('hook.text', $('#text').value); }
   pushUndo(); syncLayerPanel(); scheduleRender(); toast('Đã bỏ phần Pro. Giờ xuất bản Free được rồi.');
 }
 async function exportPng() { if (!lastRender || !gateExport()) return; const b = await canvasBlob(withMark(lastRender.ov), 'image/png'); saveBlob(b, `hook-${state.template}-overlay.png`); }
@@ -1560,11 +1594,11 @@ async function ensureLayerFonts(layers) {
 }
 
 const STYLE_PRESETS = [
-  { n: 'TikTok cổ điển', p: { font: 'Be Vietnam Pro', weight: 900, italic: false, color: '#FFFFFF', fillOff: false, stroke: { on: true, color: '#000000', width: 10 }, shadow: { on: false }, bg: { on: false } } },
-  { n: 'Vàng viral', p: { font: 'Be Vietnam Pro', weight: 900, italic: false, color: '#FFE14D', keyColor: '#FFFFFF', fillOff: false, stroke: { on: true, color: '#000000', width: 10 }, shadow: { on: false }, bg: { on: false } } },
-  { n: 'Hộp đen', p: { font: 'Be Vietnam Pro', weight: 700, italic: false, color: '#FFFFFF', fillOff: false, stroke: { on: false }, shadow: { on: false }, bg: { on: true, mode: 'line', color: '#000000', alpha: .72, radius: 14, pad: 20 } } },
-  { n: 'Bóng mềm', p: { font: 'Be Vietnam Pro', weight: 800, italic: false, color: '#FFFFFF', fillOff: false, stroke: { on: false }, shadow: { on: true, color: '#000000', alpha: .7, blur: 18, x: 0, y: 8 }, bg: { on: false } } },
-  { n: 'Tiêu đề Anton', p: { font: 'Anton', weight: 400, italic: false, upper: true, color: '#FFFFFF', fillOff: false, stroke: { on: false }, shadow: { on: true, color: '#000000', alpha: .6, blur: 14, x: 0, y: 6 }, bg: { on: false }, spacing: 2 } },
+  { n: 'TikTok cổ điển', pro: true, p: { font: 'Be Vietnam Pro', weight: 900, italic: false, color: '#FFFFFF', fillOff: false, stroke: { on: true, color: '#000000', width: 10 }, shadow: { on: false }, bg: { on: false } } },
+  { n: 'Vàng viral', pro: true, p: { font: 'Be Vietnam Pro', weight: 900, italic: false, color: '#FFE14D', keyColor: '#FFFFFF', fillOff: false, stroke: { on: true, color: '#000000', width: 10 }, shadow: { on: false }, bg: { on: false } } },
+  { n: 'Hộp đen', pro: true, p: { font: 'Be Vietnam Pro', weight: 700, italic: false, color: '#FFFFFF', fillOff: false, stroke: { on: false }, shadow: { on: false }, bg: { on: true, mode: 'line', color: '#000000', alpha: .72, radius: 14, pad: 20 } } },
+  { n: 'Bóng mềm', pro: true, p: { font: 'Be Vietnam Pro', weight: 800, italic: false, color: '#FFFFFF', fillOff: false, stroke: { on: false }, shadow: { on: true, color: '#000000', alpha: .7, blur: 18, x: 0, y: 8 }, bg: { on: false } } },
+  { n: 'Tiêu đề Anton', pro: true, p: { font: 'Anton', weight: 400, italic: false, upper: true, color: '#FFFFFF', fillOff: false, stroke: { on: false }, shadow: { on: true, color: '#000000', alpha: .6, blur: 14, x: 0, y: 6 }, bg: { on: false }, spacing: 2 } },
   { n: 'Neon', pro: true, p: { font: 'Montserrat', weight: 900, italic: false, color: '#F4FFE6', keyColor: '#99DF00', fillOff: false, stroke: { on: false }, shadow: { on: false }, glow: { on: true, color: '#99DF00', alpha: .95, blur: 30 }, bg: { on: false } } },
   { n: 'Bóng 3D', pro: true, p: { font: 'Paytone One', weight: 400, italic: false, color: '#FFFFFF', fillOff: false, stroke: { on: true, color: '#26210F', width: 6 }, shadow: { on: true, color: '#99DF00', alpha: 1, blur: 0, x: 7, y: 7 }, bg: { on: false } } },
   { n: 'Sticker trắng', pro: true, p: { font: 'Baloo 2', weight: 800, italic: false, color: '#26210F', keyColor: '#E8452C', fillOff: false, stroke: { on: false }, shadow: { on: true, color: '#000000', alpha: .35, blur: 16, x: 0, y: 8 }, bg: { on: true, mode: 'block', color: '#FFFFFF', alpha: 1, radius: 26, pad: 26 }, rotate: -3 } },
@@ -1793,7 +1827,7 @@ let undoT = null; function pushUndoSoon() { clearTimeout(undoT); undoT = setTime
 
 /* ---------- thao tác lớp ---------- */
 function addLayer(text, over, preset) {
-  const L = newLayer(text, over); if (preset) { applyPreset(L, preset); Object.assign(L, over); }
+  const L = newLayer(text, over); if (preset) { applyPreset(L, preset); Object.assign(L, over); L.pro = false; }   // kiểu do nút thêm chữ tự chọn thì vẫn là Free
   state.layers.push(L); state.sel = L.id; pushUndo(); syncLayerPanel(); linkEditorFonts(); scheduleRender();
   const e = ed(); e.focus(); selectAllIn(e);
 }
@@ -1815,7 +1849,7 @@ function templateToLayers() {
   const blocks = blocksFromText($('#text').value); if (!blocks.length) return toast('Chưa có câu hook');
   let y = Math.max(.14, state.ypct / 100 + .04); const created = [];
   for (const b of blocks) {
-    const size = Math.max(40, Math.min(84, state.size)); const L = newLayer(b, { y }); applyPreset(L, STYLE_PRESETS[3]); L.size = size;
+    const size = Math.max(40, Math.min(84, state.size)); const L = newLayer(b, { y }); applyPreset(L, STYLE_PRESETS[3]); L.pro = false; L.size = size;
     state.layers.push(L); created.push(L); y += (b.split('\n').length * size * 1.25 + 40) / 1920;
   }
   state.sel = created[0].id; selectTemplate('blank', false); pushUndo(); syncLayerPanel(); linkEditorFonts(); scheduleRender();
@@ -1910,7 +1944,7 @@ function fmt(kind, val) {
   let runs = L.tpl ? tplRuns() : L.runs; const len = runsText(runs).length;
   let s = Math.min(edSel ? edSel.s : 0, len), e = Math.min(edSel ? edSel.e : 0, len);
   const whole = s === e;
-  if (['b', 'big', 'small', 'c'].includes(kind)) markPro(L);
+  if (['b', 'big', 'small', 'c', 'i'].includes(kind)) markPro(L);
   if (whole) {
     if (!L.tpl && kind === 'c') { L.color = val; L.runs = L.runs.map(r => { const o = { ...r }; delete o.c; return o; }); pushUndoSoon(); renderEditor(); markRows(); scheduleRender(); return; }
     if (L.tpl && kind !== 'clear') { toast('Bôi đen phần chữ muốn đổi trước đã'); return; }
@@ -2154,6 +2188,8 @@ async function runLayerAI(ask) {
     else r = await callApi({ action: 'hook_ai', mode: 'layer', token: hvToken(), text, ask, presets: STYLE_PRESETS.map(p => p.n) });
     if (!r.ok) { out.className = 'status err'; out.textContent = ({ het_luot: 'Hết lượt AI hôm nay.', het_phien: 'Phiên đăng nhập hết hạn, đăng nhập lại nhé.', ban_qua: 'AI đang bận, thử lại sau một phút.', sai_key: 'Khóa AI trên máy chủ không hợp lệ. Báo mentor.' }[r.error] || 'AI chưa chỉnh được.') + (r.chi_tiet ? ' Mã lỗi: ' + r.chi_tiet : ''); return; }
     const d = r.data || {};
+    if (d.text === undefined && d.preset === undefined) { out.className = 'status err'; out.textContent = 'Máy chủ đang chạy HookAI.gs bản cũ nên chưa có AI chỉnh chữ. Mentor dán HookAI.gs mới vào Apps Script rồi Deploy, chọn New version là dùng được.'; if (r.con !== undefined) showQuota(r.con, r.han); return; }
+    if (String(d.text || '').trim() === text.trim() && ask !== 'style') { out.className = 'status ok'; out.textContent = (d.note || '') + ' AI giữ nguyên câu vì thấy đã ổn.'; if (r.con !== undefined) showQuota(r.con, r.han); return; }
     if (d.text && ask !== 'style') { if (L.tpl) { $('#text').value = String(d.text); ls.set('hook.text', $('#text').value); } else L.runs = markupToRuns(String(d.text)); }
     const P = STYLE_PRESETS.find(p => p.n === d.preset); if (P && ask === 'style') { if (L.tpl) applyPresetTpl(P); else applyPreset(L, P); }
     if (!L.tpl) pushUndo();
@@ -2274,6 +2310,7 @@ async function exportLayersZip() {
   $('#btnAI').addEventListener('click', runAI);
   $('#acctBtn').addEventListener('click', () => state.pro ? $('#proPanel').scrollIntoView({ behavior: 'smooth', block: 'start' }) : openUpsell());
   $('#btnUnlock').addEventListener('click', () => openUpsell());
+  $('#btnPvSize').addEventListener('click', () => { document.body.classList.toggle('pv-big'); $('#btnPvSize').textContent = document.body.classList.contains('pv-big') ? '⤡' : '⤢'; setTimeout(drawSelection, 250); });
   $('#btnDemoAI').addEventListener('click', () => { showResult(DEMO_DATA, true); openSheet(true); });
   $('#btnAiShow').addEventListener('click', () => openSheet());
   $('#aiSheetClose').addEventListener('click', closeSheet);
