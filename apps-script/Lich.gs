@@ -328,6 +328,10 @@ function lichApi(body){
   try{
     if (act === 'hv_signup')  return apiDangKy(body);
     if (act === 'hv_login')   return apiDangNhap(body);
+    // Tài khoản Pro (mua Viral Studio, không học khoá) chỉ dùng được tool,
+    // không đặt lịch kèm — chặn ở đây cho khỏi lọt vào từng hàm bên dưới
+    var ai = aiDay(body.token);
+    if (ai && ai.vaitro === 'pro') return jsonOut({ok:false, error:'chi_pro'});
     if (act === 'hv_slots')   return apiXemLich(body);
     if (act === 'hv_book')    return apiDatLich(body);
     if (act === 'hv_cancel')  return apiHuyLich(body);
@@ -407,7 +411,7 @@ function apiDangNhap(b){
   cache.remove(khoa);
 
   // đã đúng mật khẩu nhưng Toàn chưa phân vai
-  if (hv.vaitro !== 'hv' && hv.vaitro !== 'mentor')
+  if (hv.vaitro !== 'hv' && hv.vaitro !== 'mentor' && hv.vaitro !== 'pro')
     return jsonOut({ok:false, error:'cho_duyet'});
 
   // Token mang sẵn mã tài khoản ở đầu: "A7K3M.<40 ký tự ngẫu nhiên>".
@@ -432,7 +436,7 @@ function aiDay(token, dsHV){
 
   function dungPhien(r){
     if (!r.token || r.trangthai === 'off') return false;
-    if (r.vaitro !== 'hv' && r.vaitro !== 'mentor') return false;
+    if (r.vaitro !== 'hv' && r.vaitro !== 'mentor' && r.vaitro !== 'pro') return false;
     if (r.token_han && new Date(r.token_han) < new Date()) return false;
     return true;
   }
@@ -1060,9 +1064,10 @@ function dsTaiKhoan(chatId){
   if (!ds.length) return tgSend(chatId,
     'Chưa ai đăng ký tài khoản.\n_Mọi người tự đăng ký ở khu học viên trên web._');
 
-  var cho = ds.filter(function(r){ return r.vaitro!=='hv' && r.vaitro!=='mentor' });
+  var cho = ds.filter(function(r){ return r.vaitro!=='hv' && r.vaitro!=='mentor' && r.vaitro!=='pro' });
   var men = ds.filter(function(r){ return r.vaitro==='mentor' });
   var hvs = ds.filter(function(r){ return r.vaitro==='hv' });
+  var pro = ds.filter(function(r){ return r.vaitro==='pro' });
 
   var dong = ['👥 *'+ds.length+' tài khoản*'];
   function khoi(tieude, list, icon){
@@ -1077,8 +1082,9 @@ function dsTaiKhoan(chatId){
   khoi('Đang chờ phân vai', cho, '⏳');
   khoi('Mentor', men, '🧑‍🏫');
   khoi('Học viên', hvs, '🎓');
+  khoi('Viral Studio Pro (mua lẻ)', pro, '✦');
 
-  dong.push('', '_Đổi vai: /vaitro mail hv · /vaitro mail mentor_');
+  dong.push('', '_Đổi vai: /vaitro mail hv · mentor · pro_');
   dong.push('_Xoá: /xoatk mail  ·  Cấp lại mật khẩu: /doimk mail_');
 
   // nút phân vai nhanh cho tối đa 4 người đang chờ
@@ -1093,8 +1099,9 @@ function dsTaiKhoan(chatId){
 /* ── đổi vai trò bằng lệnh ── */
 function doiVaiTro(chatId, arg){
   if (!arg){ datCho(chatId,'vaitro');
-    return tgSend(chatId,'Nhắn vào tin tiếp theo: `email hv` hoặc `email mentor`\n'+
-      'VD: `an@gmail.com mentor`  ·  Gõ /dstk để xem danh sách.'); }
+    return tgSend(chatId,'Nhắn vào tin tiếp theo: `email hv`, `email mentor` hoặc `email pro`\n'+
+      'VD: `an@gmail.com mentor`  ·  `pro` = người mua Viral Studio Pro, không học khoá\n'+
+      'Gõ /dstk để xem danh sách.'); }
 
   var p = String(arg).trim().split(/\s+/);
   var hv = hvTheoEmail(p[0]);
@@ -1102,15 +1109,18 @@ function doiVaiTro(chatId, arg){
 
   var v = String(p[1]||'').toLowerCase();
   var vai = /^(mentor|m|gv)$/.test(v) ? 'mentor'
-          : /^(hv|h|hocvien|học viên)$/.test(v) ? 'hv' : '';
-  if (!vai) return tgSend(chatId,'Vai trò phải là `hv` hoặc `mentor`.\nVD: `/vaitro '+hv.email+' mentor`');
+          : /^(hv|h|hocvien|học viên)$/.test(v) ? 'hv'
+          : /^(pro|p|vip)$/.test(v) ? 'pro' : '';
+  if (!vai) return tgSend(chatId,'Vai trò phải là `hv`, `mentor` hoặc `pro`.\nVD: `/vaitro '+hv.email+' mentor`');
 
   ghiO(SHEET_HV, HV_HEADERS, hv.row, 'vaitro', vai);
   ghiO(SHEET_HV, HV_HEADERS, hv.row, 'trangthai', 'active');
   ghiO(SHEET_HV, HV_HEADERS, hv.row, 'token', '');   // đá phiên cũ để nạp lại đúng giao diện
 
-  return tgSend(chatId,'✅ *'+hv.ten+'* giờ là *'+(vai==='mentor'?'mentor':'học viên')+'*.\n'+
-    '_Họ cần đăng nhập lại để thấy đúng giao diện._');
+  var tenVai = {mentor:'mentor', hv:'học viên', pro:'tài khoản Viral Studio Pro'}[vai];
+  return tgSend(chatId,'✅ *'+hv.ten+'* giờ là *'+tenVai+'*.\n'+
+    (vai==='pro' ? '_Họ đăng nhập lại ở khu học viên là Viral Studio mở Pro (không đặt được lịch kèm)._'
+                 : '_Họ cần đăng nhập lại để thấy đúng giao diện._'));
 }
 
 /* ── xoá tài khoản ── */

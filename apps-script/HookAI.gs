@@ -3,7 +3,8 @@
  *
  * Luồng:
  *   trang tool  ──POST {action:'hook_ai', token, text, image, ...}──▶  Apps Script (file này)
- *     1. aiDay(token)            → phải là học viên hoặc mentor đang đăng nhập (Lich.gs)
+ *     1. aiDay(token)            → học viên / mentor / tài khoản Pro đang đăng nhập (Lich.gs)
+ *        không có token          → khách thử: 3 lượt trọn đời theo mã thiết bị (b.thu)
  *     2. trừ lượt trong ngày     → HOOK_AI_DAILY lượt / người / ngày (mentor không giới hạn)
  *     3. gọi Claude              → key nằm trong Script Properties, trình duyệt không bao giờ thấy
  *     4. ghi log vào tab HookAI  → biết ai dùng, dùng bao nhiêu, tốn bao nhiêu token
@@ -29,6 +30,8 @@ var GEMINI_KEY_MAC_DINH = '';
 var HOOK_AI_PROVIDER_MAC_DINH = 'gemini';
 var HOOK_AI_MODEL_MAC_DINH = '';          // để trống: tự dò model key này dùng được
 var HOOK_AI_DAILY_MAC_DINH = '20';
+var HOOK_THU_HAN   = 3;           // người lạ chưa có tài khoản: thử 3 lượt AI trọn đời theo thiết bị
+var HOOK_THU_SHEET = 'HookThu';   // tab ghi lượt thử: thiết bị · số lượt · lần đầu · lần cuối
 
 function hookCfg(name){
   var v = cfgProp(name);
@@ -50,37 +53,96 @@ var HOOK_TEMPLATES = ['highlight','editorial','glass','sticker','bubbles','timel
 
 function hookAi(b){
   var me = aiDay(b.token);
-  if (!me) return jsonOut({ok:false, error:'het_phien'});
+  var khach = false;                    // người lạ đang dùng lượt thử
+  if (!me){
+    me = hookKhach(b);
+    if (!me) return jsonOut({ok:false, error:'het_phien'});
+    khach = true;
+  }
 
   var provider = (hookCfg('HOOK_AI_PROVIDER') || 'gemini').toLowerCase();
   var key = provider === 'claude' ? cfgProp('ANTHROPIC_API_KEY') : hookCfg('GEMINI_API_KEY');
   if (!key) return jsonOut({ok:false, error:'chua_cai_key'});
 
-  if (b.mode === 'layer') return hookLayer(b, me, provider, key);
+  if (b.mode === 'layer'){
+    if (khach) return jsonOut({ok:false, error:'can_pro'});   // chỉnh từng lớp là của Pro
+    return hookLayer(b, me, provider, key);
+  }
 
   var text = String(b.text || '').slice(0, 1500).trim();
   if (!text) return jsonOut({ok:false, error:'thieu_text'});
   var img = String(b.image || '');
   if (img.length > 1500000) return jsonOut({ok:false, error:'anh_qua_lon'});
 
-  // ── lượt trong ngày ──
-  var han = parseInt(hookCfg('HOOK_AI_DAILY') || '20', 10) || 20;
-  var khongGioiHan = me.vaitro === 'mentor';
-  var con = hookTruLuot(me.ma, han, khongGioiHan);
-  if (con < 0) return jsonOut({ok:false, error:'het_luot', han:han});
+  // ── lượt: khách thử 3 lượt trọn đời · học viên/Pro theo ngày · mentor không giới hạn ──
+  var han, con, khongGioiHan = false;
+  if (khach){
+    han = HOOK_THU_HAN;
+    con = hookThuTru(me.ma);
+    if (con < 0) return jsonOut({ok:false, error:'het_thu', han:han});
+  } else {
+    han = parseInt(hookCfg('HOOK_AI_DAILY') || '20', 10) || 20;
+    khongGioiHan = me.vaitro === 'mentor';
+    con = hookTruLuot(me.ma, han, khongGioiHan);
+    if (con < 0) return jsonOut({ok:false, error:'het_luot', han:han});
+  }
 
   // ── gọi AI ──
   var prompt = hookPrompt(text, b, !!img);
   var kq = provider === 'claude' ? goiClaude(key, img, prompt) : goiGemini(key, img, prompt);
   if (!kq.ok){
-    hookHoanLuot(me.ma, khongGioiHan);
+    if (khach) hookThuHoan(me.ma); else hookHoanLuot(me.ma, khongGioiHan);
     hookLog(me, text, false, kq.loi, kq.vin || 0, kq.vout || 0, kq.model);
     return jsonOut({ok:false, error: kq.error, chi_tiet: String(kq.loi || '').slice(0, me.vaitro === 'mentor' ? 400 : 160)});
   }
   var data = kq.data;
 
   hookLog(me, text, true, '', kq.vin || 0, kq.vout || 0, kq.model);
-  return jsonOut({ok:true, data:data, con: khongGioiHan ? null : con, han:han, ten: me.ten_goi || me.ten});
+  return jsonOut({ok:true, data:data, con: khongGioiHan ? null : con, han:han, ten: me.ten_goi || me.ten, thu: khach || undefined});
+}
+
+/* ── khách thử: nhận diện bằng mã thiết bị trang tool tự sinh (b.thu) ──
+   Không có tài khoản nên chỉ có mã này để đếm. Xoá dữ liệu trình duyệt là
+   có mã mới — chấp nhận, vì 3 lượt AI chỉ là mồi để người ta thấy Pro làm gì. */
+function hookKhach(b){
+  var dev = String(b.thu || '').replace(/[^A-Za-z0-9_-]/g,'').slice(0, 64);
+  if (dev.length < 8) return null;
+  return {ma:'thu:' + dev, ten:'Khách thử', ten_goi:'Khách thử', vaitro:'thu'};
+}
+function hookThuSheet(){
+  var sh = ss().getSheetByName(HOOK_THU_SHEET);
+  if (!sh){ sh = ss().insertSheet(HOOK_THU_SHEET); sh.appendRow(['thiet_bi','so_luot','lan_dau','lan_cuoi']); sh.setFrozenRows(1); }
+  return sh;
+}
+function hookThuTim(sh, ma){
+  var last = sh.getLastRow();
+  if (last < 2) return null;
+  var vals = sh.getRange(2, 1, last - 1, 2).getValues();
+  for (var i = 0; i < vals.length; i++)
+    if (String(vals[i][0]) === ma) return {row: i + 2, dem: Number(vals[i][1]) || 0};
+  return null;
+}
+function hookThuDem(ma){
+  var r = hookThuTim(hookThuSheet(), ma);
+  return r ? r.dem : 0;
+}
+/** Trừ một lượt thử; trả về số lượt còn lại, -1 nếu đã hết. */
+function hookThuTru(ma){
+  var lock = LockService.getScriptLock(); lock.waitLock(10000);
+  try{
+    var sh = hookThuSheet(), r = hookThuTim(sh, ma), luc = nowVN();
+    if (!r){ sh.appendRow([ma, 1, luc, luc]); return HOOK_THU_HAN - 1; }
+    if (r.dem >= HOOK_THU_HAN) return -1;
+    sh.getRange(r.row, 2, 1, 3).setValues([[r.dem + 1, sh.getRange(r.row, 3).getValue(), luc]]);
+    return HOOK_THU_HAN - r.dem - 1;
+  } finally { lock.releaseLock(); }
+}
+function hookThuHoan(ma){
+  var lock = LockService.getScriptLock(); lock.waitLock(10000);
+  try{
+    var sh = hookThuSheet(), r = hookThuTim(sh, ma);
+    if (r && r.dem > 0) sh.getRange(r.row, 2).setValue(r.dem - 1);
+  } finally { lock.releaseLock(); }
 }
 
 /* ── Gemini: bậc miễn phí, dữ liệu có thể được Google dùng để cải thiện sản phẩm ──
@@ -273,7 +335,12 @@ function hookLayer(b, me, provider, key){
 /* Xem còn bao nhiêu lượt mà không trừ — trang tool gọi lúc mở để hiện "còn N lượt" */
 function hookTrangThai(b){
   var me = aiDay(b.token);
-  if (!me) return jsonOut({ok:false, error:'het_phien'});
+  if (!me){
+    // chưa đăng nhập → báo còn mấy lượt thử cho thiết bị này
+    var k = hookKhach(b);
+    if (!k) return jsonOut({ok:false, error:'het_phien'});
+    return jsonOut({ok:true, thu:true, ten:'', con: Math.max(0, HOOK_THU_HAN - hookThuDem(k.ma)), han: HOOK_THU_HAN});
+  }
   var han = parseInt(hookCfg('HOOK_AI_DAILY') || '20', 10) || 20;
   if (me.vaitro === 'mentor') return jsonOut({ok:true, ten: me.ten_goi || me.ten, con:null, han:han});
   var dem = hookDemHomNay()[me.ma] || 0;
