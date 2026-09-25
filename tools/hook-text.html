@@ -182,7 +182,8 @@
   .phone canvas#selLayer{position:absolute;inset:8px;width:calc(100% - 16px);height:calc(100% - 16px);pointer-events:none;border-radius:16px;background:transparent}
   .studio{--st-bg:var(--surface);--st-panel:var(--surface-2);--st-tile:var(--line);--st-line:var(--line);--st-text:var(--text);--st-muted:var(--muted);padding:14px 14px 16px}
   .studio [hidden]{display:none!important}
-  .studio .templates{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}
+  .studio .templates{display:grid;grid-auto-flow:column;grid-auto-columns:128px;grid-template-columns:none;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin}
+  .studio .templates .tpl small{display:none}
   .theme-btn{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--surface-2);color:var(--text);font-size:18px;cursor:pointer}
   .layers-out{margin-top:12px;border-top:1px dashed var(--line);padding-top:12px}
   .studio h2{color:var(--st-text);margin:0}
@@ -316,7 +317,7 @@
             <button class="st-ic" id="btnRedo" title="Làm lại (Ctrl+Shift+Z)" aria-label="Làm lại">↷</button>
           </div>
         </div>
-        <p class="st-hint">Chạm chữ trên khung preview để chọn, kéo để dời. Muốn tô màu vài chữ: bôi đen chữ đó rồi chạm màu.</p>
+        <p class="st-hint">Chạm chữ trên khung preview để chọn, kéo để dời, chấm xanh để phóng to, chấm trắng để xoay. Bôi đen vài chữ rồi chạm màu để tô riêng.</p>
         <div class="st-layers">
           <div id="layerList" style="display:contents"></div>
           <button class="addchip main" id="btnAddText" type="button">+ Thêm chữ</button>
@@ -325,6 +326,10 @@
         </div>
         <textarea id="text" hidden aria-hidden="true">3 giây đầu quyết định
 **90% lượt xem** của bạn</textarea>
+        <div hidden aria-hidden="true">
+          <input type="color" id="cAccent" value="#99DF00"><input type="color" id="cDark" value="#26210F"><input type="color" id="cLight" value="#FFFFFF"><input type="color" id="cCream" value="#F9E8DD">
+          <div id="presets"></div><button id="btnResetBrand" type="button"></button>
+        </div>
         <div class="st-empty" id="layerEmpty">Chưa chọn chữ nào. Chạm vào chữ trên khung preview, hoặc bấm "+ Thêm chữ".</div>
         <div id="layerProps" hidden>
           <div id="lText" contenteditable="true" spellcheck="false" role="textbox" aria-multiline="true" aria-label="Nội dung chữ"></div>
@@ -336,55 +341,36 @@
             <button class="tb" type="button" data-f="small" data-free title="Thu nhỏ phần chữ chọn" aria-label="Thu nhỏ chữ">A<sup>−</sup></button>
             <button class="tb" type="button" data-f="clear" title="Bỏ màu, đậm, nghiêng của phần chữ chọn"><small>Xoá kiểu</small></button>
             <span class="sp"></span>
+            <button class="tb" type="button" id="btnSplit" data-tplonly title="Tách câu hook thành các lớp chữ tự do" aria-label="Tách thành chữ tự do"><small>Tách lớp</small></button>
             <button class="tb" type="button" id="btnDlLayer" title="Tải riêng lớp này (PNG nền trong suốt)" aria-label="Tải riêng lớp này">⤓</button>
             <button class="tb" type="button" id="btnDupSel" data-free title="Nhân bản lớp" aria-label="Nhân bản lớp">⧉</button>
             <button class="tb danger" type="button" id="btnDelSel" title="Xoá lớp" aria-label="Xoá lớp">🗑</button>
           </div>
-          <div class="tpl-note" data-tplonly hidden><span id="tplOn">Câu hook đang trình bày theo mẫu <b id="tplName"></b>. Bôi đen chữ rồi chạm <b>Nhấn màu</b> hoặc <b>I</b>. Kéo trên khung để dời lên xuống, kéo chấm xanh để phóng to. Đổi bố cục ở tab <b>Mẫu</b>, vị trí và phủ tối ở tab <b>Tinh chỉnh</b>.</span><span id="tplOff" hidden>Câu hook này chưa dùng mẫu nào nên không hiện trên video. Chọn một bố cục ở tab <b>Mẫu</b> bên dưới.</span><br><button class="addchip main" id="btnSplit" type="button">Chỉnh tự do từng chữ (font, màu, viền, bóng)</button></div>
           <div class="tabs" id="edTabs" role="tablist">
             <button type="button" data-t="style" aria-selected="true">Mẫu</button>
-            <button type="button" data-t="font" data-free aria-selected="false">Phông chữ</button>
-            <button type="button" data-t="look" data-free aria-selected="false">Phong cách</button>
-            <button type="button" data-t="pos" data-free aria-selected="false">Vị trí</button>
-            <button type="button" data-t="tune" data-tplonly aria-selected="false">Tinh chỉnh</button>
-            <button type="button" data-t="brand" aria-selected="false">Màu kênh</button>
+            <button type="button" data-t="font" aria-selected="false">Phông chữ</button>
+            <button type="button" data-t="look" aria-selected="false">Phong cách</button>
+            <button type="button" data-t="pos" aria-selected="false">Vị trí</button>
             <button type="button" data-t="ai" aria-selected="false">AI ✦</button>
           </div>
+
           <div class="pane" data-t="style">
-            <div class="pst-grid" id="presetGrid" data-free></div>
-            <div class="templates" id="templates" data-tplonly hidden></div>
+            <div data-tplonly>
+              <div class="rowlbl">Bố cục</div>
+              <div class="templates" id="templates"></div>
+              <div id="tplExtra"></div>
+              <div class="rowlbl" style="margin-top:12px">Kiểu chữ nhanh</div>
+            </div>
+            <div class="pst-grid" id="presetGrid"></div>
           </div>
-          <div class="pane" data-t="tune" hidden>
-            <div id="tplExtra" style="margin-bottom:6px"></div>
-        <div class="slider"><span>Vị trí dọc</span><input type="range" id="ypct" min="3" max="80" value="13"><output id="ypctOut">13%</output></div>
-        <div class="slider"><span>Cỡ chữ</span><input type="range" id="size" min="30" max="110" value="66"><output id="sizeOut">66px</output></div>
-        <div class="slider"><span>Bề rộng tối đa</span><input type="range" id="maxw" min="60" max="96" value="80"><output id="maxwOut">80%</output></div>
-        <div class="row" style="margin-top:6px">
-          <span class="hint" style="margin:0">Căn:</span>
-          <div class="seg" id="align" role="group" aria-label="Căn lề"><button data-v="center" aria-pressed="true">Giữa</button><button data-v="left" aria-pressed="false">Trái</button></div>
-          <span class="hint" style="margin:0 0 0 8px">Phủ tối:</span>
-          <div class="seg" id="dim" role="group" aria-label="Phủ tối"><button data-v="auto" aria-pressed="true">Tự động</button><button data-v="off" aria-pressed="false">Tắt</button></div>
-        </div>
-          </div>
-          <div class="pane" data-t="brand" hidden>
-        <p class="hint">Mặc định là màu Tự Mình Xây Kênh. Đổi theo kênh riêng của bạn, bấm Lưu để lần sau tự nhớ.</p>
-        <div class="swatches">
-          <label class="sw">Màu nhấn<input type="color" id="cAccent" value="#99DF00"></label>
-          <label class="sw">Màu tối<input type="color" id="cDark" value="#26210F"></label>
-          <label class="sw">Chữ sáng<input type="color" id="cLight" value="#FFFFFF"></label>
-          <label class="sw">Chữ kem<input type="color" id="cCream" value="#F9E8DD"></label>
-        </div>
-        <div class="presets" id="presets"></div>
-        <div class="row" style="margin-top:10px">
-          <button class="btn sm" id="btnSaveBrand">Lưu làm màu kênh của tôi</button>
-          <button class="btn sm" id="btnResetBrand">Về màu TMXK</button>
-        </div>
-          </div>
+
           <div class="pane" data-t="font" hidden>
             <div class="font-grid" id="fontGrid"></div>
-            <div class="chips" id="weightRow"></div>
-            <div class="slider"><span>Cỡ</span><input type="range" data-p="size" data-unit="px" min="14" max="260"><output></output></div>
+            <div class="chips" id="weightRow" data-free></div>
+            <div class="slider" data-free><span>Cỡ</span><input type="range" data-p="size" data-unit="px" min="14" max="260"><output></output></div>
+            <div class="slider" data-tplonly><span>Cỡ</span><input type="range" id="size" min="30" max="110" value="66"><output id="sizeOut">66px</output></div>
           </div>
+
           <div class="pane" data-t="look" hidden>
             <div class="tabs sub" id="styleSub" role="tablist">
               <button type="button" data-s="text" aria-selected="true">Văn bản</button>
@@ -395,16 +381,21 @@
             </div>
             <div class="subpane" data-s="text">
               <div class="dots" id="rowText"></div>
-              <div class="rowlbl">Màu của chữ được nhấn</div>
+              <div class="rowlbl">Màu chữ được nhấn</div>
               <div class="dots" id="rowKey"></div>
+              <div data-tplonly>
+                <div class="rowlbl">Màu khối, thẻ của mẫu</div>
+                <div class="dots" id="rowBox"></div>
+              </div>
               <div class="chips">
                 <label class="tgl"><input type="checkbox" data-p="upper"><span>VIẾT HOA</span></label>
-                <label class="tgl"><input type="checkbox" data-p="italic"><span><i>Nghiêng cả lớp</i></span></label>
-                <label class="tgl"><input type="checkbox" data-p="fillOff"><span>Chữ rỗng</span></label>
+                <label class="tgl" data-free><input type="checkbox" data-p="italic"><span><i>Nghiêng cả lớp</i></span></label>
+                <label class="tgl" data-free><input type="checkbox" data-p="fillOff"><span>Chữ rỗng</span></label>
+                <button class="chip" type="button" id="btnSaveBrand" data-tplonly>Lưu làm màu kênh của tôi</button>
               </div>
               <div class="slider"><span>Độ mờ</span><input type="range" data-p="opacity" data-scale="100" data-unit="%" min="10" max="100"><output></output></div>
-              <div class="slider"><span>Giãn chữ</span><input type="range" data-p="spacing" min="-4" max="30"><output></output></div>
-              <div class="slider"><span>Giãn dòng</span><input type="range" data-p="lineH" data-scale="100" data-unit="%" min="80" max="200"><output></output></div>
+              <div class="slider" data-free><span>Giãn chữ</span><input type="range" data-p="spacing" min="-4" max="30"><output></output></div>
+              <div class="slider" data-free><span>Giãn dòng</span><input type="range" data-p="lineH" data-scale="100" data-unit="%" min="80" max="200"><output></output></div>
             </div>
             <div class="subpane" data-s="stroke" hidden>
               <div class="dots" id="rowStroke"></div>
@@ -417,10 +408,11 @@
             </div>
             <div class="subpane" data-s="bg" hidden>
               <div class="dots" id="rowBg"></div>
-              <div class="seg" id="bgMode" role="group" aria-label="Kiểu nền" style="margin:4px 0"><button type="button" data-v="line">Hộp từng dòng</button><button type="button" data-v="block">Một khối</button></div>
+              <div class="seg" id="bgMode" data-free role="group" aria-label="Kiểu nền" style="margin:4px 0"><button type="button" data-v="line">Hộp từng dòng</button><button type="button" data-v="block">Một khối</button></div>
               <div class="slider"><span>Độ đậm</span><input type="range" data-p="bg.alpha" data-scale="100" data-unit="%" min="0" max="100"><output></output></div>
               <div class="slider"><span>Bo góc</span><input type="range" data-p="bg.radius" min="0" max="60"><output></output></div>
-              <div class="slider"><span>Đệm</span><input type="range" data-p="bg.pad" min="0" max="60"><output></output></div>
+              <div class="slider"><span>Đệm</span><input type="range" data-p="bg.pad" min="0" max="80"><output></output></div>
+              <div class="row" data-tplonly style="margin-top:6px"><span class="rowlbl" style="margin:0">Phủ tối nền video:</span><div class="seg" id="dim" role="group" aria-label="Phủ tối"><button type="button" data-v="auto" aria-pressed="true">Tự động</button><button type="button" data-v="off" aria-pressed="false">Tắt</button></div></div>
             </div>
             <div class="subpane" data-s="shadow" hidden>
               <div class="dots" id="rowShadow"></div>
@@ -430,19 +422,25 @@
               <div class="slider"><span>Lệch dọc</span><input type="range" data-p="shadow.y" min="-40" max="40"><output></output></div>
             </div>
           </div>
+
           <div class="pane" data-t="pos" hidden>
-            <div class="seg" id="lAlign" role="group" aria-label="Căn chữ"><button type="button" data-v="left">Trái</button><button type="button" data-v="center">Giữa</button><button type="button" data-v="right">Phải</button></div>
-            <div class="slider"><span>Ngang</span><input type="range" data-p="x" data-scale="100" data-unit="%" min="0" max="100"><output></output></div>
-            <div class="slider"><span>Dọc</span><input type="range" data-p="y" data-scale="100" data-unit="%" min="0" max="100"><output></output></div>
+            <div class="seg" id="lAlign" data-free role="group" aria-label="Căn chữ"><button type="button" data-v="left">Trái</button><button type="button" data-v="center">Giữa</button><button type="button" data-v="right">Phải</button></div>
+            <div class="seg" id="align" data-tplonly role="group" aria-label="Căn lề"><button type="button" data-v="left" aria-pressed="false">Trái</button><button type="button" data-v="center" aria-pressed="true">Giữa</button></div>
+            <div class="slider" data-free><span>Ngang</span><input type="range" data-p="x" data-scale="100" data-unit="%" min="0" max="100"><output></output></div>
+            <div class="slider" data-tplonly><span>Ngang</span><input type="range" data-p="dx" data-scale="100" data-unit="%" min="-40" max="40"><output></output></div>
+            <div class="slider" data-free><span>Dọc</span><input type="range" data-p="y" data-scale="100" data-unit="%" min="0" max="100"><output></output></div>
+            <div class="slider" data-tplonly><span>Dọc</span><input type="range" id="ypct" min="3" max="80" value="13"><output id="ypctOut">13%</output></div>
             <div class="slider"><span>Xoay</span><input type="range" data-p="rotate" data-unit="°" min="-180" max="180"><output></output></div>
-            <div class="slider"><span>Bề rộng</span><input type="range" data-p="maxw" data-unit="%" min="20" max="100"><output></output></div>
+            <div class="slider" data-free><span>Bề rộng</span><input type="range" data-p="maxw" data-unit="%" min="20" max="100"><output></output></div>
+            <div class="slider" data-tplonly><span>Bề rộng</span><input type="range" id="maxw" min="60" max="96" value="80"><output id="maxwOut">80%</output></div>
             <div class="st-actions">
               <button class="chip" type="button" id="btnCenterX">Căn giữa khung</button>
-              <button class="chip" type="button" id="btnUp">Đưa lên trên</button>
-              <button class="chip" type="button" id="btnDown">Đưa xuống dưới</button>
-              <button class="chip" type="button" id="btnHide">Ẩn lớp</button>
+              <button class="chip" type="button" id="btnUp" data-free>Đưa lên trên</button>
+              <button class="chip" type="button" id="btnDown" data-free>Đưa xuống dưới</button>
+              <button class="chip" type="button" id="btnHide" data-free>Ẩn lớp</button>
             </div>
           </div>
+
           <div class="pane" data-t="ai" hidden>
             <div class="ai-grid" id="layerAi">
               <button type="button" class="ai-btn" data-ask="manh">Viết mạnh hơn<small>Luật 1 giây, từ mạnh lên đầu</small></button>
@@ -450,7 +448,7 @@
               <button type="button" class="ai-btn" data-ask="cotnha">Giọng cợt nhả<small>Như nói với bạn thân</small></button>
               <button type="button" class="ai-btn" data-ask="xanhchin">Kiểu xanh chín<small>Khẳng định chắc nịch</small></button>
               <button type="button" class="ai-btn" data-ask="nhan">Tự nhấn từ khoá<small>Tô màu 1-2 từ đắt nhất</small></button>
-              <button type="button" class="ai-btn" data-ask="style" data-free>AI chọn kiểu chữ<small>Hợp giọng câu này</small></button>
+              <button type="button" class="ai-btn" data-ask="style">AI chọn kiểu chữ<small>Hợp giọng câu này</small></button>
             </div>
             <div class="status" id="layerAiOut"></div>
           </div>
@@ -713,7 +711,7 @@ function dimLayer(ctx, W, H, where, pct, strength) {
   g.addColorStop(0, `rgba(0,0,0,${strength})`); g.addColorStop(1, 'rgba(0,0,0,0)');
   ctx.fillStyle = g; ctx.fillRect(0, where === 'top' ? 0 : H - n, W, n);
 }
-const F = (weight, size, italic = false) => italic ? { family: 'Playfair Display', weight: 800, size, style: 'italic' } : { family: 'Be Vietnam Pro', weight, size };
+const F = (weight, size, italic = false) => italic ? { family: 'Playfair Display', weight: 800, size, style: 'italic' } : { family: (state.tplStyle && state.tplStyle.font) || 'Be Vietnam Pro', weight, size };
 function fitSize(ctx, paras, mk, maxW, size, floor = 0.7) {
   const start = size;
   while (size > 8) {
@@ -1085,6 +1083,40 @@ function fitToSafe() {
   syncSliders(); render().then(() => { const n = checkSafe(alphaBBox(lastRender.ov), lastRender.fr.height); toast(n ? 'Đã đẩy vào, còn vướng một chút: giảm cỡ chữ hoặc bớt dòng.' : 'Đã đưa vào vùng an toàn.'); });
 }
 
+/* ---------- hiệu ứng áp lên cả câu hook theo mẫu: viền, rực sáng, bóng, nền, xoay, dời ngang, độ mờ ---------- */
+const TPL_STYLE_DEFAULT = () => ({ font: 'Be Vietnam Pro', upper: false, opacity: 1, rotate: 0, dx: 0, preset: '',
+  stroke: { on: false, color: '#000000', width: 8 }, glow: { on: false, color: '#99DF00', alpha: .9, blur: 24 },
+  shadow: { on: false, color: '#000000', alpha: .6, blur: 14, x: 0, y: 6 }, bg: { on: false, mode: 'block', color: '#000000', alpha: .6, radius: 24, pad: 30 } });
+state.tplStyle = TPL_STYLE_DEFAULT();
+try { const t = JSON.parse(ls.get('hook.tplStyle') || 'null'); if (t) { const d = TPL_STYLE_DEFAULT(); state.tplStyle = { ...d, ...t, stroke: { ...d.stroke, ...t.stroke }, glow: { ...d.glow, ...t.glow }, shadow: { ...d.shadow, ...t.shadow }, bg: { ...d.bg, ...t.bg } }; } } catch {}
+function tintCanvas(src, color) { const c = document.createElement('canvas'); c.width = src.width; c.height = src.height; const g = c.getContext('2d'); g.drawImage(src, 0, 0); g.globalCompositeOperation = 'source-in'; g.fillStyle = color; g.fillRect(0, 0, c.width, c.height); return c; }
+function tplFx(src, W) {
+  const S = state.tplStyle; if (!S) return src; const k = W / BASE_W;
+  if (!S.stroke.on && !S.glow.on && !S.shadow.on && !S.bg.on && S.opacity >= 1 && !S.rotate && !S.dx) return src;
+  const out = document.createElement('canvas'); out.width = src.width; out.height = src.height; const g = out.getContext('2d');
+  const bb = (S.bg.on || S.rotate) ? alphaBBox(src) : null;
+  g.globalAlpha = S.opacity; g.translate(S.dx * W, 0);
+  if (S.rotate && bb) { const cx = (bb.left + bb.right) / 2, cy = (bb.top + bb.bot) / 2; g.translate(cx, cy); g.rotate(S.rotate * Math.PI / 180); g.translate(-cx, -cy); }
+  if (S.bg.on && bb) { const pd = S.bg.pad * k; g.fillStyle = hexA(S.bg.color, S.bg.alpha); rrect(g, bb.left - pd, bb.top - pd, bb.right - bb.left + 2 * pd, bb.bot - bb.top + 2 * pd, S.bg.radius * k); g.fill(); }
+  const FAR = 30000;   // vẽ hình ở ngoài khung, chỉ để lại bóng của nó
+  const ghost = (color, alpha, blur, x, y, times) => { g.save(); g.shadowColor = hexA(color, alpha); g.shadowBlur = blur * k; g.shadowOffsetX = x * k + FAR; g.shadowOffsetY = y * k; for (let i = 0; i < times; i++) g.drawImage(src, -FAR, 0); g.restore(); };
+  if (S.shadow.on) ghost(S.shadow.color, S.shadow.alpha, S.shadow.blur, S.shadow.x, S.shadow.y, 1);
+  if (S.glow.on) ghost(S.glow.color, S.glow.alpha, S.glow.blur, 0, 0, 3);
+  if (S.stroke.on && S.stroke.width > 0) { const sil = tintCanvas(src, S.stroke.color), r = S.stroke.width * k; for (const rr of [r, r / 2]) for (let i = 0; i < 16; i++) { const a = i / 16 * Math.PI * 2; g.drawImage(sil, Math.cos(a) * rr, Math.sin(a) * rr); } }
+  g.drawImage(src, 0, 0);
+  return out;
+}
+function applyPresetTpl(P) {
+  const S = state.tplStyle, d = TPL_STYLE_DEFAULT(), pp = P.p;
+  S.font = pp.font; S.upper = !!pp.upper; S.preset = P.n;
+  S.stroke = { ...d.stroke, ...(pp.stroke || {}) }; if (S.stroke.on) S.stroke.width = Math.max(3, Math.round(S.stroke.width * .7));
+  S.shadow = { ...d.shadow, ...(pp.shadow || {}) }; S.glow = { ...d.glow, ...(pp.glow || {}) };
+  S.bg = { ...d.bg, ...(pp.bg || {}), mode: 'block' };
+  if (!pp.fillOff) { state.brand.light = pp.color; state.brand.cream = pp.color; }
+  if (pp.keyColor) state.brand.accent = pp.keyColor;
+  applyBrandInputs();
+}
+
 /* ---------- render pipeline ---------- */
 let fontsReady = false;
 async function ensureFonts() {
@@ -1103,21 +1135,23 @@ function renderTo(frameImg, opts, W) {
   if (dm) dimLayer(g, W, H, ...dm);
   const c = ctxOf(opts, W, H, fr);
   T[opts.template](c, ov.getContext('2d'));
-  return { fr, ov, notes: c.notes, dm };
+  return { fr, ov: opts.template === 'blank' ? ov : tplFx(ov, W), notes: c.notes, dm };
 }
 function currentOpts(overrides = {}) {
-  const o = { ...state, blocks: blocksFromText($('#text').value), ...overrides };
+  const raw = $('#text').value; const o = { ...state, blocks: blocksFromText(state.tplStyle && state.tplStyle.upper ? raw.toUpperCase() : raw), ...overrides };
   if (!o.blocks.length) o.blocks = [' '];
   return o;
 }
 let renderTimer = null; let lastRender = null;
 function scheduleRender() { clearTimeout(renderTimer); renderTimer = setTimeout(render, 60); }
 async function render() {
-  if (!state.frame) return; await ensureFonts(); await ensureLayerFonts(state.layers);
+  if (!state.frame) return; await ensureFonts(); await ensureLayerFonts([...state.layers, ...fontWeights({ font: state.tplStyle.font }).map(w => ({ font: state.tplStyle.font, weight: w, runs: [] }))]);
+  ls.set('hook.tplStyle', JSON.stringify(state.tplStyle));
   const opts = currentOpts();
   const { fr, ov: ovTpl, notes, dm } = renderTo(state.frame, opts, BASE_W);
   const ov = document.createElement('canvas'); ov.width = fr.width; ov.height = fr.height;
   const og = ov.getContext('2d'); og.drawImage(ovTpl, 0, 0); drawLayers(og, fr.width, fr.height);
+  { const S = state.tplStyle, fx = []; if (tplActive()) { if (S.font !== 'Be Vietnam Pro') fx.push(`câu hook dùng font ${S.font} thay cho Be Vietnam Pro`); if (S.stroke.on) fx.push(`viền ${S.stroke.color} dày ${S.stroke.width}`); if (S.glow.on) fx.push(`rực sáng ${S.glow.color}`); if (S.shadow.on) fx.push(`bóng ${S.shadow.color} lệch ${S.shadow.x}/${S.shadow.y}`); if (S.bg.on) fx.push(`nền ${S.bg.color} ${Math.round(S.bg.alpha * 100)}%`); if (S.rotate) fx.push(`xoay ${S.rotate}°`); if (fx.length) notes.push('Tuỳ chỉnh thêm: ' + fx.join(', ') + '.'); } }
   notes.push(...layerNotes());
   const pv = $('#preview'); pv.width = fr.width; pv.height = fr.height;
   const g = pv.getContext('2d'); g.drawImage(fr, 0, 0); g.drawImage(ov, 0, 0);
@@ -1597,7 +1631,7 @@ function drawSelection() {
   g.strokeStyle = '#FFFFFF'; g.lineWidth = 1.2 * k; g.setLineDash([5 * k, 4 * k]); g.strokeRect(-b.w / 2, -b.h / 2, b.w, b.h); g.setLineDash([]);
   const dot = (x, y, fill) => { g.beginPath(); g.arc(x, y, 8 * k, 0, Math.PI * 2); g.fillStyle = fill; g.fill(); g.lineWidth = 1.6 * k; g.strokeStyle = '#26210F'; g.stroke(); };
   dot(b.w / 2, b.h / 2, '#99DF00');
-  if (!L.tpl) { g.strokeStyle = '#FFFFFF'; g.lineWidth = 1.2 * k; g.beginPath(); g.moveTo(0, -b.h / 2); g.lineTo(0, -b.h / 2 - 18 * k); g.stroke(); dot(0, -b.h / 2 - 26 * k, '#FFFFFF'); }
+  g.strokeStyle = '#FFFFFF'; g.lineWidth = 1.2 * k; g.beginPath(); g.moveTo(0, -b.h / 2); g.lineTo(0, -b.h / 2 - 18 * k); g.stroke(); dot(0, -b.h / 2 - 26 * k, '#FFFFFF');
   g.restore();
 }
 function toLocal(L, px, py) { const b = L._box; const dx = px - b.cx, dy = py - b.cy; const c = Math.cos(-b.rot), s = Math.sin(-b.rot); return { x: dx * c - dy * s, y: dx * s + dy * c }; }
@@ -1606,7 +1640,7 @@ function hitLayer(px, py) {
   const L = selLayer(), k = uiK();
   if (L && L._box && !L.hidden) { const p = toLocal(L, px, py), b = L._box;
     if (Math.hypot(p.x - b.w / 2, p.y - b.h / 2) < 16 * k) return { L, mode: 'scale' };
-    if (!L.tpl && Math.hypot(p.x, p.y + b.h / 2 + 26 * k) < 16 * k) return { L, mode: 'rotate' }; }
+    if (Math.hypot(p.x, p.y + b.h / 2 + 26 * k) < 16 * k) return { L, mode: 'rotate' }; }
   for (let i = state.layers.length - 1; i >= 0; i--) { const M = state.layers[i]; if (M._box && !M.hidden && inBox(M, px, py)) return { L: M, mode: 'move' }; }
   if (tplActive() && TPL._box && inBox(TPL, px, py)) return { L: TPL, mode: 'move' };
   return null;
@@ -1620,17 +1654,21 @@ function onDown(e) {
   e.preventDefault(); $('#preview').setPointerCapture(e.pointerId);
   selectLayer(hit.L.id);
   const L = hit.L, b = L._box;
-  drag = { mode: hit.mode, L, sx: p.x, sy: p.y, ox: L.tpl ? 0 : L.x, oy: L.tpl ? state.ypct : L.y, size: L.tpl ? state.size : L.size, dist: Math.hypot(p.x - b.cx, p.y - b.cy), W: lastRender.fr.width, H: lastRender.fr.height, moved: false };
+  drag = { mode: hit.mode, L, sx: p.x, sy: p.y, ox: L.tpl ? state.tplStyle.dx : L.x, oy: L.tpl ? state.ypct : L.y, size: L.tpl ? state.size : L.size, dist: Math.hypot(p.x - b.cx, p.y - b.cy), W: lastRender.fr.width, H: lastRender.fr.height, moved: false };
   drawSelection();
 }
 function onMove(e) {
   const pv = $('#preview');
-  if (!drag) { if (!lastRender) return; const p = canvasPoint(e); const h = hitLayer(p.x, p.y); pv.style.cursor = !h ? 'default' : h.mode === 'scale' ? 'nwse-resize' : h.mode === 'rotate' ? 'grab' : h.L.tpl ? 'ns-resize' : 'move'; return; }
+  if (!drag) { if (!lastRender) return; const p = canvasPoint(e); const h = hitLayer(p.x, p.y); pv.style.cursor = !h ? 'default' : h.mode === 'scale' ? 'nwse-resize' : h.mode === 'rotate' ? 'grab' : 'move'; return; }
   const p = canvasPoint(e), L = drag.L; drag.moved = true;
   if (L.tpl) {
-    if (drag.mode === 'move') state.ypct = Math.round(Math.min(80, Math.max(3, drag.oy + (p.y - drag.sy) / drag.H * 100)));
-    else state.size = Math.round(Math.min(110, Math.max(30, drag.size * Math.hypot(p.x - L._box.cx, p.y - L._box.cy) / Math.max(1, drag.dist))));
-    syncSliders(); renderLive(); return;
+    const S = state.tplStyle;
+    if (drag.mode === 'move') {
+      state.ypct = Math.round(Math.min(80, Math.max(3, drag.oy + (p.y - drag.sy) / drag.H * 100)));
+      let nx = drag.ox + (p.x - drag.sx) / drag.W; guides.v = Math.abs(nx) < .012; if (guides.v) nx = 0; S.dx = Math.round(Math.min(.4, Math.max(-.4, nx)) * 1000) / 1000;
+    } else if (drag.mode === 'scale') state.size = Math.round(Math.min(110, Math.max(30, drag.size * Math.hypot(p.x - L._box.cx, p.y - L._box.cy) / Math.max(1, drag.dist))));
+    else { let a = Math.atan2(p.y - L._box.cy, p.x - L._box.cx) * 180 / Math.PI + 90; if (a > 180) a -= 360; for (const snap of [0, 90, -90, 180, -180]) if (Math.abs(a - snap) < 4) a = snap; S.rotate = Math.round(a); }
+    syncSliders(); syncProps(true); renderLive(); return;
   }
   if (drag.mode === 'move') {
     let nx = drag.ox + (p.x - drag.sx) / drag.W, ny = drag.oy + (p.y - drag.sy) / drag.H;
@@ -1762,9 +1800,9 @@ function renderEditor() {
   const L = selLayer(), e = ed(); if (!L) { e.innerHTML = ''; return; }
   const runs = L.tpl ? tplRuns() : L.runs;
   const base = L.tpl ? state.brand.light : L.color, key = L.tpl ? state.brand.accent : L.keyColor;
-  e.style.fontFamily = L.tpl ? '"Be Vietnam Pro", system-ui, sans-serif' : `"${L.font}", system-ui, sans-serif`;
+  e.style.fontFamily = `"${tgt(L).font}", system-ui, sans-serif`;
   e.style.fontWeight = L.tpl ? 700 : L.weight; e.style.fontStyle = !L.tpl && L.italic ? 'italic' : 'normal';
-  e.style.textTransform = !L.tpl && L.upper ? 'uppercase' : 'none';
+  e.style.textTransform = tgt(L).upper ? 'uppercase' : 'none';
   e.style.color = L.fillOff ? '#FFFFFF' : base; e.style.background = lum(L.fillOff ? '#FFFFFF' : base) > .55 ? '#2B2F33' : '#F3EEE6';
   e.innerHTML = runsToHTML(runs, key, !!L.tpl);
   if (L.tpl) lastEdText = $('#text').value;
@@ -1818,11 +1856,12 @@ function buildLayerList() {
 let llT = null; function buildLayerListSoon() { clearTimeout(llT); llT = setTimeout(buildLayerList, 250); }
 function getPath(o, p) { return p.split('.').reduce((a, k) => a && a[k], o); }
 function setPath(o, p, v) { const ks = p.split('.'); let a = o; for (let i = 0; i < ks.length - 1; i++) a = a[ks[i]]; a[ks[ks.length - 1]] = v; }
+function tgt(L) { return L.tpl ? state.tplStyle : L; }
 function syncProps(onlyGeom) {
-  const L = selLayer(); if (!L || L.tpl) return;
+  const L = selLayer(); if (!L) return; const T = tgt(L);
   document.querySelectorAll('#layerProps [data-p]').forEach(inp => {
-    const p = inp.dataset.p; if (onlyGeom && !['x', 'y', 'size', 'rotate'].includes(p)) return;
-    let v = getPath(L, p); if (inp.dataset.scale) v = Math.round(v * +inp.dataset.scale);
+    const p = inp.dataset.p; if (onlyGeom && !['x', 'y', 'dx', 'size', 'rotate'].includes(p)) return;
+    let v = getPath(T, p); if (v === undefined) return; if (inp.dataset.scale) v = Math.round(v * +inp.dataset.scale);
     if (inp.type === 'checkbox') inp.checked = !!v; else if (document.activeElement !== inp) inp.value = v;
     const out = inp.parentElement.querySelector('output'); if (out) out.textContent = inp.value + (inp.dataset.unit || '');
   });
@@ -1837,44 +1876,45 @@ function showSub(t) {
   document.querySelectorAll('#layerProps .subpane').forEach(p => p.hidden = p.dataset.s !== t);
 }
 /* hàng chấm màu tròn kiểu CapCut */
-const PALETTE = ['#FFFFFF', '#C9C9C9', '#8A8A8A', '#3D3D3D', '#000000', '#FFE14D', '#FFB020', '#FF7A1A', '#FF5A5F', '#FF6FB5', '#B07CFF', '#4DA3FF', '#5EE7C6'];
+const PALETTE = ['#99DF00', '#FFFFFF', '#C9C9C9', '#8A8A8A', '#3D3D3D', '#000000', '#FFE14D', '#FFB020', '#FF7A1A', '#FF5A5F', '#FF6FB5', '#B07CFF', '#4DA3FF', '#5EE7C6'];
+const onOff = key => ({ none: true, get: L => tgt(L)[key].on ? tgt(L)[key].color : null, set: (L, c) => { const o = tgt(L)[key]; if (c == null) o.on = false; else { o.on = true; o.color = c; if (key === 'stroke' && !o.width) o.width = 8; } } });
 const ROWS = {
-  rowText:   { get: L => L.color, set: (L, c) => fmt('c', c), self: true },
-  rowKey:    { get: L => L.keyColor, set: (L, c) => { L.keyColor = c; } },
-  rowStroke: { none: true, get: L => L.stroke.on ? L.stroke.color : null, set: (L, c) => { if (c == null) L.stroke.on = false; else Object.assign(L.stroke, { on: true, color: c, width: L.stroke.width || 8 }); } },
-  rowGlow:   { none: true, get: L => L.glow.on ? L.glow.color : null, set: (L, c) => { if (c == null) L.glow.on = false; else Object.assign(L.glow, { on: true, color: c }); } },
-  rowBg:     { none: true, get: L => L.bg.on ? L.bg.color : null, set: (L, c) => { if (c == null) L.bg.on = false; else Object.assign(L.bg, { on: true, color: c }); } },
-  rowShadow: { none: true, get: L => L.shadow.on ? L.shadow.color : null, set: (L, c) => { if (c == null) L.shadow.on = false; else Object.assign(L.shadow, { on: true, color: c }); } },
+  rowText:   { get: L => L.tpl ? state.brand.light : L.color, set: (L, c) => { if (L.tpl) { state.brand.light = c; state.brand.cream = c; applyBrandInputs(); } else fmt('c', c); }, self: L => !L.tpl },
+  rowKey:    { get: L => L.tpl ? state.brand.accent : L.keyColor, set: (L, c) => { if (L.tpl) { state.brand.accent = c; applyBrandInputs(); } else L.keyColor = c; } },
+  rowBox:    { get: () => state.brand.dark, set: (L, c) => { state.brand.dark = c; applyBrandInputs(); } },
+  rowStroke: onOff('stroke'), rowGlow: onOff('glow'), rowBg: onOff('bg'), rowShadow: onOff('shadow'),
 };
 function pickRow(id, c) {
-  const L = selLayer(); if (!L || L.tpl) return; const R = ROWS[id];
-  R.set(L, c);
-  if (!R.self) { pushUndoSoon(); renderEditor(); markRows(); syncProps(); scheduleRender(); }
+  const L = selLayer(); if (!L) return; const R = ROWS[id];
+  R.set(L, c); tgt(L).preset = '';
+  if (!(R.self && R.self(L))) { pushUndoSoon(); renderEditor(); markRows(); syncProps(); scheduleRender(); }
 }
 function buildRows() {
-  const cols = [state.brand.accent.toUpperCase(), ...PALETTE.filter(c => c !== state.brand.accent.toUpperCase())];
   for (const id of Object.keys(ROWS)) {
     const box = $('#' + id); if (!box) continue; box.innerHTML = '';
     const pick = el('label', 'dot rainbow'); pick.title = 'Chọn màu bất kỳ';
     const ci = document.createElement('input'); ci.type = 'color'; ci.setAttribute('aria-label', 'Chọn màu bất kỳ'); ci.addEventListener('input', () => pickRow(id, ci.value.toUpperCase())); pick.append(ci); box.append(pick);
     if (ROWS[id].none) { const b = el('button', 'dot none'); b.type = 'button'; b.title = 'Tắt'; b.setAttribute('aria-label', 'Tắt'); b.dataset.c = ''; b.onclick = () => pickRow(id, null); box.append(b); }
     box.append(el('i', 'dot-sep'));
-    for (const c of cols) { const b = el('button', 'dot'); b.type = 'button'; b.style.background = c; b.title = c; b.setAttribute('aria-label', 'Màu ' + c); b.dataset.c = c; b.onclick = () => pickRow(id, c); box.append(b); }
+    for (const c of PALETTE) { const b = el('button', 'dot'); b.type = 'button'; b.style.background = c; b.title = c; b.setAttribute('aria-label', 'Màu ' + c); b.dataset.c = c; b.onclick = () => pickRow(id, c); box.append(b); }
     box.addEventListener('mousedown', ev => { if (ev.target.closest('button')) ev.preventDefault(); });   // giữ phần chữ đang bôi đen
   }
 }
 function markRows() {
-  const L = selLayer(); if (!L || L.tpl) return;
+  const L = selLayer(); if (!L) return;
   for (const id of Object.keys(ROWS)) {
-    const box = $('#' + id); if (!box) continue; const cur = ROWS[id].get(L); let hit = false;
+    const box = $('#' + id); if (!box || !box.firstChild) continue; const cur = ROWS[id].get(L); let hit = false;
     box.querySelectorAll('button.dot').forEach(b => { const on = cur == null ? b.dataset.c === '' : String(b.dataset.c).toUpperCase() === String(cur).toUpperCase(); if (on) hit = true; b.setAttribute('aria-pressed', String(on)); });
-    const rb = box.querySelector('.rainbow'); rb.classList.toggle('on', !hit && cur != null); if (cur) { rb.querySelector('input').value = cur; if (!hit) rb.style.setProperty('--cur', cur); }
+    const rb = box.querySelector('.rainbow'); rb.classList.toggle('on', !hit && cur != null); if (cur) { rb.querySelector('input').value = cur; rb.style.setProperty('--cur', cur); }
   }
   document.querySelectorAll('#styleSub button').forEach(b => { const g = { stroke: 'rowStroke', glow: 'rowGlow', bg: 'rowBg', shadow: 'rowShadow' }[b.dataset.s]; b.classList.toggle('lit', !!g && ROWS[g].get(L) != null); });
+  $('#fmtKeyDot').style.background = L.tpl ? state.brand.accent : L.keyColor;
 }
 const WNAME = { 400: 'Thường', 500: 'Vừa', 600: 'Hơi đậm', 700: 'Đậm', 800: 'Rất đậm', 900: 'Đen' };
 function buildFontUI(L) {
-  document.querySelectorAll('#fontGrid .fnt').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.f === L.font)));
+  const T = tgt(L);
+  document.querySelectorAll('#fontGrid .fnt').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.f === T.font)));
+  if (L.tpl) return;
   const fw = fontWeights(L); if (!fw.includes(+L.weight)) L.weight = fw.reduce((a, w) => Math.abs(w - L.weight) < Math.abs(a - L.weight) ? w : a, fw[0]);
   const row = $('#weightRow'); row.innerHTML = '';
   fw.forEach(w => { const b = el('button', 'chip', WNAME[w] || w); b.type = 'button'; b.style.fontFamily = `"${L.font}", system-ui`; b.style.fontWeight = w; b.setAttribute('aria-pressed', String(+L.weight === w)); b.onclick = () => { L.weight = w; pushUndo(); buildFontUI(L); renderEditor(); scheduleRender(); }; row.append(b); });
@@ -1886,16 +1926,16 @@ function syncLayerPanel() {
   const isT = !!L.tpl;
   document.querySelectorAll('#editorCard [data-free]').forEach(x => x.hidden = isT);
   document.querySelectorAll('#editorCard [data-tplonly]').forEach(x => x.hidden = !isT);
-  if (isT) { $('#tplName').textContent = TEMPLATES[state.template].name; $('#tplOn').hidden = !tplActive(); $('#tplOff').hidden = tplActive(); $('#btnSplit').hidden = !tplActive(); showTab(['style', 'tune', 'brand', 'ai'].includes(curTab) ? curTab : 'style'); }
+  if (isT) $('#btnSplit').hidden = !tplActive();
+  showTab(curTab); showSub(curSub); buildFontUI(L);
+  if (isT) syncSliders();
   else {
-    showTab(curTab === 'tune' ? 'style' : curTab); showSub(curSub); buildFontUI(L);
     document.querySelectorAll('#lAlign button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === L.align)));
     document.querySelectorAll('#bgMode button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === L.bg.mode)));
-    document.querySelectorAll('#presetGrid .pst').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.n === L.preset)));
     $('#btnHide').textContent = L.hidden ? 'Hiện lớp' : 'Ẩn lớp';
-    syncProps(false); markRows();
   }
-  $('#fmtKeyDot').style.background = isT ? state.brand.accent : L.keyColor;
+  document.querySelectorAll('#presetGrid .pst').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.n === tgt(L).preset)));
+  syncProps(false); markRows();
   renderEditor(); $('#layerAiOut').textContent = '';
 }
 function buildEditorUI() {
@@ -1903,7 +1943,7 @@ function buildEditorUI() {
   FONTS.forEach(x => {
     const b = el('button', 'fnt', x.f); b.type = 'button'; b.dataset.f = x.f; b.style.fontFamily = `"${x.f}", system-ui`; b.style.fontWeight = x.w.includes(700) ? 700 : x.w[x.w.length - 1];
     if (!x.free) b.append(el('span', 'lock', 'PRO'));
-    b.onclick = () => { const L = selLayer(); if (!L || L.tpl) return; L.font = x.f; L.preset = ''; linkEditorFonts(); pushUndo(); buildFontUI(L); buildLayerList(); renderEditor(); scheduleRender(); if (!x.free && !state.pro) toast('Font Pro: xem thử thoải mái, xuất file cần mở Pro'); };
+    b.onclick = () => { const L = selLayer(); if (!L) return; const T = tgt(L); T.font = x.f; T.preset = ''; linkEditorFonts(); if (!L.tpl) pushUndo(); buildFontUI(L); buildLayerList(); renderEditor(); scheduleRender(); if (!x.free && !state.pro) toast('Font Pro: xem thử thoải mái, xuất file cần mở Pro'); };
     fg.append(b);
   });
   buildRows();
@@ -1916,15 +1956,15 @@ function buildEditorUI() {
     if (pp.shadow?.on) sw.style.textShadow = `${pp.shadow.x / 3}px ${pp.shadow.y / 3}px ${pp.shadow.blur / 3}px ${hexA(pp.shadow.color, pp.shadow.alpha)}`;
     if (pp.bg?.on) { sw.style.background = hexA(pp.bg.color, pp.bg.alpha); sw.style.borderRadius = '6px'; sw.style.padding = '0 6px'; }
     b.append(sw, el('small', null, P.n)); if (P.pro) b.append(el('span', 'lock', 'PRO'));
-    b.onclick = () => { const L = selLayer(); if (!L || L.tpl) return; applyPreset(L, P); pushUndo(); linkEditorFonts(); syncLayerPanel(); scheduleRender(); if (P.pro && !state.pro) toast('Kiểu Pro: xem thử thoải mái, xuất file cần mở Pro'); };
+    b.onclick = () => { const L = selLayer(); if (!L) return; if (L.tpl) applyPresetTpl(P); else { applyPreset(L, P); pushUndo(); } linkEditorFonts(); syncLayerPanel(); scheduleRender(); if (P.pro && !state.pro) toast('Kiểu Pro: xem thử thoải mái, xuất file cần mở Pro'); };
     grid.append(b);
   });
   document.querySelectorAll('#layerProps [data-p]').forEach(inp => {
     const ev = inp.type === 'checkbox' || inp.tagName === 'SELECT' ? 'change' : 'input';
     inp.addEventListener(ev, () => {
-      const L = selLayer(); if (!L || L.tpl) return; let v;
+      const L = selLayer(); if (!L) return; const T = tgt(L); if (getPath(T, inp.dataset.p) === undefined) return; let v;
       if (inp.type === 'checkbox') v = inp.checked; else if (inp.type === 'range' || inp.type === 'number') v = +inp.value / (inp.dataset.scale ? +inp.dataset.scale : 1); else v = inp.value;
-      setPath(L, inp.dataset.p, v);
+      setPath(T, inp.dataset.p, v);
       if (['color', 'keyColor', 'weight', 'italic', 'upper', 'fillOff'].includes(inp.dataset.p)) { renderEditor(); }
       const out = inp.parentElement.querySelector('output'); if (out) out.textContent = inp.value + (inp.dataset.unit || '');
       pushUndoSoon(); scheduleRender();
@@ -1960,7 +2000,7 @@ function buildEditorUI() {
   $('#btnUp').onclick = () => state.sel && moveLayer(state.sel, 1);
   $('#btnDown').onclick = () => state.sel && moveLayer(state.sel, -1);
   $('#btnHide').onclick = () => { const L = selLayer(); if (!L || L.tpl) return; L.hidden = !L.hidden; pushUndo(); syncLayerPanel(); scheduleRender(); };
-  $('#btnCenterX').onclick = () => { const L = selLayer(); if (!L || L.tpl) return; L.x = .5; pushUndo(); syncProps(); scheduleRender(); };
+  $('#btnCenterX').onclick = () => { const L = selLayer(); if (!L) return; if (L.tpl) state.tplStyle.dx = 0; else { L.x = .5; pushUndo(); } syncProps(); scheduleRender(); };
   document.querySelectorAll('#layerAi button').forEach(b => b.addEventListener('click', () => runLayerAI(b.dataset.ask, b)));
   const pv = $('#preview');
   pv.addEventListener('pointerdown', onDown); pv.addEventListener('pointermove', onMove); pv.addEventListener('pointerup', onUp); pv.addEventListener('pointercancel', onUp);
@@ -2000,12 +2040,12 @@ let lastTplKey = null, lastAccent = null;
 function afterRenderEditor() {
   const accentChanged = state.brand.accent !== lastAccent, tplChanged = state.template !== lastTplKey;
   lastAccent = state.brand.accent; lastTplKey = state.template;
-  if (accentChanged) buildRows();
   if (tplChanged && !state.sel) state.sel = 'TPL';
-  if (accentChanged || tplChanged) { syncLayerPanel(); return; }
+  if (tplChanged) { syncLayerPanel(); return; }
+  if (accentChanged) { markRows(); if (document.activeElement !== ed()) renderEditor(); }
   if (state.sel === 'TPL' && document.activeElement !== ed() && lastEdText !== $('#text').value) renderEditor();
 }
-function layersUsePro() { return state.layers.some(L => !L.hidden && (L.pro || !FREE_FONTS.has(L.font))); }
+function layersUsePro() { return state.layers.some(L => !L.hidden && (L.pro || !FREE_FONTS.has(L.font))) || (tplActive() && !FREE_FONTS.has(state.tplStyle.font)); }
 
 /* ---------- AI trên từng lớp chữ (Pro) ---------- */
 const DEMO_LAYER = { manh: '**3 giây** đầu\nquyết định cả video', gon: '**3 giây** quyết định tất cả', cotnha: 'ủa alo, **3 giây** đầu\nmà cũng lười nghĩ hả trời', xanhchin: '3 giây đầu **luôn quyết định**\nvideo sống hay chết', nhan: '3 giây đầu quyết định\n**90% lượt xem** của bạn' };
@@ -2023,7 +2063,7 @@ async function runLayerAI(ask) {
     if (!r.ok) { out.className = 'status err'; out.textContent = ({ het_luot: 'Hết lượt AI hôm nay.', het_phien: 'Phiên đăng nhập hết hạn, đăng nhập lại nhé.', ban_qua: 'AI đang bận, thử lại sau một phút.', sai_key: 'Khóa AI trên máy chủ không hợp lệ. Báo mentor.' }[r.error] || 'AI chưa chỉnh được.') + (r.chi_tiet ? ' Mã lỗi: ' + r.chi_tiet : ''); return; }
     const d = r.data || {};
     if (d.text && ask !== 'style') { if (L.tpl) { $('#text').value = String(d.text); ls.set('hook.text', $('#text').value); } else L.runs = markupToRuns(String(d.text)); }
-    const P = STYLE_PRESETS.find(p => p.n === d.preset); if (P && ask === 'style' && !L.tpl) applyPreset(L, P);
+    const P = STYLE_PRESETS.find(p => p.n === d.preset); if (P && ask === 'style') { if (L.tpl) applyPresetTpl(P); else applyPreset(L, P); }
     if (!L.tpl) pushUndo();
     syncLayerPanel(); linkEditorFonts(); scheduleRender();
     out.className = 'status ok'; out.textContent = d.note || 'Đã chỉnh. Không ưng thì bấm hoàn tác.';
