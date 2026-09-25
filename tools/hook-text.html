@@ -1349,9 +1349,13 @@ function applyPresetTpl(P) {
   S.stroke = { ...d.stroke, ...(pp.stroke || {}) }; if (S.stroke.on) S.stroke.width = Math.max(3, Math.round(S.stroke.width * .7));
   S.shadow = { ...d.shadow, ...(pp.shadow || {}) }; S.glow = { ...d.glow, ...(pp.glow || {}) };
   S.bg = { ...d.bg, ...(pp.bg || {}), mode: 'block' };
-  if (!pp.fillOff) { state.brand.light = pp.color; state.brand.cream = pp.color; }
-  if (pp.keyColor) state.brand.accent = pp.keyColor;
-  applyBrandInputs();
+  tmxkBrand(); applyBrandInputs();
+}
+/* Bản mẫu luôn dùng màu Tự Mình Xây Kênh: nhấn xanh lá, chữ trắng; nền chữ sáng thì chữ nâu đậm cho dễ đọc */
+function tmxkBrand() {
+  const S = state.tplStyle, b = { ...TMXK };
+  if (S && S.bg && S.bg.on && lum(S.bg.color) > .6) { b.light = TMXK.dark; b.cream = TMXK.dark; }
+  state.brand = b;
 }
 
 /* ---------- render pipeline ---------- */
@@ -1668,8 +1672,7 @@ function dropPro() {
   if (PRO_TPL.has(state.template)) selectTemplate('highlight', true);
   if (state.tplStyle.pro || !FREE_FONTS.has(state.tplStyle.font)) {
     state.tplStyle = { ...TPL_STYLE_DEFAULT(), dx: state.tplStyle.dx };
-    let b = { ...TMXK }; try { const sb = ls.get('hook.brand'); if (sb) b = { ...TMXK, ...JSON.parse(sb) }; } catch {}
-    state.brand = b; applyBrandInputs();
+    tmxkBrand(); applyBrandInputs();
   }
   for (const L of state.layers) if (L.pro || !FREE_FONTS.has(L.font) || L.runs.some(r => r.c || r.b || r.i || r.s)) {
     applyPreset(L, STYLE_PRESETS[0]); L.pro = false; L.runs = mergeRuns(L.runs.map(r => { const o = { ...r }; delete o.c; delete o.b; delete o.i; delete o.s; return o; }));
@@ -2631,7 +2634,8 @@ async function saveAllLayers() {
 /* ---------- boot ---------- */
 (function init() {
   buildTemplates(); buildPresets(); renderExtra(); syncSliders(); applyBrandInputs(); buildEditorUI(); linkEditorFonts();
-  const savedBrand = ls.get('hook.brand'); if (savedBrand) { try { state.brand = { ...TMXK, ...JSON.parse(savedBrand) }; applyBrandInputs(); } catch {} }
+  try { localStorage.removeItem('hook.brand'); } catch {}   // bộ màu kênh cũ không còn dùng
+  tmxkBrand(); applyBrandInputs();
   const savedText = ls.get('hook.text'); if (savedText) $('#text').value = savedText;
   sampleFrame();
 
