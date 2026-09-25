@@ -56,7 +56,7 @@ function hookAi(b){
   if (!kq.ok){
     hookHoanLuot(me.ma, khongGioiHan);
     hookLog(me, text, false, kq.loi, kq.vin || 0, kq.vout || 0, kq.model);
-    return jsonOut({ok:false, error: kq.error, chi_tiet: me.vaitro === 'mentor' ? String(kq.loi || '').slice(0, 400) : undefined});
+    return jsonOut({ok:false, error: kq.error, chi_tiet: String(kq.loi || '').slice(0, me.vaitro === 'mentor' ? 400 : 160)});
   }
   var data = kq.data;
 
@@ -243,3 +243,14 @@ var HOOK_SCHEMA = {
     hashtags:{ type:'array', items:{type:'string'} }
   }
 };
+
+/* Chạy thử trong trình soạn Apps Script: chọn thuHookAI → Run → xem Execution log. Không trừ lượt. */
+function thuHookAI(){
+  var kq = goiGemini(
+    hookCfg('GEMINI_API_KEY'), '',
+    hookPrompt('3 giây đầu quyết định 90% lượt xem của bạn', {platform:'all', facePos:'mid'}, false)
+  );
+  Logger.log(kq.ok
+    ? 'CHẠY ĐƯỢC · model ' + kq.model + '\n' + JSON.stringify(kq.data).slice(0, 600)
+    : 'LỖI: ' + kq.loi);
+}
