@@ -1,6 +1,6 @@
 # Kiến thức nền về hook
 
-Dùng ở bước 2 (xử lý nội dung) khi đề xuất viết lại hook và chọn từ khóa. Đúc kết từ tài liệu "Mổ xẻ Nghề Content" (fanpage Nghề Content, 04/2026 đến 09/2026), diễn đạt lại; các khái niệm mang dấu ấn của họ như "32 concept truyền thông", "lợi ích phút chót", "chất liệu bản thân" nên dẫn nguồn khi đưa vào giáo trình.
+Dùng ở bước 2 (xử lý nội dung) khi đề xuất viết lại hook và chọn từ khóa. Đúc kết từ tài liệu tổng hợp của Tự Mình Xây Kênh.
 
 1. LUẬT 1 GIÂY. Người lướt quyết định dừng hay không trong 1 giây, chỉ qua hai cửa: MẮT THẤY (dòng chữ to mở đầu, bối cảnh, nhân vật, biểu cảm) và TAI NGHE (nhạc, giọng). Hook text là thứ mắt thấy đầu tiên, nên nó cạnh tranh với mọi video khác trên bảng tin, không chỉ video cùng ngành. Nội dung hay mà thua ở 1 giây đầu thì không ai biết nó hay.
 
@@ -14,7 +14,7 @@ Dùng ở bước 2 (xử lý nội dung) khi đề xuất viết lại hook và
 
 6. CÔNG THỨC TIÊU ĐỀ T = I + D + C + K: Insight (nỗi đau, mong muốn, sân si thật của tệp) + Đối tượng (nói rõ cho ai) + Concept truyền thông (chọn 1 đến 3 trong bộ concept bên dưới) + yếu tố khác (ngành, tình huống). Một tiêu đề tốt thường chồng 2-3 concept. Ví dụ cấu trúc: "Bật mí 5 việc làm thêm giúp sinh viên năm nhất kiếm 10 triệu/tháng" = bật mí + con số lớn + hữu ích thông dụng + đối tượng sinh viên năm nhất.
 
-7. CÁC CONCEPT HAY DÙNG NHẤT CHO HOOK TEXT (từ bộ 32 concept): con số cụ thể; hữu ích thông dụng và "lợi ích phút chót" (nói ngay người xem được gì); bật mí bí mật, lén lút; cảnh báo; ngược đời nghịch lý; so sánh; tài sản lớn, con số to; hành trình ("cùng tớ", "tớ sẽ tốt hơn"); tốt đẹp bất ngờ (HỜI); phóng đại; game hoá, thử thách; gây tranh cãi có kiểm soát; chủ đề hot, realtime; đồng cảm với số đông; hài hước.
+7. CÁC CONCEPT HAY DÙNG NHẤT CHO HOOK TEXT: con số cụ thể; hữu ích thông dụng và "lợi ích phút chót" (nói ngay người xem được gì); bật mí bí mật, lén lút; cảnh báo; ngược đời nghịch lý; so sánh; tài sản lớn, con số to; hành trình ("cùng tớ", "tớ sẽ tốt hơn"); tốt đẹp bất ngờ (HỜI); phóng đại; game hoá, thử thách; gây tranh cãi có kiểm soát; chủ đề hot, realtime; đồng cảm với số đông; hài hước.
 
 8. NĂM CÁCH MỞ ĐẦU GIỮ NGƯỜI XEM: tạo đồng cảm; tạo mâu thuẫn; tạo bất ngờ; tạo khoảng trống thông tin (nói kết quả, giấu cách làm); gợi lại một niềm tin quen rồi lật nó.
 
