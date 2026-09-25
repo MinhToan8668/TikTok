@@ -1100,7 +1100,7 @@ function showResult(d) {
   // hook viết lại
   if (Array.isArray(d.hooks) && d.hooks.length) {
     const b2 = el('div', 'res-block'); b2.append(el('h3', null, '5 hook viết lại'));
-    d.hooks.forEach(h => { const r = el('div', 'alt'); const l = el('div'); l.append(el('small', null, h.formula || 'Hook'), el('p', null, String(h.text || '').replace(/\*\*/g, ''))); const bt = el('button', 'btn sm', 'Dùng'); bt.onclick = () => { $('#text').value = h.text; ls.set('hook.text', h.text); scheduleRender(); toast('Đã thay câu hook'); }; r.append(l, bt); b2.append(r); });
+    d.hooks.forEach(h => { const r = el('div', 'alt'); const l = el('div'); l.append(el('small', null, (h.formula || 'Hook') + (h.concept ? ' · ' + h.concept : '')), el('p', null, String(h.text || '').replace(/\*\*/g, ''))); const bt = el('button', 'btn sm', 'Dùng'); bt.onclick = () => { $('#text').value = h.text; ls.set('hook.text', h.text); scheduleRender(); toast('Đã thay câu hook'); }; r.append(l, bt); b2.append(r); });
     box.append(b2);
   }
   // bố cục

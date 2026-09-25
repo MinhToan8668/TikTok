@@ -27,6 +27,8 @@ Xem ảnh và ghi nhận:
 
 ### Bước 2: Xử lý nội dung
 
+Đọc `reference/kien-thuc-hook.md` trước. Khi hook gốc yếu theo luật 1 giây, đề xuất 2 đến 3 bản viết lại theo các công thức trong đó (con số cụ thể, nỗi đau, lật niềm tin quen, khoảng trống thông tin, xanh chín, HỜI 3 con số, NHƯNG phóng đại) và nói rõ vì sao. Không tự đổi giọng xưng hô của tác giả.
+
 - Tách hook thành **ý chính** (1 cụm người xem phải nắm trong 1 giây) và phần còn lại.
 - Chọn **1 đến 2 từ khóa** để nhấn màu. Nhiều hơn là loãng.
 - Hook mở đầu: tối đa 2 dòng, mỗi dòng dưới 25 ký tự. Text dài kiểu tâm sự (3 đoạn trở lên) thì dùng `bubbles` hoặc `timeline` và nhắc người dùng cho từng khối hiện lần lượt theo lời nói.
