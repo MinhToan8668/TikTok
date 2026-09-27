@@ -1806,65 +1806,81 @@ function loadFrameFile(file) {
   const img = new Image(); img.onload = () => { state.frame = img; state.frameName = file.name; $('#fileName').textContent = `${file.name} · ${img.width}×${img.height}`; scheduleRender(); URL.revokeObjectURL(img.src); }; img.src = URL.createObjectURL(file);
 }
 function sampleFrame() {
-  // ảnh mẫu: người không lộ mặt cầm mic, vẽ kiểu chấm stipple trên nền xanh lá TMXK (canvas, không nhúng ảnh)
+  // ảnh mẫu: creator cầm mic nói chuyện, minh hoạ phẳng tỉ lệ tự nhiên, nền xanh lá TMXK (canvas, không nhúng ảnh)
   const W = 1080, H = 1920, cv = document.createElement('canvas'); cv.width = W; cv.height = H; const g = cv.getContext('2d');
-  let gr = g.createRadialGradient(W * .5, H * .46, 120, W * .5, H * .5, H * .78); gr.addColorStop(0, '#A8EA1C'); gr.addColorStop(1, '#86C800');
-  g.fillStyle = gr; g.fillRect(0, 0, W, H);
+  const lin = (x0, y0, x1, y1, st) => { const q = g.createLinearGradient(x0, y0, x1, y1); st.forEach(([o, c]) => q.addColorStop(o, c)); return q; };
+  const rad = (x, y, r0, r1, st) => { const q = g.createRadialGradient(x, y, r0, x, y, r1); st.forEach(([o, c]) => q.addColorStop(o, c)); return q; };
+  const fill = (c, path) => { g.beginPath(); path(); g.fillStyle = c; g.fill(); };
+  const ell = (x, y, rx, ry, c, r = 0) => fill(c, () => g.ellipse(x, y, rx, ry, r, 0, Math.PI * 2));
+  const cx = 540, SKIN = '#EDBE98', SKIN2 = '#D9A27C', SKIN3 = '#C28763', HAIR = '#241915';
 
-  // bản đồ độ đậm (trắng = không chấm, đen = chấm dày). Mỗi khối: tô mảng xám rồi viền đậm
-  const dm = document.createElement('canvas'); dm.width = W; dm.height = H; const d = dm.getContext('2d');
-  d.fillStyle = '#fff'; d.fillRect(0, 0, W, H); d.lineJoin = 'round'; d.lineCap = 'round';
-  const rg = (x, y, r0, r1, a, b) => { const q = d.createRadialGradient(x, y, r0, x, y, r1); q.addColorStop(0, a); q.addColorStop(1, b); return q; };
-  const shape = (path, fill, line = 6) => { d.beginPath(); path(); d.fillStyle = fill; d.fill(); d.strokeStyle = '#2a2a2a'; d.lineWidth = line; d.stroke(); };
-  const cx = 540;
-  // áo thun
-  shape(() => { d.moveTo(cx - 140, 1150); d.bezierCurveTo(cx - 320, 1165, cx - 420, 1215, cx - 465, 1320); d.lineTo(cx - 545, 1600); d.quadraticCurveTo(cx - 490, 1640, cx - 420, 1650);
-    d.lineTo(cx - 405, 1920); d.lineTo(cx + 405, 1920); d.lineTo(cx + 420, 1650); d.quadraticCurveTo(cx + 490, 1640, cx + 545, 1600); d.lineTo(cx + 465, 1320); d.bezierCurveTo(cx + 420, 1215, cx + 320, 1165, cx + 140, 1150); d.closePath(); },
-    rg(cx - 80, 1330, 40, 620, '#d6d6d6', '#6e6e6e'));
-  d.strokeStyle = 'rgba(40,40,40,.7)'; d.lineWidth = 5;   // đường may tay áo, nếp gấp
-  for (const [a, b2, c, e] of [[cx - 420, 1650, cx - 440, 1330], [cx + 420, 1650, cx + 440, 1330]]) { d.beginPath(); d.moveTo(a, b2); d.quadraticCurveTo((a + c) / 2 + (a < cx ? 30 : -30), (b2 + e) / 2, c, e); d.stroke(); }
-  d.strokeStyle = 'rgba(120,120,120,.45)'; d.lineWidth = 34;
-  for (const [x0, y0, x1, y1, x2, y2] of [[cx - 330, 1420, cx - 270, 1580, cx - 300, 1780], [cx + 280, 1470, cx + 320, 1620, cx + 290, 1800], [cx - 60, 1700, cx - 20, 1790, cx - 90, 1900]]) { d.beginPath(); d.moveTo(x0, y0); d.quadraticCurveTo(x1, y1, x2, y2); d.stroke(); }
-  // cổ
-  shape(() => { d.moveTo(cx - 98, 920); d.lineTo(cx - 104, 1172); d.quadraticCurveTo(cx, 1215, cx + 104, 1172); d.lineTo(cx + 98, 920); }, '#9a9a9a', 5);
-  d.fillStyle = 'rgba(80,80,80,.55)'; d.beginPath(); d.ellipse(cx, 985, 104, 48, 0, 0, Math.PI * 2); d.fill();
-  // đầu: quả cầu trơn
-  shape(() => d.arc(cx, 760, 212, 0, Math.PI * 2), rg(cx - 80, 680, 10, 250, '#f0f0f0', '#8a8a8a'), 6);
-  // cẳng tay chéo ngực lên cằm
-  shape(() => { d.moveTo(cx - 150, 1920); d.quadraticCurveTo(cx - 10, 1450, cx + 95, 1135); d.lineTo(cx + 215, 1155); d.quadraticCurveTo(cx + 100, 1500, cx - 10, 1920); d.closePath(); },
-    (() => { const q = d.createLinearGradient(cx - 150, 0, cx + 215, 0); q.addColorStop(0, '#7c7c7c'); q.addColorStop(1, '#c4c4c4'); return q; })(), 6);
-  d.fillStyle = 'rgba(90,90,90,.35)'; d.beginPath(); d.moveTo(cx - 150, 1920); d.quadraticCurveTo(cx - 10, 1450, cx + 95, 1135); d.lineTo(cx + 130, 1140); d.quadraticCurveTo(cx + 20, 1480, cx - 100, 1920); d.fill();
-  // mic kiểu condenser cổ điển, nghiêng về phía miệng
-  d.save(); d.translate(cx + 150, 905); d.rotate(-.24);
-  shape(() => { d.roundRect ? d.roundRect(-62, -170, 124, 250, 60) : d.rect(-62, -170, 124, 250); }, '#8d8d8d', 6);
-  d.strokeStyle = 'rgba(40,40,40,.75)'; d.lineWidth = 4;
-  for (let yy = -150; yy <= 60; yy += 18) { d.beginPath(); d.moveTo(-52, yy); d.lineTo(52, yy); d.stroke(); }
-  for (let xx = -40; xx <= 40; xx += 20) { d.beginPath(); d.moveTo(xx, -160); d.lineTo(xx, 72); d.stroke(); }
-  shape(() => d.rect(-70, 70, 140, 30), '#3a3a3a', 5);
-  shape(() => { d.moveTo(-44, 100); d.lineTo(-34, 270); d.lineTo(34, 270); d.lineTo(44, 100); d.closePath(); }, '#707070', 5);
-  d.restore();
+  /* nền xanh lá TMXK: sáng giữa, trầm mép, vài mảng tròn mờ cho có chiều sâu */
+  g.fillStyle = rad(cx, 820, 80, 1300, [[0, '#B4F02E'], [.55, '#99DF00'], [1, '#6FA600']]); g.fillRect(0, 0, W, H);
+  ell(cx, 860, 470, 470, 'rgba(255,255,255,.14)');
+  ell(170, 380, 180, 180, 'rgba(255,255,255,.08)'); ell(930, 1320, 230, 230, 'rgba(27,34,13,.07)');
+  g.fillStyle = rad(cx + 30, 1500, 100, 700, [[0, 'rgba(27,34,13,.22)'], [1, 'rgba(27,34,13,0)']]); g.fillRect(0, 900, W, 1020);
+
+  /* áo thun trắng */
+  fill(lin(0, 1150, 0, 1920, [[0, '#FBF9F4'], [1, '#E6E1D6']]), () => {
+    g.moveTo(cx - 110, 1135); g.bezierCurveTo(cx - 300, 1150, cx - 400, 1200, cx - 440, 1300);
+    g.lineTo(cx - 520, 1560); g.quadraticCurveTo(cx - 470, 1600, cx - 395, 1600); g.lineTo(cx - 385, 1920);
+    g.lineTo(cx + 385, 1920); g.lineTo(cx + 395, 1600); g.quadraticCurveTo(cx + 470, 1600, cx + 520, 1560);
+    g.lineTo(cx + 440, 1300); g.bezierCurveTo(cx + 400, 1200, cx + 300, 1150, cx + 110, 1135); g.closePath(); });
+  // bóng mặt tối của áo (ánh sáng từ trái)
+  fill('rgba(120,110,95,.16)', () => { g.moveTo(cx + 180, 1150); g.bezierCurveTo(cx + 330, 1170, cx + 420, 1230, cx + 440, 1300); g.lineTo(cx + 520, 1560); g.quadraticCurveTo(cx + 470, 1600, cx + 395, 1600); g.lineTo(cx + 385, 1920); g.lineTo(cx + 250, 1920); g.bezierCurveTo(cx + 280, 1600, cx + 300, 1350, cx + 180, 1150); });
+  g.strokeStyle = 'rgba(150,140,120,.35)'; g.lineWidth = 5; g.lineCap = 'round';
+  for (const [a, b, c, d2, e, f] of [[cx - 395, 1600, cx - 420, 1450, cx - 425, 1310], [cx + 395, 1600, cx + 420, 1450, cx + 425, 1310], [cx - 250, 1500, cx - 220, 1650, cx - 260, 1850]]) { g.beginPath(); g.moveTo(a, b); g.quadraticCurveTo(c, d2, e, f); g.stroke(); }
+  // cổ áo tròn
+  g.strokeStyle = '#E2DCCF'; g.lineWidth = 18; g.beginPath(); g.ellipse(cx, 1140, 115, 48, 0, .05, Math.PI - .05); g.stroke();
+
+  /* cổ */
+  fill(lin(0, 1000, 0, 1180, [[0, SKIN3], [1, SKIN2]]), () => { g.moveTo(cx - 66, 990); g.lineTo(cx - 72, 1150); g.quadraticCurveTo(cx, 1195, cx + 72, 1150); g.lineTo(cx + 66, 990); g.closePath(); });
+
+  /* tai, mặt */
+  ell(cx - 150, 820, 24, 44, SKIN2); ell(cx + 150, 820, 24, 44, SKIN2);
+  ell(cx - 150, 822, 12, 26, SKIN3); ell(cx + 150, 822, 12, 26, SKIN3);
+  fill(rad(cx - 40, 760, 30, 260, [[0, '#F6CDAA'], [1, SKIN]]), () => {
+    g.moveTo(cx, 1040); g.bezierCurveTo(cx - 95, 1040, cx - 152, 960, cx - 152, 820); g.bezierCurveTo(cx - 152, 690, cx - 90, 610, cx, 610);
+    g.bezierCurveTo(cx + 90, 610, cx + 152, 690, cx + 152, 820); g.bezierCurveTo(cx + 152, 960, cx + 95, 1040, cx, 1040); });
+  fill('rgba(194,135,99,.28)', () => { g.moveTo(cx + 152, 820); g.bezierCurveTo(cx + 152, 960, cx + 95, 1040, cx, 1040); g.bezierCurveTo(cx + 70, 1010, cx + 120, 940, cx + 135, 830); g.closePath(); });   // má bên tối
+
+  /* tóc ngắn, có mái vuốt */
+  fill(HAIR, () => {
+    g.moveTo(cx - 158, 830); g.bezierCurveTo(cx - 175, 700, cx - 140, 600, cx - 40, 575); g.bezierCurveTo(cx + 40, 555, cx + 150, 580, cx + 168, 690);
+    g.bezierCurveTo(cx + 172, 740, cx + 162, 790, cx + 156, 820); g.bezierCurveTo(cx + 140, 760, cx + 120, 720, cx + 60, 700);
+    g.bezierCurveTo(cx - 10, 690, cx - 80, 700, cx - 120, 690); g.bezierCurveTo(cx - 138, 740, cx - 145, 790, cx - 158, 830); });
+  g.strokeStyle = 'rgba(255,255,255,.12)'; g.lineWidth = 7; g.beginPath(); g.moveTo(cx - 90, 610); g.quadraticCurveTo(cx, 585, cx + 90, 620); g.stroke();
+
+  /* nét mặt: lông mày, mắt, mũi, miệng đang nói, má hồng */
+  g.strokeStyle = HAIR; g.lineCap = 'round'; g.lineWidth = 12;
+  g.beginPath(); g.moveTo(cx - 100, 758); g.quadraticCurveTo(cx - 70, 742, cx - 36, 752); g.stroke();
+  g.beginPath(); g.moveTo(cx + 36, 752); g.quadraticCurveTo(cx + 70, 742, cx + 100, 758); g.stroke();
+  for (const s of [-1, 1]) { ell(cx + s * 66, 806, 22, 14, '#FFFFFF'); ell(cx + s * 66, 806, 12, 13, '#2B1D16'); ell(cx + s * 62, 802, 4, 4, '#FFFFFF'); }
+  g.strokeStyle = 'rgba(160,100,70,.6)'; g.lineWidth = 6; g.beginPath(); g.moveTo(cx - 4, 820); g.quadraticCurveTo(cx - 16, 880, cx + 10, 888); g.stroke();
+  ell(cx - 92, 880, 30, 16, 'rgba(236,130,110,.25)'); ell(cx + 92, 880, 30, 16, 'rgba(236,130,110,.25)');
+  fill('#9B3F36', () => { g.moveTo(cx - 44, 930); g.quadraticCurveTo(cx, 985, cx + 44, 930); g.quadraticCurveTo(cx, 945, cx - 44, 930); });
+  fill('#FFFFFF', () => { g.moveTo(cx - 34, 934); g.quadraticCurveTo(cx, 950, cx + 34, 934); g.quadraticCurveTo(cx, 942, cx - 34, 934); });
+
+  /* tay phải cầm mic: bắp tay thò ra từ tay áo, khuỷu ngang eo, cẳng tay gập chéo lên */
+  fill(SKIN2, () => { g.moveTo(cx + 400, 1585); g.lineTo(cx + 510, 1565); g.quadraticCurveTo(cx + 505, 1680, cx + 470, 1770); g.quadraticCurveTo(cx + 420, 1800, cx + 385, 1760); g.quadraticCurveTo(cx + 380, 1670, cx + 400, 1585); });   // bắp tay
+  fill(lin(cx + 180, 0, cx + 480, 0, [[0, SKIN], [1, SKIN2]]), () => { g.moveTo(cx + 385, 1760); g.quadraticCurveTo(cx + 250, 1450, cx + 178, 1135); g.lineTo(cx + 272, 1122); g.quadraticCurveTo(cx + 330, 1420, cx + 478, 1745); g.quadraticCurveTo(cx + 430, 1805, cx + 385, 1760); });   // cẳng tay
+  fill('rgba(194,135,99,.35)', () => { g.moveTo(cx + 478, 1745); g.quadraticCurveTo(cx + 330, 1420, cx + 272, 1122); g.lineTo(cx + 246, 1126); g.quadraticCurveTo(cx + 300, 1430, cx + 440, 1770); g.closePath(); });
+  fill('rgba(120,110,95,.18)', () => { g.moveTo(cx + 360, 1780); g.quadraticCurveTo(cx + 230, 1470, cx + 170, 1160); g.lineTo(cx + 150, 1170); g.quadraticCurveTo(cx + 210, 1480, cx + 330, 1800); g.closePath(); });   // bóng cẳng tay đổ lên áo
+  // mic: thân đen, đầu lưới bạc
+  g.save(); g.translate(cx + 205, 985); g.rotate(-.35);
+  fill('#1E1E1E', () => { g.roundRect ? g.roundRect(-24, 30, 48, 190, 18) : g.rect(-24, 30, 48, 190); });
+  fill('#3A3A3A', () => g.rect(-30, 20, 60, 22));
+  fill(rad(-14, -30, 6, 70, [[0, '#EDEDED'], [1, '#8C8C8C']]), () => g.arc(0, -10, 58, 0, Math.PI * 2));
+  g.strokeStyle = 'rgba(60,60,60,.45)'; g.lineWidth = 3;
+  for (let a = -48; a <= 48; a += 16) { g.beginPath(); g.moveTo(a, -10 - Math.sqrt(58 * 58 - a * a)); g.lineTo(a, -10 + Math.sqrt(58 * 58 - a * a)); g.stroke(); g.beginPath(); g.moveTo(-Math.sqrt(58 * 58 - a * a), -10 + a); g.lineTo(Math.sqrt(58 * 58 - a * a), -10 + a); g.stroke(); }
+  g.restore();
   // bàn tay nắm thân mic
-  shape(() => { d.ellipse(cx + 190, 1128, 84, 96, -.3, 0, Math.PI * 2); }, rg(cx + 170, 1100, 10, 110, '#cfcfcf', '#7a7a7a'), 6);
-  d.strokeStyle = 'rgba(40,40,40,.8)'; d.lineWidth = 5;
-  for (let i = 0; i < 3; i++) { d.beginPath(); d.moveTo(cx + 125, 1085 + i * 36); d.quadraticCurveTo(cx + 190, 1068 + i * 36, cx + 255, 1098 + i * 36); d.stroke(); }
-  d.beginPath(); d.moveTo(cx + 120, 1060); d.quadraticCurveTo(cx + 100, 1110, cx + 130, 1170); d.stroke();   // ngón cái
-  // mờ dần phía dưới như ảnh gốc
-  const fade = d.createLinearGradient(0, 1560, 0, H); fade.addColorStop(0, 'rgba(255,255,255,0)'); fade.addColorStop(1, 'rgba(255,255,255,.9)'); d.fillStyle = fade; d.fillRect(0, 1560, W, H - 1560);
+  fill(rad(cx + 225, 1110, 10, 90, [[0, SKIN], [1, SKIN2]]), () => g.ellipse(cx + 228, 1112, 70, 62, -.4, 0, Math.PI * 2));
+  g.strokeStyle = SKIN3; g.lineWidth = 6; for (let i = 0; i < 3; i++) { g.beginPath(); g.moveTo(cx + 175 + i * 6, 1085 + i * 26); g.quadraticCurveTo(cx + 220, 1072 + i * 26, cx + 270, 1092 + i * 26); g.stroke(); }
 
-  // rải chấm: chỗ tối nhiều chấm to, chỗ sáng thưa chấm nhỏ (ngẫu nhiên có seed để lần nào cũng giống nhau)
-  const px = d.getImageData(0, 0, W, H).data, step = 4.2;
-  let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-  g.fillStyle = '#1B220D';
-  for (let y = 0; y < H; y += step) for (let x = 0; x < W; x += step) {
-    const jx = x + (rnd() - .5) * step * 1.1, jy = y + (rnd() - .5) * step * 1.1;
-    const i = ((Math.round(jy) * W) + Math.round(jx)) * 4; if (i < 0 || i >= px.length) continue;
-    const dens = 1 - px[i] / 255; if (dens < .03) continue;
-    if (rnd() < Math.pow(dens, 1.1) * 1.3) { g.globalAlpha = .5 + dens * .45; g.beginPath(); g.arc(jx, jy, .8 + dens * 1.5, 0, Math.PI * 2); g.fill(); }
-  }
-  g.globalAlpha = 1;
-  // phủ tối nhẹ phía trên cho chữ trắng và vệt nhấn nổi
-  const top = g.createLinearGradient(0, 0, 0, H * .38); top.addColorStop(0, 'rgba(27,34,13,.42)'); top.addColorStop(1, 'rgba(27,34,13,0)'); g.fillStyle = top; g.fillRect(0, 0, W, H * .38);
-  g.fillStyle = 'rgba(27,34,13,.6)'; g.font = '600 30px "Be Vietnam Pro", sans-serif'; g.textAlign = 'center'; g.fillText('ẢNH MẪU · bấm Đổi ảnh để dùng ảnh cap của bạn', W / 2, H - 50);
+  /* hoàn thiện: phủ tối nhẹ phía trên cho chữ, chữ nhắc */
+  const top = g.createLinearGradient(0, 0, 0, H * .36); top.addColorStop(0, 'rgba(27,34,13,.4)'); top.addColorStop(1, 'rgba(27,34,13,0)'); g.fillStyle = top; g.fillRect(0, 0, W, H * .36);
+  g.fillStyle = 'rgba(27,34,13,.55)'; g.font = '600 30px "Be Vietnam Pro", sans-serif'; g.textAlign = 'center'; g.fillText('ẢNH MẪU · bấm Đổi ảnh để dùng ảnh cap của bạn', W / 2, H - 50);
   const img = new Image(); img.onload = () => { if (!state.frame) { state.frame = img; scheduleRender(); } }; img.src = cv.toDataURL('image/jpeg', .9);
 }
 
