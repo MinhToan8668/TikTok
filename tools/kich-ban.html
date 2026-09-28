@@ -159,8 +159,8 @@
   </header>
 
   <nav class="feat-tabs" aria-label="Công cụ trong Viral Studio">
-    <a class="ft" href="hook-text.html">Hook text</a>
     <a class="ft on" href="#" aria-current="page">Kịch bản viral</a>
+    <a class="ft" href="hook-text.html">Hook viral</a>
   </nav>
 
   <div class="grid">
@@ -397,7 +397,7 @@ async function loadQuota() {
 function openUpsell(title, text) { $('#upTitle').textContent = title; $('#upText').textContent = text; $('#upsell').classList.add('show'); }
 
 /* ---------- chấm ---------- */
-const ERR = { het_thu: 'Bạn đã dùng hết 3 lượt AI thử. Tạo tài khoản miễn phí để có thêm 10 lượt.', het_luot_thu: 'Bạn đã dùng hết lượt AI miễn phí. Mua Pro 50k/tháng hoặc đăng ký học viên để dùng tiếp.', het_luot: 'Hết lượt AI hôm nay, mai quay lại nhé.', het_phien: 'Phiên đăng nhập hết hạn. Đăng nhập lại ở trang Hook text.', thieu_text: 'Chưa có chữ nào để chấm.', chua_cai_key: 'Máy chủ chưa cài khóa AI. Báo mentor.', sai_key: 'Khóa AI trên máy chủ không hợp lệ. Báo mentor.', ban_qua: 'AI đang bận, thử lại sau một phút.', tu_choi: 'AI không xử lý được nội dung này, thử diễn đạt khác.', loi_mang: 'Máy chủ không gọi được AI, thử lại.', unknown_action: 'Máy chủ chưa cập nhật.' };
+const ERR = { het_thu: 'Bạn đã dùng hết 3 lượt AI thử. Tạo tài khoản miễn phí để có thêm 10 lượt.', het_luot_thu: 'Bạn đã dùng hết lượt AI miễn phí. Mua Pro 50k/tháng hoặc đăng ký học viên để dùng tiếp.', het_luot: 'Hết lượt AI hôm nay, mai quay lại nhé.', het_phien: 'Phiên đăng nhập hết hạn. Đăng nhập lại ở trang Hook viral.', thieu_text: 'Chưa có chữ nào để chấm.', chua_cai_key: 'Máy chủ chưa cài khóa AI. Báo mentor.', sai_key: 'Khóa AI trên máy chủ không hợp lệ. Báo mentor.', ban_qua: 'AI đang bận, thử lại sau một phút.', tu_choi: 'AI không xử lý được nội dung này, thử diễn đạt khác.', loi_mang: 'Máy chủ không gọi được AI, thử lại.', unknown_action: 'Máy chủ chưa cập nhật.' };
 let busy = false;
 async function cham() {
   if (busy) return;
@@ -449,7 +449,7 @@ function renderKq(d, parts) {
   }
   if (Array.isArray(d.y_chinh) && d.y_chinh.length) { H('Ý chính để quay không cần nhìn giấy'); const ul = el('ul'); d.y_chinh.forEach(s => ul.append(el('li', null, s))); const bx = el('div', 'box'); bx.append(ul); box.append(bx); }
   if (d.chu_man_hinh) { H('Chữ hook trên màn hình'); const bx = el('div', 'box'); bx.style.whiteSpace = 'pre-wrap'; bx.style.fontWeight = '700'; bx.textContent = d.chu_man_hinh.replace(/\*\*/g, ''); box.append(bx);
-    const row = el('div', 'row'); const b = el('a', 'btn pro', 'Đặt chữ này lên video trong Hook text →'); b.href = 'hook-text.html'; b.onclick = () => { ls.set('hook.text', d.chu_man_hinh); }; row.append(b); box.append(row); }
+    const row = el('div', 'row'); const b = el('a', 'btn pro', 'Đặt chữ này lên video trong Hook viral →'); b.href = 'hook-text.html'; b.onclick = () => { ls.set('hook.text', d.chu_man_hinh); }; row.append(b); box.append(row); }
   if (d.caption) { H('Caption và hashtag'); const bx = el('div', 'box'); bx.append(document.createTextNode(d.caption)); const tg = el('div', 'tags'); (d.hashtags || []).forEach(h => tg.append(el('span', null, h.startsWith('#') ? h : '#' + h))); bx.append(tg); box.append(bx);
     const row = el('div', 'row'); const b = el('button', 'btn', 'Chép caption'); b.type = 'button'; b.onclick = () => copyText(d.caption + '\n\n' + (d.hashtags || []).map(h => h.startsWith('#') ? h : '#' + h).join(' ')); row.append(b); box.append(row); }
 }
