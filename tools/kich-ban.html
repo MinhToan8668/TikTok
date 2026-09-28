@@ -59,6 +59,14 @@
   :root[data-theme="dark"] .ft.on{background:#99DF00;color:#0B0C08;box-shadow:0 4px 0 rgba(153,223,0,.32)}
   @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .ft{border-color:#99DF00;box-shadow:0 4px 0 rgba(153,223,0,.32)} :root:not([data-theme="light"]) .ft.on{background:#99DF00;color:#0B0C08;box-shadow:0 4px 0 rgba(153,223,0,.32)}}
   @media (max-width:520px){.feat-tabs{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;overflow:visible}.ft{flex-direction:column;justify-content:center;gap:4px;padding:9px 6px;font-size:13px;text-align:center;line-height:1.2}.ft .fi{font-size:19px}}
+  /* điện thoại: nút chọn cao đủ bấm, chia đều hàng; ô nhập 16px để iPhone không tự phóng to */
+  @media (max-width:520px){
+    .seg{display:flex;width:100%}
+    .seg button{flex:1 1 auto;min-height:42px;padding:9px 10px;font-size:13.5px}
+    input:not([type=checkbox]):not([type=radio]):not([type=range]),select,textarea{font-size:16px}
+    button,.pill{min-height:38px}
+    .theme-btn{min-height:0}
+  }
   .grid{display:grid;grid-template-columns:minmax(0,1fr) 440px;gap:20px;align-items:start}
   .col{display:flex;flex-direction:column;gap:14px;min-width:0}
   .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
