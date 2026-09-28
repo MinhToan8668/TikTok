@@ -495,7 +495,7 @@
 
   <nav class="feat-tabs" aria-label="Công cụ trong Viral Studio">
     <a class="ft on" href="#" aria-current="page">Hook text</a>
-    <span class="ft soon" title="Đang làm">Sắp có thêm</span>
+    <a class="ft" href="kich-ban.html">Kịch bản viral</a>
   </nav>
 
   <div class="grid">
@@ -3080,6 +3080,7 @@ async function saveAllLayers() {
   $('#btnAI').addEventListener('click', runAI);
   $('#btnTrial').addEventListener('click', runAI);
   $('#acctBtn').addEventListener('click', () => openAcct());
+  if (/taikhoan/.test(location.hash)) { history.replaceState(null, '', location.pathname); setTimeout(() => openAcct(), 300); }
   $('#btnUnlock').addEventListener('click', () => state.acct ? openUpsell() : openAcct('signup'));
   $('#btnPvSize').addEventListener('click', () => { document.body.classList.toggle('pv-big'); $('#btnPvSize').textContent = document.body.classList.contains('pv-big') ? '⤡' : '⤢'; setTimeout(drawSelection, 250); });
   $('#btnDemoAI').addEventListener('click', () => { showResult(DEMO_DATA, true); openSheet(true); });

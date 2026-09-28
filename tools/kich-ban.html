@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Viral Studio · Kịch bản viral · Tự Mình Xây Kênh</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Cg%20transform%3D%22rotate%28-9%2032%2017%29%22%3E%3Crect%20x%3D%2219%22%20y%3D%2211%22%20width%3D%2226%22%20height%3D%2212%22%20rx%3D%223%22%20fill%3D%22%2399df00%22/%3E%3Cpath%20d%3D%22M30%2014.4v5.2a1%201%200%200%200%201.52.86l4.6-2.6a1%201%200%200%200%200-1.72l-4.6-2.6A1%201%200%200%200%2030%2014.4z%22%20fill%3D%22%2326210f%22/%3E%3C/g%3E%3Crect%20x%3D%2219%22%20y%3D%2228%22%20width%3D%2226%22%20height%3D%2212%22%20rx%3D%223%22%20fill%3D%22%2326210f%22/%3E%3Crect%20x%3D%224%22%20y%3D%2244%22%20width%3D%2226%22%20height%3D%2212%22%20rx%3D%223%22%20fill%3D%22%2326210f%22/%3E%3Crect%20x%3D%2234%22%20y%3D%2244%22%20width%3D%2226%22%20height%3D%2212%22%20rx%3D%223%22%20fill%3D%22%2326210f%22/%3E%3C/svg%3E">
+<meta name="description" content="Nhập kịch bản theo khung, AI của Tự Mình Xây Kênh chấm theo khoá, dự đoán điểm người xem rời, canh đúng 60–105 giây theo tốc độ nói và viết lại bằng giọng người thật.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F9E8DD; --ink:#26210F; --lime:#99DF00; --moss:#1B220D;
+    --bg:#F4E9DF; --surface:#FDF7F1; --surface-2:#F1E4D6; --line:#DCCDBC; --line-strong:#B9A891;
+    --text:#26210F; --muted:#6F6553; --accent:#99DF00; --accent-ink:#26210F; --accent-soft:#E9F7C4;
+    --pro:#26210F; --pro-text:#F9E8DD; --danger:#B4432A; --warn:#B8860B; --ok:#3E7D1F;
+    --radius:14px; --shadow:0 10px 30px rgba(38,33,15,.10);
+    --font-ui:'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --font-display:'Bricolage Grotesque', 'Be Vietnam Pro', system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme:dark;
+      --bg:#161B0B; --surface:#1F2610; --surface-2:#283016; --line:#3A4322; --line-strong:#5A6636;
+      --text:#F1EBDD; --muted:#B4AC95; --accent:#99DF00; --accent-ink:#1B220D; --accent-soft:#2E3A12;
+      --pro:#99DF00; --pro-text:#1B220D; --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme:dark;
+    --bg:#161B0B; --surface:#1F2610; --surface-2:#283016; --line:#3A4322; --line-strong:#5A6636;
+    --text:#F1EBDD; --muted:#B4AC95; --accent:#99DF00; --accent-ink:#1B220D; --accent-soft:#2E3A12;
+    --pro:#99DF00; --pro-text:#1B220D; --shadow:0 10px 30px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size:14.5px;line-height:1.5}
+  .wrap{max-width:1240px;margin:0 auto;padding-inline:16px;padding-block:18px 60px}
+  header.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+  .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit}
+  .tmxk-logo{width:38px;height:38px;flex:none}
+  .tmxk-logo .ink{fill:var(--text)}
+  .brand h1{font-family:var(--font-display);font-weight:800;font-size:22px;margin:0;letter-spacing:-.01em}
+  .brand p{margin:0;color:var(--muted);font-size:12px}
+  .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .theme-btn{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--text);cursor:pointer;font-size:16px}
+  .pill{border:1px solid var(--line-strong);background:var(--surface);color:var(--text);border-radius:999px;padding:7px 14px;font:inherit;font-weight:700;cursor:pointer;text-decoration:none;font-size:13px}
+  .pill.pro{background:var(--pro);color:var(--pro-text);border-color:transparent}
+  .feat-tabs{display:flex;gap:6px;margin:-6px 0 14px;overflow-x:auto;scrollbar-width:none}
+  .ft{flex:none;border-radius:999px;padding:6px 14px;font-size:13px;font-weight:700;text-decoration:none;border:1px solid var(--line);color:var(--muted);background:var(--surface)}
+  .ft.on{background:var(--text);color:var(--surface);border-color:var(--text)}
+  .grid{display:grid;grid-template-columns:minmax(0,1fr) 440px;gap:20px;align-items:start}
+  .col{display:flex;flex-direction:column;gap:14px;min-width:0}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+  .card h2{font-family:var(--font-display);font-weight:700;font-size:15px;margin:0 0 10px;display:flex;align-items:center;gap:8px;letter-spacing:.01em}
+  .hint{color:var(--muted);font-size:13px;margin:0 0 10px}
+  .lbl{display:block;font-size:12px;color:var(--muted);margin:10px 0 4px;font-weight:600}
+  input[type=text],select,textarea{width:100%;font:inherit;font-size:14px;color:var(--text);background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:9px 11px}
+  textarea{resize:vertical;min-height:72px;line-height:1.55}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);border-color:transparent}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;flex-wrap:wrap}
+  .seg button{font:inherit;font-size:13px;border:0;background:var(--surface-2);color:var(--muted);padding:7px 12px;cursor:pointer}
+  .seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);font-weight:600}
+  .btn{font:inherit;font-weight:600;border:1px solid var(--line-strong);background:var(--surface);color:var(--text);border-radius:10px;padding:9px 14px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;text-decoration:none}
+  .btn.pro{background:var(--pro);color:var(--pro-text);border-color:transparent}
+  .btn.lg{padding:12px 18px;font-size:15px}
+  .btn.wide{width:100%;justify-content:center}
+  .btn:disabled{opacity:.55;cursor:default}
+  .linkbtn{border:0;background:none;color:var(--text);font:inherit;font-weight:700;text-decoration:underline;cursor:pointer;padding:0}
+  .status{font-size:13px;color:var(--muted);margin-top:8px;min-height:1.2em}
+  .status.err{color:var(--danger)} .status.ok{color:var(--ok)}
+  .spinner{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .8s linear infinite;vertical-align:-2px;margin-right:6px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .lock{background:var(--pro);color:var(--pro-text);font-size:9.5px;font-weight:800;letter-spacing:.08em;padding:2px 6px;border-radius:999px;vertical-align:2px}
+  .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:999px;font-size:13px;box-shadow:var(--shadow);opacity:0;transition:.2s;pointer-events:none;z-index:30;max-width:92vw;text-align:center}
+  .toast.show{opacity:1}
+  /* khung */
+  .khung-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
+  .khung{text-align:left;border:1.5px solid var(--line);background:var(--surface-2);color:var(--text);border-radius:12px;padding:10px 12px;font:inherit;cursor:pointer;display:grid;gap:3px}
+  .khung b{font-size:13.5px}
+  .khung small{color:var(--muted);font-size:12px;line-height:1.35}
+  .khung[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 2px var(--accent) inset}
+  .khung .use{font-size:11px;color:var(--ok);font-weight:600}
+  /* phần kịch bản */
+  .phan{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:10px;background:var(--surface)}
+  .phan-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:6px}
+  .phan-head b{font-size:13.5px}
+  .phan-head b i{display:inline-block;width:20px;height:20px;border-radius:50%;background:var(--text);color:var(--surface);font-style:normal;font-size:11px;text-align:center;line-height:20px;margin-right:6px}
+  .phan-time{font-size:12px;color:var(--muted);white-space:nowrap}
+  .phan-time.bad{color:var(--danger)} .phan-time.warn{color:var(--warn)} .phan-time.ok{color:var(--ok)}
+  .phan small.tip{display:block;color:var(--muted);font-size:12px;margin-bottom:6px;line-height:1.4}
+  .tl{margin-top:12px}
+  .tl-bar{position:relative;height:16px;border-radius:999px;background:var(--surface-2);overflow:hidden;border:1px solid var(--line)}
+  .tl-bar i{position:absolute;top:0;bottom:0}
+  .tl-band{position:absolute;top:-4px;bottom:-4px;border-left:2px dashed var(--ok);border-right:2px dashed var(--ok);pointer-events:none}
+  .tl-lbl{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:4px}
+  .tl-total{font-size:22px;font-family:var(--font-display);font-weight:800;line-height:1}
+  .tl-total.bad{color:var(--danger)} .tl-total.warn{color:var(--warn)} .tl-total.ok{color:var(--ok)}
+  .tl-drop{position:absolute;top:-6px;width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-top:9px solid var(--danger);transform:translateX(-50%)}
+  /* kết quả */
+  .score-wrap{display:flex;gap:14px;align-items:center}
+  .ring{--p:0;width:96px;height:96px;border-radius:50%;background:conic-gradient(var(--accent) calc(var(--p)*1%),var(--surface-2) 0);display:grid;place-items:center;flex:none}
+  .ring b{width:74px;height:74px;border-radius:50%;background:var(--surface);display:grid;place-items:center;font-family:var(--font-display);font-size:26px;font-weight:800}
+  .ring b small{font-size:10px;color:var(--muted);font-weight:600;display:block;text-align:center;line-height:1}
+  .bars{flex:1;display:grid;gap:5px;min-width:0}
+  .bar{display:grid;grid-template-columns:118px 1fr 28px;gap:8px;align-items:center;font-size:12px}
+  .bar span:last-child{text-align:right;font-weight:700}
+  .bar i{height:8px;border-radius:999px;background:var(--surface-2);overflow:hidden;display:block}
+  .bar i b{display:block;height:100%;background:var(--accent);border-radius:999px}
+  .verdict{margin:12px 0 0;padding:10px 12px;border-left:3px solid var(--text);background:var(--surface-2);border-radius:0 10px 10px 0;font-size:14px;line-height:1.5}
+  .kq h3{font-size:13px;margin:16px 0 6px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+  .kq ul{margin:0;padding-left:18px}
+  .kq li{margin:4px 0}
+  .box{background:var(--surface-2);border-radius:10px;padding:10px 12px;font-size:13.5px;line-height:1.5}
+  .box.praise{background:var(--accent-soft)}
+  .drop{display:grid;grid-template-columns:52px 1fr;gap:8px;padding:8px 0;border-top:1px dashed var(--line)}
+  .drop:first-child{border-top:0}
+  .drop b{color:var(--danger);font-size:16px;font-family:var(--font-display)}
+  .drop q{display:block;font-style:italic;color:var(--muted);font-size:12.5px}
+  .rw{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-top:6px}
+  .rw .tc{font-family:var(--font-display);font-weight:700;font-size:12px;color:var(--ok);margin-right:8px}
+  .rw b{font-size:13px}
+  .rw p{margin:6px 0 4px;white-space:pre-wrap;line-height:1.55}
+  .rw small{color:var(--muted);font-size:12px}
+  .giong{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px;font-size:13px}
+  .giong .m{color:var(--danger);text-decoration:line-through;text-decoration-color:rgba(180,67,42,.5)}
+  .giong .n{color:var(--ok)}
+  .kq .row{margin-top:10px}
+  .tags span{display:inline-block;background:var(--surface-2);border-radius:999px;padding:3px 9px;font-size:12px;margin:2px 4px 2px 0}
+  .quota{font-size:12.5px;color:var(--muted)}
+  .empty{color:var(--muted);font-size:13.5px;line-height:1.6;padding:8px 0}
+  .empty b{color:var(--text)}
+  .upsell{position:fixed;inset:0;background:rgba(20,18,8,.6);display:none;place-items:center;padding:20px;z-index:10}
+  .upsell.show{display:grid}
+  .upsell .box2{background:var(--surface);border-radius:20px;padding:22px;max-width:440px;width:100%;box-shadow:var(--shadow)}
+  .upsell h3{margin:0 0 6px;font-family:var(--font-display);font-size:20px}
+  @media (max-width:900px){
+    .grid{grid-template-columns:1fr}
+    .two{grid-template-columns:1fr}
+    .bar{grid-template-columns:96px 1fr 28px}
+    .brand h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="../index.html" aria-label="Tự Mình Xây Kênh, về trang chủ">
+      <svg class="tmxk-logo" viewBox="0 0 64 64" aria-hidden="true"><g transform="rotate(-9 32 17)"><rect x="19" y="11" width="26" height="12" rx="3" fill="#99df00"/><path d="M30 14.4v5.2a1 1 0 0 0 1.52.86l4.6-2.6a1 1 0 0 0 0-1.72l-4.6-2.6A1 1 0 0 0 30 14.4z" fill="#26210f"/></g><rect class="ink" x="19" y="28" width="26" height="12" rx="3"/><rect class="ink" x="4" y="44" width="26" height="12" rx="3"/><rect class="ink" x="34" y="44" width="26" height="12" rx="3"/></svg>
+      <div><h1>Viral Studio</h1><p>by Tự Mình Xây Kênh</p></div>
+    </a>
+    <div class="row" style="gap:8px">
+      <span class="quota" id="quota"></span>
+      <button class="theme-btn" id="themeBtn" type="button" aria-label="Đổi giao diện sáng hoặc tối">◐</button>
+      <a class="pill pro" id="acctBtn" href="hook-text.html#taikhoan">Tài khoản</a>
+    </div>
+  </header>
+
+  <nav class="feat-tabs" aria-label="Công cụ trong Viral Studio">
+    <a class="ft" href="hook-text.html">Hook text</a>
+    <a class="ft on" href="#" aria-current="page">Kịch bản viral</a>
+  </nav>
+
+  <div class="grid">
+    <div class="col">
+      <section class="card">
+        <h2>1 · Video này nói với ai, để làm gì</h2>
+        <p class="hint">AI chấm theo đúng tệp và mục tiêu bạn chọn. Điền càng thật, góp ý càng trúng.</p>
+        <div class="two">
+          <div><label class="lbl" for="chuDe">Chủ đề / ngách của kênh</label><input type="text" id="chuDe" placeholder="VD: nấu ăn cho mẹ bỉm đi làm, kinh nghiệm đi làm ngân hàng, quán bún nhà mình"></div>
+          <div><label class="lbl" for="doiTuong">Người xem là ai (càng cụ thể càng tốt)</label><input type="text" id="doiTuong" placeholder="VD: mẹ 25–35 tuổi nuôi con dưới 3 tuổi, đi làm văn phòng, tối vẫn phải nấu"></div>
+        </div>
+        <label class="lbl">Mục tiêu video</label>
+        <div class="seg" id="mucTieu" role="group"><button type="button" data-v="nhan_biet" aria-pressed="true">Kéo người mới (viral)</button><button type="button" data-v="uy_tin" aria-pressed="false">Tạo uy tín</button><button type="button" data-v="chuyen_doi" aria-pressed="false">Ra đơn / booking</button></div>
+        <div class="two">
+          <div><label class="lbl" for="xungHo">Xưng hô, giọng kênh</label>
+            <select id="xungHo"><option value="mình – mấy bạn">mình – mấy bạn</option><option value="mình – mấy chị">mình – mấy chị (tâm sự)</option><option value="tui – mấy sốp">tui – mấy sốp (cợt nhả)</option><option value="dì – bé">dì – bé (chữa lành)</option><option value="em – anh chị">em – anh chị (bán hàng)</option><option value="tao – mày">tao – mày (bạn thân)</option><option value="tôi – các bạn">tôi – các bạn (chuyên gia)</option><option value="tự nhiên theo kịch bản">để AI đọc từ kịch bản</option></select></div>
+          <div id="spWrap" hidden><label class="lbl" for="sanPham">Sản phẩm / dịch vụ (nếu có)</label><input type="text" id="sanPham" placeholder="VD: combo hải sản 1tr2, khoá học 540k, chảo chống dính"></div>
+        </div>
+        <div class="two">
+          <div><label class="lbl">Dạng quay</label><div class="seg" id="dang" role="group"><button type="button" data-v="noi_camera" aria-pressed="true">Nói vào camera</button><button type="button" data-v="voice_over" aria-pressed="false">Voice-over</button><button type="button" data-v="text" aria-pressed="false">Chữ chạy</button></div></div>
+          <div><label class="lbl">Tốc độ nói của bạn</label><div class="seg" id="tocDo" role="group"><button type="button" data-v="cham" aria-pressed="false">Chậm · 2,3 chữ/s</button><button type="button" data-v="vua" aria-pressed="true">Vừa · 2,8</button><button type="button" data-v="nhanh" aria-pressed="false">Nhanh · 3,3</button></div></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>2 · Chọn khung kịch bản</h2>
+        <p class="hint">Mỗi khung là một bố cục đã ra video triệu view trong khoá. Chọn theo loại chuyện bạn định kể.</p>
+        <div class="khung-grid" id="khungGrid"></div>
+      </section>
+
+      <section class="card">
+        <h2>3 · Viết kịch bản theo từng phần <span id="khungTen" class="hint" style="margin:0;font-weight:400"></span></h2>
+        <p class="hint">Viết đúng như bạn sẽ nói, đừng gọt cho văn vẻ. Đồng hồ bên phải mỗi phần đếm theo tốc độ nói bạn chọn. Mục tiêu cả video <b>60–105 giây</b>.</p>
+        <div id="phanList"></div>
+        <div class="tl">
+          <div class="row" style="justify-content:space-between;align-items:flex-end;margin-bottom:6px">
+            <div><div class="tl-total" id="tlTotal">0s</div><div class="hint" style="margin:0" id="tlNote">Chưa có chữ nào.</div></div>
+            <div class="hint" style="margin:0;text-align:right" id="tlWords"></div>
+          </div>
+          <div class="tl-bar" id="tlBar"><div class="tl-band" id="tlBand"></div></div>
+          <div class="tl-lbl"><span>0s</span><span>60s</span><span>105s</span><span id="tlMax">120s</span></div>
+        </div>
+        <div class="row" style="margin-top:14px;justify-content:space-between">
+          <button class="btn pro lg" id="btnCham" type="button">✦ Chấm kịch bản <small style="font-weight:500;opacity:.8">· 1 lượt AI</small></button>
+          <div class="row" style="gap:6px"><button class="btn" id="btnCopy" type="button">Chép kịch bản</button><button class="btn" id="btnClear" type="button">Xoá viết lại</button></div>
+        </div>
+        <div class="status" id="chamStatus"></div>
+      </section>
+    </div>
+
+    <div class="col">
+      <section class="card kq" id="kq">
+        <h2>Kết quả khám kịch bản</h2>
+        <div class="empty" id="kqEmpty">
+          Điền kịch bản rồi bấm <b>✦ Chấm kịch bản</b>. AI của Tự Mình Xây Kênh sẽ:
+          <ul style="margin:6px 0 0;padding-left:18px">
+            <li>chấm 5 tiêu chí theo khoá: hook 3 giây, nhịp giữ chân, cảm xúc và chi tiết, rõ ràng đúng tệp, kết và giọng;</li>
+            <li>chỉ ra <b>giây nào người xem sẽ lướt</b> và vì sao;</li>
+            <li>bắt các câu nghe như <b>văn máy</b> và nói lại cho ra người thật;</li>
+            <li>viết lại trọn kịch bản đúng khung, canh <b>60–105 giây</b> theo tốc độ nói của bạn, kèm mốc thời gian và 4–5 ý chính để quay không cần nhìn giấy;</li>
+            <li>đề xuất chữ hook trên màn hình, caption và hashtag.</li>
+          </ul>
+        </div>
+        <div id="kqBody" hidden></div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<div class="upsell" id="upsell" role="dialog" aria-modal="true">
+  <div class="box2">
+    <h3 id="upTitle">✦ Dùng thử miễn phí</h3>
+    <p class="hint" id="upText"></p>
+    <div class="row" style="gap:8px;margin-top:6px">
+      <a class="btn pro" href="hook-text.html#taikhoan">Tạo tài khoản / Đăng nhập</a>
+      <button class="btn" type="button" id="upClose">Để sau</button>
+    </div>
+    <p class="hint" style="margin:10px 0 0">Tài khoản miễn phí có 10 lượt AI. Pro 50k/tháng dùng 20 lượt mỗi ngày. Học viên khoá dùng không giới hạn.</p>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const el = (t, c, txt) => { const e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; };
+const ls = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} } };
+const API = 'https://script.google.com/macros/s/AKfycbyxe1nWupAl6VheDZHaU3Ojm-d6c8F_khhUMtkehNCLh5OnGW6f2uF0PKPYZ4eYUqyGjQ/exec';
+const HV_KEY = 'tmxk_hv', ND_KEY = 'vs_user';
+const DEMO = /demo/.test(location.hash);
+function hvToken() { try { const o = JSON.parse(ls.get(HV_KEY) || 'null'); return o && o.token ? o.token : ''; } catch { return ''; } }
+function ndToken() { try { const o = JSON.parse(ls.get(ND_KEY) || 'null'); return o && o.token ? o.token : ''; } catch { return ''; } }
+function authToken() { return hvToken() || ndToken(); }
+function devId() { let d = ls.get('vs_dev'); if (!d || d.length < 8) { d = 'd' + Math.random().toString(36).slice(2, 12) + Date.now().toString(36); ls.set('vs_dev', d); } return d; }
+async function callApi(body) { const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) }); return r.json(); }
+let toastT; function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2600); }
+
+/* ---------- khung kịch bản: từ các buổi Storytelling của khoá ---------- */
+const TOC_DO = { cham: 2.35, vua: 2.8, nhanh: 3.3 };
+const KHUNG = [
+  { k: 'khoanhkhac', n: 'Một khoảnh khắc (5W-1H)', d: 'Kể MỘT khoảnh khắc thật, tả từng hành động nhỏ', use: 'Chuyện gia đình, đời thường, cảm xúc', phan: [
+    ['loi_thoai', 'Mở bằng một câu thoại', 'Một câu ai đó nói trong khoảnh khắc đó. VD: "Để tôi bóc tôm cho bà ngoại." Không dẫn chuyện, không chào.', .05],
+    ['tai_sao', 'Vì sao có khoảnh khắc đó', 'Ai nói câu đó, với ai, hoàn cảnh nào dẫn tới. 2–3 câu.', .15],
+    ['boi_canh', 'Bối cảnh, từng hành động nhỏ', 'Kể liên tiếp 4–5 hành động nhỏ: mời mãi → gắp món khác → nhìn → không nói gì → chọn con to nhất → gỡ từng cái vỏ → bỏ vô chén.', .42],
+    ['cam_xuc', 'Cảm xúc của mình (show, đừng kể)', 'Đừng viết "mình xúc động". Viết cơ thể mình làm gì: "miệng nhai cơm mà mắt cay xè".', .2],
+    ['ket', 'Bài học cá nhân', 'Một câu cảm nghĩ riêng của mình. Không triết lý chung "hãy trân trọng gia đình".', .18] ] },
+  { k: 'bonnhip', n: 'Kể chuyện 4 nhịp', d: 'Vấn đề → tình huống → hậu quả → quan điểm', use: 'Chuyện đi học, đi làm, mối quan hệ', phan: [
+    ['van_de', 'Câu đánh thẳng vào vấn đề', 'Một câu hỏi hoặc khẳng định người xem đang gặp. VD: "Làm sao sinh viên cân bằng đi học và đi làm?"', .06],
+    ['tinh_huong', 'Tình huống thật', 'Chuyện gì xảy ra, khi nào, mình thấy sao. Tả hình ảnh: "3h sáng chạy deadline, 6h chuông iPhone như đấm vào tai, mắt thâm như gấu trúc".', .42],
+    ['hau_qua', 'Hậu quả / kết quả', 'Điều gì xảy ra sau đó. Cụ thể, có con số nếu có.', .26],
+    ['quan_diem', 'Quan điểm + giải pháp', 'Mình nhận ra gì, giờ mình làm khác đi thế nào. Kết bằng một câu của riêng mình.', .26] ] },
+  { k: 'kinhnghiem', n: 'Chia sẻ kinh nghiệm (6 bước)', d: 'Hook xanh chín, xung đột, giải pháp kèm suy nghĩ', use: 'Xây thương hiệu cá nhân, bán dịch vụ giá cao', phan: [
+    ['hook', 'Hook xanh chín', 'Câu khẳng định chắc nịch dáng chân lý. VD: "Có 3 nguyên lý khi đi tìm việc BẤT DI BẤT DỊCH, dù bạn ở level nào."', .07],
+    ['boi_canh', 'Bối cảnh, xuất phát điểm', 'Nhân vật là ai, đang ở đâu, hoàn cảnh thế nào. Có tên trường, tên nghề, con số.', .18],
+    ['xung_dot', 'Xung đột', 'Khó khăn cụ thể phải vượt. Cái gì cản đường, ai nói không.', .2],
+    ['giai_phap', 'Giải pháp + SUY NGHĨ đằng sau', 'Xương sống: mình nghĩ gì, suy luận thế nào rồi mới làm. Đây là chỗ AI không viết thay được.', .38],
+    ['chot', 'Chốt quan điểm', 'Một câu cho người ta lăng kính mới. VD: "Không quan trọng bạn có gì, quan trọng người ta có cần không."', .17] ] },
+  { k: 'chanthuc', n: 'Chân thực 2026', d: 'Nêu vấn đề → mô tả thật cụ thể → giải pháp', use: 'Nỗi đau khách hàng, chuyện nghề', phan: [
+    ['van_de', 'Nêu vấn đề nhiều người gặp', 'Tình huống hoặc nỗi đau của đúng tệp người xem. 1–2 câu.', .1],
+    ['mo_ta', 'Mô tả vấn đề cụ thể nhất có thể', 'Kể chuyện mình đã hoặc đang trải qua. Chi tiết nhìn thấy, nghe thấy, con số, thời điểm.', .55],
+    ['giai_phap', 'Giải pháp hoặc bài học', 'Mình làm gì để qua, hoặc rút ra gì. Nói như với bạn thân.', .35] ] },
+  { k: 'vlog', n: 'Daily vlog cảm xúc', d: 'Quay cường độ cảm xúc, không quay hành động', use: 'Một ngày của quán, của mẹ bỉm, của người đi làm', phan: [
+    ['mo_canh', 'Mở cảnh: giờ giấc, cái mệt thật', '"5 giờ sáng, trời tối om, hai vợ chồng lọ mọ kéo cửa quán, mắt còn lờ đờ…"', .12],
+    ['canh1', 'Cảnh 1 + cảm xúc trong hành động', 'Không chỉ "mở quán". Có cái ngáp, cái va vấp, cái quên đồ.', .24],
+    ['canh2', 'Cảnh 2 + một sự cố nhỏ', 'Chi tiết đời thường khiến người xem thấy "nhà mình cũng vậy".', .24],
+    ['canh3', 'Cảnh 3, cao trào của ngày', 'Khoảnh khắc đáng nhớ nhất. Người xem đồng cảm với sự cố gắng, không phải thành công.', .24],
+    ['ket', 'Kết', 'Một câu về ngày hôm đó, hoặc câu hỏi mở cho người xem kể chuyện của họ.', .16] ] },
+  { k: 'fichtean', n: 'Thử thách (Fichtean)', d: 'Vào thẳng hành động, khó dần, không đoạn chùng', use: 'Thử thách, phản ứng, "24h không…"', phan: [
+    ['vao_thang', 'Vào thẳng hành động', '"Tôi đã thử ăn mì cay cấp độ 10 và đây là điều xảy ra." Không giới thiệu.', .07],
+    ['tt1', 'Thử thách 1', 'Miếng đầu tiên: chuyện gì xảy ra ngay lập tức.', .22],
+    ['tt2', 'Thử thách 2, khó hơn', 'Mồ hôi túa, nước mắt rơi, nhưng vẫn tiếp.', .24],
+    ['tt3', 'Thử thách 3, khó nhất', 'Đỉnh căng thẳng. Tưởng không qua nổi.', .26],
+    ['ket', 'Kết luận mạnh', 'Hoàn thành hay không, và một bài học thật.', .21] ] },
+  { k: 'baydiem', n: 'Chuyện dài 7 điểm', d: 'Hai lần thắt, hai bước ngoặt, kết sâu', use: 'Chuyện cá nhân truyền cảm hứng', phan: [
+    ['mo', 'Mở đầu hấp dẫn', '"Tôi từng phá sản, mất hết. Nhưng đây là cách tôi trở lại."', .06],
+    ['ct1', 'Cao trào 1: sự kiện thú vị', 'Chuyện đang tốt, có gì đó bắt đầu.', .12],
+    ['that1', 'Thắt 1: xung đột', 'Một quyết định sai, mọi thứ căng lên.', .15],
+    ['giua', 'Điểm giữa: bước ngoặt', 'Một cuộc gặp, một câu nói làm mình nhận ra điều gì.', .17],
+    ['that2', 'Thắt 2: tưởng bế tắc', 'Thử áp dụng nhưng thất bại lần nữa.', .17],
+    ['bn2', 'Bước ngoặt 2: phát hiện bất ngờ', 'Tìm ra chiến lược đúng.', .17],
+    ['ket', 'Kết: bài học sâu', 'Xây lại, lần này khác chỗ nào. Một câu để lại.', .16] ] },
+  { k: 'tips', n: 'Danh sách hữu ích', d: 'Hook có số, mỗi ý một ví dụ thật', use: '"3 cách…", "5 lỗi…" cho đúng tệp', phan: [
+    ['hook', 'Hook có con số và đối tượng', '"3 lỗi khi vay tiêu dùng khiến bạn trả gấp đôi." Có số, có đối tượng, có mất mát cụ thể.', .07],
+    ['y1', 'Ý 1 + ví dụ thật', 'Không chỉ nêu ý, kể một lần mình hoặc khách gặp.', .26],
+    ['y2', 'Ý 2 + ví dụ thật', 'Ý đắt hơn ý 1.', .26],
+    ['y3', 'Ý 3, ý đắt nhất', 'Ý người ta ít biết nhất, giữ tới cuối.', .26],
+    ['ket', 'Kết + kêu gọi cụ thể', '"Comment nghề của bạn, mình chỉ đúng lỗi bạn hay mắc." Không like share follow.', .15] ] },
+  { k: 'hoi', n: 'Bán hàng HỜI 3 tầng', d: 'Con số để khách tự chia, xếp từng món', use: 'Combo, set quà, khoá học, sản phẩm có giá', phan: [
+    ['hook', 'Hook 2–3 con số', '"Combo 1tr2 cho gia đình 4 người ăn 10 ngày." Không nói rẻ, không nói hời.', .08],
+    ['tung_mon', 'Xếp từng món vào', 'Mỗi món một câu tả: chất, nguồn, cách ăn. Không quay tổng quan một phát.', .5],
+    ['mon_dat', 'Món ai cũng biết là đắt', 'Dừng lại khen riêng: vì sao nó đắt, vì sao mình vẫn cho vào.', .22],
+    ['cta', 'Kêu gọi', 'Cách đặt, còn bao nhiêu suất, giao thế nào. Một câu.', .2] ] },
+  { k: 'giohang', n: 'Viral có cài giỏ hàng', d: 'Chuyện viral, 5–6 giây cho một tính năng', use: 'Affiliate, tuyến "vợ dạy chồng", review đời thường', phan: [
+    ['hook', 'Hook của câu chuyện', 'Hook như video viral bình thường, sản phẩm chưa xuất hiện.', .07],
+    ['chuyen', 'Câu chuyện có sản phẩm bên trong', 'Tình huống làm nổi bật đúng MỘT tính năng: chồng rán nem be bét vì chảo thường…', .55],
+    ['tinh_nang', '5–6 giây cho MỘT tính năng', 'Chỉ một tính năng đặc sắc nhất, nói trong 5–6 giây.', .1],
+    ['ket', 'Kết + kêu gọi bấm link', 'Kết câu chuyện rồi chỉ link ở góc trái hoặc bình luận.', .28] ] },
+  { k: 'tudo', n: 'Tự do', d: 'Mở, thân, kết theo ý bạn', use: 'Khi chuyện của bạn không vừa khung nào', phan: [
+    ['mo', 'Mở bài (3–5 giây)', 'Câu đầu tiên người ta nghe. Không chào, không giới thiệu.', .08],
+    ['than', 'Thân bài', 'Kể đủ, tả kỹ, một video một khoảnh khắc.', .72],
+    ['ket', 'Kết bài', 'Bài học riêng hoặc câu hỏi kéo bình luận.', .2] ] },
+];
+const state = { khung: 'khoanhkhac', mucTieu: 'nhan_biet', dang: 'noi_camera', tocDo: 'vua', text: {}, kq: null };
+try { Object.assign(state, JSON.parse(ls.get('kb.draft') || '{}'), { kq: null }); } catch {}
+if (!KHUNG.find(x => x.k === state.khung)) state.khung = 'khoanhkhac';
+function khungHienTai() { return KHUNG.find(x => x.k === state.khung); }
+function saveDraft() { ls.set('kb.draft', JSON.stringify({ khung: state.khung, mucTieu: state.mucTieu, dang: state.dang, tocDo: state.tocDo, text: state.text, chuDe: $('#chuDe').value, doiTuong: $('#doiTuong').value, xungHo: $('#xungHo').value, sanPham: $('#sanPham').value })); }
+function demChu(t) { return String(t || '').replace(/\*\*|_/g, ' ').split(/\s+/).filter(w => /[0-9A-Za-zÀ-ỹ]/.test(w)).length; }
+function giay(n) { return n / TOC_DO[state.tocDo] * 1.06; }
+function fmtS(s) { s = Math.round(s); return s >= 60 ? `${Math.floor(s / 60)}p${String(s % 60).padStart(2, '0')}` : `${s}s`; }
+
+function setSeg(id, v) { document.querySelectorAll(`#${id} button`).forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === v))); }
+function bindSeg(id, fn) { document.querySelectorAll(`#${id} button`).forEach(b => b.addEventListener('click', () => { setSeg(id, b.dataset.v); fn(b.dataset.v); })); }
+
+function buildKhung() {
+  const box = $('#khungGrid'); box.innerHTML = '';
+  for (const K of KHUNG) {
+    const b = el('button', 'khung'); b.type = 'button'; b.dataset.k = K.k; b.setAttribute('aria-pressed', String(K.k === state.khung));
+    b.append(el('b', null, K.n), el('small', null, K.d), el('span', 'use', 'Hợp: ' + K.use));
+    b.onclick = () => { state.khung = K.k; document.querySelectorAll('.khung').forEach(x => x.setAttribute('aria-pressed', String(x === b))); buildPhan(); saveDraft(); };
+    box.append(b);
+  }
+}
+const COLORS = ['#99DF00', '#5EE7C6', '#FFD166', '#FF9A3C', '#FF6FB5', '#B07CFF', '#4DA3FF'];
+function buildPhan() {
+  const K = khungHienTai(); $('#khungTen').textContent = '· ' + K.n;
+  $('#spWrap').hidden = !['hoi', 'giohang'].includes(K.k) && state.mucTieu !== 'chuyen_doi';
+  const box = $('#phanList'); box.innerHTML = '';
+  state.text[K.k] = state.text[K.k] || {};
+  K.phan.forEach(([k, ten, tip], i) => {
+    const w = el('div', 'phan'); const h = el('div', 'phan-head'); const b = el('b'); b.innerHTML = `<i>${i + 1}</i>${ten}`; const t = el('span', 'phan-time'); t.dataset.k = k; h.append(b, t);
+    const ta = document.createElement('textarea'); ta.placeholder = tip; ta.value = state.text[K.k][k] || ''; ta.rows = i === 0 ? 2 : 3; ta.dataset.k = k;
+    ta.addEventListener('input', () => { state.text[K.k][k] = ta.value; updateTimes(); saveDraft(); });
+    w.append(h, el('small', 'tip', tip), ta); box.append(w);
+  });
+  updateTimes();
+}
+function updateTimes() {
+  const K = khungHienTai(), T = state.text[K.k] || {}; let total = 0, words = 0; const segs = [];
+  K.phan.forEach(([k, ten, tip, share], i) => {
+    const n = demChu(T[k]), s = giay(n); total += s; words += n; segs.push([s, COLORS[i % COLORS.length], ten]);
+    const goal = [share * 60, share * 105]; const e = document.querySelector(`.phan-time[data-k="${k}"]`); if (!e) return;
+    const cls = !n ? '' : s < goal[0] * .6 ? 'bad' : s < goal[0] ? 'warn' : s > goal[1] * 1.3 ? 'bad' : s > goal[1] ? 'warn' : 'ok';
+    e.className = 'phan-time ' + cls; e.textContent = n ? `${n} chữ ≈ ${fmtS(s)} · nên ${Math.round(goal[0])}–${Math.round(goal[1])}s` : `nên ${Math.round(goal[0])}–${Math.round(goal[1])}s`;
+  });
+  const max = Math.max(120, total * 1.05); $('#tlMax').textContent = fmtS(max);
+  const bar = $('#tlBar'); bar.querySelectorAll('i,.tl-drop').forEach(x => x.remove()); let x = 0;
+  segs.forEach(([s, c, ten]) => { const i = el('i'); i.style.left = (x / max * 100) + '%'; i.style.width = (s / max * 100) + '%'; i.style.background = c; i.title = `${ten}: ${fmtS(s)}`; bar.append(i); x += s; });
+  const band = $('#tlBand'); band.style.left = (60 / max * 100) + '%'; band.style.width = (45 / max * 100) + '%';
+  if (state.kq && Array.isArray(state.kq.diem_roi)) state.kq.diem_roi.forEach(d => { const m = el('span', 'tl-drop'); m.style.left = (Math.min(d.giay, max) / max * 100) + '%'; m.title = `Người xem dễ lướt ở giây ${d.giay}: ${d.ly_do}`; bar.append(m); });
+  const tot = $('#tlTotal'); tot.textContent = fmtS(total);
+  tot.className = 'tl-total ' + (!words ? '' : total < 45 ? 'bad' : total < 60 ? 'warn' : total <= 105 ? 'ok' : total <= 125 ? 'warn' : 'bad');
+  $('#tlWords').textContent = words ? `${words} chữ · tốc độ ${TOC_DO[state.tocDo]} chữ/giây` : '';
+  const need = [Math.round(60 * TOC_DO[state.tocDo] / 1.06), Math.round(105 * TOC_DO[state.tocDo] / 1.06)];
+  $('#tlNote').textContent = !words ? `Cần khoảng ${need[0]}–${need[1]} chữ cho 60–105 giây ở tốc độ này.`
+    : total < 60 ? `Còn thiếu khoảng ${Math.round((60 - total) * TOC_DO[state.tocDo])} chữ nữa mới đủ 60 giây. Thường thiếu ở phần tả chi tiết.`
+    : total <= 105 ? 'Đúng khung 60–105 giây. Giờ xem từng phần có cân không.'
+    : `Dư khoảng ${Math.round((total - 105) * TOC_DO[state.tocDo])} chữ. Cắt ý trùng, từ thừa trước; đừng cắt chi tiết đắt.`;
+}
+function goiKichBan() { const K = khungHienTai(), T = state.text[K.k] || {}; return K.phan.map(([k, ten]) => ({ k, ten, text: (T[k] || '').trim() })); }
+function kichBanText(parts) { return parts.filter(p => p.text).map(p => p.text).join('\n\n'); }
+
+/* ---------- quota / tài khoản ---------- */
+let plan = 'guest', trial = null;
+async function loadQuota() {
+  if (DEMO) { $('#quota').textContent = 'Bản demo'; return; }
+  try {
+    const r = await callApi({ action: 'hook_status', token: authToken(), thu: authToken() ? undefined : devId() });
+    if (!r.ok) { $('#quota').textContent = ''; return; }
+    plan = r.loai || 'guest'; trial = r.con;
+    $('#quota').textContent = r.con == null ? `${r.ten || 'Mentor'} · AI không giới hạn` : plan === 'khach' ? `Khách thử: còn ${r.con}/${r.han} lượt AI` : `${r.ten ? r.ten + ' · ' : ''}còn ${r.con}/${r.han} lượt AI${plan === 'free' ? ' miễn phí' : ' hôm nay'}`;
+    $('#acctBtn').textContent = plan === 'khach' ? 'Tài khoản' : plan === 'free' ? 'Free' : plan === 'pro' ? '✦ Pro' : 'Học viên';
+  } catch { $('#quota').textContent = ''; }
+}
+function openUpsell(title, text) { $('#upTitle').textContent = title; $('#upText').textContent = text; $('#upsell').classList.add('show'); }
+
+/* ---------- chấm ---------- */
+const ERR = { het_thu: 'Bạn đã dùng hết 3 lượt AI thử. Tạo tài khoản miễn phí để có thêm 10 lượt.', het_luot_thu: 'Bạn đã dùng hết lượt AI miễn phí. Mua Pro 50k/tháng hoặc đăng ký học viên để dùng tiếp.', het_luot: 'Hết lượt AI hôm nay, mai quay lại nhé.', het_phien: 'Phiên đăng nhập hết hạn. Đăng nhập lại ở trang Hook text.', thieu_text: 'Chưa có chữ nào để chấm.', chua_cai_key: 'Máy chủ chưa cài khóa AI. Báo mentor.', sai_key: 'Khóa AI trên máy chủ không hợp lệ. Báo mentor.', ban_qua: 'AI đang bận, thử lại sau một phút.', tu_choi: 'AI không xử lý được nội dung này, thử diễn đạt khác.', loi_mang: 'Máy chủ không gọi được AI, thử lại.', unknown_action: 'Máy chủ chưa cập nhật.' };
+let busy = false;
+async function cham() {
+  if (busy) return;
+  const parts = goiKichBan(); if (!kichBanText(parts).trim()) { toast('Viết kịch bản trước đã'); return; }
+  const st = $('#chamStatus'), btn = $('#btnCham'); busy = true; btn.disabled = true;
+  const t0 = Date.now(); const tick = setInterval(() => { st.className = 'status'; st.innerHTML = `<span class="spinner"></span>Mentor AI đang đọc từng câu và canh giờ · ${Math.round((Date.now() - t0) / 1000)} giây (thường 20–50 giây)`; }, 400);
+  try {
+    let r;
+    if (DEMO) { await new Promise(z => setTimeout(z, 1200)); r = { ok: true, data: demoData(parts), con: 9, han: 10 }; }
+    else r = await callApi({ action: 'hook_ai', mode: 'script', token: authToken(), thu: authToken() ? undefined : devId(), khung: state.khung, phan: parts, chu_de: $('#chuDe').value.trim(), doi_tuong: $('#doiTuong').value.trim(), muc_tieu: state.mucTieu, xung_ho: $('#xungHo').value, dang: state.dang, toc_do: state.tocDo, san_pham: $('#sanPham').value.trim() });
+    clearInterval(tick);
+    if (!r.ok) {
+      st.className = 'status err'; st.textContent = (ERR[r.error] || 'Có lỗi khi gọi AI, thử lại sau.') + (r.chi_tiet ? ' Mã lỗi: ' + r.chi_tiet : '');
+      if (r.error === 'het_thu') openUpsell('Hết 3 lượt thử', ERR.het_thu);
+      if (r.error === 'het_luot_thu') openUpsell('Hết lượt AI miễn phí', ERR.het_luot_thu);
+      if (r.error === 'unknown_action' || (r.data && !r.data.score)) st.textContent = 'Máy chủ đang chạy HookAI.gs bản cũ nên chưa có chấm kịch bản. Mentor dán HookAI.gs mới vào Apps Script rồi Deploy, chọn New version.';
+      return;
+    }
+    if (!r.data || !r.data.score) { st.className = 'status err'; st.textContent = 'Máy chủ đang chạy HookAI.gs bản cũ nên chưa có chấm kịch bản. Mentor dán HookAI.gs mới rồi Deploy, chọn New version.'; return; }
+    state.kq = r.data; renderKq(r.data, parts); updateTimes();
+    st.className = 'status ok'; st.textContent = `Xong sau ${Math.round((Date.now() - t0) / 1000)} giây.` + (r.con != null ? ` Còn ${r.con}/${r.han} lượt.` : '');
+    if (r.con != null) $('#quota').textContent = plan === 'khach' ? `Khách thử: còn ${r.con}/${r.han} lượt AI` : `còn ${r.con}/${r.han} lượt AI`;
+    if (matchMedia('(max-width:900px)').matches) $('#kq').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch { clearInterval(tick); st.className = 'status err'; st.textContent = 'Không kết nối được máy chủ.'; }
+  finally { busy = false; btn.disabled = false; }
+}
+const TIEU_CHI = [['hook', 'Hook 3 giây'], ['nhip', 'Nhịp giữ chân'], ['cam_xuc', 'Cảm xúc, chi tiết'], ['ro_rang', 'Rõ ràng, đúng tệp'], ['ket', 'Kết và giọng']];
+function renderKq(d, parts) {
+  $('#kqEmpty').hidden = true; const box = $('#kqBody'); box.hidden = false; box.innerHTML = '';
+  const sc = d.score || {}; const total = Math.round(sc.total || TIEU_CHI.reduce((a, [k]) => a + (+sc[k] || 0), 0));
+  const sw = el('div', 'score-wrap'); const ring = el('div', 'ring'); ring.style.setProperty('--p', total); const rb = el('b'); rb.innerHTML = `${total}<small>/100</small>`; ring.append(rb);
+  const bars = el('div', 'bars'); TIEU_CHI.forEach(([k, n]) => { const r = el('div', 'bar'); const i = el('i'); const bb = el('b'); bb.style.width = (Math.max(0, Math.min(20, +sc[k] || 0)) / 20 * 100) + '%'; i.append(bb); r.append(el('span', null, n), i, el('span', null, String(Math.round(+sc[k] || 0)))); bars.append(r); });
+  sw.append(ring, bars); box.append(sw);
+  if (d.verdict) box.append(Object.assign(el('p', 'verdict', d.verdict)));
+  const H = t => box.append(el('h3', null, t));
+  if (d.thoi_luong) { H('Thời lượng'); const tl = d.thoi_luong; box.append(el('div', 'box', `Kịch bản hiện tại: ${tl.chu_may || tl.chu || demChu(kichBanText(parts))} chữ ≈ ${fmtS(tl.giay_may || tl.giay || 0)} ở tốc độ bạn chọn. ${tl.nhan_xet || ''}`)); }
+  if (Array.isArray(d.diem_roi) && d.diem_roi.length) { H('Người xem sẽ lướt ở đâu'); const w = el('div'); d.diem_roi.forEach(x => { const r = el('div', 'drop'); const q = el('div'); q.append(el('span', null, x.ly_do || '')); if (x.doan) q.append(el('q', null, '“' + x.doan + '”')); r.append(el('b', null, 'giây ' + Math.round(x.giay)), q); w.append(r); }); box.append(w); }
+  H('Khám bài'); if (d.khen) box.append(el('div', 'box praise', '👍 ' + d.khen));
+  if (Array.isArray(d.sua) && d.sua.length) { const ul = el('ul'); d.sua.forEach(s => ul.append(el('li', null, s))); const bx = el('div', 'box'); bx.style.marginTop = '6px'; bx.append(el('b', null, 'Sửa 3 chỗ này:'), ul); box.append(bx); }
+  if (d.lam_ngay) { const bx = el('div', 'box'); bx.style.marginTop = '6px'; bx.innerHTML = '<b>Làm ngay trước khi quay:</b> '; bx.append(document.createTextNode(d.lam_ngay)); box.append(bx); }
+  if (d.giong) { H(`Giọng người thật · ${Math.round(d.giong.diem)}/10`); const cm = d.giong.cau_may || [], st = d.giong.sua_thanh || [];
+    if (cm.length) { const g = el('div', 'giong'); cm.forEach((c, i) => { g.append(el('span', 'm', c), el('span', 'n', st[i] || '')); }); box.append(g); } else box.append(el('div', 'box', 'Không bắt được câu nào nghe như văn máy. Giữ giọng này.')); }
+  if (Array.isArray(d.viet_lai) && d.viet_lai.length) {
+    H(`Bản viết lại · ${fmtS(d.viet_lai_giay || (d.viet_lai[d.viet_lai.length - 1] || {}).den || 0)} · ${d.viet_lai_chu || demChu(d.viet_lai.map(p => p.text).join(' '))} chữ`);
+    d.viet_lai.forEach(p => { const r = el('div', 'rw'); const hd = el('div'); hd.append(el('span', 'tc', `${fmtS(p.tu)}–${fmtS(p.den)}`), el('b', null, p.phan)); r.append(hd, el('p', null, p.text)); if (p.ghi_chu) r.append(el('small', null, '🎬 ' + p.ghi_chu)); box.append(r); });
+    const row = el('div', 'row'); const b1 = el('button', 'btn pro', 'Dùng bản này vào form'); b1.type = 'button'; b1.onclick = () => { const K = khungHienTai(); K.phan.forEach(([k, ten], i) => { const p = d.viet_lai[i]; if (p) state.text[K.k][k] = p.text; }); buildPhan(); saveDraft(); toast('Đã thay vào form. Sửa lại cho đúng giọng bạn rồi chấm lần nữa nếu muốn.'); };
+    const b2 = el('button', 'btn', 'Chép bản viết lại'); b2.type = 'button'; b2.onclick = () => copyText(d.viet_lai.map(p => `[${fmtS(p.tu)}–${fmtS(p.den)}] ${p.phan}\n${p.text}`).join('\n\n'));
+    row.append(b1, b2); box.append(row);
+  }
+  if (Array.isArray(d.y_chinh) && d.y_chinh.length) { H('Ý chính để quay không cần nhìn giấy'); const ul = el('ul'); d.y_chinh.forEach(s => ul.append(el('li', null, s))); const bx = el('div', 'box'); bx.append(ul); box.append(bx); }
+  if (d.chu_man_hinh) { H('Chữ hook trên màn hình'); const bx = el('div', 'box'); bx.style.whiteSpace = 'pre-wrap'; bx.style.fontWeight = '700'; bx.textContent = d.chu_man_hinh.replace(/\*\*/g, ''); box.append(bx);
+    const row = el('div', 'row'); const b = el('a', 'btn pro', 'Đặt chữ này lên video trong Hook text →'); b.href = 'hook-text.html'; b.onclick = () => { ls.set('hook.text', d.chu_man_hinh); }; row.append(b); box.append(row); }
+  if (d.caption) { H('Caption và hashtag'); const bx = el('div', 'box'); bx.append(document.createTextNode(d.caption)); const tg = el('div', 'tags'); (d.hashtags || []).forEach(h => tg.append(el('span', null, h.startsWith('#') ? h : '#' + h))); bx.append(tg); box.append(bx);
+    const row = el('div', 'row'); const b = el('button', 'btn', 'Chép caption'); b.type = 'button'; b.onclick = () => copyText(d.caption + '\n\n' + (d.hashtags || []).map(h => h.startsWith('#') ? h : '#' + h).join(' ')); row.append(b); box.append(row); }
+}
+async function copyText(t) { try { await navigator.clipboard.writeText(t); toast('Đã sao chép'); } catch { toast('Không sao chép được, bôi đen để copy'); } }
+
+/* bản demo để xem giao diện khi chưa nối máy chủ (#demo) */
+function demoData(parts) {
+  const sp = TOC_DO[state.tocDo]; let t = 0; const vl = parts.map((p, i) => { const text = p.text || `(${p.ten} — bản demo)`; const n = demChu(text); const tu = Math.round(t); t += n / sp * 1.06; return { phan: p.ten, text, tu, den: Math.round(t), ghi_chu: 'Quay cận, ánh sáng cửa sổ.' }; });
+  return { score: { total: 61, hook: 9, nhip: 12, cam_xuc: 13, ro_rang: 15, ket: 12 }, verdict: 'Bản demo: câu mở đang là câu dẫn chuyện nên 3 giây đầu chưa có gì để dừng; phần thân có chi tiết nhưng cảm xúc đang được kể chứ chưa được show.', thoi_luong: { chu: demChu(kichBanText(parts)), giay: Math.round(t), nhan_xet: 'Đang thiếu khoảng 15 giây ở phần tả chi tiết.' }, diem_roi: [{ giay: 3, doan: (parts[0].text || '').split(' ').slice(0, 6).join(' '), ly_do: 'Mở bằng câu dẫn chuyện, chưa có lời thoại hay mâu thuẫn.' }, { giay: 34, doan: '…', ly_do: 'Đoạn giải thích dài 12 giây không có móc mới.' }], khen: 'Cụm "mắt cay xè" là show cảm xúc đúng kiểu, giữ nguyên.', sua: ['Đổi câu mở thành một câu thoại của nhân vật.', 'Thêm 3 hành động nhỏ liên tiếp trước cao trào.', 'Kết bằng cảm nghĩ riêng thay cho câu triết lý.'], lam_ngay: 'Đọc to kịch bản một lần, gạch những chỗ bạn tự thấy mình không nói như vậy ngoài đời.', giong: { diem: 6, cau_may: ['Hôm nay mình sẽ chia sẻ với mọi người'], sua_thanh: ['Nói thật là hôm qua mình khóc vì một dĩa tôm.'] }, viet_lai: vl, viet_lai_giay: Math.round(t), viet_lai_chu: demChu(vl.map(p => p.text).join(' ')), y_chinh: ['Câu thoại mở', 'Vì sao có bữa cơm đó', '5 hành động: mời, gắp, nhìn, chọn, gỡ', 'Mắt cay xè', 'Câu kết riêng'], chu_man_hinh: 'Mẹ chồng **bóc tôm**\ncho mẹ đẻ mình', caption: 'Nhà bạn có khoảnh khắc nào như vậy không? Kể mình nghe với.', hashtags: ['#tuminhxaykenh', '#giadinh', '#mechong', '#chuyennhaminh', '#xaykenh'] };
+}
+
+/* ---------- boot ---------- */
+function applyTheme(t) { if (t) document.documentElement.dataset.theme = t; else delete document.documentElement.dataset.theme; }
+applyTheme(ls.get('hook.theme'));
+$('#themeBtn').addEventListener('click', () => { const dark = document.documentElement.dataset.theme ? document.documentElement.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; const t = dark ? 'light' : 'dark'; applyTheme(t); ls.set('hook.theme', t); });
+(function restore() { try { const d = JSON.parse(ls.get('kb.draft') || '{}'); if (d.chuDe) $('#chuDe').value = d.chuDe; if (d.doiTuong) $('#doiTuong').value = d.doiTuong; if (d.xungHo) $('#xungHo').value = d.xungHo; if (d.sanPham) $('#sanPham').value = d.sanPham; } catch {} })();
+setSeg('mucTieu', state.mucTieu); setSeg('dang', state.dang); setSeg('tocDo', state.tocDo);
+bindSeg('mucTieu', v => { state.mucTieu = v; buildPhan(); saveDraft(); });
+bindSeg('dang', v => { state.dang = v; saveDraft(); });
+bindSeg('tocDo', v => { state.tocDo = v; updateTimes(); saveDraft(); });
+['chuDe', 'doiTuong', 'xungHo', 'sanPham'].forEach(id => $('#' + id).addEventListener('input', saveDraft));
+buildKhung(); buildPhan();
+$('#btnCham').addEventListener('click', cham);
+$('#btnCopy').addEventListener('click', () => { const K = khungHienTai(); copyText(goiKichBan().filter(p => p.text).map(p => `[${p.ten}]\n${p.text}`).join('\n\n')); });
+$('#btnClear').addEventListener('click', () => { if (!confirm('Xoá hết chữ trong các phần của khung này?')) return; state.text[state.khung] = {}; state.kq = null; buildPhan(); saveDraft(); $('#kqBody').hidden = true; $('#kqEmpty').hidden = false; });
+$('#upClose').addEventListener('click', () => $('#upsell').classList.remove('show'));
+$('#upsell').addEventListener('click', e => { if (e.target === e.currentTarget) e.currentTarget.classList.remove('show'); });
+loadQuota();
+</script>
+</body>
+</html>
