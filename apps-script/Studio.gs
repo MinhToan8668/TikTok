@@ -326,6 +326,33 @@ function stBaoDungChung(nd, ds){
   }catch(e){ ghiLoi('stBaoDungChung', e); }
 }
 
+/* ── báo hồ sơ kênh mới về bot Telegram ──
+   Tool tự lưu mỗi lần học viên rời một ô, nên phải chặn spam: mỗi người tối đa
+   15 phút một tin, và chỉ báo khi đã điền được từ 3 mục trở lên. */
+var ST_HS_NHAN = {kenh:'Tên kênh', nganh:'Ngách', dinh_vi:'Định vị', doi_tuong:'Nói với ai',
+  muc_tieu:'Mục tiêu', xung_ho:'Xưng hô', dang:'Định dạng', do_dai:'Độ dài',
+  text_batbuoc:'Chữ bắt buộc', nhac:'Nhạc', hashtag:'Hashtag', khong_lam:'Không làm',
+  pillar:'Pillar', san_pham:'Sản phẩm', ghi_chu:'Ghi chú'};
+
+function stBaoHoSo(ten, email, sdt, hs, nguon){
+  try{
+    var so = ndCoHs(hs); if (so < 3) return;
+    var k = 'hsbao_' + String(hsKhoa(email, sdt) || ten).replace(/[^A-Za-z0-9]/g, '').slice(0, 80);
+    var c = CacheService.getScriptCache();
+    if (c.get(k)) return;
+    c.put(k, String(so), 900);
+    var d = ['📋 *Hồ sơ kênh vừa được điền*', '', '👤 *' + (ten || '(chưa có tên)') + '*'];
+    if (email) d.push('📧 `' + email + '`');
+    if (sdt)   d.push('📱 `' + sdt + '`');
+    d.push('✍️ ' + so + '/' + ST_HS_TRUONG.length + ' mục · ' + (nguon || 'sua_tay'), '');
+    ST_HS_TRUONG.forEach(function(f){
+      if (hs[f]) d.push('*' + (ST_HS_NHAN[f] || f) + ':* ' + String(hs[f]).slice(0, 300));
+    });
+    if (email) d.push('', 'Lịch sử dùng AI: `/lichsu ' + email + '`');
+    dsChat('ADMIN_CHAT_IDS').forEach(function(id){ tgSend(id, d.join('\n')); });
+  }catch(e){ ghiLoi('stBaoHoSo', e); }
+}
+
 /* ── hồ sơ kênh: học viên tự sửa; mentor sửa hộ bằng cách gửi thêm 'ma' ── */
 function stLuuHoSo(b){
   var nd = ndTuToken(b.token), hv = nd ? null : aiDay(b.token);
@@ -339,14 +366,17 @@ function stLuuHoSo(b){
     var dich = b.ma ? ndTheoMa(b.ma) : null;
     var em = dich ? dich.email : chuanEmail(b.email_dich), st = dich ? dich.sdt : (b.sdt_dich || '');
     if (!em && !st) return jsonOut({ok:false, error:'khong_thay'});
-    hsGhi(em, st, b.ten_dich || (dich ? dich.ten : ''), hs, 'mentor');
+    var tenD = b.ten_dich || (dich ? dich.ten : '');
+    hsGhi(em, st, tenD, hs, 'mentor');
     if (dich) ghiDong(ST_SHEET, ST_HEADERS, dich, {ho_so: JSON.stringify(hs)});
+    stBaoHoSo(tenD, em, st, hs, 'mentor điền hộ');
     return jsonOut({ok:true, ho_so: hs});
   }
 
   var email = nd ? nd.email : hv.email, sdt = nd ? nd.sdt : '', ten = nd ? nd.ten : (hv.ten_goi || hv.ten);
   hsGhi(email, sdt, ten, hs, 'sua_tay');
   if (nd) ghiDong(ST_SHEET, ST_HEADERS, nd, {ho_so: JSON.stringify(hs)});
+  stBaoHoSo(ten, email, sdt, hs, nd ? (ndLaPro(nd) ? 'tài khoản Pro tự điền' : 'tài khoản Free tự điền') : 'học viên tự điền');
   return jsonOut({ok:true, ho_so: hs});
 }
 /* Mentor xem danh sách tài khoản để chạy thử tool bằng hồ sơ thật của học viên. */
