@@ -420,6 +420,20 @@
   :root[data-theme="dark"] .ft.on{background:#99DF00;color:#0B0C08;box-shadow:0 2px 0 var(--bg),0 6px 0 rgba(153,223,0,.32)}
   @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .ft{border-color:#99DF00;box-shadow:0 4px 0 rgba(153,223,0,.32)} :root:not([data-theme="light"]) .ft.on{background:#99DF00;color:#0B0C08;box-shadow:0 2px 0 var(--bg),0 6px 0 rgba(153,223,0,.32)}}
   @media (max-width:520px){.feat-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;overflow:visible}.ft{flex-direction:column;justify-content:center;gap:4px;padding:9px 6px;font-size:13px;text-align:center;line-height:1.2}.ft .fi{font-size:19px}}
+  /* điện thoại: header hai hàng (tên tool trên, nút dưới), nút chọn cao đủ bấm, ô nhập 16px để iPhone không tự phóng to */
+  @media (max-width:520px){
+    header.top{flex-wrap:wrap;gap:8px 10px}
+    header.top .brand{flex:1 1 100%}
+    header.top > .row{width:100%;justify-content:flex-end;gap:8px}
+    .brand h1{font-size:19px}
+    .acct .pill{padding:8px 12px;font-size:13px;min-height:36px}
+    .seg{display:inline-flex;flex-wrap:wrap}
+    .seg button{min-height:42px;padding:9px 12px;font-size:13.5px}
+    input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]),select,textarea{font-size:16px}
+    input[type=color]{min-width:40px;min-height:36px}
+    select{min-height:38px}
+    button:not(.theme-btn){min-height:38px}
+  }
   .ft.soon{border-style:dashed;font-weight:600}
   .img-btn{position:relative;display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-weight:700}
   .img-btn input{position:absolute;opacity:0;width:1px;height:1px}
