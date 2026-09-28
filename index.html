@@ -957,6 +957,24 @@ body.hv-mode{padding-bottom:0}
   color:var(--lime-deep);display:block;margin-top:2px}
 .hv-cas{display:flex;flex-wrap:wrap;gap:8px}
 .hv-trong{font-size:13px;color:var(--faint);padding:6px 0}
+/* danh sách học viên của mentor: hồ sơ kênh và lịch sử dùng AI */
+.hs-the{border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin:8px 0;background:var(--card)}
+.hs-dau{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px}
+.hs-dau b{font-size:15px}
+.hs-dau .hs-mail{font-size:12.5px;color:var(--faint)}
+.hs-co{font-size:11px;font-weight:700;border-radius:999px;padding:2px 8px;background:var(--lime-soft);color:var(--ink)}
+.hs-co.free{background:#eee;color:#666}
+.hs-co.dk{background:#ffe9c9;color:#7a4b00}
+.hs-dong{font-size:12.5px;color:var(--quiet);margin-top:3px}
+.hs-nuts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.hs-nuts button{font:inherit;font-size:12.5px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:5px 11px;cursor:pointer}
+.hs-nuts button:hover{border-color:var(--lime-deep)}
+.hs-chitiet{margin-top:9px;border-top:1px dashed var(--line);padding-top:8px;font-size:13px;line-height:1.6}
+.hs-chitiet dt{font-weight:700;font-size:12px;color:var(--quiet);margin-top:6px}
+.hs-chitiet dd{margin:0}
+.hs-ls{margin-top:8px;font-size:12.5px;line-height:1.7}
+.hs-ls div{border-bottom:1px solid var(--line);padding:3px 0}
+.hs-ls .gio{color:var(--faint);font-variant-numeric:tabular-nums;margin-right:6px}
 .hv-ca{border:1.5px solid var(--line-dk);border-radius:999px;padding:9px 15px;
   font-size:13px;line-height:1.3;background:var(--paper-lt);color:var(--ink-soft);
   transition:.18s;text-align:left}
@@ -1932,6 +1950,7 @@ body.hv-mode{padding-bottom:0}
       <div class="hv-chedo" id="hvCheDo" style="display:none">
         <button id="hvTabToi" class="on">Lịch của tôi</button>
         <button id="hvTabTQ">Tổng quan lớp</button>
+        <button id="hvTabHS">Học viên</button>
       </div>
 
       <div class="hv-cua-toi" id="hvMineBox" style="display:none">
@@ -1939,7 +1958,7 @@ body.hv-mode{padding-bottom:0}
         <div class="hv-mine" id="hvMine"></div>
       </div>
 
-      <div class="hv-tuan">
+      <div class="hv-tuan" id="hvTuanHang">
         <button class="hv-nut" id="hvTruoc">‹ Tuần trước</button>
         <b id="hvNhanTuan">—</b>
         <button class="hv-nut" id="hvSau">Tuần sau ›</button>
@@ -1953,6 +1972,7 @@ body.hv-mode{padding-bottom:0}
         <button type="button" class="chinh" id="hvLuuOk">Lưu lịch</button>
       </div>
       <div id="hvTQ" style="display:none"></div>
+      <div id="hvHS" style="display:none"></div>
       <div class="hv-msg" id="hvMsg"></div>
       <p class="hv-chu" id="hvChu" style="display:none">
         <b>Cách dùng:</b> bấm vào những ca bạn rảnh — tick bao nhiêu cũng được, chưa lưu
@@ -3236,12 +3256,112 @@ function hvDoiCheDo(che){
   HV.cheDo = che;
   $('#hvTabToi').classList.toggle('on', che === 'toi');
   $('#hvTabTQ').classList.toggle('on',  che === 'tq');
+  $('#hvTabHS').classList.toggle('on',  che === 'hs');
   if (!laMentor()) return;
-  var tq = che === 'tq';
-  $('#hvTieuDe').textContent = tq ? 'Tổng quan lớp' : 'Lịch rảnh của bạn';
-  $('#hvMoTa').textContent = tq
+  var tq = che === 'tq', hs = che === 'hs';
+  $('#hvTieuDe').textContent = hs ? 'Học viên' : tq ? 'Tổng quan lớp' : 'Lịch rảnh của bạn';
+  $('#hvMoTa').textContent = hs
+    ? 'Hồ sơ kênh và lịch sử dùng AI của từng người — cả học viên đã có tài khoản Viral Studio lẫn người mới điền form đăng ký khoá.'
+    : tq
     ? 'Lịch của tất cả mentor trong tuần, ai đã đặt ca nào, và bạn học viên nào tuần này chưa đặt buổi nào — để cả nhóm nhìn chung một bức tranh.'
     : 'Bấm vào ca bạn rảnh là mở cho học viên đặt. Học viên đặt xong bạn thấy tên họ ngay tại ca đó, và bot cũng báo về nhóm.';
+  // màn học viên không dính gì tới lịch tuần, ẩn hết phần lịch đi cho đỡ rối
+  ['#hvTuanHang','#hvMineBox','#hvHan','#hvNgays','#hvLuu','#hvChu','#hvTQ'].forEach(function(q){
+    var e = document.querySelector(q); if (e && hs) e.style.display = 'none';
+  });
+  $('#hvHS').style.display = hs ? '' : 'none';
+  if (hs) hvTaiHocVien();
+}
+
+/* ---- mentor: hồ sơ kênh và lịch sử dùng AI của từng học viên ---- */
+var HS_NHAN = {kenh:'Tên kênh', nganh:'Ngách', dinh_vi:'Định vị', doi_tuong:'Nói với ai',
+  muc_tieu:'Mục tiêu', xung_ho:'Xưng hô', dang:'Định dạng', do_dai:'Độ dài',
+  text_batbuoc:'Chữ bắt buộc', nhac:'Nhạc', hashtag:'Hashtag', khong_lam:'Không làm',
+  pillar:'Pillar', san_pham:'Sản phẩm', ghi_chu:'Ghi chú'};
+var HS_NGUON = {sua_tay:'tự sửa', tai_khoan:'trong tài khoản', form_dang_ky:'từ form đăng ký khoá', mau:'mẫu mentor nạp'};
+
+function hvTaiHocVien(){
+  var o = $('#hvHS');
+  o.innerHTML = '<div class="hv-trong">Đang tải danh sách…</div>';
+  hvGoi('st_ds', {token:HV.token}).then(function(r){
+    if (!r || !r.ok){
+      o.innerHTML = '<div class="hv-trong">' + (
+        r && r.error === 'unknown_action'
+          ? 'Máy chủ đang chạy Studio.gs bản cũ nên chưa có danh sách này. Dán Studio.gs mới vào Apps Script rồi Deploy, chọn New version.'
+          : r && r.error === 'khong_co_quyen'
+          ? 'Tài khoản này không có quyền mentor.'
+          : 'Không xem được danh sách' + (r && r.error ? ' (' + esc(r.error) + ')' : '') + '.') + '</div>';
+      return;
+    }
+    hvVeDsHocVien(r.ds || []);
+  }).catch(function(){ o.innerHTML = '<div class="hv-trong">Không kết nối được máy chủ.</div>'; });
+}
+
+function hvVeDsHocVien(ds){
+  var o = $('#hvHS');
+  if (!ds.length){ o.innerHTML = '<div class="hv-trong">Chưa có ai điền form đăng ký hay tạo tài khoản Viral Studio.</div>'; return; }
+  var co = ds.filter(function(x){ return x.so_truong }).length;
+  var h = ['<div class="hv-trong">' + ds.length + ' người · ' + co + ' người đã có hồ sơ kênh</div>'];
+  ds.forEach(function(x, i){
+    var nhanGoi = x.goi === 'pro' ? 'Pro' : x.goi === 'dk' ? 'mới đăng ký khoá' : 'Free';
+    var lop = x.goi === 'pro' ? '' : x.goi === 'dk' ? ' dk' : ' free';
+    h.push('<div class="hs-the" data-i="' + i + '">');
+    h.push('<div class="hs-dau"><b>' + esc(x.ten || '(chưa có tên)') + '</b>' +
+      '<span class="hs-co' + lop + '">' + nhanGoi + '</span>' +
+      (x.email ? '<span class="hs-mail">' + esc(x.email) + '</span>' : '') +
+      (x.sdt ? '<span class="hs-mail">' + esc(x.sdt) + '</span>' : '') + '</div>');
+    h.push('<div class="hs-dong">' +
+      (x.so_truong ? '📋 hồ sơ ' + x.so_truong + '/15 mục' + (x.ho_so_nguon ? ' · ' + (HS_NGUON[x.ho_so_nguon] || x.ho_so_nguon) : '') : '📋 chưa có hồ sơ kênh') +
+      (x.luot ? ' · còn ' + x.luot.hook + ' hook / ' + x.luot.script + ' kịch bản / ' + x.luot.soi + ' soi' : '') +
+      (x.ma ? '' : ' · chưa có tài khoản Viral Studio') + '</div>');
+    h.push('<div class="hs-nuts">' +
+      (x.so_truong ? '<button type="button" data-hs-ho="' + i + '">Xem hồ sơ kênh</button>' : '') +
+      (x.ma ? '<button type="button" data-hs-ls="' + i + '">Lịch sử dùng AI</button>' : '') + '</div>');
+    h.push('<div class="hs-chitiet" data-ct="' + i + '" style="display:none"></div>');
+    h.push('</div>');
+  });
+  o.innerHTML = h.join('');
+  o.querySelectorAll('[data-hs-ho]').forEach(function(b){
+    b.addEventListener('click', function(){ hvHienHoSo(ds[+b.dataset.hsHo], b); });
+  });
+  o.querySelectorAll('[data-hs-ls]').forEach(function(b){
+    b.addEventListener('click', function(){ hvHienLichSu(ds[+b.dataset.hsLs], b); });
+  });
+}
+
+function hvOChiTiet(nut){ return nut.closest('.hs-the').querySelector('.hs-chitiet'); }
+
+function hvHienHoSo(x, nut){
+  var o = hvOChiTiet(nut);
+  if (o.dataset.dang === 'hoso' && o.style.display !== 'none'){ o.style.display = 'none'; return; }
+  var hs = x.ho_so || {}, h = ['<dl>'];
+  Object.keys(HS_NHAN).forEach(function(k){
+    if (hs[k]) h.push('<dt>' + HS_NHAN[k] + '</dt><dd>' + esc(String(hs[k])) + '</dd>');
+  });
+  h.push('</dl>');
+  o.innerHTML = h.join(''); o.dataset.dang = 'hoso'; o.style.display = '';
+}
+
+function hvHienLichSu(x, nut){
+  var o = hvOChiTiet(nut);
+  if (o.dataset.dang === 'ls' && o.style.display !== 'none'){ o.style.display = 'none'; return; }
+  o.dataset.dang = 'ls'; o.style.display = '';
+  o.innerHTML = '<div class="hv-trong">Đang tải lịch sử…</div>';
+  hvGoi('st_lichsu', {token:HV.token, ma:x.ma}).then(function(r){
+    if (!r || !r.ok){ o.innerHTML = '<div class="hv-trong">Không xem được lịch sử' + (r && r.error ? ' (' + esc(r.error) + ')' : '') + '.</div>'; return; }
+    var ls = r.lich_su || [];
+    var dau = '<div class="hs-dong">📱 ' + r.so_thiet_bi + ' thiết bị trong 7 ngày' +
+      (r.so_thiet_bi > 3 ? ' — cao bất thường, có thể đang dùng chung' : '') + '</div>';
+    if (!ls.length){ o.innerHTML = dau + '<div class="hv-trong">Chưa có lượt AI nào.</div>'; return; }
+    var h = ['<div class="hs-ls">'];
+    ls.forEach(function(d){
+      h.push('<div><span class="gio">' + esc(String(d.thoi_gian).slice(5, 16)) + '</span>' +
+        esc(d.tool || '') + ' · <span class="gio">' + esc(String(d.thiet_bi).slice(0, 8)) + '</span> ' +
+        (d.ket_qua === 'ok' ? '' : '❌ ') + esc(String(d.noi_dung || '').slice(0, 90)) + '</div>');
+    });
+    h.push('</div>');
+    o.innerHTML = dau + h.join('');
+  }).catch(function(){ o.innerHTML = '<div class="hv-trong">Không kết nối được máy chủ.</div>'; });
 }
 function hvRaNgoai(){
   $('#hvLogin').style.display = 'block';
@@ -3355,6 +3475,9 @@ function hvDangNhap(){
 /* ---- tải lịch tuần ---- */
 function hvTai(tuan){
   if (HV.vaitro === 'pro') return;         // tài khoản Pro không có lịch
+  if (HV.cheDo === 'hs') return;           // mentor đang xem danh sách học viên, không đụng tới lịch
+  $('#hvHS').style.display = 'none';
+  ['#hvTuanHang','#hvNgays'].forEach(function(q){ var e = document.querySelector(q); if (e) e.style.display = ''; });
   hvBoCho();
   if (laMentor() && HV.cheDo === 'tq') return hvTaiTongQuan(tuan);
   $('#hvTQ').style.display = 'none';
@@ -3864,6 +3987,7 @@ function initHV(){
   $('#hvLuuBo').addEventListener('click', hvBoCho2);
   $('#hvTabToi').addEventListener('click', function(){ hvDoiCheDo('toi'); hvTai(HV.tuan) });
   $('#hvTabTQ').addEventListener('click',  function(){ hvDoiCheDo('tq');  hvTai(HV.tuan) });
+  $('#hvTabHS').addEventListener('click',  function(){ hvDoiCheDo('hs'); });
   $('#hvTruoc').addEventListener('click', function(){ hvTai(hvCong(HV.tuan,-7)) });
   $('#hvSau').addEventListener('click',   function(){ hvTai(hvCong(HV.tuan, 7)) });
 
