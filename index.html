@@ -808,7 +808,7 @@ body.hv-mode{padding-bottom:0}
   border-radius:999px;padding:4px;margin-bottom:22px}
 .hv-tab button{flex:1;border-radius:999px;padding:9px 8px;font-size:13.5px;font-weight:700;
   font-family:var(--disp);color:var(--quiet);transition:.18s}
-.hv-tab button.on{background:var(--ink);color:var(--paper-lt)}
+.hv-tab button.on{background:var(--lime);color:#1c2600}
 .hv-cho{background:var(--lime-wash);border:1.5px solid var(--lime-deep);
   border-radius:var(--r-sm);padding:16px 18px;font-size:13.5px;line-height:1.7;
   color:var(--ink-soft);margin-top:18px}
@@ -855,14 +855,40 @@ body.hv-mode{padding-bottom:0}
 .hv-chedo button{border-radius:999px;padding:11px 20px;font-size:14.5px;font-weight:800;
   font-family:var(--disp);color:var(--quiet);transition:.18s;white-space:nowrap}
 .hv-chedo button:hover{color:var(--ink);background:var(--paper)}
-.hv-chedo button.on{background:var(--ink);color:var(--paper-lt);box-shadow:0 4px 0 rgba(28,38,0,.22)}
-/* tab Viral Studio: chỗ ăn tiền của khoá, để lime cho đập vào mắt */
-.hv-chedo button.noi{background:var(--lime);color:var(--ink);box-shadow:0 3px 0 rgba(28,38,0,.2)}
-.hv-chedo button.noi:hover{background:var(--lime);filter:brightness(1.04)}
-.hv-chedo button.noi.on{background:var(--ink);color:var(--lime)}
+.hv-chedo button.on{background:var(--lime);color:#1c2600;box-shadow:0 4px 0 rgba(28,38,0,.22)}
 @media(max-width:560px){
   .hv-chedo{gap:4px;padding:4px}
   .hv-chedo button{padding:9px 13px;font-size:13px;flex:1 1 auto;text-align:center}
+}
+/* dải Viral Studio: đứng riêng trên thanh tab, lime đập vào mắt, icon lúc lắc mời bấm */
+.hv-vs{position:relative;display:grid;grid-template-columns:auto 1fr;gap:16px 18px;align-items:center;
+  background:var(--lime);color:#1c2600;border:2px solid #1c2600;border-radius:var(--r);
+  padding:clamp(16px,2.6vw,22px) clamp(18px,3vw,26px);margin-bottom:22px;
+  box-shadow:0 6px 0 #1c2600,0 24px 50px -30px rgba(28,38,0,.45);
+  animation:vsNhay .7s var(--ease) both}
+.hv-vs .vs-icon{font-size:clamp(36px,5vw,50px);line-height:1;display:inline-block;
+  transform-origin:50% 90%;animation:vsLac 3.2s ease-in-out infinite}
+.hv-vs .vs-nhan{display:inline-block;background:#1c2600;color:var(--lime);font-family:var(--disp);
+  font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+  border-radius:999px;padding:4px 10px;margin-bottom:6px;animation:freeNhay 1.6s ease-in-out infinite}
+.hv-vs h3{font-family:var(--disp);font-size:clamp(18px,2.4vw,22px);font-weight:800;color:#1c2600;margin:0 0 4px}
+.hv-vs p{font-size:13.5px;line-height:1.6;color:#2c3a00;margin:0}
+.hv-vs .vs-nut{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:10px}
+.hv-vs .vs-nut a{display:inline-flex;align-items:center;gap:8px;text-decoration:none;
+  background:var(--paper-lt);color:#1c2600;border:2px solid #1c2600;border-radius:999px;
+  padding:10px 16px;font-family:var(--disp);font-size:14px;font-weight:800;
+  box-shadow:0 4px 0 #1c2600;transition:transform .15s,box-shadow .15s}
+.hv-vs .vs-nut a:hover{transform:translateY(-2px);box-shadow:0 6px 0 #1c2600}
+.hv-vs .vs-nut a i{font-style:normal;font-size:17px;line-height:1}
+.hv-vs .vs-nut a em{font-style:normal;font-size:12px;font-weight:700;color:#5f8c00;margin-left:2px}
+@keyframes vsLac{0%,70%,100%{transform:rotate(0)}74%{transform:rotate(-14deg)}78%{transform:rotate(12deg)}
+  82%{transform:rotate(-9deg)}86%{transform:rotate(6deg)}90%{transform:rotate(-3deg)}}
+@keyframes vsNhay{0%{opacity:0;transform:translateY(14px) scale(.96)}60%{transform:translateY(-4px) scale(1.01)}100%{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.hv-vs,.hv-vs .vs-icon,.hv-vs .vs-nhan{animation:none}}
+@media(max-width:560px){
+  .hv-vs{grid-template-columns:1fr;gap:10px}
+  .hv-vs .vs-icon{font-size:34px}
+  .hv-vs .vs-nut a{flex:1 1 auto;justify-content:center;padding:10px 12px;font-size:13.5px}
 }
 .hv-hs-cuoi{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:16px;
   border-top:1px solid var(--line);padding-top:16px}
@@ -1974,11 +2000,25 @@ body.hv-mode{padding-bottom:0}
         <p id="hvMoTa">Chọn một ca trống là xong — mentor nhận thông báo ngay. Bận thì bấm lại đúng ca đó để huỷ, ca sẽ mở lại cho bạn khác.</p>
       </div>
 
+      <!-- ── dải Viral Studio: luôn hiện, đứng riêng trên thanh tab ── -->
+      <div class="hv-vs" id="hvTools">
+        <span class="vs-icon" aria-hidden="true">🧰</span>
+        <div>
+          <span class="vs-nhan">Pro đã mở cho bạn</span>
+          <h3>Viral Studio · ba tool AI của khoá</h3>
+          <p>Đăng nhập ở đây rồi là cả ba tool tự nhận Pro, không giới hạn lượt. Hồ sơ kênh bên tab Hồ sơ kênh được cả ba tool đọc để góp ý đúng kênh bạn.</p>
+        </div>
+        <div class="vs-nut">
+          <a href="tools/soi-video.html" target="_blank" rel="noopener"><i>🎬</i>Soi video viral <em>MỚI</em></a>
+          <a href="tools/kich-ban.html" target="_blank" rel="noopener"><i>📝</i>Kịch bản viral</a>
+          <a href="tools/hook-text.html" target="_blank" rel="noopener"><i>⚡</i>Hook viral</a>
+        </div>
+      </div>
+
       <div class="hv-chedo" id="hvCheDo" style="display:none">
         <button id="hvTabToi" class="on">Lịch của tôi</button>
         <button id="hvTabTQ">Tổng quan lớp</button>
         <button id="hvTabHS">Học viên</button>
-        <button id="hvTabVS" class="noi">🧰 Viral Studio</button>
         <button id="hvTabHoSo">Hồ sơ kênh</button>
       </div>
 
@@ -2007,26 +2047,6 @@ body.hv-mode{padding-bottom:0}
 
       <!-- ── màn Học viên (mentor) ── -->
       <div id="hvHS" style="display:none"></div>
-
-      <!-- ── màn Viral Studio ── -->
-      <div class="hv-cua-toi" id="hvTools">
-        <h3>🧰 Viral Studio · bản Pro của bạn</h3>
-        <p style="margin:6px 0 14px">Đăng nhập ở khu học viên rồi thì cả ba tool tự nhận Pro, không phải đăng nhập lại. Hồ sơ kênh bên tab Hồ sơ kênh cũng được ba tool dùng chung để góp ý đúng kênh bạn.</p>
-        <div class="hv-tools">
-          <a href="tools/kich-ban.html" target="_blank" rel="noopener">
-            <b>📝 Kịch bản viral</b>
-            <span>Viết kịch bản theo khung kể chuyện, AI chấm từng câu, canh giờ từng phần và gợi ý cảnh quay.</span>
-            <em>Mở tool ↗</em></a>
-          <a href="tools/hook-text.html" target="_blank" rel="noopener">
-            <b>✍️ Hook viral</b>
-            <span>Đặt chữ hook lên frame video theo 14 bố cục, AI chấm hook và viết lại 5 bản, xuất PNG sạch kéo thẳng vào CapCut.</span>
-            <em>Mở tool ↗</em></a>
-          <a href="tools/soi-video.html" target="_blank" rel="noopener">
-            <b>🔎 Soi video viral</b>
-            <span>Dán link video đang lên, AI tải về nghe và bóc lời thoại theo giây, mổ ba cửa rồi rút khuôn áp sang kênh bạn.</span>
-            <em>Mở tool ↗</em></a>
-        </div>
-      </div>
 
       <!-- ── màn Hồ sơ kênh ── -->
       <!-- hồ sơ kênh của chính học viên, dựng sẵn từ form đăng ký khoá -->
@@ -3298,7 +3318,6 @@ function hvVaoTrong(){
 
   ['#hvCheDo','#hvManLich','#hvMineBox','#hvHan','#hvNgays','#hvLuu','#hvTQ','#hvChu'].forEach(function(s){
     var e=$(s); if(e) e.style.display = pro ? 'none' : ''; });
-  if (pro) $('#hvTools').style.display = '';   // tài khoản chỉ mua tool: vào là thấy ngay ba tool
   var tuanBar = $('#hvTruoc') && $('#hvTruoc').parentNode; if (tuanBar) tuanBar.style.display = pro ? 'none' : '';
   if (pro){
     $('#hvVai').style.display = 'none';
@@ -3330,14 +3349,11 @@ function hvDoiCheDo(che){
   $('#hvTabTQ').classList.toggle('on',  che === 'tq');
   $('#hvTabHS').classList.toggle('on',  che === 'hs');
   $('#hvTabHoSo').classList.toggle('on', che === 'hoso');
-  $('#hvTabVS').classList.toggle('on', che === 'vs');
-  var m = laMentor(), tq = che === 'tq', hs = che === 'hs', ho = che === 'hoso', vs = che === 'vs';
+  var m = laMentor(), tq = che === 'tq', hs = che === 'hs', ho = che === 'hoso';
 
-  $('#hvTieuDe').textContent = vs ? 'Viral Studio' : ho ? 'Hồ sơ kênh của bạn'
+  $('#hvTieuDe').textContent = ho ? 'Hồ sơ kênh của bạn'
     : hs ? 'Học viên' : tq ? 'Tổng quan lớp' : m ? 'Lịch rảnh của bạn' : 'Đặt lịch kèm 1:1';
-  $('#hvMoTa').textContent = vs
-    ? 'Ba tool AI đi kèm khoá học. Đăng nhập ở đây rồi thì bên tool tự nhận Pro, không phải đăng nhập lại.'
-    : ho
+  $('#hvMoTa').textContent = ho
     ? 'Ba tool bên Viral Studio đọc hồ sơ này để chấm đúng kênh bạn. Sửa xong nhớ bấm Lưu hồ sơ ở cuối trang.'
     : hs
     ? 'Hồ sơ kênh và lịch sử dùng AI của từng người — cả học viên đã có tài khoản Viral Studio lẫn người mới điền form đăng ký khoá.'
@@ -3348,8 +3364,7 @@ function hvDoiCheDo(che){
     : 'Chọn một ca trống là xong — mentor nhận thông báo ngay. Bận thì bấm lại đúng ca đó để huỷ, ca sẽ mở lại cho bạn khác.';
 
   // mỗi tab đúng một màn, bật cái này thì tắt hết cái kia
-  $('#hvManLich').style.display = (hs || ho || vs) ? 'none' : '';
-  $('#hvTools').style.display   = vs ? '' : 'none';
+  $('#hvManLich').style.display = (hs || ho) ? 'none' : '';
   $('#hvHS').style.display      = hs ? '' : 'none';
   $('#hvHoSo').style.display    = ho ? '' : 'none';
   if (hs) hvTaiHocVien();
@@ -3654,7 +3669,7 @@ function hvDangNhap(){
 /* ---- tải lịch tuần ---- */
 function hvTai(tuan){
   if (HV.vaitro === 'pro') return;         // tài khoản Pro không có lịch
-  if (HV.cheDo === 'hs' || HV.cheDo === 'hoso' || HV.cheDo === 'vs') return;   // đang ở tab khác
+  if (HV.cheDo === 'hs' || HV.cheDo === 'hoso') return;   // đang ở tab khác
   ['#hvTuanHang','#hvNgays'].forEach(function(q){ var e = document.querySelector(q); if (e) e.style.display = ''; });
   hvBoCho();
   if (laMentor() && HV.cheDo === 'tq') return hvTaiTongQuan(tuan);
@@ -4167,7 +4182,6 @@ function initHV(){
   $('#hvTabTQ').addEventListener('click',  function(){ hvDoiCheDo('tq');  hvTai(HV.tuan) });
   $('#hvTabHS').addEventListener('click',  function(){ hvDoiCheDo('hs'); });
   $('#hvTabHoSo').addEventListener('click', function(){ hvDoiCheDo('hoso'); });
-  $('#hvTabVS').addEventListener('click',   function(){ hvDoiCheDo('vs'); });
   $('#hvHsLuu').addEventListener('click', hvLuuHoSo);
   $('#hvTruoc').addEventListener('click', function(){ hvTai(hvCong(HV.tuan,-7)) });
   $('#hvSau').addEventListener('click',   function(){ hvTai(hvCong(HV.tuan, 7)) });
