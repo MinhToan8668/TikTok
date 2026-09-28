@@ -750,7 +750,7 @@ function soiTiLe(s){
 function hookSoi(b, ai, provider, key){
   var me = ai.me;
   var loiThoai = String(b.loi_thoai || '').slice(0, 5000).trim();
-  var muonVideo = !!(b.video_b64 || (b.link && /^(tiktok|youtube)$/.test(String(b.nen || soiNen(String(b.link || '')))) && b.tu_video !== false));
+  var muonVideo = !!(b.file_uri || b.video_b64 || (b.link && /^(tiktok|youtube)$/.test(String(b.nen || soiNen(String(b.link || '')))) && b.tu_video !== false));
   if (!muonVideo && kbDemChu(loiThoai) < 8) return jsonOut({ok:false, error:'thieu_text'});
   var img = String(b.image || '');
   if (img.length > 1500000) return jsonOut({ok:false, error:'anh_qua_lon'});
@@ -949,7 +949,8 @@ var CHAM_KIEN_THUC = [
 
 function hookChamVideo(b, ai, provider, key){
   var me = ai.me;
-  var muonVideo = !!(b.video_b64 || (b.link && /^(tiktok|youtube)$/.test(String(b.nen || soiNen(String(b.link || ''))))));
+  // video có thể tới theo ba đường: file nhỏ gửi thẳng (video_b64), file lớn đã nằm trên Gemini (file_uri), hoặc link
+  var muonVideo = !!(b.file_uri || b.video_b64 || (b.link && /^(tiktok|youtube)$/.test(String(b.nen || soiNen(String(b.link || ''))))));
   var loiThoai = String(b.loi_thoai || '').slice(0, 5000).trim();
   if (!muonVideo && kbDemChu(loiThoai) < 8) return jsonOut({ok:false, error:'khong_co_video'});
   var gkey = key;
