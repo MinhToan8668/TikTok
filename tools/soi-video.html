@@ -428,14 +428,14 @@ async function layLink() {
     if (DEMO) { await new Promise(z => setTimeout(z, 600)); r = { ok: true, ho_tro: true, video: true, nen: 'tiktok', tac_gia: 'kenhmau', caption: 'Mẹ chồng bóc tôm cho mẹ đẻ mình #giadinh #mechong', anh: '', giay: 47, so_lieu: { view: 120000, like: 9000, cmt: 300, luu: 1500, share: 700, giay: 47 } }; }
     else r = await callApi({ action: 'hook_ai', mode: 'link', token: authToken(), thu: authToken() ? undefined : devId(), link: u });
     if (!r.ok) { st.className = 'status err'; st.textContent = r.error === 'het_phien' ? 'Phiên đăng nhập hết hạn, đăng nhập lại ở tab Hook viral.' : r.error === 'unknown_action' || r.error === 'thieu_text' ? 'Máy chủ đang chạy HookAI.gs bản cũ, mentor cần dán bản mới rồi Deploy → New version.' : 'Không lấy được thông tin từ link. Tải file video lên hoặc dán lời thoại.'; return; }
-    if (!r.ho_tro) { st.className = 'status'; st.textContent = 'Không lấy được từ link này (video riêng tư hoặc nền tảng chặn). Tải file video lên hoặc dán lời thoại.'; state.link = { tac_gia: '', caption: '', video: false, giay: 0 }; updateSrc(); return; }
+    if (!r.ho_tro) { st.className = 'status'; st.textContent = 'Không lấy được từ link này (video riêng tư hoặc nền tảng chặn). Tải file video lên hoặc dán lời thoại.' + (r.loi ? ' Chi tiết: ' + r.loi : ''); state.link = { tac_gia: '', caption: '', video: false, giay: 0 }; updateSrc(); return; }
     state.link = { tac_gia: r.tac_gia || '', caption: r.caption || '', video: !!r.video, giay: r.giay || 0 }; state.tuVideo = true;
     if (r.anh) { try { state.image = await dataUrlToJpeg(r.anh); state.imageFrom = 'link'; } catch { state.image = ''; } }
     if (r.so_lieu) { const m = { view: 'nView', like: 'nLike', cmt: 'nCmt', luu: 'nLuu', share: 'nShare' }; Object.keys(m).forEach(k => { if (r.so_lieu[k]) $('#' + m[k]).value = String(r.so_lieu[k]); }); }
     if (r.giay && !$('#giay').value) $('#giay').value = String(r.giay);
     showPrev(); syncFrameUI(); updateRatios(); updateCount(); updateSrc();
     st.className = r.video ? 'status ok' : 'status';
-    st.textContent = r.video ? 'Đã lấy ' + [r.tac_gia && 'tên kênh', r.caption && 'caption', r.so_lieu && r.so_lieu.view && 'số liệu', state.image && 'ảnh bìa'].filter(Boolean).join(', ') + '. Video ' + (r.giay ? r.giay + ' giây, ' : '') + 'AI sẽ tự tải về nghe khi bạn bấm Soi. Thêm vài bình luận nổi bật rồi bấm Soi video.' : (r.ghi_chu || 'Lấy được thông tin nhưng không tải được video. Tải file video lên hoặc dán lời thoại.');
+    st.textContent = r.video ? 'Đã lấy ' + [r.tac_gia && 'tên kênh', r.caption && 'caption', r.so_lieu && r.so_lieu.view && 'số liệu', state.image && 'ảnh bìa'].filter(Boolean).join(', ') + '. Video ' + (r.giay ? r.giay + ' giây, ' : '') + 'AI sẽ tự tải về nghe khi bạn bấm Soi. Thêm vài bình luận nổi bật rồi bấm Soi video.' : (r.ghi_chu || 'Lấy được thông tin nhưng không tải được video. Tải file video lên hoặc dán lời thoại.') + (r.loi ? ' Chi tiết: ' + r.loi : '');
     saveDraft();
   } catch { st.className = 'status err'; st.textContent = 'Không kết nối được máy chủ.'; }
   finally { $('#btnLink').disabled = false; }
