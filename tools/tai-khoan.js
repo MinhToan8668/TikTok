@@ -55,10 +55,17 @@
   }
 
   /* ── hồ sơ kênh: của chính mình, hoặc của học viên mà mentor đang mượn để chạy thử ── */
-  function hoSo() {
+  function hoSoGoc() {
     if (TK.vaiHoSo && TK.vaiHoSo.ho_so) return TK.vaiHoSo.ho_so;
     if (TK.me && TK.me.ho_so) return TK.me.ho_so;
     return json(HS_KEY) || {};       // người chưa đăng nhập vẫn điền tay được, lưu tạm trong máy
+  }
+  /* Hồ sơ mà AI dùng cho lần chấm này: bản đã lưu, đè lên bởi mấy ô vừa sửa mà chưa bấm lưu. */
+  function hoSo() {
+    var g = hoSoGoc(), m = {};
+    Object.keys(g).forEach(function (k) { m[k] = g[k]; });
+    Object.keys(hsSua).forEach(function (k) { if (hsSua[k]) m[k] = hsSua[k]; else delete m[k]; });
+    return m;
   }
   function luuHoSoTam(hs) { ls.set(HS_KEY, JSON.stringify(hs || {})); }
   function laMentor() { return !!(TK.me && (TK.me.vaitro === 'mentor' || TK.me.mentor)); }
@@ -111,7 +118,9 @@
     '.tk-hs-dau button{margin-top:0}',
     '.tk-hs-luoi{display:grid;grid-template-columns:1fr 1fr;gap:2px 14px;margin-top:6px}',
     '.tk-hs-rong{grid-column:1/-1}',
-    '.tk-hs-bao{margin:8px 0 0;font-size:12px;color:var(--muted,#777)}',
+    '.tk-hs-bao{margin:0;font-size:12px;color:var(--muted,#777);flex:1 1 200px}',
+    '.tk-hs-cuoi{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:12px;border-top:1px solid var(--line,#ddd);padding-top:12px}',
+    '.tk-hs-cuoi button{margin-top:0}',
     '@media(max-width:700px){.tk-hs-luoi{grid-template-columns:1fr}}',
     '.tk-dong{border:0;background:none;font-size:18px;line-height:1;cursor:pointer;color:var(--muted,#777);float:right;padding:0 0 0 8px}',
     '.tk-chon{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 12px}',
@@ -545,7 +554,7 @@
   /* ── hồ sơ kênh gắn THẲNG vào form của tool ──
      Tool đăng ký mấy ô nó đã có sẵn (ngách, tệp, xưng hô…) bằng ganO, phần hồ sơ còn lại
      được vẽ ngay bên dưới. Sửa ô nào là hồ sơ tự lưu, cả ba tool dùng chung, khỏi mở hộp thoại. */
-  var oGan = {}, hsSua = {}, luuHen = null, oBao = null;
+  var oGan = {}, hsSua = {}, oBao = null;
 
   function ganO(map) {
     Object.keys(map).forEach(function (k) {
@@ -558,25 +567,37 @@
   }
   function ghiTruong(k, v) {
     v = String(v == null ? '' : v).trim();
-    if ((hoSo()[k] || '') === v) return;
-    hsSua[k] = v; henLuu();
+    if ((hoSoGoc()[k] || '') === v) delete hsSua[k];
+    else hsSua[k] = v;
+    veNutLuu();
   }
-  function henLuu() {
-    if (!Object.keys(hsSua).length) return;
-    if (TK.vaiHoSo) { hsSua = {}; return; }        // mentor đang chạy thử: không ghi đè hồ sơ học viên
-    if (!TK.me) { nhac('Tạo tài khoản để giữ lại hồ sơ này'); return; }
-    clearTimeout(luuHen);
-    luuHen = setTimeout(async function () {
-      var m = {}, cu = hoSo();
-      Object.keys(cu).forEach(function (k) { m[k] = cu[k]; });
-      Object.keys(hsSua).forEach(function (k) { if (hsSua[k]) m[k] = hsSua[k]; else delete m[k]; });
-      hsSua = {};
-      nhac('Đang lưu hồ sơ…');
-      try { nhac(await luuHoSo(m) ? '✓ Đã lưu vào hồ sơ kênh' : 'Chưa lưu được, thử lại'); }
-      catch (e) { nhac('Không kết nối được máy chủ'); }
-    }, 900);
+  function coSua() { return Object.keys(hsSua).length > 0; }
+
+  /* Lưu lên hệ thống: hồ sơ này là một bản duy nhất, nên lưu ở đây thì bên khu học viên
+     và cả ba tool đều thấy ngay. */
+  async function luuHoSoChung() {
+    if (!coSua()) return;
+    if (TK.vaiHoSo) { nhac('Đang chạy thử bằng hồ sơ học viên khác nên không ghi đè. Về hồ sơ của mình rồi lưu.'); return; }
+    if (!TK.me) { mo('signup', 'Tạo tài khoản để lưu hồ sơ kênh, mất 30 giây.'); return; }
+    var m = hoSo();
+    if (nutLuu) nutLuu.disabled = true;
+    nhac('Đang lưu…');
+    try {
+      if (await luuHoSo(m)) {
+        hsSua = {};
+        nhac('✓ Đã lưu. Khu học viên và cả ba tool dùng chung hồ sơ này.');
+      } else nhac('Chưa lưu được, thử lại giúp mình.');
+    } catch (e) { nhac('Không kết nối được máy chủ.'); }
+    veNutLuu();
   }
+
   function nhac(t) { if (oBao) { oBao.textContent = t; oBao.hidden = !t; } }
+  var nutLuu = null;
+  function veNutLuu() {
+    if (!nutLuu) return;
+    nutLuu.disabled = !coSua();
+    if (coSua()) nhac('Có thay đổi chưa lưu — AI vẫn chấm theo bản đang sửa, bấm Lưu để giữ lại.');
+  }
 
   /* Ô gắn vào cuối phần 1 của tool: dòng trạng thái + những mục hồ sơ mà tool chưa có ô sẵn. */
   function oMoiHoSo(dich, bo) {
@@ -620,7 +641,12 @@
         w.appendChild(l); w.appendChild(i); luoi.appendChild(w);
       });
       v.appendChild(luoi);
-      oBao = el('p', 'tk-hs-bao'); oBao.hidden = true; v.appendChild(oBao);
+      var cuoi = el('div', 'tk-hs-cuoi');
+      nutLuu = nut('Lưu vào hồ sơ kênh', true); nutLuu.disabled = !coSua();
+      nutLuu.onclick = luuHoSoChung;
+      cuoi.appendChild(nutLuu);
+      oBao = el('p', 'tk-hs-bao'); oBao.hidden = true; cuoi.appendChild(oBao);
+      v.appendChild(cuoi);
     }
     ve2(); dich.appendChild(v);
     TK._veMoi = ve2;

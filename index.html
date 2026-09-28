@@ -850,11 +850,23 @@ body.hv-mode{padding-bottom:0}
 .hv-chu{font-size:12.5px;color:var(--faint);margin-top:16px;line-height:1.7}
 
 /* ── tổng quan lớp (chỉ mentor) ── */
-.hv-chedo{display:inline-flex;gap:4px;background:var(--paper);border:1.5px solid var(--line);
-  border-radius:999px;padding:4px;margin-bottom:18px}
-.hv-chedo button{border-radius:999px;padding:8px 16px;font-size:13.5px;font-weight:700;
+.hv-chedo{display:flex;flex-wrap:wrap;gap:6px;background:var(--card);border:1.5px solid var(--line);
+  border-radius:999px;padding:5px;margin-bottom:20px;box-shadow:0 10px 26px -20px rgba(80,60,35,.5)}
+.hv-chedo button{border-radius:999px;padding:11px 20px;font-size:14.5px;font-weight:800;
   font-family:var(--disp);color:var(--quiet);transition:.18s;white-space:nowrap}
-.hv-chedo button.on{background:var(--ink);color:var(--paper-lt)}
+.hv-chedo button:hover{color:var(--ink);background:var(--paper)}
+.hv-chedo button.on{background:var(--ink);color:var(--paper-lt);box-shadow:0 4px 0 rgba(28,38,0,.22)}
+/* tab Viral Studio: chỗ ăn tiền của khoá, để lime cho đập vào mắt */
+.hv-chedo button.noi{background:var(--lime);color:var(--ink);box-shadow:0 3px 0 rgba(28,38,0,.2)}
+.hv-chedo button.noi:hover{background:var(--lime);filter:brightness(1.04)}
+.hv-chedo button.noi.on{background:var(--ink);color:var(--lime)}
+@media(max-width:560px){
+  .hv-chedo{gap:4px;padding:4px}
+  .hv-chedo button{padding:9px 13px;font-size:13px;flex:1 1 auto;text-align:center}
+}
+.hv-hs-cuoi{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:16px;
+  border-top:1px solid var(--line);padding-top:16px}
+.hv-hs-cuoi .hv-hs-bao{margin:0}
 .tq-so{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
 .tq-o{position:relative;background:var(--card);border:1.5px solid var(--line);
   border-radius:var(--r);padding:16px 18px 14px;overflow:hidden;
@@ -1962,6 +1974,41 @@ body.hv-mode{padding-bottom:0}
         <p id="hvMoTa">Chọn một ca trống là xong — mentor nhận thông báo ngay. Bận thì bấm lại đúng ca đó để huỷ, ca sẽ mở lại cho bạn khác.</p>
       </div>
 
+      <div class="hv-chedo" id="hvCheDo" style="display:none">
+        <button id="hvTabToi" class="on">Lịch của tôi</button>
+        <button id="hvTabTQ">Tổng quan lớp</button>
+        <button id="hvTabHS">Học viên</button>
+        <button id="hvTabVS" class="noi">🧰 Viral Studio</button>
+        <button id="hvTabHoSo">Hồ sơ kênh</button>
+      </div>
+
+      <!-- ── màn Đặt lịch ── -->
+      <div id="hvManLich">
+        <div class="hv-cua-toi" id="hvMineBox" style="display:none">
+          <h3 id="hvMineTieuDe">📌 Lịch sắp tới của bạn</h3>
+          <div class="hv-mine" id="hvMine"></div>
+        </div>
+
+        <div class="hv-tuan" id="hvTuanHang">
+          <button class="hv-nut" id="hvTruoc">‹ Tuần trước</button>
+          <b id="hvNhanTuan">—</b>
+          <button class="hv-nut" id="hvSau">Tuần sau ›</button>
+        </div>
+
+        <div class="hv-han" id="hvHan" style="display:none"></div>
+        <div class="hv-ngays" id="hvNgays"></div>
+        <div class="hv-luu" id="hvLuu">
+          <span class="dem" id="hvLuuDem"></span>
+          <button type="button" id="hvLuuBo">Bỏ thay đổi</button>
+          <button type="button" class="chinh" id="hvLuuOk">Lưu lịch</button>
+        </div>
+        <div id="hvTQ" style="display:none"></div>
+      </div>
+
+      <!-- ── màn Học viên (mentor) ── -->
+      <div id="hvHS" style="display:none"></div>
+
+      <!-- ── màn Viral Studio ── -->
       <div class="hv-cua-toi" id="hvTools">
         <h3>🧰 Viral Studio · bản Pro của bạn</h3>
         <p style="margin:6px 0 14px">Đăng nhập ở khu học viên rồi thì cả ba tool tự nhận Pro, không phải đăng nhập lại. Hồ sơ kênh bên tab Hồ sơ kênh cũng được ba tool dùng chung để góp ý đúng kênh bạn.</p>
@@ -1981,41 +2028,16 @@ body.hv-mode{padding-bottom:0}
         </div>
       </div>
 
-      <div class="hv-chedo" id="hvCheDo" style="display:none">
-        <button id="hvTabToi" class="on">Lịch của tôi</button>
-        <button id="hvTabTQ">Tổng quan lớp</button>
-        <button id="hvTabHS">Học viên</button>
-        <button id="hvTabVS">Viral Studio</button>
-        <button id="hvTabHoSo">Hồ sơ kênh</button>
-      </div>
-
-      <div class="hv-cua-toi" id="hvMineBox" style="display:none">
-        <h3 id="hvMineTieuDe">📌 Lịch sắp tới của bạn</h3>
-        <div class="hv-mine" id="hvMine"></div>
-      </div>
-
-      <div class="hv-tuan" id="hvTuanHang">
-        <button class="hv-nut" id="hvTruoc">‹ Tuần trước</button>
-        <b id="hvNhanTuan">—</b>
-        <button class="hv-nut" id="hvSau">Tuần sau ›</button>
-      </div>
-
-      <div class="hv-han" id="hvHan" style="display:none"></div>
-      <div class="hv-ngays" id="hvNgays"></div>
-      <div class="hv-luu" id="hvLuu">
-        <span class="dem" id="hvLuuDem"></span>
-        <button type="button" id="hvLuuBo">Bỏ thay đổi</button>
-        <button type="button" class="chinh" id="hvLuuOk">Lưu lịch</button>
-      </div>
-      <div id="hvTQ" style="display:none"></div>
-      <div id="hvHS" style="display:none"></div>
-
+      <!-- ── màn Hồ sơ kênh ── -->
       <!-- hồ sơ kênh của chính học viên, dựng sẵn từ form đăng ký khoá -->
       <div class="hv-hoso" id="hvHoSo" style="display:none">
         <h3>📋 Hồ sơ kênh của bạn</h3>
         <p class="hv-hs-nguon" id="hvHsNguon"></p>
         <div class="hv-hs-luoi" id="hvHsLuoi"></div>
-        <p class="hv-hs-bao" id="hvHsBao"></p>
+        <div class="hv-hs-cuoi">
+          <button type="button" class="btn btn-ink btn-md" id="hvHsLuu">Lưu hồ sơ</button>
+          <p class="hv-hs-bao" id="hvHsBao"></p>
+        </div>
       </div>
       <div class="hv-msg" id="hvMsg"></div>
       <p class="hv-chu" id="hvChu" style="display:none">
@@ -3274,8 +3296,9 @@ function hvVaoTrong(){
   var m = laMentor();
   var pro = HV.vaitro === 'pro';           // mua Viral Studio Pro, không học khoá → chỉ có tool
 
-  ['#hvCheDo','#hvMineBox','#hvHan','#hvNgays','#hvLuu','#hvTQ','#hvChu'].forEach(function(s){
+  ['#hvCheDo','#hvManLich','#hvMineBox','#hvHan','#hvNgays','#hvLuu','#hvTQ','#hvChu'].forEach(function(s){
     var e=$(s); if(e) e.style.display = pro ? 'none' : ''; });
+  if (pro) $('#hvTools').style.display = '';   // tài khoản chỉ mua tool: vào là thấy ngay ba tool
   var tuanBar = $('#hvTruoc') && $('#hvTruoc').parentNode; if (tuanBar) tuanBar.style.display = pro ? 'none' : '';
   if (pro){
     $('#hvVai').style.display = 'none';
@@ -3315,7 +3338,7 @@ function hvDoiCheDo(che){
   $('#hvMoTa').textContent = vs
     ? 'Ba tool AI đi kèm khoá học. Đăng nhập ở đây rồi thì bên tool tự nhận Pro, không phải đăng nhập lại.'
     : ho
-    ? 'Ba tool bên Viral Studio đọc hồ sơ này để chấm đúng kênh bạn. Sửa ô nào là tự lưu, không cần bấm nút.'
+    ? 'Ba tool bên Viral Studio đọc hồ sơ này để chấm đúng kênh bạn. Sửa xong nhớ bấm Lưu hồ sơ ở cuối trang.'
     : hs
     ? 'Hồ sơ kênh và lịch sử dùng AI của từng người — cả học viên đã có tài khoản Viral Studio lẫn người mới điền form đăng ký khoá.'
     : tq
@@ -3324,14 +3347,11 @@ function hvDoiCheDo(che){
     ? 'Bấm vào ca bạn rảnh là mở cho học viên đặt. Học viên đặt xong bạn thấy tên họ ngay tại ca đó, và bot cũng báo về nhóm.'
     : 'Chọn một ca trống là xong — mentor nhận thông báo ngay. Bận thì bấm lại đúng ca đó để huỷ, ca sẽ mở lại cho bạn khác.';
 
-  // mỗi tab một màn riêng, không chồng lên nhau
-  var anLich = hs || ho || vs;
-  ['#hvTuanHang','#hvMineBox','#hvHan','#hvNgays','#hvLuu','#hvChu','#hvTQ'].forEach(function(q){
-    var e = document.querySelector(q); if (e && anLich) e.style.display = 'none';
-  });
-  $('#hvTools').style.display = vs ? '' : 'none';
-  $('#hvHS').style.display = hs ? '' : 'none';
-  $('#hvHoSo').style.display = ho ? '' : 'none';
+  // mỗi tab đúng một màn, bật cái này thì tắt hết cái kia
+  $('#hvManLich').style.display = (hs || ho || vs) ? 'none' : '';
+  $('#hvTools').style.display   = vs ? '' : 'none';
+  $('#hvHS').style.display      = hs ? '' : 'none';
+  $('#hvHoSo').style.display    = ho ? '' : 'none';
   if (hs) hvTaiHocVien();
   if (ho) hvTaiHoSo();
 }
@@ -3356,7 +3376,7 @@ var HV_HS_TRUONG = [
   ['san_pham', 'Sản phẩm hoặc dịch vụ', 'VD: khoá học 540k · set hải sản 1tr2 · dịch vụ sửa tại nhà', 0],
   ['ghi_chu', 'Ghi chú vận hành khác', 'VD: 2 video/tuần, đăng 20h–22h · quay bằng điện thoại, ánh sáng cửa sổ', 0]
 ];
-var HV_HS = {hs:{}, nguon:'', o:{}, hen:null, xong:false};
+var HV_HS = {hs:{}, nguon:'', o:{}, xong:false};
 
 function hvTaiHoSo(){
   if (HV.vaitro === 'pro') return;                 // tài khoản chỉ mua tool, không có khu học viên
@@ -3388,29 +3408,48 @@ function hvVeHoSo(){
     var i = document.createElement(t[3] ? 'textarea' : 'input');
     if (!t[3]) i.type = 'text';
     i.id = 'hvhs_' + t[0]; i.placeholder = t[2]; i.value = HV_HS.hs[t[0]] || '';
-    i.addEventListener('change', hvHenLuuHoSo); i.addEventListener('blur', hvHenLuuHoSo);
+    i.addEventListener('input', hvHsDoiO);
     HV_HS.o[t[0]] = i;
     w.appendChild(lb); w.appendChild(i); l.appendChild(w);
   });
+  $('#hvHsLuu').disabled = true;
+  $('#hvHsBao').textContent = '';
   $('#hvHoSo').style.display = '';
 }
 
-function hvHenLuuHoSo(){
+function hvHsDangSua(){
   var m = {}, doi = false;
   HV_HS_TRUONG.forEach(function(t){
     var v = (HV_HS.o[t[0]].value || '').trim();
     if (v) m[t[0]] = v;
     if (v !== (HV_HS.hs[t[0]] || '')) doi = true;
   });
-  if (!doi) return;
-  clearTimeout(HV_HS.hen);
-  HV_HS.hen = setTimeout(function(){
-    $('#hvHsBao').textContent = 'Đang lưu…';
-    hvGoi('st_hoso', {token:HV.token, ho_so:m}).then(function(r){
-      if (r && r.ok){ HV_HS.hs = r.ho_so || m; $('#hvHsBao').textContent = '✓ Đã lưu. Ba tool bên Viral Studio dùng ngay hồ sơ này.'; }
-      else $('#hvHsBao').textContent = 'Chưa lưu được' + (r && r.error ? ' (' + r.error + ')' : '') + ', thử lại giúp mình.';
-    }).catch(function(){ $('#hvHsBao').textContent = 'Không kết nối được máy chủ.'; });
-  }, 900);
+  return {m:m, doi:doi};
+}
+function hvHsDoiO(){
+  var d = hvHsDangSua();
+  $('#hvHsLuu').disabled = !d.doi;
+  $('#hvHsBao').textContent = d.doi ? 'Có thay đổi chưa lưu.' : '';
+}
+function hvLuuHoSo(){
+  var d = hvHsDangSua();
+  if (!d.doi) return;
+  var nut = $('#hvHsLuu');
+  nut.disabled = true;
+  $('#hvHsBao').textContent = 'Đang lưu…';
+  hvGoi('st_hoso', {token:HV.token, ho_so:d.m}).then(function(r){
+    if (r && r.ok){
+      HV_HS.hs = r.ho_so || d.m;
+      $('#hvHsBao').textContent = '✓ Đã lưu lúc ' + new Date().toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'}) +
+        '. Ba tool bên Viral Studio dùng ngay hồ sơ này.';
+    } else {
+      $('#hvHsBao').textContent = 'Chưa lưu được' + (r && r.error ? ' (' + r.error + ')' : '') + ', thử lại giúp mình.';
+      nut.disabled = false;
+    }
+  }).catch(function(){
+    $('#hvHsBao').textContent = 'Không kết nối được máy chủ, thử lại giúp mình.';
+    nut.disabled = false;
+  });
 }
 
 /* ---- mentor: hồ sơ kênh và lịch sử dùng AI của từng học viên ---- */
@@ -3616,7 +3655,6 @@ function hvDangNhap(){
 function hvTai(tuan){
   if (HV.vaitro === 'pro') return;         // tài khoản Pro không có lịch
   if (HV.cheDo === 'hs' || HV.cheDo === 'hoso' || HV.cheDo === 'vs') return;   // đang ở tab khác
-  $('#hvHS').style.display = 'none'; $('#hvHoSo').style.display = 'none'; $('#hvTools').style.display = 'none';
   ['#hvTuanHang','#hvNgays'].forEach(function(q){ var e = document.querySelector(q); if (e) e.style.display = ''; });
   hvBoCho();
   if (laMentor() && HV.cheDo === 'tq') return hvTaiTongQuan(tuan);
@@ -4130,6 +4168,7 @@ function initHV(){
   $('#hvTabHS').addEventListener('click',  function(){ hvDoiCheDo('hs'); });
   $('#hvTabHoSo').addEventListener('click', function(){ hvDoiCheDo('hoso'); });
   $('#hvTabVS').addEventListener('click',   function(){ hvDoiCheDo('vs'); });
+  $('#hvHsLuu').addEventListener('click', hvLuuHoSo);
   $('#hvTruoc').addEventListener('click', function(){ hvTai(hvCong(HV.tuan,-7)) });
   $('#hvSau').addEventListener('click',   function(){ hvTai(hvCong(HV.tuan, 7)) });
 
