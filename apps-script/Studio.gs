@@ -166,7 +166,14 @@ function studioApi(b){
 }
 
 function stNganHang(){ return {ngan_hang: stCfg('ST_NGAN_HANG'), stk: stCfg('ST_STK'), chu_tk: stCfg('ST_CHU_TK')}; }
-function stCauHinh(){ return jsonOut({ok:true, goi: stGoi(), bank: stNganHang(), luot_thu: ST_LUOT_THU}); }
+/* Link group Zalo do bot đặt bằng /zalo — mọi màn hình "chờ duyệt" và "đã chuyển khoản" đều dùng chung. */
+function stZalo(){
+  try{ var c = getConfig(); return (c && c.zalo && c.zalo.groupUrl) || ''; }catch(e){ return ''; }
+}
+function stCauHinh(){
+  return jsonOut({ok:true, goi: stGoi(), bank: stNganHang(), zalo: stZalo(),
+    luot_thu: ST_LUOT_THU, luot: {hook: ST_LUOT_THU, script: ST_LUOT_KB, soi: ST_LUOT_SOI}});
+}
 
 /* ── đăng ký: không cần duyệt, có ngay lượt AI miễn phí ── */
 function stDangKy(b){

@@ -3273,6 +3273,12 @@ function hvSoat(cap){
 }
 
 /* ---- tạo tài khoản ---- */
+/* Nhắc nhở kèm link group Zalo — link do mentor đặt qua bot bằng lệnh /zalo */
+function hvZaloNhac(){
+  var z = (typeof CFG !== 'undefined' && CFG && CFG.zalo && CFG.zalo.groupUrl) || '';
+  return z ? ' Lâu quá thì nhắn tụi mình trong <a href="' + z + '" target="_blank" rel="noopener"><b>group Zalo</b></a> nhé.'
+           : ' Lâu quá thì nhắn cho tụi mình nhé.';
+}
 function hvDangKy(){
   var btn = $('#hvKy');
   if (btn.classList.contains('busy')) return;
@@ -3296,7 +3302,7 @@ function hvDangKy(){
         '<p class="sub">Tụi mình vừa nhận được đăng ký của <b>' + esc(hvTenGoi(ten)) + '</b>.</p>' +
         '<div class="hv-cho">Duyệt xong bạn quay lại đây, bấm <b>Đăng nhập</b> với chính ' +
         'email <b>' + esc(email) + '</b> và mật khẩu vừa đặt là vào được.<br><br>' +
-        'Thường trong ngày là xong. Lâu quá thì nhắn cho tụi mình trong group Zalo nhé.</div>';
+        'Thường trong ngày là xong.' + hvZaloNhac() + '</div>';
     } else {
       hvBao('#hvKyMsg', {
         da_ton_tai:'Email này đăng ký rồi. Bấm <b>Đăng nhập</b> ở trên, quên mật khẩu thì nhắn mentor cấp lại.',

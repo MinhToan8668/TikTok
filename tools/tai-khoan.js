@@ -23,7 +23,7 @@
   function json(k) { try { return JSON.parse(ls.get(k) || 'null'); } catch (e) { return null; } }
 
   var TK = {
-    api: '', tool: 'hook', onDoi: null,
+    api: '', tool: 'hook', onDoi: null, cfg: null,
     me: null,          // hồ sơ tài khoản trả từ st_me
     vaiHoSo: null      // mentor đang mượn hồ sơ của học viên nào để chạy thử
   };
@@ -146,6 +146,7 @@
     dung(); oTrang.innerHTML = ''; oTrang.classList.toggle('rong', trang === 'signup' && tab === 'signup' && kieu === 'hv' && !TK.me);
     var x = el('button', 'tk-dong', '✕'); x.type = 'button'; x.setAttribute('aria-label', 'Đóng'); x.onclick = dong; oTrang.appendChild(x);
     if (trang === 'hoso') return veHoSo();
+    if (trang === 'pro') return vePro();
     if (trang === 'hv') return veDsHv();
     if (TK.me) return veHome(loiNhan);
     return veDangKy(loiNhan);
@@ -246,6 +247,11 @@
     var a = document.createElement('a'); a.href = '#'; a.textContent = 'Đăng nhập bằng tài khoản khu học viên';
     a.onclick = function (e) { e.preventDefault(); tab = 'login'; kieu = 'khach'; ve('signup'); };
     p.appendChild(a); oTrang.appendChild(p);
+    var z = zalo();
+    if (z) { var za = el('p', 'tk-phu'); za.style.margin = '6px 0 0';
+      za.appendChild(document.createTextNode('Cần hỗ trợ? '));
+      var la = document.createElement('a'); la.href = z; la.target = '_blank'; la.rel = 'noopener'; la.textContent = 'Nhắn mentor trong group Zalo';
+      za.appendChild(la); oTrang.appendChild(za); }
   }
 
   /* ── trang chính của tài khoản ── */
@@ -267,7 +273,11 @@
         lu.appendChild(sp);
       });
       oTrang.appendChild(lu);
-      oTrang.appendChild(el('p', 'tk-phu', 'Hết lượt thì đăng ký học viên để dùng không giới hạn, hoặc mua Pro.'));
+      var up = el('div', 'tk-moi');
+      up.appendChild(el('b', null, '✦ Nâng cấp Pro' + (nhanGia() ? ' · ' + nhanGia() : '')));
+      up.appendChild(document.createTextNode('Dùng cả ba tool theo hạn mức ngày, không còn đếm lượt. Chuyển khoản xong mentor mở trong ngày.'));
+      var bu = nut('Xem cách chuyển khoản', true); bu.onclick = function () { ve('pro'); };
+      up.appendChild(bu); oTrang.appendChild(up);
     }
 
     var hs = (a.ho_so && Object.keys(a.ho_so).length) ? a.ho_so : null;
@@ -393,6 +403,64 @@
     bao(); ve('hoso');
   }
 
+  /* ── cấu hình bán Pro: giá, số ngày, link Zalo. Mentor đổi bằng bot: /giapro /ngaypro /zalo ── */
+  async function napCfg() {
+    if (TK.cfg) return TK.cfg;
+    try { var r = await goi({ action: 'st_cfg' }); if (r.ok) TK.cfg = r; } catch (e) { }
+    return TK.cfg;
+  }
+  function goiPro() { return (TK.cfg && TK.cfg.goi && TK.cfg.goi[0]) || { ten: 'Pro', gia: 0, ngay: 0 }; }
+  function tien(n) { return Number(n || 0).toLocaleString('vi-VN') + 'đ'; }
+  function nhanGia() { var g = goiPro(); return g.gia ? tien(g.gia) + (g.ten ? ' · ' + g.ten.replace(/^Pro /, '') : '') : ''; }
+  function zalo() { return (TK.cfg && TK.cfg.zalo) || ''; }
+
+  /* ── nâng cấp Pro: tạo mã chuyển khoản rồi hiện số tài khoản ngay trong tool ── */
+  async function vePro() {
+    oTrang.appendChild(el('h3', null, 'Nâng cấp Pro'));
+    var g = goiPro();
+    oTrang.appendChild(el('p', 'tk-phu', g.gia
+      ? 'Gói ' + g.ten + ' · ' + tien(g.gia) + '. Chuyển khoản đúng nội dung bên dưới, mentor xác nhận là Pro mở ngay.'
+      : 'Mentor chưa cài giá gói Pro. Nhắn mentor giúp mình.'));
+    var o = el('div'); oTrang.appendChild(o);
+    o.appendChild(el('p', 'tk-tt', 'Đang tạo mã chuyển khoản…'));
+    try {
+      var r = await goi({ action: 'st_buy', token: token() });
+      o.innerHTML = '';
+      if (!r.ok) {
+        o.appendChild(el('p', 'tk-tt loi', r.error === 'chua_cai_bank'
+          ? 'Mentor chưa cài tài khoản nhận tiền. Nhắn mentor giúp mình.' : 'Chưa tạo được mã, thử lại sau.'));
+      } else {
+        var b = r.bank || {};
+        if (r.qr) { var im = new Image(); im.src = r.qr; im.alt = 'Mã QR chuyển khoản'; im.style.cssText = 'width:100%;max-width:230px;display:block;margin:0 auto 10px;border-radius:12px'; o.appendChild(im); }
+        [['Ngân hàng', b.ngan_hang], ['Số tài khoản', b.stk], ['Chủ tài khoản', b.chu_tk], ['Số tiền', tien(r.so_tien)], ['Nội dung', r.ma_ck]].forEach(function (d) {
+          if (!d[1]) return;
+          var row = el('div', 'tk-the'), t2 = el('div');
+          t2.appendChild(el('small', null, d[0])); t2.appendChild(el('b', null, String(d[1])));
+          row.appendChild(t2);
+          var c = nut('Chép'); c.style.marginLeft = 'auto';
+          c.onclick = function () { try { navigator.clipboard.writeText(String(d[1])); c.textContent = 'Đã chép'; setTimeout(function () { c.textContent = 'Chép'; }, 1200); } catch (e) { } };
+          row.appendChild(c); o.appendChild(row);
+        });
+        o.appendChild(el('p', 'tk-phu', 'Quét QR bằng app ngân hàng là tự điền đủ. Ghi đúng nội dung để mentor đối chiếu.'));
+        var xong = nut('Tôi đã chuyển khoản', true); xong.className += ' rong';
+        var tt2 = el('p', 'tk-tt');
+        xong.onclick = async function () {
+          xong.disabled = true; tt2.className = 'tk-tt'; tt2.textContent = 'Đang báo cho mentor…';
+          try {
+            var r2 = await goi({ action: 'st_paid', token: token(), ma_ck: r.ma_ck });
+            tt2.className = 'tk-tt ok';
+            tt2.innerHTML = r2.ok
+              ? 'Đã báo mentor. Thường trong ngày là xong.' + (zalo() ? ' Lâu quá thì nhắn trong <a href="' + zalo() + '" target="_blank" rel="noopener"><b>group Zalo</b></a> nhé.' : '')
+              : 'Chưa gửi được, thử lại giúp mình.';
+          } catch (e) { tt2.className = 'tk-tt loi'; tt2.textContent = 'Không kết nối được máy chủ.'; }
+          finally { xong.disabled = false; }
+        };
+        o.appendChild(xong); o.appendChild(tt2);
+      }
+    } catch (e) { o.innerHTML = ''; o.appendChild(el('p', 'tk-tt loi', 'Không kết nối được máy chủ.')); }
+    var q = nut('Quay lại'); q.onclick = function () { ve('home'); }; oTrang.appendChild(q);
+  }
+
   /* ── nạp hồ sơ tài khoản ── */
   async function nap() {
     var t = token();
@@ -455,16 +523,33 @@
     opt = opt || {};
     TK.api = opt.api || TK.api; TK.tool = opt.tool || TK.tool;
     var cu = opt.onDoi;
-    TK.onDoi = function (me) { if (TK._veMoi) { try { TK._veMoi(); } catch (e) { } } if (cu) cu(me); };
+    TK.onDoi = function (me) { if (TK._veMoi) { try { TK._veMoi(); } catch (e) { } } veNutPro(); if (cu) cu(me); };
+    napCfg().then(veNutPro);
     nap();
     return TK;
+  }
+
+  /* Nút Nâng cấp Pro ở góc màn hình, chỉ hiện với tài khoản đang dùng thử. */
+  var nutPro = null;
+  function veNutPro() {
+    var can = TK.me && !laPro();
+    if (!can) { if (nutPro) { nutPro.remove(); nutPro = null; } return; }
+    if (!nutPro) {
+      nutPro = document.createElement('button'); nutPro.type = 'button'; nutPro.id = 'tkNutPro';
+      nutPro.style.cssText = 'position:fixed;right:14px;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);z-index:40;' +
+        'border:0;border-radius:999px;padding:11px 16px;font:inherit;font-weight:800;font-size:13px;cursor:pointer;' +
+        'background:var(--pro,#26210F);color:var(--pro-text,#F9E8DD);box-shadow:0 8px 22px rgba(0,0,0,.22)';
+      nutPro.onclick = function () { mo('pro'); };
+      document.body.appendChild(nutPro);
+    }
+    nutPro.textContent = '✦ Nâng cấp Pro' + (nhanGia() ? ' · ' + nhanGia() : '');
   }
 
   global.TK = {
     khoiDong: khoiDong, nap: nap, mo: mo, dong: dong, canCo: canCo,
     moHocVien: function () { tab = 'signup'; kieu = 'hv'; mo('signup'); },
     token: token, dev: dev, hoSo: hoSo, luuHoSoTam: luuHoSoTam,
-    laPro: laPro, laMentor: laMentor, luotCon: luotCon, oMoiHoSo: oMoiHoSo,
+    laPro: laPro, laMentor: laMentor, luotCon: luotCon, oMoiHoSo: oMoiHoSo, zalo: zalo, giaPro: nhanGia,
     get me() { return TK.me; }, get vai() { return TK.vaiHoSo; },
     dat: function (k, v) { TK[k] = v; }
   };

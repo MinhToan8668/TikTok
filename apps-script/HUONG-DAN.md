@@ -253,3 +253,10 @@ Muốn tặng thêm lượt hoặc gia hạn tay: sửa cột `luot_dung` (số 
 - **Mentor** xem danh sách gộp cả tài khoản Studio lẫn người mới điền form đăng ký khoá, mượn hồ sơ học viên để chạy thử tool, điền hộ hồ sơ cho ai chưa có (`st_ds`, `st_hoso` kèm `email_dich`), xem lịch sử (`st_lichsu`, `/lichsu email`), xem hồ sơ (`/hoso email`), danh sách (`/dshv`).
 - **Chống dùng chung tài khoản:** mỗi lượt AI ghi vào bảng `AiLichSu` kèm mã thiết bị. Quá `ST_TB_TOI_DA` (3) thiết bị khác nhau trong `ST_TB_NGAY` (7) ngày thì bot nhắn riêng cho mentor, tối đa một lần mỗi 24 giờ. Không chặn học viên, chỉ báo để mentor tự kiểm tra.
 - **Nâng cấp bảng:** `stNangCap()` nối thêm cột mới vào bảng `NguoiDung` đang chạy. Không có hàm này thì `bang()` sẽ đổi tên bảng cũ thành bản lưu và tạo bảng rỗng, mất tài khoản đã có.
+
+## Đăng ký gọn lại: Khách hay Học viên (bản 09/2026)
+
+- Một form duy nhất, chọn vai trước: **Khách dùng thử** tạo tài khoản ngay trong tool; **Học viên khoá học** thì chỉ có hai đường là đăng nhập (tài khoản khu học viên dùng chung cho cả ba tool) hoặc bấm sang trang đăng ký khoá. Không còn nhiều lối vào lẫn lộn.
+- Khách hết lượt thì thấy nút **✦ Nâng cấp Pro** cố định ở góc phải dưới, kèm giá lấy từ cấu hình. Đặt giá bằng bot: `/giapro 250k` và `/ngaypro 90` → tự hiện "250.000đ · 3 tháng".
+- Màn chuyển khoản nằm luôn trong tool: QR, số tài khoản, số tiền, nội dung, nút "Tôi đã chuyển khoản" báo thẳng cho bot.
+- **Link group Zalo** do bot đặt bằng `/zalo https://zalo.me/g/...`. `st_cfg` trả link này xuống, các màn "chờ duyệt" và "đã chuyển khoản" đều dùng chung, không còn câu chữ cứng trong code.
