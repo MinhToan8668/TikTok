@@ -830,6 +830,7 @@
       <div class="me-actions">
         <button class="me-act buy" id="goUpgrade" type="button"><b>✦ Mua Pro <span data-price>50k</span></b><small>Không giới hạn, xuất sạch, AI 20 lượt mỗi ngày</small></button>
         <a class="me-act" id="goHv" href="../index.html#dangky"><b>🎓 Đăng ký học viên</b><small>Bao trọn gói khoá học, được duyệt là có Pro</small></a>
+        <button class="me-act" id="goHoSo" type="button"><b>📋 Hồ sơ kênh của bạn</b><small>Điền một lần, cả ba tool chấm đúng ngách và tệp của bạn</small></button>
         <button class="me-act" id="goSoi" type="button"><b>👀 Soi kênh miễn phí</b><small>Mentor xem video, chỉ đúng một chỗ nên sửa</small></button>
       </div>
       <div id="paneUpgrade" class="me-pane" hidden>
@@ -878,6 +879,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
+<script src="tai-khoan.js"></script>
 <script>
 /* =========================================================
    Hook Text Studio — Tự Mình Xây Kênh
@@ -1659,15 +1661,16 @@ function setStatus(msg, cls = '') { const s = $('#aiStatus'); s.innerHTML = msg;
 async function runAI() {
   if (aiBusy || !state.frame) return;
   const text = $('#text').value.trim(); if (!text) { setStatus('Nhập câu hook ở bước 2 trước đã.', 'err'); return; }
+  if (!DEMO && !authToken()) { TK.mo('signup', 'Tạo tài khoản miễn phí để dùng AI phân tích hook. Mất 30 giây, có ngay 10 lượt và AI sẽ bám đúng kênh của bạn.'); return; }
   aiBusy = true; $('#btnAI').disabled = true; $('#btnTrial').disabled = true; $('#proResult').innerHTML = '';
   if (DEMO) { setStatus('<span class="spinner"></span>Bản demo đang dựng kết quả mẫu...'); await new Promise(r => setTimeout(r, 1200)); setStatus('Bản demo: kết quả mẫu cố định, chưa gọi AI thật. Đã áp dụng bố cục số 1.', 'ok'); showResult(DEMO_DATA); openSheet(); aiBusy = false; $('#btnAI').disabled = false; return; }
   const t0 = Date.now(); const tick = setInterval(() => setStatus(`<span class="spinner"></span>AI đang xem frame và viết đề xuất · ${Math.round((Date.now() - t0) / 1000)} giây`), 500);
   try {
-    const r = await callApi({ action: 'hook_ai', token: authToken(), thu: authToken() ? undefined : devId(), text, image: await frameB64(), platform: state.platform, facePos: state.facePos });
+    const r = await callApi({ action: 'hook_ai', token: authToken(), dev: TK.dev(), ho_so: TK.hoSo(), text, image: await frameB64(), platform: state.platform, facePos: state.facePos });
     clearInterval(tick);
     if (!r.ok) {
-      if (r.error === 'het_thu') { setTrial(0, r.han || 3); openUpsell(`Bạn đã dùng hết 3 lượt AI thử. Tạo tài khoản miễn phí để có thêm ${luotThu()} lượt AI, hoặc mua Pro.`); }
-      const map = { het_thu: 'Hết 3 lượt AI thử miễn phí.', can_pro: 'Chỉnh chữ bằng AI cần tài khoản.', het_phien: 'Phiên đăng nhập đã hết hạn. Đăng nhập lại nhé.', het_luot_thu: 'Bạn đã dùng hết lượt AI miễn phí. Mua Pro hoặc đăng ký học viên để dùng tiếp.', het_luot: `Bạn đã dùng hết ${r.han || ''} lượt hôm nay. Mai quay lại nhé.`, chua_cai_key: 'Máy chủ chưa được cài khóa AI (GEMINI_API_KEY). Báo mentor giúp mình.', loi_mang: 'Máy chủ không gọi được AI. Chụp mã lỗi bên dưới gửi mentor.', loi_ai: 'AI trả lỗi. Chụp mã lỗi bên dưới gửi mentor.', sai_key: 'Khóa AI trên máy chủ không hợp lệ hoặc đã bị xoá. Báo mentor thay khóa mới.', ban_qua: 'AI đang bận hoặc chạm hạn mức theo phút. Đợi khoảng một phút rồi bấm lại.', tu_choi: 'AI không xử lý được nội dung này, thử diễn đạt khác.', anh_qua_lon: 'Ảnh quá lớn, chọn ảnh nhỏ hơn.', thieu_text: 'Nhập câu hook trước đã.' };
+      if (r.error === 'can_dangky') { TK.mo('signup', 'Tạo tài khoản miễn phí để dùng AI, mất 30 giây.'); }
+      const map = { can_dangky: 'Tạo tài khoản miễn phí để dùng AI, mất 30 giây.', het_thu: 'Hết lượt AI thử miễn phí.', can_pro: 'Chỉnh chữ bằng AI cần tài khoản.', het_phien: 'Phiên đăng nhập đã hết hạn. Đăng nhập lại nhé.', het_luot_thu: 'Bạn đã dùng hết lượt AI miễn phí. Mua Pro hoặc đăng ký học viên để dùng tiếp.', het_luot: `Bạn đã dùng hết ${r.han || ''} lượt hôm nay. Mai quay lại nhé.`, chua_cai_key: 'Máy chủ chưa được cài khóa AI (GEMINI_API_KEY). Báo mentor giúp mình.', loi_mang: 'Máy chủ không gọi được AI. Chụp mã lỗi bên dưới gửi mentor.', loi_ai: 'AI trả lỗi. Chụp mã lỗi bên dưới gửi mentor.', sai_key: 'Khóa AI trên máy chủ không hợp lệ hoặc đã bị xoá. Báo mentor thay khóa mới.', ban_qua: 'AI đang bận hoặc chạm hạn mức theo phút. Đợi khoảng một phút rồi bấm lại.', tu_choi: 'AI không xử lý được nội dung này, thử diễn đạt khác.', anh_qua_lon: 'Ảnh quá lớn, chọn ảnh nhỏ hơn.', thieu_text: 'Nhập câu hook trước đã.' };
       setStatus((map[r.error] || 'Có lỗi khi gọi AI, thử lại sau.') + (r.chi_tiet ? `<br><small style="font-weight:400;opacity:.85">Mã lỗi: ${String(r.chi_tiet).replace(/</g,'&lt;')}</small>` : ''), 'err'); if (r.error === 'het_phien') setPro(false); if (r.error === 'het_luot_thu') { state.acct && (state.acct.luot_con = 0); setAcct(state.acct); openUpsell('Mua Pro hoặc đăng ký học viên để AI phân tích không giới hạn.'); } return;
     }
     setStatus(`Xong sau ${Math.round((Date.now() - t0) / 1000)} giây. Đã áp dụng bố cục số 1.`, 'ok');
@@ -2530,7 +2533,7 @@ async function runLayerAI(ask) {
   try {
     let r;
     if (DEMO) { await new Promise(z => setTimeout(z, 800)); r = { ok: true, data: ask === 'style' ? { text, preset: 'Vàng viral', note: 'Bản demo: câu ngắn, có con số, hợp kiểu chữ vàng viền đen đọc nhanh nhất.' } : { text: DEMO_LAYER[ask] || text, preset: '', note: 'Bản demo: kết quả mẫu cố định.' } }; }
-    else r = await callApi({ action: 'hook_ai', mode: 'layer', token: authToken(), text, ask, presets: STYLE_PRESETS.map(p => p.n) });
+    else r = await callApi({ action: 'hook_ai', mode: 'layer', token: authToken(), dev: TK.dev(), ho_so: TK.hoSo(), text, ask, presets: STYLE_PRESETS.map(p => p.n) });
     if (!r.ok) { out.className = 'status err'; out.textContent = ({ can_pro: 'AI chỉnh chữ là tính năng Pro.', het_luot_thu: 'AI chỉnh chữ là tính năng Pro.', het_luot: 'Hết lượt AI hôm nay.', het_phien: 'Phiên đăng nhập hết hạn, đăng nhập lại nhé.', ban_qua: 'AI đang bận, thử lại sau một phút.', sai_key: 'Khóa AI trên máy chủ không hợp lệ. Báo mentor.' }[r.error] || 'AI chưa chỉnh được.') + (r.chi_tiet ? ' Mã lỗi: ' + r.chi_tiet : ''); return; }
     const d = r.data || {};
     if (d.text === undefined && d.preset === undefined) { out.className = 'status err'; out.textContent = 'Máy chủ đang chạy HookAI.gs bản cũ nên chưa có AI chỉnh chữ. Mentor dán HookAI.gs mới vào Apps Script rồi Deploy, chọn New version là dùng được.'; if (r.con !== undefined) showQuota(r.con, r.han); return; }
@@ -2744,7 +2747,8 @@ async function runDesign() {
   if (aiBusy || !state.frame) return;
   const text = $('#text').value.trim() || state.layers.map(L => runsText(L.runs)).join('\n').trim();
   if (!text) return toast('Nhập câu hook trước đã');
-  if (!DEMO && planOf(state.acct) === 'guest') { openUpsell(`AI thiết kế chữ cần tài khoản. Tạo tài khoản miễn phí để có ${luotThu()} lượt AI.`); return; }
+  if (!DEMO && planOf(state.acct) === 'guest') { TK.mo('signup', `AI thiết kế chữ cần tài khoản. Tạo tài khoản miễn phí để có ${luotThu()} lượt AI.`); return; }
+  if (!DEMO && !authToken()) { TK.mo('signup', 'Tạo tài khoản miễn phí để dùng AI thiết kế bố cục chữ.'); return; }
   if (!DEMO && !state.pro && !(state.trial > 0)) { openUpsell('Bạn đã dùng hết lượt AI miễn phí. Mua Pro hoặc đăng ký học viên để AI thiết kế không giới hạn.'); return; }
   const out = $('#designOut'), btns = [$('#btnDesign'), $('#btnDesignTop')];
   aiBusy = true; btns.forEach(b => b.disabled = true);
@@ -2752,7 +2756,7 @@ async function runDesign() {
   try {
     let r;
     if (DEMO) { await new Promise(z => setTimeout(z, 900)); r = { ok: true, data: designLocal(text) }; }
-    else r = await callApi({ action: 'hook_ai', mode: 'design', token: authToken(), text, image: await frameB64(), platform: state.platform, facePos: state.facePos });
+    else r = await callApi({ action: 'hook_ai', mode: 'design', token: authToken(), dev: TK.dev(), ho_so: TK.hoSo(), text, image: await frameB64(), platform: state.platform, facePos: state.facePos });
     clearInterval(tick);
     if (!r.ok) {
       out.className = 'status err';
@@ -2809,6 +2813,7 @@ const ACCT_ERR = {
   khong_thay: 'Không tìm thấy giao dịch này.', goi_sai: 'Gói không hợp lệ.',
 };
 function planOf(a) { if (!a) return 'guest'; if (a.loai === 'hv') return 'hv'; return a.pro ? 'pro' : 'free'; }
+TK.khoiDong({ api: API, tool: 'hook', onDoi: me => { if (me && me.luot && state.acct) { state.acct.luot_con = me.luot.hook; state.acct.ho_so = me.ho_so; } } });
 function fmtDate(iso) { try { return new Date(iso).toLocaleDateString('vi-VN'); } catch { return ''; } }
 function setAcct(a) {
   state.acct = a; const plan = planOf(a); const pro = plan === 'pro' || plan === 'hv';
@@ -2853,7 +2858,7 @@ async function checkPro() {
     setAcct(null); guestTrial();
   } catch { setAcct(null); }
 }
-async function guestTrial() { try { const r = await callApi({ action: 'hook_status', thu: devId() }); if (r.ok && r.thu && !state.acct) setTrial(r.con, r.han); } catch { } }
+async function guestTrial() { setTrial(0, 0); }   // không còn chế độ khách: phải có tài khoản mới chạy AI
 
 /* ---------- xuất file: Pro, dùng thử, hay bản có logo ---------- */
 async function gateExport(kind) {
@@ -3081,6 +3086,7 @@ async function saveAllLayers() {
   $('#btnAI').addEventListener('click', runAI);
   $('#btnTrial').addEventListener('click', runAI);
   $('#acctBtn').addEventListener('click', () => openAcct());
+  $('#goHoSo').addEventListener('click', () => { $('#acctSheet').classList.remove('show'); TK.mo('hoso'); });
   if (/taikhoan/.test(location.hash)) { history.replaceState(null, '', location.pathname); setTimeout(() => openAcct(), 300); }
   $('#btnUnlock').addEventListener('click', () => state.acct ? openUpsell() : openAcct('signup'));
   $('#btnPvSize').addEventListener('click', () => { document.body.classList.toggle('pv-big'); $('#btnPvSize').textContent = document.body.classList.contains('pv-big') ? '⤡' : '⤢'; setTimeout(drawSelection, 250); });

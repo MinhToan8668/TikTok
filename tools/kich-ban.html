@@ -154,7 +154,7 @@
     <div class="row" style="gap:8px">
       <span class="quota" id="quota"></span>
       <button class="theme-btn" id="themeBtn" type="button" aria-label="Đổi giao diện sáng hoặc tối">◐</button>
-      <a class="pill pro" id="acctBtn" href="hook-text.html#taikhoan">Tài khoản</a>
+      <button class="pill pro" id="acctBtn" type="button">Tài khoản</button>
     </div>
   </header>
 
@@ -244,6 +244,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
+<script src="tai-khoan.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const el = (t, c, txt) => { const e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; };
@@ -386,31 +387,46 @@ function goiKichBan() { const K = khungHienTai(), T = state.text[K.k] || {}; ret
 function kichBanText(parts) { return parts.filter(p => p.text).map(p => p.text).join('\n\n'); }
 
 /* ---------- quota / tài khoản ---------- */
-let plan = 'guest', trial = null;
-async function loadQuota() {
-  if (DEMO) { $('#quota').textContent = 'Bản demo'; return; }
-  try {
-    const r = await callApi({ action: 'hook_status', token: authToken(), thu: authToken() ? undefined : devId() });
-    if (!r.ok) { $('#quota').textContent = ''; return; }
-    plan = r.loai || 'guest'; trial = r.con;
-    $('#quota').textContent = r.con == null ? `${r.ten || 'Mentor'} · AI không giới hạn` : plan === 'khach' ? `Khách thử: còn ${r.con}/${r.han} lượt AI` : `${r.ten ? r.ten + ' · ' : ''}còn ${r.con}/${r.han} lượt AI${plan === 'free' ? ' miễn phí' : ' hôm nay'}`;
-    $('#acctBtn').textContent = plan === 'khach' ? 'Tài khoản' : plan === 'free' ? 'Free' : plan === 'pro' ? '✦ Pro' : 'Học viên';
-  } catch { $('#quota').textContent = ''; }
+let plan = 'guest';
+function veQuota() {
+  const me = TK.me, q = $('#quota');
+  if (!me) { q.textContent = DEMO ? 'Bản demo' : 'Chưa đăng nhập'; plan = 'guest'; $('#acctBtn').textContent = 'Đăng ký'; return; }
+  plan = me.loai === 'hv' ? 'hv' : me.pro ? 'pro' : 'free';
+  $('#acctBtn').textContent = me.loai === 'hv' ? 'Học viên' : me.pro ? '✦ Pro' : 'Free';
+  if (TK.laPro()) { q.textContent = (me.ten || '') + ' · AI không giới hạn'; return; }
+  const con = TK.luotCon('script'), han = (me.han || {})['script'];
+  q.textContent = `${me.ten ? me.ten + ' · ' : ''}còn ${con == null ? '?' : con}/${han == null ? '?' : han} lượt chấm kịch bản`;
 }
-function openUpsell(title, text) { $('#upTitle').textContent = title; $('#upText').textContent = text; $('#upsell').classList.add('show'); }
+async function loadQuota() { if (DEMO) { $('#quota').textContent = 'Bản demo'; return; } await TK.nap(); }
+function openUpsell(title, text) { TK.mo(TK.me ? 'home' : 'signup', [title, text].filter(Boolean).join(' · ')); }
 
 /* ---------- chấm ---------- */
-const ERR = { het_thu: 'Bạn đã dùng hết 3 lượt AI thử. Tạo tài khoản miễn phí để có thêm 10 lượt.', het_luot_thu: 'Bạn đã dùng hết lượt AI miễn phí. Mua Pro 50k/tháng hoặc đăng ký học viên để dùng tiếp.', het_luot: 'Hết lượt AI hôm nay, mai quay lại nhé.', het_phien: 'Phiên đăng nhập hết hạn. Đăng nhập lại ở trang Hook viral.', thieu_text: 'Chưa có chữ nào để chấm.', chua_cai_key: 'Máy chủ chưa cài khóa AI. Báo mentor.', sai_key: 'Khóa AI trên máy chủ không hợp lệ. Báo mentor.', ban_qua: 'AI đang bận, thử lại sau một phút.', tu_choi: 'AI không xử lý được nội dung này, thử diễn đạt khác.', loi_mang: 'Máy chủ không gọi được AI, thử lại.', unknown_action: 'Máy chủ chưa cập nhật.' };
+const ERR = { can_dangky: 'Tạo tài khoản miễn phí để dùng AI, mất 30 giây.', khong_co_quyen: 'Tài khoản này không có quyền.', het_thu: 'Bạn đã dùng hết 3 lượt AI thử. Tạo tài khoản miễn phí để có thêm 10 lượt.', het_luot_thu: 'Bạn đã dùng hết lượt AI miễn phí. Mua Pro 50k/tháng hoặc đăng ký học viên để dùng tiếp.', het_luot: 'Hết lượt AI hôm nay, mai quay lại nhé.', het_phien: 'Phiên đăng nhập hết hạn. Đăng nhập lại ở trang Hook viral.', thieu_text: 'Chưa có chữ nào để chấm.', chua_cai_key: 'Máy chủ chưa cài khóa AI. Báo mentor.', sai_key: 'Khóa AI trên máy chủ không hợp lệ. Báo mentor.', ban_qua: 'AI đang bận, thử lại sau một phút.', tu_choi: 'AI không xử lý được nội dung này, thử diễn đạt khác.', loi_mang: 'Máy chủ không gọi được AI, thử lại.', unknown_action: 'Máy chủ chưa cập nhật.' };
 let busy = false;
+/* Hồ sơ kênh → điền sẵn phần "video này nói với ai", để học viên khỏi gõ lại mỗi lần. */
+function dienTuHoSo() {
+  const hs = TK.hoSo() || {};
+  const map = { chuDe: 'nganh', doiTuong: 'doi_tuong', sanPham: 'san_pham' };
+  Object.keys(map).forEach(id => { const o = $('#' + id); if (o && !o.value.trim() && hs[map[id]]) o.value = hs[map[id]]; });
+  if (hs.xung_ho && !$('#xungHo').dataset.nguoiChon) {
+    const sel = $('#xungHo');
+    let hop = [...sel.options].find(o => o.value === hs.xung_ho || o.textContent.trim() === hs.xung_ho);
+    if (!hop) { hop = new Option(hs.xung_ho + ' · theo hồ sơ kênh', hs.xung_ho); sel.add(hop, 0); }   // xưng hô riêng của kênh, không có sẵn trong danh sách
+    sel.value = hop.value;
+  }
+  saveDraft();
+}
+
 async function cham() {
   if (busy) return;
+  if (!DEMO && !(await TK.canCo('script'))) return;
   const parts = goiKichBan(); if (!kichBanText(parts).trim()) { toast('Viết kịch bản trước đã'); return; }
   const st = $('#chamStatus'), btn = $('#btnCham'); busy = true; btn.disabled = true;
   const t0 = Date.now(); const tick = setInterval(() => { st.className = 'status'; st.innerHTML = `<span class="spinner"></span>Mentor AI đang đọc từng câu và canh giờ · ${Math.round((Date.now() - t0) / 1000)} giây (thường 20–50 giây)`; }, 400);
   try {
     let r;
     if (DEMO) { await new Promise(z => setTimeout(z, 1200)); r = { ok: true, data: demoData(parts), con: 9, han: 10 }; }
-    else r = await callApi({ action: 'hook_ai', mode: 'script', token: authToken(), thu: authToken() ? undefined : devId(), khung: state.khung, phan: parts, chu_de: $('#chuDe').value.trim(), doi_tuong: $('#doiTuong').value.trim(), muc_tieu: state.mucTieu, xung_ho: $('#xungHo').value, dang: state.dang, toc_do: state.tocDo, san_pham: $('#sanPham').value.trim() });
+    else r = await callApi({ action: 'hook_ai', mode: 'script', token: TK.token(), dev: TK.dev(), ho_so: TK.hoSo(), khung: state.khung, phan: parts, chu_de: $('#chuDe').value.trim(), doi_tuong: $('#doiTuong').value.trim(), muc_tieu: state.mucTieu, xung_ho: $('#xungHo').value, dang: state.dang, toc_do: state.tocDo, san_pham: $('#sanPham').value.trim() });
     clearInterval(tick);
     if (!r.ok) {
       st.className = 'status err'; st.textContent = (ERR[r.error] || 'Có lỗi khi gọi AI, thử lại sau.') + (r.chi_tiet ? ' Mã lỗi: ' + r.chi_tiet : '');
@@ -422,7 +438,7 @@ async function cham() {
     if (!r.data || !r.data.score) { st.className = 'status err'; st.textContent = 'Máy chủ đang chạy HookAI.gs bản cũ nên chưa có chấm kịch bản. Mentor dán HookAI.gs mới rồi Deploy, chọn New version.'; return; }
     state.kq = r.data; renderKq(r.data, parts); updateTimes(); try { ls.set('kb.kq', JSON.stringify({ khung: state.khung, d: r.data, parts })); } catch {}
     st.className = 'status ok'; st.textContent = `Xong sau ${Math.round((Date.now() - t0) / 1000)} giây.` + (r.con != null ? ` Còn ${r.con}/${r.han} lượt.` : '');
-    if (r.con != null) $('#quota').textContent = plan === 'khach' ? `Khách thử: còn ${r.con}/${r.han} lượt AI` : `còn ${r.con}/${r.han} lượt AI`;
+    if (r.luot && TK.me) { TK.me.luot = r.luot; veQuota(); } else if (r.con != null) $('#quota').textContent = `còn ${r.con}/${r.han} lượt`;
     if (matchMedia('(max-width:900px)').matches) $('#kq').scrollIntoView({ behavior: 'smooth', block: 'start' });
   } catch { clearInterval(tick); st.className = 'status err'; st.textContent = 'Không kết nối được máy chủ.'; }
   finally { busy = false; btn.disabled = false; }
@@ -477,11 +493,15 @@ bindSeg('tocDo', v => { state.tocDo = v; updateTimes(); saveDraft(); });
 (function importSoi() { try { const im = JSON.parse(ls.get('kb.import') || 'null'); if (!im || !im.khung) return; ls.del ? ls.del('kb.import') : localStorage.removeItem('kb.import'); const K = KHUNG.find(x => x.k === im.khung); if (!K) return; state.khung = K.k; state.text[K.k] = {}; state.canh[K.k] = {}; (im.phan || []).forEach((g, i) => { if (K.phan[i] && g) state.text[K.k][K.phan[i][0]] = String(g).replace(/\*\*/g, ''); }); (im.canh || []).forEach((c, i) => { if (K.phan[i] && c) state.canh[K.k][K.phan[i][0]] = c; }); try { localStorage.removeItem('kb.kq'); } catch {} if (im.chuDe) $('#chuDe').value = im.chuDe; if (im.doiTuong) $('#doiTuong').value = im.doiTuong; if (im.sanPham) $('#sanPham').value = im.sanPham; state.kq = null; saveDraft(); setTimeout(() => toast('Đã nhập khung' + (im.nguon ? ' mượn từ ' + im.nguon : '') + '. Gợi ý trong [ ] là chỗ bạn thay bằng chuyện thật của mình.'), 400); } catch {} })();
 buildKhung(); buildPhan();
 (function moLaiKq() { try { const o = JSON.parse(ls.get('kb.kq') || 'null'); if (o && o.d && o.d.score && o.khung === state.khung) { state.kq = o.d; renderKq(o.d, o.parts || goiKichBan()); updateTimes(); } } catch {} })();
+$('#acctBtn').addEventListener('click', () => TK.mo());
+$('#xungHo').addEventListener('change', e => { e.target.dataset.nguoiChon = '1'; });
+TK.oMoiHoSo($('#chuDe').closest('section'));
 $('#btnCham').addEventListener('click', cham);
 $('#btnCopy').addEventListener('click', () => { const K = khungHienTai(); copyText(goiKichBan().filter(p => p.text).map(p => `[${p.ten}]\n${p.text}`).join('\n\n')); });
 $('#btnClear').addEventListener('click', () => { if (!confirm('Xoá hết chữ trong các phần của khung này?')) return; state.text[state.khung] = {}; state.canh[state.khung] = {}; state.kq = null; try { localStorage.removeItem('kb.kq'); } catch {} buildPhan(); saveDraft(); $('#kqBody').hidden = true; $('#kqEmpty').hidden = false; });
 $('#upClose').addEventListener('click', () => $('#upsell').classList.remove('show'));
 $('#upsell').addEventListener('click', e => { if (e.target === e.currentTarget) e.currentTarget.classList.remove('show'); });
+TK.khoiDong({ api: API, tool: 'script', onDoi: () => { veQuota(); dienTuHoSo(); } });
 loadQuota();
 </script>
 </body>

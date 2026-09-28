@@ -241,3 +241,13 @@ Muốn tặng thêm lượt hoặc gia hạn tay: sửa cột `luot_dung` (số 
 - Nút "Viết kịch bản theo khung này" chuyển sang tab Kịch bản viral, điền sẵn lời thoại mẫu và cảnh quay từng phần (qua localStorage `kb.import`). Kết quả chấm kịch bản cũng được lưu (`kb.kq`).
 - Phần nghe video chỉ Gemini làm được; nếu HOOK_AI_PROVIDER là claude thì vẫn cần GEMINI_API_KEY cho tool này.
 - Lượt dùng chung với AI phân tích hook và chấm kịch bản. Xem giao diện không cần máy chủ: `soi-video.html#demo`.
+
+## Tài khoản, hồ sơ kênh và lượt AI (bản 09/2026)
+
+- **Bỏ hẳn chế độ khách.** Muốn chạy AI phải có tài khoản miễn phí (email + số điện thoại). Đăng ký ngay trong tool, không phải rời trang. File dùng chung: `tools/tai-khoan.js`.
+- **Lượt miễn phí theo từng tool:** hook `ST_LUOT_THU` = 10, chấm kịch bản `ST_LUOT_KB` = 3, soi video `ST_LUOT_SOI` = 1. Bot: `/luotthu`, `/luotkb`, `/luotsoi`. Pro và học viên vẫn tính theo `HOOK_AI_DAILY` mỗi ngày.
+- **Hồ sơ kênh** (cột `ho_so`, JSON 15 trường): ngách, tệp, định vị, xưng hô, định dạng, độ dài, chữ bắt buộc, nhạc, hashtag, điều cấm, pillar, sản phẩm. Cả ba tool chèn hồ sơ vào prompt nên AI chấm đúng kênh, không nói chung chung. Học viên tự sửa trong mục Tài khoản → Hồ sơ kênh (`st_hoso`).
+- **Hồ sơ mẫu 4 kênh** chốt trong buổi 08/09/2026 nằm trong `ST_HS_MAU`. Chạy `stNapHoSoMau()` một lần trong trình soạn Apps Script để tự gán theo tên, hoặc `/naphoso email duong` (duong · duy · phong · hai).
+- **Mentor** xem danh sách tài khoản và mượn hồ sơ học viên để chạy thử tool (`st_ds`), xem lịch sử (`st_lichsu`, `/lichsu email`), xem hồ sơ (`/hoso email`), danh sách (`/dshv`).
+- **Chống dùng chung tài khoản:** mỗi lượt AI ghi vào bảng `AiLichSu` kèm mã thiết bị. Quá `ST_TB_TOI_DA` (3) thiết bị khác nhau trong `ST_TB_NGAY` (7) ngày thì bot nhắn riêng cho mentor, tối đa một lần mỗi 24 giờ. Không chặn học viên, chỉ báo để mentor tự kiểm tra.
+- **Nâng cấp bảng:** `stNangCap()` nối thêm cột mới vào bảng `NguoiDung` đang chạy. Không có hàm này thì `bang()` sẽ đổi tên bảng cũ thành bản lưu và tạo bảng rỗng, mất tài khoản đã có.

@@ -37,7 +37,32 @@ var ST_LUOT_THU = stSo('ST_LUOT_THU', ST_LUOT_THU_MD);
 
 var ST_SHEET       = 'NguoiDung';
 var ST_HEADERS     = ['ma','email','sdt','ten','salt','hash','goi','pro_han','luot_dung',
-                      'token','token_han','tao','dangnhap_cuoi','trangthai','ghichu'];
+                      'token','token_han','tao','dangnhap_cuoi','trangthai','ghichu',
+                      'ho_so','luot_kb','luot_soi','thiet_bi','canh_bao'];
+
+/* Hạn mức lượt AI cho tài khoản MIỄN PHÍ, tính theo từng tool (bot: /luotthu, /luotkb, /luotsoi).
+   Pro và học viên không dùng mấy con số này, họ tính theo hạn mức ngày HOOK_AI_DAILY. */
+var ST_LUOT_KB_MD  = 3;        // chấm kịch bản viral
+var ST_LUOT_SOI_MD = 1;        // soi video viral (nặng nhất: AI phải nghe cả video)
+var ST_LUOT_KB  = stSo('ST_LUOT_KB',  ST_LUOT_KB_MD);
+var ST_LUOT_SOI = stSo('ST_LUOT_SOI', ST_LUOT_SOI_MD);
+/* Mỗi tool một cột đếm riêng. 'hook' giữ nguyên cột cũ luot_dung để không mất số liệu. */
+var ST_TOOL = {
+  hook:   {cot:'luot_dung', ten:'AI phân tích hook', han:function(){ return ST_LUOT_THU  }},
+  script: {cot:'luot_kb',   ten:'chấm kịch bản',     han:function(){ return ST_LUOT_KB   }},
+  soi:    {cot:'luot_soi',  ten:'soi video viral',   han:function(){ return ST_LUOT_SOI  }}
+};
+function stToolCua(mode){
+  if (mode === 'script') return 'script';
+  if (mode === 'soi' || mode === 'link' || mode === 'apkhuon') return 'soi';
+  return 'hook';
+}
+
+/* Lịch sử dùng AI của từng tài khoản: để mentor soi được ai đang dùng hộ người khác. */
+var ST_LOG_SHEET   = 'AiLichSu';
+var ST_LOG_HEADERS = ['thoi_gian','ma','ten','goi','tool','thiet_bi','noi_dung','ket_qua'];
+var ST_TB_NGAY     = 7;        // xét thiết bị trong bao nhiêu ngày gần đây
+var ST_TB_TOI_DA   = 3;        // quá số thiết bị này trong cửa sổ trên thì báo bot
 var ST_PAY_SHEET   = 'ThanhToan';
 var ST_PAY_HEADERS = ['ma_ck','ma_nd','email','sdt','ten','goi','so_tien','ngay',
                       'trangthai','tao','xac_nhan','nguon'];
@@ -53,16 +78,50 @@ function stGoi(){
 }
 
 /* ═══════ BẢNG ═══════ */
-function moiND(){  return docBang(ST_SHEET, ST_HEADERS, {token_han:oMoc, pro_han:oMoc}); }
+/* bang() đổi tên bảng cũ thành bản lưu khi số cột không khớp — thêm cột mới mà không
+   nối sẵn tiêu đề là mất sạch tài khoản đã có. Hàm này nối thêm cột ngay trên bảng đang chạy. */
+function stNangCap(){
+  try{
+    var sh = ss().getSheetByName(ST_SHEET);
+    if (!sh || sh.getLastRow() < 1) return;
+    var n = sh.getLastColumn();
+    if (n >= ST_HEADERS.length) return;
+    var cu = sh.getRange(1, 1, 1, n).getValues()[0].map(function(x){ return String(x) });
+    for (var i = 0; i < n; i++) if (cu[i] !== ST_HEADERS[i]) return;   // tiêu đề lạ: để nguyên cho người kiểm tra
+    var them = ST_HEADERS.slice(n);
+    sh.getRange(1, n + 1, 1, them.length).setValues([them]);
+    sh.getRange(1, n + 1, sh.getMaxRows(), them.length).setNumberFormat('@');
+  }catch(e){ ghiLoi('stNangCap', e); }
+}
+function moiND(){  stNangCap(); return docBang(ST_SHEET, ST_HEADERS, {token_han:oMoc, pro_han:oMoc}); }
 function moiPay(){ return docBang(ST_PAY_SHEET, ST_PAY_HEADERS); }
 function ndTheoEmail(e){ e = chuanEmail(e); var r = null; moiND().forEach(function(x){ if (!r && chuanEmail(x.email) === e) r = x }); return r; }
 function ndTheoMa(ma){ ma = String(ma||'').toUpperCase(); var r = null; moiND().forEach(function(x){ if (!r && String(x.ma).toUpperCase() === ma) r = x }); return r; }
 function sdtHopLe(s){ var d = String(s||'').replace(/\D/g,''); return d.length >= 9 && d.length <= 12; }
 function ndLaPro(nd){ return !!(nd && nd.pro_han && new Date(nd.pro_han) > new Date()); }
-function ndLuotCon(nd){ return Math.max(0, ST_LUOT_THU - (parseInt(nd.luot_dung,10) || 0)); }
+function ndLuotCon(nd, tool){
+  var t = ST_TOOL[tool || 'hook'] || ST_TOOL.hook;
+  return Math.max(0, t.han() - (parseInt(nd[t.cot], 10) || 0));
+}
+/* Hồ sơ kênh học viên: tool đọc để cá nhân hoá, học viên tự sửa trong tài khoản. */
+var ST_HS_TRUONG = ['kenh','nganh','dinh_vi','doi_tuong','muc_tieu','xung_ho','dang','do_dai',
+                    'text_batbuoc','nhac','hashtag','khong_lam','pillar','san_pham','ghi_chu'];
+function ndDocHs(nd){
+  try{ var o = JSON.parse(nd.ho_so || '{}'); return (o && typeof o === 'object') ? o : {}; }catch(e){ return {}; }
+}
+function ndLamHs(raw){
+  var o = {};
+  if (!raw || typeof raw !== 'object') return o;
+  ST_HS_TRUONG.forEach(function(k){ if (raw[k] != null) o[k] = String(raw[k]).slice(0, 600).trim(); });
+  return o;
+}
+function ndCoHs(hs){ var c = 0; ST_HS_TRUONG.forEach(function(k){ if (hs[k]) c++ }); return c; }
 function ndHoSo(nd){
   return {loai:'nd', ma:nd.ma, ten:nd.ten, email:nd.email, sdt:nd.sdt, pro:ndLaPro(nd),
-          pro_han:nd.pro_han, luot_con:ndLuotCon(nd), luot_thu:ST_LUOT_THU};
+          pro_han:nd.pro_han, luot_con:ndLuotCon(nd), luot_thu:ST_LUOT_THU,
+          luot: {hook:ndLuotCon(nd,'hook'), script:ndLuotCon(nd,'script'), soi:ndLuotCon(nd,'soi')},
+          han:  {hook:ST_LUOT_THU, script:ST_LUOT_KB, soi:ST_LUOT_SOI},
+          ho_so: ndDocHs(nd)};
 }
 
 /* Token người dùng: "U" + mã + "." + 40 ký tự ngẫu nhiên. Sheet chỉ giữ bản băm. */
@@ -94,6 +153,9 @@ function studioApi(b){
     if (act === 'st_use')    return stDungLuot(b);
     if (act === 'st_buy')    return stMua(b);
     if (act === 'st_paid')   return stDaChuyen(b);
+    if (act === 'st_hoso')   return stLuuHoSo(b);         // học viên tự sửa hồ sơ kênh; mentor sửa hộ khi có 'ma'
+    if (act === 'st_ds')     return stDanhSach(b);         // mentor xem danh sách tài khoản
+    if (act === 'st_lichsu') return stLichSu(b);           // mentor xem lịch sử dùng AI của một tài khoản
     if (act === 'st_khoa')      return stKhoa(b);          // form đăng ký học viên: có nhận chuyển khoản không
     if (act === 'st_khoa_paid') return stKhoaDaChuyen(b);  // học viên bấm "Tôi đã chuyển khoản"
     return jsonOut({ok:false, error:'unknown_action'});
@@ -176,24 +238,121 @@ function stToi(b){
   return jsonOut({ok:false, error:'het_phien'});
 }
 
-/* ── lượt dùng thử: người dùng Free trừ 1 lượt; Pro và học viên không trừ ── */
-function stTruLuotThu(ma){
+/* ── lượt dùng thử: tài khoản Free trừ 1 lượt của ĐÚNG tool đang gọi; Pro và học viên không trừ ── */
+function stTruLuot(ma, tool){
+  var t = ST_TOOL[tool] || ST_TOOL.hook;
   var lock = LockService.getScriptLock(); lock.waitLock(10000);
   try{
     var nd = ndTheoMa(ma); if (!nd) return -1;
-    var da = parseInt(nd.luot_dung,10) || 0;
-    if (da >= ST_LUOT_THU) return -1;
-    ghiDong(ST_SHEET, ST_HEADERS, nd, {luot_dung: String(da + 1)});
-    return ST_LUOT_THU - da - 1;
+    var han = t.han(), da = parseInt(nd[t.cot], 10) || 0;
+    if (da >= han) return -1;
+    var sua = {}; sua[t.cot] = String(da + 1);
+    ghiDong(ST_SHEET, ST_HEADERS, nd, sua);
+    return han - da - 1;
   } finally { lock.releaseLock(); }
 }
-function stHoanLuotThu(ma){
+function stHoanLuot(ma, tool){
+  var t = ST_TOOL[tool] || ST_TOOL.hook;
   var lock = LockService.getScriptLock(); lock.waitLock(10000);
   try{
     var nd = ndTheoMa(ma); if (!nd) return;
-    var da = parseInt(nd.luot_dung,10) || 0;
-    if (da > 0) ghiDong(ST_SHEET, ST_HEADERS, nd, {luot_dung: String(da - 1)});
+    var da = parseInt(nd[t.cot], 10) || 0;
+    if (da > 0){ var sua = {}; sua[t.cot] = String(da - 1); ghiDong(ST_SHEET, ST_HEADERS, nd, sua); }
   } finally { lock.releaseLock(); }
+}
+function stTruLuotThu(ma){ return stTruLuot(ma, 'hook'); }     // tên cũ, giữ cho phần gọi sẵn
+function stHoanLuotThu(ma){ return stHoanLuot(ma, 'hook'); }
+
+/* ── lịch sử dùng AI ── */
+function stGhiLog(nd, tool, dev, noiDung, ok){
+  try{
+    bang(ST_LOG_SHEET, ST_LOG_HEADERS).appendRow([nowVN(), nd.ma, nd.ten,
+      ndLaPro(nd) ? 'pro' : 'free', String(tool || ''), String(dev || ''),
+      String(noiDung || '').slice(0, 200), ok ? 'ok' : 'loi']);
+  }catch(e){ ghiLoi('stGhiLog', e); }
+}
+function stLogCua(ma, n){
+  var ds = [];
+  try{
+    docBang(ST_LOG_SHEET, ST_LOG_HEADERS).forEach(function(r){ if (String(r.ma) === String(ma)) ds.push(r) });
+  }catch(e){}
+  return ds.slice(-(n || 30)).reverse();
+}
+
+/* ── phát hiện một tài khoản đang được nhiều người dùng chung ──
+   Không chặn, không làm phiền học viên: chỉ nhắn riêng cho mentor để tự kiểm tra lịch sử. */
+function stGhiThietBi(nd, dev){
+  dev = String(dev || '').replace(/[^A-Za-z0-9_-]/g, '').slice(0, 40);
+  if (dev.length < 8) return;
+  var lock = LockService.getScriptLock();
+  try{ lock.waitLock(8000); }catch(e){ return; }
+  try{
+    var moi = ndTheoMa(nd.ma); if (!moi) return;
+    var ds = []; try{ ds = JSON.parse(moi.thiet_bi || '[]') || []; }catch(e){ ds = []; }
+    if (!Array.isArray(ds)) ds = [];
+    var luc = new Date().getTime(), thay = false;
+    ds.forEach(function(x){ if (x && x.d === dev){ x.l = luc; x.n = (x.n || 0) + 1; thay = true; } });
+    if (!thay) ds.push({d: dev, l: luc, n: 1, dau: luc});
+    var moc = luc - ST_TB_NGAY * 86400000;
+    ds = ds.filter(function(x){ return x && x.l > moc }).slice(-12);
+    var sua = {thiet_bi: JSON.stringify(ds)};
+    var lanCuoi = Number(moi.canh_bao) || 0;
+    if (ds.length > ST_TB_TOI_DA && luc - lanCuoi > 86400000){
+      sua.canh_bao = String(luc);
+      stBaoDungChung(moi, ds);
+    }
+    ghiDong(ST_SHEET, ST_HEADERS, moi, sua);
+  }catch(e){ ghiLoi('stGhiThietBi', e); }
+  finally { try{ lock.releaseLock(); }catch(e){} }
+}
+function stBaoDungChung(nd, ds){
+  try{
+    var t = ['⚠️ *Tài khoản có thể đang dùng chung*',
+      '*' + nd.ten + '* · `' + nd.ma + '`',
+      nd.email + ' · ' + nd.sdt,
+      'Gói: ' + (ndLaPro(nd) ? 'Pro' : 'Free'),
+      ds.length + ' thiết bị khác nhau trong ' + ST_TB_NGAY + ' ngày (ngưỡng ' + ST_TB_TOI_DA + ').',
+      '', 'Xem lịch sử: `/lichsu ' + nd.email + '`'].join('\n');
+    dsChat('ADMIN_CHAT_IDS').forEach(function(id){ tgSend(id, t) });
+  }catch(e){ ghiLoi('stBaoDungChung', e); }
+}
+
+/* ── hồ sơ kênh: học viên tự sửa; mentor sửa hộ bằng cách gửi thêm 'ma' ── */
+function stLuuHoSo(b){
+  var nd = ndTuToken(b.token), hv = nd ? null : aiDay(b.token);
+  var laMentor = !!(hv && (hv.vaitro === 'mentor' || hv.vaitro === 'admin'));
+  if (!nd && !laMentor) return jsonOut({ok:false, error:'het_phien'});
+  var dich = nd;
+  if (b.ma){
+    if (!laMentor && (!nd || String(nd.ma).toUpperCase() !== String(b.ma).toUpperCase()))
+      return jsonOut({ok:false, error:'khong_co_quyen'});
+    dich = ndTheoMa(b.ma);
+  }
+  if (!dich) return jsonOut({ok:false, error:'khong_thay'});
+  var hs = ndLamHs(b.ho_so);
+  ghiDong(ST_SHEET, ST_HEADERS, dich, {ho_so: JSON.stringify(hs)});
+  return jsonOut({ok:true, ho_so: hs});
+}
+/* Mentor xem danh sách tài khoản để chạy thử tool bằng hồ sơ thật của học viên. */
+function stDanhSach(b){
+  var hv = aiDay(b.token);
+  if (!hv || (hv.vaitro !== 'mentor' && hv.vaitro !== 'admin')) return jsonOut({ok:false, error:'khong_co_quyen'});
+  var ds = moiND().map(function(nd){
+    var hs = ndDocHs(nd);
+    return {ma:nd.ma, ten:nd.ten, email:nd.email, sdt:nd.sdt, goi: ndLaPro(nd) ? 'pro' : 'free',
+            tao:nd.tao, dangnhap_cuoi:nd.dangnhap_cuoi, so_truong: ndCoHs(hs),
+            luot: {hook:ndLuotCon(nd,'hook'), script:ndLuotCon(nd,'script'), soi:ndLuotCon(nd,'soi')},
+            ho_so: hs};
+  });
+  return jsonOut({ok:true, ds:ds, han:{hook:ST_LUOT_THU, script:ST_LUOT_KB, soi:ST_LUOT_SOI}});
+}
+function stLichSu(b){
+  var hv = aiDay(b.token);
+  if (!hv || (hv.vaitro !== 'mentor' && hv.vaitro !== 'admin')) return jsonOut({ok:false, error:'khong_co_quyen'});
+  var nd = b.ma ? ndTheoMa(b.ma) : (b.email ? ndTheoEmail(b.email) : null);
+  if (!nd) return jsonOut({ok:false, error:'khong_thay'});
+  var tb = []; try{ tb = JSON.parse(nd.thiet_bi || '[]') || []; }catch(e){}
+  return jsonOut({ok:true, ten:nd.ten, email:nd.email, so_thiet_bi: tb.length, lich_su: stLogCua(nd.ma, 50)});
 }
 function stDungLuot(b){
   var nd = ndTuToken(b.token);
@@ -280,9 +439,109 @@ function studioCallback(cb){
   tgApi('editMessageReplyMarkup', {chat_id:chatId, message_id:msgId, reply_markup:{inline_keyboard:[[{text:nhan, callback_data:'xong'}]]}});
 }
 
+
+/* ═══════ HỒ SƠ KÊNH MẪU — chốt trong buổi định hướng 08/09/2026 ═══════
+   Nạp sẵn để học viên vào tool là tool đã biết kênh họ, khỏi điền lại từ đầu.
+   Học viên sửa được trong mục Tài khoản; mentor gán bằng /naphoso email duong */
+var ST_HS_MAU = {
+  duong: { ten_goi:'Thùy Dương · Spa Từ Sơn', khop:['thuy duong','thuỳ dương','duong','dương'],
+    kenh:'Spa Từ Sơn, Bắc Ninh',
+    nganh:'Spa chăm sóc mụn và sắc tố da tại Từ Sơn, Bắc Ninh',
+    dinh_vi:'Cô chủ spa người Đà Nẵng, 33 tuổi, bỏ nghề kế toán, vào lại Đà Nẵng học nghề 4 tháng rồi về Từ Sơn mở tiệm. Không phải bác sĩ, là người từng ngồi đúng chỗ khách đang ngồi. Giọng Đà Nẵng giữa đất Bắc Ninh, tuyệt đối không sửa giọng.',
+    doi_tuong:'Phụ nữ 25–45 tuổi trong bán kính 20km: Từ Sơn, Đình Bảng, Bắc Ninh',
+    muc_tieu:'Khách bước vào tiệm. Không đuổi view toàn quốc.',
+    xung_ho:'mình – các chị',
+    dang:'Vlog trong tiệm lồng tiếng (60%) · POV nói về dịch vụ da mặt cho khách (40%)',
+    do_dai:'45–60 giây',
+    text_batbuoc:'Chữ to 3–4 dòng mỗi video. Ít nhất một dòng phải có chữ "Từ Sơn - Bắc Ninh".',
+    nhac:'Nhạc trend nhẹ cho video POV, ưu tiên Hoà Minzy (Bắc Bling)',
+    hashtag:'Đúng một hashtag địa phương #tuson + 3 hashtag ngành (#spabacninh #nanmun #lamdep). Không nhồi thêm.',
+    khong_lam:'Không hứa kết quả, không hứa thời gian, không dùng chữ điều trị / đặc trị / chữa khỏi theo nghĩa y tế. Tuyệt đối không bật filter làm đẹp, không làm mịn da.',
+    pillar:'Hành trình mở tiệm 70% (vlog trong tiệm, kéo người Từ Sơn thành người quen trước khi thành khách) · Da thật ca thật 30% (ảnh so sánh, quay macro, cận tay)',
+    san_pham:'Dịch vụ spa: chăm sóc da, nặn mụn, xử lý sắc tố',
+    ghi_chu:'Mỗi video: gắn location tag, nói "Từ Sơn" ra miệng, chữ "Từ Sơn" trên màn hình. 2 video/tuần, đăng 12h–13h và 16h–20h. Ưu tiên ánh sáng tiệm, bớt đèn trắng. Lộ mặt, trừ nhóm soi da, lấy nhân mụn, gội đầu. Thước đo tuần đầu: trên 50% người xem ở Bắc Ninh.' },
+
+  duy: { ten_goi:'Tùng Duy · Banker Gen Z', khop:['tung duy','tùng duy','duy'],
+    kenh:'Banker Gen Z',
+    nganh:'Tín dụng cá nhân: vay thế chấp, thẻ tín dụng, gửi tiết kiệm',
+    dinh_vi:'Thằng em 22 tuổi ngồi ở ghế bên kia bàn vay. Thị trường đã có đàn anh 30+ kể chuyện nghề sales, chưa ai làm banker Gen Z. Năm ba đi bán thẻ tín dụng vì dễ apply, rồi làm trainee Shinhan 4 tháng rưỡi, chi nhánh hết headcount phải nghỉ, giờ quay lại sale khách hàng cá nhân.',
+    doi_tuong:'Người 25–45 tuổi sắp đi vay, đang tìm hiểu thẻ tín dụng hoặc gửi tiết kiệm',
+    muc_tieu:'Inbox hỏi hồ sơ vay. Khách đến qua bio, không qua lời chào mời trong video.',
+    xung_ho:'mình – mấy bạn',
+    dang:'Talking head ngồi bàn làm việc (70%) · POV một ngày làm việc (20%)',
+    do_dai:'45–80 giây',
+    text_batbuoc:'Hook lặp lại ở giây đầu, thêm 2–3 điểm nhấn giữa video',
+    nhac:'Piano nhẹ khoảng 15% cho video kể chuyện, nhạc truyền cảm hứng',
+    hashtag:'Một câu chốt + 4–5 hashtag, có #tindung và hashtag tên kênh',
+    khong_lam:'Không nêu lãi suất hay hạn mức cụ thể của ngân hàng mình, không cam kết duyệt hồ sơ, không để lộ chi tiết nhận dạng của khách.',
+    pillar:'22 tuổi đi làm ngân hàng 20% (POV, vlog lồng tiếng, kéo tệp bạn trẻ ngoài tài chính) · chuyện nghề tín dụng và kiến thức vay cho người sắp vay',
+    san_pham:'Tư vấn hồ sơ vay khách hàng cá nhân',
+    ghi_chu:'Luôn lộ mặt, đây là lợi thế lớn nhất. Trang phục đời thường nhất quán như đồng phục kênh. Ánh sáng cửa sổ bên trái, ngồi bàn làm việc. 2 video/tuần, đăng 12h–13h và 16h–20h. Thước đo tuần đầu: tỷ lệ xem hết trên 30%.' },
+
+  phong: { ten_goi:'Phong · Tín dụng năm đầu', khop:['lam giai phong','giai phong','phong'],
+    kenh:'Chuyện nghề tín dụng',
+    nganh:'Chuyện nghề tín dụng, nói với người trong ngành. Nội dung là NGHỀ, không phải sản phẩm.',
+    dinh_vi:'Người đang ở trong nghề năm đầu, kể đúng cái mình đang trải qua. Từ Đại học Cần Thơ lên Sài Gòn làm sales trainee. Không cần tỏ ra biết sâu, hình ảnh đời thường đi làm, tông vui vẻ và thẳng thắn.',
+    doi_tuong:'Sinh viên tài chính ngân hàng, nhân viên mới vào nghề, người đang ứng tuyển',
+    muc_tieu:'Độ phủ tích cực trong cộng đồng cùng ngành',
+    xung_ho:'mình – mấy bạn',
+    dang:'POV, vlog một ngày, lồng tiếng',
+    do_dai:'40–60 giây',
+    text_batbuoc:'Chữ trên màn hình bám theo nội dung vlog',
+    nhac:'Nhẹ, tông vui. Không dùng nhạc buồn kể cả ở video kể chuyện.',
+    hashtag:'Một câu chốt + 4–5 hashtag',
+    khong_lam:'Không nêu tên ngân hàng đang làm, không so sánh sản phẩm giữa các ngân hàng, không nêu con số lương. Nói về áp lực thì được, than vãn về nơi làm việc thì không.',
+    pillar:'Sống sót năm đầu 39% · Thực tế nghề 28% · Thứ trường không dạy 22% · Người ngoài hiểu sai 11%',
+    san_pham:'',
+    ghi_chu:'Voice-over thu riêng ở nhà buổi tối. 2 video/tuần, đăng 20h–22h. Ghi chú điện thoại mọi khoảnh khắc bất chợt trong ngày để làm chất liệu. Thước đo tuần đầu: có bình luận thật từ người cùng ngành.' },
+
+  hai: { ten_goi:'Đại Hải · Vlog gia đình', khop:['dai hai','đại hải','hai','hải'],
+    kenh:'Bếp nhà mình',
+    nganh:'Vlog nấu ăn gia đình, cơm trưa cho vợ',
+    dinh_vi:'Ông bố nấu ăn ngon. Vợ đi làm spa, chồng ở nhà chăm con và nấu cơm. Tinh thần đời thường, thật, hơi hài.',
+    doi_tuong:'Phụ nữ chăm con, phụ nữ ở nhà',
+    muc_tieu:'Lan toả, kéo view, làm affiliate đồ bếp',
+    xung_ho:'mình – mọi người',
+    dang:'POV, vlog một ngày, lồng tiếng. Nói chuyện với vợ khi ăn.',
+    do_dai:'40–60 giây',
+    text_batbuoc:'Chữ trên màn hình bám theo nội dung vlog',
+    nhac:'Nhẹ, tông vui',
+    hashtag:'Một câu chốt + 4–5 hashtag',
+    khong_lam:'Không khoe, không dàn dựng quá chỉn chu. Giữ chất đời thường.',
+    pillar:'Món ăn bất ngờ cho vợ 70% · Đàn ông nội trợ 20% · Đồ nhà bếp đang dùng 10%',
+    san_pham:'Đồ dùng nhà bếp (affiliate)',
+    ghi_chu:'2 video/tuần, đăng 20h–22h. Ghi chú điện thoại những khoảnh khắc bất chợt. Mục tiêu tuần đầu: trên 5000 view.' }
+};
+function stHsMau(k){
+  var m = ST_HS_MAU[String(k || '').toLowerCase()];
+  if (!m) return null;
+  var o = {}; ST_HS_TRUONG.forEach(function(f){ if (m[f]) o[f] = m[f] });
+  return o;
+}
+/* Tự gán hồ sơ cho tài khoản đã có, khớp theo tên. Chạy tay trong trình soạn Apps Script,
+   hoặc dùng /naphoso email duong cho chắc tay. Không ghi đè hồ sơ học viên đã tự sửa. */
+function stNapHoSoMau(){
+  var ds = moiND(), ket = [];
+  ds.forEach(function(nd){
+    if (ndCoHs(ndDocHs(nd))) { ket.push('bỏ qua (đã có hồ sơ): ' + nd.ten); return; }
+    var ten = khongDau(nd.ten || '');
+    var key = null;
+    Object.keys(ST_HS_MAU).forEach(function(k){
+      if (key) return;
+      ST_HS_MAU[k].khop.forEach(function(t){ if (!key && ten.indexOf(khongDau(t)) > -1) key = k });
+    });
+    if (!key) { ket.push('không khớp mẫu nào: ' + nd.ten); return; }
+    ghiDong(ST_SHEET, ST_HEADERS, nd, {ho_so: JSON.stringify(stHsMau(key))});
+    ket.push('✅ ' + nd.ten + ' ← ' + ST_HS_MAU[key].ten_goi);
+  });
+  var t = ket.length ? ket.join('\n') : 'Chưa có tài khoản nào trong bảng NguoiDung.';
+  Logger.log(t);
+  return t;
+}
+
 /* ═══════ LỆNH BOT TELEGRAM (chỉ chat quản trị) ═══════
    Code.gs gọi:  if (quanTri && studioCoLenh(cmd)) return studioLenh(cmd, arg, chatId);  */
-var LENH_STUDIO = ['studio','stk','giapro','ngaypro','luotthu','luotai','mopro','tatpro','dsck','timnd','ckkhoa','tienkhoa'];
+var LENH_STUDIO = ['studio','stk','giapro','ngaypro','luotthu','luotkb','luotsoi','luotai','mopro','tatpro','dsck','timnd','ckkhoa','tienkhoa','hoso','lichsu','dshv','naphoso'];
 function studioCoLenh(cmd){ return LENH_STUDIO.indexOf(cmd) > -1; }
 
 var ST_MA_NH = {vietcombank:'VCB', vcb:'VCB', mb:'MB', mbbank:'MB', quandoi:'MB', techcombank:'TCB', tcb:'TCB',
@@ -326,12 +585,18 @@ function studioLenh(cmd, arg, chatId){
       '🏦 /stk `MB | 0123456789 | NGUYEN VAN A` — tài khoản nhận tiền',
       '💰 /giapro `50000` — giá gói Pro',
       '📆 /ngaypro `30` — gói dùng bao nhiêu ngày',
-      '🎁 /luotthu `10` — số lượt AI miễn phí cho tài khoản mới',
+      '🎁 /luotthu `10` — lượt AI phân tích hook cho tài khoản mới',
+      '📝 /luotkb `3` — lượt chấm kịch bản cho tài khoản mới',
+      '🔎 /luotsoi `1` — lượt soi video cho tài khoản mới',
       '🤖 /luotai `20` — lượt AI mỗi ngày của Pro và học viên',
       '🧾 /dsck — giao dịch đang chờ (Pro và học phí), bấm nút để xác nhận',
       '🎓 /ckkhoa `bat` · `tat` — hiện màn chuyển khoản sau khi học viên điền form',
       '💵 /tienkhoa `2000000` — số tiền chuyển (`auto` = theo giá ưu đãi của bot)',
       '🔎 /timnd `email` — xem một người dùng',
+      '👥 /dshv — danh sách tài khoản và hồ sơ kênh đã điền',
+      '🧾 /hoso `email` — xem hồ sơ kênh của một người',
+      '📥 /naphoso `email duong` — nạp hồ sơ mẫu (duong · duy · phong · hai)',
+      '🕵️ /lichsu `email` — lịch sử dùng AI, soi xem có dùng chung không',
       '✅ /mopro `email 30` — tự mở Pro cho ai đó (số ngày, bỏ trống = 1 gói)',
       '⛔ /tatpro `email` — tắt Pro'
     ].join('\n'));
@@ -367,6 +632,29 @@ function studioLenh(cmd, arg, chatId){
     var n = parseInt(arg, 10); if (isNaN(n) || n < 0 || n > 1000) return hoi('Gửi một con số từ 0 đến 1000.');
     P.setProperty('ST_LUOT_THU', String(n));
     return tgSend(chatId, '✅ Tài khoản Free giờ có *' + n + '* lượt AI phân tích miễn phí (áp dụng cho cả người đã đăng ký, tính theo số lượt họ đã dùng).');
+  }
+  if (cmd === 'luotkb'){
+    if (!arg) return hoi('📝 Tài khoản mới được bao nhiêu lượt *chấm kịch bản*? Ví dụ `3`');
+    var nkb = parseInt(arg, 10); if (isNaN(nkb) || nkb < 0 || nkb > 1000) return hoi('Gửi một con số từ 0 đến 1000.');
+    P.setProperty('ST_LUOT_KB', String(nkb));
+    return tgSend(chatId, '✅ Tài khoản Free giờ có *' + nkb + '* lượt chấm kịch bản.');
+  }
+  if (cmd === 'luotsoi'){
+    if (!arg) return hoi('🔎 Tài khoản mới được bao nhiêu lượt *soi video viral*? Ví dụ `1`');
+    var nsoi = parseInt(arg, 10); if (isNaN(nsoi) || nsoi < 0 || nsoi > 1000) return hoi('Gửi một con số từ 0 đến 1000.');
+    P.setProperty('ST_LUOT_SOI', String(nsoi));
+    return tgSend(chatId, '✅ Tài khoản Free giờ có *' + nsoi + '* lượt soi video viral.');
+  }
+  if (cmd === 'dshv'){
+    var dsAll = moiND();
+    if (!dsAll.length) return tgSend(chatId, 'Chưa có tài khoản nào.');
+    var dong = dsAll.slice(-25).reverse().map(function(x){
+      var hsx = ndDocHs(x), so = ndCoHs(hsx);
+      return (ndLaPro(x) ? '✦' : '🆓') + ' *' + x.ten + '* · `' + x.email + '`\n   ' +
+        (so ? '📋 hồ sơ ' + so + '/' + ST_HS_TRUONG.length + ' mục' + (hsx.nganh ? ' · ' + hsx.nganh : '') : '📋 _chưa có hồ sơ kênh_') +
+        ' · còn ' + ndLuotCon(x,'hook') + '/' + ndLuotCon(x,'script') + '/' + ndLuotCon(x,'soi') + ' (hook/kb/soi)';
+    });
+    return tgSend(chatId, ['👥 *' + dsAll.length + ' tài khoản* (mới nhất trước)', ''].concat(dong).join('\n'));
   }
   if (cmd === 'luotai'){
     if (!arg) return hoi('🤖 Pro và học viên được bao nhiêu lượt AI mỗi ngày? Ví dụ `20`');
@@ -409,9 +697,39 @@ function studioLenh(cmd, arg, chatId){
   if (!arg) return hoi('Gửi email người dùng' + (cmd === 'mopro' ? ', kèm số ngày nếu muốn (ví dụ `ban@gmail.com 30`)' : '') + '.');
   var em = arg.split(/\s+/)[0], nd = ndTheoEmail(em);
   if (!nd) return tgSend(chatId, '🔎 Không thấy người dùng Viral Studio có email `' + em + '`.');
+  if (cmd === 'hoso'){
+    var hs1 = ndDocHs(nd);
+    if (!ndCoHs(hs1)) return tgSend(chatId, '📋 *' + nd.ten + '* chưa điền hồ sơ kênh.\nHọ tự điền trong tool ở mục Tài khoản → Hồ sơ kênh.');
+    var nhan = {kenh:'Tên kênh', nganh:'Ngách', dinh_vi:'Định vị', doi_tuong:'Nói với ai', muc_tieu:'Mục tiêu',
+      xung_ho:'Xưng hô', dang:'Định dạng', do_dai:'Độ dài', text_batbuoc:'Chữ bắt buộc', nhac:'Nhạc',
+      hashtag:'Hashtag', khong_lam:'Không làm', pillar:'Pillar', san_pham:'Sản phẩm', ghi_chu:'Ghi chú'};
+    var dg = ST_HS_TRUONG.filter(function(k){ return hs1[k] }).map(function(k){ return '*' + nhan[k] + ':* ' + hs1[k] });
+    return tgSend(chatId, ['📋 *Hồ sơ kênh · ' + nd.ten + '*', ''].concat(dg).join('\n'));
+  }
+  if (cmd === 'naphoso'){
+    var khoaMau = (arg.split(/\s+/)[1] || '').toLowerCase();
+    if (!ST_HS_MAU[khoaMau]) return hoi('📥 Gửi `email` kèm tên mẫu: `duong` · `duy` · `phong` · `hai`.\nVí dụ: `ban@gmail.com duong`');
+    ghiDong(ST_SHEET, ST_HEADERS, nd, {ho_so: JSON.stringify(stHsMau(khoaMau))});
+    return tgSend(chatId, '✅ Đã nạp hồ sơ *' + ST_HS_MAU[khoaMau].ten_goi + '* cho *' + nd.ten + '*.\nHọ sửa lại được trong tool ở mục Tài khoản → Hồ sơ kênh.');
+  }
+  if (cmd === 'lichsu'){
+    var tb2 = []; try{ tb2 = JSON.parse(nd.thiet_bi || '[]') || []; }catch(e){}
+    var ls = stLogCua(nd.ma, 15);
+    var dau = ['🕵️ *Lịch sử AI · ' + nd.ten + '*', '`' + nd.email + '` · ' + (ndLaPro(nd) ? 'Pro' : 'Free'),
+      '📱 *' + tb2.length + ' thiết bị* trong ' + ST_TB_NGAY + ' ngày' + (tb2.length > ST_TB_TOI_DA ? ' ⚠️ _cao bất thường_' : ''), ''];
+    if (!ls.length) return tgSend(chatId, dau.concat(['_Chưa có lượt AI nào._']).join('\n'));
+    var dongLs = ls.map(function(r){
+      return '`' + String(r.thoi_gian).slice(5, 16) + '` ' + r.tool + ' · `' + String(r.thiet_bi).slice(0, 8) + '` ' +
+        (r.ket_qua === 'ok' ? '' : '❌ ') + String(r.noi_dung).slice(0, 60);
+    });
+    return tgSend(chatId, dau.concat(dongLs).join('\n'));
+  }
   if (cmd === 'timnd'){
     return tgSend(chatId, ['👤 *' + nd.ten + '* · `' + nd.ma + '`', '📧 `' + nd.email + '` · 📱 `' + nd.sdt + '`',
-      ndLaPro(nd) ? '✦ Pro tới ' + stHan(nd.pro_han) : '🆓 Free · còn ' + ndLuotCon(nd) + '/' + ST_LUOT_THU + ' lượt AI',
+      ndLaPro(nd) ? '✦ Pro tới ' + stHan(nd.pro_han)
+        : '🆓 Free · còn ' + ndLuotCon(nd,'hook') + '/' + ST_LUOT_THU + ' hook · ' +
+          ndLuotCon(nd,'script') + '/' + ST_LUOT_KB + ' kịch bản · ' + ndLuotCon(nd,'soi') + '/' + ST_LUOT_SOI + ' soi',
+      '📋 Hồ sơ kênh: ' + (ndCoHs(ndDocHs(nd)) ? (ndDocHs(nd).nganh || 'đã điền') + ' — xem bằng /hoso' : '_chưa điền_'),
       '🕐 Tạo ' + nd.tao + (nd.dangnhap_cuoi ? ' · đăng nhập ' + nd.dangnhap_cuoi : '')].join('\n'));
   }
   if (cmd === 'mopro'){
