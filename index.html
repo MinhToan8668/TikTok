@@ -975,6 +975,16 @@ body.hv-mode{padding-bottom:0}
 .hs-ls{margin-top:8px;font-size:12.5px;line-height:1.7}
 .hs-ls div{border-bottom:1px solid var(--line);padding:3px 0}
 .hs-ls .gio{color:var(--faint);font-variant-numeric:tabular-nums;margin-right:6px}
+/* hồ sơ kênh của chính học viên trong khu học viên */
+.hv-hoso{margin-top:18px}
+.hv-hs-nguon{font-size:13px;color:var(--quiet);margin:4px 0 10px;line-height:1.55}
+.hv-hs-luoi{display:grid;grid-template-columns:1fr 1fr;gap:2px 14px}
+.hv-hs-luoi .rong{grid-column:1/-1}
+.hv-hs-luoi label{display:block;font-size:12px;color:var(--quiet);font-weight:600;margin:9px 0 4px}
+.hv-hs-luoi input,.hv-hs-luoi textarea{width:100%;font:inherit;font-size:14px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 11px}
+.hv-hs-luoi textarea{resize:vertical;min-height:64px;line-height:1.55}
+.hv-hs-bao{font-size:12.5px;color:var(--quiet);margin:10px 0 0;min-height:1em}
+@media(max-width:700px){.hv-hs-luoi{grid-template-columns:1fr}}
 .hv-ca{border:1.5px solid var(--line-dk);border-radius:999px;padding:9px 15px;
   font-size:13px;line-height:1.3;background:var(--paper-lt);color:var(--ink-soft);
   transition:.18s;text-align:left}
@@ -1973,6 +1983,14 @@ body.hv-mode{padding-bottom:0}
       </div>
       <div id="hvTQ" style="display:none"></div>
       <div id="hvHS" style="display:none"></div>
+
+      <!-- hồ sơ kênh của chính học viên, dựng sẵn từ form đăng ký khoá -->
+      <div class="hv-cua-toi hv-hoso" id="hvHoSo" style="display:none">
+        <h3>📋 Hồ sơ kênh của bạn</h3>
+        <p class="hv-hs-nguon" id="hvHsNguon"></p>
+        <div class="hv-hs-luoi" id="hvHsLuoi"></div>
+        <p class="hv-hs-bao" id="hvHsBao"></p>
+      </div>
       <div class="hv-msg" id="hvMsg"></div>
       <p class="hv-chu" id="hvChu" style="display:none">
         <b>Cách dùng:</b> bấm vào những ca bạn rảnh — tick bao nhiêu cũng được, chưa lưu
@@ -3229,6 +3247,7 @@ function hvVaoTrong(){
 
   var m = laMentor();
   var pro = HV.vaitro === 'pro';           // mua Viral Studio Pro, không học khoá → chỉ có tool
+  if (!HV_HS.xong){ HV_HS.xong = true; hvTaiHoSo(); }
   ['#hvCheDo','#hvMineBox','#hvHan','#hvNgays','#hvLuu','#hvTQ','#hvChu'].forEach(function(s){
     var e=$(s); if(e) e.style.display = pro ? 'none' : ''; });
   var tuanBar = $('#hvTruoc') && $('#hvTruoc').parentNode; if (tuanBar) tuanBar.style.display = pro ? 'none' : '';
@@ -3266,11 +3285,82 @@ function hvDoiCheDo(che){
     ? 'Lịch của tất cả mentor trong tuần, ai đã đặt ca nào, và bạn học viên nào tuần này chưa đặt buổi nào — để cả nhóm nhìn chung một bức tranh.'
     : 'Bấm vào ca bạn rảnh là mở cho học viên đặt. Học viên đặt xong bạn thấy tên họ ngay tại ca đó, và bot cũng báo về nhóm.';
   // màn học viên không dính gì tới lịch tuần, ẩn hết phần lịch đi cho đỡ rối
-  ['#hvTuanHang','#hvMineBox','#hvHan','#hvNgays','#hvLuu','#hvChu','#hvTQ'].forEach(function(q){
+  ['#hvTuanHang','#hvMineBox','#hvHan','#hvNgays','#hvLuu','#hvChu','#hvTQ','#hvHoSo'].forEach(function(q){
     var e = document.querySelector(q); if (e && hs) e.style.display = 'none';
   });
   $('#hvHS').style.display = hs ? '' : 'none';
   if (hs) hvTaiHocVien();
+}
+
+/* ---- hồ sơ kênh của chính học viên ----
+   Dựng sẵn từ câu trả lời trong form đăng ký khoá (máy chủ lo phần đó), hiện ngay
+   ở đây để học viên xem và sửa. Sửa xong là ba tool bên Viral Studio dùng luôn. */
+var HV_HS_TRUONG = [
+  ['kenh', 'Tên kênh', 'VD: Bếp nhà Mi · Thợ điện Sài Gòn · Cô giáo IELTS 7.5', 0],
+  ['nganh', 'Ngách của kênh', 'VD: cơm nhà cho mẹ bỉm · sửa xe máy · luyện thi IELTS · môi giới đất nền', 1],
+  ['doi_tuong', 'Nói với ai', 'VD: mẹ 25–35 đi làm văn phòng · thợ mới vào nghề · người mua nhà lần đầu', 1],
+  ['dinh_vi', 'Điều khiến bạn khác người ta', 'VD: 10 năm trong nghề nhưng nói tiếng người thường · bỏ phố về quê làm lại', 1],
+  ['muc_tieu', 'Mục tiêu thật của kênh', 'VD: khách nhắn tin đặt lịch · kéo người mới biết tới kênh · bán khoá học', 0],
+  ['xung_ho', 'Xưng hô, giọng kênh', 'VD: mình – mấy bạn · em – anh chị · tui – mấy sốp', 0],
+  ['dang', 'Định dạng video hay quay', 'VD: nói vào camera 70%, POV một ngày đi làm 30% · vlog lồng tiếng', 0],
+  ['do_dai', 'Độ dài video', 'VD: 30–45 giây · 45–60 giây · trên 1 phút', 0],
+  ['text_batbuoc', 'Chữ bắt buộc trên màn hình', 'VD: mỗi video phải có tên khu vực · luôn hiện giá', 0],
+  ['nhac', 'Nhạc hay dùng', 'VD: nhạc trend nhẹ · piano mộc 15% · không dùng nhạc buồn', 0],
+  ['hashtag', 'Caption và hashtag', 'VD: một câu chốt + 4–5 hashtag, có hashtag khu vực và ngành', 0],
+  ['khong_lam', 'Tuyệt đối KHÔNG làm', 'VD: không hứa kết quả · không nêu tên công ty đang làm · không bàn chính trị', 1],
+  ['pillar', 'Cấu trúc pillar', 'VD: chuyện nghề 50%, hướng dẫn 30%, hậu trường 20%', 0],
+  ['san_pham', 'Sản phẩm hoặc dịch vụ', 'VD: khoá học 540k · set hải sản 1tr2 · dịch vụ sửa tại nhà', 0],
+  ['ghi_chu', 'Ghi chú vận hành khác', 'VD: 2 video/tuần, đăng 20h–22h · quay bằng điện thoại, ánh sáng cửa sổ', 0]
+];
+var HV_HS = {hs:{}, nguon:'', o:{}, hen:null, xong:false};
+
+function hvTaiHoSo(){
+  if (HV.vaitro === 'pro') return;                 // tài khoản chỉ mua tool, không có khu học viên
+  hvGoi('st_me', {token:HV.token}).then(function(r){
+    if (!r || !r.ok || !r.ho_so) return;           // máy chủ bản cũ thì lặng lẽ bỏ qua
+    HV_HS.hs = r.ho_so.ho_so || {};
+    HV_HS.nguon = r.ho_so.ho_so_nguon || '';
+    hvVeHoSo();
+  }).catch(function(){});
+}
+
+function hvVeHoSo(){
+  var so = 0; HV_HS_TRUONG.forEach(function(t){ if (HV_HS.hs[t[0]]) so++ });
+  $('#hvHsNguon').innerHTML = HV_HS.nguon === 'form_dang_ky'
+    ? 'Mấy ô này tụi mình dựng sẵn từ đúng những gì bạn đã kể trong <b>form đăng ký khoá</b> — ngách, tệp, nỗi đau khán giả, tone, định dạng. Đọc lại, thấy chỗ nào chưa đúng thì sửa thẳng ở đây.'
+    : so
+    ? 'Ba tool bên Viral Studio đang bám theo hồ sơ này để góp ý đúng kênh bạn. Sửa ô nào là tự lưu.'
+    : 'Điền được tới đâu hay tới đó. Ba tool bên Viral Studio sẽ chấm đúng ngách, đúng tệp và tránh mấy điều kênh bạn không được nói.';
+  var l = $('#hvHsLuoi'); l.innerHTML = ''; HV_HS.o = {};
+  HV_HS_TRUONG.forEach(function(t){
+    var w = document.createElement('div'); if (t[3]) w.className = 'rong';
+    var lb = document.createElement('label'); lb.textContent = t[1]; lb.htmlFor = 'hvhs_' + t[0];
+    var i = document.createElement(t[3] ? 'textarea' : 'input');
+    if (!t[3]) i.type = 'text';
+    i.id = 'hvhs_' + t[0]; i.placeholder = t[2]; i.value = HV_HS.hs[t[0]] || '';
+    i.addEventListener('change', hvHenLuuHoSo); i.addEventListener('blur', hvHenLuuHoSo);
+    HV_HS.o[t[0]] = i;
+    w.appendChild(lb); w.appendChild(i); l.appendChild(w);
+  });
+  $('#hvHoSo').style.display = '';
+}
+
+function hvHenLuuHoSo(){
+  var m = {}, doi = false;
+  HV_HS_TRUONG.forEach(function(t){
+    var v = (HV_HS.o[t[0]].value || '').trim();
+    if (v) m[t[0]] = v;
+    if (v !== (HV_HS.hs[t[0]] || '')) doi = true;
+  });
+  if (!doi) return;
+  clearTimeout(HV_HS.hen);
+  HV_HS.hen = setTimeout(function(){
+    $('#hvHsBao').textContent = 'Đang lưu…';
+    hvGoi('st_hoso', {token:HV.token, ho_so:m}).then(function(r){
+      if (r && r.ok){ HV_HS.hs = r.ho_so || m; $('#hvHsBao').textContent = '✓ Đã lưu. Ba tool bên Viral Studio dùng ngay hồ sơ này.'; }
+      else $('#hvHsBao').textContent = 'Chưa lưu được' + (r && r.error ? ' (' + r.error + ')' : '') + ', thử lại giúp mình.';
+    }).catch(function(){ $('#hvHsBao').textContent = 'Không kết nối được máy chủ.'; });
+  }, 900);
 }
 
 /* ---- mentor: hồ sơ kênh và lịch sử dùng AI của từng học viên ---- */
@@ -3478,6 +3568,7 @@ function hvTai(tuan){
   if (HV.cheDo === 'hs') return;           // mentor đang xem danh sách học viên, không đụng tới lịch
   $('#hvHS').style.display = 'none';
   ['#hvTuanHang','#hvNgays'].forEach(function(q){ var e = document.querySelector(q); if (e) e.style.display = ''; });
+  if (Object.keys(HV_HS.o).length) $('#hvHoSo').style.display = '';
   hvBoCho();
   if (laMentor() && HV.cheDo === 'tq') return hvTaiTongQuan(tuan);
   $('#hvTQ').style.display = 'none';
