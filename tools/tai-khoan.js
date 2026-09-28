@@ -125,6 +125,10 @@
     '.tk-khung .tk-cho{position:absolute;inset:0;display:grid;place-items:center;font-size:13px;color:var(--muted,#777)}',
     '@media(max-width:420px){.tk-chon{grid-template-columns:1fr}}',
     /* logo trên đầu tool: ô mực nghiêng, gạch kem, tách hẳn khỏi nền lime */
+    // Nền lưới mờ giống landing
+    'body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.08;background-image:linear-gradient(#1c2600 2px,transparent 2px),linear-gradient(90deg,#1c2600 2px,transparent 2px);background-size:100% 92px,184px 100%}',
+    ':root[data-theme="dark"] body::before{opacity:.07;background-image:linear-gradient(#99DF00 1px,transparent 1px),linear-gradient(90deg,#99DF00 1px,transparent 1px)}',
+    '@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) body::before{opacity:.07;background-image:linear-gradient(#99DF00 1px,transparent 1px),linear-gradient(90deg,#99DF00 1px,transparent 1px)}}',
     '.brand .tmxk-logo{width:46px;height:46px;flex:none;background:#1B1C12;border-radius:13px;padding:7px;box-sizing:border-box;transform:rotate(-6deg);box-shadow:0 4px 0 rgba(28,38,0,.28)}',
     '.brand .tmxk-logo .ink{fill:#F9E8DD}',
     ':root[data-theme="dark"] .brand .tmxk-logo{background:#F9E8DD}',
