@@ -729,7 +729,12 @@
     var bao = function (p, c) { if (typeof onTienDo === 'function') { try { onTienDo(p, c); } catch (e) { } } };
     bao(0, 'Đang mở phiên tải…');
     var s0 = await goiLai({ action: 'hook_ai', mode: 'up_start', token: token(), dev: dev(), size: file.size, mime: file.type || 'video/mp4', ten: file.name });
-    if (!s0.ok) { var e0 = new Error(s0.error || 'up_start'); e0.ma = s0.error; e0.han = s0.han; throw e0; }
+    if (!s0.ok) {
+      // máy chủ chưa biết mode up_start (HookAI.gs bản cũ) thì rơi xuống nhánh mặc định và trả thieu_text / unknown_action
+      var cu = s0.error === 'thieu_text' || s0.error === 'unknown_action';
+      var e0 = new Error(cu ? 'máy chủ đang chạy HookAI.gs bản cũ' : (s0.error || 'up_start'));
+      e0.ma = cu ? 'may_chu_cu' : s0.error; e0.han = s0.han; throw e0;
+    }
     var KHUC = s0.khuc || 8 * 1024 * 1024, n = Math.ceil(file.size / KHUC);
     for (var i = 0; i < n; i++) {
       var b64 = await docKhuc(file.slice(i * KHUC, Math.min(file.size, (i + 1) * KHUC)));
