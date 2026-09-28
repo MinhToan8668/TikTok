@@ -125,9 +125,23 @@ section{position:relative;z-index:1}
 
 /* ═══════════ NAV ═══════════ */
 nav{position:sticky;top:0;z-index:110;border-bottom:1.5px solid transparent;
-  background:rgba(249,232,221,.82);backdrop-filter:blur(16px) saturate(1.3);
+  background:rgba(153,223,0,.9);backdrop-filter:blur(16px) saturate(1.3);
   transition:border-color .3s,background .3s}
-nav.stuck{border-bottom-color:var(--line);background:rgba(249,232,221,.96)}
+nav.stuck{border-bottom-color:rgba(28,38,0,.2);background:rgba(153,223,0,.97)}
+/* menu nền lime: chỉnh các phần vốn màu lime cho khỏi chìm */
+nav .brand span{color:#2f3d08}
+nav .brand-logo rect[fill="#99df00"]{fill:var(--paper-lt)}
+nav .nav-link{color:#33420a}
+nav .nav-link:hover,nav .nav-link.hot{color:#1c2600}
+nav .nav-link.hot i{background:#ff4d1f;color:#fff;box-shadow:0 2px 0 rgba(28,38,0,.35);
+  transform:rotate(-5deg);display:inline-block;animation:freeNhay 2.4s ease-in-out infinite}
+@keyframes freeNhay{0%,100%{transform:rotate(-5deg) scale(1)}50%{transform:rotate(-5deg) scale(1.12)}}
+@media(prefers-reduced-motion:reduce){nav .nav-link.hot i{animation:none}}
+nav .nav-slots{color:#33420a}
+nav .nav-slots b{color:#1c2600}
+nav .nav-slots .dot{background:#1c2600}
+nav .nav-cta .btn-lime{background:var(--paper-lt);color:#1c2600;box-shadow:0 5px 0 rgba(28,38,0,.28)}
+nav .burger{border-color:rgba(28,38,0,.35)}
 .nav-in{display:flex;align-items:center;justify-content:space-between;gap:16px;max-width:1280px;
   padding-top:15px;padding-bottom:15px}
 .brand{display:flex;align-items:center;gap:9px;text-decoration:none;font-family:var(--disp);flex-shrink:0}
