@@ -13,7 +13,7 @@
   'use strict';
 
   var ND_KEY = 'vs_user', HV_KEY = 'tmxk_hv', DEV_KEY = 'vs_dev', HS_KEY = 'vs_hoso_tam';
-  var TOOL_TEN = { hook: 'AI phân tích hook', script: 'chấm kịch bản', soi: 'soi video viral' };
+  var TOOL_TEN = { hook: 'AI phân tích hook', script: 'chấm kịch bản', soi: 'soi video viral', cham: 'chấm video của bạn' };
 
   var ls = {
     get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },

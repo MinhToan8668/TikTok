@@ -260,3 +260,11 @@ Muốn tặng thêm lượt hoặc gia hạn tay: sửa cột `luot_dung` (số 
 - Khách hết lượt thì thấy nút **✦ Nâng cấp Pro** cố định ở góc phải dưới, kèm giá lấy từ cấu hình. Đặt giá bằng bot: `/giapro 250k` và `/ngaypro 90` → tự hiện "250.000đ · 3 tháng".
 - Màn chuyển khoản nằm luôn trong tool: QR, số tài khoản, số tiền, nội dung, nút "Tôi đã chuyển khoản" báo thẳng cho bot.
 - **Link group Zalo** do bot đặt bằng `/zalo https://zalo.me/g/...`. `st_cfg` trả link này xuống, các màn "chờ duyệt" và "đã chuyển khoản" đều dùng chung, không còn câu chữ cứng trong code.
+
+## Chấm video của bạn (bản 09/2026)
+
+- Tab thứ tư của Viral Studio, file `tools/cham-video.html`. Khác Soi video (mổ video người khác để học): ở đây học viên đưa **video của chính mình** lên — kéo file MP4/MOV tối đa 40MB, hoặc dán link TikTok/YouTube video đã đăng — kèm mục tiêu video, ý định muốn truyền tải, và số liệu nếu đã đăng.
+- Bấm **Chấm video** gọi `hook_ai` với `mode: 'cham'` (hàm `hookChamVideo` trong HookAI.gs). Dùng lại toàn bộ đường tải video và nghe video của Soi video (`soiLayVideo`, Files API cho video lớn). AI trả về: điểm tổng trên 100 tính theo trọng số 7 thang (hook 25 · giữ chân 25 · nội dung 15 · hình ảnh 10 · âm thanh 10 · dựng 10 · kết 5); khả năng viral thấp/vừa/cao; điểm mạnh phải giữ; lưu ý theo từng giây có mức nặng/vừa/nhẹ; tách **sửa video này** (làm được với footage đang có) với **lần sau** (quay · thu âm · dựng); 3 hook mở lại; 3 kịch bản tiếp theo kèm hook, khung và định hướng 2 tuần. Bảng kiến thức chấm nằm trong `CHAM_KIEN_THUC`.
+- Máy chủ tính lại điểm tổng từ 7 thang theo trọng số để không lệch với điểm AI tự ghi. Kết quả lưu trong trình duyệt (`cham.kq`), nút "Viết kịch bản này →" đẩy sang tab Kịch bản viral qua `kb.import`, nút "Đặt lên video →" đẩy hook sang tab Hook viral.
+- Lượt riêng: cột `luot_cham` trong bảng `NguoiDung` (`stNangCap()` tự nối cột), mặc định `ST_LUOT_CHAM` = 1, bot chỉnh bằng `/luotcham`. Pro và học viên tính theo `HOOK_AI_DAILY` như các tool khác.
+- Xem giao diện không cần máy chủ: `cham-video.html#demo`.
