@@ -116,6 +116,8 @@
     '.tk-hs-dau b{display:block;width:100%;margin:0}',
     '.tk-hs-dau .tk-phu{margin:0;flex:1 1 220px}',
     '.tk-hs-dau button{margin-top:0}',
+    '.tk-hs-mo{font-weight:800}',
+    '.tk-hs-mo[aria-expanded="true"]{background:var(--surface-2,#f0f0f0)}',
     '.tk-hs-luoi{display:grid;grid-template-columns:1fr 1fr;gap:2px 14px;margin-top:6px}',
     '.tk-hs-rong{grid-column:1/-1}',
     '.tk-hs-bao{margin:0;font-size:12px;color:var(--muted,#777);flex:1 1 200px}',
@@ -594,15 +596,21 @@
   function nhac(t) { if (oBao) { oBao.textContent = t; oBao.hidden = !t; } }
   var nutLuu = null;
   function veNutLuu() {
+    if (!nutLuu && TK._veMoi) { try { TK._veMoi(); } catch (e) { } return; }
     if (!nutLuu) return;
+    if (!nutLuu.isConnected && TK._veMoi) { try { TK._veMoi(); } catch (e) { } return; }
     nutLuu.disabled = !coSua();
     if (coSua()) nhac('Có thay đổi chưa lưu — AI vẫn chấm theo bản đang sửa, bấm Lưu để giữ lại.');
   }
 
   /* Ô gắn vào cuối phần 1 của tool: dòng trạng thái + những mục hồ sơ mà tool chưa có ô sẵn. */
+  var MO_KEY = 'vs_hs_mo';
   function oMoiHoSo(dich, bo) {
     if (!dich) return;
     napCss();
+    var moRong = ls.get(MO_KEY) === '1';
+    function luuMo() { ls.set(MO_KEY, moRong ? '1' : '0'); }
+    function soMuc(h) { var c = 0; HS_TRUONG.forEach(function (t) { if (h[t[0]]) c++ }); return c; }
     var v = el('div', 'tk-moi'); v.id = 'tkMoiHoSo';
     bo = bo || [];
     function ve2() {
@@ -623,13 +631,22 @@
         var b0 = nut('Về hồ sơ của mình'); b0.onclick = function () { TK.vaiHoSo = null; bao(); }; d.appendChild(b0);
       } else {
         d.appendChild(el('b', null, '📋 Đây là hồ sơ kênh của bạn' + (hs.nganh ? ' · ' + hs.nganh : '')));
-        d.appendChild(el('span', 'tk-phu', 'Sửa ô nào là hồ sơ tự lưu, cả ba tool dùng chung. Không phải mở bảng nào khác.'));
+        d.appendChild(el('span', 'tk-phu', soMuc(hs) + '/' + HS_TRUONG.length + ' mục đã điền · cả ba tool dùng chung hồ sơ này.'));
         if (laMentor()) { var bm = nut('Chạy thử bằng hồ sơ học viên'); bm.onclick = function () { mo('hv'); }; d.appendChild(bm); }
       }
+      // nút đóng mở: bình thường gấp lại cho gọn, cần sửa mới bung ra
+      var bMo = nut(moRong ? 'Thu gọn hồ sơ' : 'Sửa hồ sơ kênh');
+      bMo.className += ' tk-hs-mo';
+      bMo.setAttribute('aria-expanded', moRong ? 'true' : 'false');
+      bMo.onclick = function () { moRong = !moRong; luuMo(); ve2(); };
+      d.appendChild(bMo);
       v.appendChild(d);
 
+      // gấp lại mà vẫn còn thay đổi chưa lưu (sửa mấy ô ngách, tệp ở trên) thì phải còn nút Lưu
+      if (!moRong && !coSua()) return;
+
       var luoi = el('div', 'tk-hs-luoi');
-      HS_TRUONG.forEach(function (t) {
+      if (moRong) HS_TRUONG.forEach(function (t) {
         if (bo.indexOf(t[0]) > -1 || oGan[t[0]]) return;         // tool đã có ô riêng cho mục này
         var w = el('div', t[3] ? 'tk-hs-rong' : null);
         var l = el('label', 'lbl', t[1]); l.htmlFor = 'tkhs_' + t[0];
@@ -640,7 +657,7 @@
         i.addEventListener('blur', function () { ghiTruong(t[0], i.value); });
         w.appendChild(l); w.appendChild(i); luoi.appendChild(w);
       });
-      v.appendChild(luoi);
+      if (moRong) v.appendChild(luoi);
       var cuoi = el('div', 'tk-hs-cuoi');
       nutLuu = nut('Lưu vào hồ sơ kênh', true); nutLuu.disabled = !coSua();
       nutLuu.onclick = luuHoSoChung;
