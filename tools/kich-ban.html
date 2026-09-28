@@ -403,18 +403,51 @@ function openUpsell(title, text) { TK.mo(TK.me ? 'home' : 'signup', [title, text
 /* ---------- chấm ---------- */
 const ERR = { can_dangky: 'Tạo tài khoản miễn phí để dùng AI, mất 30 giây.', khong_co_quyen: 'Tài khoản này không có quyền.', het_thu: 'Bạn đã dùng hết 3 lượt AI thử. Tạo tài khoản miễn phí để có thêm 10 lượt.', het_luot_thu: 'Bạn đã dùng hết lượt AI miễn phí. Mua Pro 50k/tháng hoặc đăng ký học viên để dùng tiếp.', het_luot: 'Hết lượt AI hôm nay, mai quay lại nhé.', het_phien: 'Phiên đăng nhập hết hạn. Đăng nhập lại ở trang Hook viral.', thieu_text: 'Chưa có chữ nào để chấm.', chua_cai_key: 'Máy chủ chưa cài khóa AI. Báo mentor.', sai_key: 'Khóa AI trên máy chủ không hợp lệ. Báo mentor.', ban_qua: 'AI đang bận, thử lại sau một phút.', tu_choi: 'AI không xử lý được nội dung này, thử diễn đạt khác.', loi_mang: 'Máy chủ không gọi được AI, thử lại.', unknown_action: 'Máy chủ chưa cập nhật.' };
 let busy = false;
-/* Hồ sơ kênh → điền sẵn phần "video này nói với ai", để học viên khỏi gõ lại mỗi lần. */
+/* Hồ sơ kênh → điền THẲNG vào form bên trên. Mentor đổi sang hồ sơ học viên khác là
+   mấy ô này đổi theo luôn; ô nào bạn tự gõ tay thì giữ nguyên, không bị ghi đè. */
+const SEG_MD = { mucTieu: 'nhan_biet', dang: 'noi_camera' };
+let hsDien = {};
+function hsO(id, gt) {
+  const o = $('#' + id); if (!o) return;
+  const cu = (o.value || '').trim();
+  if (cu && cu !== (hsDien[id] || '')) return;        // bạn đã tự gõ ô này
+  o.value = gt || ''; hsDien[id] = gt || '';
+}
+function hsSeg(id, gt) {
+  if (!gt) return;
+  const moc = hsDien[id] !== undefined ? hsDien[id] : SEG_MD[id];
+  if (state[id] !== moc) return;                      // bạn đã tự bấm chọn khác
+  state[id] = gt; hsDien[id] = gt; setSeg(id, gt);
+}
+function hsMucTieu(t) {
+  t = (t || '').toLowerCase();
+  if (/đơn|booking|inbox|khách|bán|chốt|liên hệ|đặt lịch/.test(t)) return 'chuyen_doi';
+  if (/uy tín|tin tưởng|chuyên gia|thương hiệu|nhận diện nghề/.test(t)) return 'uy_tin';
+  if (/view|viral|người mới|lan to|phủ|follow/.test(t)) return 'nhan_biet';
+  return '';
+}
+function hsDang(t) {
+  t = (t || '').toLowerCase();
+  if (/voice|lồng tiếng|thuyết minh/.test(t)) return 'voice_over';
+  if (/chữ chạy|text on screen|không lộ mặt/.test(t)) return 'text';
+  if (/camera|talking head|pov|lộ mặt|nói vào/.test(t)) return 'noi_camera';
+  return '';
+}
 function dienTuHoSo() {
   const hs = TK.hoSo() || {};
-  const map = { chuDe: 'nganh', doiTuong: 'doi_tuong', sanPham: 'san_pham' };
-  Object.keys(map).forEach(id => { const o = $('#' + id); if (o && !o.value.trim() && hs[map[id]]) o.value = hs[map[id]]; });
-  if (hs.xung_ho && !$('#xungHo').dataset.nguoiChon) {
-    const sel = $('#xungHo');
+  hsO('chuDe', hs.nganh || hs.kenh);
+  hsO('doiTuong', hs.doi_tuong);
+  hsO('sanPham', hs.san_pham);
+  hsSeg('mucTieu', hsMucTieu(hs.muc_tieu));
+  hsSeg('dang', hsDang(hs.dang));
+  const sel = $('#xungHo');
+  if (hs.xung_ho && sel.value === (hsDien.xungHo || sel.value) && !sel.dataset.nguoiChon) {
+    [...sel.options].forEach(o => { if (o.dataset.tuHoSo) o.remove(); });   // bỏ lựa chọn của hồ sơ cũ
     let hop = [...sel.options].find(o => o.value === hs.xung_ho || o.textContent.trim() === hs.xung_ho);
-    if (!hop) { hop = new Option(hs.xung_ho + ' · theo hồ sơ kênh', hs.xung_ho); sel.add(hop, 0); }   // xưng hô riêng của kênh, không có sẵn trong danh sách
-    sel.value = hop.value;
+    if (!hop) { hop = new Option(hs.xung_ho + ' · theo hồ sơ kênh', hs.xung_ho); hop.dataset.tuHoSo = '1'; sel.add(hop, 0); }
+    sel.value = hop.value; hsDien.xungHo = hop.value;
   }
-  saveDraft();
+  buildPhan(); saveDraft();
 }
 
 async function cham() {

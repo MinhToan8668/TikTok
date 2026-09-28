@@ -498,8 +498,7 @@
       var hs = hoSo(), co = Object.keys(hs).length;
       if (TK.vaiHoSo) {
         v.appendChild(el('b', null, '🎓 Đang chạy thử bằng hồ sơ của ' + TK.vaiHoSo.ten));
-        v.appendChild(document.createTextNode('Mọi góp ý của AI sẽ bám theo kênh của học viên này.'));
-        var b0 = nut('Đổi lại hồ sơ của mình'); b0.onclick = function () { TK.vaiHoSo = null; bao(); ve2(); }; v.appendChild(b0);
+        v.appendChild(document.createTextNode('Mấy ô bên trên đã điền theo kênh của học viên này. Quay về hồ sơ của bạn trong mục Tài khoản.'));
         return;
       }
       if (co) {

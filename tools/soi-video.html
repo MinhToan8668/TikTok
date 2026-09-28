@@ -492,10 +492,19 @@ function openUpsell(title, text) { TK.mo(TK.me ? 'home' : 'signup', [title, text
 /* ---------- soi ---------- */
 const ERR = { can_dangky: 'Tạo tài khoản miễn phí để dùng AI, mất 30 giây.', khong_co_quyen: 'Tài khoản này không có quyền.', khong_tai_duoc_video: 'Không tải được video từ link này (video riêng tư, bị chặn hoặc dịch vụ tải đang nghẽn). Tải file video lên hoặc dán lời thoại rồi soi lại.', video_qua_lon: 'Video quá lớn (trên 45MB). Cắt ngắn hoặc nén rồi tải file lên.', video_hong: 'File video không đọc được, thử xuất lại dạng MP4.', khong_co_video: 'Chưa có video hay lời thoại để soi.', can_gemini: 'Máy chủ đang chạy Claude, phần nghe video cần thêm GEMINI_API_KEY. Báo mentor.', het_thu: 'Bạn đã dùng hết 3 lượt AI thử. Tạo tài khoản miễn phí để có thêm 10 lượt.', het_luot_thu: 'Bạn đã dùng hết lượt AI miễn phí. Mua Pro 50k/tháng hoặc đăng ký học viên để dùng tiếp.', het_luot: 'Hết lượt AI hôm nay, mai quay lại nhé.', het_phien: 'Phiên đăng nhập hết hạn. Đăng nhập lại ở tab Hook viral.', thieu_text: 'Lời thoại quá ngắn để soi. Chép ít nhất vài câu.', anh_qua_lon: 'Ảnh quá lớn, chọn ảnh khác.', chua_cai_key: 'Máy chủ chưa cài khóa AI. Báo mentor.', sai_key: 'Khóa AI trên máy chủ không hợp lệ. Báo mentor.', ban_qua: 'AI đang bận, thử lại sau một phút.', tu_choi: 'AI không xử lý được nội dung này, thử bỏ bớt phần nhạy cảm.', loi_mang: 'Máy chủ không gọi được AI, thử lại.', unknown_action: 'Máy chủ chưa cập nhật.' };
 let busy = false;
+/* Hồ sơ kênh → điền thẳng vào form. Đổi hồ sơ là mấy ô này đổi theo; ô nào bạn tự gõ thì giữ nguyên. */
+let hsDien = {};
+function hsO(id, gt) {
+  const o = $('#' + id); if (!o) return;
+  const cu = (o.value || '').trim();
+  if (cu && cu !== (hsDien[id] || '')) return;        // bạn đã tự gõ ô này
+  o.value = gt || ''; hsDien[id] = gt || '';
+}
 function dienTuHoSo() {
   const hs = TK.hoSo() || {};
-  const map = { chuDe: 'nganh', doiTuong: 'doi_tuong', sanPham: 'san_pham' };
-  Object.keys(map).forEach(id => { const o = $('#' + id); if (o && !o.value.trim() && hs[map[id]]) o.value = hs[map[id]]; });
+  hsO('chuDe', hs.nganh || hs.kenh);
+  hsO('doiTuong', hs.doi_tuong);
+  hsO('sanPham', hs.san_pham);
   saveDraft();
 }
 
