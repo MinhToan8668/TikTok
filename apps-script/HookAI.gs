@@ -223,7 +223,7 @@ function goiGemini(key, img, prompt, schema, maxTok, media){
   var loiCuoi = '', modelCuoi = models[0], quaTai = false, batDau = Date.now();
   for (var mi = 0; mi < models.length; mi++){
     var model = models[mi]; modelCuoi = model;
-    var daChoLai = false;
+    var soLanCho = 0, CHO = [3000, 8000];           // quá tải: chờ 3 giây rồi 8 giây trên cùng model, rồi mới đổi
     for (var ki = 0; ki < kieu.length; ki++){
       if (Date.now() - batDau > 300000) return {ok:false, error: quaTai ? 'ban_qua' : 'loi_ai', loi:'het gio · ' + loiCuoi, model:model};
       var req = { contents:[{role:'user', parts:parts}], generationConfig: kieu[ki].gc };
@@ -252,7 +252,7 @@ function goiGemini(key, img, prompt, schema, maxTok, media){
       if (ma === 401 || ma === 403 || /API_KEY_INVALID|API key not valid/.test(raw)) return {ok:false, error:'sai_key', loi:loiCuoi, model:model};
       if (ma === 429 || ma === 503 || ma === 500){
         quaTai = true;
-        if (!daChoLai){ daChoLai = true; Utilities.sleep(2000); ki--; continue; }   // chờ 2 giây, thử lại đúng kiểu này một lần
+        if (soLanCho < CHO.length && Date.now() - batDau < 240000){ Utilities.sleep(CHO[soLanCho++]); ki--; continue; }   // thử lại đúng kiểu này
         break;                                                                          // vẫn bận: sang model khác
       }
       if (ma === 404) break;                                                            // model không có: sang model khác

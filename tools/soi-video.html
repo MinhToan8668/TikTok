@@ -374,7 +374,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="tai-khoan.js?v=202609281548"></script>
+<script src="tai-khoan.js?v=202609281609"></script>
 <script>
 const $ = s => document.querySelector(s);
 const el = (t, c, txt) => { const e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; };
@@ -512,8 +512,19 @@ async function loadQuota() { if (DEMO) { $('#quota').textContent = 'Bản demo';
 function openUpsell(title, text) { TK.mo(TK.me ? 'home' : 'signup', [title, text].filter(Boolean).join(' · ')); }
 
 /* ---------- soi ---------- */
-const ERR = { can_dangky: 'Tạo tài khoản miễn phí để dùng AI, mất 30 giây.', khong_co_quyen: 'Tài khoản này không có quyền.', khong_tai_duoc_video: 'Không tải được video từ link này (video riêng tư, bị chặn hoặc dịch vụ tải đang nghẽn). Tải file video lên hoặc dán lời thoại rồi soi lại.', video_qua_lon: 'Video quá lớn (trên 200MB). Cắt ngắn hoặc nén rồi tải file lên.', het_phien_tai: 'Phiên tải bị mất giữa chừng, bấm lại để tải từ đầu.', thieu_khuc: 'Tải lên bị thiếu một khúc, bấm Soi lại để gửi lại.', video_hong: 'File video không đọc được, thử xuất lại dạng MP4.', khong_co_video: 'Chưa có video hay lời thoại để soi.', can_gemini: 'Máy chủ đang chạy Claude, phần nghe video cần thêm GEMINI_API_KEY. Báo mentor.', het_thu: 'Bạn đã dùng hết 3 lượt AI thử. Tạo tài khoản miễn phí để có thêm 10 lượt.', het_luot_thu: 'Bạn đã dùng hết lượt AI miễn phí. Mua Pro 50k/tháng hoặc đăng ký học viên để dùng tiếp.', het_luot: 'Hết lượt AI hôm nay, mai quay lại nhé.', het_phien: 'Phiên đăng nhập hết hạn. Đăng nhập lại ở tab Hook viral.', thieu_text: 'Lời thoại quá ngắn để soi. Chép ít nhất vài câu.', anh_qua_lon: 'Ảnh quá lớn, chọn ảnh khác.', chua_cai_key: 'Máy chủ chưa cài khóa AI. Báo mentor.', sai_key: 'Khóa AI trên máy chủ không hợp lệ. Báo mentor.', ban_qua: 'AI đang bận, thử lại sau một phút.', tu_choi: 'AI không xử lý được nội dung này, thử bỏ bớt phần nhạy cảm.', loi_mang: 'Máy chủ không gọi được AI, thử lại.', unknown_action: 'Máy chủ chưa cập nhật.', may_chu_cu: 'Máy chủ đang chạy HookAI.gs bản cũ nên chưa nhận được video tải lên. Mentor dán HookAI.gs mới vào Apps Script rồi Deploy, chọn New version.' };
+const ERR = { can_dangky: 'Tạo tài khoản miễn phí để dùng AI, mất 30 giây.', khong_co_quyen: 'Tài khoản này không có quyền.', khong_tai_duoc_video: 'Không tải được video từ link này (video riêng tư, bị chặn hoặc dịch vụ tải đang nghẽn). Tải file video lên hoặc dán lời thoại rồi soi lại.', video_qua_lon: 'Video quá lớn (trên 200MB). Cắt ngắn hoặc nén rồi tải file lên.', het_phien_tai: 'Phiên tải bị mất giữa chừng, bấm lại để tải từ đầu.', thieu_khuc: 'Tải lên bị thiếu một khúc, bấm Soi lại để gửi lại.', video_hong: 'File video không đọc được, thử xuất lại dạng MP4.', khong_co_video: 'Chưa có video hay lời thoại để soi.', can_gemini: 'Máy chủ đang chạy Claude, phần nghe video cần thêm GEMINI_API_KEY. Báo mentor.', het_thu: 'Bạn đã dùng hết 3 lượt AI thử. Tạo tài khoản miễn phí để có thêm 10 lượt.', het_luot_thu: 'Bạn đã dùng hết lượt AI miễn phí. Mua Pro 50k/tháng hoặc đăng ký học viên để dùng tiếp.', het_luot: 'Hết lượt AI hôm nay, mai quay lại nhé.', het_phien: 'Phiên đăng nhập hết hạn. Đăng nhập lại ở tab Hook viral.', thieu_text: 'Lời thoại quá ngắn để soi. Chép ít nhất vài câu.', anh_qua_lon: 'Ảnh quá lớn, chọn ảnh khác.', chua_cai_key: 'Máy chủ chưa cài khóa AI. Báo mentor.', sai_key: 'Khóa AI trên máy chủ không hợp lệ. Báo mentor.', ban_qua: 'AI của Google đang quá tải, đã tự thử lại 3 lần mà chưa được. Đợi 1–2 phút rồi bấm lại, video không phải tải lại.', tu_choi: 'AI không xử lý được nội dung này, thử bỏ bớt phần nhạy cảm.', loi_mang: 'Máy chủ không gọi được AI, thử lại.', unknown_action: 'Máy chủ chưa cập nhật.', may_chu_cu: 'Máy chủ đang chạy HookAI.gs bản cũ nên chưa nhận được video tải lên. Mentor dán HookAI.gs mới vào Apps Script rồi Deploy, chọn New version.' };
 let busy = false;
+/* AI bận (Google trả 503/429): tự đếm ngược 20 giây rồi gọi lại, tối đa 2 lần. Video đã tải
+   được dùng lại qua file_uri, và máy chủ đã hoàn lượt khi lỗi nên gọi lại không tốn thêm. */
+async function goiCoThuLai(body) {
+  const st = $('#soiStatus');
+  for (let lan = 0; ; lan++) {
+    const r = await callApi(body);
+    if (r.ok || r.error !== 'ban_qua' || lan >= 2) return r;
+    for (let g = 20; g > 0; g--) { st.className = 'status'; st.innerHTML = `<span class="spinner"></span>AI của Google đang quá tải, tự thử lại sau ${g} giây (lần ${lan + 2}/3)…`; await new Promise(z => setTimeout(z, 1000)); }
+  }
+}
+
 /* Hồ sơ kênh → điền thẳng vào form. Đổi hồ sơ là mấy ô này đổi theo; ô nào bạn tự gõ thì giữ nguyên. */
 let hsDien = {};
 function hsO(id, gt) {
@@ -552,7 +563,7 @@ async function soi() {
       tickLai();
     }
     if (DEMO) { await new Promise(z => setTimeout(z, 1200)); r = { ok: true, data: demoData(loi, so, ng), con: 9, han: 10 }; }
-    else r = await callApi({ action: 'hook_ai', mode: 'soi', token: TK.token(), dev: TK.dev(), ho_so: TK.hoSo(), link: $('#link').value.trim(), nen: state.nen, tac_gia: state.link.tac_gia, caption: state.link.caption, tu_video: ng !== 'text', video_b64: ng === 'file' && !lon ? state.file.b64 : undefined, video_mime: ng === 'file' && !lon ? state.file.mime : undefined, ...(lon || {}), loi_thoai: loi, chu_man_hinh: $('#chuManHinh').value.trim(), binh_luan: $('#binhLuan').value.trim(), so_lieu: so, image: ng === 'text' ? state.image : '', chu_de: $('#chuDe').value.trim(), doi_tuong: $('#doiTuong').value.trim(), san_pham: $('#sanPham').value.trim() });
+    else r = await goiCoThuLai({ action: 'hook_ai', mode: 'soi', token: TK.token(), dev: TK.dev(), ho_so: TK.hoSo(), link: $('#link').value.trim(), nen: state.nen, tac_gia: state.link.tac_gia, caption: state.link.caption, tu_video: ng !== 'text', video_b64: ng === 'file' && !lon ? state.file.b64 : undefined, video_mime: ng === 'file' && !lon ? state.file.mime : undefined, ...(lon || {}), loi_thoai: loi, chu_man_hinh: $('#chuManHinh').value.trim(), binh_luan: $('#binhLuan').value.trim(), so_lieu: so, image: ng === 'text' ? state.image : '', chu_de: $('#chuDe').value.trim(), doi_tuong: $('#doiTuong').value.trim(), san_pham: $('#sanPham').value.trim() });
     clearInterval(tick);
     if (!r.ok) {
       st.className = 'status err'; st.textContent = (ERR[r.error] || 'Có lỗi khi gọi AI, thử lại sau.') + (r.chi_tiet ? ' Mã lỗi: ' + r.chi_tiet : '');
