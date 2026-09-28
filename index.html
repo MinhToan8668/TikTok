@@ -133,7 +133,10 @@ nav .brand span{color:#2f3d08}
 nav .brand-logo rect[fill="#99df00"]{fill:var(--paper-lt)}
 nav .nav-link{color:#33420a}
 nav .nav-link:hover,nav .nav-link.hot{color:#1c2600}
-nav .nav-link.hot i{background:var(--ink);color:var(--lime)}
+nav .nav-link.hot i{background:#ff4d1f;color:#fff;box-shadow:0 2px 0 rgba(28,38,0,.35);
+  transform:rotate(-5deg);display:inline-block;animation:freeNhay 2.4s ease-in-out infinite}
+@keyframes freeNhay{0%,100%{transform:rotate(-5deg) scale(1)}50%{transform:rotate(-5deg) scale(1.12)}}
+@media(prefers-reduced-motion:reduce){nav .nav-link.hot i{animation:none}}
 nav .nav-slots{color:#33420a}
 nav .nav-slots b{color:#1c2600}
 nav .nav-slots .dot{background:#1c2600}
