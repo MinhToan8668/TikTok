@@ -91,7 +91,17 @@
     '.tk-moi{border:1px dashed var(--line-strong,#bbb);border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.55;margin-top:10px}',
     '.tk-moi b{display:block;margin-bottom:2px}',
     '.tk-moi button{margin-top:8px}',
-    '.tk-dong{border:0;background:none;font-size:18px;line-height:1;cursor:pointer;color:var(--muted,#777);float:right;padding:0 0 0 8px}'
+    '.tk-dong{border:0;background:none;font-size:18px;line-height:1;cursor:pointer;color:var(--muted,#777);float:right;padding:0 0 0 8px}',
+    '.tk-chon{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 12px}',
+    '.tk-chon button{font:inherit;text-align:left;border:1.5px solid var(--line,#ddd);background:var(--surface-2,#f7f7f7);color:var(--text,#222);border-radius:12px;padding:10px 12px;cursor:pointer;display:grid;gap:2px}',
+    '.tk-chon button b{font-size:14px}',
+    '.tk-chon button small{font-size:12px;color:var(--muted,#777);line-height:1.35}',
+    '.tk-chon button[aria-pressed="true"]{border-color:var(--pro,#26210F);background:var(--accent-soft,#eef8d8);box-shadow:0 0 0 1px var(--pro,#26210F) inset}',
+    '.tk-hop.rong{max-width:620px}',
+    '.tk-khung{position:relative;border:1px solid var(--line,#ddd);border-radius:12px;overflow:hidden;background:#f9e8dd;height:min(70vh,640px)}',
+    '.tk-khung iframe{width:100%;height:100%;border:0;display:block}',
+    '.tk-khung .tk-cho{position:absolute;inset:0;display:grid;place-items:center;font-size:13px;color:var(--muted,#777)}',
+    '@media(max-width:420px){.tk-chon{grid-template-columns:1fr}}'
   ].join('');
 
   var HS_TRUONG = [
@@ -112,7 +122,7 @@
     ['ghi_chu', 'Ghi chú vận hành khác', 'VD: 2 video/tuần, đăng 12h–13h và 16h–20h, gắn location tag', 0]
   ];
 
-  var hop = null, oTrang = null, tab = 'signup', dsHv = null;
+  var hop = null, oTrang = null, tab = 'signup', kieu = 'khach', dsHv = null;
 
   function dung() {
     if (hop) return hop;
@@ -120,18 +130,20 @@
     hop = document.createElement('div'); hop.className = 'tk-nen'; hop.setAttribute('role', 'dialog'); hop.setAttribute('aria-modal', 'true');
     hop.innerHTML = '<div class="tk-hop" id="tkHop"></div>';
     hop.addEventListener('click', function (e) { if (e.target === hop) dong(); });
+    // form đăng ký học viên (landing ?embed=dangky) báo đóng khi người dùng bấm X hoặc xong việc
+    window.addEventListener('message', function (e) { if (e.data && e.data.tmxk === 'close' && kieu === 'hv') dong(); });
     document.body.appendChild(hop);
     oTrang = hop.querySelector('#tkHop');
     return hop;
   }
   function mo(trang, loiNhan) { dung(); ve(trang || (TK.me ? 'home' : 'signup'), loiNhan); hop.classList.add('mo'); }
-  function dong() { if (hop) hop.classList.remove('mo'); }
+  function dong() { if (hop) { hop.classList.remove('mo'); var f = hop.querySelector('.tk-khung iframe'); if (f) f.src = 'about:blank'; } }
 
   function el(t, c, txt) { var e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; }
   function nut(nhan, chinh) { var b = el('button', 'tk-nut' + (chinh ? ' chinh' : ''), nhan); b.type = 'button'; return b; }
 
   function ve(trang, loiNhan) {
-    dung(); oTrang.innerHTML = '';
+    dung(); oTrang.innerHTML = ''; oTrang.classList.toggle('rong', trang === 'signup' && tab === 'signup' && kieu === 'hv' && !TK.me);
     var x = el('button', 'tk-dong', '✕'); x.type = 'button'; x.setAttribute('aria-label', 'Đóng'); x.onclick = dong; oTrang.appendChild(x);
     if (trang === 'hoso') return veHoSo();
     if (trang === 'pro') return vePro();
@@ -141,10 +153,10 @@
   }
 
   /* ── đăng ký / đăng nhập ── */
-  var vai = 'khach';   // khách dùng thử · học viên khoá Tự Mình Xây Kênh
   function veDangKy(loiNhan) {
-    oTrang.appendChild(el('h3', null, tab === 'login' ? 'Đăng nhập' : 'Tạo tài khoản'));
-    if (loiNhan) oTrang.appendChild(el('p', 'tk-phu', loiNhan));
+    var hv = tab === 'signup' && kieu === 'hv';
+    oTrang.appendChild(el('h3', null, tab === 'login' ? 'Đăng nhập' : (hv ? 'Đăng ký học viên' : 'Tạo tài khoản miễn phí')));
+    if (loiNhan && !hv) oTrang.appendChild(el('p', 'tk-phu', loiNhan));
 
     var tabs = el('div', 'tk-tab');
     [['signup', 'Tạo tài khoản'], ['login', 'Đăng nhập']].forEach(function (p) {
@@ -154,41 +166,25 @@
     });
     oTrang.appendChild(tabs);
 
-    if (tab === 'login') {
-      oTrang.appendChild(el('p', 'tk-phu', 'Dùng đúng email và mật khẩu bạn đã đặt. Học viên khoá Tự Mình Xây Kênh đăng nhập ở đây luôn, tài khoản khu học viên dùng được cho cả ba tool.'));
-    } else {
-      // chọn vai trước, mọi thứ phía dưới đổi theo
-      oTrang.appendChild(el('p', 'tk-phu', 'Bạn là ai? Chọn đúng để mình mở đúng quyền.'));
-      var chon = el('div', 'tk-tab'); chon.style.display = 'flex'; chon.style.width = '100%';
-      [['khach', 'Khách dùng thử'], ['hv', 'Học viên khoá học']].forEach(function (p) {
-        var b = el('button', null, p[1]); b.type = 'button'; b.style.flex = '1';
-        b.setAttribute('aria-pressed', String(vai === p[0]));
-        b.onclick = function () { vai = p[0]; ve('signup', loiNhan); };
+    if (tab === 'signup') {
+      // chọn ngay trong bảng: dùng thử tool như khách, hay đăng ký học viên khoá
+      var chon = el('div', 'tk-chon');
+      [['khach', '🙋 Khách', 'Tạo tài khoản 30 giây, dùng thử AI miễn phí'],
+       ['hv', '🎓 Học viên khoá', 'Đăng ký học Tự Mình Xây Kênh, được duyệt là dùng tool không giới hạn']].forEach(function (p) {
+        var b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-pressed', String(kieu === p[0]));
+        b.appendChild(el('b', null, p[1])); b.appendChild(el('small', null, p[2]));
+        b.onclick = function () { if (kieu !== p[0]) { kieu = p[0]; ve('signup', loiNhan); } };
         chon.appendChild(b);
       });
       oTrang.appendChild(chon);
+    }
+    if (hv) return veFormHocVien();
 
+    if (tab === 'signup') {
       var qua = el('div', 'tk-qua');
-      if (vai === 'khach') {
-        qua.innerHTML = '🎁 Miễn phí, dùng thử ngay: <b>10 lượt AI phân tích hook</b>, <b>3 lượt chấm kịch bản</b>, <b>1 lượt soi video viral</b>.' +
-          '<br>Hết lượt thì nâng cấp Pro' + (nhanGia() ? ' <b>' + nhanGia() + '</b>' : '') + ', hoặc đăng ký khoá học để dùng không giới hạn.';
-      } else {
-        qua.innerHTML = '🎓 Học viên khoá <b>Tự Mình Xây Kênh</b> dùng cả ba tool không giới hạn, và hồ sơ kênh đã được mentor chốt sẵn nên AI chấm đúng kênh bạn ngay từ lượt đầu.';
-      }
+      qua.innerHTML = '🎁 Miễn phí, dùng được ngay: <b>10 lượt AI phân tích hook</b>, <b>3 lượt chấm kịch bản</b>, <b>1 lượt soi video viral</b>.' +
+        '<br>Điền hồ sơ kênh một lần là cả ba tool tự bám đúng ngách và tệp của bạn.';
       oTrang.appendChild(qua);
-
-      if (vai === 'hv') {
-        var h = el('div', 'tk-moi');
-        h.appendChild(el('b', null, 'Đã đăng ký khoá rồi?'));
-        h.appendChild(document.createTextNode('Mentor duyệt xong là bạn đăng nhập được bằng email đã đăng ký. Chưa có mật khẩu thì tạo ở trang khoá học.'));
-        var b1 = nut('Tôi đã có tài khoản, đăng nhập', true); b1.onclick = function () { tab = 'login'; ve('signup'); };
-        var b2 = el('a', 'tk-nut', 'Đăng ký khoá học'); b2.href = '../index.html#dangky'; b2.style.textDecoration = 'none';
-        var hang0 = el('div', 'tk-hang'); hang0.appendChild(b1); hang0.appendChild(b2);
-        h.appendChild(hang0); oTrang.appendChild(h);
-        var z0 = zalo();
-        if (z0) { var za = el('a', 'tk-phu', 'Cần hỗ trợ? Nhắn mentor trong group Zalo.'); za.href = z0; za.target = '_blank'; za.style.display = 'block'; oTrang.appendChild(za); }
-        return;   // vai học viên không có form tạo tài khoản khách
-      }
     }
 
     var f = document.createElement('form'); f.noValidate = true;
@@ -232,6 +228,30 @@
       finally { gui.disabled = false; }
     };
     oTrang.appendChild(f);
+    if (tab === 'signup') oTrang.appendChild(el('p', 'tk-phu', 'Học viên Tự Mình Xây Kênh đăng nhập bằng tài khoản khu học viên ở tab Đăng nhập, hồ sơ kênh đã có sẵn.'));
+  }
+
+  /* ── đăng ký học viên: form chi tiết của landing, mở ngay trong bảng ── */
+  function veFormHocVien() {
+    oTrang.appendChild(el('p', 'tk-phu', 'Giữ chỗ chưa mất phí, tụi mình gọi tư vấn trong 24 giờ. Được duyệt là dùng cả ba tool không giới hạn.'));
+    var k = el('div', 'tk-khung'), cho = el('div', 'tk-cho', 'Đang mở form đăng ký…');
+    var f = document.createElement('iframe');
+    f.title = 'Form đăng ký học viên Tự Mình Xây Kênh';
+    // form nhúng tự đặt con trỏ vào ô đầu tiên làm bảng cuộn khuất tiêu đề: kéo về đầu
+    function veDau() { oTrang.scrollTop = 0; hop.scrollTop = 0; }
+    f.addEventListener('load', function () { cho.remove(); veDau(); setTimeout(veDau, 120); setTimeout(veDau, 400); });
+    f.src = '../index.html?embed=dangky';
+    k.appendChild(cho); k.appendChild(f); oTrang.appendChild(k);
+    var p = el('p', 'tk-phu'); p.style.margin = '10px 0 0';
+    p.appendChild(document.createTextNode('Đã là học viên? '));
+    var a = document.createElement('a'); a.href = '#'; a.textContent = 'Đăng nhập bằng tài khoản khu học viên';
+    a.onclick = function (e) { e.preventDefault(); tab = 'login'; kieu = 'khach'; ve('signup'); };
+    p.appendChild(a); oTrang.appendChild(p);
+    var z = zalo();
+    if (z) { var za = el('p', 'tk-phu'); za.style.margin = '6px 0 0';
+      za.appendChild(document.createTextNode('Cần hỗ trợ? '));
+      var la = document.createElement('a'); la.href = z; la.target = '_blank'; la.rel = 'noopener'; la.textContent = 'Nhắn mentor trong group Zalo';
+      za.appendChild(la); oTrang.appendChild(za); }
   }
 
   /* ── trang chính của tài khoản ── */
@@ -255,7 +275,7 @@
       oTrang.appendChild(lu);
       var up = el('div', 'tk-moi');
       up.appendChild(el('b', null, '✦ Nâng cấp Pro' + (nhanGia() ? ' · ' + nhanGia() : '')));
-      up.appendChild(document.createTextNode('Dùng cả ba tool thoải mái theo hạn mức ngày, không còn đếm lượt. Chuyển khoản xong mentor mở trong ngày.'));
+      up.appendChild(document.createTextNode('Dùng cả ba tool theo hạn mức ngày, không còn đếm lượt. Chuyển khoản xong mentor mở trong ngày.'));
       var bu = nut('Xem cách chuyển khoản', true); bu.onclick = function () { ve('pro'); };
       up.appendChild(bu); oTrang.appendChild(up);
     }
@@ -286,53 +306,6 @@
     var hang = el('div', 'tk-hang');
     var ra = nut('Đăng xuất'); ra.onclick = function () { ls.del(ND_KEY); ls.del(HV_KEY); TK.me = null; TK.vaiHoSo = null; bao(); ve('signup'); };
     hang.appendChild(ra); oTrang.appendChild(hang);
-  }
-
-  /* ── nâng cấp Pro: tạo mã chuyển khoản rồi hiện số tài khoản ── */
-  async function vePro() {
-    oTrang.appendChild(el('h3', null, 'Nâng cấp Pro'));
-    var g = goiPro();
-    oTrang.appendChild(el('p', 'tk-phu', g.gia
-      ? 'Gói ' + g.ten + ' · ' + tien(g.gia) + '. Chuyển khoản đúng nội dung bên dưới, mentor xác nhận là Pro mở ngay.'
-      : 'Mentor chưa cài giá gói Pro. Nhắn mentor giúp mình.'));
-    var o = el('div'); oTrang.appendChild(o);
-    o.appendChild(el('p', 'tk-tt', 'Đang tạo mã chuyển khoản…'));
-    try {
-      var r = await goi({ action: 'st_buy', token: token() });
-      o.innerHTML = '';
-      if (!r.ok) {
-        o.appendChild(el('p', 'tk-tt loi', r.error === 'chua_cai_bank'
-          ? 'Mentor chưa cài tài khoản nhận tiền. Nhắn mentor giúp mình.' : 'Chưa tạo được mã, thử lại sau.'));
-      } else {
-        var b = r.bank || {};
-        if (r.qr) { var im = new Image(); im.src = r.qr; im.alt = 'Mã QR chuyển khoản'; im.style.cssText = 'width:100%;max-width:230px;display:block;margin:0 auto 10px;border-radius:12px'; o.appendChild(im); }
-        [['Ngân hàng', b.ngan_hang], ['Số tài khoản', b.stk], ['Chủ tài khoản', b.chu_tk], ['Số tiền', tien(r.so_tien)], ['Nội dung', r.ma_ck]].forEach(function (d) {
-          if (!d[1]) return;
-          var row = el('div', 'tk-the'); var t2 = el('div');
-          t2.appendChild(el('small', null, d[0])); t2.appendChild(el('b', null, String(d[1])));
-          row.appendChild(t2);
-          var c = nut('Chép'); c.style.marginLeft = 'auto';
-          c.onclick = function () { try { navigator.clipboard.writeText(String(d[1])); c.textContent = 'Đã chép'; setTimeout(function () { c.textContent = 'Chép'; }, 1200); } catch (e) { } };
-          row.appendChild(c); o.appendChild(row);
-        });
-        o.appendChild(el('p', 'tk-phu', 'Quét QR bằng app ngân hàng là tự điền đủ. Ghi đúng nội dung để mentor đối chiếu.'));
-        var xong = nut('Tôi đã chuyển khoản', true); xong.className += ' rong';
-        var tt2 = el('p', 'tk-tt');
-        xong.onclick = async function () {
-          xong.disabled = true; tt2.className = 'tk-tt'; tt2.textContent = 'Đang báo cho mentor…';
-          try {
-            var r2 = await goi({ action: 'st_paid', token: token(), ma_ck: r.ma_ck });
-            tt2.className = 'tk-tt ok';
-            tt2.innerHTML = r2.ok
-              ? 'Đã báo mentor. Thường trong ngày là xong.' + (zalo() ? ' Lâu quá thì nhắn trong <a href="' + zalo() + '" target="_blank" rel="noopener"><b>group Zalo</b></a> nhé.' : '')
-              : 'Chưa gửi được, thử lại giúp mình.';
-          } catch (e) { tt2.className = 'tk-tt loi'; tt2.textContent = 'Không kết nối được máy chủ.'; }
-          finally { xong.disabled = false; }
-        };
-        o.appendChild(xong); o.appendChild(tt2);
-      }
-    } catch (e) { o.innerHTML = ''; o.appendChild(el('p', 'tk-tt loi', 'Không kết nối được máy chủ.')); }
-    var q = nut('Quay lại'); q.onclick = function () { ve('home'); }; oTrang.appendChild(q);
   }
 
   /* ── hồ sơ kênh ── */
@@ -441,6 +414,53 @@
   function nhanGia() { var g = goiPro(); return g.gia ? tien(g.gia) + (g.ten ? ' · ' + g.ten.replace(/^Pro /, '') : '') : ''; }
   function zalo() { return (TK.cfg && TK.cfg.zalo) || ''; }
 
+  /* ── nâng cấp Pro: tạo mã chuyển khoản rồi hiện số tài khoản ngay trong tool ── */
+  async function vePro() {
+    oTrang.appendChild(el('h3', null, 'Nâng cấp Pro'));
+    var g = goiPro();
+    oTrang.appendChild(el('p', 'tk-phu', g.gia
+      ? 'Gói ' + g.ten + ' · ' + tien(g.gia) + '. Chuyển khoản đúng nội dung bên dưới, mentor xác nhận là Pro mở ngay.'
+      : 'Mentor chưa cài giá gói Pro. Nhắn mentor giúp mình.'));
+    var o = el('div'); oTrang.appendChild(o);
+    o.appendChild(el('p', 'tk-tt', 'Đang tạo mã chuyển khoản…'));
+    try {
+      var r = await goi({ action: 'st_buy', token: token() });
+      o.innerHTML = '';
+      if (!r.ok) {
+        o.appendChild(el('p', 'tk-tt loi', r.error === 'chua_cai_bank'
+          ? 'Mentor chưa cài tài khoản nhận tiền. Nhắn mentor giúp mình.' : 'Chưa tạo được mã, thử lại sau.'));
+      } else {
+        var b = r.bank || {};
+        if (r.qr) { var im = new Image(); im.src = r.qr; im.alt = 'Mã QR chuyển khoản'; im.style.cssText = 'width:100%;max-width:230px;display:block;margin:0 auto 10px;border-radius:12px'; o.appendChild(im); }
+        [['Ngân hàng', b.ngan_hang], ['Số tài khoản', b.stk], ['Chủ tài khoản', b.chu_tk], ['Số tiền', tien(r.so_tien)], ['Nội dung', r.ma_ck]].forEach(function (d) {
+          if (!d[1]) return;
+          var row = el('div', 'tk-the'), t2 = el('div');
+          t2.appendChild(el('small', null, d[0])); t2.appendChild(el('b', null, String(d[1])));
+          row.appendChild(t2);
+          var c = nut('Chép'); c.style.marginLeft = 'auto';
+          c.onclick = function () { try { navigator.clipboard.writeText(String(d[1])); c.textContent = 'Đã chép'; setTimeout(function () { c.textContent = 'Chép'; }, 1200); } catch (e) { } };
+          row.appendChild(c); o.appendChild(row);
+        });
+        o.appendChild(el('p', 'tk-phu', 'Quét QR bằng app ngân hàng là tự điền đủ. Ghi đúng nội dung để mentor đối chiếu.'));
+        var xong = nut('Tôi đã chuyển khoản', true); xong.className += ' rong';
+        var tt2 = el('p', 'tk-tt');
+        xong.onclick = async function () {
+          xong.disabled = true; tt2.className = 'tk-tt'; tt2.textContent = 'Đang báo cho mentor…';
+          try {
+            var r2 = await goi({ action: 'st_paid', token: token(), ma_ck: r.ma_ck });
+            tt2.className = 'tk-tt ok';
+            tt2.innerHTML = r2.ok
+              ? 'Đã báo mentor. Thường trong ngày là xong.' + (zalo() ? ' Lâu quá thì nhắn trong <a href="' + zalo() + '" target="_blank" rel="noopener"><b>group Zalo</b></a> nhé.' : '')
+              : 'Chưa gửi được, thử lại giúp mình.';
+          } catch (e) { tt2.className = 'tk-tt loi'; tt2.textContent = 'Không kết nối được máy chủ.'; }
+          finally { xong.disabled = false; }
+        };
+        o.appendChild(xong); o.appendChild(tt2);
+      }
+    } catch (e) { o.innerHTML = ''; o.appendChild(el('p', 'tk-tt loi', 'Không kết nối được máy chủ.')); }
+    var q = nut('Quay lại'); q.onclick = function () { ve('home'); }; oTrang.appendChild(q);
+  }
+
   /* ── nạp hồ sơ tài khoản ── */
   async function nap() {
     var t = token();
@@ -513,7 +533,7 @@
   var nutPro = null;
   function veNutPro() {
     var can = TK.me && !laPro();
-    if (!can) { if (nutPro) nutPro.remove(), nutPro = null; return; }
+    if (!can) { if (nutPro) { nutPro.remove(); nutPro = null; } return; }
     if (!nutPro) {
       nutPro = document.createElement('button'); nutPro.type = 'button'; nutPro.id = 'tkNutPro';
       nutPro.style.cssText = 'position:fixed;right:14px;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);z-index:40;' +
@@ -527,6 +547,7 @@
 
   global.TK = {
     khoiDong: khoiDong, nap: nap, mo: mo, dong: dong, canCo: canCo,
+    moHocVien: function () { tab = 'signup'; kieu = 'hv'; mo('signup'); },
     token: token, dev: dev, hoSo: hoSo, luuHoSoTam: luuHoSoTam,
     laPro: laPro, laMentor: laMentor, luotCon: luotCon, oMoiHoSo: oMoiHoSo, zalo: zalo, giaPro: nhanGia,
     get me() { return TK.me; }, get vai() { return TK.vaiHoSo; },
