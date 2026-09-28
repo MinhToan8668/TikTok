@@ -236,12 +236,12 @@ nav .burger{border-color:rgba(28,38,0,.35)}
   color:var(--lime-deep);line-height:1.55}
 
 /* ═══════════ TICKER ═══════════ */
-.ticker-clip{overflow:hidden}  /* kẹp phần nghiêng lòi ra để trang không cuộn ngang */
+.ticker-clip{overflow:hidden;background:var(--lime);padding:6px 0;margin:-6px 0}  /* kẹp phần nghiêng lòi ra; nền lime che khe hở hai đầu vì dải bị nghiêng */
 .ticker{background:var(--ink);border-top:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink);
-  overflow:hidden;padding:12px 0;width:104%;margin-left:-2%;
+  overflow:hidden;padding:17px 0;width:104%;margin-left:-2%;
   transform:rotate(-.4deg);position:relative;z-index:2}
-.ticker-in{display:flex;gap:0;width:max-content;animation:tick 26s linear infinite}
-.ticker span{font-family:var(--disp);font-weight:700;font-size:14px;color:var(--lime);
+.ticker-in{display:flex;gap:0;width:max-content;animation:tick 104s linear infinite}
+.ticker span{font-family:var(--disp);font-weight:700;font-size:15.5px;color:var(--lime);
   letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;padding-right:18px}
 .ticker span::after{content:'✳';margin-left:18px;font-weight:400}
 @keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
@@ -665,6 +665,17 @@ footer a:hover{color:var(--lime-deep)}
 .modal-x:hover{border-color:var(--red);color:var(--red)}
 .modal h2{font-size:24px;font-weight:800;margin-bottom:7px;letter-spacing:-.02em}
 .modal-sub{color:var(--quiet);font-size:13.5px;line-height:1.65;margin-bottom:24px}
+.dk-chon{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 36px 22px 0}
+.dk-chon button{font:inherit;text-align:left;display:grid;gap:3px;cursor:pointer;border-radius:var(--r-sm);
+  border:1.5px solid var(--line-dk);background:var(--card);color:var(--ink);padding:12px 14px}
+.dk-chon button b{font-family:var(--disp);font-size:15px;font-weight:800}
+.dk-chon button small{font-size:12px;color:var(--quiet);line-height:1.4}
+.dk-chon button[aria-pressed="true"]{border:2px solid var(--ink);background:var(--lime);box-shadow:0 4px 0 rgba(28,38,0,.25)}
+.dk-chon button[aria-pressed="true"] small{color:#33420a}
+html.embed .dk-chon{display:none}
+.dk-tool{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.linkbtn{font:inherit;border:0;background:none;padding:0;color:var(--ink);font-weight:700;text-decoration:underline;cursor:pointer}
+@media(max-width:520px){.dk-chon{grid-template-columns:1fr;margin-right:30px}.dk-tool .btn{width:100%}}
 .modal-sub b{color:var(--lime-deep);font-weight:600}
 .fsec{font-family:var(--hand);font-style:italic;font-size:14px;color:var(--lime-deep);
   margin:24px 0 2px;display:flex;align-items:center;gap:12px}
@@ -1104,7 +1115,7 @@ body.hv-mode{padding-bottom:0}
 /* ═══════════ RESPONSIVE ═══════════ */
 @media(max-width:1440px){.nav-slots{display:none}.nav-link{padding:9px 8px;font-size:13px}}
 @media(max-width:1240px){.brand span{display:none}}
-@media(max-width:1180px){.nav-link{padding:9px 6px;font-size:12.5px}.nav-cta{gap:10px}}
+@media(max-width:1180px){.nav-link{padding:9px 6px;font-size:12.5px}.nav-cta{gap:8px}.nav-cta .btn-sm{padding-left:13px;padding-right:13px}}
 @media(max-width:1000px){.nav-links{display:none}.burger{display:flex}}
 @media(max-width:1000px){
   .hero-in{grid-template-columns:1fr;gap:34px}
@@ -1200,7 +1211,7 @@ body.hv-mode{padding-bottom:0}
     <div class="nav-cta">
       <div class="nav-slots"><span class="dot"></span>còn <b data-bind="computed.remaining">—</b> chỗ</div>
       <button class="btn btn-lime btn-sm" data-hv-mo>Khu học viên</button>
-      <button class="btn btn-ink btn-sm" data-open>Giữ chỗ</button>
+      <button class="btn btn-ink btn-sm" data-open>Đăng ký học</button>
       <button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
     </div>
   </div>
@@ -1218,7 +1229,7 @@ body.hv-mode{padding-bottom:0}
     <a href="#hocphi">Học phí</a>
     <a href="#faq">Hỏi đáp</a>
     <button class="btn btn-lime btn-md" data-hv-mo style="margin-top:18px">Khu học viên →</button>
-    <button class="btn btn-ink btn-md" data-open>Đăng ký giữ chỗ →</button>
+    <button class="btn btn-ink btn-md" data-open>Đăng ký học →</button>
   </div>
 </nav>
 
@@ -1237,7 +1248,7 @@ body.hv-mode{padding-bottom:0}
       <h1 class="rv">Chưa biết xây kênh,<br><span class="thin">chưa biết edit?</span><br>Tụi mình <span class="u">làm cùng bạn.</span></h1>
       <p class="lead rv">Lớp học xây kênh TikTok <strong>30 ngày</strong> do đội ngũ sáng lập kênh Tự Mình Xây Kênh trực tiếp đứng lớp. Mỗi tuần một buổi live <strong>chốt hướng đi cho kênh của bạn</strong>, xuyên suốt khóa mentor mở máy <strong>dựng video chung với bạn</strong> — tới khi bạn tự tin bấm nút đăng. Mọi thứ dạy bằng số liệu thật: watch time, retention, hook rate. Không dạy mẹo may rủi.</p>
       <div class="hero-actions rv">
-        <button class="btn btn-ink btn-lg" data-open data-cta>Đăng ký giữ chỗ <span class="arw">→</span></button>
+        <button class="btn btn-ink btn-lg" data-open data-cta>Đăng ký học <span class="arw">→</span></button>
         <div class="hero-free">
           <button class="btn btn-lime btn-lg" data-go="soikenh">🔍 Soi kênh miễn phí</button>
           <button class="btn btn-lime btn-lg" data-go="toolviral">✨ Viral Studio miễn phí</button>
@@ -1337,7 +1348,7 @@ body.hv-mode{padding-bottom:0}
     <div class="tv-g em">
       <small>Học viên khoá</small><b>Free</b>
       <span>Vào lớp là có Pro sẵn, cộng thêm mentor ngồi sửa video cùng bạn suốt 30 ngày.</span>
-      <button class="btn btn-ink btn-md" data-open data-cta>Đăng ký giữ chỗ →</button>
+      <button class="btn btn-ink btn-md" data-open data-cta>Đăng ký học →</button>
     </div>
   </div>
 </div></section>
@@ -1738,7 +1749,7 @@ body.hv-mode{padding-bottom:0}
       <div class="rc-row strike" style="margin-top:8px"><span>Học phí gốc</span><b data-bind="computed.price.regular">—</b></div>
       <div class="rc-total"><span>Đăng ký sớm</span><b data-bind="computed.price.earlyBird">—</b></div>
       <div class="rc-save" data-tpl="đỡ được {{computed.price.saveAmount}} nếu giữ chỗ trước khi lớp đủ người"></div>
-      <button class="btn btn-ink btn-md" data-open data-cta>Giữ chỗ đăng ký sớm <span class="arw">→</span></button>
+      <button class="btn btn-ink btn-md" data-open data-cta>Đăng ký học sớm <span class="arw">→</span></button>
       <div class="rc-foot">điền form miễn phí · tư vấn xong mới quyết định</div>
     </div>
   </div>
@@ -1787,7 +1798,7 @@ body.hv-mode{padding-bottom:0}
   </div>
   <div class="cd-chot rv">
     <span class="hand">vào group không mất gì. Vào lớp hay không, tính sau.</span>
-    <button class="btn btn-ink btn-md" data-open data-cta>Giữ chỗ &amp; nhận link group <span class="arw">→</span></button>
+    <button class="btn btn-ink btn-md" data-open data-cta>Đăng ký &amp; nhận link group <span class="arw">→</span></button>
   </div>
 </div></section>
 
@@ -1803,7 +1814,7 @@ body.hv-mode{padding-bottom:0}
       </div>
       <div class="prog" id="ctaProg"><i></i></div>
     </div>
-    <button class="btn btn-lime btn-xl" data-open data-cta>Đăng ký giữ chỗ <span class="arw">→</span></button>
+    <button class="btn btn-lime btn-xl" data-open data-cta>Đăng ký học <span class="arw">→</span></button>
     <p class="cta-sub" data-tpl="{{computed.scheduleShort}} · điền xong nhận ngay link group cộng đồng, miễn phí"></p>
     <div class="cta-live"><span class="dot"></span><span id="ctaLive">—</span></div>
   </div>
@@ -1831,7 +1842,7 @@ body.hv-mode{padding-bottom:0}
       <b data-bind="computed.price.earlyBirdShort">—</b>
       <span data-tpl="{{computed.cohortLabel}} · còn {{computed.remaining}} chỗ đăng ký sớm"></span>
     </div>
-    <button class="btn btn-ink btn-md" data-open data-cta>Giữ chỗ →</button>
+    <button class="btn btn-ink btn-md" data-open data-cta>Đăng ký học →</button>
   </div>
 </div>
 
@@ -1961,8 +1972,38 @@ body.hv-mode{padding-bottom:0}
   <div class="modal">
     <button class="modal-x" data-close aria-label="Đóng">×</button>
 
+    <div class="dk-chon" id="dkChon" role="group" aria-label="Chọn kiểu đăng ký">
+      <button type="button" data-dk="hoc" aria-pressed="true"><b>🎓 Đăng ký học</b><small>Lớp 30 ngày, mentor kèm edit 1:1, có sẵn Viral Studio Pro</small></button>
+      <button type="button" data-dk="khach" aria-pressed="false"><b>🙋 Khách dùng thử</b><small>Tạo tài khoản 30 giây, dùng thử AI của Viral Studio miễn phí</small></button>
+    </div>
+
+    <div id="khachView" style="display:none">
+      <h2>Tài khoản khách dùng thử</h2>
+      <p class="modal-sub">Miễn phí, dùng được ngay: <b>10 lượt AI phân tích hook, 3 lượt chấm kịch bản, 1 lượt soi video viral</b>. Một tài khoản dùng chung cho cả ba công cụ trong Viral Studio.</p>
+      <form class="fields" id="khachForm" novalidate>
+        <div class="fg"><label class="fl" for="k-ten">Họ và tên *</label><input class="inp" id="k-ten" name="ten" autocomplete="name" placeholder="Nguyễn Văn A"></div>
+        <div class="fg"><label class="fl" for="k-email">Email *</label><input class="inp" id="k-email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="ban@gmail.com"></div>
+        <div class="fg"><label class="fl" for="k-sdt">Số điện thoại (Zalo) *</label><input class="inp" id="k-sdt" name="sdt" type="tel" inputmode="tel" autocomplete="tel" placeholder="09xx xxx xxx"></div>
+        <div class="fg"><label class="fl" for="k-pass">Mật khẩu, ít nhất 6 ký tự *</label><input class="inp" id="k-pass" name="pass" type="password" autocomplete="new-password"></div>
+        <div class="form-msg" id="khachMsg"></div>
+        <button class="btn btn-ink btn-lg" id="khachBtn" type="submit" style="width:100%;margin-top:6px"><span class="spin"></span><span class="lbl">Tạo tài khoản và dùng ngay →</span></button>
+        <p class="privacy">Đã có tài khoản? Mở Viral Studio rồi bấm Đăng nhập.</p>
+      </form>
+      <div id="khachDone" style="display:none;text-align:center;padding:6px 0">
+        <div class="done-ic">🎉</div>
+        <h3 style="font-size:22px;font-weight:800;margin-bottom:10px">Tài khoản đã sẵn sàng</h3>
+        <p style="color:var(--quiet);line-height:1.7;font-size:14.5px;margin-bottom:18px">Bạn đã đăng nhập sẵn. Chọn một công cụ để thử ngay:</p>
+        <div class="dk-tool">
+          <a class="btn btn-ink btn-md" href="tools/soi-video.html">🔎 Soi video viral</a>
+          <a class="btn btn-line btn-md" href="tools/kich-ban.html">✍️ Kịch bản viral</a>
+          <a class="btn btn-line btn-md" href="tools/hook-text.html">🎬 Hook viral</a>
+        </div>
+        <p style="color:var(--quiet);font-size:13px;margin-top:16px">Muốn học bài bản, có mentor ngồi sửa video cùng? <button type="button" class="linkbtn" data-dk="hoc">Đăng ký học</button></p>
+      </div>
+    </div>
+
     <div id="formView">
-      <h2 id="mTitle">Đăng ký giữ chỗ</h2>
+      <h2 id="mTitle">Đăng ký học</h2>
       <p class="modal-sub"><b id="mCohort">—</b><br>Bốn bước ngắn để tụi mình hiểu kênh của bạn trước khi lớp bắt đầu. Điền xong nhận ngay link group cộng đồng Tự Mình Xây Kênh, miễn phí.</p>
       <form class="fields" id="regForm" novalidate>
         <div class="prog"><i id="progBar" style="width:25%"></i></div>
@@ -2440,16 +2481,27 @@ function loadConfig(){
 var lastFocus=null, LAST_REG=null;
 var EMBED=/[?&]embed=dangky\b/.test(location.search);
 if(EMBED) document.documentElement.classList.add('embed');
-function openModal(){
-  if(CFG && CFG.computed.isClosed) return;
+/* Hộp đăng ký có hai kiểu: đăng ký học (form 4 bước) hoặc tạo tài khoản khách
+   dùng thử Viral Studio. Trong tool (EMBED) chỉ có form học. */
+function dkChe(che){
+  var khach = che==='khach' && !EMBED;
+  $$('#dkChon [data-dk]').forEach(function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-dk')===(khach?'khach':'hoc'))); });
+  $('#khachView').style.display = khach ? 'block' : 'none';
+  $('#formView').style.display = khach ? 'none' : 'block';
+  $('#doneView').style.display = 'none';
+  if (khach){ $('#khachForm').style.display='block'; $('#khachDone').style.display='none';
+    setTimeout(function(){ var n=$('#k-ten'); if(n) n.focus(); },60); }
+  else { goStep(1); setTimeout(function(){ var n=$('#f-name'); if(n) n.focus(); },60); }
+}
+function openModal(che){
+  if(che!=='khach' && CFG && CFG.computed.isClosed) return;
   lastFocus=document.activeElement;
   $('#modal').classList.add('on');
   $('#formView').style.display='block';
   $('#doneView').style.display='none';
   $('#formMsg').className='form-msg';
   document.body.classList.add('lock');
-  goStep(1);
-  setTimeout(function(){ var n=$('#f-name'); if(n) n.focus(); },60);
+  dkChe(che==='khach' ? 'khach' : 'hoc');
 }
 function closeModal(){
   if(EMBED){ try{ parent.postMessage({tmxk:'close'},'*'); }catch(e){} return; }
@@ -2723,7 +2775,8 @@ function initChrome(){
 
   // nhân đôi nội dung ticker để vòng lặp liền mạch
   var t=$('#tickerIn');
-  if(t) t.innerHTML+=t.innerHTML;
+  // lặp 4 lần cho mỗi nửa dài hơn màn rộng nhất (~2800px), rồi nhân đôi để vòng lặp liền mạch
+  if(t){ var goc=t.innerHTML; t.innerHTML=goc+goc+goc+goc; t.innerHTML+=t.innerHTML; }
 
   window.addEventListener('scroll',function(){
     nav.classList.toggle('stuck',window.scrollY>12);
@@ -2800,6 +2853,37 @@ function initChrome(){
     b.addEventListener('click',function(){ closeDrawer(); openModal() });
   });
   $$('[data-close]').forEach(function(b){ b.addEventListener('click',closeModal) });
+  $$('[data-dk]').forEach(function(b){ b.addEventListener('click',function(){ dkChe(b.getAttribute('data-dk')); }); });
+
+  /* ── tài khoản khách Viral Studio: cùng máy chủ, cùng chỗ lưu với tool ── */
+  (function(){
+    var f=$('#khachForm'); if(!f) return;
+    function msg(t){ var m=$('#khachMsg'); m.textContent=t||''; m.className='form-msg'+(t?' on bad':''); }
+    function xong(){ $('#khachForm').style.display='none'; $('#khachDone').style.display='block'; }
+    f.addEventListener('submit',function(e){
+      e.preventDefault();
+      var d={ten:$('#k-ten').value.trim(), email:$('#k-email').value.trim(), sdt:$('#k-sdt').value.trim(), pass:$('#k-pass').value};
+      if(!d.ten||!d.email||!d.sdt){ msg('Điền đủ tên, email và số điện thoại giúp mình.'); return; }
+      if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(d.email)){ msg('Email chưa đúng định dạng.'); return; }
+      var so=d.sdt.replace(/\D/g,''); if(so.length<9||so.length>12){ msg('Số điện thoại chưa đúng.'); return; }
+      if((d.pass||'').length<6){ msg('Mật khẩu ít nhất 6 ký tự.'); return; }
+      msg(''); var btn=$('#khachBtn'); btn.classList.add('busy'); btn.disabled=true;
+      if(!API || API.indexOf('PASTE_')===0){ btn.classList.remove('busy'); btn.disabled=false; xong(); return; }   // bản xem thử
+      fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+        body:JSON.stringify({action:'st_signup', ten:d.ten, email:d.email, sdt:d.sdt, pass:d.pass, nguon:'landing'})})
+        .then(function(r){return r.json()})
+        .then(function(r){
+          if(!r.ok){ msg({da_ton_tai:'Email này đã có tài khoản. Mở Viral Studio rồi bấm Đăng nhập nhé.',
+            la_hoc_vien:'Email này là tài khoản học viên. Mở Viral Studio và đăng nhập bằng tài khoản khu học viên.',
+            email_sai:'Email chưa đúng định dạng.', sdt_sai:'Số điện thoại chưa đúng.', mk_ngan:'Mật khẩu ít nhất 6 ký tự.',
+            busy:'Máy chủ đang bận, thử lại sau vài giây.'}[r.error] || 'Chưa tạo được tài khoản, thử lại giúp mình.'); return; }
+          try{ localStorage.setItem('vs_user', JSON.stringify({token:r.token})); }catch(err){}
+          xong();
+        })
+        .catch(function(){ msg('Không kết nối được máy chủ. Kiểm tra mạng rồi thử lại.'); })
+        .then(function(){ btn.classList.remove('busy'); btn.disabled=false; });
+    });
+  })();
   $('#modal').addEventListener('click',function(e){ if(e.target===this) closeModal() });
   document.addEventListener('keydown',function(e){
     if(e.key==='Escape'){ closeModal(); closeDrawer(); }
