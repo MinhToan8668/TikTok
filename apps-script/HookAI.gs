@@ -88,6 +88,7 @@ function hookAi(b){
   if (b.mode === 'script') return hookScript(b, ai, provider, key);   // chấm kịch bản viral, khách thử cũng dùng được
   if (b.mode === 'link') return soiLink(b);                            // Soi video: lấy caption, tên kênh, ảnh bìa qua oEmbed, không tốn lượt
   if (b.mode === 'soi') return hookSoi(b, ai, provider, key);         // Soi video viral: mổ theo ba cửa rồi áp khuôn sang kênh học viên
+  if (b.mode === 'apkhuon') return hookApKhuon(b, ai, provider, key); // sau khi soi: áp công thức đã rút sang một khung kịch bản khác, không tốn lượt
   if (b.mode === 'design'){
     if (ai.loai === 'khach') return jsonOut({ok:false, error:'can_pro'});   // thiết kế bố cục cần tài khoản
     return hookDesign(b, ai, provider, key);
@@ -534,7 +535,7 @@ function hookScript(b, ai, provider, key){
     '3. diem_roi: 1–3 chỗ người xem sẽ lướt, mỗi chỗ ghi giay (ước tính từ đầu video), doan (trích 5–10 chữ trong kịch bản), ly_do (một câu, gọi tên lỗi theo khoá: hook giới thiệu, đoạn chùng, kể sự việc, nhồi ý, giải thích dài...).',
     '4. khen: 1 câu khen cụ thể (trích đúng cụm chữ hay và nói vì sao nó hay). sua: đúng 3 việc sửa cụ thể, mỗi việc chỉ đúng câu cần đổi và đổi thành gì, nêu nguyên tắc khoá đang dùng. lam_ngay: 1 việc làm trong 10 phút trước khi quay.',
     '5. giong: diem 0–10 mức "nghe như người thật đang nói"; cau_may: tối đa 4 cụm trong kịch bản nghe như văn máy, đọc kịch bản hoặc sáo (trích nguyên văn); sua_thanh: cách nói lại tương ứng theo giọng của học viên, cùng số phần tử với cau_may.',
-    '6. viet_lai: kịch bản viết lại HOÀN CHỈNH theo đúng khung đã chọn, giữ đúng số phần và tên phần như học viên, tổng ' + chuDich.tu + '–' + chuDich.den + ' chữ (hãy đếm), nhắm ' + chuDich.dep + ' chữ. Mỗi phần: phan (tên), text (lời nói thật, câu ngắn, có cảm thán và ngắt nghỉ tự nhiên, có ít nhất 4–5 hành động nhỏ hoặc chi tiết giác quan ở phần thân, cảm xúc show không kể, có suy nghĩ đằng sau hành động; hook là lời thoại hoặc câu đánh thẳng vấn đề, không giới thiệu), tu và den là mốc giây bắt đầu và kết thúc tính theo số chữ của chính phần đó ở tốc độ trên, ghi_chu 1 câu về cách quay hoặc cảnh cần có cho phần này. Bản viết lại phải có một móc mới mỗi 15–20 giây và cao trào rơi ở khoảng 55–75% thời lượng.',
+    '6. viet_lai: kịch bản viết lại HOÀN CHỈNH theo đúng khung đã chọn, giữ đúng số phần và tên phần như học viên, tổng ' + chuDich.tu + '–' + chuDich.den + ' chữ (hãy đếm), nhắm ' + chuDich.dep + ' chữ. Mỗi phần: phan (tên), text (lời nói thật, câu ngắn, có cảm thán và ngắt nghỉ tự nhiên, có ít nhất 4–5 hành động nhỏ hoặc chi tiết giác quan ở phần thân, cảm xúc show không kể, có suy nghĩ đằng sau hành động; hook là lời thoại hoặc câu đánh thẳng vấn đề, không giới thiệu), tu và den là mốc giây bắt đầu và kết thúc tính theo số chữ của chính phần đó ở tốc độ trên, canh_quay là 1–2 câu HƯỚNG DẪN QUAY cụ thể cho phần này: góc máy (cận, trung, POV, đặt máy ở đâu), bối cảnh và ánh sáng, hành động của bạn hoặc nhân vật trong khung, chữ nào hiện trên màn hình lúc đó, cắt cảnh hay giữ một cú. Với dạng voice-over hay daily vlog, text vẫn PHẢI là lời dẫn/voice-over đầy đủ để đọc, không được chỉ ghi hướng dẫn quay. Bản viết lại phải có một móc mới mỗi 15–20 giây và cao trào rơi ở khoảng 55–75% thời lượng.',
     '7. y_chinh: 4–5 gạch đầu dòng ngắn để học viên quay không cần nhìn kịch bản (mỗi dòng dưới 10 chữ).',
     '8. chu_man_hinh: dòng chữ hook đặt lên khung hình cho 3 giây đầu, tối đa 2 dòng ngăn bằng \\n, dưới 12 chữ, đánh dấu 1–2 từ khoá bằng **...**.',
     '9. caption: 1–2 câu có câu hỏi hoặc kêu gọi bình luận cụ thể, không lặp hook. hashtags: 5 hashtag tiếng Việt không dấu, có #tuminhxaykenh.'
@@ -549,7 +550,7 @@ function hookScript(b, ai, provider, key){
       diem_roi:{ type:'array', items:{ type:'object', additionalProperties:false, required:['giay','doan','ly_do'], properties:{ giay:{type:'number'}, doan:{type:'string'}, ly_do:{type:'string'} } } },
       khen:{type:'string'}, sua:{ type:'array', items:{type:'string'} }, lam_ngay:{type:'string'},
       giong:{ type:'object', additionalProperties:false, required:['diem','cau_may','sua_thanh'], properties:{ diem:{type:'number'}, cau_may:{type:'array', items:{type:'string'}}, sua_thanh:{type:'array', items:{type:'string'}} } },
-      viet_lai:{ type:'array', items:{ type:'object', additionalProperties:false, required:['phan','text','tu','den','ghi_chu'], properties:{ phan:{type:'string'}, text:{type:'string'}, tu:{type:'number'}, den:{type:'number'}, ghi_chu:{type:'string'} } } },
+      viet_lai:{ type:'array', items:{ type:'object', additionalProperties:false, required:['phan','text','tu','den','canh_quay'], properties:{ phan:{type:'string'}, text:{type:'string'}, tu:{type:'number'}, den:{type:'number'}, canh_quay:{type:'string'} } } },
       y_chinh:{ type:'array', items:{type:'string'} },
       chu_man_hinh:{type:'string'}, caption:{type:'string'}, hashtags:{ type:'array', items:{type:'string'} }
     } };
@@ -562,7 +563,7 @@ function hookScript(b, ai, provider, key){
   }
   var d = kq.data || {};
   // đếm lại thời lượng bản viết lại bằng máy cho khớp tốc độ đã chọn (AI hay ước lượng lệch)
-  var t = 0; (Array.isArray(d.viet_lai) ? d.viet_lai : []).forEach(function(p){ var s = kbDemChu(p.text) / tocDo * 1.06; p.tu = Math.round(t); t += s; p.den = Math.round(t); p.chu = kbDemChu(p.text); });
+  var t = 0; (Array.isArray(d.viet_lai) ? d.viet_lai : []).forEach(function(p){ var s = kbDemChu(p.text) / tocDo * 1.06; p.tu = Math.round(t); t += s; p.den = Math.round(t); p.chu = kbDemChu(p.text); p.ghi_chu = String(p.canh_quay || p.ghi_chu || ''); });
   d.viet_lai_giay = Math.round(t); d.viet_lai_chu = (d.viet_lai || []).reduce(function(a, p){ return a + (p.chu || 0) }, 0);
   d.thoi_luong = d.thoi_luong || {}; d.thoi_luong.chu_may = soChu; d.thoi_luong.giay_may = giay;
   hookLog(me, '[kichban:' + khung + '] ' + toanBo.slice(0, 80), true, '', kq.vin || 0, kq.vout || 0, kq.model);
@@ -801,7 +802,7 @@ function hookSoi(b, ai, provider, key){
     '4. cua3 (LẶP LẠI ĐƯỢC): diem 0–10 (mức dễ mượn cho người khác); cong_thuc: MỘT dòng công thức của video theo kiểu [A] + [B] + [C]; khuon: 4–7 bước, mỗi bước 1 câu có chỗ trống trong ngoặc vuông để ai cũng điền được (VD: "Mở bằng câu thoại của [người thân] về [một việc rất nhỏ]"); ky_thuat_muon_duoc: 2–4 kỹ thuật học viên mượn được ngay; chat_lieu_rieng: 1–3 thứ là của riêng người làm video, không copy được (trải nghiệm, quan hệ, nghề, hoàn cảnh).',
     '5. binh_luan: nếu có bình luận thì dong_cam (người xem đồng cảm với cái gì, 1–2 câu), tep (tệp thật lộ qua bình luận), y_tuong_tiep: 2–3 ý tưởng video tiếp theo rút từ câu hỏi lặp lại trong bình luận; không có bình luận thì ghi dong_cam = "Chưa có bình luận để đọc" và để mảng rỗng.',
     '6. chi_so: nếu có số liệu thì doc 2–3 câu đọc theo mục 4 (tỉ lệ nào nổi, nói lên điều gì về cửa nào, có lặp lại được không); không có thì ghi "Chưa có số liệu".',
-    '7. muon_khuon (ÁP SANG KÊNH HỌC VIÊN): hop_khong: true nếu học viên có thể có chất liệu tương đương với ngách và tệp đã ghi, false nếu không; ly_do 1–2 câu thẳng; khung: mã khung nên dùng; hooks: đúng 3 hook mượn cấu trúc câu của video gốc nhưng ruột là ngách học viên, mỗi cái có formula (tên khuôn) và text (tối đa 2 dòng ngăn bằng \\n, dưới 12 chữ, đánh dấu 1–2 từ khoá bằng **...**, chỗ cần số liệu thật thì để [ ]); phan: đúng số phần và đúng thứ tự của khung đã chọn, mỗi phần có ten (đúng tên phần trong danh sách) và goi_y (2–3 câu gợi ý nội dung học viên nên điền, viết như hướng dẫn, chỗ cần chất liệu thật thì để [ ]); y_chinh: 4–5 ý chính để quay; luu_y: 1 câu về thứ không được copy từ video gốc.',
+    '7. muon_khuon (ÁP SANG KÊNH HỌC VIÊN): hop_khong: true nếu học viên có thể có chất liệu tương đương với ngách và tệp đã ghi, false nếu không; ly_do 1–2 câu thẳng; khung: mã khung nên dùng; hooks: đúng 3 hook mượn cấu trúc câu của video gốc nhưng ruột là ngách học viên, mỗi cái có formula (tên khuôn) và text (tối đa 2 dòng ngăn bằng \\n, dưới 12 chữ, đánh dấu 1–2 từ khoá bằng **...**, chỗ cần số liệu thật thì để [ ]); phan: đúng số phần và đúng thứ tự của khung đã chọn, mỗi phần có ten (đúng tên phần trong danh sách), thoai (LỜI THOẠI MẪU 1–3 câu học viên sẽ NÓI hoặc đọc voice-over ở phần này, viết theo giọng người thật, xưng hô hợp tệp của học viên, mượn kỹ thuật của video gốc nhưng ruột là ngách học viên; chỗ cần chất liệu thật thì để [ ]; kể cả daily vlog cũng phải có lời dẫn) và canh_quay (1–2 câu hướng dẫn quay: góc máy, bối cảnh, hành động trong khung, chữ trên màn hình); y_chinh: 4–5 ý chính để quay; luu_y: 1 câu về thứ không được copy từ video gốc.',
     '8. dung_copy: 1–3 thứ trong video này KHÔNG nên bắt chước và vì sao (trend trần, drama, từ tuyệt đối, gợi dục, đặc thù kênh lớn, may mắn thời điểm...). lam_ngay: 1 việc làm trong 30 phút hôm nay.',
     'Không bịa số liệu. Không bịa chi tiết không có trong video, lời thoại, bình luận hoặc ảnh. Nếu tư liệu không đủ để kết luận phần nào, nói rõ trong phần đó thay vì đoán.'
   ].filter(function(x){ return x !== '' }).join('\n');
@@ -828,7 +829,7 @@ function hookSoi(b, ai, provider, key){
       muon_khuon:{ type:'object', additionalProperties:false, required:['hop_khong','ly_do','khung','hooks','phan','y_chinh','luu_y'],
         properties:{ hop_khong:{type:'boolean'}, ly_do:{type:'string'}, khung:{type:'string', enum:Object.keys(SOI_KHUNG_PHAN)},
           hooks:{ type:'array', items:{ type:'object', additionalProperties:false, required:['formula','text'], properties:{ formula:{type:'string'}, text:{type:'string'} } } },
-          phan:{ type:'array', items:{ type:'object', additionalProperties:false, required:['ten','goi_y'], properties:{ ten:{type:'string'}, goi_y:{type:'string'} } } },
+          phan:{ type:'array', items:{ type:'object', additionalProperties:false, required:['ten','thoai','canh_quay'], properties:{ ten:{type:'string'}, thoai:{type:'string'}, canh_quay:{type:'string'} } } },
           y_chinh:{type:'array', items:{type:'string'}}, luu_y:{type:'string'} } },
       dung_copy:{type:'array', items:{type:'string'}}, lam_ngay:{type:'string'}
     } };
@@ -857,12 +858,58 @@ function hookSoi(b, ai, provider, key){
   var mk = d.muon_khuon || {}; var khungMk = SOI_KHUNG_PHAN[mk.khung] ? mk.khung : 'tudo';
   var tenPhan = SOI_KHUNG_PHAN[khungMk], phanAi = Array.isArray(mk.phan) ? mk.phan : [];
   mk.khung = khungMk;
-  mk.phan = tenPhan.map(function(ten, i){ var p = phanAi[i] || {}; return { ten: ten, goi_y: String(p.goi_y || '').slice(0, 600) }; });
+  mk.phan = tenPhan.map(function(ten, i){ var p = phanAi[i] || {}; var th = String(p.thoai || p.goi_y || '').slice(0, 700); return { ten: ten, thoai: th, canh_quay: String(p.canh_quay || '').slice(0, 300), goi_y: th }; });
   mk.hooks = (Array.isArray(mk.hooks) ? mk.hooks : []).slice(0, 3).map(function(h){ return { formula: String(h.formula || '').slice(0, 60), text: String(h.text || '').slice(0, 160) }; });
   d.muon_khuon = mk;
   d.meta = { giay: giay, so_chu: soChu, toc_do: giay ? Math.round(soChu / giay * 100) / 100 : 0, ti_le: soiTiLe(so), so_lieu: so, nguon: media ? video.nguon : 'chu', kich_thuoc: video && video.kich_thuoc || 0, canh_bao: canhBao };
   hookLog(me, nhan, true, '', kq.vin || 0, kq.vout || 0, kq.model);
   return jsonOut({ok:true, data:d, con: khongGioiHan ? null : con, han:han, loai:ai.loai, thu: ai.loai === 'khach' || undefined});
+}
+
+/* Sau khi soi xong, học viên đổi sang khung kịch bản khác: chỉ cần công thức đã rút + thông tin kênh,
+   AI viết lại lời thoại mẫu và cảnh quay cho đúng số phần của khung mới. Gọn, không đọc lại video, không trừ lượt. */
+function hookApKhuon(b, ai, provider, key){
+  var me = ai.me;
+  var khung = SOI_KHUNG_PHAN[b.khung] ? String(b.khung) : '';
+  if (!khung) return jsonOut({ok:false, error:'khung_sai'});
+  var arr = function(x, n, m){ return (Array.isArray(x) ? x : []).slice(0, n).map(function(t){ return String(t).slice(0, m || 200) }); };
+  var tomTat = String(b.tom_tat || '').slice(0, 400), congThuc = String(b.cong_thuc || '').slice(0, 300);
+  var khuon = arr(b.khuon, 8, 200), kyThuat = arr(b.ky_thuat, 5, 160), chatLieu = arr(b.chat_lieu, 4, 160), hooks = arr(b.hooks, 3, 160);
+  var loi = String(b.loi_thoai || '').slice(0, 1500);
+  if (!congThuc && !khuon.length && !loi) return jsonOut({ok:false, error:'thieu_text'});
+  var chuDe = String(b.chu_de || '').slice(0, 200), doiTuong = String(b.doi_tuong || '').slice(0, 200), sanPham = String(b.san_pham || '').slice(0, 150);
+  var tenPhan = SOI_KHUNG_PHAN[khung];
+  var prompt = [
+    'Bạn là mentor của khóa "Tự Mình Xây Kênh". Học viên vừa mổ một video viral và rút được công thức bên dưới. Giờ họ muốn áp công thức đó vào một KHUNG KỊCH BẢN KHÁC cho kênh của mình. Nói như người thật, giọng hợp tệp, không văn AI. Làm đúng theo kiến thức dưới đây.',
+    '', KB_KIEN_THUC, '',
+    'VIDEO GỐC ĐÃ MỔ: ' + (tomTat || 'không có tóm tắt'),
+    congThuc ? 'Công thức rút ra: ' + congThuc : '',
+    khuon.length ? 'Khuôn từng bước: ' + khuon.map(function(x, i){ return (i + 1) + ') ' + x }).join(' ') : '',
+    kyThuat.length ? 'Kỹ thuật mượn được: ' + kyThuat.join('; ') : '',
+    chatLieu.length ? 'Chất liệu riêng của họ (không copy): ' + chatLieu.join('; ') : '',
+    hooks.length ? 'Hook đã đề xuất cho học viên: ' + hooks.join(' | ') : '',
+    loi ? 'Trích lời thoại video gốc (chỉ để bắt giọng, không chép): <<<' + loi + '>>>' : '',
+    '',
+    'KÊNH HỌC VIÊN: chủ đề/ngách: ' + (chuDe || 'chưa ghi') + ' · người xem: ' + (doiTuong || 'chưa ghi') + (sanPham ? ' · sản phẩm/dịch vụ: ' + sanPham : ''),
+    'KHUNG MỚI: ' + KB_KHUNG[khung] + '. Các phần theo đúng thứ tự: ' + tenPhan.join(' → '),
+    '',
+    'TRẢ JSON: hop_khong (true/false: công thức này lắp vào khung mới có hợp không), ly_do (1–2 câu thẳng, nếu không hợp thì nói khung nào hợp hơn), phan: đúng ' + tenPhan.length + ' phần đúng thứ tự, mỗi phần có ten (đúng tên phần), thoai (LỜI THOẠI MẪU 1–3 câu học viên sẽ nói hoặc đọc voice-over, giọng người thật, xưng hô hợp tệp, mượn kỹ thuật của video gốc nhưng ruột là ngách học viên, chỗ cần chất liệu thật để [ ], daily vlog cũng phải có lời dẫn), canh_quay (1–2 câu: góc máy, bối cảnh, hành động trong khung, chữ trên màn hình); y_chinh: 4–5 ý chính để quay không cần nhìn giấy; luu_y: 1 câu về thứ không được copy. Không bịa số liệu.'
+  ].filter(function(x){ return x !== '' }).join('\n');
+  var schema = { type:'object', additionalProperties:false, required:['hop_khong','ly_do','phan','y_chinh','luu_y'],
+    properties:{ hop_khong:{type:'boolean'}, ly_do:{type:'string'},
+      phan:{ type:'array', items:{ type:'object', additionalProperties:false, required:['ten','thoai','canh_quay'], properties:{ ten:{type:'string'}, thoai:{type:'string'}, canh_quay:{type:'string'} } } },
+      y_chinh:{type:'array', items:{type:'string'}}, luu_y:{type:'string'} } };
+  var kq = provider === 'claude' ? goiClaude(key, '', prompt, schema, 3000) : goiGemini(key, '', prompt, schema, 3000);
+  if (!kq.ok){
+    hookLog(me, '[apkhuon:' + khung + '] ' + congThuc.slice(0, 60), false, kq.loi, kq.vin || 0, kq.vout || 0, kq.model);
+    return jsonOut({ok:false, error: kq.error, chi_tiet: String(kq.loi || '').slice(0, me.vaitro === 'mentor' ? 400 : 160)});
+  }
+  var d = kq.data || {}, phanAi = Array.isArray(d.phan) ? d.phan : [];
+  var out = { hop_khong: d.hop_khong !== false, ly_do: String(d.ly_do || '').slice(0, 400), khung: khung,
+    phan: tenPhan.map(function(ten, i){ var p = phanAi[i] || {}; var th = String(p.thoai || '').slice(0, 700); return { ten: ten, thoai: th, canh_quay: String(p.canh_quay || '').slice(0, 300), goi_y: th }; }),
+    y_chinh: arr(d.y_chinh, 6, 120), luu_y: String(d.luu_y || '').slice(0, 300) };
+  hookLog(me, '[apkhuon:' + khung + '] ' + congThuc.slice(0, 60), true, '', kq.vin || 0, kq.vout || 0, kq.model);
+  return jsonOut({ok:true, data:out});
 }
 
 /* CHẨN ĐOÁN SOI VIDEO — chạy trong trình soạn Apps Script: sửa link bên dưới, chọn thuSoiVideo → Run → xem Execution log.

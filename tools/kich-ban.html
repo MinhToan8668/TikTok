@@ -323,11 +323,11 @@ const KHUNG = [
     ['than', 'Thân bài', 'Kể đủ, tả kỹ, một video một khoảnh khắc.', .72],
     ['ket', 'Kết bài', 'Bài học riêng hoặc câu hỏi kéo bình luận.', .2] ] },
 ];
-const state = { khung: 'khoanhkhac', mucTieu: 'nhan_biet', dang: 'noi_camera', tocDo: 'vua', text: {}, kq: null };
+const state = { khung: 'khoanhkhac', mucTieu: 'nhan_biet', dang: 'noi_camera', tocDo: 'vua', text: {}, canh: {}, kq: null };
 try { Object.assign(state, JSON.parse(ls.get('kb.draft') || '{}'), { kq: null }); } catch {}
 if (!KHUNG.find(x => x.k === state.khung)) state.khung = 'khoanhkhac';
 function khungHienTai() { return KHUNG.find(x => x.k === state.khung); }
-function saveDraft() { ls.set('kb.draft', JSON.stringify({ khung: state.khung, mucTieu: state.mucTieu, dang: state.dang, tocDo: state.tocDo, text: state.text, chuDe: $('#chuDe').value, doiTuong: $('#doiTuong').value, xungHo: $('#xungHo').value, sanPham: $('#sanPham').value })); }
+function saveDraft() { ls.set('kb.draft', JSON.stringify({ khung: state.khung, mucTieu: state.mucTieu, dang: state.dang, tocDo: state.tocDo, text: state.text, canh: state.canh, chuDe: $('#chuDe').value, doiTuong: $('#doiTuong').value, xungHo: $('#xungHo').value, sanPham: $('#sanPham').value })); }
 function demChu(t) { return String(t || '').replace(/\*\*|_/g, ' ').split(/\s+/).filter(w => /[0-9A-Za-zÀ-ỹ]/.test(w)).length; }
 function giay(n) { return n / TOC_DO[state.tocDo] * 1.06; }
 function fmtS(s) { s = Math.round(s); return s >= 60 ? `${Math.floor(s / 60)}p${String(s % 60).padStart(2, '0')}` : `${s}s`; }
@@ -354,7 +354,9 @@ function buildPhan() {
     const w = el('div', 'phan'); const h = el('div', 'phan-head'); const b = el('b'); b.innerHTML = `<i>${i + 1}</i>${ten}`; const t = el('span', 'phan-time'); t.dataset.k = k; h.append(b, t);
     const ta = document.createElement('textarea'); ta.placeholder = tip; ta.value = state.text[K.k][k] || ''; ta.rows = i === 0 ? 2 : 3; ta.dataset.k = k;
     ta.addEventListener('input', () => { state.text[K.k][k] = ta.value; updateTimes(); saveDraft(); });
-    w.append(h, el('small', 'tip', tip), ta); box.append(w);
+    w.append(h, el('small', 'tip', tip), ta);
+    const cq = ((state.canh || {})[K.k] || {})[k]; if (cq) { const c = el('small', 'tip canh'); c.textContent = '🎬 Cảnh quay gợi ý: ' + cq; c.style.marginTop = '6px'; c.style.color = 'var(--ok)'; w.append(c); }
+    box.append(w);
   });
   updateTimes();
 }
@@ -418,7 +420,7 @@ async function cham() {
       return;
     }
     if (!r.data || !r.data.score) { st.className = 'status err'; st.textContent = 'Máy chủ đang chạy HookAI.gs bản cũ nên chưa có chấm kịch bản. Mentor dán HookAI.gs mới rồi Deploy, chọn New version.'; return; }
-    state.kq = r.data; renderKq(r.data, parts); updateTimes();
+    state.kq = r.data; renderKq(r.data, parts); updateTimes(); try { ls.set('kb.kq', JSON.stringify({ khung: state.khung, d: r.data, parts })); } catch {}
     st.className = 'status ok'; st.textContent = `Xong sau ${Math.round((Date.now() - t0) / 1000)} giây.` + (r.con != null ? ` Còn ${r.con}/${r.han} lượt.` : '');
     if (r.con != null) $('#quota').textContent = plan === 'khach' ? `Khách thử: còn ${r.con}/${r.han} lượt AI` : `còn ${r.con}/${r.han} lượt AI`;
     if (matchMedia('(max-width:900px)').matches) $('#kq').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -443,8 +445,8 @@ function renderKq(d, parts) {
     if (cm.length) { const g = el('div', 'giong'); cm.forEach((c, i) => { g.append(el('span', 'm', c), el('span', 'n', st[i] || '')); }); box.append(g); } else box.append(el('div', 'box', 'Không bắt được câu nào nghe như văn máy. Giữ giọng này.')); }
   if (Array.isArray(d.viet_lai) && d.viet_lai.length) {
     H(`Bản viết lại · ${fmtS(d.viet_lai_giay || (d.viet_lai[d.viet_lai.length - 1] || {}).den || 0)} · ${d.viet_lai_chu || demChu(d.viet_lai.map(p => p.text).join(' '))} chữ`);
-    d.viet_lai.forEach(p => { const r = el('div', 'rw'); const hd = el('div'); hd.append(el('span', 'tc', `${fmtS(p.tu)}–${fmtS(p.den)}`), el('b', null, p.phan)); r.append(hd, el('p', null, p.text)); if (p.ghi_chu) r.append(el('small', null, '🎬 ' + p.ghi_chu)); box.append(r); });
-    const row = el('div', 'row'); const b1 = el('button', 'btn pro', 'Dùng bản này vào form'); b1.type = 'button'; b1.onclick = () => { const K = khungHienTai(); K.phan.forEach(([k, ten], i) => { const p = d.viet_lai[i]; if (p) state.text[K.k][k] = p.text; }); buildPhan(); saveDraft(); toast('Đã thay vào form. Sửa lại cho đúng giọng bạn rồi chấm lần nữa nếu muốn.'); };
+    d.viet_lai.forEach(p => { const r = el('div', 'rw'); const hd = el('div'); hd.append(el('span', 'tc', `${fmtS(p.tu)}–${fmtS(p.den)}`), el('b', null, p.phan)); r.append(hd, el('p', null, p.text)); if (p.canh_quay || p.ghi_chu) r.append(el('small', null, '🎬 Cảnh quay: ' + (p.canh_quay || p.ghi_chu))); box.append(r); });
+    const row = el('div', 'row'); const b1 = el('button', 'btn pro', 'Dùng bản này vào form'); b1.type = 'button'; b1.onclick = () => { const K = khungHienTai(); state.canh[K.k] = state.canh[K.k] || {}; K.phan.forEach(([k, ten], i) => { const p = d.viet_lai[i]; if (p) { state.text[K.k][k] = p.text; if (p.canh_quay || p.ghi_chu) state.canh[K.k][k] = p.canh_quay || p.ghi_chu; } }); buildPhan(); saveDraft(); toast('Đã thay vào form. Sửa lại cho đúng giọng bạn rồi chấm lần nữa nếu muốn.'); };
     const b2 = el('button', 'btn', 'Chép bản viết lại'); b2.type = 'button'; b2.onclick = () => copyText(d.viet_lai.map(p => `[${fmtS(p.tu)}–${fmtS(p.den)}] ${p.phan}\n${p.text}`).join('\n\n'));
     row.append(b1, b2); box.append(row);
   }
@@ -472,11 +474,12 @@ bindSeg('mucTieu', v => { state.mucTieu = v; buildPhan(); saveDraft(); });
 bindSeg('dang', v => { state.dang = v; saveDraft(); });
 bindSeg('tocDo', v => { state.tocDo = v; updateTimes(); saveDraft(); });
 ['chuDe', 'doiTuong', 'xungHo', 'sanPham'].forEach(id => $('#' + id).addEventListener('input', saveDraft));
-(function importSoi() { try { const im = JSON.parse(ls.get('kb.import') || 'null'); if (!im || !im.khung) return; ls.del ? ls.del('kb.import') : localStorage.removeItem('kb.import'); const K = KHUNG.find(x => x.k === im.khung); if (!K) return; state.khung = K.k; state.text[K.k] = {}; (im.phan || []).forEach((g, i) => { if (K.phan[i] && g) state.text[K.k][K.phan[i][0]] = g; }); if (im.chuDe) $('#chuDe').value = im.chuDe; if (im.doiTuong) $('#doiTuong').value = im.doiTuong; if (im.sanPham) $('#sanPham').value = im.sanPham; state.kq = null; saveDraft(); setTimeout(() => toast('Đã nhập khung' + (im.nguon ? ' mượn từ ' + im.nguon : '') + '. Gợi ý trong [ ] là chỗ bạn thay bằng chuyện thật của mình.'), 400); } catch {} })();
+(function importSoi() { try { const im = JSON.parse(ls.get('kb.import') || 'null'); if (!im || !im.khung) return; ls.del ? ls.del('kb.import') : localStorage.removeItem('kb.import'); const K = KHUNG.find(x => x.k === im.khung); if (!K) return; state.khung = K.k; state.text[K.k] = {}; state.canh[K.k] = {}; (im.phan || []).forEach((g, i) => { if (K.phan[i] && g) state.text[K.k][K.phan[i][0]] = String(g).replace(/\*\*/g, ''); }); (im.canh || []).forEach((c, i) => { if (K.phan[i] && c) state.canh[K.k][K.phan[i][0]] = c; }); try { localStorage.removeItem('kb.kq'); } catch {} if (im.chuDe) $('#chuDe').value = im.chuDe; if (im.doiTuong) $('#doiTuong').value = im.doiTuong; if (im.sanPham) $('#sanPham').value = im.sanPham; state.kq = null; saveDraft(); setTimeout(() => toast('Đã nhập khung' + (im.nguon ? ' mượn từ ' + im.nguon : '') + '. Gợi ý trong [ ] là chỗ bạn thay bằng chuyện thật của mình.'), 400); } catch {} })();
 buildKhung(); buildPhan();
+(function moLaiKq() { try { const o = JSON.parse(ls.get('kb.kq') || 'null'); if (o && o.d && o.d.score && o.khung === state.khung) { state.kq = o.d; renderKq(o.d, o.parts || goiKichBan()); updateTimes(); } } catch {} })();
 $('#btnCham').addEventListener('click', cham);
 $('#btnCopy').addEventListener('click', () => { const K = khungHienTai(); copyText(goiKichBan().filter(p => p.text).map(p => `[${p.ten}]\n${p.text}`).join('\n\n')); });
-$('#btnClear').addEventListener('click', () => { if (!confirm('Xoá hết chữ trong các phần của khung này?')) return; state.text[state.khung] = {}; state.kq = null; buildPhan(); saveDraft(); $('#kqBody').hidden = true; $('#kqEmpty').hidden = false; });
+$('#btnClear').addEventListener('click', () => { if (!confirm('Xoá hết chữ trong các phần của khung này?')) return; state.text[state.khung] = {}; state.canh[state.khung] = {}; state.kq = null; try { localStorage.removeItem('kb.kq'); } catch {} buildPhan(); saveDraft(); $('#kqBody').hidden = true; $('#kqEmpty').hidden = false; });
 $('#upClose').addEventListener('click', () => $('#upsell').classList.remove('show'));
 $('#upsell').addEventListener('click', e => { if (e.target === e.currentTarget) e.currentTarget.classList.remove('show'); });
 loadQuota();

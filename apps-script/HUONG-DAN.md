@@ -237,6 +237,7 @@ Muốn tặng thêm lượt hoặc gia hạn tay: sửa cột `luot_dung` (số 
 
 - Tab thứ ba của Viral Studio. Học viên dán link video cùng ngách. `mode: 'link'` (không tốn lượt) lấy caption, tên kênh, ảnh bìa, thời lượng và số liệu (TikTok qua dịch vụ tikwm.com, YouTube qua oEmbed). Khi bấm Soi, máy chủ tự tải video về (TikTok qua tikwm; YouTube Gemini đọc thẳng link; Facebook/Instagram học viên tải file lên, tối đa 40MB) và đưa cho Gemini nghe: bóc lời thoại theo giây, đọc chữ màn hình, nhận xét 1 giây mắt thấy và tai nghe. Video trên 14MB đi qua Files API của Gemini. Không có video thì học viên dán lời thoại.
 - Bấm **Soi video** gọi `hook_ai` với `mode: 'soi'` (hàm `hookSoi`). AI mổ theo ba cửa của khoá: dừng lại, xem hết, lặp lại được; đọc bình luận, đọc số theo tỉ lệ trên view; rút khuôn có chỗ trống; áp sang kênh học viên (3 hook + khung kịch bản + gợi ý từng phần).
-- Nút "Viết kịch bản theo khung này" chuyển sang tab Kịch bản viral và điền sẵn gợi ý từng phần (qua localStorage `kb.import`).
+- Kết quả soi được lưu trong trình duyệt (`soi.kq`), đi qua tab khác rồi quay lại vẫn còn; nút "Soi video mới" để xoá. Sau khi soi, học viên chọn khung kịch bản khác trong ô chọn: `mode: 'apkhuon'` (không tốn lượt) lắp công thức đã rút vào khung mới, trả lời thoại mẫu và cảnh quay từng phần.
+- Nút "Viết kịch bản theo khung này" chuyển sang tab Kịch bản viral, điền sẵn lời thoại mẫu và cảnh quay từng phần (qua localStorage `kb.import`). Kết quả chấm kịch bản cũng được lưu (`kb.kq`).
 - Phần nghe video chỉ Gemini làm được; nếu HOOK_AI_PROVIDER là claude thì vẫn cần GEMINI_API_KEY cho tool này.
 - Lượt dùng chung với AI phân tích hook và chấm kịch bản. Xem giao diện không cần máy chủ: `soi-video.html#demo`.
