@@ -91,7 +91,17 @@
     '.tk-moi{border:1px dashed var(--line-strong,#bbb);border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.55;margin-top:10px}',
     '.tk-moi b{display:block;margin-bottom:2px}',
     '.tk-moi button{margin-top:8px}',
-    '.tk-dong{border:0;background:none;font-size:18px;line-height:1;cursor:pointer;color:var(--muted,#777);float:right;padding:0 0 0 8px}'
+    '.tk-dong{border:0;background:none;font-size:18px;line-height:1;cursor:pointer;color:var(--muted,#777);float:right;padding:0 0 0 8px}',
+    '.tk-chon{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 12px}',
+    '.tk-chon button{font:inherit;text-align:left;border:1.5px solid var(--line,#ddd);background:var(--surface-2,#f7f7f7);color:var(--text,#222);border-radius:12px;padding:10px 12px;cursor:pointer;display:grid;gap:2px}',
+    '.tk-chon button b{font-size:14px}',
+    '.tk-chon button small{font-size:12px;color:var(--muted,#777);line-height:1.35}',
+    '.tk-chon button[aria-pressed="true"]{border-color:var(--pro,#26210F);background:var(--accent-soft,#eef8d8);box-shadow:0 0 0 1px var(--pro,#26210F) inset}',
+    '.tk-hop.rong{max-width:620px}',
+    '.tk-khung{position:relative;border:1px solid var(--line,#ddd);border-radius:12px;overflow:hidden;background:#f9e8dd;height:min(70vh,640px)}',
+    '.tk-khung iframe{width:100%;height:100%;border:0;display:block}',
+    '.tk-khung .tk-cho{position:absolute;inset:0;display:grid;place-items:center;font-size:13px;color:var(--muted,#777)}',
+    '@media(max-width:420px){.tk-chon{grid-template-columns:1fr}}'
   ].join('');
 
   var HS_TRUONG = [
@@ -112,7 +122,7 @@
     ['ghi_chu', 'Ghi chú vận hành khác', 'VD: 2 video/tuần, đăng 12h–13h và 16h–20h, gắn location tag', 0]
   ];
 
-  var hop = null, oTrang = null, tab = 'signup', dsHv = null;
+  var hop = null, oTrang = null, tab = 'signup', kieu = 'khach', dsHv = null;
 
   function dung() {
     if (hop) return hop;
@@ -120,18 +130,20 @@
     hop = document.createElement('div'); hop.className = 'tk-nen'; hop.setAttribute('role', 'dialog'); hop.setAttribute('aria-modal', 'true');
     hop.innerHTML = '<div class="tk-hop" id="tkHop"></div>';
     hop.addEventListener('click', function (e) { if (e.target === hop) dong(); });
+    // form đăng ký học viên (landing ?embed=dangky) báo đóng khi người dùng bấm X hoặc xong việc
+    window.addEventListener('message', function (e) { if (e.data && e.data.tmxk === 'close' && kieu === 'hv') dong(); });
     document.body.appendChild(hop);
     oTrang = hop.querySelector('#tkHop');
     return hop;
   }
   function mo(trang, loiNhan) { dung(); ve(trang || (TK.me ? 'home' : 'signup'), loiNhan); hop.classList.add('mo'); }
-  function dong() { if (hop) hop.classList.remove('mo'); }
+  function dong() { if (hop) { hop.classList.remove('mo'); var f = hop.querySelector('.tk-khung iframe'); if (f) f.src = 'about:blank'; } }
 
   function el(t, c, txt) { var e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; }
   function nut(nhan, chinh) { var b = el('button', 'tk-nut' + (chinh ? ' chinh' : ''), nhan); b.type = 'button'; return b; }
 
   function ve(trang, loiNhan) {
-    dung(); oTrang.innerHTML = '';
+    dung(); oTrang.innerHTML = ''; oTrang.classList.toggle('rong', trang === 'signup' && tab === 'signup' && kieu === 'hv' && !TK.me);
     var x = el('button', 'tk-dong', '✕'); x.type = 'button'; x.setAttribute('aria-label', 'Đóng'); x.onclick = dong; oTrang.appendChild(x);
     if (trang === 'hoso') return veHoSo();
     if (trang === 'hv') return veDsHv();
@@ -141,8 +153,9 @@
 
   /* ── đăng ký / đăng nhập ── */
   function veDangKy(loiNhan) {
-    oTrang.appendChild(el('h3', null, tab === 'login' ? 'Đăng nhập' : 'Tạo tài khoản miễn phí'));
-    if (loiNhan) oTrang.appendChild(el('p', 'tk-phu', loiNhan));
+    var hv = tab === 'signup' && kieu === 'hv';
+    oTrang.appendChild(el('h3', null, tab === 'login' ? 'Đăng nhập' : (hv ? 'Đăng ký học viên' : 'Tạo tài khoản miễn phí')));
+    if (loiNhan && !hv) oTrang.appendChild(el('p', 'tk-phu', loiNhan));
 
     var tabs = el('div', 'tk-tab');
     [['signup', 'Tạo tài khoản'], ['login', 'Đăng nhập']].forEach(function (p) {
@@ -151,6 +164,20 @@
       tabs.appendChild(b);
     });
     oTrang.appendChild(tabs);
+
+    if (tab === 'signup') {
+      // chọn ngay trong bảng: dùng thử tool như khách, hay đăng ký học viên khoá
+      var chon = el('div', 'tk-chon');
+      [['khach', '🙋 Khách', 'Tạo tài khoản 30 giây, dùng thử AI miễn phí'],
+       ['hv', '🎓 Học viên khoá', 'Đăng ký học Tự Mình Xây Kênh, được duyệt là dùng tool không giới hạn']].forEach(function (p) {
+        var b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-pressed', String(kieu === p[0]));
+        b.appendChild(el('b', null, p[1])); b.appendChild(el('small', null, p[2]));
+        b.onclick = function () { if (kieu !== p[0]) { kieu = p[0]; ve('signup', loiNhan); } };
+        chon.appendChild(b);
+      });
+      oTrang.appendChild(chon);
+    }
+    if (hv) return veFormHocVien();
 
     if (tab === 'signup') {
       var qua = el('div', 'tk-qua');
@@ -201,6 +228,24 @@
     };
     oTrang.appendChild(f);
     if (tab === 'signup') oTrang.appendChild(el('p', 'tk-phu', 'Học viên Tự Mình Xây Kênh đăng nhập bằng tài khoản khu học viên ở tab Đăng nhập, hồ sơ kênh đã có sẵn.'));
+  }
+
+  /* ── đăng ký học viên: form chi tiết của landing, mở ngay trong bảng ── */
+  function veFormHocVien() {
+    oTrang.appendChild(el('p', 'tk-phu', 'Giữ chỗ chưa mất phí, tụi mình gọi tư vấn trong 24 giờ. Được duyệt là dùng cả ba tool không giới hạn.'));
+    var k = el('div', 'tk-khung'), cho = el('div', 'tk-cho', 'Đang mở form đăng ký…');
+    var f = document.createElement('iframe');
+    f.title = 'Form đăng ký học viên Tự Mình Xây Kênh';
+    // form nhúng tự đặt con trỏ vào ô đầu tiên làm bảng cuộn khuất tiêu đề: kéo về đầu
+    function veDau() { oTrang.scrollTop = 0; hop.scrollTop = 0; }
+    f.addEventListener('load', function () { cho.remove(); veDau(); setTimeout(veDau, 120); setTimeout(veDau, 400); });
+    f.src = '../index.html?embed=dangky';
+    k.appendChild(cho); k.appendChild(f); oTrang.appendChild(k);
+    var p = el('p', 'tk-phu'); p.style.margin = '10px 0 0';
+    p.appendChild(document.createTextNode('Đã là học viên? '));
+    var a = document.createElement('a'); a.href = '#'; a.textContent = 'Đăng nhập bằng tài khoản khu học viên';
+    a.onclick = function (e) { e.preventDefault(); tab = 'login'; kieu = 'khach'; ve('signup'); };
+    p.appendChild(a); oTrang.appendChild(p);
   }
 
   /* ── trang chính của tài khoản ── */
@@ -417,6 +462,7 @@
 
   global.TK = {
     khoiDong: khoiDong, nap: nap, mo: mo, dong: dong, canCo: canCo,
+    moHocVien: function () { tab = 'signup'; kieu = 'hv'; mo('signup'); },
     token: token, dev: dev, hoSo: hoSo, luuHoSoTam: luuHoSoTam,
     laPro: laPro, laMentor: laMentor, luotCon: luotCon, oMoiHoSo: oMoiHoSo,
     get me() { return TK.me; }, get vai() { return TK.vaiHoSo; },
