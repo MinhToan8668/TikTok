@@ -147,9 +147,12 @@
 
   var hop = null, oTrang = null, tab = 'signup', kieu = 'khach', dsHv = null;
 
+  // nạp CSS một lần, dùng cho cả bảng tài khoản lẫn ô hồ sơ gắn sẵn trong trang tool
+  var daCss = false;
+  function napCss() { if (daCss) return; daCss = true; var st = document.createElement('style'); st.textContent = CSS; document.head.appendChild(st); }
   function dung() {
     if (hop) return hop;
-    var st = document.createElement('style'); st.textContent = CSS; document.head.appendChild(st);
+    napCss();
     hop = document.createElement('div'); hop.className = 'tk-nen'; hop.setAttribute('role', 'dialog'); hop.setAttribute('aria-modal', 'true');
     hop.innerHTML = '<div class="tk-hop" id="tkHop"></div>';
     hop.addEventListener('click', function (e) { if (e.target === hop) dong(); });
@@ -564,6 +567,7 @@
   /* Ô gắn vào cuối phần 1 của tool: dòng trạng thái + những mục hồ sơ mà tool chưa có ô sẵn. */
   function oMoiHoSo(dich, bo) {
     if (!dich) return;
+    napCss();
     var v = el('div', 'tk-moi'); v.id = 'tkMoiHoSo';
     bo = bo || [];
     function ve2() {
