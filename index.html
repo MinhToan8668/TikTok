@@ -976,6 +976,15 @@ body.hv-mode{padding-bottom:0}
 .hs-ls div{border-bottom:1px solid var(--line);padding:3px 0}
 .hs-ls .gio{color:var(--faint);font-variant-numeric:tabular-nums;margin-right:6px}
 /* hồ sơ kênh của chính học viên trong khu học viên */
+.hv-tools{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.hv-tools a{display:grid;gap:5px;align-content:start;text-decoration:none;
+  background:rgba(255,255,255,.06);border:1px solid var(--moss-line);border-radius:var(--r-sm);
+  padding:14px 15px;transition:.18s}
+.hv-tools a:hover{background:rgba(255,255,255,.12);transform:translateY(-2px)}
+.hv-tools b{font-size:14.5px;color:var(--paper-lt);font-weight:800}
+.hv-tools span{font-size:13px;line-height:1.55;color:#c8cfb4}
+.hv-tools em{font-style:normal;font-size:12.5px;font-weight:700;color:var(--lime);margin-top:3px}
+@media(max-width:760px){.hv-tools{grid-template-columns:1fr}}
 .hv-hoso{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r);
   padding:clamp(18px,3vw,24px);margin-bottom:22px}
 .hv-hoso h3{font-family:var(--disp);font-size:17px;font-weight:800;color:var(--ink);margin-bottom:6px}
@@ -1955,14 +1964,28 @@ body.hv-mode{padding-bottom:0}
 
       <div class="hv-cua-toi" id="hvTools">
         <h3>🧰 Viral Studio · bản Pro của bạn</h3>
-        <p style="margin:6px 0 10px">Đặt chữ hook lên frame video theo 14 bố cục, AI chấm hook và viết lại 5 bản, xuất PNG sạch kéo thẳng vào CapCut. Đăng nhập ở đây rồi thì bên tool tự nhận Pro.</p>
-        <a class="hv-nut" href="tools/hook-text.html" target="_blank" rel="noopener">Mở Viral Studio ↗</a>
+        <p style="margin:6px 0 14px">Đăng nhập ở khu học viên rồi thì cả ba tool tự nhận Pro, không phải đăng nhập lại. Hồ sơ kênh bên tab Hồ sơ kênh cũng được ba tool dùng chung để góp ý đúng kênh bạn.</p>
+        <div class="hv-tools">
+          <a href="tools/kich-ban.html" target="_blank" rel="noopener">
+            <b>📝 Kịch bản viral</b>
+            <span>Viết kịch bản theo khung kể chuyện, AI chấm từng câu, canh giờ từng phần và gợi ý cảnh quay.</span>
+            <em>Mở tool ↗</em></a>
+          <a href="tools/hook-text.html" target="_blank" rel="noopener">
+            <b>✍️ Hook viral</b>
+            <span>Đặt chữ hook lên frame video theo 14 bố cục, AI chấm hook và viết lại 5 bản, xuất PNG sạch kéo thẳng vào CapCut.</span>
+            <em>Mở tool ↗</em></a>
+          <a href="tools/soi-video.html" target="_blank" rel="noopener">
+            <b>🔎 Soi video viral</b>
+            <span>Dán link video đang lên, AI tải về nghe và bóc lời thoại theo giây, mổ ba cửa rồi rút khuôn áp sang kênh bạn.</span>
+            <em>Mở tool ↗</em></a>
+        </div>
       </div>
 
       <div class="hv-chedo" id="hvCheDo" style="display:none">
         <button id="hvTabToi" class="on">Lịch của tôi</button>
         <button id="hvTabTQ">Tổng quan lớp</button>
         <button id="hvTabHS">Học viên</button>
+        <button id="hvTabVS">Viral Studio</button>
         <button id="hvTabHoSo">Hồ sơ kênh</button>
       </div>
 
@@ -3274,7 +3297,7 @@ function hvVaoTrong(){
   $('#hvTabTQ').style.display = m ? '' : 'none';
   $('#hvTabHS').style.display = m ? '' : 'none';
   $('#hvCheDo').style.display = 'inline-flex';
-  if (!m && HV.cheDo !== 'hoso') hvDoiCheDo('toi');
+  if (!HV.cheDo || HV.cheDo === 'toi') hvDoiCheDo('toi');
 }
 
 /* ---- mentor: đổi giữa lịch của tôi và tổng quan lớp ---- */
@@ -3284,11 +3307,14 @@ function hvDoiCheDo(che){
   $('#hvTabTQ').classList.toggle('on',  che === 'tq');
   $('#hvTabHS').classList.toggle('on',  che === 'hs');
   $('#hvTabHoSo').classList.toggle('on', che === 'hoso');
-  var m = laMentor(), tq = che === 'tq', hs = che === 'hs', ho = che === 'hoso';
+  $('#hvTabVS').classList.toggle('on', che === 'vs');
+  var m = laMentor(), tq = che === 'tq', hs = che === 'hs', ho = che === 'hoso', vs = che === 'vs';
 
-  $('#hvTieuDe').textContent = ho ? 'Hồ sơ kênh của bạn'
+  $('#hvTieuDe').textContent = vs ? 'Viral Studio' : ho ? 'Hồ sơ kênh của bạn'
     : hs ? 'Học viên' : tq ? 'Tổng quan lớp' : m ? 'Lịch rảnh của bạn' : 'Đặt lịch kèm 1:1';
-  $('#hvMoTa').textContent = ho
+  $('#hvMoTa').textContent = vs
+    ? 'Ba tool AI đi kèm khoá học. Đăng nhập ở đây rồi thì bên tool tự nhận Pro, không phải đăng nhập lại.'
+    : ho
     ? 'Ba tool bên Viral Studio đọc hồ sơ này để chấm đúng kênh bạn. Sửa ô nào là tự lưu, không cần bấm nút.'
     : hs
     ? 'Hồ sơ kênh và lịch sử dùng AI của từng người — cả học viên đã có tài khoản Viral Studio lẫn người mới điền form đăng ký khoá.'
@@ -3299,11 +3325,11 @@ function hvDoiCheDo(che){
     : 'Chọn một ca trống là xong — mentor nhận thông báo ngay. Bận thì bấm lại đúng ca đó để huỷ, ca sẽ mở lại cho bạn khác.';
 
   // mỗi tab một màn riêng, không chồng lên nhau
-  var anLich = hs || ho;
+  var anLich = hs || ho || vs;
   ['#hvTuanHang','#hvMineBox','#hvHan','#hvNgays','#hvLuu','#hvChu','#hvTQ'].forEach(function(q){
     var e = document.querySelector(q); if (e && anLich) e.style.display = 'none';
   });
-  $('#hvTools').style.display = anLich ? 'none' : '';
+  $('#hvTools').style.display = vs ? '' : 'none';
   $('#hvHS').style.display = hs ? '' : 'none';
   $('#hvHoSo').style.display = ho ? '' : 'none';
   if (hs) hvTaiHocVien();
@@ -3589,8 +3615,8 @@ function hvDangNhap(){
 /* ---- tải lịch tuần ---- */
 function hvTai(tuan){
   if (HV.vaitro === 'pro') return;         // tài khoản Pro không có lịch
-  if (HV.cheDo === 'hs' || HV.cheDo === 'hoso') return;   // đang ở tab khác, không đụng tới lịch
-  $('#hvHS').style.display = 'none'; $('#hvHoSo').style.display = 'none';
+  if (HV.cheDo === 'hs' || HV.cheDo === 'hoso' || HV.cheDo === 'vs') return;   // đang ở tab khác
+  $('#hvHS').style.display = 'none'; $('#hvHoSo').style.display = 'none'; $('#hvTools').style.display = 'none';
   ['#hvTuanHang','#hvNgays'].forEach(function(q){ var e = document.querySelector(q); if (e) e.style.display = ''; });
   hvBoCho();
   if (laMentor() && HV.cheDo === 'tq') return hvTaiTongQuan(tuan);
@@ -4103,6 +4129,7 @@ function initHV(){
   $('#hvTabTQ').addEventListener('click',  function(){ hvDoiCheDo('tq');  hvTai(HV.tuan) });
   $('#hvTabHS').addEventListener('click',  function(){ hvDoiCheDo('hs'); });
   $('#hvTabHoSo').addEventListener('click', function(){ hvDoiCheDo('hoso'); });
+  $('#hvTabVS').addEventListener('click',   function(){ hvDoiCheDo('vs'); });
   $('#hvTruoc').addEventListener('click', function(){ hvTai(hvCong(HV.tuan,-7)) });
   $('#hvSau').addEventListener('click',   function(){ hvTai(hvCong(HV.tuan, 7)) });
 
