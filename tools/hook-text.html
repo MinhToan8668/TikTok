@@ -408,9 +408,15 @@
   .tmxk-logo{width:38px;height:38px;flex:none}
   .tmxk-logo .ink{fill:var(--text)}
   .brand p{font-size:12px}
-  .feat-tabs{display:flex;gap:6px;margin:-6px 0 14px;overflow-x:auto;scrollbar-width:none}
-  .ft{flex:none;border-radius:999px;padding:6px 14px;font-size:13px;font-weight:700;text-decoration:none;border:1px solid var(--line);color:var(--muted);background:var(--surface)}
-  .ft.on{background:var(--text);color:var(--surface);border-color:var(--text)}
+  .feat-tabs{display:flex;gap:10px;margin:-2px 0 18px;padding:4px 2px 8px;overflow-x:auto;scrollbar-width:none}
+  .ft{flex:none;display:inline-flex;align-items:center;gap:8px;border-radius:14px;padding:11px 18px;font-size:15px;font-weight:800;letter-spacing:-.01em;text-decoration:none;border:2px solid var(--text);color:var(--text);background:var(--surface);box-shadow:0 4px 0 var(--text);transition:transform .15s,box-shadow .15s}
+  .ft .fi{font-size:17px;line-height:1}
+  .ft:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--text)}
+  .ft.on{background:var(--text);color:#99DF00;transform:translateY(2px);box-shadow:0 2px 0 var(--text)}
+  :root[data-theme="dark"] .ft{border-color:#99DF00;box-shadow:0 4px 0 #99DF00}
+  :root[data-theme="dark"] .ft.on{background:#99DF00;color:#0B0C08;box-shadow:0 2px 0 #5F8C00}
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .ft{border-color:#99DF00;box-shadow:0 4px 0 #99DF00} :root:not([data-theme="light"]) .ft.on{background:#99DF00;color:#0B0C08;box-shadow:0 2px 0 #5F8C00}}
+  @media (max-width:520px){.feat-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;overflow:visible}.ft{flex-direction:column;justify-content:center;gap:4px;padding:9px 6px;font-size:13px;text-align:center;line-height:1.2}.ft .fi{font-size:19px}}
   .ft.soon{border-style:dashed;font-weight:600}
   .img-btn{position:relative;display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-weight:700}
   .img-btn input{position:absolute;opacity:0;width:1px;height:1px}
@@ -494,9 +500,9 @@
   </header>
 
   <nav class="feat-tabs" aria-label="Công cụ trong Viral Studio">
-    <a class="ft" href="kich-ban.html">Kịch bản viral</a>
-    <a class="ft on" href="#" aria-current="page">Hook viral</a>
-    <a class="ft" href="soi-video.html">Soi video viral</a>
+    <a class="ft" href="kich-ban.html"><span class="fi" aria-hidden="true">📝</span>Kịch bản viral</a>
+    <a class="ft on" href="#" aria-current="page"><span class="fi" aria-hidden="true">⚡</span>Hook viral</a>
+    <a class="ft" href="soi-video.html"><span class="fi" aria-hidden="true">🎬</span>Soi video viral</a>
   </nav>
 
   <div class="grid">
