@@ -724,6 +724,7 @@ $('#loiThoai').addEventListener('input', () => { if (!state.file && !state.link.
 $('#frameFile').addEventListener('change', async e => { const f = e.target.files && e.target.files[0]; if (!f) return; try { state.image = await fileToJpeg(f); state.imageFrom = 'file'; syncFrameUI(); if (!$('#vidprev').hidden) showPrev(); toast('Đã thêm ảnh'); } catch { toast('Không đọc được ảnh'); } e.target.value = ''; });
 $('#frameClear').addEventListener('click', () => { state.image = ''; state.imageFrom = ''; syncFrameUI(); if (!$('#vidprev').hidden) showPrev(); });
 $('#acctBtn').addEventListener('click', () => TK.mo());
+TK.ganO({ nganh: '#chuDe', doi_tuong: '#doiTuong', san_pham: '#sanPham' });
 TK.oMoiHoSo($('#chuDe').closest('section'));
 $('#btnSoi').addEventListener('click', soi);
 $('#btnClear').addEventListener('click', () => { if (state.kq && !$('#kqBody').hidden === false) {} if (!$('#grid').classList.contains('has-kq') && !confirm('Xoá hết thông tin video đang điền?')) return; xoaKq(); ['link', 'loiThoai', 'giay', 'chuManHinh', 'binhLuan', 'nView', 'nLike', 'nCmt', 'nLuu', 'nShare'].forEach(id => $('#' + id).value = ''); state.image = ''; state.imageFrom = ''; state.link = { tac_gia: '', caption: '', video: false, giay: 0 }; state.file = null; state.tuVideo = true; state.kq = null; $('#vidprev').hidden = true; $('#linkStatus').textContent = ''; syncFrameUI(); updateCount(); updateRatios(); updateSrc(); saveDraft(); $('#kqBody').hidden = true; $('#kqEmpty').hidden = false; });

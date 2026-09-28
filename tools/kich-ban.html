@@ -167,8 +167,8 @@
   <div class="grid">
     <div class="col">
       <section class="card">
-        <h2>1 · Video này nói với ai, để làm gì</h2>
-        <p class="hint">AI chấm theo đúng tệp và mục tiêu bạn chọn. Điền càng thật, góp ý càng trúng.</p>
+        <h2>1 · Hồ sơ kênh của bạn</h2>
+        <p class="hint">AI chấm theo đúng kênh bạn thay vì nói chung chung. Điền càng thật, góp ý càng trúng. Học viên đăng nhập là mấy ô này tự có sẵn.</p>
         <div class="two">
           <div><label class="lbl" for="chuDe">Chủ đề / ngách của kênh</label><input type="text" id="chuDe" placeholder="VD: nấu ăn cho mẹ bỉm đi làm, kinh nghiệm đi làm ngân hàng, quán bún nhà mình"></div>
           <div><label class="lbl" for="doiTuong">Người xem là ai (càng cụ thể càng tốt)</label><input type="text" id="doiTuong" placeholder="VD: mẹ 25–35 tuổi nuôi con dưới 3 tuổi, đi làm văn phòng, tối vẫn phải nấu"></div>
@@ -519,8 +519,9 @@ applyTheme(ls.get('hook.theme'));
 $('#themeBtn').addEventListener('click', () => { const dark = document.documentElement.dataset.theme ? document.documentElement.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; const t = dark ? 'light' : 'dark'; applyTheme(t); ls.set('hook.theme', t); });
 (function restore() { try { const d = JSON.parse(ls.get('kb.draft') || '{}'); if (d.chuDe) $('#chuDe').value = d.chuDe; if (d.doiTuong) $('#doiTuong').value = d.doiTuong; if (d.xungHo) $('#xungHo').value = d.xungHo; if (d.sanPham) $('#sanPham').value = d.sanPham; } catch {} })();
 setSeg('mucTieu', state.mucTieu); setSeg('dang', state.dang); setSeg('tocDo', state.tocDo);
-bindSeg('mucTieu', v => { state.mucTieu = v; buildPhan(); saveDraft(); });
-bindSeg('dang', v => { state.dang = v; saveDraft(); });
+const nhanSeg = (id, v) => ([...document.querySelectorAll('#' + id + ' button')].find(b => b.dataset.v === v) || {}).textContent || '';
+bindSeg('mucTieu', v => { state.mucTieu = v; hsDien.mucTieu = v; buildPhan(); saveDraft(); TK.ghiTruong('muc_tieu', nhanSeg('mucTieu', v)); });
+bindSeg('dang', v => { state.dang = v; hsDien.dang = v; saveDraft(); TK.ghiTruong('dang', nhanSeg('dang', v)); });
 bindSeg('tocDo', v => { state.tocDo = v; updateTimes(); saveDraft(); });
 ['chuDe', 'doiTuong', 'xungHo', 'sanPham'].forEach(id => $('#' + id).addEventListener('input', saveDraft));
 (function importSoi() { try { const im = JSON.parse(ls.get('kb.import') || 'null'); if (!im || !im.khung) return; ls.del ? ls.del('kb.import') : localStorage.removeItem('kb.import'); const K = KHUNG.find(x => x.k === im.khung); if (!K) return; state.khung = K.k; state.text[K.k] = {}; state.canh[K.k] = {}; (im.phan || []).forEach((g, i) => { if (K.phan[i] && g) state.text[K.k][K.phan[i][0]] = String(g).replace(/\*\*/g, ''); }); (im.canh || []).forEach((c, i) => { if (K.phan[i] && c) state.canh[K.k][K.phan[i][0]] = c; }); try { localStorage.removeItem('kb.kq'); } catch {} if (im.chuDe) $('#chuDe').value = im.chuDe; if (im.doiTuong) $('#doiTuong').value = im.doiTuong; if (im.sanPham) $('#sanPham').value = im.sanPham; state.kq = null; saveDraft(); setTimeout(() => toast('Đã nhập khung' + (im.nguon ? ' mượn từ ' + im.nguon : '') + '. Gợi ý trong [ ] là chỗ bạn thay bằng chuyện thật của mình.'), 400); } catch {} })();
@@ -528,7 +529,8 @@ buildKhung(); buildPhan();
 (function moLaiKq() { try { const o = JSON.parse(ls.get('kb.kq') || 'null'); if (o && o.d && o.d.score && o.khung === state.khung) { state.kq = o.d; renderKq(o.d, o.parts || goiKichBan()); updateTimes(); } } catch {} })();
 $('#acctBtn').addEventListener('click', () => TK.mo());
 $('#xungHo').addEventListener('change', e => { e.target.dataset.nguoiChon = '1'; });
-TK.oMoiHoSo($('#chuDe').closest('section'));
+TK.ganO({ nganh: '#chuDe', doi_tuong: '#doiTuong', san_pham: '#sanPham', xung_ho: '#xungHo' });
+TK.oMoiHoSo($('#chuDe').closest('section'), ['muc_tieu', 'dang']);   // hai mục này đã có nút chọn ở trên
 $('#btnCham').addEventListener('click', cham);
 $('#btnCopy').addEventListener('click', () => { const K = khungHienTai(); copyText(goiKichBan().filter(p => p.text).map(p => `[${p.ten}]\n${p.text}`).join('\n\n')); });
 $('#btnClear').addEventListener('click', () => { if (!confirm('Xoá hết chữ trong các phần của khung này?')) return; state.text[state.khung] = {}; state.canh[state.khung] = {}; state.kq = null; try { localStorage.removeItem('kb.kq'); } catch {} buildPhan(); saveDraft(); $('#kqBody').hidden = true; $('#kqEmpty').hidden = false; });

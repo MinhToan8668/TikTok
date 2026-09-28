@@ -91,6 +91,14 @@
     '.tk-moi{border:1px dashed var(--line-strong,#bbb);border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.55;margin-top:10px}',
     '.tk-moi b{display:block;margin-bottom:2px}',
     '.tk-moi button{margin-top:8px}',
+    '.tk-hs-dau{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px}',
+    '.tk-hs-dau b{display:block;width:100%;margin:0}',
+    '.tk-hs-dau .tk-phu{margin:0;flex:1 1 220px}',
+    '.tk-hs-dau button{margin-top:0}',
+    '.tk-hs-luoi{display:grid;grid-template-columns:1fr 1fr;gap:2px 14px;margin-top:6px}',
+    '.tk-hs-rong{grid-column:1/-1}',
+    '.tk-hs-bao{margin:8px 0 0;font-size:12px;color:var(--muted,#777)}',
+    '@media(max-width:700px){.tk-hs-luoi{grid-template-columns:1fr}}',
     '.tk-dong{border:0;background:none;font-size:18px;line-height:1;cursor:pointer;color:var(--muted,#777);float:right;padding:0 0 0 8px}',
     '.tk-chon{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 12px}',
     '.tk-chon button{font:inherit;text-align:left;border:1.5px solid var(--line,#ddd);background:var(--surface-2,#f7f7f7);color:var(--text,#222);border-radius:12px;padding:10px 12px;cursor:pointer;display:grid;gap:2px}',
@@ -105,22 +113,23 @@
   ].join('');
 
   var HS_TRUONG = [
-    ['kenh', 'Tên kênh', 'VD: Spa Từ Sơn, Bắc Ninh', 0],
-    ['nganh', 'Ngách của kênh', 'VD: Spa chăm sóc mụn và sắc tố da tại Từ Sơn', 1],
-    ['doi_tuong', 'Nói với ai', 'VD: Phụ nữ 25–45 trong bán kính 20km quanh Từ Sơn', 1],
-    ['dinh_vi', 'Định vị, điều khiến bạn khác người ta', 'VD: Cô chủ spa người Đà Nẵng mở tiệm ở Bắc Ninh, giữ nguyên giọng Đà Nẵng', 1],
-    ['muc_tieu', 'Mục tiêu thật của kênh', 'VD: Khách bước vào tiệm, không đuổi view toàn quốc', 0],
-    ['xung_ho', 'Xưng hô, giọng kênh', 'VD: mình – các chị', 0],
-    ['dang', 'Định dạng video hay quay', 'VD: Vlog trong tiệm lồng tiếng 60%, POV nói về dịch vụ 40%', 0],
-    ['do_dai', 'Độ dài video', 'VD: 45–60 giây', 0],
-    ['text_batbuoc', 'Chữ bắt buộc trên màn hình', 'VD: Ít nhất một dòng phải có chữ Từ Sơn - Bắc Ninh', 0],
-    ['nhac', 'Nhạc hay dùng', 'VD: Nhạc trend nhẹ, ưu tiên Hoà Minzy', 0],
-    ['hashtag', 'Caption và hashtag', 'VD: #tuson + 3 hashtag ngành, không nhồi thêm', 0],
-    ['khong_lam', 'Tuyệt đối KHÔNG làm', 'VD: Không hứa kết quả, không dùng chữ điều trị, không bật filter làm đẹp', 1],
-    ['pillar', 'Cấu trúc pillar', 'VD: Hành trình mở tiệm 70%, da thật ca thật 30%', 0],
-    ['san_pham', 'Sản phẩm hoặc dịch vụ', 'VD: Chăm sóc da, nặn mụn, xử lý sắc tố', 0],
-    ['ghi_chu', 'Ghi chú vận hành khác', 'VD: 2 video/tuần, đăng 12h–13h và 16h–20h, gắn location tag', 0]
+    ['kenh', 'Tên kênh', 'VD: Bếp nhà Mi · Thợ điện Sài Gòn · Cô giáo IELTS 7.5', 0],
+    ['nganh', 'Ngách của kênh', 'VD: cơm nhà cho mẹ bỉm · sửa xe máy · luyện thi IELTS · môi giới đất nền Long An', 1],
+    ['doi_tuong', 'Nói với ai', 'VD: mẹ 25–35 đi làm văn phòng · thợ mới vào nghề · sinh viên năm cuối · người mua nhà lần đầu', 1],
+    ['dinh_vi', 'Điều khiến bạn khác người ta', 'VD: 10 năm trong nghề nhưng nói tiếng người thường · bỏ phố về quê làm lại · người từng ngồi đúng chỗ khách đang ngồi', 1],
+    ['muc_tieu', 'Mục tiêu thật của kênh', 'VD: khách nhắn tin đặt lịch · kéo người mới biết tới kênh · bán khoá học · tuyển thợ', 0],
+    ['xung_ho', 'Xưng hô, giọng kênh', 'VD: mình – mấy bạn · em – anh chị · tui – mấy sốp · tôi – các bạn', 0],
+    ['dang', 'Định dạng video hay quay', 'VD: nói vào camera 70%, POV một ngày đi làm 30% · vlog lồng tiếng · chữ chạy không lộ mặt', 0],
+    ['do_dai', 'Độ dài video', 'VD: 30–45 giây · 45–60 giây · trên 1 phút', 0],
+    ['text_batbuoc', 'Chữ bắt buộc trên màn hình', 'VD: mỗi video phải có tên khu vực · luôn hiện giá · hook lặp lại ở giây đầu', 0],
+    ['nhac', 'Nhạc hay dùng', 'VD: nhạc trend nhẹ · piano mộc 15% · không dùng nhạc buồn', 0],
+    ['hashtag', 'Caption và hashtag', 'VD: một câu chốt + 4–5 hashtag, có hashtag khu vực và hashtag ngành', 0],
+    ['khong_lam', 'Tuyệt đối KHÔNG làm', 'VD: không hứa kết quả · không nêu tên công ty đang làm · không bàn chính trị · không so sánh với đối thủ', 1],
+    ['pillar', 'Cấu trúc pillar', 'VD: chuyện nghề 50%, hướng dẫn 30%, hậu trường 20%', 0],
+    ['san_pham', 'Sản phẩm hoặc dịch vụ', 'VD: khoá học 540k · set hải sản 1tr2 · dịch vụ sửa chữa tại nhà · nhận tư vấn hồ sơ', 0],
+    ['ghi_chu', 'Ghi chú vận hành khác', 'VD: 2 video/tuần, đăng 20h–22h · quay bằng điện thoại, ánh sáng cửa sổ · không lộ mặt con', 0]
   ];
+
 
   var hop = null, oTrang = null, tab = 'signup', kieu = 'khach', dsHv = null;
 
@@ -489,28 +498,84 @@
     return true;
   }
 
-  /* ── ô mời điền hồ sơ, gắn vào form của tool ── */
-  function oMoiHoSo(dich) {
+  /* ── hồ sơ kênh gắn THẲNG vào form của tool ──
+     Tool đăng ký mấy ô nó đã có sẵn (ngách, tệp, xưng hô…) bằng ganO, phần hồ sơ còn lại
+     được vẽ ngay bên dưới. Sửa ô nào là hồ sơ tự lưu, cả ba tool dùng chung, khỏi mở hộp thoại. */
+  var oGan = {}, hsSua = {}, luuHen = null, oBao = null;
+
+  function ganO(map) {
+    Object.keys(map).forEach(function (k) {
+      var e = typeof map[k] === 'string' ? document.querySelector(map[k]) : map[k];
+      if (!e) return;
+      oGan[k] = e;
+      var f = function () { ghiTruong(k, e.value); };
+      e.addEventListener('change', f); e.addEventListener('blur', f);
+    });
+  }
+  function ghiTruong(k, v) {
+    v = String(v == null ? '' : v).trim();
+    if ((hoSo()[k] || '') === v) return;
+    hsSua[k] = v; henLuu();
+  }
+  function henLuu() {
+    if (!Object.keys(hsSua).length) return;
+    if (TK.vaiHoSo) { hsSua = {}; return; }        // mentor đang chạy thử: không ghi đè hồ sơ học viên
+    if (!TK.me) { nhac('Tạo tài khoản để giữ lại hồ sơ này'); return; }
+    clearTimeout(luuHen);
+    luuHen = setTimeout(async function () {
+      var m = {}, cu = hoSo();
+      Object.keys(cu).forEach(function (k) { m[k] = cu[k]; });
+      Object.keys(hsSua).forEach(function (k) { if (hsSua[k]) m[k] = hsSua[k]; else delete m[k]; });
+      hsSua = {};
+      nhac('Đang lưu hồ sơ…');
+      try { nhac(await luuHoSo(m) ? '✓ Đã lưu vào hồ sơ kênh' : 'Chưa lưu được, thử lại'); }
+      catch (e) { nhac('Không kết nối được máy chủ'); }
+    }, 900);
+  }
+  function nhac(t) { if (oBao) { oBao.textContent = t; oBao.hidden = !t; } }
+
+  /* Ô gắn vào cuối phần 1 của tool: dòng trạng thái + những mục hồ sơ mà tool chưa có ô sẵn. */
+  function oMoiHoSo(dich, bo) {
     if (!dich) return;
     var v = el('div', 'tk-moi'); v.id = 'tkMoiHoSo';
+    bo = bo || [];
     function ve2() {
       v.innerHTML = '';
-      var hs = hoSo(), co = Object.keys(hs).length;
-      if (TK.vaiHoSo) {
-        v.appendChild(el('b', null, '🎓 Đang chạy thử bằng hồ sơ của ' + TK.vaiHoSo.ten));
-        v.appendChild(document.createTextNode('Mấy ô bên trên đã điền theo kênh của học viên này. Quay về hồ sơ của bạn trong mục Tài khoản.'));
-        return;
-      }
-      if (co) {
-        var ng = TK.me && TK.me.ho_so_nguon === 'form_dang_ky' ? ' · lấy từ form đăng ký khoá của bạn' : '';
-        v.appendChild(el('b', null, '📋 Đang cá nhân hoá theo kênh của bạn' + (hs.nganh ? ': ' + hs.nganh : '') + ng));
-        v.appendChild(document.createTextNode('AI chấm theo đúng ngách, tệp, xưng hô và mấy điều kênh bạn không được nói.'));
-        var b1 = nut('Sửa hồ sơ kênh'); b1.onclick = function () { mo('hoso'); }; v.appendChild(b1);
-      } else {
+      var hs = hoSo();
+
+      if (!TK.me) {
         v.appendChild(el('b', null, '📋 Bạn là học viên? Hồ sơ kênh của bạn sẽ được điền sẵn ở đây'));
         v.appendChild(document.createTextNode('Điền một lần ngách, tệp, xưng hô và điều cấm của kênh, cả ba tool sẽ góp ý đúng kênh bạn thay vì nói chung chung. Học viên khoá Tự Mình Xây Kênh đã được mentor chốt sẵn, chỉ cần đăng nhập.'));
-        var b2 = nut(TK.me ? 'Điền hồ sơ kênh' : 'Tạo tài khoản, điền hồ sơ', true); b2.onclick = function () { mo(TK.me ? 'hoso' : 'signup'); }; v.appendChild(b2);
+        var b2 = nut('Tạo tài khoản, lưu hồ sơ', true); b2.onclick = function () { mo('signup'); }; v.appendChild(b2);
+        return;
       }
+
+      var d = el('div', 'tk-hs-dau');
+      if (TK.vaiHoSo) {
+        d.appendChild(el('b', null, '🎓 Đang chạy thử bằng hồ sơ của ' + TK.vaiHoSo.ten));
+        d.appendChild(el('span', 'tk-phu', 'Sửa ở đây không ảnh hưởng hồ sơ của học viên.'));
+        var b0 = nut('Về hồ sơ của mình'); b0.onclick = function () { TK.vaiHoSo = null; bao(); }; d.appendChild(b0);
+      } else {
+        d.appendChild(el('b', null, '📋 Đây là hồ sơ kênh của bạn' + (hs.nganh ? ' · ' + hs.nganh : '')));
+        d.appendChild(el('span', 'tk-phu', 'Sửa ô nào là hồ sơ tự lưu, cả ba tool dùng chung. Không phải mở bảng nào khác.'));
+        if (laMentor()) { var bm = nut('Chạy thử bằng hồ sơ học viên'); bm.onclick = function () { mo('hv'); }; d.appendChild(bm); }
+      }
+      v.appendChild(d);
+
+      var luoi = el('div', 'tk-hs-luoi');
+      HS_TRUONG.forEach(function (t) {
+        if (bo.indexOf(t[0]) > -1 || oGan[t[0]]) return;         // tool đã có ô riêng cho mục này
+        var w = el('div', t[3] ? 'tk-hs-rong' : null);
+        var l = el('label', 'lbl', t[1]); l.htmlFor = 'tkhs_' + t[0];
+        var i = document.createElement(t[3] ? 'textarea' : 'input');
+        if (!t[3]) i.type = 'text';
+        i.id = 'tkhs_' + t[0]; i.placeholder = t[2]; i.value = hs[t[0]] || '';
+        i.addEventListener('change', function () { ghiTruong(t[0], i.value); });
+        i.addEventListener('blur', function () { ghiTruong(t[0], i.value); });
+        w.appendChild(l); w.appendChild(i); luoi.appendChild(w);
+      });
+      v.appendChild(luoi);
+      oBao = el('p', 'tk-hs-bao'); oBao.hidden = true; v.appendChild(oBao);
     }
     ve2(); dich.appendChild(v);
     TK._veMoi = ve2;
@@ -548,7 +613,7 @@
     khoiDong: khoiDong, nap: nap, mo: mo, dong: dong, canCo: canCo,
     moHocVien: function () { tab = 'signup'; kieu = 'hv'; mo('signup'); },
     token: token, dev: dev, hoSo: hoSo, luuHoSoTam: luuHoSoTam,
-    laPro: laPro, laMentor: laMentor, luotCon: luotCon, oMoiHoSo: oMoiHoSo, zalo: zalo, giaPro: nhanGia,
+    laPro: laPro, laMentor: laMentor, luotCon: luotCon, oMoiHoSo: oMoiHoSo, ganO: ganO, ghiTruong: ghiTruong, zalo: zalo, giaPro: nhanGia,
     get me() { return TK.me; }, get vai() { return TK.vaiHoSo; },
     dat: function (k, v) { TK[k] = v; }
   };
