@@ -225,3 +225,10 @@ Muốn tặng thêm lượt hoặc gia hạn tay: sửa cột `luot_dung` (số 
 - Bật bằng `/ckkhoa bat` (cần đã cài `/stk`). Học viên điền form xong sẽ thấy QR chuyển khoản, nội dung `TMXK <mã đăng ký>`.
 - Học viên bấm "Tôi đã chuyển khoản" → bot nhắn kèm nút **✅ Đã nhận học phí · duyệt học viên**. Bấm là đăng ký chuyển sang `approved`, giao dịch ghi vào tab `ThanhToan` (gói `khoa`).
 - Viral Studio mở form này ngay trong trang (`index.html?embed=dangky`), không rời trang edit. Link `index.html#dangky-form` cũng mở thẳng form.
+
+## Chấm kịch bản viral (tools/kich-ban.html)
+
+- Tab thứ hai của Viral Studio. Học viên chọn 1 trong 11 khung kịch bản của khoá, điền từng phần, chọn tốc độ nói. Tool tự đếm chữ và canh giây (mục tiêu 60–105 giây).
+- Bấm **Chấm kịch bản** gọi `hook_ai` với `mode: 'script'` trong HookAI.gs (hàm `hookScript`). Kiến thức chấm nằm trong `KB_KIEN_THUC`, khung trong `KB_KHUNG`.
+- Lượt dùng chung với AI phân tích hook: khách 3 lượt, tài khoản Free 10 lượt, Pro theo hạn ngày (`HOOK_AI_DAILY`).
+- Xem giao diện không cần máy chủ: mở `kich-ban.html#demo`.
