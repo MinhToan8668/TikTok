@@ -35,9 +35,23 @@
     if (!d || d.length < 8) { d = 'd' + Math.random().toString(36).slice(2, 12) + Date.now().toString(36); ls.set(DEV_KEY, d); }
     return d;
   }
+  /* Ba kiểu hỏng khác hẳn nhau, đừng gộp chung một câu "không kết nối được":
+       mang   — fetch ngã, máy không ra được internet
+       mayChu — máy chủ có trả lời nhưng không phải JSON (Apps Script văng lỗi, chưa deploy, hết quota)
+       còn lại — lỗi dựng giao diện SAU KHI máy chủ đã trả lời xong */
+  function loiMang(e) { return !!(e && e.mang); }
+  function loiMayChu(e) { return !!(e && e.mayChu); }
   async function goi(body) {
-    var r = await fetch(TK.api, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) });
-    return r.json();
+    var r;
+    try {
+      r = await fetch(TK.api, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) });
+    } catch (e) { var em = new Error('fetch ngã: ' + (e && e.message || e)); em.mang = true; throw em; }
+    var t = await r.text();
+    try { return JSON.parse(t); }
+    catch (e) {
+      var es = new Error('máy chủ trả về không phải JSON (HTTP ' + r.status + '): ' + String(t).slice(0, 140).replace(/\s+/g, ' '));
+      es.mayChu = true; throw es;
+    }
   }
 
   /* ── hồ sơ kênh: của chính mình, hoặc của học viên mà mentor đang mượn để chạy thử ── */
@@ -233,10 +247,19 @@
         ls.set(ND_KEY, JSON.stringify({ token: r.token }));
         await nap();
         var tam = json(HS_KEY);
-        if (tam && Object.keys(tam).length && TK.me && !(TK.me.ho_so && Object.keys(TK.me.ho_so).length)) await luuHoSo(tam);
+        // hồ sơ điền tạm lúc chưa đăng nhập: lưu được thì tốt, hỏng cũng không được chặn đường vào
+        if (tam && Object.keys(tam).length && TK.me && !(TK.me.ho_so && Object.keys(TK.me.ho_so).length)) {
+          try { await luuHoSo(tam); } catch (e) { console.error('[TK] chưa lưu được hồ sơ tạm:', e); }
+        }
         tt.className = 'tk-tt ok'; tt.textContent = 'Xong. Chào ' + ((TK.me && TK.me.ten) || '') + '!';
         ve(tab === 'signup' ? 'hoso' : 'home');
-      } catch (err) { tt.className = 'tk-tt loi'; tt.textContent = 'Không kết nối được máy chủ.'; }
+      } catch (err) {
+        console.error('[TK] đăng nhập/đăng ký lỗi:', err);
+        tt.className = 'tk-tt loi';
+        tt.textContent = loiMang(err) ? 'Máy bạn không ra được mạng, kiểm tra wifi rồi thử lại.'
+          : loiMayChu(err) ? 'Máy chủ đang lỗi — ' + err.message + ' Báo mentor deploy lại Apps Script.'
+          : 'Xong phần máy chủ rồi nhưng màn hình bị lỗi: ' + (err && err.message || err) + '. Tải lại trang giúp mình.';
+      }
       finally { gui.disabled = false; }
     };
     oTrang.appendChild(f);
