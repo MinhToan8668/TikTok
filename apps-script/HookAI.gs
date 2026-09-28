@@ -129,6 +129,7 @@ function hookAi(b){
   if (b.mode === 'soi') return hookSoi(b, ai, provider, key);         // Soi video viral: mổ theo ba cửa rồi áp khuôn sang kênh học viên
   if (b.mode === 'apkhuon') return hookApKhuon(b, ai, provider, key); // sau khi soi: áp công thức đã rút sang một khung kịch bản khác, không tốn lượt
   if (b.mode === 'cham') return hookChamVideo(b, ai, provider, key);  // Chấm video CỦA CHÍNH học viên: khả năng viral, chỗ sửa, bài cho lần sau, kịch bản tiếp
+  if (b.mode === 'up_start' || b.mode === 'up_chunk' || b.mode === 'up_done') return upVideo(b, ai);   // video lớn: gửi từng khúc 8MB, không tốn lượt
   if (b.mode === 'design') return hookDesign(b, ai, provider, key);
   if (b.mode === 'layer'){
     if (ai.loai === 'free') return jsonOut({ok:false, error:'can_pro'});   // AI chỉnh chữ chỉ dành cho Pro và học viên
@@ -714,6 +715,10 @@ function geminiUploadFile(key, bytes, mime){
 function soiLayVideo(b, key){
   var nen = String(b.nen || soiNen(String(b.link || '')));
   var bytes = null, mime = 'video/mp4', tw = null;
+  if (b.file_uri){   // video lớn đã được đẩy lên Gemini qua up_start / up_chunk / up_done
+    if (!/^https:\/\/generativelanguage\.googleapis\.com\//.test(String(b.file_uri))) return {ok:false, error:'video_hong', loi:'file_uri la'};
+    return {ok:true, part:{file_data:{mime_type: /^video\//.test(String(b.file_mime || '')) ? String(b.file_mime) : 'video/mp4', file_uri:String(b.file_uri)}}, nguon:'upload', kich_thuoc: Number(b.file_size) || 0};
+  }
   if (b.video_b64){
     try{ bytes = Utilities.base64Decode(String(b.video_b64)); }catch(e){ return {ok:false, error:'video_hong', loi:'base64'}; }
     mime = /^video\//.test(String(b.video_mime || '')) ? String(b.video_mime) : 'video/mp4';
@@ -1048,6 +1053,105 @@ function hookChamVideo(b, ai, provider, key){
   d.meta = { giay: giay, so_chu: soChu, toc_do: giay ? Math.round(soChu / giay * 100) / 100 : 0, ti_le: soiTiLe(so), so_lieu: so, nguon: media ? video.nguon : 'chu', kich_thuoc: video && video.kich_thuoc || 0, canh_bao: canhBao, da_dang: daDang };
   hookLog(me, nhan, true, '', kq.vin || 0, kq.vout || 0, kq.model, ai);
   return jsonOut({ok:true, data:d, con: khongGioiHan ? null : con, han:han, loai:ai.loai, tool:ai.tool, luot: hookLuotCon(ai)});
+}
+
+/* ═══════ VIDEO LỚN: NHẬN TỪNG KHÚC RỒI ĐẨY LÊN GEMINI ═══════
+   Apps Script chỉ nhận ~50MB mỗi lần gọi, video lại phải đóng base64 (+33%), nên gửi
+   nguyên file chỉ an toàn tới ~35MB. Cách này: trình duyệt cắt file thành khúc 8MB
+   (bội của 256KB, đúng yêu cầu resumable upload của Google), gửi lần lượt, máy chủ cất
+   tạm từng khúc vào Drive; xong thì mở một phiên resumable upload lên Gemini Files API và
+   bơm từng khúc qua, không bao giờ phải giữ cả video trong bộ nhớ. Trần đặt 200MB. */
+var UP_KHUC_TOI_DA = 9 * 1024 * 1024;        // một khúc giải mã ra không quá 9MB
+var UP_TONG_TOI_DA = 200 * 1024 * 1024;      // cả video
+var UP_SO_KHUC_TOI_DA = 26;
+var UP_THU_MUC = 'ViralStudio_Upload_Tam';
+
+function upThuMuc(){
+  var id = cfgProp('UP_FOLDER_ID');
+  if (id){ try{ var f = DriveApp.getFolderById(id); if (!f.isTrashed()) return f; }catch(e){} }
+  var it = DriveApp.getFoldersByName(UP_THU_MUC);
+  var fd = it.hasNext() ? it.next() : DriveApp.createFolder(UP_THU_MUC);
+  try{ PropertiesService.getScriptProperties().setProperty('UP_FOLDER_ID', fd.getId()); }catch(e){}
+  return fd;
+}
+function upTenKhuc(id, i){ return 'vsup_' + id + '_' + ('00' + i).slice(-2); }
+function upDonRac(fd){
+  // khúc để quên quá 1 ngày (người dùng tắt trình duyệt giữa chừng) thì bỏ vào thùng rác
+  try{
+    var moc = new Date().getTime() - 86400000, it = fd.getFiles(), n = 0;
+    while (it.hasNext() && n < 60){ var f = it.next(); n++; if (f.getDateCreated().getTime() < moc) f.setTrashed(true); }
+  }catch(e){}
+}
+function upVideo(b, ai){
+  var key = hookCfg('GEMINI_API_KEY'); if (!key) return jsonOut({ok:false, error:'can_gemini'});
+  var fd;
+  try{ fd = upThuMuc(); }catch(e){ return jsonOut({ok:false, error:'khong_co_drive', chi_tiet:String(e).slice(0, 160)}); }
+
+  if (b.mode === 'up_start'){
+    var tong = Number(b.size) || 0;
+    if (!tong || tong > UP_TONG_TOI_DA) return jsonOut({ok:false, error:'video_qua_lon', han: UP_TONG_TOI_DA});
+    upDonRac(fd);
+    return jsonOut({ok:true, id: chuoiNgauNhien(12, 'abcdefghjkmnpqrstuvwxyz23456789'), khuc: 8 * 1024 * 1024, toi_da: UP_TONG_TOI_DA});
+  }
+  var id = String(b.id || '').replace(/[^a-z0-9]/g, '').slice(0, 12);
+  if (id.length < 8) return jsonOut({ok:false, error:'thieu'});
+
+  if (b.mode === 'up_chunk'){
+    var i = parseInt(b.i, 10);
+    if (isNaN(i) || i < 0 || i >= UP_SO_KHUC_TOI_DA) return jsonOut({ok:false, error:'thieu'});
+    var bytes; try{ bytes = Utilities.base64Decode(String(b.b64 || '')); }catch(e){ return jsonOut({ok:false, error:'video_hong', chi_tiet:'base64'}); }
+    if (!bytes.length || bytes.length > UP_KHUC_TOI_DA) return jsonOut({ok:false, error:'video_hong', chi_tiet:'khuc ' + bytes.length});
+    var ten = upTenKhuc(id, i), cu = fd.getFilesByName(ten);
+    while (cu.hasNext()) cu.next().setTrashed(true);     // gửi lại khúc này (mạng rớt) thì thay bản cũ
+    fd.createFile(Utilities.newBlob(bytes, 'application/octet-stream', ten));
+    return jsonOut({ok:true, i:i, bytes:bytes.length});
+  }
+
+  if (b.mode === 'up_done'){
+    var n = parseInt(b.n, 10); if (!n || n < 1 || n > UP_SO_KHUC_TOI_DA) return jsonOut({ok:false, error:'thieu'});
+    var mime = /^video\//.test(String(b.mime || '')) ? String(b.mime) : 'video/mp4';
+    var files = [], tongByte = 0;
+    for (var k = 0; k < n; k++){
+      var it = fd.getFilesByName(upTenKhuc(id, k));
+      if (!it.hasNext()) return jsonOut({ok:false, error:'thieu_khuc', i:k});
+      var f = it.next(); files.push(f); tongByte += f.getSize();
+    }
+    if (tongByte > UP_TONG_TOI_DA){ files.forEach(function(f){ f.setTrashed(true) }); return jsonOut({ok:false, error:'video_qua_lon'}); }
+    var kq = geminiUploadKhuc(key, files, tongByte, mime, String(b.ten || 'video'));
+    files.forEach(function(f){ try{ f.setTrashed(true); }catch(e){} });
+    if (!kq.ok) return jsonOut({ok:false, error:'khong_tai_duoc_video', chi_tiet: String(kq.loi || '').slice(0, 220)});
+    return jsonOut({ok:true, file_uri: kq.uri, mime: kq.mime, size: tongByte});
+  }
+  return jsonOut({ok:false, error:'unknown_action'});
+}
+/* Resumable upload lên Gemini Files API: mở phiên, bơm từng khúc theo offset, khúc cuối kèm finalize. */
+function geminiUploadKhuc(key, files, tongByte, mime, ten){
+  var r0 = UrlFetchApp.fetch('https://generativelanguage.googleapis.com/upload/v1beta/files', {
+    method:'post', contentType:'application/json', muteHttpExceptions:true,
+    headers:{ 'x-goog-api-key': key, 'X-Goog-Upload-Protocol':'resumable', 'X-Goog-Upload-Command':'start',
+              'X-Goog-Upload-Header-Content-Length': String(tongByte), 'X-Goog-Upload-Header-Content-Type': mime },
+    payload: JSON.stringify({file:{display_name: String(ten).slice(0, 80)}}) });
+  if (r0.getResponseCode() !== 200) return {ok:false, loi:'start http ' + r0.getResponseCode() + ': ' + r0.getContentText().slice(0, 160)};
+  var h = r0.getAllHeaders(), url = h['X-Goog-Upload-URL'] || h['x-goog-upload-url'];
+  if (!url) return {ok:false, loi:'khong co upload url'};
+  var offset = 0, cuoi = null;
+  for (var i = 0; i < files.length; i++){
+    var bytes = files[i].getBlob().getBytes(), last = i === files.length - 1;
+    var r = UrlFetchApp.fetch(url, { method:'post', contentType: mime, payload: bytes, muteHttpExceptions:true,
+      headers:{ 'X-Goog-Upload-Offset': String(offset), 'X-Goog-Upload-Command': last ? 'upload, finalize' : 'upload' } });
+    if (r.getResponseCode() !== 200) return {ok:false, loi:'khuc ' + i + ' http ' + r.getResponseCode() + ': ' + r.getContentText().slice(0, 160)};
+    offset += bytes.length; if (last) cuoi = r;
+  }
+  var f = {}; try{ f = (JSON.parse(cuoi.getContentText()) || {}).file || {}; }catch(e){}
+  if (!f.name) return {ok:false, loi:'finalize khong co name'};
+  for (var t = 0; t < 60; t++){
+    if (f.state === 'ACTIVE') return {ok:true, uri:f.uri, mime:f.mimeType || mime};
+    if (f.state === 'FAILED') return {ok:false, loi:'files state FAILED'};
+    Utilities.sleep(2000);
+    var g = UrlFetchApp.fetch('https://generativelanguage.googleapis.com/v1beta/' + f.name, {muteHttpExceptions:true, headers:{'x-goog-api-key': key}});
+    if (g.getResponseCode() === 200) f = JSON.parse(g.getContentText()) || f;
+  }
+  return {ok:false, loi:'files cho qua lau'};
 }
 
 function thuSoiVideo(){

@@ -714,11 +714,41 @@
     nutTop.innerHTML = '✦ <span class="tk-pro-dai">Nâng cấp </span>Pro' + (gia ? ' <span class="tk-pro-dai">· ' + gia.split(' · ')[0] + '</span>' : '');
   }
 
+  /* ── video lớn: cắt khúc 8MB gửi lần lượt, máy chủ ghép rồi đẩy lên Gemini ──
+     Trả về {file_uri, mime, size}. onTienDo(phanTram, chu) để trang tool vẽ tiến độ. */
+  function docKhuc(blob) {
+    return new Promise(function (ok, no) { var fr = new FileReader(); fr.onload = function () { ok(String(fr.result).split(',')[1] || ''); }; fr.onerror = no; fr.readAsDataURL(blob); });
+  }
+  async function goiLai(body, lan) {
+    for (var t = 0; ; t++) {
+      try { return await goi(body); }
+      catch (e) { if (t >= (lan || 2)) throw e; await new Promise(function (z) { setTimeout(z, 1500 * (t + 1)); }); }
+    }
+  }
+  async function taiVideo(file, onTienDo) {
+    var bao = function (p, c) { if (typeof onTienDo === 'function') { try { onTienDo(p, c); } catch (e) { } } };
+    bao(0, 'Đang mở phiên tải…');
+    var s0 = await goiLai({ action: 'hook_ai', mode: 'up_start', token: token(), dev: dev(), size: file.size, ten: file.name });
+    if (!s0.ok) { var e0 = new Error(s0.error || 'up_start'); e0.ma = s0.error; e0.han = s0.han; throw e0; }
+    var KHUC = s0.khuc || 8 * 1024 * 1024, n = Math.ceil(file.size / KHUC);
+    for (var i = 0; i < n; i++) {
+      var b64 = await docKhuc(file.slice(i * KHUC, Math.min(file.size, (i + 1) * KHUC)));
+      bao(Math.round(i / n * 85), 'Đang tải khúc ' + (i + 1) + '/' + n + '…');
+      var r = await goiLai({ action: 'hook_ai', mode: 'up_chunk', token: token(), dev: dev(), id: s0.id, i: i, b64: b64 });
+      if (!r.ok) { var e1 = new Error(r.error || 'up_chunk'); e1.ma = r.error; e1.chi_tiet = r.chi_tiet; throw e1; }
+    }
+    bao(88, 'Đã tải xong, đang đưa cho AI…');
+    var d = await goiLai({ action: 'hook_ai', mode: 'up_done', token: token(), dev: dev(), id: s0.id, n: n, mime: file.type || 'video/mp4', ten: file.name }, 1);
+    if (!d.ok) { var e2 = new Error(d.error || 'up_done'); e2.ma = d.error; e2.chi_tiet = d.chi_tiet; throw e2; }
+    bao(100, 'AI đã nhận video');
+    return { file_uri: d.file_uri, mime: d.mime || file.type || 'video/mp4', size: d.size || file.size };
+  }
+
   global.TK = {
     khoiDong: khoiDong, nap: nap, mo: mo, dong: dong, canCo: canCo,
     moHocVien: function () { tab = 'signup'; kieu = 'hv'; mo('signup'); },
     token: token, dev: dev, hoSo: hoSo, luuHoSoTam: luuHoSoTam,
-    laPro: laPro, laMentor: laMentor, luotCon: luotCon, oMoiHoSo: oMoiHoSo, ganO: ganO, ghiTruong: ghiTruong, zalo: zalo, giaPro: nhanGia,
+    laPro: laPro, laMentor: laMentor, luotCon: luotCon, oMoiHoSo: oMoiHoSo, ganO: ganO, ghiTruong: ghiTruong, taiVideo: taiVideo, zalo: zalo, giaPro: nhanGia,
     get me() { return TK.me; }, get vai() { return TK.vaiHoSo; },
     dat: function (k, v) { TK[k] = v; }
   };

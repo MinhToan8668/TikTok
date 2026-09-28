@@ -221,7 +221,7 @@
 
         <div class="drop-zone" id="dropZone" role="button" tabindex="0">
           <b>📤 Kéo file video vào đây, hoặc bấm để chọn</b>
-          <small>MP4 / MOV, tối đa 40MB · video 1–2 phút thường 5–20MB · xuất từ CapCut chọn 720p là vừa</small>
+          <small>MP4 / MOV, tối đa 200MB · video 1–2 phút thường 5–20MB · file lớn sẽ tải theo từng khúc, có thanh tiến độ</small>
           <input type="file" id="videoFile" accept="video/mp4,video/quicktime,video/webm,video/*" hidden>
         </div>
         <div class="fileup" id="fileRow" hidden>
@@ -309,7 +309,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="tai-khoan.js?v=202609281011"></script>
+<script src="tai-khoan.js?v=202609281029"></script>
 <script>
 const $ = s => document.querySelector(s);
 const el = (t, c, txt) => { const e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; };
@@ -329,6 +329,7 @@ const KN = { thap: ['Khả năng viral: THẤP', 'var(--danger)'], vua: ['Khả 
 const MUC_TEN = { nang: 'nặng', vua: 'vừa', nhe: 'nhẹ' };
 
 /* ---------- state ---------- */
+const INLINE_TOI_DA = 12 * 1048576, LON_TOI_DA = 200 * 1048576;
 const state = { nen: 'tiktok', image: '', link: { tac_gia: '', caption: '', video: false, giay: 0 }, file: null, daDang: 'chua', mucTieu: 'nhan_biet', kq: null };
 function nguon() { if (state.file) return 'file'; if (state.link.video && /^https?:/.test($('#link').value.trim())) return 'link'; if (demChu($('#loiThoai').value) >= 8) return 'text'; return ''; }
 function updateSrc() {
@@ -396,10 +397,15 @@ function videoDuration(file) { return new Promise(ok => { try { const v = docume
 async function chonVideo(file) {
   if (!file) return;
   if (!/^video\//.test(file.type || '') && !/\.(mp4|mov|webm|m4v)$/i.test(file.name)) { toast('Chọn file video (MP4, MOV) nhé'); return; }
-  if (file.size > 40 * 1048576) { toast('File quá 40MB. Xuất lại 720p hoặc cắt ngắn.'); return; }
+  if (file.size > LON_TOI_DA) { toast('File quá 200MB. Xuất lại 720p hoặc cắt ngắn.'); return; }
   $('#fileRow').hidden = false; $('#videoNote').textContent = 'Đang đọc file…';
-  try { const [b64, giay] = await Promise.all([readVideoFile(file), videoDuration(file)]); state.file = { b64, mime: file.type || 'video/mp4', name: file.name, size: file.size, giay }; if (giay) { $('#giay').value = String(giay); updateCount(); } updateSrc(); toast('Đã có video, bấm Chấm video'); }
-  catch { state.file = null; updateSrc(); toast('Không đọc được file'); }
+  try {
+    // dưới 12MB gửi thẳng trong một lần gọi; lớn hơn thì giữ file, lúc chấm mới cắt khúc tải lên
+    const lon = file.size > INLINE_TOI_DA;
+    const [b64, giay] = await Promise.all([lon ? Promise.resolve('') : readVideoFile(file), videoDuration(file)]);
+    state.file = { file, b64, lon, mime: file.type || 'video/mp4', name: file.name, size: file.size, giay };
+    if (giay) { $('#giay').value = String(giay); updateCount(); } updateSrc(); toast(lon ? 'Đã chọn video, khi bấm Chấm sẽ tải lên theo từng khúc' : 'Đã có video, bấm Chấm video');
+  } catch { state.file = null; updateSrc(); toast('Không đọc được file'); }
 }
 
 /* ---------- quota ---------- */
@@ -426,7 +432,7 @@ function dienTuHoSo() {
 }
 
 /* ---------- chấm ---------- */
-const ERR = { can_dangky: 'Tạo tài khoản miễn phí để dùng AI, mất 30 giây.', khong_co_quyen: 'Tài khoản này không có quyền.', khong_tai_duoc_video: 'Không tải được video từ link này. Tải file video lên rồi chấm lại.', video_qua_lon: 'Video quá lớn (trên 45MB). Xuất lại 720p hoặc cắt ngắn.', video_hong: 'File video không đọc được, thử xuất lại dạng MP4.', khong_co_video: 'Chưa có video. Tải file lên hoặc dán link video đã đăng.', can_gemini: 'Máy chủ đang chạy Claude, phần xem video cần thêm GEMINI_API_KEY. Báo mentor.', het_luot_thu: 'Bạn đã dùng hết lượt chấm video miễn phí. Nâng cấp Pro hoặc đăng ký học viên để dùng tiếp.', het_luot: 'Hết lượt AI hôm nay, mai quay lại nhé.', het_phien: 'Phiên đăng nhập hết hạn. Đăng nhập lại giúp mình.', chua_cai_key: 'Máy chủ chưa cài khóa AI. Báo mentor.', sai_key: 'Khóa AI trên máy chủ không hợp lệ. Báo mentor.', ban_qua: 'AI đang bận, thử lại sau một phút.', tu_choi: 'AI không xử lý được nội dung này.', loi_mang: 'Máy chủ không gọi được AI, thử lại.', unknown_action: 'Máy chủ chưa cập nhật.' };
+const ERR = { can_dangky: 'Tạo tài khoản miễn phí để dùng AI, mất 30 giây.', khong_co_quyen: 'Tài khoản này không có quyền.', khong_tai_duoc_video: 'Không tải được video từ link này. Tải file video lên rồi chấm lại.', video_qua_lon: 'Video quá lớn (trên 200MB). Xuất lại 720p hoặc cắt ngắn.', khong_co_drive: 'Máy chủ chưa mở được Google Drive để nhận file lớn. Báo mentor.', thieu_khuc: 'Tải lên bị thiếu một khúc, bấm Chấm lại để gửi lại.', video_hong: 'File video không đọc được, thử xuất lại dạng MP4.', khong_co_video: 'Chưa có video. Tải file lên hoặc dán link video đã đăng.', can_gemini: 'Máy chủ đang chạy Claude, phần xem video cần thêm GEMINI_API_KEY. Báo mentor.', het_luot_thu: 'Bạn đã dùng hết lượt chấm video miễn phí. Nâng cấp Pro hoặc đăng ký học viên để dùng tiếp.', het_luot: 'Hết lượt AI hôm nay, mai quay lại nhé.', het_phien: 'Phiên đăng nhập hết hạn. Đăng nhập lại giúp mình.', chua_cai_key: 'Máy chủ chưa cài khóa AI. Báo mentor.', sai_key: 'Khóa AI trên máy chủ không hợp lệ. Báo mentor.', ban_qua: 'AI đang bận, thử lại sau một phút.', tu_choi: 'AI không xử lý được nội dung này.', loi_mang: 'Máy chủ không gọi được AI, thử lại.', unknown_action: 'Máy chủ chưa cập nhật.' };
 let busy = false;
 async function cham() {
   if (busy) return;
@@ -434,13 +440,23 @@ async function cham() {
   const ng = nguon();
   if (!ng) { toast('Tải file video lên, hoặc dán link video đã đăng rồi bấm Lấy video'); $('#dropZone').focus(); return; }
   const st = $('#chamStatus'), btn = $('#btnCham'); busy = true; btn.disabled = true;
-  const t0 = Date.now();
-  const tick = setInterval(() => { st.className = 'status'; st.innerHTML = `<span class="spinner"></span>${ng === 'text' ? 'Mentor AI đang đọc kịch bản' : 'AI đang xem trọn video, nghe giọng, đọc chữ rồi chấm từng giây'} · ${Math.round((Date.now() - t0) / 1000)} giây (${ng === 'text' ? 'thường 25–60' : 'thường 40–120'} giây)`; }, 400);
+  let t0 = Date.now(), tick;
+  const tickLai = () => { t0 = Date.now(); tick = setInterval(() => { st.className = 'status'; st.innerHTML = `<span class="spinner"></span>${ng === 'text' ? 'Mentor AI đang đọc kịch bản' : 'AI đang xem trọn video, nghe giọng, đọc chữ rồi chấm từng giây'} · ${Math.round((Date.now() - t0) / 1000)} giây (${ng === 'text' ? 'thường 25–60' : 'thường 40–120'} giây)`; }, 400); };
+  tickLai();
   const so = docSo();
   try {
-    let r;
+    let r, lon = null;
+    if (!DEMO && ng === 'file' && state.file.lon) {
+      clearInterval(tick);
+      if (!state.file.file_uri) {
+        try { state.file.file_uri = (await TK.taiVideo(state.file.file, (p, c) => { st.className = 'status'; st.innerHTML = `<span class="spinner"></span>${c} ${p}%`; })).file_uri; }
+        catch (e) { st.className = 'status err'; st.textContent = (ERR[e.ma] || 'Không tải được video lên (' + (e.message || e) + ').') + (e.chi_tiet ? ' ' + e.chi_tiet : '') + ' Thử lại, hoặc xuất video nhẹ hơn.'; return; }
+      }
+      lon = { file_uri: state.file.file_uri, file_mime: state.file.mime, file_size: state.file.size };
+      tickLai();
+    }
     if (DEMO) { await new Promise(z => setTimeout(z, 1200)); r = { ok: true, data: demoData(so), con: 0, han: 1 }; }
-    else r = await callApi({ action: 'hook_ai', mode: 'cham', token: TK.token(), dev: TK.dev(), ho_so: TK.hoSo(), link: ng === 'link' ? $('#link').value.trim() : '', nen: state.nen, video_b64: ng === 'file' ? state.file.b64 : undefined, video_mime: ng === 'file' ? state.file.mime : undefined, loi_thoai: $('#loiThoai').value.trim(), y_dinh: $('#yDinh').value.trim(), da_dang: state.daDang === 'roi', muc_tieu: state.mucTieu, so_lieu: state.daDang === 'roi' ? so : { giay: so.giay }, chu_de: $('#chuDe').value.trim(), doi_tuong: $('#doiTuong').value.trim(), san_pham: $('#sanPham').value.trim() });
+    else r = await callApi({ action: 'hook_ai', mode: 'cham', token: TK.token(), dev: TK.dev(), ho_so: TK.hoSo(), link: ng === 'link' ? $('#link').value.trim() : '', nen: state.nen, video_b64: ng === 'file' && !lon ? state.file.b64 : undefined, video_mime: ng === 'file' && !lon ? state.file.mime : undefined, ...(lon || {}), loi_thoai: $('#loiThoai').value.trim(), y_dinh: $('#yDinh').value.trim(), da_dang: state.daDang === 'roi', muc_tieu: state.mucTieu, so_lieu: state.daDang === 'roi' ? so : { giay: so.giay }, chu_de: $('#chuDe').value.trim(), doi_tuong: $('#doiTuong').value.trim(), san_pham: $('#sanPham').value.trim() });
     clearInterval(tick);
     if (!r.ok) {
       st.className = 'status err'; st.textContent = (ERR[r.error] || 'Có lỗi khi gọi AI, thử lại sau.') + (r.chi_tiet ? ' Mã lỗi: ' + r.chi_tiet : '');

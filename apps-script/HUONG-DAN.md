@@ -268,3 +268,9 @@ Muốn tặng thêm lượt hoặc gia hạn tay: sửa cột `luot_dung` (số 
 - Máy chủ tính lại điểm tổng từ 7 thang theo trọng số để không lệch với điểm AI tự ghi. Kết quả lưu trong trình duyệt (`cham.kq`), nút "Viết kịch bản này →" đẩy sang tab Kịch bản viral qua `kb.import`, nút "Đặt lên video →" đẩy hook sang tab Hook viral.
 - Lượt riêng: cột `luot_cham` trong bảng `NguoiDung` (`stNangCap()` tự nối cột), mặc định `ST_LUOT_CHAM` = 1, bot chỉnh bằng `/luotcham`. Pro và học viên tính theo `HOOK_AI_DAILY` như các tool khác.
 - Xem giao diện không cần máy chủ: `cham-video.html#demo`.
+
+### Video lớn tới 200MB (bản 09/2026)
+
+- Giới hạn 40MB cũ là của Apps Script: mỗi lần gọi chỉ nhận ~50MB, video lại phải đóng base64 (+33%). Giờ trình duyệt **cắt file thành khúc 8MB** (`TK.taiVideo` trong `tai-khoan.js`) gửi lần lượt: `mode: 'up_start'` → `up_chunk` (i, b64) → `up_done`. Máy chủ cất tạm từng khúc vào thư mục Drive `ViralStudio_Upload_Tam`, rồi mở phiên **resumable upload** lên Gemini Files API và bơm từng khúc theo offset — không giữ cả video trong bộ nhớ. Xong thì xoá khúc trên Drive; khúc để quên quá 1 ngày được dọn ở lần `up_start` sau.
+- `hook_ai` mode `soi` và `cham` nhận thêm `file_uri` (+ `file_mime`, `file_size`) thay cho `video_b64`. File dưới 12MB vẫn gửi thẳng một lần như cũ. Trần 200MB đặt ở cả hai đầu (`UP_TONG_TOI_DA`).
+- Không tốn lượt AI cho phần tải; cần đăng nhập. Dùng `DriveApp`, dự án đã có quyền này từ trước (Code.gs dùng để dọn file nháp).
