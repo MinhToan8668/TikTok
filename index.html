@@ -976,12 +976,14 @@ body.hv-mode{padding-bottom:0}
 .hs-ls div{border-bottom:1px solid var(--line);padding:3px 0}
 .hs-ls .gio{color:var(--faint);font-variant-numeric:tabular-nums;margin-right:6px}
 /* hồ sơ kênh của chính học viên trong khu học viên */
-.hv-hoso{margin-top:18px}
+.hv-hoso{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r);
+  padding:clamp(18px,3vw,24px);margin-bottom:22px}
+.hv-hoso h3{font-family:var(--disp);font-size:17px;font-weight:800;color:var(--ink);margin-bottom:6px}
 .hv-hs-nguon{font-size:13px;color:var(--quiet);margin:4px 0 10px;line-height:1.55}
 .hv-hs-luoi{display:grid;grid-template-columns:1fr 1fr;gap:2px 14px}
 .hv-hs-luoi .rong{grid-column:1/-1}
 .hv-hs-luoi label{display:block;font-size:12px;color:var(--quiet);font-weight:600;margin:9px 0 4px}
-.hv-hs-luoi input,.hv-hs-luoi textarea{width:100%;font:inherit;font-size:14px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 11px}
+.hv-hs-luoi input,.hv-hs-luoi textarea{width:100%;font:inherit;font-size:14px;color:var(--ink);background:var(--paper-lt);border:1px solid var(--line);border-radius:10px;padding:9px 11px}
 .hv-hs-luoi textarea{resize:vertical;min-height:64px;line-height:1.55}
 .hv-hs-bao{font-size:12.5px;color:var(--quiet);margin:10px 0 0;min-height:1em}
 @media(max-width:700px){.hv-hs-luoi{grid-template-columns:1fr}}
@@ -1961,6 +1963,7 @@ body.hv-mode{padding-bottom:0}
         <button id="hvTabToi" class="on">Lịch của tôi</button>
         <button id="hvTabTQ">Tổng quan lớp</button>
         <button id="hvTabHS">Học viên</button>
+        <button id="hvTabHoSo">Hồ sơ kênh</button>
       </div>
 
       <div class="hv-cua-toi" id="hvMineBox" style="display:none">
@@ -1985,7 +1988,7 @@ body.hv-mode{padding-bottom:0}
       <div id="hvHS" style="display:none"></div>
 
       <!-- hồ sơ kênh của chính học viên, dựng sẵn từ form đăng ký khoá -->
-      <div class="hv-cua-toi hv-hoso" id="hvHoSo" style="display:none">
+      <div class="hv-hoso" id="hvHoSo" style="display:none">
         <h3>📋 Hồ sơ kênh của bạn</h3>
         <p class="hv-hs-nguon" id="hvHsNguon"></p>
         <div class="hv-hs-luoi" id="hvHsLuoi"></div>
@@ -3247,7 +3250,7 @@ function hvVaoTrong(){
 
   var m = laMentor();
   var pro = HV.vaitro === 'pro';           // mua Viral Studio Pro, không học khoá → chỉ có tool
-  if (!HV_HS.xong){ HV_HS.xong = true; hvTaiHoSo(); }
+
   ['#hvCheDo','#hvMineBox','#hvHan','#hvNgays','#hvLuu','#hvTQ','#hvChu'].forEach(function(s){
     var e=$(s); if(e) e.style.display = pro ? 'none' : ''; });
   var tuanBar = $('#hvTruoc') && $('#hvTruoc').parentNode; if (tuanBar) tuanBar.style.display = pro ? 'none' : '';
@@ -3266,8 +3269,12 @@ function hvVaoTrong(){
     : 'Chọn một ca trống là xong — mentor nhận thông báo ngay. Bận thì bấm lại đúng ca đó để huỷ, ca sẽ mở lại cho bạn khác.';
   $('#hvMineTieuDe').textContent = m ? '📌 Buổi đã có người đặt' : '📌 Lịch sắp tới của bạn';
   $('#hvChu').style.display = m ? 'block' : 'none';
-  $('#hvCheDo').style.display = m ? 'inline-flex' : 'none';
-  if (!m) hvDoiCheDo('toi');
+  // học viên cũng có tab, chỉ ít hơn mentor: Đặt lịch và Hồ sơ kênh
+  $('#hvTabToi').textContent = m ? 'Lịch của tôi' : 'Đặt lịch';
+  $('#hvTabTQ').style.display = m ? '' : 'none';
+  $('#hvTabHS').style.display = m ? '' : 'none';
+  $('#hvCheDo').style.display = 'inline-flex';
+  if (!m && HV.cheDo !== 'hoso') hvDoiCheDo('toi');
 }
 
 /* ---- mentor: đổi giữa lịch của tôi và tổng quan lớp ---- */
@@ -3276,20 +3283,31 @@ function hvDoiCheDo(che){
   $('#hvTabToi').classList.toggle('on', che === 'toi');
   $('#hvTabTQ').classList.toggle('on',  che === 'tq');
   $('#hvTabHS').classList.toggle('on',  che === 'hs');
-  if (!laMentor()) return;
-  var tq = che === 'tq', hs = che === 'hs';
-  $('#hvTieuDe').textContent = hs ? 'Học viên' : tq ? 'Tổng quan lớp' : 'Lịch rảnh của bạn';
-  $('#hvMoTa').textContent = hs
+  $('#hvTabHoSo').classList.toggle('on', che === 'hoso');
+  var m = laMentor(), tq = che === 'tq', hs = che === 'hs', ho = che === 'hoso';
+
+  $('#hvTieuDe').textContent = ho ? 'Hồ sơ kênh của bạn'
+    : hs ? 'Học viên' : tq ? 'Tổng quan lớp' : m ? 'Lịch rảnh của bạn' : 'Đặt lịch kèm 1:1';
+  $('#hvMoTa').textContent = ho
+    ? 'Ba tool bên Viral Studio đọc hồ sơ này để chấm đúng kênh bạn. Sửa ô nào là tự lưu, không cần bấm nút.'
+    : hs
     ? 'Hồ sơ kênh và lịch sử dùng AI của từng người — cả học viên đã có tài khoản Viral Studio lẫn người mới điền form đăng ký khoá.'
     : tq
     ? 'Lịch của tất cả mentor trong tuần, ai đã đặt ca nào, và bạn học viên nào tuần này chưa đặt buổi nào — để cả nhóm nhìn chung một bức tranh.'
-    : 'Bấm vào ca bạn rảnh là mở cho học viên đặt. Học viên đặt xong bạn thấy tên họ ngay tại ca đó, và bot cũng báo về nhóm.';
-  // màn học viên không dính gì tới lịch tuần, ẩn hết phần lịch đi cho đỡ rối
-  ['#hvTuanHang','#hvMineBox','#hvHan','#hvNgays','#hvLuu','#hvChu','#hvTQ','#hvHoSo'].forEach(function(q){
-    var e = document.querySelector(q); if (e && hs) e.style.display = 'none';
+    : m
+    ? 'Bấm vào ca bạn rảnh là mở cho học viên đặt. Học viên đặt xong bạn thấy tên họ ngay tại ca đó, và bot cũng báo về nhóm.'
+    : 'Chọn một ca trống là xong — mentor nhận thông báo ngay. Bận thì bấm lại đúng ca đó để huỷ, ca sẽ mở lại cho bạn khác.';
+
+  // mỗi tab một màn riêng, không chồng lên nhau
+  var anLich = hs || ho;
+  ['#hvTuanHang','#hvMineBox','#hvHan','#hvNgays','#hvLuu','#hvChu','#hvTQ'].forEach(function(q){
+    var e = document.querySelector(q); if (e && anLich) e.style.display = 'none';
   });
+  $('#hvTools').style.display = anLich ? 'none' : '';
   $('#hvHS').style.display = hs ? '' : 'none';
+  $('#hvHoSo').style.display = ho ? '' : 'none';
   if (hs) hvTaiHocVien();
+  if (ho) hvTaiHoSo();
 }
 
 /* ---- hồ sơ kênh của chính học viên ----
@@ -3316,12 +3334,18 @@ var HV_HS = {hs:{}, nguon:'', o:{}, hen:null, xong:false};
 
 function hvTaiHoSo(){
   if (HV.vaitro === 'pro') return;                 // tài khoản chỉ mua tool, không có khu học viên
+  if (HV_HS.xong) return;                          // đã nạp rồi thì giữ nguyên chữ đang gõ dở
+  HV_HS.xong = true;
+  $('#hvHsNguon').textContent = 'Đang tải hồ sơ…';
   hvGoi('st_me', {token:HV.token}).then(function(r){
-    if (!r || !r.ok || !r.ho_so) return;           // máy chủ bản cũ thì lặng lẽ bỏ qua
+    if (!r || !r.ok || !r.ho_so){
+      $('#hvHsNguon').textContent = 'Máy chủ đang chạy Studio.gs bản cũ nên chưa đọc được hồ sơ. Báo mentor deploy lại giúp mình.';
+      return;
+    }
     HV_HS.hs = r.ho_so.ho_so || {};
     HV_HS.nguon = r.ho_so.ho_so_nguon || '';
     hvVeHoSo();
-  }).catch(function(){});
+  }).catch(function(){ HV_HS.xong = false; $('#hvHsNguon').textContent = 'Không kết nối được máy chủ, bấm lại tab này để thử lại.'; });
 }
 
 function hvVeHoSo(){
@@ -3565,10 +3589,9 @@ function hvDangNhap(){
 /* ---- tải lịch tuần ---- */
 function hvTai(tuan){
   if (HV.vaitro === 'pro') return;         // tài khoản Pro không có lịch
-  if (HV.cheDo === 'hs') return;           // mentor đang xem danh sách học viên, không đụng tới lịch
-  $('#hvHS').style.display = 'none';
+  if (HV.cheDo === 'hs' || HV.cheDo === 'hoso') return;   // đang ở tab khác, không đụng tới lịch
+  $('#hvHS').style.display = 'none'; $('#hvHoSo').style.display = 'none';
   ['#hvTuanHang','#hvNgays'].forEach(function(q){ var e = document.querySelector(q); if (e) e.style.display = ''; });
-  if (Object.keys(HV_HS.o).length) $('#hvHoSo').style.display = '';
   hvBoCho();
   if (laMentor() && HV.cheDo === 'tq') return hvTaiTongQuan(tuan);
   $('#hvTQ').style.display = 'none';
@@ -4079,6 +4102,7 @@ function initHV(){
   $('#hvTabToi').addEventListener('click', function(){ hvDoiCheDo('toi'); hvTai(HV.tuan) });
   $('#hvTabTQ').addEventListener('click',  function(){ hvDoiCheDo('tq');  hvTai(HV.tuan) });
   $('#hvTabHS').addEventListener('click',  function(){ hvDoiCheDo('hs'); });
+  $('#hvTabHoSo').addEventListener('click', function(){ hvDoiCheDo('hoso'); });
   $('#hvTruoc').addEventListener('click', function(){ hvTai(hvCong(HV.tuan,-7)) });
   $('#hvSau').addEventListener('click',   function(){ hvTai(hvCong(HV.tuan, 7)) });
 
