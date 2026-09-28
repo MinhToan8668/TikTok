@@ -668,9 +668,10 @@
       nutTop = document.createElement('button'); nutTop.type = 'button'; nutTop.id = 'tkNutProTop'; nutTop.className = 'tk-pro-nut tk-pro-top';
       nutTop.onclick = moPro;
     }
-    // Hook viral bọc nút tài khoản trong khung .acct: đặt nút Pro ra ngoài khung cho khỏi chật
-    var moc = acct.parentNode.classList.contains('acct') ? acct.parentNode : acct;
-    if (nutTop.nextSibling !== moc) moc.parentNode.insertBefore(nutTop, moc);
+    // nút Tài khoản của hook-text nằm trong viên thuốc .acct có nền và viền riêng —
+    // chèn vào trong đó thì viên thuốc trắng bao luôn cả nút Pro. Đặt ra ngoài viên thuốc.
+    var vien = acct.closest ? (acct.closest('.acct') || acct) : acct;
+    if (nutTop.nextSibling !== vien) vien.parentNode.insertBefore(nutTop, vien);
     nutTop.innerHTML = '✦ <span class="tk-pro-dai">Nâng cấp </span>Pro' + (gia ? ' <span class="tk-pro-dai">· ' + gia.split(' · ')[0] + '</span>' : '');
   }
 
