@@ -123,7 +123,21 @@
     '.tk-khung{position:relative;border:1px solid var(--line,#ddd);border-radius:12px;overflow:hidden;background:#f9e8dd;height:min(70vh,640px)}',
     '.tk-khung iframe{width:100%;height:100%;border:0;display:block}',
     '.tk-khung .tk-cho{position:absolute;inset:0;display:grid;place-items:center;font-size:13px;color:var(--muted,#777)}',
-    '@media(max-width:420px){.tk-chon{grid-template-columns:1fr}}'
+    '@media(max-width:420px){.tk-chon{grid-template-columns:1fr}}',
+    /* logo trên đầu tool: ô mực nghiêng, gạch kem, tách hẳn khỏi nền lime */
+    '.brand .tmxk-logo{width:46px;height:46px;flex:none;background:#1B1C12;border-radius:13px;padding:7px;box-sizing:border-box;transform:rotate(-6deg);box-shadow:0 4px 0 rgba(28,38,0,.28)}',
+    '.brand .tmxk-logo .ink{fill:#F9E8DD}',
+    ':root[data-theme="dark"] .brand .tmxk-logo{background:#F9E8DD}',
+    ':root[data-theme="dark"] .brand .tmxk-logo .ink{fill:#1B1C12}',
+    '@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .brand .tmxk-logo{background:#F9E8DD} :root:not([data-theme="light"]) .brand .tmxk-logo .ink{fill:#1B1C12}}',
+    /* nút Nâng cấp Pro: cam đỏ, chữ trắng, nhấp nháy nhẹ cho nổi trên nền lime và nền đen */
+    '.tk-pro-nut{border:0;cursor:pointer;font:inherit;font-weight:800;color:#fff;border-radius:999px;white-space:nowrap;background:linear-gradient(135deg,#ff6a2b,#ff3d1f);box-shadow:0 4px 0 rgba(120,30,0,.35),0 0 0 0 rgba(255,77,31,.55);animation:tkProNhay 2.2s ease-in-out infinite}',
+    '.tk-pro-nut:hover{filter:brightness(1.06);transform:translateY(-1px)}',
+    '.tk-pro-top{padding:9px 14px;font-size:13px}',
+    '#tkNutPro{position:fixed;right:14px;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);z-index:40;padding:13px 20px;font-size:14.5px}',
+    '@keyframes tkProNhay{0%,100%{box-shadow:0 4px 0 rgba(120,30,0,.35),0 0 0 0 rgba(255,77,31,.5)}50%{box-shadow:0 4px 0 rgba(120,30,0,.35),0 0 0 8px rgba(255,77,31,0)}}',
+    '@media(prefers-reduced-motion:reduce){.tk-pro-nut{animation:none}}',
+    '@media(max-width:520px){.tk-pro-top .tk-pro-dai{display:none}}'
   ].join('');
 
   var HS_TRUONG = [
@@ -619,25 +633,39 @@
     TK.api = opt.api || TK.api; TK.tool = opt.tool || TK.tool;
     var cu = opt.onDoi;
     TK.onDoi = function (me) { if (TK._veMoi) { try { TK._veMoi(); } catch (e) { } } veNutPro(); if (cu) cu(me); };
+    napCss();
     napCfg().then(veNutPro);
     nap();
     return TK;
   }
 
-  /* Nút Nâng cấp Pro ở góc màn hình, chỉ hiện với tài khoản đang dùng thử. */
-  var nutPro = null;
+  /* Nút Nâng cấp Pro: một nút nổi ở góc màn hình (tài khoản đang dùng thử) và một nút
+     ngay cạnh nút tài khoản trên đầu trang (mọi ai chưa có Pro). */
+  var nutPro = null, nutTop = null;
+  function moPro() { if (TK.me) mo('pro'); else mo('signup', 'Tạo tài khoản trước, rồi nâng cấp Pro ngay trong bảng này.'); }
   function veNutPro() {
+    napCss();
+    var gia = nhanGia();
+    // góc màn hình
     var can = TK.me && !laPro();
-    if (!can) { if (nutPro) { nutPro.remove(); nutPro = null; } return; }
-    if (!nutPro) {
-      nutPro = document.createElement('button'); nutPro.type = 'button'; nutPro.id = 'tkNutPro';
-      nutPro.style.cssText = 'position:fixed;right:14px;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);z-index:40;' +
-        'border:0;border-radius:999px;padding:11px 16px;font:inherit;font-weight:800;font-size:13px;cursor:pointer;' +
-        'background:var(--pro,#26210F);color:var(--pro-text,#F9E8DD);box-shadow:0 8px 22px rgba(0,0,0,.22)';
-      nutPro.onclick = function () { mo('pro'); };
-      document.body.appendChild(nutPro);
+    if (!can) { if (nutPro) { nutPro.remove(); nutPro = null; } }
+    else {
+      if (!nutPro) {
+        nutPro = document.createElement('button'); nutPro.type = 'button'; nutPro.id = 'tkNutPro'; nutPro.className = 'tk-pro-nut';
+        nutPro.onclick = moPro; document.body.appendChild(nutPro);
+      }
+      nutPro.textContent = '✦ Nâng cấp Pro' + (gia ? ' · ' + gia : '');
     }
-    nutPro.textContent = '✦ Nâng cấp Pro' + (nhanGia() ? ' · ' + nhanGia() : '');
+    // cạnh nút tài khoản
+    var acct = document.getElementById('acctBtn');
+    var canTop = acct && !laPro();
+    if (!canTop) { if (nutTop) { nutTop.remove(); nutTop = null; } return; }
+    if (!nutTop) {
+      nutTop = document.createElement('button'); nutTop.type = 'button'; nutTop.id = 'tkNutProTop'; nutTop.className = 'tk-pro-nut tk-pro-top';
+      nutTop.onclick = moPro;
+    }
+    if (nutTop.nextSibling !== acct) acct.parentNode.insertBefore(nutTop, acct);
+    nutTop.innerHTML = '✦ <span class="tk-pro-dai">Nâng cấp </span>Pro' + (gia ? ' <span class="tk-pro-dai">· ' + gia.split(' · ')[0] + '</span>' : '');
   }
 
   global.TK = {
