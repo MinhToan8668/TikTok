@@ -456,11 +456,15 @@
     var o = el('div'); oTrang.appendChild(o);
     o.appendChild(el('p', 'tk-tt', 'Đang tạo mã chuyển khoản…'));
     try {
-      var r = await goi({ action: 'st_buy', token: token() });
+      var r = await goi({ action: 'st_buy', token: token(), goi: g.ma });   // thiếu mã gói là máy chủ trả goi_sai
       o.innerHTML = '';
       if (!r.ok) {
-        o.appendChild(el('p', 'tk-tt loi', r.error === 'chua_cai_bank'
-          ? 'Mentor chưa cài tài khoản nhận tiền. Nhắn mentor giúp mình.' : 'Chưa tạo được mã, thử lại sau.'));
+        o.appendChild(el('p', 'tk-tt loi', {
+          chua_cai_stk: 'Mentor chưa cài tài khoản nhận tiền. Nhắn mentor giúp mình.',
+          chua_cai_bank: 'Mentor chưa cài tài khoản nhận tiền. Nhắn mentor giúp mình.',
+          goi_sai: 'Mentor chưa cài gói Pro. Nhắn mentor giúp mình.',
+          het_phien: 'Phiên đăng nhập hết hạn, đăng nhập lại rồi bấm lại giúp mình.'
+        }[r.error] || ('Chưa tạo được mã' + (r.error ? ' (' + r.error + ')' : '') + ', thử lại sau.')));
       } else {
         var b = r.bank || {};
         if (r.qr) { var im = new Image(); im.src = r.qr; im.alt = 'Mã QR chuyển khoản'; im.style.cssText = 'width:100%;max-width:230px;display:block;margin:0 auto 10px;border-radius:12px'; o.appendChild(im); }
