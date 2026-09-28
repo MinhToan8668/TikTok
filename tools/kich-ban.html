@@ -161,6 +161,7 @@
   <nav class="feat-tabs" aria-label="Công cụ trong Viral Studio">
     <a class="ft on" href="#" aria-current="page">Kịch bản viral</a>
     <a class="ft" href="hook-text.html">Hook viral</a>
+    <a class="ft" href="soi-video.html">Soi video viral</a>
   </nav>
 
   <div class="grid">
@@ -471,6 +472,7 @@ bindSeg('mucTieu', v => { state.mucTieu = v; buildPhan(); saveDraft(); });
 bindSeg('dang', v => { state.dang = v; saveDraft(); });
 bindSeg('tocDo', v => { state.tocDo = v; updateTimes(); saveDraft(); });
 ['chuDe', 'doiTuong', 'xungHo', 'sanPham'].forEach(id => $('#' + id).addEventListener('input', saveDraft));
+(function importSoi() { try { const im = JSON.parse(ls.get('kb.import') || 'null'); if (!im || !im.khung) return; ls.del ? ls.del('kb.import') : localStorage.removeItem('kb.import'); const K = KHUNG.find(x => x.k === im.khung); if (!K) return; state.khung = K.k; state.text[K.k] = {}; (im.phan || []).forEach((g, i) => { if (K.phan[i] && g) state.text[K.k][K.phan[i][0]] = g; }); if (im.chuDe) $('#chuDe').value = im.chuDe; if (im.doiTuong) $('#doiTuong').value = im.doiTuong; if (im.sanPham) $('#sanPham').value = im.sanPham; state.kq = null; saveDraft(); setTimeout(() => toast('Đã nhập khung' + (im.nguon ? ' mượn từ ' + im.nguon : '') + '. Gợi ý trong [ ] là chỗ bạn thay bằng chuyện thật của mình.'), 400); } catch {} })();
 buildKhung(); buildPhan();
 $('#btnCham').addEventListener('click', cham);
 $('#btnCopy').addEventListener('click', () => { const K = khungHienTai(); copyText(goiKichBan().filter(p => p.text).map(p => `[${p.ten}]\n${p.text}`).join('\n\n')); });

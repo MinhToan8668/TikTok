@@ -232,3 +232,10 @@ Muốn tặng thêm lượt hoặc gia hạn tay: sửa cột `luot_dung` (số 
 - Bấm **Chấm kịch bản** gọi `hook_ai` với `mode: 'script'` trong HookAI.gs (hàm `hookScript`). Kiến thức chấm nằm trong `KB_KIEN_THUC`, khung trong `KB_KHUNG`.
 - Lượt dùng chung với AI phân tích hook: khách 3 lượt, tài khoản Free 10 lượt, Pro theo hạn ngày (`HOOK_AI_DAILY`).
 - Xem giao diện không cần máy chủ: mở `kich-ban.html#demo`.
+
+## Soi video viral (tools/soi-video.html)
+
+- Tab thứ ba của Viral Studio. Học viên dán link video cùng ngách (TikTok, YouTube tự lấy caption, tên kênh, ảnh bìa qua oEmbed bằng `mode: 'link'`, không tốn lượt), chép lời thoại, số liệu, bình luận nổi bật.
+- Bấm **Soi video** gọi `hook_ai` với `mode: 'soi'` (hàm `hookSoi`). AI mổ theo ba cửa của khoá: dừng lại, xem hết, lặp lại được; đọc bình luận, đọc số theo tỉ lệ trên view; rút khuôn có chỗ trống; áp sang kênh học viên (3 hook + khung kịch bản + gợi ý từng phần).
+- Nút "Viết kịch bản theo khung này" chuyển sang tab Kịch bản viral và điền sẵn gợi ý từng phần (qua localStorage `kb.import`).
+- Lượt dùng chung với AI phân tích hook và chấm kịch bản. Xem giao diện không cần máy chủ: `soi-video.html#demo`.
