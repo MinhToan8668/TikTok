@@ -121,7 +121,7 @@ function ndHoSo(nd){
           pro_han:nd.pro_han, luot_con:ndLuotCon(nd), luot_thu:ST_LUOT_THU,
           luot: {hook:ndLuotCon(nd,'hook'), script:ndLuotCon(nd,'script'), soi:ndLuotCon(nd,'soi')},
           han:  {hook:ST_LUOT_THU, script:ST_LUOT_KB, soi:ST_LUOT_SOI},
-          ho_so: ndDocHs(nd)};
+          ho_so: hsHienDung(nd.email, nd.sdt, nd), ho_so_nguon: hsNguon(nd.email, nd.sdt, nd)};
 }
 
 /* Token người dùng: "U" + mã + "." + 40 ký tự ngẫu nhiên. Sheet chỉ giữ bản băm. */
@@ -234,7 +234,9 @@ function stToi(b){
     return jsonOut({ok:true, ho_so:hs});
   }
   var hv = aiDay(b.token);
-  if (hv) return jsonOut({ok:true, ho_so:{loai:'hv', ten:hv.ten_goi||hv.ten, email:hv.email, pro:true, vaitro:hv.vaitro}});
+  if (hv) return jsonOut({ok:true, ho_so:{loai:'hv', ten:hv.ten_goi||hv.ten, email:hv.email, pro:true, vaitro:hv.vaitro,
+    mentor: hv.vaitro === 'mentor' || hv.vaitro === 'admin',
+    ho_so: hsHienDung(hv.email, '', null), ho_so_nguon: hsNguon(hv.email, '', null)}});
   return jsonOut({ok:false, error:'het_phien'});
 }
 
@@ -320,30 +322,51 @@ function stBaoDungChung(nd, ds){
 /* ── hồ sơ kênh: học viên tự sửa; mentor sửa hộ bằng cách gửi thêm 'ma' ── */
 function stLuuHoSo(b){
   var nd = ndTuToken(b.token), hv = nd ? null : aiDay(b.token);
+  if (!nd && !hv) return jsonOut({ok:false, error:'het_phien'});
   var laMentor = !!(hv && (hv.vaitro === 'mentor' || hv.vaitro === 'admin'));
-  if (!nd && !laMentor) return jsonOut({ok:false, error:'het_phien'});
-  var dich = nd;
-  if (b.ma){
-    if (!laMentor && (!nd || String(nd.ma).toUpperCase() !== String(b.ma).toUpperCase()))
-      return jsonOut({ok:false, error:'khong_co_quyen'});
-    dich = ndTheoMa(b.ma);
-  }
-  if (!dich) return jsonOut({ok:false, error:'khong_thay'});
   var hs = ndLamHs(b.ho_so);
-  ghiDong(ST_SHEET, ST_HEADERS, dich, {ho_so: JSON.stringify(hs)});
+
+  // mentor sửa hộ người khác: nhận mã tài khoản Studio hoặc email của học viên
+  if (b.ma || b.email_dich){
+    if (!laMentor) return jsonOut({ok:false, error:'khong_co_quyen'});
+    var dich = b.ma ? ndTheoMa(b.ma) : null;
+    var em = dich ? dich.email : chuanEmail(b.email_dich), st = dich ? dich.sdt : (b.sdt_dich || '');
+    if (!em && !st) return jsonOut({ok:false, error:'khong_thay'});
+    hsGhi(em, st, b.ten_dich || (dich ? dich.ten : ''), hs, 'mentor');
+    if (dich) ghiDong(ST_SHEET, ST_HEADERS, dich, {ho_so: JSON.stringify(hs)});
+    return jsonOut({ok:true, ho_so: hs});
+  }
+
+  var email = nd ? nd.email : hv.email, sdt = nd ? nd.sdt : '', ten = nd ? nd.ten : (hv.ten_goi || hv.ten);
+  hsGhi(email, sdt, ten, hs, 'sua_tay');
+  if (nd) ghiDong(ST_SHEET, ST_HEADERS, nd, {ho_so: JSON.stringify(hs)});
   return jsonOut({ok:true, ho_so: hs});
 }
 /* Mentor xem danh sách tài khoản để chạy thử tool bằng hồ sơ thật của học viên. */
 function stDanhSach(b){
   var hv = aiDay(b.token);
   if (!hv || (hv.vaitro !== 'mentor' && hv.vaitro !== 'admin')) return jsonOut({ok:false, error:'khong_co_quyen'});
-  var ds = moiND().map(function(nd){
-    var hs = ndDocHs(nd);
-    return {ma:nd.ma, ten:nd.ten, email:nd.email, sdt:nd.sdt, goi: ndLaPro(nd) ? 'pro' : 'free',
-            tao:nd.tao, dangnhap_cuoi:nd.dangnhap_cuoi, so_truong: ndCoHs(hs),
-            luot: {hook:ndLuotCon(nd,'hook'), script:ndLuotCon(nd,'script'), soi:ndLuotCon(nd,'soi')},
-            ho_so: hs};
+  var ds = [], daCo = {};
+  moiND().forEach(function(nd){
+    var hs = hsHienDung(nd.email, nd.sdt, nd), k = hsKhoa(nd.email, nd.sdt);
+    if (k) daCo[k] = 1;
+    ds.push({ma:nd.ma, ten:nd.ten, email:nd.email, sdt:nd.sdt, goi: ndLaPro(nd) ? 'pro' : 'free',
+      nguon:'tai_khoan', ho_so_nguon: hsNguon(nd.email, nd.sdt, nd),
+      tao:nd.tao, dangnhap_cuoi:nd.dangnhap_cuoi, so_truong: ndCoHs(hs),
+      luot: {hook:ndLuotCon(nd,'hook'), script:ndLuotCon(nd,'script'), soi:ndLuotCon(nd,'soi')}, ho_so: hs});
   });
+  // học viên mới điền form đăng ký khoá, chưa tạo tài khoản Viral Studio
+  try{
+    allRegs().forEach(function(r){
+      var k = hsKhoa(r.email, r.phone);
+      if (!k || daCo[k]) return;
+      daCo[k] = 1;
+      var hs = hsHienDung(r.email, r.phone, null);
+      ds.push({ma:'', ten:r.name, email:r.email || '', sdt:r.phone || '', goi:'dk', nguon:'form_dang_ky',
+        ho_so_nguon: hsNguon(r.email, r.phone, null), tao:r.time, dangnhap_cuoi:'',
+        so_truong: ndCoHs(hs), luot:null, ho_so:hs});
+    });
+  }catch(e){ ghiLoi('stDanhSach/regs', e); }
   return jsonOut({ok:true, ds:ds, han:{hook:ST_LUOT_THU, script:ST_LUOT_KB, soi:ST_LUOT_SOI}});
 }
 function stLichSu(b){
@@ -440,6 +463,93 @@ function studioCallback(cb){
 }
 
 
+
+/* ═══════ HỒ SƠ KÊNH: một kho duy nhất cho mọi kiểu tài khoản ═══════
+   Ba nguồn, đọc theo thứ tự ưu tiên:
+     1. bảng HoSoKenh — bản học viên hoặc mentor đã sửa tay, khoá theo email
+     2. cột ho_so của tài khoản Viral Studio
+     3. dựng tự động từ FORM ĐĂNG KÝ KHOÁ HỌC (bảng DangKy) — chỗ học viên đã kể hết
+        ngách, tệp, nỗi đau, tone, định dạng lúc đăng ký với mentor
+   Nhờ vậy học viên đăng nhập bằng tài khoản khu học viên (không có dòng trong NguoiDung)
+   vẫn được cá nhân hoá, và người vừa đăng ký khoá là tool đã biết kênh họ. */
+var ST_HS_SHEET   = 'HoSoKenh';
+var ST_HS_HEADERS = ['khoa','ten','email','sdt','ho_so','nguon','cap_nhat'];
+
+function hsKhoa(email, sdt){
+  var e = chuanEmail(email);
+  if (e) return e;
+  var d = String(sdt || '').replace(/\D/g, '');
+  return d ? 'sdt:' + d.slice(-9) : '';
+}
+function hsTim(email, sdt){
+  var k = hsKhoa(email, sdt); if (!k) return null;
+  var hit = null;
+  try{ docBang(ST_HS_SHEET, ST_HS_HEADERS).forEach(function(r){ if (!hit && String(r.khoa) === k) hit = r }); }catch(e){}
+  return hit;
+}
+function hsGhi(email, sdt, ten, hs, nguon){
+  var k = hsKhoa(email, sdt); if (!k) return;
+  var cu = hsTim(email, sdt), gt = JSON.stringify(hs || {});
+  if (cu) ghiDong(ST_HS_SHEET, ST_HS_HEADERS, cu, {ten: ten || cu.ten, ho_so: gt, nguon: nguon || 'sua_tay', cap_nhat: nowVN()});
+  else bang(ST_HS_SHEET, ST_HS_HEADERS).appendRow([k, ten || '', chuanEmail(email), "'" + String(sdt || ''), gt, nguon || 'sua_tay', nowVN()]);
+}
+
+/* ── dựng hồ sơ từ một dòng form đăng ký khoá học ── */
+function dkGop(){ var a = []; for (var i = 0; i < arguments.length; i++){ var v = String(arguments[i] || '').trim(); if (v) a.push(v); } return a.join(' · '); }
+var DK_TONE_XUNG = {
+  'chị em thân mật':'mình – các chị', 'vui vẻ, hài hước':'mình – mấy bạn', 'kể chuyện':'mình – mấy bạn',
+  'thẳng thắn, thực tế':'mình – mấy bạn', 'truyền cảm hứng':'mình – mấy bạn',
+  'chuyên nghiệp, sắc bén':'tôi – các bạn', 'giáo dục, trầm tĩnh':'tôi – các bạn'
+};
+function dkHoSo(r){
+  if (!r) return null;
+  var hs = {};
+  if (r.niche)   hs.nganh    = String(r.niche).slice(0, 600);
+  hs.doi_tuong = dkGop(r.audience, r.aud_age, r.aud_gender && String(r.aud_gender) !== 'Đa dạng' ? r.aud_gender : '');
+  hs.dinh_vi   = dkGop(r.unique, r.job ? 'Nghề: ' + r.job : '', r.strength ? 'Thế mạnh: ' + r.strength : '');
+  hs.muc_tieu  = dkGop(r.goals, r.timeline);
+  if (r.tone){
+    var t0 = String(r.tone).split(/[,;·]/)[0].trim().toLowerCase();
+    hs.xung_ho = DK_TONE_XUNG[t0] || '';
+    hs.ghi_chu = dkGop('Tone: ' + r.tone);
+  }
+  if (r.format)  hs.dang     = String(r.format);
+  hs.ghi_chu = dkGop(hs.ghi_chu, r.pain ? 'Nỗi đau của khán giả: ' + r.pain : '',
+                     r.camera ? 'Thoải mái lên hình: ' + r.camera + '/5' : '',
+                     r.time_week ? 'Thời gian mỗi tuần: ' + r.time_week : '',
+                     r.tried ? 'Đã từng: ' + r.tried : '', r.channel ? 'Kênh: ' + r.channel : '',
+                     r.refs ? 'Kênh tham khảo: ' + r.refs : '', r.fear ? 'Đang ngại: ' + r.fear : '');
+  if (r.channel) hs.kenh = String(r.channel).slice(0, 200);
+  var o = {}; ST_HS_TRUONG.forEach(function(k){ if (hs[k]) o[k] = String(hs[k]).slice(0, 600) });
+  return o;
+}
+function dkTim(email, sdt){
+  var e = chuanEmail(email), d = String(sdt || '').replace(/\D/g, '').slice(-9), hit = null;
+  try{
+    allRegs().forEach(function(r){
+      if (hit) return;
+      if (e && chuanEmail(r.email || '') === e) hit = r;
+      else if (d && String(r.phone || '').replace(/\D/g, '').slice(-9) === d) hit = r;
+    });
+  }catch(err){}
+  return hit;
+}
+
+/* Hồ sơ đang có hiệu lực của một người. nd có thể là null (học viên khu học viên). */
+function hsHienDung(email, sdt, nd){
+  var t = hsTim(email, sdt);
+  if (t){ try{ var o = JSON.parse(t.ho_so || '{}'); if (ndCoHs(o)) return o; }catch(e){} }
+  if (nd){ var a = ndDocHs(nd); if (ndCoHs(a)) return a; }
+  var dk = dkHoSo(dkTim(email, sdt));
+  return (dk && ndCoHs(dk)) ? dk : {};
+}
+function hsNguon(email, sdt, nd){
+  var t = hsTim(email, sdt);
+  if (t){ try{ if (ndCoHs(JSON.parse(t.ho_so || '{}'))) return 'sua_tay'; }catch(e){} }
+  if (nd && ndCoHs(ndDocHs(nd))) return 'tai_khoan';
+  return dkTim(email, sdt) ? 'form_dang_ky' : '';
+}
+
 /* ═══════ HỒ SƠ KÊNH MẪU — chốt trong buổi định hướng 08/09/2026 ═══════
    Nạp sẵn để học viên vào tool là tool đã biết kênh họ, khỏi điền lại từ đầu.
    Học viên sửa được trong mục Tài khoản; mentor gán bằng /naphoso email duong */
@@ -521,9 +631,21 @@ function stHsMau(k){
 /* Tự gán hồ sơ cho tài khoản đã có, khớp theo tên. Chạy tay trong trình soạn Apps Script,
    hoặc dùng /naphoso email duong cho chắc tay. Không ghi đè hồ sơ học viên đã tự sửa. */
 function stNapHoSoMau(){
-  var ds = moiND(), ket = [];
-  ds.forEach(function(nd){
-    if (ndCoHs(ndDocHs(nd))) { ket.push('bỏ qua (đã có hồ sơ): ' + nd.ten); return; }
+  var ket = [];
+  // người đã điền form đăng ký khoá: dựng hồ sơ thẳng từ câu trả lời của họ
+  try{
+    allRegs().forEach(function(r){
+      var k = hsKhoa(r.email, r.phone); if (!k) return;
+      var t = hsTim(r.email, r.phone);
+      if (t){ try{ if (ndCoHs(JSON.parse(t.ho_so || '{}'))) { ket.push('bỏ qua (đã có hồ sơ): ' + r.name); return; } }catch(e){} }
+      var hs = dkHoSo(r);
+      if (!hs || !ndCoHs(hs)) { ket.push('form đăng ký thiếu dữ liệu: ' + r.name); return; }
+      hsGhi(r.email, r.phone, r.name, hs, 'form_dang_ky');
+      ket.push('✅ ' + r.name + ' ← form đăng ký khoá (' + ndCoHs(hs) + ' mục)');
+    });
+  }catch(e){ ket.push('không đọc được bảng đăng ký: ' + e); }
+  moiND().forEach(function(nd){
+    if (ndCoHs(hsHienDung(nd.email, nd.sdt, nd))) { ket.push('bỏ qua (đã có hồ sơ): ' + nd.ten); return; }
     var ten = khongDau(nd.ten || '');
     var key = null;
     Object.keys(ST_HS_MAU).forEach(function(k){
@@ -532,9 +654,10 @@ function stNapHoSoMau(){
     });
     if (!key) { ket.push('không khớp mẫu nào: ' + nd.ten); return; }
     ghiDong(ST_SHEET, ST_HEADERS, nd, {ho_so: JSON.stringify(stHsMau(key))});
+    hsGhi(nd.email, nd.sdt, nd.ten, stHsMau(key), 'mau');
     ket.push('✅ ' + nd.ten + ' ← ' + ST_HS_MAU[key].ten_goi);
   });
-  var t = ket.length ? ket.join('\n') : 'Chưa có tài khoản nào trong bảng NguoiDung.';
+  var t = ket.length ? ket.join('\n') : 'Chưa có ai trong bảng NguoiDung lẫn bảng đăng ký khoá.';
   Logger.log(t);
   return t;
 }
@@ -710,6 +833,7 @@ function studioLenh(cmd, arg, chatId){
     var khoaMau = (arg.split(/\s+/)[1] || '').toLowerCase();
     if (!ST_HS_MAU[khoaMau]) return hoi('📥 Gửi `email` kèm tên mẫu: `duong` · `duy` · `phong` · `hai`.\nVí dụ: `ban@gmail.com duong`');
     ghiDong(ST_SHEET, ST_HEADERS, nd, {ho_so: JSON.stringify(stHsMau(khoaMau))});
+    hsGhi(nd.email, nd.sdt, nd.ten, stHsMau(khoaMau), 'mau');
     return tgSend(chatId, '✅ Đã nạp hồ sơ *' + ST_HS_MAU[khoaMau].ten_goi + '* cho *' + nd.ten + '*.\nHọ sửa lại được trong tool ở mục Tài khoản → Hồ sơ kênh.');
   }
   if (cmd === 'lichsu'){

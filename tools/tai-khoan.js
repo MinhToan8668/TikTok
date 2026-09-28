@@ -255,7 +255,9 @@
 
   /* ── hồ sơ kênh ── */
   function veHoSo() {
-    oTrang.appendChild(el('h3', null, 'Hồ sơ kênh'));
+    var v = TK.vaiHoSo;
+    oTrang.appendChild(el('h3', null, v ? 'Hồ sơ kênh · ' + v.ten : 'Hồ sơ kênh'));
+    if (v) oTrang.appendChild(el('p', 'tk-phu', 'Bạn đang điền hộ ' + v.ten + (v.email ? ' (' + v.email + ')' : '') + '. Lưu xong, học viên đăng nhập là tool đã bám theo hồ sơ này.'));
     oTrang.appendChild(el('p', 'tk-phu', TK.me
       ? 'Điền được tới đâu hay tới đó. Tool đọc hồ sơ này để chấm đúng kênh bạn, không góp ý chung chung.'
       : 'Bạn chưa đăng nhập nên hồ sơ chỉ lưu trong máy này. Tạo tài khoản để lưu lại và dùng trên máy khác.'));
@@ -288,35 +290,62 @@
     oTrang.appendChild(q);
   }
   async function luuHoSo(hs) {
-    var r = await goi({ action: 'st_hoso', token: token(), ho_so: hs, ma: TK.vaiHoSo ? TK.vaiHoSo.ma : undefined });
+    var v = TK.vaiHoSo;
+    var r = await goi({ action: 'st_hoso', token: token(), ho_so: hs,
+      ma: v && v.ma ? v.ma : undefined,
+      email_dich: v && !v.ma ? v.email : undefined,
+      sdt_dich: v && !v.ma ? v.sdt : undefined,
+      ten_dich: v ? v.ten : undefined });
     if (!r.ok) return null;
     if (TK.vaiHoSo) TK.vaiHoSo.ho_so = r.ho_so; else if (TK.me) TK.me.ho_so = r.ho_so;
     bao(); return r.ho_so;
   }
 
   /* ── mentor: danh sách học viên ── */
-  async function veDsHv() {
-    oTrang.appendChild(el('h3', null, 'Tài khoản học viên'));
-    oTrang.appendChild(el('p', 'tk-phu', 'Bấm một người để mượn hồ sơ kênh của họ, rồi chạy thử tool y như họ đang dùng.'));
+  var NGUON_TEN = { tai_khoan: 'tài khoản Studio', form_dang_ky: 'form đăng ký khoá', sua_tay: 'đã sửa tay', mentor: 'mentor điền', mau: 'hồ sơ mẫu' };
+  async function veDsHv(loi) {
+    oTrang.appendChild(el('h3', null, 'Học viên'));
+    oTrang.appendChild(el('p', 'tk-phu', 'Gồm cả người mới điền form đăng ký khoá, chưa tạo tài khoản Viral Studio. Bấm một người để mượn hồ sơ kênh của họ rồi chạy thử tool y như họ đang dùng.'));
     var box = el('div', 'tk-ds'); oTrang.appendChild(box);
     box.appendChild(el('p', 'tk-tt', 'Đang tải…'));
     try {
-      if (!dsHv) { var r = await goi({ action: 'st_ds', token: token() }); dsHv = r.ok ? r.ds : []; }
+      if (!dsHv) {
+        var r = await goi({ action: 'st_ds', token: token() });
+        if (!r.ok) {
+          box.innerHTML = '';
+          box.appendChild(el('p', 'tk-tt loi', r.error === 'unknown_action'
+            ? 'Máy chủ đang chạy Studio.gs bản cũ nên chưa có danh sách này. Dán Studio.gs mới vào Apps Script rồi Deploy, nhớ chọn New version.'
+            : r.error === 'khong_co_quyen' ? 'Tài khoản này không phải mentor.' : 'Không tải được danh sách.'));
+          var q0 = nut('Quay lại'); q0.onclick = function () { ve('home'); }; oTrang.appendChild(q0);
+          return;
+        }
+        dsHv = r.ds || [];
+      }
       box.innerHTML = '';
-      if (!dsHv.length) { box.appendChild(el('p', 'tk-tt', 'Chưa có tài khoản nào.')); }
+      if (!dsHv.length) box.appendChild(el('p', 'tk-tt', 'Chưa có ai trong bảng tài khoản lẫn bảng đăng ký khoá.'));
       dsHv.slice().reverse().forEach(function (x) {
         var b = document.createElement('button'); b.type = 'button';
-        b.appendChild(el('b', null, (x.goi === 'pro' ? '✦ ' : '') + x.ten));
-        b.appendChild(el('small', null, [x.email, x.so_truong ? 'hồ sơ ' + x.so_truong + ' mục' + (x.ho_so.nganh ? ' · ' + x.ho_so.nganh : '') : 'chưa có hồ sơ'].join(' · ')));
+        b.appendChild(el('b', null, (x.goi === 'pro' ? '✦ ' : x.goi === 'dk' ? '📝 ' : '') + x.ten));
+        var mo = x.so_truong
+          ? 'hồ sơ ' + x.so_truong + ' mục' + (NGUON_TEN[x.ho_so_nguon] ? ' (' + NGUON_TEN[x.ho_so_nguon] + ')' : '') + (x.ho_so.nganh ? ' · ' + x.ho_so.nganh : '')
+          : 'chưa có hồ sơ kênh';
+        b.appendChild(el('small', null, [x.email || x.sdt, x.goi === 'dk' ? 'chưa có tài khoản Studio' : '', mo].filter(Boolean).join(' · ')));
         b.onclick = function () {
-          TK.vaiHoSo = x.so_truong ? x : null;
-          if (!x.so_truong) { alert('Học viên này chưa điền hồ sơ kênh.'); return; }
-          bao(); ve('home');
+          if (!x.so_truong) { TK.vaiHoSo = null; bao(); moSuaHo(x); return; }
+          TK.vaiHoSo = x; bao(); ve('home');
         };
         box.appendChild(b);
       });
-    } catch (e) { box.innerHTML = ''; box.appendChild(el('p', 'tk-tt loi', 'Không tải được danh sách.')); }
-    var q = nut('Quay lại'); q.onclick = function () { ve('home'); }; oTrang.appendChild(q);
+    } catch (e) { box.innerHTML = ''; box.appendChild(el('p', 'tk-tt loi', 'Không kết nối được máy chủ.')); }
+    var hang = el('div', 'tk-hang');
+    var lam = nut('Tải lại'); lam.onclick = function () { dsHv = null; ve('hv'); };
+    var q = nut('Quay lại'); q.onclick = function () { ve('home'); };
+    hang.appendChild(lam); hang.appendChild(q); oTrang.appendChild(hang);
+  }
+  /* Mentor điền hộ hồ sơ cho người chưa có: mở đúng form hồ sơ, lưu theo email của họ. */
+  function moSuaHo(x) {
+    TK.vaiHoSo = { ma: x.ma || '', ten: x.ten, email: x.email, sdt: x.sdt, ho_so: x.ho_so || {}, dienHo: true };
+    bao(); ve('hoso');
   }
 
   /* ── nạp hồ sơ tài khoản ── */
@@ -361,7 +390,8 @@
         return;
       }
       if (co) {
-        v.appendChild(el('b', null, '📋 Đang cá nhân hoá theo kênh của bạn' + (hs.nganh ? ': ' + hs.nganh : '')));
+        var ng = TK.me && TK.me.ho_so_nguon === 'form_dang_ky' ? ' · lấy từ form đăng ký khoá của bạn' : '';
+        v.appendChild(el('b', null, '📋 Đang cá nhân hoá theo kênh của bạn' + (hs.nganh ? ': ' + hs.nganh : '') + ng));
         v.appendChild(document.createTextNode('AI chấm theo đúng ngách, tệp, xưng hô và mấy điều kênh bạn không được nói.'));
         var b1 = nut('Sửa hồ sơ kênh'); b1.onclick = function () { mo('hoso'); }; v.appendChild(b1);
       } else {

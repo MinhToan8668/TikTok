@@ -84,7 +84,12 @@ function hookLuotCon(ai){
 }
 function hookHoSo(ai, b){
   var hs = {};
-  if (ai.nd && typeof ndDocHs === 'function') hs = ndDocHs(ai.nd) || {};
+  if (typeof hsHienDung === 'function'){
+    var em = ai.nd ? ai.nd.email : (ai.me && ai.me.email) || '';
+    var st = ai.nd ? ai.nd.sdt : '';
+    try{ hs = hsHienDung(em, st, ai.nd || null) || {}; }catch(e){ hs = {}; }
+  }
+  if (!hs || !Object.keys(hs).length) hs = (ai.nd && typeof ndDocHs === 'function') ? (ndDocHs(ai.nd) || {}) : {};
   var them = (b && b.ho_so && typeof b.ho_so === 'object') ? b.ho_so : {};
   if (typeof ST_HS_TRUONG !== 'undefined')
     ST_HS_TRUONG.forEach(function(k){ if (them[k]) hs[k] = String(them[k]).slice(0, 600) });
@@ -935,9 +940,9 @@ function hookTrangThai(b){
   if (ai.loai === 'free') return jsonOut({ok:true, ten: me.ten, loai:'free', tool:tool,
     con: ndLuotCon(ai.nd, tool), han: (ST_TOOL[tool] || ST_TOOL.hook).han(),
     luot: {hook:ndLuotCon(ai.nd,'hook'), script:ndLuotCon(ai.nd,'script'), soi:ndLuotCon(ai.nd,'soi')},
-    han_tool: {hook:ST_LUOT_THU, script:ST_LUOT_KB, soi:ST_LUOT_SOI}, ho_so: ndDocHs(ai.nd)});
+    han_tool: {hook:ST_LUOT_THU, script:ST_LUOT_KB, soi:ST_LUOT_SOI}, ho_so: hookHoSo(ai, b)});
   var han = parseInt(hookCfg('HOOK_AI_DAILY') || '20', 10) || 20;
-  var hsMe = (ai.nd && typeof ndDocHs === 'function') ? ndDocHs(ai.nd) : {};
+  var hsMe = hookHoSo(ai, b);
   if (me.vaitro === 'mentor') return jsonOut({ok:true, ten: me.ten_goi || me.ten, con:null, han:han, loai:ai.loai, mentor:true, ho_so:hsMe});
   var dem = hookDemHomNay()[me.ma] || 0;
   return jsonOut({ok:true, ten: me.ten_goi || me.ten, con: Math.max(0, han - dem), han:han, loai:ai.loai, ho_so:hsMe});
