@@ -233,8 +233,8 @@
 
     if (tab === 'signup') {
       var qua = el('div', 'tk-qua');
-      qua.innerHTML = '🎁 Miễn phí, dùng được ngay: <b>10 lượt AI phân tích hook</b>, <b>3 lượt chấm kịch bản</b>, <b>1 lượt soi video viral</b>.' +
-        '<br>Điền hồ sơ kênh một lần là cả ba tool tự bám đúng ngách và tệp của bạn.';
+      qua.innerHTML = '🎁 Miễn phí, dùng được ngay: <b>10 lượt AI phân tích hook</b>, <b>3 lượt chấm kịch bản</b>, <b>1 lượt soi video viral</b>, <b>1 lượt chấm video của bạn</b>.' +
+        '<br>Điền hồ sơ kênh một lần là cả bốn tool tự bám đúng ngách và tệp của bạn.';
       oTrang.appendChild(qua);
     }
 
@@ -328,14 +328,14 @@
 
     if (!laPro()) {
       var lu = el('div', 'tk-luot'), l = a.luot || {}, h = a.han || {};
-      [['hook', 'Hook'], ['script', 'Kịch bản'], ['soi', 'Soi video']].forEach(function (p) {
+      [['hook', 'Hook'], ['script', 'Kịch bản'], ['soi', 'Soi video'], ['cham', 'Chấm video']].forEach(function (p) {
         var con = l[p[0]], sp = el('span', con === 0 ? 'het' : null, p[1] + ': còn ' + (con == null ? '?' : con) + '/' + (h[p[0]] == null ? '?' : h[p[0]]));
         lu.appendChild(sp);
       });
       oTrang.appendChild(lu);
       var up = el('div', 'tk-moi');
       up.appendChild(el('b', null, '✦ Nâng cấp Pro' + (nhanGia() ? ' · ' + nhanGia() : '')));
-      up.appendChild(document.createTextNode('Dùng cả ba tool theo hạn mức ngày, không còn đếm lượt. Chuyển khoản xong mentor mở trong ngày.'));
+      up.appendChild(document.createTextNode('Dùng cả bốn tool theo hạn mức ngày, không còn đếm lượt. Chuyển khoản xong mentor mở trong ngày.'));
       var bu = nut('Xem cách chuyển khoản', true); bu.onclick = function () { ve('pro'); };
       up.appendChild(bu); oTrang.appendChild(up);
     }
@@ -531,8 +531,9 @@
     if (!t) { TK.me = null; bao(); return null; }
     try {
       var r = await goi({ action: 'st_me', token: t });
+      TK.napLoi = null;
       if (r.ok && r.ho_so) { TK.me = r.ho_so; } else { TK.me = null; if (r.error === 'het_phien') { ls.del(ND_KEY); ls.del(HV_KEY); } }
-    } catch (e) { }
+    } catch (e) { TK.napLoi = e; }   // mất mạng hay máy chủ lỗi: giữ TK.me cũ, đừng coi là hết phiên
     bao(); return TK.me;
   }
   function bao() { if (typeof TK.onDoi === 'function') { try { TK.onDoi(TK.me); } catch (e) { } } }
@@ -545,6 +546,7 @@
       return false;
     }
     if (!TK.me) await nap();
+    if (!TK.me && TK.napLoi) { mo('home', loiMang(TK.napLoi) ? 'Máy bạn đang mất mạng, kiểm tra kết nối rồi thử lại.' : 'Máy chủ đang lỗi hoặc chưa deploy bản mới, thử lại sau ít phút.'); return false; }
     if (!TK.me) { mo('signup', 'Phiên đăng nhập đã hết hạn, đăng nhập lại giúp mình.'); return false; }
     if (!laPro()) {
       var con = luotCon(tool);
@@ -751,6 +753,7 @@
 
   global.TK = {
     khoiDong: khoiDong, nap: nap, mo: mo, dong: dong, canCo: canCo,
+    goi: goi, loiMang: loiMang, loiMayChu: loiMayChu,   // tool dùng chung một cách gọi API và một cách phân loại lỗi
     moHocVien: function () { tab = 'signup'; kieu = 'hv'; mo('signup'); },
     token: token, dev: dev, hoSo: hoSo, luuHoSoTam: luuHoSoTam,
     laPro: laPro, laMentor: laMentor, luotCon: luotCon, oMoiHoSo: oMoiHoSo, ganO: ganO, ghiTruong: ghiTruong, taiVideo: taiVideo, zalo: zalo, giaPro: nhanGia,

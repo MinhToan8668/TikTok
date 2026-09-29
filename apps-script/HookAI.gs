@@ -211,9 +211,12 @@ function schemaRutGon(sc){
   return o;
 }
 
-function goiGemini(key, img, prompt, schema, maxTok, media, nhiet){
+/* hetGio: mốc Date.now() phải trả kết quả trước đó. Apps Script giết script ở 6 phút, nên hàm gọi
+   (đã tốn thời gian tải video) truyền mốc này xuống để không có lần thử nào bắt đầu quá muộn. */
+function goiGemini(key, img, prompt, schema, maxTok, media, nhiet, hetGio){
   schema = schema || HOOK_SCHEMA; maxTok = maxTok || 6000;
   nhiet = (nhiet == null) ? 0.7 : nhiet;   // chấm điểm dùng ~0.15 cho ra đều tay, sáng tác dùng 0.7–0.8
+  var hanGio = Math.min(Date.now() + 300000, Number(hetGio) || Infinity);
   var cauHinh = hookCfg('HOOK_AI_MODEL');
   var coSan = geminiModels(key);
   var models = cauHinh ? [cauHinh].concat(coSan.filter(function(m){ return m !== cauHinh })) : coSan;
@@ -227,12 +230,12 @@ function goiGemini(key, img, prompt, schema, maxTok, media, nhiet){
     {ten:'schema',     gc:{responseMimeType:'application/json', responseSchema: schemaRutGon(schema), maxOutputTokens: maxTok, temperature: nhiet}},
     {ten:'tudo',       gc:{responseMimeType:'application/json', maxOutputTokens: maxTok, temperature: nhiet}}
   ];
-  var loiCuoi = '', modelCuoi = models[0], quaTai = false, batDau = Date.now();
+  var loiCuoi = '', modelCuoi = models[0], quaTai = false;
   for (var mi = 0; mi < models.length; mi++){
     var model = models[mi]; modelCuoi = model;
     var soLanCho = 0, CHO = [3000, 8000];           // quá tải: chờ 3 giây rồi 8 giây trên cùng model, rồi mới đổi
     for (var ki = 0; ki < kieu.length; ki++){
-      if (Date.now() - batDau > 300000) return {ok:false, error: quaTai ? 'ban_qua' : 'loi_ai', loi:'het gio · ' + loiCuoi, model:model};
+      if (Date.now() > hanGio - 45000) return {ok:false, error: quaTai ? 'ban_qua' : 'het_gio', loi:'het gio · ' + loiCuoi, model:model};   // chừa 45 giây cho phần ghi log và trả JSON
       var req = { contents:[{role:'user', parts:parts}], generationConfig: kieu[ki].gc };
       var res, ma, raw;
       try{
@@ -259,7 +262,7 @@ function goiGemini(key, img, prompt, schema, maxTok, media, nhiet){
       if (ma === 401 || ma === 403 || /API_KEY_INVALID|API key not valid/.test(raw)) return {ok:false, error:'sai_key', loi:loiCuoi, model:model};
       if (ma === 429 || ma === 503 || ma === 500){
         quaTai = true;
-        if (soLanCho < CHO.length && Date.now() - batDau < 240000){ Utilities.sleep(CHO[soLanCho++]); ki--; continue; }   // thử lại đúng kiểu này
+        if (soLanCho < CHO.length && Date.now() < hanGio - 90000){ Utilities.sleep(CHO[soLanCho++]); ki--; continue; }   // thử lại đúng kiểu này nếu còn dư giờ
         break;                                                                          // vẫn bận: sang model khác
       }
       if (ma === 404) break;                                                            // model không có: sang model khác
@@ -291,7 +294,8 @@ function goiClaude(key, img, prompt, schema, maxTok, nhiet){
     ma = res.getResponseCode(); raw = res.getContentText();
   }catch(err){ return {ok:false, error:'loi_mang', loi:'mang: '+err, model:model}; }
   if (ma !== 200) return {ok:false, error: (ma === 429 || ma === 529) ? 'ban_qua' : 'loi_ai', loi:'http '+ma+': '+String(raw).slice(0,300), model:model};
-  var j = JSON.parse(raw); var u = j.usage || {};
+  var j; try{ j = JSON.parse(raw); }catch(err){ return {ok:false, error:'loi_ai', loi:'json ngoai: '+String(raw).slice(0,200), model:model}; }
+  var u = j.usage || {};
   if (j.stop_reason === 'refusal') return {ok:false, error:'tu_choi', loi:'refusal', vin:u.input_tokens||0, vout:u.output_tokens||0, model:model};
   var chu = (j.content || []).filter(function(c){ return c.type === 'text' }).map(function(c){ return c.text }).join('');
   var data; try{ data = JSON.parse(chu); }catch(err){ return {ok:false, error:'loi_ai', loi:'json: '+chu.slice(0,200), vin:u.input_tokens||0, vout:u.output_tokens||0, model:model}; }
@@ -559,7 +563,7 @@ function hookScript(b, ai, provider, key){
       chu_man_hinh:{type:'string'}, caption:{type:'string'}, hashtags:{ type:'array', items:{type:'string'} }
     } };
 
-  var kq = provider === 'claude' ? goiClaude(key, '', prompt, schema, 7000, 0.2) : goiGemini(key, '', prompt, schema, 7000, 0.2);
+  var kq = provider === 'claude' ? goiClaude(key, '', prompt, schema, 7000, 0.2) : goiGemini(key, '', prompt, schema, 7000, null, 0.2);
   if (!kq.ok){
     hookHoan(ai);
     hookLog(me, '[kichban:' + khung + '] ' + toanBo.slice(0, 80), false, kq.loi, kq.vin || 0, kq.vout || 0, kq.model, ai);
@@ -702,20 +706,23 @@ function soiLink(b){
 
 /* Đưa video lên Files API của Gemini (dùng cho video trên 14MB). Trả về file_uri khi Gemini xử lý xong. */
 function geminiUploadFile(key, bytes, mime){
-  var r = UrlFetchApp.fetch('https://generativelanguage.googleapis.com/upload/v1beta/files', {
-    method:'post', contentType: mime, payload: bytes, muteHttpExceptions:true,
-    headers:{ 'x-goog-api-key': key, 'X-Goog-Upload-Protocol':'raw' } });
-  if (r.getResponseCode() !== 200) return {ok:false, loi:'files upload http ' + r.getResponseCode() + ': ' + r.getContentText().slice(0, 200)};
-  var f = (JSON.parse(r.getContentText()) || {}).file || {};
-  if (!f.name) return {ok:false, loi:'files upload khong co name'};
-  for (var i = 0; i < 40; i++){
-    if (f.state === 'ACTIVE') return {ok:true, uri:f.uri, mime:f.mimeType || mime};
-    if (f.state === 'FAILED') return {ok:false, loi:'files state FAILED'};
-    Utilities.sleep(2000);
-    var g = UrlFetchApp.fetch('https://generativelanguage.googleapis.com/v1beta/' + f.name, {muteHttpExceptions:true, headers:{'x-goog-api-key': key}});
-    if (g.getResponseCode() === 200) f = JSON.parse(g.getContentText()) || f;
-  }
-  return {ok:false, loi:'files cho qua lau'};
+  // Mọi lỗi mạng hay JSON hỏng đều trả {ok:false} để hàm gọi hoàn lượt, không ném ra doPost.
+  try{
+    var r = UrlFetchApp.fetch('https://generativelanguage.googleapis.com/upload/v1beta/files', {
+      method:'post', contentType: mime, payload: bytes, muteHttpExceptions:true,
+      headers:{ 'x-goog-api-key': key, 'X-Goog-Upload-Protocol':'raw' } });
+    if (r.getResponseCode() !== 200) return {ok:false, loi:'files upload http ' + r.getResponseCode() + ': ' + r.getContentText().slice(0, 200)};
+    var f = (JSON.parse(r.getContentText()) || {}).file || {};
+    if (!f.name) return {ok:false, loi:'files upload khong co name'};
+    for (var i = 0; i < 40; i++){
+      if (f.state === 'ACTIVE') return {ok:true, uri:f.uri, mime:f.mimeType || mime};
+      if (f.state === 'FAILED') return {ok:false, loi:'files state FAILED'};
+      Utilities.sleep(2000);
+      var g = UrlFetchApp.fetch('https://generativelanguage.googleapis.com/v1beta/' + f.name, {muteHttpExceptions:true, headers:{'x-goog-api-key': key}});
+      if (g.getResponseCode() === 200){ try{ f = JSON.parse(g.getContentText()) || f; }catch(e){} }
+    }
+    return {ok:false, loi:'files cho qua lau'};
+  }catch(err){ return {ok:false, loi:'files upload nga: ' + String(err).slice(0, 200)}; }
 }
 
 /* Lấy phần video để gửi Gemini: từ file học viên tải lên, từ TikTok (qua tikwm) hoặc YouTube (Gemini đọc thẳng link). */
@@ -844,7 +851,7 @@ function hookSoi(b, ai, provider, key){
     } };
 
   var kq = media ? goiGemini(gkey, '', prompt, schema, 9000, media, 0.3)
-         : provider === 'claude' ? goiClaude(key, img, prompt, schema, 8000, 0.3) : goiGemini(key, img, prompt, schema, 8000, 0.3);
+         : provider === 'claude' ? goiClaude(key, img, prompt, schema, 8000, 0.3) : goiGemini(key, img, prompt, schema, 8000, null, 0.3);
   var nhan = '[soi:' + String(b.nen || 'tiktok') + (media ? ':video' : ':chu') + '] ' + (b.tac_gia ? String(b.tac_gia).slice(0, 30) + ' · ' : '') + (loiThoai || String(b.caption || '')).slice(0, 60);
   if (!kq.ok){
     hookHoan(ai);
@@ -956,8 +963,12 @@ var CHAM_KIEN_THUC = [
   '14. CHẤM ỔN ĐỊNH, KHÔNG CẢM TÍNH. Với mỗi thang: ghi BẰNG CHỨNG trước (giây thứ mấy, câu gì, thấy gì), rồi mới cho điểm theo đúng mốc ở các mục trên. Cùng một bằng chứng phải ra cùng một điểm: 0–3 hỏng phần cốt lõi · 4–6 có ý nhưng vỏ thường hoặc còn lỗi rõ · 7–8 đúng bài, còn 1–2 chỗ chỉnh · 9–10 không thấy gì để chỉnh, người lạ chắc chắn dừng/xem hết. Không cho điểm lẻ 0,5 chỉ để "cho có"; chỉ dùng 0,5 khi bằng chứng nằm giữa hai mốc. Không thưởng điểm vì nội dung tử tế, không phạt vì gu cá nhân.'
 ].join('\n');
 
+var CHAM_B64_TOI_DA  = 62 * 1000 * 1000;   // ký tự base64 ≈ 45MB video; hơn nữa là quá SOI_VIDEO_TOI_DA, chặn trước khi giải mã
+var CHAM_GIAY_TOI_DA = 600;                // 10 phút; dài hơn Gemini xem không kịp trong 6 phút của Apps Script
+var CHAM_HET_GIO_MS  = 330 * 1000;         // ngân sách cả lượt chấm; Apps Script giết ở 360 giây
+
 function hookChamVideo(b, ai, provider, key){
-  var me = ai.me;
+  var me = ai.me, T0 = Date.now(), hetGio = T0 + CHAM_HET_GIO_MS;
   // video có thể tới theo ba đường: file nhỏ gửi thẳng (video_b64), file lớn đã nằm trên Gemini (file_uri), hoặc link
   var muonVideo = !!(b.file_uri || b.video_b64 || (b.link && /^(tiktok|youtube)$/.test(String(b.nen || soiNen(String(b.link || ''))))));
   var loiThoai = String(b.loi_thoai || '').slice(0, 5000).trim();
@@ -965,37 +976,48 @@ function hookChamVideo(b, ai, provider, key){
   var gkey = key;
   if (muonVideo && provider !== 'gemini'){ gkey = hookCfg('GEMINI_API_KEY'); if (!gkey) return jsonOut({ok:false, error:'can_gemini'}); }
 
-  var han = hookHan(ai);
-  var khongGioiHan = me.vaitro === 'mentor';
-  var con = hookTru(ai, han);
-  if (con < 0) return jsonOut({ok:false, error: ai.loai === 'free' ? 'het_luot_thu' : 'het_luot', han:han, tool: ai.tool});
-
-  var media = null, canhBao = '', video = null;
-  if (muonVideo){
-    video = soiLayVideo(b, gkey);
-    if (video.ok) media = [video.part];
-    else if (kbDemChu(loiThoai) >= 8) canhBao = 'Không tải được video (' + (video.loi || video.error) + '), AI chấm trên lời thoại và mô tả bạn gửi.';
-    else { hookHoan(ai); return jsonOut({ok:false, error: video.error || 'khong_tai_duoc_video', chi_tiet: String(video.loi || '').slice(0, me.vaitro === 'mentor' ? 600 : 220)}); }
-  }
-  var so = b.so_lieu && typeof b.so_lieu === 'object' ? b.so_lieu : {};
-  if (video && video.tw && video.tw.so_lieu){ var ts = video.tw.so_lieu; ['view','like','cmt','luu','share','giay'].forEach(function(k){ if (!(Number(so[k]) > 0) && Number(ts[k]) > 0) so[k] = ts[k]; }); }
-  var giay = Number(so.giay) > 0 ? Math.round(Number(so.giay)) : 0;
+  // Kiểm tra đầu vào TRƯỚC khi trừ lượt: quá lớn hay quá dài thì báo ngay, không tốn gì.
+  if (b.video_b64 && String(b.video_b64).length > CHAM_B64_TOI_DA) return jsonOut({ok:false, error:'video_qua_lon', chi_tiet:'base64 ' + String(b.video_b64).length});
+  var soGoc = (b.so_lieu && typeof b.so_lieu === 'object') ? b.so_lieu : {};
+  var so = {}; ['view','like','cmt','luu','share','giay'].forEach(function(k){ var v = Math.round(Number(soGoc[k]) || 0); if (isFinite(v) && v > 0) so[k] = v; });   // chỉ giữ số hữu hạn, không nhận khóa lạ
+  if (so.giay > CHAM_GIAY_TOI_DA) return jsonOut({ok:false, error:'video_qua_dai', chi_tiet: so.giay + 's'});
   var chuDe = String(b.chu_de || '').slice(0, 200), doiTuong = String(b.doi_tuong || '').slice(0, 200), sanPham = String(b.san_pham || '').slice(0, 150);
   var mucTieu = KB_MUC_TIEU[b.muc_tieu] || KB_MUC_TIEU.nhan_biet;
   var yDinh = String(b.y_dinh || '').slice(0, 1200).trim();
   var daDang = b.da_dang === true || b.da_dang === 'true';
   var gioDang = Number(b.gio_dang) || 0;
-  if (!gioDang && video && video.tw && video.tw.dang_luc) gioDang = Math.round((Date.now() / 1000 - video.tw.dang_luc) / 3600 * 10) / 10;
-  var viewGio = (daDang && gioDang > 0 && Number(so.view) > 0) ? Math.round(Number(so.view) / gioDang) : 0;
 
-  // Cùng video + cùng thông số → trả đúng kết quả cũ, hoàn lượt vừa trừ. Đây là cách duy nhất để hai lần
-  // bấm ra một đáp án; AI dù nhiệt thấp vẫn có thể lệch vài điểm.
-  var dauVideo = b.file_uri ? String(b.file_uri) : b.video_b64 ? ('b64:' + String(b.video_b64).length + ':' + String(b.video_b64).slice(0, 3000)) : String(b.link || '');
-  var khoaNho = 'cham_' + Utilities.base64EncodeWebSafe(Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, [me.ma, dauVideo, JSON.stringify(so), gioDang, daDang, b.muc_tieu, yDinh, chuDe, doiTuong, sanPham, loiThoai].join('|'), Utilities.Charset.UTF_8)).slice(0, 40);
+  // Cùng video + cùng thông số → trả đúng kết quả cũ, KHÔNG trừ lượt. Khóa tính từ đúng những gì học viên gửi
+  // (không dùng số tikwm trả về vì nó đổi theo phút), kèm nhà cung cấp AI và hồ sơ kênh để đổi hồ sơ là chấm mới.
+  var han = hookHan(ai);
+  var dauVideo = b.file_uri ? String(b.file_uri) : b.video_b64 ? ('b64:' + String(b.video_b64).length + ':' + String(b.video_b64).slice(0, 3000) + ':' + String(b.video_b64).slice(-1000)) : String(b.link || '').trim();
+  var khoaNho = 'cham_' + Utilities.base64EncodeWebSafe(Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, [me.ma, provider, dauVideo, JSON.stringify(so), gioDang, daDang, b.muc_tieu, yDinh, chuDe, doiTuong, sanPham, loiThoai, JSON.stringify(ai.hs || {})].join('|'), Utilities.Charset.UTF_8)).slice(0, 40);
   try{
     var nho = CacheService.getScriptCache().get(khoaNho);
-    if (nho){ var dn = JSON.parse(nho); dn.meta = dn.meta || {}; dn.meta.tu_bo_nho = true; hookHoan(ai); return jsonOut({ok:true, data:dn, con:null, han:han, loai:ai.loai, tool:ai.tool, luot: hookLuotCon(ai), tu_bo_nho:true}); }
+    if (nho){ var dn = JSON.parse(nho); dn.meta = dn.meta || {}; dn.meta.tu_bo_nho = true; return jsonOut({ok:true, data:dn, con:null, han:han, loai:ai.loai, tool:ai.tool, luot: hookLuotCon(ai), tu_bo_nho:true}); }
   }catch(e){}
+
+  var khongGioiHan = me.vaitro === 'mentor';
+  var con = hookTru(ai, han);
+  if (con < 0) return jsonOut({ok:false, error: ai.loai === 'free' ? 'het_luot_thu' : 'het_luot', han:han, tool: ai.tool});
+
+  // Từ đây lượt đã bị trừ: mọi lỗi bất ngờ (mạng, JSON hỏng, hết giờ) đều phải hoàn lượt, không để rơi ra doPost.
+  var nhan = '[cham' + (muonVideo ? ':video' : ':chu') + (daDang ? ':dadang' : '') + '] ' + (chuDe || loiThoai).slice(0, 60);
+  var daHoan = false, hoan = function(){ if (!daHoan){ daHoan = true; hookHoan(ai); } };   // hoàn đúng một lần, kể cả khi ghi log ném lỗi sau đó
+  try{
+  var media = null, canhBao = '', video = null;
+  if (muonVideo){
+    video = soiLayVideo(b, gkey);
+    if (video.ok) media = [video.part];
+    else if (kbDemChu(loiThoai) >= 8) canhBao = 'Không tải được video (' + (video.loi || video.error) + '), AI chấm trên lời thoại và mô tả bạn gửi.';
+    else { hoan(); return jsonOut({ok:false, error: video.error || 'khong_tai_duoc_video', chi_tiet: String(video.loi || '').slice(0, me.vaitro === 'mentor' ? 600 : 220)}); }
+  }
+  if (video && video.tw && video.tw.so_lieu){ var ts = video.tw.so_lieu; ['view','like','cmt','luu','share','giay'].forEach(function(k){ if (!(Number(so[k]) > 0) && Number(ts[k]) > 0) so[k] = Math.round(Number(ts[k])); }); }
+  var giay = Number(so.giay) > 0 ? Math.round(Number(so.giay)) : 0;
+  if (!gioDang && video && video.tw && video.tw.dang_luc) gioDang = Math.round((Date.now() / 1000 - video.tw.dang_luc) / 3600 * 10) / 10;
+  var viewGio = (daDang && gioDang > 0 && Number(so.view) > 0) ? Math.round(Number(so.view) / gioDang) : 0;
+  // Tải video đã ngốn gần hết giờ thì dừng sớm còn hơn để Apps Script giết giữa chừng (mất luôn lượt và câu trả lời).
+  if (Date.now() > hetGio - 60000){ hoan(); hookLog(me, nhan, false, 'het gio sau khi tai video ' + Math.round((Date.now() - T0) / 1000) + 's', 0, 0, '', ai); return jsonOut({ok:false, error:'het_gio'}); }
   var khungDs = Object.keys(SOI_KHUNG_PHAN).map(function(k){ return k + ' (' + KB_KHUNG[k].split(':')[0] + ')' }).join(' · ');
 
   var prompt = [
@@ -1046,11 +1068,10 @@ function hookChamVideo(b, ai, provider, key){
       huong_di:{type:'string'}, lam_ngay:{type:'string'}
     } };
 
-  var kq = media ? goiGemini(gkey, '', prompt, schema, 9000, media, 0.15)
-         : provider === 'claude' ? goiClaude(key, '', prompt, schema, 8000, 0.15) : goiGemini(key, '', prompt, schema, 8000, 0.15);
-  var nhan = '[cham' + (media ? ':video' : ':chu') + (daDang ? ':dadang' : '') + '] ' + (chuDe || loiThoai).slice(0, 60);
+  var kq = media ? goiGemini(gkey, '', prompt, schema, 9000, media, 0.15, hetGio)
+         : provider === 'claude' ? goiClaude(key, '', prompt, schema, 8000, 0.15) : goiGemini(key, '', prompt, schema, 8000, null, 0.15, hetGio);
   if (!kq.ok){
-    hookHoan(ai);
+    hoan();
     hookLog(me, nhan, false, kq.loi, kq.vin || 0, kq.vout || 0, kq.model, ai);
     return jsonOut({ok:false, error: kq.error, chi_tiet: String(kq.loi || '').slice(0, me.vaitro === 'mentor' ? 400 : 160)});
   }
@@ -1073,10 +1094,23 @@ function hookChamVideo(b, ai, provider, key){
   d.hook_moi = (Array.isArray(d.hook_moi) ? d.hook_moi : []).slice(0, 3).map(function(h){ return { formula: String(h.formula || '').slice(0, 60), text: String(h.text || '').slice(0, 160) }; });
   d.kich_ban_tiep = (Array.isArray(d.kich_ban_tiep) ? d.kich_ban_tiep : []).slice(0, 3).map(function(k){ return { tieu_de: String(k.tieu_de || '').slice(0, 120), hook: String(k.hook || '').slice(0, 200), khung: SOI_KHUNG_PHAN[k.khung] ? k.khung : 'tudo', y_tuong: String(k.y_tuong || '').slice(0, 600), vi_sao: String(k.vi_sao || '').slice(0, 300) }; });
   d.lan_sau = d.lan_sau || {}; ['quay','thu_am','dung_phim'].forEach(function(k){ d.lan_sau[k] = Array.isArray(d.lan_sau[k]) ? d.lan_sau[k] : []; });
+  // mấy trường AI trả tự do cũng ép về đúng kiểu, để chế độ "tudo" (không schema) không làm hỏng giao diện
+  d.manh = (Array.isArray(d.manh) ? d.manh : []).slice(0, 6).map(function(x){ return String(x || '').slice(0, 300) }).filter(Boolean);
+  d.sua_video_nay = (Array.isArray(d.sua_video_nay) ? d.sua_video_nay : []).slice(0, 6).map(function(v){ v = v || {}; return { viec: String(v.viec || '').slice(0, 120), cach: String(v.cach || '').slice(0, 500), tac_dung: String(v.tac_dung || '').slice(0, 200) }; }).filter(function(v){ return v.viec || v.cach });
+  ['chu_de','dang','doi_tuong_thuc','verdict'].forEach(function(k){ d.tom_tat[k] = String(d.tom_tat[k] || '').slice(0, k === 'verdict' ? 600 : 200) });
+  ['mat_thay','tai_nghe','ghi_chu'].forEach(function(k){ boc[k] = String(boc[k] || '').slice(0, 300) });
+  d.huong_di = String(d.huong_di || '').slice(0, 600); d.lam_ngay = String(d.lam_ngay || '').slice(0, 400);
   d.meta = { giay: giay, so_chu: soChu, toc_do: giay ? Math.round(soChu / giay * 100) / 100 : 0, ti_le: soiTiLe(so), so_lieu: so, nguon: media ? video.nguon : 'chu', kich_thuoc: video && video.kich_thuoc || 0, canh_bao: canhBao, da_dang: daDang, gio_dang: gioDang, view_gio: viewGio, model: kq.model, luc: nowVN() };
   try{ CacheService.getScriptCache().put(khoaNho, JSON.stringify(d), 21600); }catch(e){}   // nhớ 6 giờ, trần của CacheService
+  daHoan = true;   // đã có kết quả và đã cache: log hỏng thì không hoàn lượt nữa
   hookLog(me, nhan, true, '', kq.vin || 0, kq.vout || 0, kq.model, ai);
   return jsonOut({ok:true, data:d, con: khongGioiHan ? null : con, han:han, loai:ai.loai, tool:ai.tool, luot: hookLuotCon(ai)});
+  }catch(err){
+    hoan();
+    ghiLoi('hookChamVideo ' + me.ma, err);
+    hookLog(me, nhan, false, 'nem loi: ' + String(err && err.message || err).slice(0, 200), 0, 0, '', ai);
+    return jsonOut({ok:false, error:'loi_ai', chi_tiet: me.vaitro === 'mentor' ? String(err && err.message || err).slice(0, 300) : ''});
+  }
 }
 
 /* ═══════ VIẾT TRỌN KỊCH BẢN ═══════
@@ -1108,11 +1142,11 @@ function hookVietKichBan(b, ai, provider, key){
   if (nc.loai === 'cham'){
     khoiNc.push('NGUỒN: học viên vừa CHẤM một video của chính mình bằng tool, kết quả:');
     if (nc.verdict) khoiNc.push('- Kết luận: ' + String(nc.verdict).slice(0, 400));
-    if (nc.manh && nc.manh.length) khoiNc.push('- Cái đang làm tốt phải GIỮ: ' + nc.manh.slice(0, 4).map(function(x){ return String(x).slice(0, 200) }).join(' · '));
-    if (nc.luu_y && nc.luu_y.length) khoiNc.push('- Lỗi phải TRÁNH lặp lại: ' + nc.luu_y.slice(0, 5).map(function(x){ return String(x).slice(0, 200) }).join(' · '));
-    if (nc.lan_sau && nc.lan_sau.length) khoiNc.push('- Bài cho lần sau: ' + nc.lan_sau.slice(0, 6).map(function(x){ return String(x).slice(0, 160) }).join(' · '));
+    if (Array.isArray(nc.manh) && nc.manh.length) khoiNc.push('- Cái đang làm tốt phải GIỮ: ' + nc.manh.slice(0, 4).map(function(x){ return String(x).slice(0, 200) }).join(' · '));
+    if (Array.isArray(nc.luu_y) && nc.luu_y.length) khoiNc.push('- Lỗi phải TRÁNH lặp lại: ' + nc.luu_y.slice(0, 5).map(function(x){ return String(x).slice(0, 200) }).join(' · '));
+    if (Array.isArray(nc.lan_sau) && nc.lan_sau.length) khoiNc.push('- Bài cho lần sau: ' + nc.lan_sau.slice(0, 6).map(function(x){ return String(x).slice(0, 160) }).join(' · '));
     if (nc.huong_di) khoiNc.push('- Định hướng 2 tuần: ' + String(nc.huong_di).slice(0, 300));
-    if (nc.y_tuong) khoiNc.push('- Ý TƯỞNG ĐÃ CHỌN để viết: ' + [nc.y_tuong.tieu_de, nc.y_tuong.hook ? 'hook: "' + nc.y_tuong.hook + '"' : '', nc.y_tuong.y_tuong, nc.y_tuong.vi_sao ? 'vì sao: ' + nc.y_tuong.vi_sao : ''].filter(Boolean).map(function(x){ return String(x).slice(0, 400) }).join(' · '));
+    if (nc.y_tuong && typeof nc.y_tuong === 'object') khoiNc.push('- Ý TƯỞNG ĐÃ CHỌN để viết: ' + [nc.y_tuong.tieu_de, nc.y_tuong.hook ? 'hook: "' + nc.y_tuong.hook + '"' : '', nc.y_tuong.y_tuong, nc.y_tuong.vi_sao ? 'vì sao: ' + nc.y_tuong.vi_sao : ''].filter(Boolean).map(function(x){ return String(x).slice(0, 400) }).join(' · '));
   } else if (nc.loai === 'soi'){
     khoiNc.push('NGUỒN: học viên vừa SOI một video viral cùng ngách' + (nc.tac_gia ? ' của ' + String(nc.tac_gia).slice(0, 60) : '') + ' và muốn MƯỢN KHUÔN (không chép ruột):');
     if (nc.tom_tat) khoiNc.push('- Video gốc: ' + String(nc.tom_tat).slice(0, 400));
@@ -1156,7 +1190,7 @@ function hookVietKichBan(b, ai, provider, key){
         properties:{ ten:{type:'string'}, thoai:{type:'string'}, canh_quay:{type:'string'}, chu_man_hinh:{type:'string'} } } },
       hook_chu:{type:'string'}, ghi_chu:{type:'string'}, giay_uoc:{type:'number'} } };
 
-  var kq = provider === 'claude' ? goiClaude(key, '', prompt, schema, 6000, 0.8) : goiGemini(key, '', prompt, schema, 6000, 0.8);
+  var kq = provider === 'claude' ? goiClaude(key, '', prompt, schema, 6000, 0.8) : goiGemini(key, '', prompt, schema, 6000, null, 0.8);
   var nhan = '[viet:' + khung + (nc.loai ? ':' + nc.loai : '') + '] ' + (chuDe || yDo).slice(0, 60);
   if (!kq.ok){
     hookHoan(ai);
@@ -1296,12 +1330,13 @@ function thuSoiVideo(){
 function hookTrangThai(b){
   var ai = hookNguoi(b);
   if (!ai) return jsonOut({ok:false, error: b.token ? 'het_phien' : 'can_dangky'});
+  if (ai.loai === 'hv_het') return jsonOut({ok:false, error:'het_han_hv', hv: (typeof stHV === 'function' ? stHV() : null)});
   var me = ai.me;
   var tool = (typeof stToolCua === 'function') ? stToolCua(b.mode || b.tool) : 'hook';
   if (ai.loai === 'free') return jsonOut({ok:true, ten: me.ten, loai:'free', tool:tool,
     con: ndLuotCon(ai.nd, tool), han: (ST_TOOL[tool] || ST_TOOL.hook).han(),
-    luot: {hook:ndLuotCon(ai.nd,'hook'), script:ndLuotCon(ai.nd,'script'), soi:ndLuotCon(ai.nd,'soi')},
-    han_tool: {hook:ST_LUOT_THU, script:ST_LUOT_KB, soi:ST_LUOT_SOI}, ho_so: hookHoSo(ai, b)});
+    luot: hookLuotCon(ai),
+    han_tool: {hook:ST_LUOT_THU, script:ST_LUOT_KB, soi:ST_LUOT_SOI, cham:ST_LUOT_CHAM}, ho_so: hookHoSo(ai, b)});
   var han = parseInt(hookCfg('HOOK_AI_DAILY') || '20', 10) || 20;
   var hsMe = hookHoSo(ai, b);
   if (me.vaitro === 'mentor') return jsonOut({ok:true, ten: me.ten_goi || me.ten, con:null, han:han, loai:ai.loai, mentor:true, ho_so:hsMe});
