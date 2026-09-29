@@ -223,7 +223,8 @@
           <div class="tl-lbl"><span>0s</span><span>60s</span><span>105s</span><span id="tlMax">120s</span></div>
         </div>
         <div class="row" style="margin-top:14px;justify-content:space-between">
-          <button class="btn pro lg" id="btnCham" type="button">✦ Chấm kịch bản <small style="font-weight:500;opacity:.8">· 1 lượt AI</small></button>
+          <div class="row" style="gap:8px"><button class="btn pro lg" id="btnCham" type="button">✦ Chấm kịch bản <small style="font-weight:500;opacity:.8">· 1 lượt AI</small></button>
+          <button class="btn lg" id="btnViet" type="button" title="AI viết trọn lời thoại từng phần theo khung đang chọn, bám hồ sơ kênh; bạn chỉ sửa chi tiết thật rồi chấm">✍️ AI viết cả bài <small style="font-weight:500;opacity:.8">· 1 lượt AI</small></button></div>
           <div class="row" style="gap:6px"><button class="btn" id="btnCopy" type="button">Chép kịch bản</button><button class="btn" id="btnClear" type="button">Xoá viết lại</button></div>
         </div>
         <div class="status" id="chamStatus"></div>
@@ -262,7 +263,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="tai-khoan.js?v=202609281609"></script>
+<script src="tai-khoan.js?v=202609290232"></script>
 <script>
 const $ = s => document.querySelector(s);
 const el = (t, c, txt) => { const e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; };
@@ -542,7 +543,38 @@ bindSeg('mucTieu', v => { state.mucTieu = v; hsDien.mucTieu = v; buildPhan(); sa
 bindSeg('dang', v => { state.dang = v; hsDien.dang = v; saveDraft(); TK.ghiTruong('dang', nhanSeg('dang', v)); });
 bindSeg('tocDo', v => { state.tocDo = v; updateTimes(); saveDraft(); });
 ['chuDe', 'doiTuong', 'xungHo', 'sanPham'].forEach(id => $('#' + id).addEventListener('input', saveDraft));
-(function importSoi() { try { const im = JSON.parse(ls.get('kb.import') || 'null'); if (!im || !im.khung) return; ls.del ? ls.del('kb.import') : localStorage.removeItem('kb.import'); const K = KHUNG.find(x => x.k === im.khung); if (!K) return; state.khung = K.k; state.text[K.k] = {}; state.canh[K.k] = {}; (im.phan || []).forEach((g, i) => { if (K.phan[i] && g) state.text[K.k][K.phan[i][0]] = String(g).replace(/\*\*/g, ''); }); (im.canh || []).forEach((c, i) => { if (K.phan[i] && c) state.canh[K.k][K.phan[i][0]] = c; }); try { localStorage.removeItem('kb.kq'); } catch {} if (im.chuDe) $('#chuDe').value = im.chuDe; if (im.doiTuong) $('#doiTuong').value = im.doiTuong; if (im.sanPham) $('#sanPham').value = im.sanPham; state.kq = null; saveDraft(); setTimeout(() => toast('Đã nhập khung' + (im.nguon ? ' mượn từ ' + im.nguon : '') + '. Gợi ý trong [ ] là chỗ bạn thay bằng chuyện thật của mình.'), 400); } catch {} })();
+/* AI viết trọn bài vào khung đang chọn. Dùng khi nhận đề xuất từ Soi video / Chấm video (tự chạy), hoặc bấm tay. */
+let dangViet = false;
+async function vietBangAI(im) {
+  if (dangViet) return;
+  if (!DEMO && !(await TK.canCo('script'))) return;
+  const K = khungHienTai(), st = $('#chamStatus'), btn = $('#btnViet'); dangViet = true; btn.disabled = true;
+  const nguon = im && im.ngu_canh ? (im.ngu_canh.loai === 'cham' ? 'từ kết quả chấm video của bạn' : im.ngu_canh.loai === 'soi' ? 'mượn khuôn video vừa soi' : '') : '';
+  const t0 = Date.now(); const tick = setInterval(() => { st.className = 'status'; st.innerHTML = `<span class="spinner"></span>AI đang viết trọn kịch bản ${nguon} theo khung ${K.n} · ${Math.round((Date.now() - t0) / 1000)} giây (thường 20–45 giây)`; }, 400);
+  try {
+    const hienCo = K.phan.map(([k]) => (state.text[K.k] || {})[k] || '');
+    let r;
+    if (DEMO) { await new Promise(z => setTimeout(z, 1000)); r = { ok: true, con: 2, han: 3, data: { phan: K.phan.map(([k, ten]) => ({ ten, thoai: 'Lời thoại mẫu (demo) cho phần "' + ten + '": mình kể chuyện [chi tiết thật] cho mấy bạn nghe.', canh_quay: 'Quay cận, ánh sáng cửa sổ.', chu_man_hinh: '' })), hook_chu: 'Chữ hook **demo**', ghi_chu: 'Bản demo.', giay_uoc: 70 } }; }
+    else r = await callApi({ action: 'hook_ai', mode: 'viet', token: TK.token(), dev: TK.dev(), ho_so: TK.hoSo(), khung: K.k, chu_de: $('#chuDe').value.trim(), doi_tuong: $('#doiTuong').value.trim(), san_pham: $('#sanPham').value.trim(), muc_tieu: state.mucTieu, xung_ho: $('#xungHo').value, dang: state.dang, toc_do: state.tocDo, ngu_canh: im && im.ngu_canh || null, y_do: im && im.y_do || '', phan_hien_co: hienCo });
+    clearInterval(tick);
+    if (!r.ok) {
+      st.className = 'status err'; st.textContent = (ERR[r.error] || 'AI chưa viết được, thử lại.') + (r.chi_tiet ? ' Mã lỗi: ' + r.chi_tiet : '');
+      if (r.error === 'het_luot_thu') openUpsell('Hết lượt AI miễn phí', ERR.het_luot_thu);
+      if (r.error === 'unknown_action' || r.error === 'thieu_text' && !$('#chuDe').value) st.textContent = r.error === 'unknown_action' ? 'Máy chủ đang chạy HookAI.gs bản cũ nên chưa có AI viết bài. Mentor dán HookAI.gs mới rồi Deploy, chọn New version.' : st.textContent;
+      return false;
+    }
+    const d = r.data || {}; state.text[K.k] = state.text[K.k] || {}; state.canh[K.k] = state.canh[K.k] || {};
+    (d.phan || []).forEach((p, i) => { const id = K.phan[i] && K.phan[i][0]; if (!id) return; if (p.thoai) state.text[K.k][id] = p.thoai; if (p.canh_quay || p.chu_man_hinh) state.canh[K.k][id] = [p.canh_quay, p.chu_man_hinh ? 'Chữ màn hình: ' + p.chu_man_hinh.replace(/\n/g, ' / ') : ''].filter(Boolean).join(' · '); });
+    state.kq = null; try { localStorage.removeItem('kb.kq'); } catch {} buildPhan(); updateTimes(); saveDraft();
+    if (d.hook_chu) ls.set('hook.text', d.hook_chu);
+    st.className = 'status ok'; st.textContent = `AI đã viết xong ${nguon ? nguon + ' ' : ''}(≈${d.giay_uoc || '?'} giây${d.so_chu ? ', ' + d.so_chu + ' chữ' : ''}). ${d.ghi_chu || ''} Sửa chỗ [ ] thành chuyện thật của bạn rồi bấm Chấm kịch bản.` + (r.con != null ? ` Còn ${r.con}/${r.han} lượt.` : '');
+    if (r.luot && TK.me) { TK.me.luot = r.luot; veQuota(); }
+    toast('AI đã viết trọn bài, đọc lại và sửa chi tiết thật nhé'); return true;
+  } catch { clearInterval(tick); st.className = 'status err'; st.textContent = 'Không kết nối được máy chủ.'; return false; }
+  finally { dangViet = false; btn.disabled = false; }
+}
+let imViet = null;
+(function importSoi() { try { const im = JSON.parse(ls.get('kb.import') || 'null'); if (!im || !im.khung) return; if (im.viet) imViet = im; ls.del ? ls.del('kb.import') : localStorage.removeItem('kb.import'); const K = KHUNG.find(x => x.k === im.khung); if (!K) return; state.khung = K.k; state.text[K.k] = {}; state.canh[K.k] = {}; (im.phan || []).forEach((g, i) => { if (K.phan[i] && g) state.text[K.k][K.phan[i][0]] = String(g).replace(/\*\*/g, ''); }); (im.canh || []).forEach((c, i) => { if (K.phan[i] && c) state.canh[K.k][K.phan[i][0]] = c; }); try { localStorage.removeItem('kb.kq'); } catch {} if (im.chuDe) $('#chuDe').value = im.chuDe; if (im.doiTuong) $('#doiTuong').value = im.doiTuong; if (im.sanPham) $('#sanPham').value = im.sanPham; state.kq = null; saveDraft(); if (!im.viet) setTimeout(() => toast('Đã nhập khung' + (im.nguon ? ' mượn từ ' + im.nguon : '') + '. Gợi ý trong [ ] là chỗ bạn thay bằng chuyện thật của mình.'), 400); } catch {} })();
 buildKhung(); buildPhan();
 (function moLaiKq() { try { const o = JSON.parse(ls.get('kb.kq') || 'null'); if (o && o.d && o.d.score && o.khung === state.khung) { state.kq = o.d; renderKq(o.d, o.parts || goiKichBan()); updateTimes(); } } catch {} })();
 $('#acctBtn').addEventListener('click', () => TK.mo());
@@ -554,7 +586,9 @@ $('#btnCopy').addEventListener('click', () => { const K = khungHienTai(); copyTe
 $('#btnClear').addEventListener('click', () => { if (!confirm('Xoá hết chữ trong các phần của khung này?')) return; state.text[state.khung] = {}; state.canh[state.khung] = {}; state.kq = null; try { localStorage.removeItem('kb.kq'); } catch {} buildPhan(); saveDraft(); $('#kqBody').hidden = true; $('#kqEmpty').hidden = false; });
 $('#upClose').addEventListener('click', () => $('#upsell').classList.remove('show'));
 $('#upsell').addEventListener('click', e => { if (e.target === e.currentTarget) e.currentTarget.classList.remove('show'); });
+$('#btnViet').addEventListener('click', () => vietBangAI({ y_do: '' }));
 TK.khoiDong({ api: API, tool: 'script', onDoi: () => { veQuota(); dienTuHoSo(); } });
+if (imViet) { const im = imViet; imViet = null; setTimeout(async () => { if (!DEMO) await TK.nap(); $('#chamStatus').className = 'status'; $('#chamStatus').textContent = 'Đã nhận đề xuất, AI sắp viết trọn kịch bản…'; vietBangAI(im); }, 600); }
 loadQuota();
 </script>
 </body>
