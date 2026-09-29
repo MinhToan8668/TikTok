@@ -512,6 +512,8 @@ function renderKq(d, so, tuLuu) {
 
   // đầu: điểm tổng + khả năng viral + verdict
   const head = el('div', 'head');
+  // máy chủ (hoặc bản demo) không gửi điểm tổng thì tự cộng theo trọng số 7 thang
+  if (!d.tong && d.thang) { let s = 0, w = 0; d.thang.forEach(t => { const ts = parseFloat((THANG_TEN[t.ma] || [0, t.trong_so || 0])[1]) || 0; s += (Number(t.diem) || 0) * ts; w += ts; }); d.tong = w ? Math.round(s / w * 10) : 0; }
   const ring = el('div', 'ring'); ring.style.setProperty('--p', d.tong); ring.style.setProperty('--rc', kn[1]);
   const rb = el('b'); rb.append(document.createTextNode(String(d.tong))); rb.append(el('small', null, '/100')); ring.append(rb); head.append(ring);
   const hr = el('div'); hr.append(Object.assign(el('span', 'kn ' + (tt.kha_nang || 'vua')), { textContent: kn[0] }));
