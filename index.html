@@ -1394,7 +1394,7 @@ body.hv-mode{padding-bottom:0}
       <b>Tự Mình Xây Kênh</b><span>lớp 30 ngày</span>
     </a>
     <div class="nav-links">
-      <button class="nav-link hot" data-go="toolviral">Viral Studio <i>free</i></button>
+      <a class="nav-link hot" href="tools/soi-video.html" style="text-decoration:none">Viral Studio <i>free</i></a>
       <button class="nav-link hot" data-go="soikenh">Soi kênh <i>free</i></button>
       <button class="nav-link" data-go="editkem">Edit kèm</button>
       <button class="nav-link" data-go="ketqua">Học viên cũ</button>
@@ -1410,7 +1410,7 @@ body.hv-mode{padding-bottom:0}
   </div>
   <div id="drawer">
     <div class="dr-hot">
-      <a href="#toolviral"><span>Viral Studio</span><i>free</i></a>
+      <a href="tools/soi-video.html" data-tool><span>Viral Studio</span><i>free</i></a>
       <a href="#soikenh"><span>Soi kênh</span><i>free</i></a>
     </div>
     <div class="dr-list">
@@ -3074,14 +3074,6 @@ function initChrome(){
     }
   },{passive:true});
 
-  $$('[data-go]').forEach(function(b){
-    b.addEventListener('click',function(){
-      var el=document.getElementById(b.getAttribute('data-go'));
-      if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
-      closeDrawer();
-    });
-  });
-
   var burger=$('#burger'), drawer=$('#drawer');
   function closeDrawer(){
     burger.classList.remove('on'); drawer.classList.remove('on');
@@ -3092,7 +3084,41 @@ function initChrome(){
     burger.classList.toggle('on',on);
     burger.setAttribute('aria-expanded',String(on));
   });
-  $$('#drawer a').forEach(function(a){a.addEventListener('click',closeDrawer)});
+  /* Bấm mục trong menu điện thoại: nếu để trình duyệt tự cuộn theo #neo thì menu đóng lại đúng lúc
+     cuộn mượt đang chạy, trang co lên và Safari huỷ cú cuộn, người dùng bị đứng ở đầu trang. Nên tự
+     làm: đóng menu, đợi hai khung hình cho trang ổn định, rồi mới cuộn tới đúng chỗ. */
+  /* Trang có khối nở ra khi cuộn qua (ảnh, ticker, hiệu ứng hiện dần) nên đích tính lúc bấm sẽ lệch.
+     Cuộn mượt xong thì đo lại, còn lệch thì chỉnh thêm, tối đa 3 lần. */
+  function dichCua(el){ var navH=(nav&&nav.getBoundingClientRect().height)||72; return Math.max(0,el.getBoundingClientRect().top+window.pageYOffset-navH-8); }
+  function cuonToi(id){
+    var el=document.getElementById(id); if(!el) return;
+    window.scrollTo({top:dichCua(el),behavior:'smooth'});
+    try{ history.replaceState(null,'','#'+id); }catch(e){}
+    var lan=0, cu=-1, dung=0;
+    (function canh(){
+      var y=window.pageYOffset;
+      if(Math.abs(y-cu)<1){ dung++; } else { dung=0; cu=y; }
+      if(dung<4){ return setTimeout(canh,80); }           // chờ tới khi đứng yên ~0,3 giây
+      var lech=el.getBoundingClientRect().top-((nav&&nav.getBoundingClientRect().height)||72)-8;
+      if(Math.abs(lech)>12 && lan++<3){ dung=0; window.scrollTo({top:dichCua(el),behavior:'smooth'}); setTimeout(canh,80); }
+    })();
+  }
+  $$('[data-go]').forEach(function(b){
+    b.addEventListener('click',function(){
+      var id=b.getAttribute('data-go');
+      if(drawer.classList.contains('on')){ closeDrawer(); requestAnimationFrame(function(){ requestAnimationFrame(function(){ cuonToi(id); }); }); }
+      else cuonToi(id);
+    });
+  });
+  $$('#drawer a').forEach(function(a){
+    a.addEventListener('click',function(e){
+      var href=a.getAttribute('href')||'';
+      if(href.charAt(0)!=='#'){ closeDrawer(); return; }      // link ra trang khác (Viral Studio): để trình duyệt tự đi
+      e.preventDefault();
+      closeDrawer();
+      requestAnimationFrame(function(){ requestAnimationFrame(function(){ cuonToi(href.slice(1)); }); });
+    });
+  });
 
   /* ── Soi kênh: chọn câu tâm lý + gửi video ── */
   (function(){
