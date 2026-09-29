@@ -289,3 +289,22 @@ Muốn tặng thêm lượt hoặc gia hạn tay: sửa cột `luot_dung` (số 
 - **Số thật là trọng tài** (mục 13): video đã đăng thì tính view/giờ từ số view và giờ đăng (`gio_dang`, tự lấy từ `create_time` của TikTok qua tikwm, hoặc người dùng chọn). Mốc kênh nhỏ 1–2 ngày đầu: <30 chậm · 30–150 bình thường · 150–500 tốt · >500 rất mạnh · >2.000 viral. Đạt mức tốt thì hook và giữ chân không được dưới 6,5, tổng không dưới 65; dưới 30 view/giờ sau 24h thì tổng không quá 60.
 - **Nhớ kết quả:** khoá theo mã tài khoản + video (file_uri / đầu file / link) + số liệu + giờ đăng + mục tiêu + ý định. Cùng bộ đó trong 6 giờ thì trả đúng kết quả cũ, hoàn lượt (`tu_bo_nho: true`). Đổi bất kỳ thông số nào là chấm mới. `meta` ghi thêm `model`, `luc`, `gio_dang`, `view_gio`.
 - Ô số liệu ở Chấm video và Soi video tự định dạng `12,887` khi rời ô; gõ `12.5K`, `1,2M` vẫn hiểu.
+
+## Tool 5 · Tải video (tools/tai-ve.html + TaiVe.gs)
+
+Dán link là tải được video, ảnh, âm thanh. Không cần đăng nhập, không tốn lượt AI.
+
+**Cài:** trong Apps Script bấm ➕ → Script, đặt tên `TaiVe`, dán nội dung `TaiVe.gs`. Dán `HookAI.gs` mới (có thêm dòng chuyển `mode: 'taive'` sang `taiVe`). Sau đó Deploy → Manage deployments → Edit → New version.
+
+| Nền tảng | Lấy được gì | Đi đường nào |
+|---|---|---|
+| TikTok, Douyin | Video HD không logo, video có logo, ảnh slide, nhạc nền mp3, ảnh bìa | Trình duyệt gọi thẳng tikwm; lỗi thì máy chủ gọi thay |
+| X / Twitter | Video, GIF, ảnh gốc | Trình duyệt gọi thẳng fxtwitter; lỗi thì máy chủ gọi thay |
+| Pinterest | Ảnh gốc, video (nếu trang có) | Máy chủ đọc thẻ og: |
+| YouTube | Ảnh bìa. Video và mp3 chỉ khi có cobalt | cobalt |
+| Instagram, Facebook, Threads, Reddit | Tùy bài công khai; đầy đủ khi có cobalt | cobalt, không có thì đọc thẻ og: |
+| Link thẳng tới file .mp4/.jpg/.mp3 | File đó | Trình duyệt |
+
+**Tải file:** trình duyệt tải thẳng trước. Nếu bị chặn thì máy chủ tải hộ (tối đa 35MB). Vẫn không được thì nút đổi thành "Mở để lưu".
+
+**Muốn tải đủ YouTube / Instagram / Facebook:** tự chạy một máy [cobalt](https://github.com/imputnet/cobalt) (Docker, VPS khoảng 5$/tháng), bật API key. Sau đó thêm vào Script properties: `COBALT_URL` = `https://địa-chỉ-cobalt-của-bạn` và `COBALT_KEY` = key đã tạo. Không cần sửa code. Cobalt công khai (api.cobalt.tools) đã khóa, không dùng được.

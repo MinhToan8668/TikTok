@@ -116,6 +116,7 @@ function hookHoSoText(hs){
 }
 
 function hookAi(b){
+  if (b.mode === 'taive' || b.mode === 'taive_file') return taiVe(b);   // tool Tải về (TaiVe.gs): không cần đăng nhập, không tốn lượt AI
   var ai = hookNguoi(b);
   if (!ai) return jsonOut({ok:false, error: b.token ? 'het_phien' : 'can_dangky'});
   if (ai.loai === 'hv_het') return jsonOut({ok:false, error:'het_han_hv', hv: (typeof stHV === 'function' ? stHV() : null)});

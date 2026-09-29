@@ -59,6 +59,7 @@
   :root[data-theme="dark"] .ft.on{background:#99DF00;color:#0B0C08;box-shadow:0 4px 0 rgba(153,223,0,.32)}
   @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .ft{border-color:#99DF00;box-shadow:0 4px 0 rgba(153,223,0,.32)} :root:not([data-theme="light"]) .ft.on{background:#99DF00;color:#0B0C08;box-shadow:0 4px 0 rgba(153,223,0,.32)}}
   @media (max-width:520px){.feat-tabs{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;overflow:visible}.ft{flex-direction:column;justify-content:center;gap:4px;padding:9px 6px;font-size:13px;text-align:center;line-height:1.2}.ft .fi{font-size:19px}}
+  @media (max-width:520px){.feat-tabs .ft:last-child:nth-child(odd){grid-column:span 2;flex-direction:row;gap:8px}}
   /* điện thoại: nút chọn cao đủ bấm, chia đều hàng; ô nhập 16px để iPhone không tự phóng to */
   @media (max-width:520px){
     .seg{display:flex;width:100%}
@@ -265,6 +266,7 @@
     <a class="ft" href="kich-ban.html"><span class="fi" aria-hidden="true">📝</span>Kịch bản viral</a>
     <a class="ft" href="hook-text.html"><span class="fi" aria-hidden="true">⚡</span>Hook viral</a>
     <a class="ft" href="cham-video.html"><span class="fi" aria-hidden="true">🎯</span>Chấm video của bạn</a>
+    <a class="ft" href="tai-ve.html"><span class="fi" aria-hidden="true">⬇️</span>Tải video</a>
   </nav>
 
   <div class="grid" id="grid">
@@ -770,6 +772,7 @@ function applyTheme(t) { if (t) document.documentElement.dataset.theme = t; else
 applyTheme(ls.get('hook.theme'));
 $('#themeBtn').addEventListener('click', () => { const dark = document.documentElement.dataset.theme ? document.documentElement.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; const t = dark ? 'light' : 'dark'; applyTheme(t); ls.set('hook.theme', t); });
 restore(); setSeg('nen', state.nen); updateCount(); updateRatios(); updateSrc(); moLaiKq();
+{ const q = new URLSearchParams(location.search).get('link'); if (q) { history.replaceState(null, '', location.pathname); $('#link').value = q; saveDraft(); setTimeout(layLink, 0); } }   // từ tool Tải video: "Soi video này →"
 bindSeg('nen', v => { state.nen = v; saveDraft(); });
 ['link', 'loiThoai', 'giay', 'chuManHinh', 'binhLuan', 'nView', 'nLike', 'nCmt', 'nLuu', 'nShare', 'chuDe', 'doiTuong', 'sanPham'].forEach(id => $('#' + id).addEventListener('input', () => { saveDraft(); if (id === 'loiThoai' || id === 'giay') updateCount(); if (/^n[A-Z]/.test(id)) updateRatios(); }));
 ['nView', 'nLike', 'nCmt', 'nLuu', 'nShare'].forEach(id => { dinhDangSo($('#' + id)); $('#' + id).addEventListener('blur', e => { dinhDangSo(e.target); saveDraft(); }); });

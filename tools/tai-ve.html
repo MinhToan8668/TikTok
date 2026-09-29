@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Viral Studio · Tải video, ảnh, âm thanh · Tự Mình Xây Kênh</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Cg%20transform%3D%22rotate%28-9%2032%2017%29%22%3E%3Crect%20x%3D%2219%22%20y%3D%2211%22%20width%3D%2226%22%20height%3D%2212%22%20rx%3D%223%22%20fill%3D%22%2399df00%22/%3E%3Cpath%20d%3D%22M30%2014.4v5.2a1%201%200%200%200%201.52.86l4.6-2.6a1%201%200%200%200%200-1.72l-4.6-2.6A1%201%200%200%200%2030%2014.4z%22%20fill%3D%22%2326210f%22/%3E%3C/g%3E%3Crect%20x%3D%2219%22%20y%3D%2228%22%20width%3D%2226%22%20height%3D%2212%22%20rx%3D%223%22%20fill%3D%22%2326210f%22/%3E%3Crect%20x%3D%224%22%20y%3D%2244%22%20width%3D%2226%22%20height%3D%2212%22%20rx%3D%223%22%20fill%3D%22%2326210f%22/%3E%3Crect%20x%3D%2234%22%20y%3D%2244%22%20width%3D%2226%22%20height%3D%2212%22%20rx%3D%223%22%20fill%3D%22%2326210f%22/%3E%3C/svg%3E">
+<meta name="description" content="Dán link TikTok, Douyin, X, YouTube, Instagram, Facebook, Pinterest… là tải được video không logo, ảnh gốc và nhạc nền. Miễn phí, không tốn lượt AI.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F9E8DD; --ink:#26210F; --lime:#99DF00; --moss:#1B220D;
+    --bg:#99DF00; --surface:#FDFBF3; --surface-2:#F1F6E0; --line:#C9DE93; --line-strong:#5F8C00;
+    --text:#1C2600; --muted:#57612F; --accent:#99DF00; --accent-ink:#1C2600; --accent-soft:#E6F6BC;
+    --pro:#26210F; --pro-text:#F9E8DD; --danger:#B4432A; --warn:#B8860B; --ok:#3E7D1F;
+    --radius:14px; --shadow:0 10px 30px rgba(38,33,15,.10);
+    --font-ui:'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --font-display:'Bricolage Grotesque', 'Be Vietnam Pro', system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme:dark;
+      --bg:#0B0C08; --surface:#15170F; --surface-2:#1E2114; --line:#4E6E10; --line-strong:#99DF00;
+      --text:#F3F0E4; --muted:#B7B89A; --accent:#99DF00; --accent-ink:#0B0C08; --accent-soft:#233207;
+      --pro:#99DF00; --pro-text:#1B220D; --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme:dark;
+    --bg:#0B0C08; --surface:#15170F; --surface-2:#1E2114; --line:#4E6E10; --line-strong:#99DF00;
+    --text:#F3F0E4; --muted:#B7B89A; --accent:#99DF00; --accent-ink:#0B0C08; --accent-soft:#233207;
+    --pro:#99DF00; --pro-text:#1B220D; --shadow:0 10px 30px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size:14.5px;line-height:1.5}
+  body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.09;filter:blur(.6px);background-image:linear-gradient(#1c2600 1.5px,transparent 1.5px),linear-gradient(90deg,#1c2600 1.5px,transparent 1.5px);background-size:100% 92px,184px 100%;-webkit-mask-image:radial-gradient(ellipse 62% 58% at 50% 45%,transparent 0,transparent 38%,rgba(0,0,0,.55) 72%,#000 100%);mask-image:radial-gradient(ellipse 62% 58% at 50% 45%,transparent 0,transparent 38%,rgba(0,0,0,.55) 72%,#000 100%)}
+  :root[data-theme="dark"] body::before{opacity:.07;background-image:linear-gradient(#99DF00 1px,transparent 1px),linear-gradient(90deg,#99DF00 1px,transparent 1px)}
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) body::before{opacity:.07;background-image:linear-gradient(#99DF00 1px,transparent 1px),linear-gradient(90deg,#99DF00 1px,transparent 1px)}}
+  .wrap{max-width:1240px;margin:0 auto;padding-inline:16px;padding-block:18px 60px}
+  header.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+  .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit}
+  .tmxk-logo{width:38px;height:38px;flex:none}
+  .tmxk-logo .ink{fill:var(--text)}
+  .brand h1{font-family:var(--font-display);font-weight:800;font-size:22px;margin:0;letter-spacing:-.01em}
+  .brand p{margin:0;color:var(--muted);font-size:12px}
+  .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .theme-btn{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--text);cursor:pointer;font-size:16px}
+  .pill{border:1px solid var(--line-strong);background:var(--surface);color:var(--text);border-radius:999px;padding:7px 14px;font:inherit;font-weight:700;cursor:pointer;text-decoration:none;font-size:13px}
+  .pill.pro{background:var(--pro);color:var(--pro-text);border-color:transparent}
+  .feat-tabs{display:flex;align-items:flex-start;gap:10px;margin:-2px 0 18px;padding:4px 2px 10px;overflow-x:auto;scrollbar-width:none}
+  .ft{flex:none;display:inline-flex;align-items:center;gap:8px;border-radius:14px;padding:11px 18px;font-size:15px;font-weight:800;letter-spacing:-.01em;text-decoration:none;border:2px solid var(--text);color:var(--text);background:var(--surface);box-shadow:0 4px 0 rgba(28,38,0,.28);transition:transform .15s,box-shadow .15s}
+  .ft .fi{font-size:17px;line-height:1}
+  .ft:hover{transform:translateY(-2px);box-shadow:0 6px 0 rgba(28,38,0,.28)}
+  .ft.on,.ft.on:hover{background:var(--text);color:#99DF00;transform:none;box-shadow:0 4px 0 rgba(28,38,0,.28)}
+  :root[data-theme="dark"] .ft{border-color:#99DF00;box-shadow:0 4px 0 rgba(153,223,0,.32)}
+  :root[data-theme="dark"] .ft.on{background:#99DF00;color:#0B0C08;box-shadow:0 4px 0 rgba(153,223,0,.32)}
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .ft{border-color:#99DF00;box-shadow:0 4px 0 rgba(153,223,0,.32)} :root:not([data-theme="light"]) .ft.on{background:#99DF00;color:#0B0C08;box-shadow:0 4px 0 rgba(153,223,0,.32)}}
+  @media (max-width:520px){.feat-tabs{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;overflow:visible}.ft{flex-direction:column;justify-content:center;gap:4px;padding:9px 6px;font-size:13px;text-align:center;line-height:1.2}.ft .fi{font-size:19px}}
+  /* điện thoại: nút chọn cao đủ bấm, chia đều hàng; ô nhập 16px để iPhone không tự phóng to */
+  @media (max-width:520px){
+    .seg{display:flex;width:100%}
+    .seg button{flex:1 1 auto;min-height:42px;padding:9px 10px;font-size:13.5px}
+    input:not([type=checkbox]):not([type=radio]):not([type=range]),.card select,.card textarea{font-size:16px}   /* .card để thắng rule select,textarea 14px bên dưới */
+    button,.pill{min-height:38px}
+    .theme-btn{min-height:0}
+  }  @media (max-width:520px){.feat-tabs .ft:last-child:nth-child(odd){grid-column:span 2;flex-direction:row;gap:8px}}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+  .card h2{font-family:var(--font-display);font-weight:700;font-size:15px;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+  .hint{color:var(--muted);font-size:13px;margin:0 0 10px}
+  .btn{font:inherit;font-weight:700;border:1px solid var(--line-strong);background:var(--surface);color:var(--text);border-radius:10px;padding:9px 14px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;font-size:13.5px}
+  .btn.pro{background:var(--pro);color:var(--pro-text);border-color:transparent}
+  .btn.lg{padding:13px 20px;font-size:15px}
+  .btn:disabled{opacity:.55;cursor:default}
+  .status{font-size:13px;color:var(--muted);margin-top:8px;min-height:1.2em}
+  .status.err{color:var(--danger)} .status.ok{color:var(--ok)}
+  .spinner{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .8s linear infinite;vertical-align:-2px;margin-right:6px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:999px;font-size:13px;box-shadow:var(--shadow);opacity:0;transition:.2s;pointer-events:none;z-index:50;max-width:92vw;text-align:center}
+  .toast.show{opacity:1}
+  .quota{font-size:12.5px;color:var(--muted)}
+  .main{max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+  .hero h2{font-size:clamp(20px,3.4vw,26px);margin-bottom:4px}
+  .inrow{display:grid;grid-template-columns:1fr auto auto;gap:8px;margin-top:6px}
+  .inrow input{width:100%;font:inherit;font-size:15px;color:var(--text);background:var(--surface-2);border:2px solid var(--text);border-radius:12px;padding:12px 14px;min-width:0}
+  .inrow input:focus{outline:3px solid var(--accent);outline-offset:1px}
+  .nen{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+  .nen span{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);color:var(--muted)}
+  .nen span.full{background:var(--accent-soft);color:var(--text);border-color:var(--line-strong)}
+  .ls{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+  .ls button{font:inherit;font-size:12px;border:1px dashed var(--line-strong);background:transparent;color:var(--text);border-radius:999px;padding:4px 10px;cursor:pointer;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .info{display:grid;grid-template-columns:96px 1fr;gap:14px;align-items:start}
+  .info .cv{width:96px;aspect-ratio:3/4;border-radius:10px;object-fit:cover;background:var(--line);display:block}
+  .info .cv.nop{display:grid;place-items:center;font-size:28px}
+  .info b{display:block;font-size:14.5px;line-height:1.35;word-break:break-word}
+  .info small{color:var(--muted);font-size:12.5px;display:block;margin-top:4px}
+  .info .row{margin-top:10px;gap:8px}
+  .tag{display:inline-block;font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;background:var(--text);color:var(--bg);border-radius:6px;padding:2px 7px;margin-bottom:6px}
+  .grp h3{font-size:12.5px;margin:4px 0 8px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);display:flex;align-items:center;gap:8px}
+  .grp h3 .btn{margin-left:auto;text-transform:none;letter-spacing:0;padding:5px 10px;font-size:12.5px}
+  .items{display:grid;gap:8px}
+  .it{display:grid;grid-template-columns:52px 1fr auto;gap:10px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2)}
+  .it .th{width:52px;height:52px;border-radius:8px;object-fit:cover;background:var(--line);display:grid;place-items:center;font-size:22px}
+  .it b{font-size:13.5px;display:block}
+  .it small{color:var(--muted);font-size:12px;display:block;word-break:break-all}
+  .it .act{display:flex;gap:6px;align-items:center}
+  .it .act a{font-size:12px;color:var(--muted)}
+  .imgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+  .im{position:relative;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:var(--surface-2)}
+  .im img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block}
+  .im .btn{position:absolute;left:6px;right:6px;bottom:6px;padding:6px;font-size:12px}
+  video.pv{width:100%;max-height:420px;border-radius:12px;background:#000;display:block;margin-bottom:10px}
+  .bar{height:4px;border-radius:4px;background:var(--line);overflow:hidden;margin-top:6px}
+  .bar i{display:block;height:100%;width:0;background:var(--line-strong);transition:width .2s}
+  .note{font-size:12.5px;color:var(--muted);line-height:1.55}
+  .note b{color:var(--text)}
+  @media (max-width:560px){
+    .quota{display:none}
+    .inrow{grid-template-columns:1fr 1fr}.inrow input{grid-column:1/-1;font-size:16px}
+    .info{grid-template-columns:72px 1fr}.info .cv{width:72px}
+    .it{grid-template-columns:44px 1fr}.it .th{width:44px;height:44px}.it .act{grid-column:1/-1}.it .act .btn{flex:1}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="../index.html" aria-label="Tự Mình Xây Kênh, về trang chủ">
+      <svg class="tmxk-logo" viewBox="0 0 64 64" aria-hidden="true"><g transform="rotate(-9 32 17)"><rect x="19" y="11" width="26" height="12" rx="3" fill="#99df00"/><path d="M30 14.4v5.2a1 1 0 0 0 1.52.86l4.6-2.6a1 1 0 0 0 0-1.72l-4.6-2.6A1 1 0 0 0 30 14.4z" fill="#26210f"/></g><rect class="ink" x="19" y="28" width="26" height="12" rx="3"/><rect class="ink" x="4" y="44" width="26" height="12" rx="3"/><rect class="ink" x="34" y="44" width="26" height="12" rx="3"/></svg>
+      <div><h1>Viral Studio</h1><p>by Tự Mình Xây Kênh</p></div>
+    </a>
+    <div class="row" style="gap:8px">
+      <span class="quota" id="quota"></span>
+      <button class="theme-btn" id="themeBtn" type="button" aria-label="Đổi giao diện sáng hoặc tối">◐</button>
+      <button class="pill pro" id="acctBtn" type="button">Tài khoản</button>
+    </div>
+  </header>
+
+  <nav class="feat-tabs" aria-label="Công cụ trong Viral Studio">
+    <a class="ft" href="soi-video.html"><span class="fi" aria-hidden="true">🎬</span>Soi video viral</a>
+    <a class="ft" href="kich-ban.html"><span class="fi" aria-hidden="true">📝</span>Kịch bản viral</a>
+    <a class="ft" href="hook-text.html"><span class="fi" aria-hidden="true">⚡</span>Hook viral</a>
+    <a class="ft" href="cham-video.html"><span class="fi" aria-hidden="true">🎯</span>Chấm video của bạn</a>
+    <a class="ft on" href="#" aria-current="page"><span class="fi" aria-hidden="true">⬇️</span>Tải video</a>
+  </nav>
+
+  <main class="main">
+    <section class="card hero">
+      <h2>Dán link, tải về video · ảnh · âm thanh</h2>
+      <p class="hint">Dán link bài đăng hoặc cả đoạn chữ "Chia sẻ" copy từ app, tool tự tìm link. Miễn phí, không tốn lượt AI.</p>
+      <div class="inrow">
+        <input id="link" type="url" inputmode="url" autocomplete="off" placeholder="https://vt.tiktok.com/… · x.com/… · youtube.com/… · instagram.com/…" aria-label="Link bài đăng">
+        <button class="btn" id="btnDan" type="button">📋 Dán</button>
+        <button class="btn pro lg" id="btnLay" type="button">Lấy file</button>
+      </div>
+      <div class="status" id="st" role="status" aria-live="polite"></div>
+      <div class="nen" aria-label="Nền tảng hỗ trợ">
+        <span class="full" title="Video không logo, HD, ảnh slide, nhạc nền, ảnh bìa">TikTok</span>
+        <span class="full" title="Video không logo, ảnh, nhạc nền">Douyin</span>
+        <span class="full" title="Video, GIF, ảnh gốc">X / Twitter</span>
+        <span title="Ảnh bìa; video và mp3 khi máy chủ có cobalt">YouTube</span>
+        <span title="Tùy bài công khai">Instagram</span>
+        <span title="Tùy bài công khai">Facebook</span>
+        <span title="Tùy bài công khai">Threads</span>
+        <span class="full" title="Ảnh gốc, video">Pinterest</span>
+        <span class="full" title="Link thẳng tới file mp4, jpg, mp3…">Link file trực tiếp</span>
+      </div>
+      <div class="ls" id="lichSu"></div>
+    </section>
+
+    <section class="card" id="kq" hidden></section>
+
+    <p class="note">⚠️ <b>Chỉ tải nội dung bạn có quyền dùng.</b> Video của người khác tải về để <b>soi, học cách làm</b>, không đăng lại nguyên bản, không cắt ghép bỏ tên tác giả. Muốn biết vì sao video đó viral thì bấm <b>Soi video này</b> ngay dưới kết quả.</p>
+  </main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="tai-khoan.js?v=202609291200"></script>
+<script>
+const $ = s => document.querySelector(s);
+const el = (t, c, txt) => { const e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; };
+const ls = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} } };
+const API = 'https://script.google.com/macros/s/AKfycbyxe1nWupAl6VheDZHaU3Ojm-d6c8F_khhUMtkehNCLh5OnGW6f2uF0PKPYZ4eYUqyGjQ/exec';
+let toastT; function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 3200); }
+const TEN_NEN = { tiktok: 'TikTok', douyin: 'Douyin', x: 'X', youtube: 'YouTube', instagram: 'Instagram', facebook: 'Facebook', threads: 'Threads', pinterest: 'Pinterest', reddit: 'Reddit', file: 'File', khac: 'Trang web' };
+const ICON = { video: '🎬', anh: '🖼️', am_thanh: '🎵' };
+const NHOM = [['video', 'Video'], ['anh', 'Ảnh'], ['am_thanh', 'Âm thanh']];
+
+function timLink(t) { const m = String(t || '').match(/https?:\/\/[^\s"'<>]+/i); return m ? m[0].replace(/[),.;!?]+$/, '') : ''; }
+function nenCua(u) {
+  return /tiktok\.com/i.test(u) ? 'tiktok' : /douyin\.com|iesdouyin\.com/i.test(u) ? 'douyin'
+    : /\/\/(www\.|mobile\.)?(x|twitter)\.com\//i.test(u) ? 'x' : /youtu\.?be/i.test(u) ? 'youtube'
+    : /instagram\.com/i.test(u) ? 'instagram' : /facebook\.com|fb\.watch|fb\.com/i.test(u) ? 'facebook'
+    : /threads\.(net|com)/i.test(u) ? 'threads' : /pinterest\.|pin\.it/i.test(u) ? 'pinterest'
+    : /reddit\.com|redd\.it/i.test(u) ? 'reddit'
+    : /\.(mp4|mov|webm|m4v|jpe?g|png|webp|gif|mp3|m4a|wav|ogg|aac)(\?|#|$)/i.test(u) ? 'file' : 'khac';
+}
+function coMB(n) { return n > 100000 ? (n / 1048576).toFixed(n > 10485760 ? 0 : 1).replace('.', ',') + ' MB' : ''; }
+function fmtSo(n) { return (Number(n) || 0).toLocaleString('en-US'); }
+function tuyetDoi(u) { u = String(u || ''); return /^\//.test(u) ? 'https://www.tikwm.com' + u : u; }
+
+/* ── Nguồn chạy thẳng trên trình duyệt (có CORS): tikwm cho TikTok/Douyin, fxtwitter cho X ── */
+function tuTikwm(d, nen) {
+  const a = d.author || {}, items = [];
+  if (Array.isArray(d.images) && d.images.length) d.images.forEach((u, i) => items.push({ loai: 'anh', url: tuyetDoi(u), nhan: 'Ảnh ' + (i + 1) }));
+  else {
+    if (d.hdplay) items.push({ loai: 'video', url: tuyetDoi(d.hdplay), nhan: 'Video HD · không logo', size: d.hd_size });
+    if (d.play && d.play !== d.hdplay) items.push({ loai: 'video', url: tuyetDoi(d.play), nhan: 'Video · không logo', size: d.size });
+    if (d.wmplay) items.push({ loai: 'video', url: tuyetDoi(d.wmplay), nhan: 'Video · có logo', size: d.wm_size });
+  }
+  const mi = d.music_info || {};
+  if (d.music || mi.play) items.push({ loai: 'am_thanh', url: tuyetDoi(d.music || mi.play), nhan: 'Nhạc nền' + (mi.title ? ' · ' + mi.title : '') + (mi.author ? ' – ' + mi.author : ''), ext: 'mp3' });
+  if (d.origin_cover || d.cover) items.push({ loai: 'anh', url: tuyetDoi(d.origin_cover || d.cover), nhan: 'Ảnh bìa', bia: true });
+  return { nen, id: String(d.id || ''), tieu_de: d.title || '', tac_gia: a.nickname ? a.nickname + (a.unique_id ? ' (@' + a.unique_id + ')' : '') : (a.unique_id || ''), bia: tuyetDoi(d.origin_cover || d.cover), giay: d.duration, so: d.play_count != null ? { view: d.play_count, like: d.digg_count, cmt: d.comment_count, share: d.share_count } : null, items };
+}
+function tuFx(t) {
+  const items = [], all = ((t.media || {}).all) || [].concat((t.media || {}).photos || [], (t.media || {}).videos || []);
+  let bia = '';
+  all.forEach((m, i) => {
+    if (m.type === 'photo') { const u = /pbs\.twimg\.com\/media\//.test(m.url) ? m.url.replace(/\?.*$/, '') + '?name=orig' : m.url; items.push({ loai: 'anh', url: u, nhan: 'Ảnh ' + (i + 1) + (m.width ? ' · ' + m.width + '×' + m.height : '') }); bia = bia || m.url; }
+    else { items.push({ loai: 'video', url: m.url, nhan: (m.type === 'gif' ? 'GIF (mp4) ' : 'Video ') + (i + 1) + (m.width ? ' · ' + m.width + '×' + m.height : ''), thumb: m.thumbnail_url }); bia = bia || m.thumbnail_url; }
+  });
+  const a = t.author || {};
+  return { nen: 'x', id: String(t.id || ''), tieu_de: t.text || '', tac_gia: a.name ? a.name + ' (@' + a.screen_name + ')' : '', bia, so: t.views != null ? { view: t.views, like: t.likes, cmt: t.replies, share: t.retweets } : null, items };
+}
+async function hoiTikwm(link) {
+  for (let lan = 0; lan < 2; lan++) {
+    const r = await fetch('https://www.tikwm.com/api/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'hd=1&url=' + encodeURIComponent(link) });
+    const j = await r.json();
+    if (j && j.code === 0 && j.data) return j.data;
+    if (!/limit|request/i.test(String(j && j.msg || ''))) throw new Error('tikwm: ' + (j && j.msg));
+    await new Promise(z => setTimeout(z, 1300));   // tikwm miễn phí cho 1 yêu cầu mỗi giây
+  }
+  throw new Error('tikwm bận');
+}
+async function hoiFx(link) {
+  const m = link.match(/status(?:es)?\/(\d+)/i); if (!m) throw new Error('khong co id');
+  const r = await fetch('https://api.fxtwitter.com/status/' + m[1]); const j = await r.json();
+  if (!j || !j.tweet) throw new Error('fx: ' + (j && j.message)); return j.tweet;
+}
+function ytId(u) { const m = u.match(/(?:v=|youtu\.be\/|shorts\/|embed\/|live\/)([\w-]{11})/); return m ? m[1] : ''; }
+
+async function hoiMayChu(link) {
+  const r = await TK.goi({ action: 'hook_ai', mode: 'taive', link });
+  if (!r.ok && /can_dangky|het_phien|het_han_hv|unknown_action/.test(r.error || '')) r.error = 'may_chu_cu';   // máy chủ chưa có TaiVe.gs nên rơi vào nhánh AI bắt đăng nhập
+  return r;
+}
+
+let dangLay = false, kqHienTai = null;
+async function lay(tuLink) {
+  if (dangLay) return;
+  const st = $('#st'), raw = tuLink || $('#link').value, link = timLink(raw);
+  if (!link) { st.className = 'status err'; st.textContent = 'Chưa thấy link. Dán link bài đăng (bắt đầu bằng https://).'; $('#link').focus(); return; }
+  $('#link').value = link;
+  const nen = nenCua(link);
+  dangLay = true; $('#btnLay').disabled = true;
+  st.className = 'status'; st.innerHTML = `<span class="spinner"></span>Đang lấy file từ ${TEN_NEN[nen] || 'trang'}…`;
+  let kq = null, loi = '';
+  try {
+    if (nen === 'tiktok' || nen === 'douyin') {
+      try { kq = tuTikwm(await hoiTikwm(link), nen); }
+      catch (e) { const r = await hoiMayChu(link); if (r.ok && r.raw) kq = tuTikwm(r.raw, nen); else loi = r.error || 'khong_lay_duoc'; }
+    } else if (nen === 'x') {
+      try { kq = tuFx(await hoiFx(link)); }
+      catch (e) { const r = await hoiMayChu(link); if (r.ok && r.raw) kq = tuFx(r.raw); else loi = r.error || 'khong_lay_duoc'; }
+    } else if (nen === 'file') {
+      const ext = (link.match(/\.(\w+)(\?|#|$)/) || [])[1] || '';
+      kq = { nen, id: '', tieu_de: decodeURIComponent(link.split('/').pop().split('?')[0]), items: [{ loai: /mp3|m4a|wav|ogg|aac/i.test(ext) ? 'am_thanh' : /jpe?g|png|webp|gif/i.test(ext) ? 'anh' : 'video', url: link, nhan: 'File gốc', ext }] };
+    } else {
+      let r = null; try { r = await hoiMayChu(link); } catch (e) { r = { ok: false, error: 'loi_mang' }; }
+      if (r.ok) kq = { nen: r.nen || nen, id: '', tieu_de: r.tieu_de || '', tac_gia: r.tac_gia || '', items: r.items || [] };
+      else loi = r.error || 'khong_lay_duoc';
+      if (nen === 'youtube') {   // ảnh bìa YouTube luôn lấy được, video/mp3 cần cobalt trên máy chủ
+        const id = ytId(link);
+        if (id) {
+          kq = kq || { nen, id, tieu_de: '', items: [] }; kq.id = id; kq.bia = kq.bia || `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+          kq.items.push({ loai: 'anh', url: `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`, nhan: 'Ảnh bìa gốc (1280×720)', bia: true }, { loai: 'anh', url: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`, nhan: 'Ảnh bìa nhỏ (480×360)', bia: true });
+          if (!r.ok) kq.ghi_chu = 'Tải video, mp3 YouTube cần máy chủ có cobalt (xem hướng dẫn cho mentor). Hiện lấy được ảnh bìa.';
+          loi = '';
+        }
+      }
+    }
+  } catch (e) { loi = TK.loiMang && TK.loiMang(e) ? 'loi_mang' : 'khong_lay_duoc'; console.error('[taive]', e); }
+  dangLay = false; $('#btnLay').disabled = false;
+  if (!kq || !kq.items.length) {
+    st.className = 'status err';
+    st.textContent = ({
+      may_chu_cu: 'Máy chủ chưa cập nhật phần Tải về. Mentor dán TaiVe.gs và HookAI.gs mới vào Apps Script rồi Deploy → New version.',
+      loi_mang: 'Máy bạn đang mất mạng hoặc dịch vụ tải đang nghẽn. Kiểm tra mạng rồi bấm lại.',
+      link_sai: 'Link không hợp lệ.',
+      khong_lay_duoc: nen === 'instagram' || nen === 'facebook' || nen === 'threads' ? `Bài ${TEN_NEN[nen]} này không mở công khai cho máy chủ đọc (thường do bài riêng tư hoặc bắt đăng nhập). Thử bài khác, hoặc mentor cài cobalt để tải đầy đủ.` : 'Không lấy được file từ link này. Kiểm tra bài còn công khai không, hoặc thử lại sau ít phút.'
+    })[loi] || 'Không lấy được file từ link này (' + loi + '). Thử lại sau ít phút.';
+    return;
+  }
+  kqHienTai = kq; ve(kq);
+  const n = kq.items.length;
+  st.className = 'status ok'; st.textContent = `Tìm thấy ${n} file. Bấm Tải về ở file bạn cần.`;
+  luuLichSu(link, kq);
+}
+
+/* ── Vẽ kết quả ── */
+function ve(kq) {
+  const box = $('#kq'); box.hidden = false; box.innerHTML = '';
+  const info = el('div', 'info');
+  if (kq.bia) { const im = el('img', 'cv'); im.src = kq.bia; im.alt = ''; im.referrerPolicy = 'no-referrer'; im.onerror = () => im.replaceWith(Object.assign(el('div', 'cv nop', ICON[(kq.items[0] || {}).loai] || '📄'))); info.append(im); }
+  else info.append(el('div', 'cv nop', ICON[(kq.items[0] || {}).loai] || '📄'));
+  const tx = el('div');
+  tx.append(el('span', 'tag', TEN_NEN[kq.nen] || 'Trang web'));
+  tx.append(el('b', '', (kq.tieu_de || 'Không có tiêu đề').slice(0, 220)));
+  const phu = [kq.tac_gia, kq.giay ? kq.giay + ' giây' : '', kq.so ? `${fmtSo(kq.so.view)} view · ${fmtSo(kq.so.like)} tim · ${fmtSo(kq.so.cmt)} bình luận · ${fmtSo(kq.so.share)} chia sẻ` : ''].filter(Boolean).join(' · ');
+  if (phu) tx.append(el('small', '', phu));
+  if (kq.ghi_chu) tx.append(el('small', '', 'ℹ️ ' + kq.ghi_chu));
+  const row = el('div', 'row');
+  if ((kq.nen === 'tiktok' || kq.nen === 'youtube') && $('#link').value) { const a = el('a', 'btn pro', '🎬 Soi video này →'); a.href = 'soi-video.html?link=' + encodeURIComponent($('#link').value); row.append(a); }
+  const cp = el('button', 'btn', '📋 Chép tiêu đề'); cp.type = 'button'; cp.onclick = async () => { try { await navigator.clipboard.writeText(kq.tieu_de || ''); toast('Đã chép tiêu đề'); } catch { toast('Không chép được'); } };
+  if (kq.tieu_de) row.append(cp);
+  tx.append(row); info.append(tx); box.append(info);
+
+  const vid0 = kq.items.find(i => i.loai === 'video');
+  NHOM.forEach(([loai, ten]) => {
+    const ds = kq.items.filter(i => i.loai === loai); if (!ds.length) return;
+    const g = el('div', 'grp'); g.style.marginTop = '16px';
+    const h = el('h3', '', `${ICON[loai]} ${ten} (${ds.length})`);
+    if (ds.length > 1 && loai === 'anh') { const all = el('button', 'btn', '⬇️ Tải tất cả'); all.type = 'button'; all.onclick = () => taiHet(ds, all); h.append(all); }
+    g.append(h);
+    if (loai === 'video' && vid0) { const v = el('video', 'pv'); v.controls = true; v.preload = 'none'; v.playsInline = true; v.src = vid0.url; if (kq.bia || vid0.thumb) v.poster = vid0.thumb || kq.bia; g.append(v); }
+    if (loai === 'anh' && ds.filter(i => !i.bia).length > 1) {
+      const wrap = el('div', 'imgs');
+      ds.forEach(it => { const c = el('div', 'im'); const im = el('img'); im.src = it.url; im.alt = it.nhan; im.loading = 'lazy'; im.referrerPolicy = 'no-referrer'; const b = el('button', 'btn pro', '⬇️ ' + it.nhan); b.type = 'button'; b.onclick = () => taiFile(it, b); c.append(im, b); wrap.append(c); });
+      g.append(wrap);
+    } else {
+      const wrap = el('div', 'items');
+      ds.forEach(it => {
+        const r = el('div', 'it');
+        if (loai === 'anh' || it.thumb) { const im = el('img', 'th'); im.src = it.thumb || it.url; im.alt = ''; im.loading = 'lazy'; im.referrerPolicy = 'no-referrer'; r.append(im); } else r.append(el('div', 'th', ICON[loai]));
+        const t = el('div'); t.append(el('b', '', it.nhan)); t.append(el('small', '', [coMB(it.size), tenFile(it)].filter(Boolean).join(' · '))); const bar = el('div', 'bar'); bar.hidden = true; bar.append(el('i')); t.append(bar); r.append(t);
+        const act = el('div', 'act'); const b = el('button', 'btn pro', '⬇️ Tải về'); b.type = 'button'; b.onclick = () => taiFile(it, b, bar); const mo = el('a', '', 'Mở'); mo.href = it.url; mo.target = '_blank'; mo.rel = 'noopener noreferrer';
+        act.append(b, mo); r.append(act); wrap.append(r);
+      });
+      g.append(wrap);
+    }
+    box.append(g);
+  });
+  box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* ── Tải file: thử thẳng từ trình duyệt → máy chủ tải hộ (≤35MB) → mở tab mới để tự lưu ── */
+function duoiFile(it, mime) {
+  if (it.ext) return it.ext;
+  const m = String(mime || '').match(/\/(mp4|webm|quicktime|jpeg|png|webp|gif|mpeg|mp3|mp4a|ogg|wav|aac)/i);
+  if (m) return { quicktime: 'mov', jpeg: 'jpg', mpeg: 'mp3', mp4a: 'm4a' }[m[1].toLowerCase()] || m[1].toLowerCase();
+  const u = String(it.url).split('?')[0].match(/\.(mp4|mov|webm|jpe?g|png|webp|gif|mp3|m4a|wav|ogg)$/i);
+  if (u) return u[1].toLowerCase().replace('jpeg', 'jpg');
+  return it.loai === 'video' ? 'mp4' : it.loai === 'anh' ? 'jpg' : 'mp3';
+}
+function tenFile(it, mime) {
+  const kq = kqHienTai || {}, slug = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/gi, 'd').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40);
+  return [kq.nen, kq.id || slug(kq.tieu_de).slice(0, 24), slug(it.nhan.split(' · ').slice(0, 2).join(' '))].filter(Boolean).join('-') + '.' + duoiFile(it, mime);
+}
+function luuBlob(blob, ten) {
+  const u = URL.createObjectURL(blob), a = document.createElement('a');
+  a.href = u; a.download = ten; document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(u), 60000);
+}
+async function taiThang(it, bar) {
+  const r = await fetch(it.url, { referrerPolicy: 'no-referrer' });
+  if (!r.ok) throw new Error('http ' + r.status);
+  const tong = Number(r.headers.get('content-length')) || it.size || 0;
+  if (!r.body || !tong || !bar) return r.blob();
+  const rd = r.body.getReader(), khuc = []; let da = 0;
+  bar.hidden = false;
+  for (;;) { const { done, value } = await rd.read(); if (done) break; khuc.push(value); da += value.length; bar.firstChild.style.width = Math.min(100, da / tong * 100) + '%'; }
+  return new Blob(khuc, { type: r.headers.get('content-type') || '' });
+}
+async function taiHo(it) {
+  const r = await TK.goi({ action: 'hook_ai', mode: 'taive_file', link: it.url });
+  if (!r.ok) { const e = new Error(r.error || 'loi'); e.ma = r.error; throw e; }
+  const bin = atob(r.b64), arr = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+  return new Blob([arr], { type: r.mime || '' });
+}
+async function taiFile(it, btn, bar) {
+  const cu = btn.textContent; btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Đang tải';
+  try {
+    let blob;
+    try { blob = await taiThang(it, bar); }
+    catch (e) { btn.innerHTML = '<span class="spinner"></span>Máy chủ tải hộ'; blob = await taiHo(it); }
+    if (!blob || blob.size < 500) throw new Error('rong');
+    luuBlob(blob, tenFile(it, blob.type)); toast('Đã tải: ' + tenFile(it, blob.type));
+    btn.textContent = '✓ Đã tải';
+  } catch (e) {
+    console.error('[taive file]', e);
+    // tải tự động không được: đổi nút thành link mở file (mở tab mới sau await sẽ bị chặn popup)
+    const a = el('a', 'btn', 'Mở để lưu ↗'); a.href = it.url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+    if (btn.isConnected) btn.replaceWith(a);
+    toast(e && e.ma === 'file_qua_lon' ? 'File lớn hơn 35MB: bấm "Mở để lưu", rồi bấm ⋮ hoặc giữ vào video → Tải xuống.' : 'Không tải thẳng được: bấm "Mở để lưu", rồi bấm ⋮ hoặc giữ vào video/ảnh → Tải xuống/Lưu.');
+    btn.textContent = cu;
+  } finally { btn.disabled = false; if (bar) setTimeout(() => { bar.hidden = true; bar.firstChild.style.width = '0'; }, 1200); }
+}
+async function taiHet(ds, btn) {
+  btn.disabled = true;
+  for (let i = 0; i < ds.length; i++) { btn.textContent = `Đang tải ${i + 1}/${ds.length}`; const b = el('button'); await taiFile(ds[i], b); await new Promise(z => setTimeout(z, 400)); }
+  btn.textContent = '✓ Đã tải hết'; btn.disabled = false;
+}
+
+/* ── Link gần đây ── */
+function docLichSu() { try { return JSON.parse(ls.get('tv.lichsu') || '[]'); } catch { return []; } }
+function luuLichSu(link, kq) { const ds = docLichSu().filter(x => x.link !== link); ds.unshift({ link, t: (kq.tieu_de || link).slice(0, 60), nen: kq.nen }); ls.set('tv.lichsu', JSON.stringify(ds.slice(0, 8))); veLichSu(); }
+function veLichSu() {
+  const box = $('#lichSu'); box.innerHTML = ''; const ds = docLichSu(); if (!ds.length) return;
+  box.append(el('span', 'quota', 'Gần đây:'));
+  ds.forEach(x => { const b = el('button', '', `${TEN_NEN[x.nen] || ''} · ${x.t}`); b.type = 'button'; b.title = x.link; b.onclick = () => { $('#link').value = x.link; lay(); }; box.append(b); });
+}
+
+/* ── boot ── */
+function applyTheme(t) { if (t) document.documentElement.dataset.theme = t; else delete document.documentElement.dataset.theme; }
+applyTheme(ls.get('hook.theme'));
+$('#themeBtn').addEventListener('click', () => { const dark = document.documentElement.dataset.theme ? document.documentElement.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; const t = dark ? 'light' : 'dark'; applyTheme(t); ls.set('hook.theme', t); });
+$('#btnLay').addEventListener('click', () => lay());
+$('#link').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); lay(); } });
+$('#link').addEventListener('paste', () => setTimeout(() => { if (timLink($('#link').value)) lay(); }, 30));   // dán xong là tự lấy
+$('#btnDan').addEventListener('click', async () => { try { const t = await navigator.clipboard.readText(); if (!timLink(t)) { toast('Bộ nhớ tạm chưa có link'); return; } $('#link').value = timLink(t); lay(); } catch { toast('Trình duyệt chặn đọc bộ nhớ tạm, bấm giữ vào ô rồi Dán'); $('#link').focus(); } });
+$('#acctBtn').addEventListener('click', () => TK.mo());
+TK.khoiDong({ api: API, tool: 'taive', onDoi: me => { $('#quota').textContent = 'Miễn phí · không tốn lượt AI'; $('#acctBtn').textContent = me ? (me.loai === 'hv' ? 'Học viên' : me.pro ? '✦ Pro' : 'Free') : 'Đăng ký'; } });
+$('#quota').textContent = 'Miễn phí · không tốn lượt AI';
+veLichSu();
+const qLink = new URLSearchParams(location.search).get('link');
+if (qLink) { $('#link').value = qLink; history.replaceState(null, '', location.pathname); lay(); }
+</script>
+</body>
+</html>
