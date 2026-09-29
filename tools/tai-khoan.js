@@ -728,7 +728,7 @@
   async function taiVideo(file, onTienDo) {
     var bao = function (p, c) { if (typeof onTienDo === 'function') { try { onTienDo(p, c); } catch (e) { } } };
     bao(0, 'Đang mở phiên tải…');
-    var s0 = await goiLai({ action: 'hook_ai', mode: 'up_start', token: token(), dev: dev(), size: file.size, ten: file.name });
+    var s0 = await goiLai({ action: 'hook_ai', mode: 'up_start', token: token(), dev: dev(), size: file.size, mime: file.type || 'video/mp4', ten: file.name });
     if (!s0.ok) {
       // máy chủ chưa biết mode up_start (HookAI.gs bản cũ) thì rơi xuống nhánh mặc định và trả thieu_text / unknown_action
       var cu = s0.error === 'thieu_text' || s0.error === 'unknown_action';

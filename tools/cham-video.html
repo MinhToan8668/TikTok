@@ -309,7 +309,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="tai-khoan.js?v=202609281029"></script>
+<script src="tai-khoan.js?v=202609281609"></script>
 <script>
 const $ = s => document.querySelector(s);
 const el = (t, c, txt) => { const e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; };
@@ -432,8 +432,19 @@ function dienTuHoSo() {
 }
 
 /* ---------- chấm ---------- */
-const ERR = { can_dangky: 'Tạo tài khoản miễn phí để dùng AI, mất 30 giây.', khong_co_quyen: 'Tài khoản này không có quyền.', khong_tai_duoc_video: 'Không tải được video từ link này. Tải file video lên rồi chấm lại.', video_qua_lon: 'Video quá lớn (trên 200MB). Xuất lại 720p hoặc cắt ngắn.', khong_co_drive: 'Máy chủ chưa mở được Google Drive để nhận file lớn. Báo mentor.', thieu_khuc: 'Tải lên bị thiếu một khúc, bấm Chấm lại để gửi lại.', video_hong: 'File video không đọc được, thử xuất lại dạng MP4.', khong_co_video: 'Chưa có video. Tải file lên hoặc dán link video đã đăng.', can_gemini: 'Máy chủ đang chạy Claude, phần xem video cần thêm GEMINI_API_KEY. Báo mentor.', het_luot_thu: 'Bạn đã dùng hết lượt chấm video miễn phí. Nâng cấp Pro hoặc đăng ký học viên để dùng tiếp.', het_luot: 'Hết lượt AI hôm nay, mai quay lại nhé.', het_phien: 'Phiên đăng nhập hết hạn. Đăng nhập lại giúp mình.', chua_cai_key: 'Máy chủ chưa cài khóa AI. Báo mentor.', sai_key: 'Khóa AI trên máy chủ không hợp lệ. Báo mentor.', ban_qua: 'AI đang bận, thử lại sau một phút.', tu_choi: 'AI không xử lý được nội dung này.', loi_mang: 'Máy chủ không gọi được AI, thử lại.', unknown_action: 'Máy chủ chưa cập nhật.', may_chu_cu: 'Máy chủ đang chạy HookAI.gs bản cũ nên chưa nhận được video tải lên. Mentor dán HookAI.gs mới vào Apps Script rồi Deploy, chọn New version.' };
+const ERR = { can_dangky: 'Tạo tài khoản miễn phí để dùng AI, mất 30 giây.', khong_co_quyen: 'Tài khoản này không có quyền.', khong_tai_duoc_video: 'Không tải được video từ link này. Tải file video lên rồi chấm lại.', video_qua_lon: 'Video quá lớn (trên 200MB). Xuất lại 720p hoặc cắt ngắn.', het_phien_tai: 'Phiên tải bị mất giữa chừng, bấm lại để tải từ đầu.', thieu_khuc: 'Tải lên bị thiếu một khúc, bấm Chấm lại để gửi lại.', video_hong: 'File video không đọc được, thử xuất lại dạng MP4.', khong_co_video: 'Chưa có video. Tải file lên hoặc dán link video đã đăng.', can_gemini: 'Máy chủ đang chạy Claude, phần xem video cần thêm GEMINI_API_KEY. Báo mentor.', het_luot_thu: 'Bạn đã dùng hết lượt chấm video miễn phí. Nâng cấp Pro hoặc đăng ký học viên để dùng tiếp.', het_luot: 'Hết lượt AI hôm nay, mai quay lại nhé.', het_phien: 'Phiên đăng nhập hết hạn. Đăng nhập lại giúp mình.', chua_cai_key: 'Máy chủ chưa cài khóa AI. Báo mentor.', sai_key: 'Khóa AI trên máy chủ không hợp lệ. Báo mentor.', ban_qua: 'AI của Google đang quá tải, đã tự thử lại 3 lần mà chưa được. Đợi 1–2 phút rồi bấm lại, video không phải tải lại.', tu_choi: 'AI không xử lý được nội dung này.', loi_mang: 'Máy chủ không gọi được AI, thử lại.', unknown_action: 'Máy chủ chưa cập nhật.', may_chu_cu: 'Máy chủ đang chạy HookAI.gs bản cũ nên chưa nhận được video tải lên. Mentor dán HookAI.gs mới vào Apps Script rồi Deploy, chọn New version.' };
 let busy = false;
+/* AI bận (Google trả 503/429): tự đếm ngược 20 giây rồi gọi lại, tối đa 2 lần. Video đã tải
+   được dùng lại qua file_uri, và máy chủ đã hoàn lượt khi lỗi nên gọi lại không tốn thêm. */
+async function goiCoThuLai(body) {
+  const st = $('#chamStatus');
+  for (let lan = 0; ; lan++) {
+    const r = await callApi(body);
+    if (r.ok || r.error !== 'ban_qua' || lan >= 2) return r;
+    for (let g = 20; g > 0; g--) { st.className = 'status'; st.innerHTML = `<span class="spinner"></span>AI của Google đang quá tải, tự thử lại sau ${g} giây (lần ${lan + 2}/3)…`; await new Promise(z => setTimeout(z, 1000)); }
+  }
+}
+
 async function cham() {
   if (busy) return;
   if (!DEMO && !(await TK.canCo('cham'))) return;
@@ -456,7 +467,7 @@ async function cham() {
       tickLai();
     }
     if (DEMO) { await new Promise(z => setTimeout(z, 1200)); r = { ok: true, data: demoData(so), con: 0, han: 1 }; }
-    else r = await callApi({ action: 'hook_ai', mode: 'cham', token: TK.token(), dev: TK.dev(), ho_so: TK.hoSo(), link: ng === 'link' ? $('#link').value.trim() : '', nen: state.nen, video_b64: ng === 'file' && !lon ? state.file.b64 : undefined, video_mime: ng === 'file' && !lon ? state.file.mime : undefined, ...(lon || {}), loi_thoai: $('#loiThoai').value.trim(), y_dinh: $('#yDinh').value.trim(), da_dang: state.daDang === 'roi', muc_tieu: state.mucTieu, so_lieu: state.daDang === 'roi' ? so : { giay: so.giay }, chu_de: $('#chuDe').value.trim(), doi_tuong: $('#doiTuong').value.trim(), san_pham: $('#sanPham').value.trim() });
+    else r = await goiCoThuLai({ action: 'hook_ai', mode: 'cham', token: TK.token(), dev: TK.dev(), ho_so: TK.hoSo(), link: ng === 'link' ? $('#link').value.trim() : '', nen: state.nen, video_b64: ng === 'file' && !lon ? state.file.b64 : undefined, video_mime: ng === 'file' && !lon ? state.file.mime : undefined, ...(lon || {}), loi_thoai: $('#loiThoai').value.trim(), y_dinh: $('#yDinh').value.trim(), da_dang: state.daDang === 'roi', muc_tieu: state.mucTieu, so_lieu: state.daDang === 'roi' ? so : { giay: so.giay }, chu_de: $('#chuDe').value.trim(), doi_tuong: $('#doiTuong').value.trim(), san_pham: $('#sanPham').value.trim() });
     clearInterval(tick);
     if (!r.ok) {
       st.className = 'status err'; st.textContent = (ERR[r.error] || 'Có lỗi khi gọi AI, thử lại sau.') + (r.chi_tiet ? ' Mã lỗi: ' + r.chi_tiet : '');
