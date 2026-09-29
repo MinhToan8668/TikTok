@@ -63,7 +63,7 @@
   @media (max-width:520px){
     .seg{display:flex;width:100%}
     .seg button{flex:1 1 auto;min-height:42px;padding:9px 10px;font-size:13.5px}
-    input:not([type=checkbox]):not([type=radio]):not([type=range]),select,textarea{font-size:16px}
+    input:not([type=checkbox]):not([type=radio]):not([type=range]),.card select,.card textarea{font-size:16px}   /* .card để thắng rule select,textarea 14px bên dưới */
     button,.pill{min-height:38px}
     .theme-btn{min-height:0}
   }
@@ -89,7 +89,7 @@
   .status.err{color:var(--danger)} .status.ok{color:var(--ok)}
   .spinner{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .8s linear infinite;vertical-align:-2px;margin-right:6px}
   @keyframes spin{to{transform:rotate(360deg)}}
-  .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:999px;font-size:13px;box-shadow:var(--shadow);opacity:0;transition:.2s;pointer-events:none;z-index:30;max-width:92vw;text-align:center}
+  .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:999px;font-size:13px;box-shadow:var(--shadow);opacity:0;transition:.2s;pointer-events:none;z-index:50;max-width:92vw;text-align:center}
   .toast.show{opacity:1}
   .quota{font-size:12.5px;color:var(--muted)}
   .empty{color:var(--muted);font-size:13.5px;line-height:1.6;padding:8px 0}
@@ -148,6 +148,10 @@
   .map .bar{position:absolute;left:0;right:0;top:14px;height:10px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);display:block}
   .map .pk{position:absolute;top:8px;width:22px;height:22px;border-radius:50%;background:var(--warn);color:#fff;font-size:11px;font-weight:800;display:grid;place-items:center;transform:translateX(-50%);box-shadow:0 0 0 2px var(--surface)}
   .map .pk.nang{background:var(--danger)} .map .pk.nhe{background:var(--line-strong)}
+  .map button.pk{border:0;padding:0;min-height:0;font:inherit;font-size:11px;font-weight:800;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .map button.pk::after{content:'';position:absolute;inset:-11px}   /* vùng bấm 44px cho ngón tay, hình tròn vẫn 22px */
+  .map button.pk:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .ly.hot{background:var(--accent-soft);border-radius:8px;transition:background .3s}
   .tl-lbl{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:4px}
   .ly{display:grid;grid-template-columns:44px 1fr;gap:8px;padding:8px 0;border-top:1px dashed var(--line);font-size:13px}
   .ly:first-child{border-top:0}
@@ -234,7 +238,7 @@
           <input type="text" id="link" inputmode="url" placeholder="https://www.tiktok.com/@kenh-cua-ban/video/…">
           <button class="btn" type="button" id="btnLink">Lấy video</button>
         </div>
-        <div class="status" id="linkStatus"></div>
+        <div class="status" id="linkStatus" role="status" aria-live="polite"></div>
         <div class="vidprev" id="vidprev" hidden>
           <div id="pvImg"><div class="noimg">chưa có ảnh</div></div>
           <div><b id="pvAuthor"></b><p id="pvCaption"></p><div class="srcline" id="pvSrc"></div></div>
@@ -242,7 +246,7 @@
         <div class="srcline off" id="srcLine">Chưa có video</div>
 
         <label class="lbl">Video này</label>
-        <div class="seg" id="daDang" role="group"><button type="button" data-v="chua" aria-pressed="true">Chưa đăng, muốn sửa trước</button><button type="button" data-v="roi" aria-pressed="false">Đã đăng rồi</button></div>
+        <div class="seg" id="daDang" role="group" aria-label="Video đã đăng chưa"><button type="button" data-v="chua" aria-pressed="true">Chưa đăng, muốn sửa trước</button><button type="button" data-v="roi" aria-pressed="false">Đã đăng rồi</button></div>
 
         <div id="soLieuBox" hidden>
           <label class="lbl">Số liệu sau khi đăng (link TikTok tự điền, sửa được)</label>
@@ -262,7 +266,7 @@
         </div>
 
         <label class="lbl">Mục tiêu của video này</label>
-        <div class="seg" id="mucTieu" role="group"><button type="button" data-v="nhan_biet" aria-pressed="true">Kéo người mới (viral)</button><button type="button" data-v="uy_tin" aria-pressed="false">Tạo uy tín</button><button type="button" data-v="chuyen_doi" aria-pressed="false">Ra đơn / booking</button></div>
+        <div class="seg" id="mucTieu" role="group" aria-label="Mục tiêu của video"><button type="button" data-v="nhan_biet" aria-pressed="true">Kéo người mới (viral)</button><button type="button" data-v="uy_tin" aria-pressed="false">Tạo uy tín</button><button type="button" data-v="chuyen_doi" aria-pressed="false">Ra đơn / booking</button></div>
 
         <label class="lbl" for="yDinh">Bạn định truyền tải điều gì? <span style="font-weight:500">(tuỳ chọn, nhưng nên ghi)</span></label>
         <textarea id="yDinh" rows="3" placeholder="VD: Muốn người xem thấy mình bận nhưng vẫn nấu cơm cho con, để họ đồng cảm và hỏi công thức. Ghi vào đây để AI so ý định với thứ video thật sự truyền tải."></textarea>
@@ -289,7 +293,7 @@
           <button class="btn pro lg" id="btnCham" type="button">🎯 Chấm video <small style="font-weight:500;opacity:.8">· 1 lượt AI</small></button>
           <button class="btn" id="btnClear" type="button">Xoá form</button>
         </div>
-        <div class="status" id="chamStatus"></div>
+        <div class="status" id="chamStatus" role="status" aria-live="polite"></div>
       </section>
     </div>
 
@@ -312,7 +316,7 @@
     </div>
   </div>
 </div>
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="tai-khoan.js?v=202609290408"></script>
 <script>
@@ -321,7 +325,9 @@ const el = (t, c, txt) => { const e = document.createElement(t); if (c) e.classN
 const ls = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} }, del(k){ try { localStorage.removeItem(k); } catch {} } };
 const API = 'https://script.google.com/macros/s/AKfycbyxe1nWupAl6VheDZHaU3Ojm-d6c8F_khhUMtkehNCLh5OnGW6f2uF0PKPYZ4eYUqyGjQ/exec';
 const DEMO = /demo/.test(location.hash);
-async function callApi(body) { const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) }); return r.json(); }
+const callApi = body => TK.goi(body);   // dùng chung với tai-khoan.js để lỗi mạng và lỗi máy chủ được phân loại
+/* Ba kiểu hỏng, ba câu khác nhau (xem tai-khoan.js): mất mạng · máy chủ trả không phải JSON · lỗi dựng giao diện sau khi đã có kết quả */
+function cauLoi(e, khiVe) { console.error('[cham]', e); if (TK.loiMang(e)) return 'Máy bạn đang mất mạng. Kiểm tra wifi/4G rồi bấm lại.'; if (TK.loiMayChu(e)) return 'Máy chủ có trả lời nhưng không đúng định dạng (Apps Script lỗi hoặc chưa deploy bản mới). Thử lại sau ít phút, nếu vẫn vậy báo mentor.'; return khiVe || 'Có lỗi trên trang này: ' + (e && e.message || e); }
 let toastT; function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2600); }
 async function copyText(t) { try { await navigator.clipboard.writeText(t); toast('Đã sao chép'); } catch { toast('Không sao chép được, bôi đen để copy'); } }
 function demChu(t) { return String(t || '').replace(/\*\*|_/g, ' ').split(/\s+/).filter(w => /[0-9A-Za-zÀ-ỹ]/.test(w)).length; }
@@ -350,8 +356,9 @@ function updateSrc() {
   $('#dropZone').hidden = !!state.file;
 }
 function docSo() { return { view: soNhap($('#nView').value), like: soNhap($('#nLike').value), cmt: soNhap($('#nCmt').value), luu: soNhap($('#nLuu').value), share: soNhap($('#nShare').value), giay: soNhap($('#giay').value) }; }
-function saveDraft() { ls.set('cham.draft', JSON.stringify({ nen: state.nen, daDang: state.daDang, mucTieu: state.mucTieu, link: $('#link').value, loiThoai: $('#loiThoai').value, yDinh: $('#yDinh').value, giay: $('#giay').value, gioDang: $('#gioDang').value, nView: $('#nView').value, nLike: $('#nLike').value, nCmt: $('#nCmt').value, nLuu: $('#nLuu').value, nShare: $('#nShare').value, chuDe: $('#chuDe').value, doiTuong: $('#doiTuong').value, sanPham: $('#sanPham').value, linkInfo: state.link })); }
+function saveDraft() { if (DEMO) return; ls.set('cham.draft', JSON.stringify({ nen: state.nen, daDang: state.daDang, mucTieu: state.mucTieu, link: $('#link').value, loiThoai: $('#loiThoai').value, yDinh: $('#yDinh').value, giay: $('#giay').value, gioDang: $('#gioDang').value, nView: $('#nView').value, nLike: $('#nLike').value, nCmt: $('#nCmt').value, nLuu: $('#nLuu').value, nShare: $('#nShare').value, chuDe: $('#chuDe').value, doiTuong: $('#doiTuong').value, sanPham: $('#sanPham').value, linkInfo: state.link })); }
 function restore() {
+  if (DEMO) return;   // bản demo nhúng trong landing: không đọc, không ghi gì của học viên
   let d = {}; try { d = JSON.parse(ls.get('cham.draft') || '{}'); } catch {}
   ['link', 'loiThoai', 'yDinh', 'giay', 'gioDang', 'nView', 'nLike', 'nCmt', 'nLuu', 'nShare', 'chuDe', 'doiTuong', 'sanPham'].forEach(id => { if (d[id]) $('#' + id).value = d[id]; });
   ['nView', 'nLike', 'nCmt', 'nLuu', 'nShare'].forEach(id => dinhDangSo($('#' + id)));
@@ -378,29 +385,33 @@ function showPrev() {
   $('#pvSrc').textContent = state.link.video ? 'AI sẽ tải video từ link về xem' : 'Không tải được video từ link, tải file lên nhé';
 }
 function nenTuLink(u) { return /tiktok\.com/i.test(u) ? 'tiktok' : /youtu\.?be/i.test(u) ? 'youtube' : /instagram\.com/i.test(u) ? 'instagram' : /facebook\.com|fb\.watch/i.test(u) ? 'facebook' : ''; }
+/* Đổi link là mọi thứ lấy từ link cũ (tên kênh, ảnh bìa, cờ "có video", thời lượng) hết giá trị. */
+function resetLink() { state.link = { tac_gia: '', caption: '', video: false, giay: 0 }; state.image = ''; state.gioDangThat = 0; state.linkDaLay = ''; $('#vidprev').hidden = true; if (!state.file) $('#giay').value = ''; updateCount(); updateSrc(); }
+let layBusy = false;
 async function layLink() {
+  if (layBusy) return;
   const u = $('#link').value.trim(), st = $('#linkStatus'); if (!/^https?:\/\//i.test(u)) { st.className = 'status err'; st.textContent = 'Dán link đầy đủ bắt đầu bằng https://'; return; }
   const n = nenTuLink(u); if (n) state.nen = n;
-  if (n === 'facebook' || n === 'instagram') { st.className = 'status'; st.textContent = 'Facebook và Instagram không cho tải tự động. Tải file video lên ở trên nhé.'; state.link = { tac_gia: '', caption: '', video: false, giay: 0 }; updateSrc(); return; }
-  st.className = 'status'; st.innerHTML = '<span class="spinner"></span>Đang lấy video và số liệu…'; $('#btnLink').disabled = true;
+  if (n === 'facebook' || n === 'instagram') { st.className = 'status'; st.textContent = 'Facebook và Instagram không cho tải tự động. Tải file video lên ở trên nhé.'; resetLink(); return; }
+  st.className = 'status'; st.innerHTML = '<span class="spinner"></span>Đang lấy video và số liệu…'; $('#btnLink').disabled = true; layBusy = true;
   try {
     let r;
     if (DEMO) { await new Promise(z => setTimeout(z, 500)); r = { ok: true, ho_tro: true, video: true, nen: 'tiktok', tac_gia: 'kenhcuaban', caption: 'Cơm trưa cho vợ ngày mưa #bepnhaminh', anh: '', giay: 52, so_lieu: { view: 1800, like: 96, cmt: 7, luu: 14, share: 5, giay: 52 } }; }
     else r = await callApi({ action: 'hook_ai', mode: 'link', token: TK.token(), dev: TK.dev(), link: u });
-    if (!r.ok) { st.className = 'status err'; st.textContent = r.error === 'het_phien' ? 'Phiên đăng nhập hết hạn, đăng nhập lại.' : (r.error === 'unknown_action' || r.error === 'thieu_text') ? 'Máy chủ đang chạy HookAI.gs bản cũ, mentor cần dán bản mới rồi Deploy → New version.' : 'Không lấy được từ link. Tải file video lên nhé.'; return; }
-    if (!r.ho_tro) { st.className = 'status'; st.textContent = 'Không lấy được từ link này (video riêng tư hoặc nền tảng chặn). Tải file video lên nhé.'; state.link = { tac_gia: '', caption: '', video: false, giay: 0 }; updateSrc(); return; }
-    state.link = { tac_gia: r.tac_gia || '', caption: r.caption || '', video: !!r.video, giay: r.giay || 0 };
+    if (!r.ok) { resetLink(); st.className = 'status err'; st.textContent = r.error === 'het_phien' ? 'Phiên đăng nhập hết hạn, đăng nhập lại.' : (r.error === 'unknown_action' || r.error === 'thieu_text') ? 'Máy chủ đang chạy HookAI.gs bản cũ, mentor cần dán bản mới rồi Deploy → New version.' : 'Không lấy được từ link. Tải file video lên nhé.'; return; }
+    if (!r.ho_tro) { resetLink(); st.className = 'status'; st.textContent = 'Không lấy được từ link này (video riêng tư hoặc nền tảng chặn). Tải file video lên nhé.'; return; }
+    state.link = { tac_gia: r.tac_gia || '', caption: r.caption || '', video: !!r.video, giay: r.giay || 0 }; state.linkDaLay = u; state.image = '';
     if (r.anh) { try { state.image = await dataUrlToJpeg(r.anh); } catch { state.image = ''; } }
     if (r.so_lieu && r.so_lieu.view) { state.daDang = 'roi'; setSeg('daDang', 'roi'); veDaDang(); const m = { view: 'nView', like: 'nLike', cmt: 'nCmt', luu: 'nLuu', share: 'nShare' }; Object.keys(m).forEach(k => { if (r.so_lieu[k]) $('#' + m[k]).value = fmtSo(r.so_lieu[k]); }); }
     if (r.gio_dang) { const sel = $('#gioDang'), moc = [...sel.options].map(o => Number(o.value) || 0).filter(Boolean); const gan = moc.reduce((a, b) => Math.abs(b - r.gio_dang) < Math.abs(a - r.gio_dang) ? b : a, moc[0]); sel.value = String(gan); state.gioDangThat = r.gio_dang; }
     veViewGio();
-    if (r.giay && !$('#giay').value) $('#giay').value = String(r.giay);
+    if (r.giay && !state.file) $('#giay').value = String(r.giay);   // link mới thì thời lượng mới; file đang chọn thì giữ của file
     showPrev(); updateCount(); updateSrc();
     st.className = r.video ? 'status ok' : 'status';
     st.textContent = r.video ? 'Đã lấy video' + (r.giay ? ' ' + r.giay + ' giây' : '') + (r.so_lieu && r.so_lieu.view ? ', số liệu đã điền' : '') + '. Bấm Chấm video.' : (r.ghi_chu || 'Lấy được thông tin nhưng không tải được video. Tải file lên nhé.');
     saveDraft();
-  } catch { st.className = 'status err'; st.textContent = 'Không kết nối được máy chủ.'; }
-  finally { $('#btnLink').disabled = false; }
+  } catch (e) { st.className = 'status err'; st.textContent = cauLoi(e); }
+  finally { $('#btnLink').disabled = false; layBusy = false; }
 }
 function imgToJpeg(img) { const max = 1024, r = Math.min(1, max / Math.max(img.naturalWidth || img.width, img.naturalHeight || img.height)); const cv = document.createElement('canvas'); cv.width = Math.round((img.naturalWidth || img.width) * r); cv.height = Math.round((img.naturalHeight || img.height) * r); cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height); return cv.toDataURL('image/jpeg', .82).split(',')[1]; }
 function dataUrlToJpeg(src) { return new Promise((ok, no) => { const im = new Image(); im.onload = () => ok(imgToJpeg(im)); im.onerror = no; im.src = src; }); }
@@ -416,8 +427,9 @@ async function chonVideo(file) {
     const lon = file.size > INLINE_TOI_DA;
     const [b64, giay] = await Promise.all([lon ? Promise.resolve('') : readVideoFile(file), videoDuration(file)]);
     state.file = { file, b64, lon, mime: file.type || 'video/mp4', name: file.name, size: file.size, giay };
-    if (giay) { $('#giay').value = String(giay); updateCount(); } updateSrc(); toast(lon ? 'Đã chọn video, khi bấm Chấm sẽ tải lên theo từng khúc' : 'Đã có video, bấm Chấm video');
-  } catch { state.file = null; updateSrc(); toast('Không đọc được file'); }
+    $('#giay').value = giay ? String(giay) : ''; updateCount(); updateSrc(); saveDraft();   // file mới thì thời lượng cũ không còn đúng, kể cả khi không đọc được metadata
+    toast(lon ? 'Đã chọn video, khi bấm Chấm sẽ tải lên theo từng khúc' : 'Đã có video, bấm Chấm video');
+  } catch (e) { console.error('[cham] đọc file', e); state.file = null; updateSrc(); toast('Không đọc được file'); }
 }
 
 /* ---------- quota ---------- */
@@ -444,7 +456,7 @@ function dienTuHoSo() {
 }
 
 /* ---------- chấm ---------- */
-const ERR = { can_dangky: 'Tạo tài khoản miễn phí để dùng AI, mất 30 giây.', het_han_hv: 'Gói Pro dành cho học viên của bạn đã hết hạn. Nâng cấp Pro để dùng tiếp, hoặc nhắn mentor.', khong_co_quyen: 'Tài khoản này không có quyền.', khong_tai_duoc_video: 'Không tải được video từ link này. Tải file video lên rồi chấm lại.', video_qua_lon: 'Video quá lớn (trên 200MB). Xuất lại 720p hoặc cắt ngắn.', het_phien_tai: 'Phiên tải bị mất giữa chừng, bấm lại để tải từ đầu.', thieu_khuc: 'Tải lên bị thiếu một khúc, bấm Chấm lại để gửi lại.', video_hong: 'File video không đọc được, thử xuất lại dạng MP4.', khong_co_video: 'Chưa có video. Tải file lên hoặc dán link video đã đăng.', can_gemini: 'Máy chủ đang chạy Claude, phần xem video cần thêm GEMINI_API_KEY. Báo mentor.', het_luot_thu: 'Bạn đã dùng hết lượt chấm video miễn phí. Nâng cấp Pro hoặc đăng ký học viên để dùng tiếp.', het_luot: 'Hết lượt AI hôm nay, mai quay lại nhé.', het_phien: 'Phiên đăng nhập hết hạn. Đăng nhập lại giúp mình.', chua_cai_key: 'Máy chủ chưa cài khóa AI. Báo mentor.', sai_key: 'Khóa AI trên máy chủ không hợp lệ. Báo mentor.', ban_qua: 'AI của Google đang quá tải, đã tự thử lại 3 lần mà chưa được. Đợi 1–2 phút rồi bấm lại, video không phải tải lại.', tu_choi: 'AI không xử lý được nội dung này.', loi_mang: 'Máy chủ không gọi được AI, thử lại.', unknown_action: 'Máy chủ chưa cập nhật.', may_chu_cu: 'Máy chủ đang chạy HookAI.gs bản cũ nên chưa nhận được video tải lên. Mentor dán HookAI.gs mới vào Apps Script rồi Deploy, chọn New version.' };
+const ERR = { can_dangky: 'Tạo tài khoản miễn phí để dùng AI, mất 30 giây.', het_han_hv: 'Gói Pro dành cho học viên của bạn đã hết hạn. Nâng cấp Pro để dùng tiếp, hoặc nhắn mentor.', khong_co_quyen: 'Tài khoản này không có quyền.', khong_tai_duoc_video: 'Không tải được video từ link này. Tải file video lên rồi chấm lại.', video_qua_lon: 'Video từ link hoặc gửi thẳng lớn hơn 45MB. Tải file lên (tối đa 200MB) hoặc xuất lại 720p.', video_qua_dai: 'Video dài quá 10 phút, AI không xem kịp. Cắt đoạn cần chấm rồi gửi lại.', het_gio: 'Video quá nặng nên máy chủ không xem xong trong 5 phút. Lượt đã được hoàn, xuất lại 720p hoặc cắt ngắn rồi thử lại.', loi_ai: 'AI trả lời lỗi giữa chừng, lượt đã được hoàn. Bấm Chấm lại.', internal: 'Máy chủ gặp lỗi bất ngờ. Thử lại sau ít phút, nếu vẫn vậy báo mentor.', het_phien_tai: 'Phiên tải bị mất giữa chừng, bấm lại để tải từ đầu.', thieu_khuc: 'Tải lên bị thiếu một khúc, bấm Chấm lại để gửi lại.', video_hong: 'File video không đọc được, thử xuất lại dạng MP4.', khong_co_video: 'Chưa có video. Tải file lên hoặc dán link video đã đăng.', can_gemini: 'Máy chủ đang chạy Claude, phần xem video cần thêm GEMINI_API_KEY. Báo mentor.', het_luot_thu: 'Bạn đã dùng hết lượt chấm video miễn phí. Nâng cấp Pro hoặc đăng ký học viên để dùng tiếp.', het_luot: 'Hết lượt AI hôm nay, mai quay lại nhé.', het_phien: 'Phiên đăng nhập hết hạn. Đăng nhập lại giúp mình.', chua_cai_key: 'Máy chủ chưa cài khóa AI. Báo mentor.', sai_key: 'Khóa AI trên máy chủ không hợp lệ. Báo mentor.', ban_qua: 'AI của Google đang quá tải, đã tự thử lại 3 lần mà chưa được. Đợi 1–2 phút rồi bấm lại, video không phải tải lại.', tu_choi: 'AI không xử lý được nội dung này.', loi_mang: 'Máy chủ không gọi được AI, thử lại.', unknown_action: 'Máy chủ chưa cập nhật.', may_chu_cu: 'Máy chủ đang chạy HookAI.gs bản cũ nên chưa nhận được video tải lên. Mentor dán HookAI.gs mới vào Apps Script rồi Deploy, chọn New version.' };
 let busy = false;
 /* AI bận (Google trả 503/429): tự đếm ngược 20 giây rồi gọi lại, tối đa 2 lần. Video đã tải
    được dùng lại qua file_uri, và máy chủ đã hoàn lượt khi lỗi nên gọi lại không tốn thêm. */
@@ -459,10 +471,12 @@ async function goiCoThuLai(body) {
 
 async function cham() {
   if (busy) return;
-  if (!DEMO && !(await TK.canCo('cham'))) return;
+  const st = $('#chamStatus'), btn = $('#btnCham');
+  busy = true; btn.disabled = true;   // khóa TRƯỚC khi chờ canCo, kẻo bấm đúp lọt hai yêu cầu và mất hai lượt
   const ng = nguon();
-  if (!ng) { toast('Tải file video lên, hoặc dán link video đã đăng rồi bấm Lấy video'); $('#dropZone').focus(); return; }
-  const st = $('#chamStatus'), btn = $('#btnCham'); busy = true; btn.disabled = true;
+  if (!ng) { busy = false; btn.disabled = false; toast('Tải file video lên, hoặc dán link video đã đăng rồi bấm Lấy video'); $('#dropZone').focus(); return; }
+  try { if (!DEMO && !(await TK.canCo('cham'))) { busy = false; btn.disabled = false; return; } }
+  catch (e) { busy = false; btn.disabled = false; st.className = 'status err'; st.textContent = cauLoi(e); return; }
   let t0 = Date.now(), tick;
   const tickLai = () => { t0 = Date.now(); tick = setInterval(() => { st.className = 'status'; st.innerHTML = `<span class="spinner"></span>${ng === 'text' ? 'Mentor AI đang đọc kịch bản' : 'AI đang xem trọn video, nghe giọng, đọc chữ rồi chấm từng giây'} · ${Math.round((Date.now() - t0) / 1000)} giây (${ng === 'text' ? 'thường 25–60' : 'thường 40–120'} giây)`; }, 400); };
   tickLai();
@@ -478,7 +492,7 @@ async function cham() {
       lon = { file_uri: state.file.file_uri, file_mime: state.file.mime, file_size: state.file.size };
       tickLai();
     }
-    if (DEMO) { await new Promise(z => setTimeout(z, 1200)); r = { ok: true, data: demoData(so), con: 0, han: 1 }; }
+    if (DEMO) { await new Promise(z => setTimeout(z, 1200)); r = { ok: true, data: demoData(so), con: null, han: null }; }
     else r = await goiCoThuLai({ action: 'hook_ai', mode: 'cham', token: TK.token(), dev: TK.dev(), ho_so: TK.hoSo(), link: ng === 'link' ? $('#link').value.trim() : '', nen: state.nen, video_b64: ng === 'file' && !lon ? state.file.b64 : undefined, video_mime: ng === 'file' && !lon ? state.file.mime : undefined, ...(lon || {}), loi_thoai: $('#loiThoai').value.trim(), y_dinh: $('#yDinh').value.trim(), da_dang: state.daDang === 'roi', gio_dang: state.daDang === 'roi' ? (state.gioDangThat || Number($('#gioDang').value) || 0) : 0, muc_tieu: state.mucTieu, so_lieu: state.daDang === 'roi' ? so : { giay: so.giay }, chu_de: $('#chuDe').value.trim(), doi_tuong: $('#doiTuong').value.trim(), san_pham: $('#sanPham').value.trim() });
     clearInterval(tick);
     if (!r.ok) {
@@ -489,18 +503,29 @@ async function cham() {
     }
     if (!r.data || !r.data.thang) { st.className = 'status err'; st.textContent = 'Máy chủ đang chạy HookAI.gs bản cũ nên chưa có Chấm video. Mentor dán HookAI.gs mới rồi Deploy, chọn New version.'; return; }
     if (r.data.meta && r.data.meta.giay && !$('#giay').value) { $('#giay').value = String(r.data.meta.giay); updateCount(); }
-    state.kq = r.data; renderKq(r.data, so);
+    state.kq = r.data;
+    // máy chủ đã trả lời và đã tính lượt: lỗi dựng giao diện ở đây không được báo thành "mất mạng"
+    try { renderKq(r.data, so); }
+    catch (e) { st.className = 'status err'; st.textContent = cauLoi(e, 'AI đã chấm xong nhưng màn hình dựng bị lỗi. Bấm Chấm lại: cùng video cùng thông số thì lấy từ bộ nhớ, không tốn lượt.'); return; }
     st.className = 'status ok'; st.textContent = r.tu_bo_nho ? 'Cùng video, cùng thông số nên lấy lại kết quả đã chấm, không tốn lượt. Đổi số liệu, giờ đăng, mục tiêu hay ý định rồi bấm lại nếu muốn chấm mới.' : `Xong sau ${Math.round((Date.now() - t0) / 1000)} giây.` + (r.con != null ? ` Còn ${r.con}/${r.han} lượt.` : '');
     if (r.luot && TK.me) { TK.me.luot = r.luot; veQuota(); } else if (r.con != null) $('#quota').textContent = `còn ${r.con}/${r.han} lượt`;
     if (matchMedia('(max-width:900px)').matches) $('#kq').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  } catch { clearInterval(tick); st.className = 'status err'; st.textContent = 'Không kết nối được máy chủ.'; }
-  finally { busy = false; btn.disabled = false; }
+  } catch (e) { clearInterval(tick); st.className = 'status err'; st.textContent = cauLoi(e); }
+  finally { clearInterval(tick); busy = false; btn.disabled = false; }
 }
 
 /* ---------- lưu kết quả ---------- */
-function luuKq(d, so) { ls.set('cham.kq', JSON.stringify({ d, so, ten: state.file ? state.file.name : (state.link.tac_gia ? '@' + state.link.tac_gia : ''), link: $('#link').value.trim(), at: Date.now() })); }
+function luuKq(d, so) { if (DEMO) return; ls.set('cham.kq', JSON.stringify({ d, so, ten: state.file ? state.file.name : (state.link.tac_gia ? '@' + state.link.tac_gia : ''), link: $('#link').value.trim(), at: Date.now() })); }
 function xoaKq() { ls.del('cham.kq'); state.kq = null; $('#kqBody').hidden = true; $('#kqEmpty').hidden = false; $('#sumBar').hidden = true; $('#grid').classList.remove('has-kq', 'edit'); }
-function moLaiKq() { let o = null; try { o = JSON.parse(ls.get('cham.kq') || 'null'); } catch {} if (!o || !o.d || !o.d.thang) return; state.kq = o.d; state.kqTen = o.ten || ''; renderKq(o.d, o.so || docSo(), true); }
+function moLaiKq() { if (DEMO) return; let o = null; try { o = JSON.parse(ls.get('cham.kq') || 'null'); } catch {} if (!o || !o.d || !o.d.thang) return; state.kq = o.d; state.kqTen = o.ten || ''; renderKq(o.d, o.so || docSo(), true); }
+/* Một chỗ xoá duy nhất, hỏi đúng một lần: khi đang có kết quả hoặc đã điền gì đó. */
+function coGiDeMat() { return $('#grid').classList.contains('has-kq') || !!state.file || ['link', 'loiThoai', 'yDinh', 'nView'].some(id => $('#' + id).value.trim()); }
+function xoaHet(hoi) {
+  if (busy) { toast('Đang chấm, đợi xong rồi xoá nhé'); return; }
+  if (hoi && coGiDeMat() && !confirm($('#grid').classList.contains('has-kq') ? 'Bỏ kết quả này và xoá thông tin video để chấm video khác?' : 'Xoá hết thông tin video đang điền?')) return;
+  xoaKq(); ['link', 'loiThoai', 'yDinh', 'giay', 'gioDang', 'nView', 'nLike', 'nCmt', 'nLuu', 'nShare'].forEach(id => $('#' + id).value = '');
+  state.file = null; state.kqTen = ''; state.daDang = 'chua'; setSeg('daDang', 'chua'); veDaDang(); resetLink(); veViewGio(); $('#linkStatus').textContent = ''; $('#chamStatus').textContent = ''; hsDien = {}; saveDraft();
+}
 function veSumBar(d, so) {
   const bar = $('#sumBar'); bar.innerHTML = ''; bar.hidden = false;
   const t = el('div'); const tt = d.tom_tat || {};
@@ -508,7 +533,7 @@ function veSumBar(d, so) {
   t.append(el('small', null, [(d.meta && d.meta.giay) ? d.meta.giay + 's' : '', d.tong + '/100', d.meta && d.meta.da_dang ? 'đã đăng' : 'chưa đăng', d.meta && d.meta.nguon === 'chu' ? 'chấm trên kịch bản' : 'AI đã xem video'].filter(Boolean).join(' · ')));
   bar.append(t);
   const rw = el('div', 'row'); const b1 = el('button', 'btn', 'Sửa thông tin'); b1.type = 'button'; b1.onclick = () => { $('#grid').classList.toggle('edit'); if ($('#grid').classList.contains('edit')) $('#formCol').scrollIntoView({ behavior: 'smooth', block: 'start' }); };
-  const b2 = el('button', 'btn', 'Chấm video khác'); b2.type = 'button'; b2.onclick = () => { if (!confirm('Bỏ kết quả này để chấm video khác?')) return; xoaKq(); $('#btnClear').click(); }; rw.append(b1, b2); bar.append(rw);
+  const b2 = el('button', 'btn', 'Chấm video khác'); b2.type = 'button'; b2.onclick = () => xoaHet(true); rw.append(b1, b2); bar.append(rw);
 }
 
 /* ---------- dựng kết quả ---------- */
@@ -562,9 +587,10 @@ function renderKq(d, so, tuLuu) {
   if ((d.luu_y || []).length) {
     H(box, 'Chỗ cần lưu ý, theo từng giây');
     const map = el('div', 'map'); map.append(el('i', 'bar'));
-    d.luu_y.forEach((m, i) => { const p = el('span', 'pk ' + m.muc, String(i + 1)); p.style.left = Math.min(98, Math.max(2, m.giay / giay * 100)) + '%'; p.title = m.giay + 's · ' + m.van_de; map.append(p); });
+    // mốc trên dòng thời gian bấm được (điện thoại không có hover): nhảy xuống đúng dòng lưu ý
+    d.luu_y.forEach((m, i) => { const p = el('button', 'pk ' + m.muc, String(i + 1)); p.type = 'button'; p.style.left = Math.min(98, Math.max(2, m.giay / giay * 100)) + '%'; p.title = m.giay + 's · ' + m.van_de; p.setAttribute('aria-label', `Lưu ý ${i + 1} ở giây ${m.giay}: ${m.van_de}`); p.onclick = () => { const r = $('#ly' + i); if (r) { r.scrollIntoView({ behavior: 'smooth', block: 'center' }); r.classList.add('hot'); setTimeout(() => r.classList.remove('hot'), 1500); } }; map.append(p); });
     box.append(map); const lbl = el('div', 'tl-lbl'); lbl.append(el('span', null, '0s'), el('span', null, '🔴 nặng · 🟠 vừa · ⚪ nhẹ'), el('span', null, giay + 's')); box.append(lbl);
-    const lyBox = el('div'); d.luu_y.forEach((m, i) => { const r = el('div', 'ly'); r.append(el('b', m.muc, m.giay + 's')); const t = el('div'); t.append(el('em', null, (i + 1) + ' · ' + MUC_TEN[m.muc])); t.append(document.createTextNode(m.van_de)); if (m.sua) t.append(el('span', 'fix', m.sua)); r.append(t); lyBox.append(r); }); box.append(lyBox);
+    const lyBox = el('div'); d.luu_y.forEach((m, i) => { const r = el('div', 'ly'); r.id = 'ly' + i; r.append(el('b', m.muc, m.giay + 's')); const t = el('div'); t.append(el('em', null, (i + 1) + ' · ' + MUC_TEN[m.muc])); t.append(document.createTextNode(m.van_de)); if (m.sua) t.append(el('span', 'fix', m.sua)); r.append(t); lyBox.append(r); }); box.append(lyBox);
   }
 
   // sửa video này
@@ -584,7 +610,7 @@ function renderKq(d, so, tuLuu) {
   // hook mở lại
   if ((d.hook_moi || []).length) {
     H(box, '3 câu mở lại để thử A/B');
-    d.hook_moi.forEach(h => { const w = el('div', 'hk'); w.append(el('small', null, h.formula || 'Hook')); const p = el('p'); p.innerHTML = markHtml(h.text); w.append(p); const rw = el('div', 'row'); rw.style.marginTop = '0'; const a = el('a', 'btn', 'Đặt lên video →'); a.href = 'hook-text.html'; a.onclick = () => ls.set('hook.text', h.text); const c = el('button', 'btn', 'Chép'); c.type = 'button'; c.onclick = () => copyText(h.text.replace(/\*\*/g, '')); rw.append(a, c); w.append(rw); box.append(w); });
+    d.hook_moi.forEach(h => { const w = el('div', 'hk'); w.append(el('small', null, h.formula || 'Hook')); const p = el('p'); p.innerHTML = markHtml(h.text); w.append(p); const rw = el('div', 'row'); rw.style.marginTop = '0'; const a = el('a', 'btn', 'Đặt lên video →'); a.href = 'hook-text.html' + (DEMO ? '#demo' : ''); a.onclick = () => { if (!DEMO) ls.set('hook.text', h.text); }; const c = el('button', 'btn', 'Chép'); c.type = 'button'; c.onclick = () => copyText(h.text.replace(/\*\*/g, '')); rw.append(a, c); w.append(rw); box.append(w); });
   }
 
   // kịch bản tiếp theo
@@ -595,24 +621,31 @@ function renderKq(d, so, tuLuu) {
       const w = el('div', 'idea'); const t = el('div'); t.append(el('span', 'n', String(i + 1))); t.append(el('b', 't', k.tieu_de)); w.append(t);
       w.append(el('div', 'hook', k.hook)); w.append(el('span', 'chip', 'Khung: ' + (KHUNG_TEN[k.khung] || k.khung)));
       w.append(el('p', null, k.y_tuong)); if (k.vi_sao) w.append(el('p', 'why', 'Vì sao: ' + k.vi_sao));
-      const rw = el('div', 'row'); const go = el('a', 'btn pro'); go.innerHTML = 'AI viết trọn kịch bản này → <small style="font-weight:500;opacity:.8">· 1 lượt AI</small>'; go.href = 'kich-ban.html';
-      go.onclick = () => ls.set('kb.import', JSON.stringify({ khung: k.khung, chuDe: $('#chuDe').value.trim(), doiTuong: $('#doiTuong').value.trim(), sanPham: $('#sanPham').value.trim(), phan: [k.hook, k.y_tuong], canh: [], nguon: 'gợi ý sau khi chấm video', viet: true,
-        ngu_canh: { loai: 'cham', verdict: (d.tom_tat || {}).verdict || '', manh: d.manh || [], luu_y: (d.luu_y || []).map(m => m.giay + 's: ' + m.van_de + ' → ' + m.sua), lan_sau: [].concat((d.lan_sau || {}).quay || [], (d.lan_sau || {}).thu_am || [], (d.lan_sau || {}).dung_phim || []), huong_di: d.huong_di || '', y_tuong: { tieu_de: k.tieu_de, hook: k.hook, y_tuong: k.y_tuong, vi_sao: k.vi_sao } } }));
+      const rw = el('div', 'row'); const go = el('a', 'btn pro'); go.innerHTML = 'AI viết trọn kịch bản này → <small style="font-weight:500;opacity:.8">· 1 lượt chấm kịch bản</small>'; go.href = 'kich-ban.html' + (DEMO ? '#demo' : '');
+      go.onclick = e => {
+        if (DEMO) return;   // bản demo không được ghi gì vào bộ nhớ thật, cũng không được tốn lượt thật bên Kịch bản
+        if (TK.luotCon('script') === 0) { e.preventDefault(); openUpsell('Hết lượt chấm kịch bản miễn phí', 'Viết trọn kịch bản tốn 1 lượt chấm kịch bản. Nâng cấp Pro hoặc đăng ký học viên để dùng tiếp.'); return; }
+        ls.set('kb.import', JSON.stringify({ khung: k.khung, chuDe: $('#chuDe').value.trim(), doiTuong: $('#doiTuong').value.trim(), sanPham: $('#sanPham').value.trim(), mucTieu: state.mucTieu, phan: [k.hook, k.y_tuong], canh: [], nguon: 'gợi ý sau khi chấm video', viet: true,
+        ngu_canh: { loai: 'cham', verdict: (d.tom_tat || {}).verdict || '', manh: d.manh || [], luu_y: (d.luu_y || []).map(m => m.giay + 's: ' + m.van_de + (m.sua ? ' → ' + m.sua : '')), lan_sau: [].concat((d.lan_sau || {}).quay || [], (d.lan_sau || {}).thu_am || [], (d.lan_sau || {}).dung_phim || []), huong_di: d.huong_di || '', y_tuong: { tieu_de: k.tieu_de, hook: k.hook, y_tuong: k.y_tuong, vi_sao: k.vi_sao } } }));
+      };
       const c = el('button', 'btn', 'Chép'); c.type = 'button'; c.onclick = () => copyText(`${k.tieu_de}\nHook: ${k.hook}\nKhung: ${KHUNG_TEN[k.khung] || k.khung}\n${k.y_tuong}`); rw.append(go, c); w.append(rw); box.append(w);
     });
   }
 
   if (d.lam_ngay) { H(box, 'Làm ngay hôm nay'); box.append(el('div', 'box praise', d.lam_ngay)); }
   box.append(el('p', 'note', 'Chấm bởi ' + (meta.model || 'AI').split('/')[0] + (meta.luc ? ' · ' + meta.luc : '') + '. Điểm suy từ bằng chứng theo mốc của khoá và đối chiếu số thật; cùng video cùng thông số thì lấy lại đúng kết quả này trong 6 giờ, không tốn lượt.'));
-  const rwAll = el('div', 'row'); const ca = el('button', 'btn', 'Chép cả báo cáo'); ca.type = 'button'; ca.onclick = () => copyText(baoCaoText(d, so)); rwAll.append(ca); box.append(rwAll);
+  const rwAll = el('div', 'row'); const ca = el('button', 'btn', 'Chép cả báo cáo'); ca.type = 'button'; ca.onclick = () => copyText(baoCaoText(d, so)); rwAll.append(ca);
+  if (navigator.share) { const sh = el('button', 'btn', 'Gửi cho mentor / nhóm'); sh.type = 'button'; sh.onclick = async () => { try { await navigator.share({ title: 'Chấm video · ' + d.tong + '/100', text: baoCaoText(d, so) }); } catch (e) { if (e && e.name !== 'AbortError') copyText(baoCaoText(d, so)); } }; rwAll.append(sh); }
+  box.append(rwAll);
 }
 function baoCaoText(d, so) {
   const tt = d.tom_tat || {}, L = [];
   L.push('CHẤM VIDEO CỦA BẠN · Viral Studio by Tự Mình Xây Kênh', `Điểm: ${d.tong}/100 · ${(KN[tt.kha_nang] || KN.vua)[0]}`, tt.verdict || '', '');
-  L.push('7 THANG'); (d.thang || []).forEach(t => L.push(`- ${(THANG_TEN[t.ma] || [t.ma])[0]}: ${t.diem}/10 — ${t.nhan_xet}`)); L.push('');
+  if (tt.doi_tuong_thuc) L.push('Tệp thực tế hợp: ' + tt.doi_tuong_thuc, '');
+  L.push('7 THANG'); (d.thang || []).forEach(t => L.push(`- ${(THANG_TEN[t.ma] || [t.ma])[0]}: ${t.diem}/10 — ${t.nhan_xet}` + (t.bang_chung ? `\n  Bằng chứng: ${t.bang_chung}` : ''))); L.push('');
   if ((d.manh || []).length) { L.push('GIỮ LẠI'); d.manh.forEach(x => L.push('- ' + x)); L.push(''); }
-  if ((d.luu_y || []).length) { L.push('LƯU Ý THEO GIÂY'); d.luu_y.forEach(m => L.push(`- ${m.giay}s [${MUC_TEN[m.muc]}] ${m.van_de} → ${m.sua}`)); L.push(''); }
-  if ((d.sua_video_nay || []).length) { L.push('SỬA VIDEO NÀY'); d.sua_video_nay.forEach(v => L.push(`- ${v.viec}: ${v.cach} (${v.tac_dung})`)); L.push(''); }
+  if ((d.luu_y || []).length) { L.push('LƯU Ý THEO GIÂY'); d.luu_y.forEach(m => L.push(`- ${m.giay}s [${MUC_TEN[m.muc] || m.muc}] ${m.van_de}` + (m.sua ? ` → ${m.sua}` : ''))); L.push(''); }
+  if ((d.sua_video_nay || []).length) { L.push('SỬA VIDEO NÀY'); d.sua_video_nay.forEach(v => L.push(`- ${v.viec}: ${v.cach}` + (v.tac_dung ? ` (${v.tac_dung})` : ''))); L.push(''); }
   const s3 = d.lan_sau || {}; L.push('LẦN SAU', 'Quay: ' + (s3.quay || []).join('; '), 'Thu âm: ' + (s3.thu_am || []).join('; '), 'Dựng: ' + (s3.dung_phim || []).join('; '), '');
   if ((d.hook_moi || []).length) { L.push('HOOK MỞ LẠI'); d.hook_moi.forEach(h => L.push(`- [${h.formula}] ${h.text.replace(/\*\*/g, '').replace(/\n/g, ' / ')}`)); L.push(''); }
   if ((d.kich_ban_tiep || []).length) { L.push('KỊCH BẢN TIẾP THEO', d.huong_di || ''); d.kich_ban_tiep.forEach((k, i) => L.push(`${i + 1}. ${k.tieu_de} · Hook: ${k.hook} · Khung: ${KHUNG_TEN[k.khung] || k.khung}\n   ${k.y_tuong}\n   Vì sao: ${k.vi_sao}`)); L.push(''); }
@@ -643,8 +676,10 @@ applyTheme(ls.get('hook.theme'));
 $('#themeBtn').addEventListener('click', () => { const dark = document.documentElement.dataset.theme ? document.documentElement.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; const t = dark ? 'light' : 'dark'; applyTheme(t); ls.set('hook.theme', t); });
 restore(); setSeg('daDang', state.daDang); setSeg('mucTieu', state.mucTieu); veDaDang(); updateCount(); updateSrc(); veViewGio(); moLaiKq();
 bindSeg('daDang', v => { state.daDang = v; veDaDang(); saveDraft(); });
-bindSeg('mucTieu', v => { state.mucTieu = v; hsDien.mucTieu = v; saveDraft(); TK.ghiTruong('muc_tieu', ([...document.querySelectorAll('#mucTieu button')].find(b => b.dataset.v === v) || {}).textContent || ''); });
-['link', 'loiThoai', 'yDinh', 'giay', 'nView', 'nLike', 'nCmt', 'nLuu', 'nShare', 'chuDe', 'doiTuong', 'sanPham'].forEach(id => $('#' + id).addEventListener('input', () => { saveDraft(); if (id === 'loiThoai' || id === 'giay') updateCount(); if (id === 'loiThoai') updateSrc(); if (id === 'nView') veViewGio(); }));
+// Mục tiêu của RIÊNG video này, đã gửi qua muc_tieu. Không ghi vào hồ sơ kênh: hồ sơ dùng chung cho cả bốn tool,
+// ghi nhãn nút ("Kéo người mới (viral)") lên đó sẽ đè mất mục tiêu thật học viên đã chốt với mentor.
+bindSeg('mucTieu', v => { state.mucTieu = v; hsDien.mucTieu = v; saveDraft(); });
+['link', 'loiThoai', 'yDinh', 'giay', 'nView', 'nLike', 'nCmt', 'nLuu', 'nShare', 'chuDe', 'doiTuong', 'sanPham'].forEach(id => $('#' + id).addEventListener('input', () => { saveDraft(); if (id === 'loiThoai' || id === 'giay') updateCount(); if (id === 'loiThoai') updateSrc(); if (id === 'nView') veViewGio(); if (id === 'link' && state.linkDaLay && $('#link').value.trim() !== state.linkDaLay) { resetLink(); $('#linkStatus').textContent = ''; } }));
 ['nView', 'nLike', 'nCmt', 'nLuu', 'nShare'].forEach(id => $('#' + id).addEventListener('blur', e => { dinhDangSo(e.target); saveDraft(); }));
 $('#gioDang').addEventListener('change', () => { state.gioDangThat = 0; veViewGio(); saveDraft(); });
 $('#link').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); layLink(); } });
@@ -656,12 +691,14 @@ dz.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { 
 ['dragleave', 'drop'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove('hot'); }));
 dz.addEventListener('drop', e => { const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; chonVideo(f); });
 $('#videoFile').addEventListener('change', e => { chonVideo(e.target.files && e.target.files[0]); e.target.value = ''; });
-$('#videoClear').addEventListener('click', () => { state.file = null; updateSrc(); });
+$('#videoClear').addEventListener('click', () => { state.file = null; $('#giay').value = state.link.giay ? String(state.link.giay) : ''; updateCount(); updateSrc(); saveDraft(); });
+// thả video lệch ra ngoài ô: trình duyệt không được mở file và đá người dùng khỏi trang
+['dragover', 'drop'].forEach(ev => window.addEventListener(ev, e => { if (!dz.contains(e.target)) e.preventDefault(); }));
 $('#acctBtn').addEventListener('click', () => TK.mo());
 TK.ganO({ nganh: '#chuDe', doi_tuong: '#doiTuong', san_pham: '#sanPham' });
 TK.oMoiHoSo($('#chuDe').closest('section'), ['muc_tieu']);   // mục tiêu đã có nút chọn ở phần 1
 $('#btnCham').addEventListener('click', cham);
-$('#btnClear').addEventListener('click', () => { if (!$('#grid').classList.contains('has-kq') && !confirm('Xoá hết thông tin video đang điền?')) return; xoaKq(); ['link', 'loiThoai', 'yDinh', 'giay', 'gioDang', 'nView', 'nLike', 'nCmt', 'nLuu', 'nShare'].forEach(id => $('#' + id).value = ''); state.gioDangThat = 0; veViewGio(); state.image = ''; state.link = { tac_gia: '', caption: '', video: false, giay: 0 }; state.file = null; state.kq = null; state.kqTen = ''; $('#vidprev').hidden = true; $('#linkStatus').textContent = ''; updateCount(); updateSrc(); saveDraft(); });
+$('#btnClear').addEventListener('click', () => xoaHet(true));
 TK.khoiDong({ api: API, tool: 'cham', onDoi: () => { veQuota(); dienTuHoSo(); } });
 loadQuota();
 </script>
