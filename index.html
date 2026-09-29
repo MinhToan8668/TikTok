@@ -245,6 +245,36 @@ nav .burger{border-color:rgba(28,38,0,.35)}
 .tag-foot{margin-top:16px;font-family:var(--hand);font-style:italic;font-size:12.5px;
   color:var(--lime-deep);line-height:1.55}
 
+/* cột phải hero: phiếu ghi danh + thẻ Viral Studio xếp chồng */
+.hero-side{display:grid;gap:26px;align-content:center;justify-items:end}
+/* thẻ Viral Studio: nền mực, chữ lime, nghiêng ngược phiếu để hai thẻ như dán tay */
+.hero-vs{position:relative;width:100%;background:var(--ink);color:var(--paper-lt);border-radius:var(--r-sm);
+  padding:20px 22px 18px;transform:rotate(-1.2deg);border:2px solid #1c2600;
+  box-shadow:0 8px 0 rgba(28,38,0,.35),0 24px 50px -20px rgba(28,38,0,.6)}
+.hero-vs::before{content:'';position:absolute;top:-13px;right:26px;transform:rotate(4deg);
+  width:78px;height:24px;background:rgba(253,243,234,.75);border:1px solid rgba(28,38,0,.2);border-radius:2px}
+.hero-vs-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.hero-vs-lbl{font-family:var(--disp);font-weight:800;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--lime)}
+.hero-vs-free{font-family:var(--disp);font-weight:800;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+  background:#ff4d1f;color:#fff;border-radius:999px;padding:4px 9px;transform:rotate(-4deg);animation:freeNhay 1.6s ease-in-out infinite}
+.hero-vs h3{font-family:var(--disp);font-size:clamp(18px,1.9vw,22px);font-weight:800;line-height:1.15;letter-spacing:-.02em;color:var(--paper-lt);margin:0 0 6px}
+.hero-vs h3 em{font-style:normal;color:var(--lime)}
+.hero-vs p{font-size:13px;line-height:1.55;color:#c8cfb4;margin:0 0 14px}
+.hero-vs-tools{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:14px}
+.hero-vs-tools span{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.07);border:1px solid rgba(153,223,0,.28);
+  border-radius:10px;padding:8px 10px;font-size:12.5px;font-weight:600;color:var(--paper-lt);line-height:1.25}
+.hero-vs-tools span i{font-style:normal;font-size:15px;line-height:1;display:inline-block;transform-origin:50% 80%}
+.hero-vs-tools span:nth-child(1) i{animation:vsLac 3.2s ease-in-out infinite}
+.hero-vs-tools span:nth-child(2) i{animation:vsLac 3.2s ease-in-out .8s infinite}
+.hero-vs-tools span:nth-child(3) i{animation:vsLac 3.2s ease-in-out 1.6s infinite}
+.hero-vs-tools span:nth-child(4) i{animation:vsLac 3.2s ease-in-out 2.4s infinite}
+.hero-vs-tools span b{font-weight:800;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;background:var(--lime);color:#1c2600;border-radius:999px;padding:2px 6px;margin-left:auto}
+.hero-vs .btn-vs{width:100%;justify-content:center;background:var(--lime);color:#1c2600;box-shadow:0 5px 0 #4f7500;font-weight:800}
+.hero-vs .btn-vs:hover{box-shadow:0 7px 0 #4f7500;transform:translateY(-2px)}
+.hero-vs-note{margin-top:11px;font-family:var(--hand);font-style:italic;font-size:12.5px;color:var(--lime);line-height:1.5;text-align:center}
+@media(prefers-reduced-motion:reduce){.hero-vs-free,.hero-vs-tools span i{animation:none}}
+@media(max-width:1000px){.hero-side{justify-items:center}.hero-vs{max-width:420px;transform:rotate(-.8deg)}}
+
 /* ═══════════ TICKER ═══════════ */
 .ticker-clip{overflow:hidden;background:var(--lime);padding:6px 0;margin:-6px 0}  /* kẹp phần nghiêng lòi ra; nền lime che khe hở hai đầu vì dải bị nghiêng */
 .ticker{background:var(--ink);border-top:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink);
@@ -1219,6 +1249,7 @@ body.hv-mode{padding-bottom:0}
 @media(max-width:1000px){.nav-links{display:none}.burger{display:flex}}
 @media(max-width:1000px){
   .hero-in{grid-template-columns:1fr;gap:34px}
+  .hero-side{width:100%}
   .tag{justify-self:center;max-width:420px;transform:rotate(1deg)}
 }
 @media(max-width:960px){
@@ -1362,6 +1393,7 @@ body.hv-mode{padding-bottom:0}
         <span class="hero-chip" data-tpl="🪑 Lớp tối đa {{slots.max}} người"></span>
       </div>
     </div>
+    <div class="hero-side">
     <aside class="tag rv">
         <div class="tag-head">
           <div class="tag-t">phiếu ghi danh · <span data-bind="computed.cohortLabel">—</span></div>
@@ -1379,6 +1411,21 @@ body.hv-mode{padding-bottom:0}
         </div>
         <div class="tag-foot">↳ giữ chỗ chưa mất phí · tụi mình gọi tư vấn trước, hợp rồi mới đóng</div>
       </aside>
+      <!-- thẻ Viral Studio: mời dùng thử ngay cạnh phiếu ghi danh -->
+      <aside class="hero-vs rv" aria-label="Viral Studio, bốn công cụ AI dùng thử miễn phí">
+        <div class="hero-vs-top"><span class="hero-vs-lbl">✦ Viral Studio</span><span class="hero-vs-free">Free · thử ngay</span></div>
+        <h3>4 tool AI làm video viral, <em>không cần tài khoản</em></h3>
+        <p>AI train từ hàng trăm video viral của khoá. Dán link là có kết quả sau một phút.</p>
+        <div class="hero-vs-tools">
+          <span><i>🎬</i>Soi video<b>Mới</b></span>
+          <span><i>📝</i>Kịch bản</span>
+          <span><i>⚡</i>Hook viral</span>
+          <span><i>🎯</i>Chấm video<b>Mới</b></span>
+        </div>
+        <button class="btn btn-lg btn-vs" data-go="toolviral">✨ Dùng thử Viral Studio →</button>
+        <div class="hero-vs-note">học viên khoá: Pro không giới hạn lượt, có sẵn khi vào lớp</div>
+      </aside>
+    </div>
   </div>
 </header>
 
