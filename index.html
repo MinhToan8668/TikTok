@@ -274,6 +274,39 @@ nav .burger{border-color:rgba(28,38,0,.35)}
 .hero-vs-note{margin-top:11px;font-family:var(--hand);font-style:italic;font-size:12.5px;color:var(--lime);line-height:1.5;text-align:center}
 @media(prefers-reduced-motion:reduce){.hero-vs-free,.hero-vs-tools span i{animation:none}}
 @media(max-width:1000px){.hero-side{justify-items:center}.hero-vs{max-width:420px;transform:rotate(-.8deg)}}
+/* ── điện thoại: hero gọn lại còn ~3 màn cuộn, thẻ Viral Studio lên ngay dưới nút Đăng ký ── */
+@media(max-width:640px){
+  .hero{padding:18px 0 36px}
+  .hero-in{gap:16px;grid-template-columns:minmax(0,1fr)}
+  .hero-in>*,.hero-left>*,.hero-side>*{min-width:0;max-width:100%}
+  .hero-left,.hero-side{display:contents}        /* để xếp lại thứ tự từng khối trong cùng một lưới */
+  .hero-brand{order:1;margin-bottom:0;gap:12px}
+  .hero-mark{--lg:58px;border-radius:26%;padding:calc(var(--lg) * .16);box-shadow:0 5px 0 rgba(28,38,0,.28),0 12px 22px -8px rgba(28,38,0,.4);animation:none}
+  .hero-pill{font-size:9.5px;padding:4px 9px;letter-spacing:.06em}
+  .hero-brand-t b{font-size:17px}
+  .hero-note{display:none}
+  .hero h1{order:2;font-size:clamp(31px,9vw,38px);margin-bottom:0}
+  .hero .lead{order:3;font-size:14.5px;line-height:1.6;margin-bottom:0}
+  .hero-actions{order:4;margin-bottom:0;gap:10px;display:grid;grid-template-columns:1fr}
+  .hero-actions [data-cta]{width:100%;justify-content:center}
+  .hero-free{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .hero-free .btn{width:100%;justify-content:center;padding:11px 8px;font-size:13.5px;white-space:normal;line-height:1.2;text-align:center}
+  .hero-actions .btn-line{display:none}          /* "Xem lớp kèm edit" đã có ở mục dưới */
+  .hero-vs{order:5;max-width:none;width:100%;transform:none;margin-top:6px;padding:18px 18px 16px}
+  .hero-vs::before{display:none}
+  .hero-vs h3{font-size:19px}
+  .hero-vs p{font-size:12.5px;margin-bottom:12px}
+  .hero-chips{order:6;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 calc(-1*var(--pad));padding:2px var(--pad) 6px}
+  .hero-chips::-webkit-scrollbar{display:none}
+  .hero-chip{flex:none;font-size:12px;padding:7px 12px}
+  .tag{order:7;width:100%;max-width:none;transform:none;padding:18px 18px 16px}
+  .tag::before{display:none}
+  .tag-num{font-size:36px}
+  .tag-lbl{display:none}
+  .an-dt{display:none}                             /* câu phụ trong lead, điện thoại giấu cho ngắn */
+  .tag .prog{margin-bottom:12px}
+  .tag-foot{margin-top:12px}
+}
 
 /* ═══════════ TICKER ═══════════ */
 .ticker-clip{overflow:hidden;background:var(--lime);padding:6px 0;margin:-6px 0}  /* kẹp phần nghiêng lòi ra; nền lime che khe hở hai đầu vì dải bị nghiêng */
@@ -1377,7 +1410,7 @@ body.hv-mode{padding-bottom:0}
         </div>
       </div>
       <h1 class="rv">Chưa biết xây kênh,<br><span class="thin">chưa biết edit?</span><br>Tụi mình <span class="u">làm cùng bạn.</span></h1>
-      <p class="lead rv">Lớp học xây kênh TikTok <strong>30 ngày</strong> do đội ngũ sáng lập kênh Tự Mình Xây Kênh trực tiếp đứng lớp. Mỗi tuần một buổi live <strong>chốt hướng đi cho kênh của bạn</strong>, xuyên suốt khóa mentor mở máy <strong>dựng video chung với bạn</strong> — tới khi bạn tự tin bấm nút đăng. Mọi thứ dạy bằng số liệu thật: watch time, retention, hook rate. Không dạy mẹo may rủi.</p>
+      <p class="lead rv">Lớp học xây kênh TikTok <strong>30 ngày</strong> do đội ngũ sáng lập kênh Tự Mình Xây Kênh trực tiếp đứng lớp. Mỗi tuần một buổi live <strong>chốt hướng đi cho kênh của bạn</strong>, xuyên suốt khóa mentor mở máy <strong>dựng video chung với bạn</strong> — tới khi bạn tự tin bấm nút đăng.<span class="an-dt"> Mọi thứ dạy bằng số liệu thật: watch time, retention, hook rate. Không dạy mẹo may rủi.</span></p>
       <div class="hero-actions rv">
         <button class="btn btn-ink btn-lg" data-open data-cta>Đăng ký học <span class="arw">→</span></button>
         <div class="hero-free">
