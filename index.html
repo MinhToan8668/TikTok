@@ -1423,7 +1423,7 @@ body.hv-mode{padding-bottom:0}
           <span><i>🎯</i>Chấm video<b>Mới</b></span>
         </div>
         <a class="btn btn-lg btn-vs" href="tools/soi-video.html" target="_blank" rel="noopener">✨ Dùng thử Viral Studio ↗</a>
-        <div class="hero-vs-note">học viên khoá: Pro không giới hạn lượt, có sẵn khi vào lớp</div>
+        <div class="hero-vs-note" id="vsNote">học viên khoá: Pro có sẵn khi vào lớp, không giới hạn lượt</div>
       </aside>
     </div>
   </div>
@@ -1469,7 +1469,7 @@ body.hv-mode{padding-bottom:0}
         </a>
       </div>
       <div class="tv-nut">
-        <a class="btn btn-ink btn-lg" href="tools/soi-video.html" target="_blank" rel="noopener">Mở Viral Studio · thử 3 lượt AI free ↗</a>
+        <a class="btn btn-ink btn-lg" href="tools/soi-video.html" target="_blank" rel="noopener">Mở Viral Studio · <span id="tvThuN">thử 3 lượt AI free</span> ↗</a>
       </div>
     </div>
     <div class="tv-phai rv">
@@ -1492,16 +1492,16 @@ body.hv-mode{padding-bottom:0}
 
   <div class="tv-gia rv">
     <div class="tv-g">
-      <small>Khách ghé chơi</small><b>3 lượt AI</b>
-      <span>Không cần tài khoản. Đủ để thấy AI soi video, sửa kịch bản và hook của bạn thành cái gì.</span>
+      <small>Khách ghé chơi</small><b id="tvLuot">3 lượt AI</b>
+      <span id="tvLuotNote">Không cần tài khoản. Đủ để thấy AI soi video, sửa kịch bản và hook của bạn thành cái gì.</span>
     </div>
     <div class="tv-g">
-      <small>Gói Pro</small><b>50k</b>
-      <span>Cả ba công cụ AI mỗi ngày, đủ 14 bố cục, xuất sạch không logo. Tạo tài khoản trong tool được 10 lượt AI phân tích miễn phí, quét QR chuyển 50k, admin xác nhận là Pro mở.</span>
+      <small id="tvGoiTen">Gói Pro</small><b id="tvGia">50k</b>
+      <span id="tvGiaNote">Cả ba công cụ AI mỗi ngày, đủ 14 bố cục, xuất sạch không logo. Tạo tài khoản trong tool được 10 lượt AI phân tích miễn phí, quét QR chuyển 50k, admin xác nhận là Pro mở.</span>
     </div>
     <div class="tv-g em">
-      <small>Học viên khoá</small><b>Free</b>
-      <span>Vào lớp là có Pro sẵn, cộng thêm mentor ngồi sửa video cùng bạn suốt 30 ngày.</span>
+      <small>Học viên khoá</small><b id="tvHv">Free</b>
+      <span id="tvHvNote">Vào lớp là có Pro sẵn, cộng thêm mentor ngồi sửa video cùng bạn suốt 30 ngày.</span>
       <button class="btn btn-ink btn-md" data-open data-cta>Đăng ký học →</button>
     </div>
   </div>
@@ -2542,6 +2542,38 @@ var CFG=null, faqBuilt=false;
 (function(){
   var ph = document.getElementById('tvPhone'); if (!ph) return;
   var SRC = { sv: 'tools/soi-video.html#demo', kb: 'tools/kich-ban.html#demo', hook: 'tools/hook-text.html#demo-pro', cv: 'tools/cham-video.html#demo' };
+
+  /* Giá gói Pro, lượt thử, gói học viên: lấy từ máy chủ, bot đổi (/giapro /ngaypro /luotthu… /ngayhv /giahv) là landing đổi theo. */
+  (function(){
+    if (!API || API.indexOf('PASTE_') === 0) return;
+    var tien = function(n){ n = Number(n) || 0; return (n % 1000 === 0 && n < 1e6) ? (n / 1000) + 'k' : n.toLocaleString('vi-VN') + 'đ'; };
+    var dat = function(id, t){ var e = document.getElementById(id); if (e && t != null) e.textContent = t; };
+    fetch(API, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body: JSON.stringify({ action:'st_cfg' }) })
+      .then(function(r){ return r.json(); })
+      .then(function(c){
+        if (!c || !c.ok) return;
+        var g = (c.goi && c.goi[0]) || {}, l = c.luot || {}, hv = c.hv || { ngay:30, gia:0 };
+        var tong = (l.soi || 0) + (l.script || 0) + (l.hook || 0) + (l.cham || 0);
+        if (g.gia){
+          dat('tvGia', tien(g.gia)); dat('tvGoiTen', 'Gói ' + (g.ten || 'Pro'));
+          dat('tvGiaNote', 'Cả bốn công cụ AI mỗi ngày trong ' + (g.ngay || 30) + ' ngày, đủ bố cục, xuất sạch không logo. Tạo tài khoản trong tool là có lượt AI miễn phí, quét QR chuyển ' + tien(g.gia) + ', admin xác nhận là Pro mở.');
+        }
+        if (tong){
+          dat('tvLuot', tong + ' lượt AI'); dat('tvThuN', 'thử ' + tong + ' lượt AI free');
+          dat('tvLuotNote', 'Tạo tài khoản 30 giây là có: ' + (l.soi || 0) + ' lượt soi video · ' + (l.script || 0) + ' lượt chấm kịch bản · ' + (l.hook || 0) + ' lượt hook · ' + (l.cham || 0) + ' lượt chấm video. Đủ để thấy AI làm được gì với kênh bạn.');
+        }
+        var han = hv.ngay ? hv.ngay + ' ngày' : 'trọn đời';
+        if (hv.gia){
+          dat('tvHv', tien(hv.gia));
+          dat('tvHvNote', 'Gói riêng cho học viên khoá: Pro ' + han + ', rẻ hơn gói thường, cộng thêm mentor ngồi sửa video cùng bạn suốt 30 ngày.');
+          dat('vsNote', 'học viên khoá: gói Pro riêng ' + tien(hv.gia) + ' · ' + han);
+        } else {
+          dat('tvHv', 'Free');
+          dat('tvHvNote', 'Vào lớp là có Pro ' + han + ' sẵn, cộng thêm mentor ngồi sửa video cùng bạn suốt 30 ngày.');
+          dat('vsNote', 'học viên khoá: Pro ' + han + ' miễn phí, có sẵn khi vào lớp');
+        }
+      }).catch(function(){ /* offline thì giữ chữ sẵn trong trang */ });
+  })();
   var dang = 'sv', f = null;
   function napTool(){
     if (f) f.remove();
