@@ -253,7 +253,12 @@
             <div><label for="nLuu">Lưu</label><input type="text" id="nLuu" inputmode="numeric" placeholder="8"></div>
             <div><label for="nShare">Chia sẻ</label><input type="text" id="nShare" inputmode="numeric" placeholder="3"></div>
           </div>
-          <p class="note">Có số thì AI đối chiếu nhận xét với số thật: rời ở đầu là lỗi hook, rời giữa là lỗi nhịp.</p>
+          <div class="two" style="margin-top:6px">
+            <div><label class="lbl" for="gioDang" style="margin-top:4px">Đăng được bao lâu rồi?</label>
+              <select id="gioDang"><option value="">chưa rõ</option><option value="3">3 giờ</option><option value="6">6 giờ</option><option value="12">12 giờ</option><option value="18">18 giờ</option><option value="24">1 ngày</option><option value="48">2 ngày</option><option value="72">3 ngày</option><option value="120">5 ngày</option><option value="168">1 tuần</option><option value="336">2 tuần</option><option value="720">1 tháng trở lên</option></select></div>
+            <div class="note" id="viewGio" style="align-self:end;margin-bottom:8px"></div>
+          </div>
+          <p class="note">AI tính <b>view/giờ</b> và tỉ lệ trên view để đối chiếu nhận xét với số thật: rời ở đầu là lỗi hook, rời giữa là lỗi nhịp. Link TikTok tự lấy giờ đăng.</p>
         </div>
 
         <label class="lbl">Mục tiêu của video này</label>
@@ -309,7 +314,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="tai-khoan.js?v=202609290232"></script>
+<script src="tai-khoan.js?v=202609290405"></script>
 <script>
 const $ = s => document.querySelector(s);
 const el = (t, c, txt) => { const e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; };
@@ -322,6 +327,10 @@ async function copyText(t) { try { await navigator.clipboard.writeText(t); toast
 function demChu(t) { return String(t || '').replace(/\*\*|_/g, ' ').split(/\s+/).filter(w => /[0-9A-Za-zÀ-ỹ]/.test(w)).length; }
 function soNhap(v) { v = String(v || '').trim().toLowerCase().replace(/\s/g, ''); if (!v) return 0; const m = v.match(/^([\d.,]+)([kmb])?$/); if (!m) return parseInt(v.replace(/\D/g, ''), 10) || 0; let n = m[1]; if (m[2]) n = n.replace(',', '.'); else n = n.replace(/[.,]/g, ''); let x = parseFloat(n) || 0; x *= { k: 1e3, m: 1e6, b: 1e9 }[m[2]] || 1; return Math.round(x); }
 function fmtN(n) { return n >= 1e6 ? (n / 1e6).toFixed(n % 1e6 ? 1 : 0) + 'M' : n >= 1e3 ? (n / 1e3).toFixed(n % 1e3 ? 1 : 0) + 'K' : String(n); }
+function fmtSo(n) { return Number(n || 0).toLocaleString('en-US'); }   // 12,887 — dễ đọc hơn 12887
+function dinhDangSo(inp) { const v = soNhap(inp.value); inp.value = v ? fmtSo(v) : ''; }
+function nhanGio(h) { h = Number(h) || 0; return !h ? '' : h < 24 ? h + ' giờ' : h < 168 ? Math.round(h / 24) + ' ngày' : h < 720 ? Math.round(h / 168) + ' tuần' : Math.round(h / 720) + ' tháng'; }
+function veViewGio() { const v = soNhap($('#nView').value), h = Number($('#gioDang').value) || 0, o = $('#viewGio'); if (!v || !h) { o.textContent = ''; return; } const vg = Math.round(v / h); const muc = vg < 30 ? 'chậm, đang ở vòng thử' : vg < 150 ? 'bình thường' : vg < 500 ? 'tốt, đã qua vòng 2' : vg < 2000 ? 'rất mạnh' : 'viral thật'; o.innerHTML = `≈ <b>${fmtSo(vg)} view/giờ</b> · ${muc} <span style="opacity:.7">(mốc cho kênh nhỏ trong 1–2 ngày đầu)</span>`; }
 
 const KHUNG_TEN = { khoanhkhac: 'Một khoảnh khắc (5W-1H)', bonnhip: 'Kể chuyện 4 nhịp', kinhnghiem: 'Chia sẻ kinh nghiệm (6 bước)', chanthuc: 'Chân thực 2026', vlog: 'Daily vlog cảm xúc', fichtean: 'Thử thách (Fichtean)', baydiem: 'Chuyện dài 7 điểm', tips: 'Danh sách hữu ích', hoi: 'Bán hàng HỜI 3 tầng', giohang: 'Viral có cài giỏ hàng', tudo: 'Tự do' };
 const THANG_TEN = { hook: ['Hook 3 giây', '25%'], giu_chan: ['Giữ chân, nhịp kể', '25%'], noi_dung: ['Nội dung, giá trị', '15%'], hinh_anh: ['Hình ảnh, khung hình', '10%'], am_thanh: ['Âm thanh, giọng', '10%'], dung_phim: ['Dựng, chữ, nhịp cắt', '10%'], ket: ['Kết, CTA', '5%'] };
@@ -341,10 +350,11 @@ function updateSrc() {
   $('#dropZone').hidden = !!state.file;
 }
 function docSo() { return { view: soNhap($('#nView').value), like: soNhap($('#nLike').value), cmt: soNhap($('#nCmt').value), luu: soNhap($('#nLuu').value), share: soNhap($('#nShare').value), giay: soNhap($('#giay').value) }; }
-function saveDraft() { ls.set('cham.draft', JSON.stringify({ nen: state.nen, daDang: state.daDang, mucTieu: state.mucTieu, link: $('#link').value, loiThoai: $('#loiThoai').value, yDinh: $('#yDinh').value, giay: $('#giay').value, nView: $('#nView').value, nLike: $('#nLike').value, nCmt: $('#nCmt').value, nLuu: $('#nLuu').value, nShare: $('#nShare').value, chuDe: $('#chuDe').value, doiTuong: $('#doiTuong').value, sanPham: $('#sanPham').value, linkInfo: state.link })); }
+function saveDraft() { ls.set('cham.draft', JSON.stringify({ nen: state.nen, daDang: state.daDang, mucTieu: state.mucTieu, link: $('#link').value, loiThoai: $('#loiThoai').value, yDinh: $('#yDinh').value, giay: $('#giay').value, gioDang: $('#gioDang').value, nView: $('#nView').value, nLike: $('#nLike').value, nCmt: $('#nCmt').value, nLuu: $('#nLuu').value, nShare: $('#nShare').value, chuDe: $('#chuDe').value, doiTuong: $('#doiTuong').value, sanPham: $('#sanPham').value, linkInfo: state.link })); }
 function restore() {
   let d = {}; try { d = JSON.parse(ls.get('cham.draft') || '{}'); } catch {}
-  ['link', 'loiThoai', 'yDinh', 'giay', 'nView', 'nLike', 'nCmt', 'nLuu', 'nShare', 'chuDe', 'doiTuong', 'sanPham'].forEach(id => { if (d[id]) $('#' + id).value = d[id]; });
+  ['link', 'loiThoai', 'yDinh', 'giay', 'gioDang', 'nView', 'nLike', 'nCmt', 'nLuu', 'nShare', 'chuDe', 'doiTuong', 'sanPham'].forEach(id => { if (d[id]) $('#' + id).value = d[id]; });
+  ['nView', 'nLike', 'nCmt', 'nLuu', 'nShare'].forEach(id => dinhDangSo($('#' + id)));
   if (d.nen) state.nen = d.nen; if (d.daDang) state.daDang = d.daDang; if (d.mucTieu) state.mucTieu = d.mucTieu;
   if (d.linkInfo && (d.linkInfo.tac_gia || d.linkInfo.caption)) { state.link = Object.assign({ video: false, giay: 0 }, d.linkInfo); showPrev(); }
   if (!$('#chuDe').value || !$('#doiTuong').value) { try { const k = JSON.parse(ls.get('kb.draft') || '{}'); if (!$('#chuDe').value && k.chuDe) $('#chuDe').value = k.chuDe; if (!$('#doiTuong').value && k.doiTuong) $('#doiTuong').value = k.doiTuong; if (!$('#sanPham').value && k.sanPham) $('#sanPham').value = k.sanPham; } catch {} }
@@ -381,7 +391,9 @@ async function layLink() {
     if (!r.ho_tro) { st.className = 'status'; st.textContent = 'Không lấy được từ link này (video riêng tư hoặc nền tảng chặn). Tải file video lên nhé.'; state.link = { tac_gia: '', caption: '', video: false, giay: 0 }; updateSrc(); return; }
     state.link = { tac_gia: r.tac_gia || '', caption: r.caption || '', video: !!r.video, giay: r.giay || 0 };
     if (r.anh) { try { state.image = await dataUrlToJpeg(r.anh); } catch { state.image = ''; } }
-    if (r.so_lieu && r.so_lieu.view) { state.daDang = 'roi'; setSeg('daDang', 'roi'); veDaDang(); const m = { view: 'nView', like: 'nLike', cmt: 'nCmt', luu: 'nLuu', share: 'nShare' }; Object.keys(m).forEach(k => { if (r.so_lieu[k]) $('#' + m[k]).value = String(r.so_lieu[k]); }); }
+    if (r.so_lieu && r.so_lieu.view) { state.daDang = 'roi'; setSeg('daDang', 'roi'); veDaDang(); const m = { view: 'nView', like: 'nLike', cmt: 'nCmt', luu: 'nLuu', share: 'nShare' }; Object.keys(m).forEach(k => { if (r.so_lieu[k]) $('#' + m[k]).value = fmtSo(r.so_lieu[k]); }); }
+    if (r.gio_dang) { const sel = $('#gioDang'), moc = [...sel.options].map(o => Number(o.value) || 0).filter(Boolean); const gan = moc.reduce((a, b) => Math.abs(b - r.gio_dang) < Math.abs(a - r.gio_dang) ? b : a, moc[0]); sel.value = String(gan); state.gioDangThat = r.gio_dang; }
+    veViewGio();
     if (r.giay && !$('#giay').value) $('#giay').value = String(r.giay);
     showPrev(); updateCount(); updateSrc();
     st.className = r.video ? 'status ok' : 'status';
@@ -467,7 +479,7 @@ async function cham() {
       tickLai();
     }
     if (DEMO) { await new Promise(z => setTimeout(z, 1200)); r = { ok: true, data: demoData(so), con: 0, han: 1 }; }
-    else r = await goiCoThuLai({ action: 'hook_ai', mode: 'cham', token: TK.token(), dev: TK.dev(), ho_so: TK.hoSo(), link: ng === 'link' ? $('#link').value.trim() : '', nen: state.nen, video_b64: ng === 'file' && !lon ? state.file.b64 : undefined, video_mime: ng === 'file' && !lon ? state.file.mime : undefined, ...(lon || {}), loi_thoai: $('#loiThoai').value.trim(), y_dinh: $('#yDinh').value.trim(), da_dang: state.daDang === 'roi', muc_tieu: state.mucTieu, so_lieu: state.daDang === 'roi' ? so : { giay: so.giay }, chu_de: $('#chuDe').value.trim(), doi_tuong: $('#doiTuong').value.trim(), san_pham: $('#sanPham').value.trim() });
+    else r = await goiCoThuLai({ action: 'hook_ai', mode: 'cham', token: TK.token(), dev: TK.dev(), ho_so: TK.hoSo(), link: ng === 'link' ? $('#link').value.trim() : '', nen: state.nen, video_b64: ng === 'file' && !lon ? state.file.b64 : undefined, video_mime: ng === 'file' && !lon ? state.file.mime : undefined, ...(lon || {}), loi_thoai: $('#loiThoai').value.trim(), y_dinh: $('#yDinh').value.trim(), da_dang: state.daDang === 'roi', gio_dang: state.daDang === 'roi' ? (state.gioDangThat || Number($('#gioDang').value) || 0) : 0, muc_tieu: state.mucTieu, so_lieu: state.daDang === 'roi' ? so : { giay: so.giay }, chu_de: $('#chuDe').value.trim(), doi_tuong: $('#doiTuong').value.trim(), san_pham: $('#sanPham').value.trim() });
     clearInterval(tick);
     if (!r.ok) {
       st.className = 'status err'; st.textContent = (ERR[r.error] || 'Có lỗi khi gọi AI, thử lại sau.') + (r.chi_tiet ? ' Mã lỗi: ' + r.chi_tiet : '');
@@ -478,7 +490,7 @@ async function cham() {
     if (!r.data || !r.data.thang) { st.className = 'status err'; st.textContent = 'Máy chủ đang chạy HookAI.gs bản cũ nên chưa có Chấm video. Mentor dán HookAI.gs mới rồi Deploy, chọn New version.'; return; }
     if (r.data.meta && r.data.meta.giay && !$('#giay').value) { $('#giay').value = String(r.data.meta.giay); updateCount(); }
     state.kq = r.data; renderKq(r.data, so);
-    st.className = 'status ok'; st.textContent = `Xong sau ${Math.round((Date.now() - t0) / 1000)} giây.` + (r.con != null ? ` Còn ${r.con}/${r.han} lượt.` : '');
+    st.className = 'status ok'; st.textContent = r.tu_bo_nho ? 'Cùng video, cùng thông số nên lấy lại kết quả đã chấm, không tốn lượt. Đổi số liệu, giờ đăng, mục tiêu hay ý định rồi bấm lại nếu muốn chấm mới.' : `Xong sau ${Math.round((Date.now() - t0) / 1000)} giây.` + (r.con != null ? ` Còn ${r.con}/${r.han} lượt.` : '');
     if (r.luot && TK.me) { TK.me.luot = r.luot; veQuota(); } else if (r.con != null) $('#quota').textContent = `còn ${r.con}/${r.han} lượt`;
     if (matchMedia('(max-width:900px)').matches) $('#kq').scrollIntoView({ behavior: 'smooth', block: 'start' });
   } catch { clearInterval(tick); st.className = 'status err'; st.textContent = 'Không kết nối được máy chủ.'; }
@@ -516,7 +528,9 @@ function renderKq(d, so, tuLuu) {
   const rb = el('b'); rb.append(document.createTextNode(String(d.tong))); rb.append(el('small', null, '/100')); ring.append(rb); head.append(ring);
   const hr = el('div'); hr.append(Object.assign(el('span', 'kn ' + (tt.kha_nang || 'vua')), { textContent: kn[0] }));
   hr.append(Object.assign(el('p'), { textContent: [tt.chu_de ? 'Video nói về: ' + tt.chu_de : '', tt.dang, giay + 's'].filter(Boolean).join(' · ') }));
-  if (tt.doi_tuong_thuc) hr.append(el('p', null, 'Tệp thực tế hợp: ' + tt.doi_tuong_thuc)); head.append(hr); box.append(head);
+  if (tt.doi_tuong_thuc) hr.append(el('p', null, 'Tệp thực tế hợp: ' + tt.doi_tuong_thuc));
+  if (meta.da_dang && so.view) { const vg = meta.view_gio || (meta.gio_dang ? Math.round(so.view / meta.gio_dang) : 0); hr.append(Object.assign(el('p'), { innerHTML: `<b>${fmtSo(so.view)}</b> xem` + (meta.gio_dang ? ` sau <b>${nhanGio(meta.gio_dang)}</b> ≈ <b>${fmtSo(vg)} view/giờ</b>` : '') + ` · tim ${fmtSo(so.like)} (${(so.like / so.view * 100).toFixed(1)}%) · bình luận ${fmtSo(so.cmt)} · lưu ${fmtSo(so.luu)} · chia sẻ ${fmtSo(so.share)}` })); }
+  head.append(hr); box.append(head);
   if (tt.verdict) box.append(el('div', 'verdict', tt.verdict));
   if (meta.canh_bao) box.append(el('p', 'note', '⚠︎ ' + meta.canh_bao));
 
@@ -526,7 +540,7 @@ function renderKq(d, so, tuLuu) {
     const r = el('div', 'th'); const nm = el('span'); nm.append(document.createTextNode((THANG_TEN[t.ma] || [t.ten || t.ma])[0])); nm.append(el('small', null, 'trọng số ' + (THANG_TEN[t.ma] ? THANG_TEN[t.ma][1] : t.trong_so + '%'))); r.append(nm);
     const bar = el('i'); const fill = el('b', 'lv' + lv(t.diem)); fill.style.width = (t.diem * 10) + '%'; bar.append(fill); r.append(bar);
     r.append(el('span', null, String(t.diem).replace('.', ','))); th.append(r);
-    if (t.nhan_xet) th.append(el('div', 'th-nx', t.nhan_xet));
+    if (t.bang_chung || t.nhan_xet) { const nx = el('div', 'th-nx'); if (t.bang_chung) { const b = el('span'); b.style.cssText = 'display:block;color:var(--text);opacity:.85'; b.textContent = '🔎 ' + t.bang_chung; nx.append(b); } if (t.nhan_xet) nx.append(document.createTextNode(t.nhan_xet)); th.append(nx); }
   }); box.append(th);
 
   // điểm mạnh
@@ -587,6 +601,7 @@ function renderKq(d, so, tuLuu) {
   }
 
   if (d.lam_ngay) { H(box, 'Làm ngay hôm nay'); box.append(el('div', 'box praise', d.lam_ngay)); }
+  box.append(el('p', 'note', 'Chấm bởi ' + (meta.model || 'AI').split('/')[0] + (meta.luc ? ' · ' + meta.luc : '') + '. Điểm suy từ bằng chứng theo mốc của khoá và đối chiếu số thật; cùng video cùng thông số thì lấy lại đúng kết quả này trong 6 giờ, không tốn lượt.'));
   const rwAll = el('div', 'row'); const ca = el('button', 'btn', 'Chép cả báo cáo'); ca.type = 'button'; ca.onclick = () => copyText(baoCaoText(d, so)); rwAll.append(ca); box.append(rwAll);
 }
 function baoCaoText(d, so) {
@@ -606,10 +621,10 @@ function baoCaoText(d, so) {
 /* bản demo (#demo) */
 function demoData(so) {
   const giay = so.giay || 52;
-  return { meta: { giay, so_chu: 96, toc_do: 1.85, ti_le: '', so_lieu: so, nguon: 'upload', canh_bao: '', da_dang: state.daDang === 'roi' },
+  return { meta: { giay, so_chu: 96, toc_do: 1.85, ti_le: '', so_lieu: so, nguon: 'upload', canh_bao: '', da_dang: state.daDang === 'roi', gio_dang: Number($('#gioDang').value) || 0, view_gio: so.view && Number($('#gioDang').value) ? Math.round(so.view / Number($('#gioDang').value)) : 0, model: 'demo', luc: '' },
     boc: { loi_thoai: [{ giay: 0, text: 'Chào mọi người, hôm nay mình nấu cơm trưa cho vợ nha.' }, { giay: 5, text: 'Trời mưa nên mình làm canh chua với cá kho.' }, { giay: 14, text: 'Cá này mình mua ở chợ sáng, tươi lắm.' }, { giay: 26, text: 'Kho tầm 20 phút là được.' }, { giay: 40, text: 'Vợ về ăn khen ngon, mình vui.' }, { giay: 48, text: 'Mọi người nhớ follow mình nha.' }], chu_man_hinh: [{ giay: 0, text: 'cơm trưa cho vợ' }], giay, mat_thay: 'Bếp hơi tối, máy đặt ngang, chữ nhỏ ở góc dưới.', tai_nghe: 'Nhạc lofi to hơn giọng, giọng đều, có tiếng quạt.', ghi_chu: '' },
     tom_tat: { chu_de: 'cơm trưa cho vợ ngày mưa', dang: 'vlog lồng tiếng', doi_tuong_thuc: 'chị em đã có gia đình, nhưng hiện đang nói với "mọi người" nên chưa ai thấy là nói với mình', kha_nang: 'thap', verdict: 'Bản demo: video có chất liệu tốt (chồng nấu cho vợ, ngày mưa) nhưng đang bị chính giây đầu giết: 5 giây đầu là chào hỏi, chữ nhỏ, nhạc át giọng, nên người lạ lướt qua trước khi thấy con cá. Sửa được bằng dựng lại, chưa cần quay lại.' },
-    thang: [{ ma: 'hook', diem: 2.5, nhan_xet: '0–5s là "Chào mọi người, hôm nay mình…", đúng lỗi kinh điển. Chữ màn hình "cơm trưa cho vợ" nhỏ, ở góc dưới, không nói được vì sao phải xem.' }, { ma: 'giu_chan', diem: 5, nhan_xet: 'Có móc ở 14s (cá tươi) và 40s (vợ khen), nhưng 14–26s là quay tổng quan nồi cá, không có gì mới trong 12 giây.' }, { ma: 'noi_dung', diem: 6.5, nhan_xet: 'Chất liệu thật, có ngày mưa và món cụ thể. Thiếu con số và thiếu một câu lý do vì sao chồng nấu.' }, { ma: 'hinh_anh', diem: 5, nhan_xet: 'Bếp tối ở 0–10s, máy ngang không dọc, cận cảnh cá kho ở 30s đẹp nhất video.' }, { ma: 'am_thanh', diem: 4, nhan_xet: 'Nhạc lofi to hơn giọng suốt video, tiếng quạt ở 20–35s, giọng đọc đều không lên xuống.' }, { ma: 'dung_phim', diem: 5.5, nhan_xet: 'Cắt đúng chỗ, nhưng chữ nhỏ 1 dòng góc dưới, không nhất quán font; 26–40s dư 6 giây.' }, { ma: 'ket', diem: 3, nhan_xet: '"Nhớ follow mình nha" là xin follow lộ liễu ở video kéo tệp mới; nên kết bằng câu vợ nói.' }],
+    thang: [{ ma: 'hook', diem: 2.5, bang_chung: '0–5s: "Chào mọi người, hôm nay mình…"; chữ 1 dòng nhỏ góc dưới; không có gì khựng.', nhan_xet: '0–5s là "Chào mọi người, hôm nay mình…", đúng lỗi kinh điển. Chữ màn hình "cơm trưa cho vợ" nhỏ, ở góc dưới, không nói được vì sao phải xem.' }, { ma: 'giu_chan', diem: 5, nhan_xet: 'Có móc ở 14s (cá tươi) và 40s (vợ khen), nhưng 14–26s là quay tổng quan nồi cá, không có gì mới trong 12 giây.' }, { ma: 'noi_dung', diem: 6.5, nhan_xet: 'Chất liệu thật, có ngày mưa và món cụ thể. Thiếu con số và thiếu một câu lý do vì sao chồng nấu.' }, { ma: 'hinh_anh', diem: 5, nhan_xet: 'Bếp tối ở 0–10s, máy ngang không dọc, cận cảnh cá kho ở 30s đẹp nhất video.' }, { ma: 'am_thanh', diem: 4, nhan_xet: 'Nhạc lofi to hơn giọng suốt video, tiếng quạt ở 20–35s, giọng đọc đều không lên xuống.' }, { ma: 'dung_phim', diem: 5.5, nhan_xet: 'Cắt đúng chỗ, nhưng chữ nhỏ 1 dòng góc dưới, không nhất quán font; 26–40s dư 6 giây.' }, { ma: 'ket', diem: 3, nhan_xet: '"Nhớ follow mình nha" là xin follow lộ liễu ở video kéo tệp mới; nên kết bằng câu vợ nói.' }],
     tong: 0, manh: ['Cận cảnh cá kho sôi lục bục ở 30s: bắt sáng đẹp, có tiếng, giữ lại làm cảnh mở.', 'Câu "vợ về ăn khen ngon" ở 40s là khoảnh khắc thật, chỉ cần thu tiếng vợ nói thay vì kể lại.', 'Chất liệu ngày mưa + chồng nấu là góc đúng với tệp chị em.'],
     luu_y: [{ giay: 0, van_de: '"Chào mọi người, hôm nay mình nấu…" mất 5 giây đầu', muc: 'nang', sua: 'Cắt bỏ hẳn, mở bằng cảnh cá sôi ở 30s kèm chữ to "Chồng nấu, vợ chỉ việc ăn".' }, { giay: 3, van_de: 'Chữ màn hình nhỏ, góc dưới, một dòng', muc: 'nang', sua: 'Đưa lên 1/3 trên, 2 dòng, cỡ chiếm ngang màn hình.' }, { giay: 14, van_de: 'Quay tổng quan nồi cá 12 giây không có gì mới', muc: 'vua', sua: 'Cắt còn 4 giây, chèn cận tay nêm nếm.' }, { giay: 20, van_de: 'Tiếng quạt lọt vào', muc: 'nhe', sua: 'Hạ tiếng gốc đoạn này, để nhạc và voice-over.' }, { giay: 48, van_de: '"Nhớ follow mình nha"', muc: 'vua', sua: 'Thay bằng câu vợ nói thật hoặc chữ "Mai mưa nữa nấu gì đây?".' }],
     sua_video_nay: [{ viec: 'Đổi cảnh mở', cach: 'Kéo cảnh cá sôi ở 30s lên đầu, 2 giây, chồng chữ to 2 dòng. Cắt bỏ 0–5s.', tac_dung: 'Cửa 1 từ 2,5 lên khoảng 6–7 mà không quay thêm gì.' }, { viec: 'Hạ nhạc, nâng giọng', cach: 'Nhạc xuống 15–20%, voice-over lên, đoạn 20–35s tắt hẳn tiếng gốc.', tac_dung: 'Nghe rõ lời, bớt cảm giác nghiệp dư.' }, { viec: 'Cắt 26–40s', cach: 'Giữ 4 giây kho cá, bỏ phần còn lại, nhảy thẳng sang vợ về.', tac_dung: 'Video còn ~42s, không có đoạn chùng.' }, { viec: 'Đổi kết', cach: 'Bỏ câu follow, kết bằng chữ "Mai mưa nữa nấu gì đây?" trên cảnh vợ ăn.', tac_dung: 'Kéo bình luận gợi món thay vì xin follow.' }],
@@ -624,10 +639,12 @@ function demoData(so) {
 function applyTheme(t) { if (t) document.documentElement.dataset.theme = t; else delete document.documentElement.dataset.theme; }
 applyTheme(ls.get('hook.theme'));
 $('#themeBtn').addEventListener('click', () => { const dark = document.documentElement.dataset.theme ? document.documentElement.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; const t = dark ? 'light' : 'dark'; applyTheme(t); ls.set('hook.theme', t); });
-restore(); setSeg('daDang', state.daDang); setSeg('mucTieu', state.mucTieu); veDaDang(); updateCount(); updateSrc(); moLaiKq();
+restore(); setSeg('daDang', state.daDang); setSeg('mucTieu', state.mucTieu); veDaDang(); updateCount(); updateSrc(); veViewGio(); moLaiKq();
 bindSeg('daDang', v => { state.daDang = v; veDaDang(); saveDraft(); });
 bindSeg('mucTieu', v => { state.mucTieu = v; hsDien.mucTieu = v; saveDraft(); TK.ghiTruong('muc_tieu', ([...document.querySelectorAll('#mucTieu button')].find(b => b.dataset.v === v) || {}).textContent || ''); });
-['link', 'loiThoai', 'yDinh', 'giay', 'nView', 'nLike', 'nCmt', 'nLuu', 'nShare', 'chuDe', 'doiTuong', 'sanPham'].forEach(id => $('#' + id).addEventListener('input', () => { saveDraft(); if (id === 'loiThoai' || id === 'giay') updateCount(); if (id === 'loiThoai') updateSrc(); }));
+['link', 'loiThoai', 'yDinh', 'giay', 'nView', 'nLike', 'nCmt', 'nLuu', 'nShare', 'chuDe', 'doiTuong', 'sanPham'].forEach(id => $('#' + id).addEventListener('input', () => { saveDraft(); if (id === 'loiThoai' || id === 'giay') updateCount(); if (id === 'loiThoai') updateSrc(); if (id === 'nView') veViewGio(); }));
+['nView', 'nLike', 'nCmt', 'nLuu', 'nShare'].forEach(id => $('#' + id).addEventListener('blur', e => { dinhDangSo(e.target); saveDraft(); }));
+$('#gioDang').addEventListener('change', () => { state.gioDangThat = 0; veViewGio(); saveDraft(); });
 $('#link').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); layLink(); } });
 $('#btnLink').addEventListener('click', layLink);
 const dz = $('#dropZone');
@@ -642,7 +659,7 @@ $('#acctBtn').addEventListener('click', () => TK.mo());
 TK.ganO({ nganh: '#chuDe', doi_tuong: '#doiTuong', san_pham: '#sanPham' });
 TK.oMoiHoSo($('#chuDe').closest('section'), ['muc_tieu']);   // mục tiêu đã có nút chọn ở phần 1
 $('#btnCham').addEventListener('click', cham);
-$('#btnClear').addEventListener('click', () => { if (!$('#grid').classList.contains('has-kq') && !confirm('Xoá hết thông tin video đang điền?')) return; xoaKq(); ['link', 'loiThoai', 'yDinh', 'giay', 'nView', 'nLike', 'nCmt', 'nLuu', 'nShare'].forEach(id => $('#' + id).value = ''); state.image = ''; state.link = { tac_gia: '', caption: '', video: false, giay: 0 }; state.file = null; state.kq = null; state.kqTen = ''; $('#vidprev').hidden = true; $('#linkStatus').textContent = ''; updateCount(); updateSrc(); saveDraft(); });
+$('#btnClear').addEventListener('click', () => { if (!$('#grid').classList.contains('has-kq') && !confirm('Xoá hết thông tin video đang điền?')) return; xoaKq(); ['link', 'loiThoai', 'yDinh', 'giay', 'gioDang', 'nView', 'nLike', 'nCmt', 'nLuu', 'nShare'].forEach(id => $('#' + id).value = ''); state.gioDangThat = 0; veViewGio(); state.image = ''; state.link = { tac_gia: '', caption: '', video: false, giay: 0 }; state.file = null; state.kq = null; state.kqTen = ''; $('#vidprev').hidden = true; $('#linkStatus').textContent = ''; updateCount(); updateSrc(); saveDraft(); });
 TK.khoiDong({ api: API, tool: 'cham', onDoi: () => { veQuota(); dienTuHoSo(); } });
 loadQuota();
 </script>

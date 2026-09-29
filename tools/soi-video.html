@@ -374,7 +374,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="tai-khoan.js?v=202609290232"></script>
+<script src="tai-khoan.js?v=202609290405"></script>
 <script>
 const $ = s => document.querySelector(s);
 const el = (t, c, txt) => { const e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; };
@@ -392,6 +392,8 @@ async function copyText(t) { try { await navigator.clipboard.writeText(t); toast
 function demChu(t) { return String(t || '').replace(/\*\*|_/g, ' ').split(/\s+/).filter(w => /[0-9A-Za-zÀ-ỹ]/.test(w)).length; }
 function soNhap(v) { v = String(v || '').trim().toLowerCase().replace(/\s/g, ''); if (!v) return 0; const m = v.match(/^([\d.,]+)([kmb])?$/); if (!m) return parseInt(v.replace(/\D/g, ''), 10) || 0; let n = m[1]; if (m[2]) n = n.replace(',', '.'); else n = n.replace(/[.,]/g, ''); let x = parseFloat(n) || 0; x *= { k: 1e3, m: 1e6, b: 1e9 }[m[2]] || 1; return Math.round(x); }
 function fmtN(n) { return n >= 1e6 ? (n / 1e6).toFixed(n % 1e6 ? 1 : 0) + 'M' : n >= 1e3 ? (n / 1e3).toFixed(n % 1e3 ? 1 : 0) + 'K' : String(n); }
+function fmtSo(n) { return Number(n || 0).toLocaleString('en-US'); }
+function dinhDangSo(inp) { const v = soNhap(inp.value); inp.value = v ? fmtSo(v) : ''; }
 
 const KHUNG_TEN = { khoanhkhac: 'Một khoảnh khắc (5W-1H)', bonnhip: 'Kể chuyện 4 nhịp', kinhnghiem: 'Chia sẻ kinh nghiệm (6 bước)', chanthuc: 'Chân thực 2026', vlog: 'Daily vlog cảm xúc', fichtean: 'Thử thách (Fichtean)', baydiem: 'Chuyện dài 7 điểm', tips: 'Danh sách hữu ích', hoi: 'Bán hàng HỜI 3 tầng', giohang: 'Viral có cài giỏ hàng', tudo: 'Tự do' };
 const KHUNG_PHAN_DEMO = { bonnhip: ['Câu đánh thẳng vào vấn đề', 'Tình huống thật', 'Hậu quả / kết quả', 'Quan điểm + giải pháp'], chanthuc: ['Nêu vấn đề nhiều người gặp', 'Mô tả vấn đề cụ thể nhất có thể', 'Giải pháp hoặc bài học'], tudo: ['Mở bài (3–5 giây)', 'Thân bài', 'Kết bài'] };
@@ -469,7 +471,7 @@ async function layLink() {
     if (!r.ho_tro) { st.className = 'status'; st.textContent = 'Không lấy được từ link này (video riêng tư hoặc nền tảng chặn). Tải file video lên hoặc dán lời thoại.'; state.link = { tac_gia: '', caption: '', video: false, giay: 0 }; updateSrc(); return; }
     state.link = { tac_gia: r.tac_gia || '', caption: r.caption || '', video: !!r.video, giay: r.giay || 0 }; state.tuVideo = true;
     if (r.anh) { try { state.image = await dataUrlToJpeg(r.anh); state.imageFrom = 'link'; } catch { state.image = ''; } }
-    if (r.so_lieu) { const m = { view: 'nView', like: 'nLike', cmt: 'nCmt', luu: 'nLuu', share: 'nShare' }; Object.keys(m).forEach(k => { if (r.so_lieu[k]) $('#' + m[k]).value = String(r.so_lieu[k]); }); }
+    if (r.so_lieu) { const m = { view: 'nView', like: 'nLike', cmt: 'nCmt', luu: 'nLuu', share: 'nShare' }; Object.keys(m).forEach(k => { if (r.so_lieu[k]) $('#' + m[k]).value = fmtSo(r.so_lieu[k]); }); }
     if (r.giay && !$('#giay').value) $('#giay').value = String(r.giay);
     showPrev(); syncFrameUI(); updateRatios(); updateCount(); updateSrc();
     st.className = r.video ? 'status ok' : 'status';
@@ -675,7 +677,7 @@ function renderKq(d, so, tuLuu) {
   }
   if (so.view) {
     H(box, 'Đọc số theo thứ tự của khoá'); const rs = el('div', 'ratios'); rs.style.marginTop = '0';
-    rs.append(Object.assign(el('span', 'ratio lv1'), { innerHTML: `Xem <b>${fmtN(so.view)}</b>` }));
+    rs.append(Object.assign(el('span', 'ratio lv1'), { innerHTML: `Xem <b>${fmtSo(so.view)}</b>` }));
     ['like', 'cmt', 'luu', 'share'].forEach(k => { if (!so[k]) return; const pct = so[k] / so.view * 100, lv = mucTiLe(k, pct); rs.append(Object.assign(el('span', 'ratio lv' + lv), { innerHTML: `${MOC[k].ten} <b>${pct >= 10 ? pct.toFixed(0) : pct >= 1 ? pct.toFixed(1) : pct.toFixed(2)}%</b> · ${MOC[k].nhan[lv]}` })); });
     box.append(rs); if (d.chi_so && d.chi_so.doc) { const b = el('div', 'box', d.chi_so.doc); b.style.marginTop = '8px'; box.append(b); }
   }
@@ -761,6 +763,7 @@ $('#themeBtn').addEventListener('click', () => { const dark = document.documentE
 restore(); setSeg('nen', state.nen); updateCount(); updateRatios(); updateSrc(); moLaiKq();
 bindSeg('nen', v => { state.nen = v; saveDraft(); });
 ['link', 'loiThoai', 'giay', 'chuManHinh', 'binhLuan', 'nView', 'nLike', 'nCmt', 'nLuu', 'nShare', 'chuDe', 'doiTuong', 'sanPham'].forEach(id => $('#' + id).addEventListener('input', () => { saveDraft(); if (id === 'loiThoai' || id === 'giay') updateCount(); if (/^n[A-Z]/.test(id)) updateRatios(); }));
+['nView', 'nLike', 'nCmt', 'nLuu', 'nShare'].forEach(id => { dinhDangSo($('#' + id)); $('#' + id).addEventListener('blur', e => { dinhDangSo(e.target); saveDraft(); }); });
 $('#link').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); layLink(); } });
 $('#btnLink').addEventListener('click', layLink);
 $('#videoFile').addEventListener('change', e => { chonVideo(e.target.files && e.target.files[0]); e.target.value = ''; });
