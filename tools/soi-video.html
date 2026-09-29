@@ -556,7 +556,7 @@ async function soi() {
   try { if (!DEMO && !(await TK.canCo('soi'))) { busy = false; btn.disabled = false; return; } }
   catch (e) { busy = false; btn.disabled = false; st.className = 'status err'; st.textContent = cauLoi(e); return; }
   let t0 = Date.now(), tick; const buoc = ng === 'text' ? 'Mentor AI đang mổ từng câu' : 'AI đang tải video, nghe và bóc lời thoại rồi mổ từng giây';
-  const tickLai = () => { t0 = Date.now(); tick = setInterval(() => { st.className = 'status'; st.innerHTML = `<span class="spinner"></span>${buoc} · ${Math.round((Date.now() - t0) / 1000)} giây (${ng === 'text' ? 'thường 25–60' : 'thường 40–120'} giây)`; }, 400); };
+  const tickLai = () => { t0 = Date.now(); tick = setInterval(() => { st.className = 'status'; st.innerHTML = `<span class="spinner"></span>${buoc} · ${Math.round((Date.now() - t0) / 1000)} giây (${ng === 'text' ? 'thường 25–60' : 'thường 40–120'} giây)${Date.now() - t0 > 150000 ? '<br>Lâu hơn bình thường: AI của Google có thể đang quá tải hoặc video nặng. Quá 5 phút máy chủ sẽ tự dừng và hoàn lượt.' : ''}`; }, 400); };
   tickLai();
   const so = docSo();
   try {

@@ -235,7 +235,8 @@ function goiGemini(key, img, prompt, schema, maxTok, media, nhiet, hetGio){
     var model = models[mi]; modelCuoi = model;
     var soLanCho = 0, CHO = [3000, 8000];           // quá tải: chờ 3 giây rồi 8 giây trên cùng model, rồi mới đổi
     for (var ki = 0; ki < kieu.length; ki++){
-      if (Date.now() > hanGio - 45000) return {ok:false, error: quaTai ? 'ban_qua' : 'het_gio', loi:'het gio · ' + loiCuoi, model:model};   // chừa 45 giây cho phần ghi log và trả JSON
+      // Một lần Gemini xem video có thể mất 2–3 phút: chỉ bắt đầu khi còn đủ giờ, không thì trả về để hoàn lượt
+      if (Date.now() > hanGio - (media ? 150000 : 45000)) return {ok:false, error: quaTai ? 'ban_qua' : 'het_gio', loi:'het gio · ' + loiCuoi, model:model};
       var req = { contents:[{role:'user', parts:parts}], generationConfig: kieu[ki].gc };
       var res, ma, raw;
       try{
@@ -262,7 +263,7 @@ function goiGemini(key, img, prompt, schema, maxTok, media, nhiet, hetGio){
       if (ma === 401 || ma === 403 || /API_KEY_INVALID|API key not valid/.test(raw)) return {ok:false, error:'sai_key', loi:loiCuoi, model:model};
       if (ma === 429 || ma === 503 || ma === 500){
         quaTai = true;
-        if (soLanCho < CHO.length && Date.now() < hanGio - 90000){ Utilities.sleep(CHO[soLanCho++]); ki--; continue; }   // thử lại đúng kiểu này nếu còn dư giờ
+        if (soLanCho < CHO.length && Date.now() < hanGio - (media ? 170000 : 90000)){ Utilities.sleep(CHO[soLanCho++]); ki--; continue; }   // thử lại đúng kiểu này nếu còn dư giờ
         break;                                                                          // vẫn bận: sang model khác
       }
       if (ma === 404) break;                                                            // model không có: sang model khác
