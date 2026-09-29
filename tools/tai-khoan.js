@@ -168,7 +168,17 @@
     '.tk-het-hp b{display:inline;font-size:14px}',
     '.tk-het-hp s{opacity:.6;font-size:12px;margin-left:4px}',
     '.tk-het-hoac{text-align:center;font-size:11.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;opacity:.6;border:0!important;box-shadow:none!important;padding:0!important}',
-    '.tk-het button{margin-top:8px;width:100%}',
+    '.tk-het button{margin-top:10px;width:100%}',
+    /* hai nút chính của bảng Nâng cấp: to, có bóng nổi, bấm lún xuống */
+    '.tk-het .tk-nut{justify-content:center;font-size:15px;font-weight:800;padding:13px 16px;border-radius:12px;border:2px solid #1c2600;box-shadow:0 4px 0 rgba(28,38,0,.55);transition:transform .12s,box-shadow .12s,filter .12s}',
+    '.tk-het .tk-nut:hover{transform:translateY(-2px);box-shadow:0 6px 0 rgba(28,38,0,.55);filter:brightness(1.05)}',
+    '.tk-het .tk-nut:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(28,38,0,.55)}',
+    '.tk-het .pro .tk-nut{background:linear-gradient(135deg,#ff6a2b,#ff3d1f);color:#fff;border-color:#7a1e00;box-shadow:0 4px 0 #7a1e00;animation:tkHetNhay 2.4s ease-in-out infinite}',
+    '.tk-het .pro .tk-nut:hover{box-shadow:0 6px 0 #7a1e00}',
+    '.tk-het .pro .tk-nut:active{box-shadow:0 1px 0 #7a1e00}',
+    '.tk-het .hv .tk-nut{background:#99DF00;color:#1c2600}',
+    '@keyframes tkHetNhay{0%,100%{box-shadow:0 4px 0 #7a1e00,0 0 0 0 rgba(255,77,31,.45)}50%{box-shadow:0 4px 0 #7a1e00,0 0 0 8px rgba(255,77,31,0)}}',
+    '@media (prefers-reduced-motion:reduce){.tk-het .pro .tk-nut{animation:none}}',
   ].join('');
 
   var HS_TRUONG = [
@@ -564,7 +574,7 @@
       if (g.gia) dau.appendChild(el('span', 'tk-het-gia', tien(g.gia)));
       p.appendChild(dau);
       p.appendChild(el('small', null, (g.ngay ? 'Dùng ' + g.ngay + ' ngày · ' : '') + 'cả năm tool theo hạn mức ngày, tải video không giới hạn. Chuyển khoản xong mentor mở trong ngày.'));
-      var bp = nut(g.gia ? 'Mua gói ' + tien(g.gia) + (g.ngay ? ' / ' + g.ngay + ' ngày' : '') : 'Nâng cấp Pro', true);
+      var bp = nut(g.gia ? '✦ Mua gói ' + tien(g.gia) + (g.ngay ? ' / ' + g.ngay + ' ngày' : '') : 'Nâng cấp Pro', true);
       bp.onclick = function () { goiChon = g; if (TK.me) ve('pro'); else { tab = 'signup'; kieu = 'khach'; ve('signup', 'Tạo tài khoản trước (30 giây), rồi mua gói ' + (g.ten || 'Pro') + ' ngay trong bảng này.'); } };
       p.appendChild(bp); w.appendChild(p);
     });
@@ -580,7 +590,7 @@
       if (khoa.gia_goc > khoa.gia_som) { hp.appendChild(document.createTextNode(' ')); hp.appendChild(el('s', null, tien(khoa.gia_goc))); }
       h.appendChild(hp);
     }
-    var bh = nut('Đăng ký học viên');
+    var bh = nut('🎓 Đăng ký học viên ngay →');
     bh.onclick = function () { tab = 'signup'; kieu = 'hv'; ve('signup'); };
     h.appendChild(bh); w.appendChild(h);
     oTrang.appendChild(w);
