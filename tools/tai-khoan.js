@@ -159,7 +159,15 @@
     '.tk-het{display:grid;gap:10px;margin-top:12px}',
     '.tk-het > div{border:2px solid var(--text,#222);border-radius:14px;padding:12px 14px;font-size:13px;line-height:1.55;box-shadow:0 4px 0 rgba(28,38,0,.28)}',
     '.tk-het > div.pro{background:var(--accent-soft,#eef8d0)}',
-    '.tk-het b{display:block;font-size:15px;margin-bottom:2px}',
+    '.tk-het b{display:block;font-size:15px}',
+    '.tk-het small{display:block;font-size:12.5px;line-height:1.5;opacity:.85;margin-top:3px}',
+    '.tk-het-dau{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}',
+    '.tk-het-gia{font-weight:900;font-size:16px;white-space:nowrap}',
+    '.tk-het-tag{font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;background:#ff4d1f;color:#fff;border-radius:999px;padding:2px 8px;transform:rotate(-4deg)}',
+    '.tk-het-hp{margin:6px 0 0;font-size:13px}',
+    '.tk-het-hp b{display:inline;font-size:14px}',
+    '.tk-het-hp s{opacity:.6;font-size:12px;margin-left:4px}',
+    '.tk-het-hoac{text-align:center;font-size:11.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;opacity:.6;border:0!important;box-shadow:none!important;padding:0!important}',
     '.tk-het button{margin-top:8px;width:100%}',
   ].join('');
 
@@ -341,15 +349,15 @@
 
     if (!laPro()) {
       var lu = el('div', 'tk-luot'), l = a.luot || {}, h = a.han || {};
-      [['hook', 'Hook'], ['script', 'Kịch bản'], ['soi', 'Soi video'], ['cham', 'Chấm video']].forEach(function (p) {
+      [['hook', 'Hook'], ['script', 'Kịch bản'], ['soi', 'Soi video'], ['cham', 'Chấm video'], ['taive', 'Tải video']].forEach(function (p) {
         var con = l[p[0]], sp = el('span', con === 0 ? 'het' : null, p[1] + ': còn ' + (con == null ? '?' : con) + '/' + (h[p[0]] == null ? '?' : h[p[0]]));
         lu.appendChild(sp);
       });
       oTrang.appendChild(lu);
       var up = el('div', 'tk-moi');
-      up.appendChild(el('b', null, '✦ Nâng cấp Pro' + (nhanGia() ? ' · ' + nhanGia() : '')));
-      up.appendChild(document.createTextNode('Dùng cả bốn tool theo hạn mức ngày, không còn đếm lượt. Chuyển khoản xong mentor mở trong ngày.'));
-      var bu = nut('Xem cách chuyển khoản', true); bu.onclick = function () { ve('pro'); };
+      up.appendChild(el('b', null, '✦ Nâng cấp Pro'));
+      up.appendChild(document.createTextNode('Mua gói Pro hoặc đăng ký học viên để dùng cả năm tool không còn đếm lượt.'));
+      var bu = nut('Xem gói Pro và ưu đãi học viên', true); bu.onclick = moPro;
       up.appendChild(bu); oTrang.appendChild(up);
     }
 
@@ -482,7 +490,9 @@
     try { var r = await goi({ action: 'st_cfg' }); if (r.ok) TK.cfg = r; } catch (e) { }
     return TK.cfg;
   }
-  function goiPro() { return (TK.cfg && TK.cfg.goi && TK.cfg.goi[0]) || { ten: 'Pro', gia: 0, ngay: 0 }; }
+  var goiChon = null;   // gói người dùng vừa chọn trong bảng Nâng cấp
+  function dsGoi() { return (TK.cfg && TK.cfg.goi && TK.cfg.goi.length) ? TK.cfg.goi : []; }
+  function goiPro() { return goiChon || dsGoi()[0] || { ten: 'Pro', gia: 0, ngay: 0 }; }
   function tien(n) { return Number(n || 0).toLocaleString('vi-VN') + 'đ'; }
   function nhanGia() { var g = goiPro(); return g.gia ? tien(g.gia) + (g.ten ? ' · ' + g.ten.replace(/^Pro /, '') : '') : ''; }
   function zalo() { return (TK.cfg && TK.cfg.zalo) || ''; }
@@ -542,19 +552,34 @@
   var hetTool = '';
   function moHet(tool, tieuDe) { hetTool = tool || TK.tool; mo('het', tieuDe || ''); }
   function veHet(tieuDe) {
-    var ten = TOOL_TEN[hetTool] || 'AI';
-    oTrang.appendChild(el('h3', null, tieuDe || ('Bạn đã dùng hết lượt ' + ten + ' miễn phí')));
-    oTrang.appendChild(el('p', 'tk-phu', 'Chọn một cách để dùng tiếp không giới hạn:'));
+    var ten = TOOL_TEN[hetTool] || 'AI', hv = (TK.cfg && TK.cfg.hv) || {}, khoa = (TK.cfg && TK.cfg.khoa) || {};
+    oTrang.appendChild(el('h3', null, tieuDe || (hetTool ? 'Bạn đã dùng hết lượt ' + ten + ' miễn phí' : '✦ Nâng cấp để dùng không giới hạn')));
+    oTrang.appendChild(el('p', 'tk-phu', 'Chọn một trong hai cách:'));
     var w = el('div', 'tk-het');
-    var p = el('div', 'pro');
-    p.appendChild(el('b', null, '✦ Nâng cấp Pro' + (nhanGia() ? ' · ' + nhanGia() : '')));
-    p.appendChild(document.createTextNode('Dùng cả năm tool theo hạn mức ngày, tải video không giới hạn. Chuyển khoản xong mentor mở trong ngày.'));
-    var bp = nut('Nâng cấp Pro', true);
-    bp.onclick = function () { if (TK.me) ve('pro'); else { tab = 'signup'; kieu = 'khach'; ve('signup', 'Tạo tài khoản trước (30 giây), rồi nâng cấp Pro ngay trong bảng này.'); } };
-    p.appendChild(bp); w.appendChild(p);
-    var h = el('div');
-    h.appendChild(el('b', null, '🎓 Đăng ký học viên Tự Mình Xây Kênh'));
-    h.appendChild(document.createTextNode('Học xây kênh cùng mentor. Được duyệt là dùng mọi tool không giới hạn trong suốt khoá.'));
+    // 1 · các gói Pro (bot /giapro /ngaypro)
+    var ds = dsGoi(); if (!ds.length) ds = [{ ten: 'Pro', gia: 0, ngay: 0 }];
+    ds.forEach(function (g) {
+      var p = el('div', 'pro');
+      var dau = el('div', 'tk-het-dau'); dau.appendChild(el('b', null, '✦ ' + (g.ten || 'Pro')));
+      if (g.gia) dau.appendChild(el('span', 'tk-het-gia', tien(g.gia)));
+      p.appendChild(dau);
+      p.appendChild(el('small', null, (g.ngay ? 'Dùng ' + g.ngay + ' ngày · ' : '') + 'cả năm tool theo hạn mức ngày, tải video không giới hạn. Chuyển khoản xong mentor mở trong ngày.'));
+      var bp = nut(g.gia ? 'Mua gói ' + tien(g.gia) + (g.ngay ? ' / ' + g.ngay + ' ngày' : '') : 'Nâng cấp Pro', true);
+      bp.onclick = function () { goiChon = g; if (TK.me) ve('pro'); else { tab = 'signup'; kieu = 'khach'; ve('signup', 'Tạo tài khoản trước (30 giây), rồi mua gói ' + (g.ten || 'Pro') + ' ngay trong bảng này.'); } };
+      p.appendChild(bp); w.appendChild(p);
+    });
+    w.appendChild(el('div', 'tk-het-hoac', 'hoặc'));
+    // 2 · học viên (bot /uudaihv /ngayhv /giasom /gia)
+    var h = el('div', 'hv');
+    var dau2 = el('div', 'tk-het-dau'); dau2.appendChild(el('b', null, '🎓 Đăng ký học viên')); dau2.appendChild(el('span', 'tk-het-tag', 'Ưu đãi'));
+    h.appendChild(dau2);
+    h.appendChild(el('small', null, hv.uu_dai || ('Học xây kênh cùng mentor, được dùng mọi tool không giới hạn ' + (hv.ngay ? 'trong ' + hv.ngay + ' ngày' : 'suốt khoá') + ', khỏi mua Pro riêng.')));
+    if (khoa.gia_som) {
+      var hp = el('p', 'tk-het-hp'); hp.appendChild(document.createTextNode('Học phí ưu đãi '));
+      hp.appendChild(el('b', null, tien(khoa.gia_som)));
+      if (khoa.gia_goc > khoa.gia_som) { hp.appendChild(document.createTextNode(' ')); hp.appendChild(el('s', null, tien(khoa.gia_goc))); }
+      h.appendChild(hp);
+    }
     var bh = nut('Đăng ký học viên');
     bh.onclick = function () { tab = 'signup'; kieu = 'hv'; ve('signup'); };
     h.appendChild(bh); w.appendChild(h);
@@ -565,6 +590,7 @@
       a.onclick = function () { tab = 'login'; ve('signup'); };
       dn.appendChild(a); oTrang.appendChild(dn);
     }
+    if (!TK.cfg) napCfg().then(function (c) { if (c && hop && hop.classList.contains('mo')) { oTrang.innerHTML = ''; ve('het', tieuDe); } });   // giá chưa về: vẽ lại khi có
   }
 
   /* ── Tải video: không tốn AI. Học viên, Pro không giới hạn; khách được ST_LUOT_TAI lần (bot /luottai).
@@ -762,10 +788,9 @@
   /* Nút Nâng cấp Pro: một nút nổi ở góc màn hình (tài khoản đang dùng thử) và một nút
      ngay cạnh nút tài khoản trên đầu trang (mọi ai chưa có Pro). */
   var nutPro = null, nutTop = null;
-  function moPro() { if (TK.me) mo('pro'); else mo('signup', 'Tạo tài khoản trước, rồi nâng cấp Pro ngay trong bảng này.'); }
+  function moPro() { hetTool = ''; mo('het'); }   // nút Nâng cấp Pro: mở bảng hai lựa chọn, giá nằm trong bảng chứ không trên nút
   function veNutPro() {
     napCss();
-    var gia = nhanGia();
     // góc màn hình
     var can = TK.me && !laPro();
     if (!can) { if (nutPro) { nutPro.remove(); nutPro = null; } }
@@ -774,7 +799,7 @@
         nutPro = document.createElement('button'); nutPro.type = 'button'; nutPro.id = 'tkNutPro'; nutPro.className = 'tk-pro-nut';
         nutPro.onclick = moPro; document.body.appendChild(nutPro);
       }
-      nutPro.textContent = '✦ Nâng cấp Pro' + (gia ? ' · ' + gia : '');
+      nutPro.textContent = '✦ Nâng cấp Pro';
     }
     // cạnh nút tài khoản
     var acct = document.getElementById('acctBtn');
@@ -788,7 +813,7 @@
     // chèn vào trong đó thì viên thuốc trắng bao luôn cả nút Pro. Đặt ra ngoài viên thuốc.
     var vien = acct.closest ? (acct.closest('.acct') || acct) : acct;
     if (nutTop.nextSibling !== vien) vien.parentNode.insertBefore(nutTop, vien);
-    nutTop.innerHTML = '✦ <span class="tk-pro-dai">Nâng cấp </span>Pro' + (gia ? ' <span class="tk-pro-dai">· ' + gia.split(' · ')[0] + '</span>' : '');
+    nutTop.innerHTML = '✦ <span class="tk-pro-dai">Nâng cấp </span>Pro';
   }
 
   /* ── video lớn: cắt khúc 8MB gửi lần lượt, máy chủ ghép rồi đẩy lên Gemini ──

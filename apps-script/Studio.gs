@@ -36,10 +36,10 @@ var ST_LUOT_THU_MD = 10;       // số lượt AI phân tích miễn phí cho m�
 var ST_LUOT_THU = stSo('ST_LUOT_THU', ST_LUOT_THU_MD);
 
 /* Gói cho học viên khoá: mặc định Pro miễn phí 30 ngày kể từ lúc tài khoản học viên được tạo.
-   Bot chỉnh: /ngayhv 30 (0 = suốt đời) · /giahv 0 (0 = miễn phí; >0 chỉ là con số hiện trên landing cho gói riêng của học viên). */
-var ST_HV_MD = {ngay:30, gia:0};
+   Bot chỉnh: /ngayhv 30 (0 = suốt đời) · /uudaihv câu ưu đãi · /giahv 0 (0 = miễn phí; >0 chỉ là con số hiện trên landing cho gói riêng của học viên). */
+var ST_HV_MD = {ngay:30, gia:0, uu_dai:''};   // uu_dai: câu mời học viên trong bảng Nâng cấp (bot /uudaihv)
 function stHV(){
-  try{ var v = cfgProp('ST_HV'); if (v){ var o = JSON.parse(v); return {ngay: Number(o.ngay) || 0, gia: Number(o.gia) || 0}; } }catch(e){}
+  try{ var v = cfgProp('ST_HV'); if (v){ var o = JSON.parse(v); return {ngay: Number(o.ngay) || 0, gia: Number(o.gia) || 0, uu_dai: String(o.uu_dai || '')}; } }catch(e){}
   return ST_HV_MD;
 }
 function stNgayTu(s){
@@ -196,7 +196,8 @@ function stZalo(){
   try{ var c = getConfig(); return (c && c.zalo && c.zalo.groupUrl) || ''; }catch(e){ return ''; }
 }
 function stCauHinh(){
-  return jsonOut({ok:true, goi: stGoi(), bank: stNganHang(), zalo: stZalo(), hv: stHV(),
+  var gk = {}; try{ gk = (getConfig() || {}).pricing || {}; }catch(e){}   // học phí khoá (bot /giasom, /gia) để bảng Nâng cấp so sánh
+  return jsonOut({ok:true, goi: stGoi(), bank: stNganHang(), zalo: stZalo(), hv: stHV(), khoa: {gia_som: Number(gk.earlyBird) || 0, gia_goc: Number(gk.regular) || 0},
     luot_thu: ST_LUOT_THU, luot: {hook: ST_LUOT_THU, script: ST_LUOT_KB, soi: ST_LUOT_SOI, cham: ST_LUOT_CHAM, taive: ST_LUOT_TAI}});
 }
 
@@ -726,7 +727,7 @@ function stNapHoSoMau(){
 
 /* ═══════ LỆNH BOT TELEGRAM (chỉ chat quản trị) ═══════
    Code.gs gọi:  if (quanTri && studioCoLenh(cmd)) return studioLenh(cmd, arg, chatId);  */
-var LENH_STUDIO = ['studio','stk','giapro','ngaypro','ngayhv','giahv','luotthu','luotkb','luotsoi','luotcham','luottai','luotai','mopro','tatpro','dsck','timnd','ckkhoa','tienkhoa','hoso','lichsu','dshv','naphoso'];
+var LENH_STUDIO = ['studio','stk','giapro','ngaypro','ngayhv','giahv','uudaihv','luotthu','luotkb','luotsoi','luotcham','luottai','luotai','mopro','tatpro','dsck','timnd','ckkhoa','tienkhoa','hoso','lichsu','dshv','naphoso'];
 function studioCoLenh(cmd){ return LENH_STUDIO.indexOf(cmd) > -1; }
 
 var ST_MA_NH = {vietcombank:'VCB', vcb:'VCB', mb:'MB', mbbank:'MB', quandoi:'MB', techcombank:'TCB', tcb:'TCB',
@@ -773,6 +774,7 @@ function studioLenh(cmd, arg, chatId){
       '📆 /ngaypro `30` — gói dùng bao nhiêu ngày',
       '🎓 /ngayhv `30` — học viên khoá được Pro mấy ngày (`0` = suốt đời)',
       '🎓 /giahv `0` — giá gói học viên hiện trên landing (`0` = miễn phí)',
+      '🎁 /uudaihv `câu ưu đãi` — dòng mời đăng ký học viên trong bảng Nâng cấp Pro (`xoa` = về mặc định)',
       '🎁 /luotthu `10` — lượt AI phân tích hook cho tài khoản mới',
       '📝 /luotkb `3` — lượt chấm kịch bản cho tài khoản mới',
       '🔎 /luotsoi `1` — lượt soi video cho tài khoản mới',
@@ -829,6 +831,12 @@ function studioLenh(cmd, arg, chatId){
     if (th === 0 ? false : (!th || th < 1000)) return hoi('Chưa hiểu số tiền. Gửi `0` hoặc ví dụ `20000`.');
     var h2 = stHV(); h2.gia = th; P.setProperty('ST_HV', JSON.stringify(h2));
     return tgSend(chatId, '✅ Gói học viên khoá: *' + (h2.gia ? stTien(h2.gia) : 'miễn phí') + '* · ' + (h2.ngay ? h2.ngay + ' ngày' : 'suốt đời') + '. Landing cập nhật ngay lần mở sau.');
+  }
+  if (cmd === 'uudaihv'){
+    if (!arg) return hoi('🎁 Gửi câu ưu đãi cho học viên, hiện trong bảng Nâng cấp Pro. Ví dụ `Tặng Pro suốt khoá + 1 buổi sửa kênh 1:1`. Gửi `xoa` để về câu mặc định.');
+    var h3 = stHV(); h3.uu_dai = /^(xoa|xóa|0)$/i.test(arg.trim()) ? '' : String(arg).trim().slice(0, 300);
+    P.setProperty('ST_HV', JSON.stringify(h3));
+    return tgSend(chatId, h3.uu_dai ? '✅ Ưu đãi học viên: _' + h3.uu_dai + '_' : '✅ Đã về câu ưu đãi mặc định.');
   }
   if (cmd === 'luotthu'){
     if (!arg) return hoi('🎁 Mỗi tài khoản mới được bao nhiêu lượt AI phân tích miễn phí? Ví dụ `10`');
