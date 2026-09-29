@@ -35,6 +35,24 @@ var ST_GOI_MD = [
 var ST_LUOT_THU_MD = 10;       // số lượt AI phân tích miễn phí cho mỗi tài khoản mới (bot: /luotthu)
 var ST_LUOT_THU = stSo('ST_LUOT_THU', ST_LUOT_THU_MD);
 
+/* Gói cho học viên khoá: mặc định Pro miễn phí 30 ngày kể từ lúc tài khoản học viên được tạo.
+   Bot chỉnh: /ngayhv 30 (0 = suốt đời) · /giahv 0 (0 = miễn phí; >0 chỉ là con số hiện trên landing cho gói riêng của học viên). */
+var ST_HV_MD = {ngay:30, gia:0};
+function stHV(){
+  try{ var v = cfgProp('ST_HV'); if (v){ var o = JSON.parse(v); return {ngay: Number(o.ngay) || 0, gia: Number(o.gia) || 0}; } }catch(e){}
+  return ST_HV_MD;
+}
+function stNgayTu(s){
+  s = String(s || ''); var m = s.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+  if (m) return new Date(+m[3], +m[2] - 1, +m[1]);
+  var d = new Date(s); return isNaN(d) ? null : d;
+}
+/* Học viên còn trong hạn Pro không? Mentor và tài khoản không rõ ngày tạo thì luôn còn. */
+function stHVConHan(hv){
+  var n = stHV().ngay; if (!n || !hv || hv.vaitro !== 'hv') return true;
+  var t = stNgayTu(hv.tao); return !t || (Date.now() - t.getTime()) < n * 864e5;
+}
+
 var ST_SHEET       = 'NguoiDung';
 var ST_HEADERS     = ['ma','email','sdt','ten','salt','hash','goi','pro_han','luot_dung',
                       'token','token_han','tao','dangnhap_cuoi','trangthai','ghichu',
@@ -175,7 +193,7 @@ function stZalo(){
   try{ var c = getConfig(); return (c && c.zalo && c.zalo.groupUrl) || ''; }catch(e){ return ''; }
 }
 function stCauHinh(){
-  return jsonOut({ok:true, goi: stGoi(), bank: stNganHang(), zalo: stZalo(),
+  return jsonOut({ok:true, goi: stGoi(), bank: stNganHang(), zalo: stZalo(), hv: stHV(),
     luot_thu: ST_LUOT_THU, luot: {hook: ST_LUOT_THU, script: ST_LUOT_KB, soi: ST_LUOT_SOI, cham: ST_LUOT_CHAM}});
 }
 
@@ -705,7 +723,7 @@ function stNapHoSoMau(){
 
 /* ═══════ LỆNH BOT TELEGRAM (chỉ chat quản trị) ═══════
    Code.gs gọi:  if (quanTri && studioCoLenh(cmd)) return studioLenh(cmd, arg, chatId);  */
-var LENH_STUDIO = ['studio','stk','giapro','ngaypro','luotthu','luotkb','luotsoi','luotcham','luotai','mopro','tatpro','dsck','timnd','ckkhoa','tienkhoa','hoso','lichsu','dshv','naphoso'];
+var LENH_STUDIO = ['studio','stk','giapro','ngaypro','ngayhv','giahv','luotthu','luotkb','luotsoi','luotcham','luotai','mopro','tatpro','dsck','timnd','ckkhoa','tienkhoa','hoso','lichsu','dshv','naphoso'];
 function studioCoLenh(cmd){ return LENH_STUDIO.indexOf(cmd) > -1; }
 
 var ST_MA_NH = {vietcombank:'VCB', vcb:'VCB', mb:'MB', mbbank:'MB', quandoi:'MB', techcombank:'TCB', tcb:'TCB',
@@ -742,6 +760,7 @@ function studioLenh(cmd, arg, chatId){
       '🏦 Nhận tiền: ' + (bank.stk ? '*' + bank.ngan_hang + '* · `' + bank.stk + '` · ' + bank.chu_tk : '⚠️ _chưa cài, người dùng chưa mua được_'),
       '💰 Gói: *' + (g.ten || '?') + '* · *' + stTien(g.gia || 0) + '*',
       '🎁 Tài khoản mới: *' + ST_LUOT_THU + '* lượt AI phân tích miễn phí',
+      '🎓 Học viên khoá: Pro *' + (stHV().ngay ? stHV().ngay + ' ngày' : 'suốt đời') + '* · ' + (stHV().gia ? stTien(stHV().gia) : 'miễn phí'),
       '🤖 Pro và học viên: *' + (parseInt((typeof hookCfg === 'function' ? hookCfg('HOOK_AI_DAILY') : cfgProp('HOOK_AI_DAILY')) || '20', 10)) + '* lượt AI mỗi ngày',
       '👥 ' + ds.length + ' người dùng · ' + soPro + ' đang Pro · ' + cho + ' giao dịch chờ',
       '🎓 Chuyển khoản trong form học viên: ' + (khoaBat() ? '*BẬT* · ' + khoaNhan(khoaTien()).toLowerCase() + ' *' + stTien(khoaTien()) + '*' : '_tắt_'),'',
@@ -749,6 +768,8 @@ function studioLenh(cmd, arg, chatId){
       '🏦 /stk `MB | 0123456789 | NGUYEN VAN A` — tài khoản nhận tiền',
       '💰 /giapro `50000` — giá gói Pro',
       '📆 /ngaypro `30` — gói dùng bao nhiêu ngày',
+      '🎓 /ngayhv `30` — học viên khoá được Pro mấy ngày (`0` = suốt đời)',
+      '🎓 /giahv `0` — giá gói học viên hiện trên landing (`0` = miễn phí)',
       '🎁 /luotthu `10` — lượt AI phân tích hook cho tài khoản mới',
       '📝 /luotkb `3` — lượt chấm kịch bản cho tài khoản mới',
       '🔎 /luotsoi `1` — lượt soi video cho tài khoản mới',
@@ -791,6 +812,19 @@ function studioLenh(cmd, arg, chatId){
     var ngay = parseInt(arg, 10); if (!ngay || ngay < 1) return hoi('Gửi một con số, ví dụ `30`.');
     var g2 = stDatGoi(function(g){ g.ngay = ngay });
     return tgSend(chatId, '✅ Gói giờ là *' + g2.ten + '* (' + g2.ngay + ' ngày) · ' + stTien(g2.gia));
+  }
+  if (cmd === 'ngayhv'){
+    if (!arg) return hoi('🎓 Học viên khoá được Pro bao nhiêu ngày kể từ lúc có tài khoản? Ví dụ `30` · gửi `0` = suốt đời');
+    var nh = parseInt(arg, 10); if (isNaN(nh) || nh < 0) return hoi('Gửi một con số, ví dụ `30`.');
+    var h1 = stHV(); h1.ngay = nh; P.setProperty('ST_HV', JSON.stringify(h1));
+    return tgSend(chatId, '✅ Học viên khoá: Pro *' + (nh ? nh + ' ngày' : 'suốt đời') + '* · ' + (h1.gia ? 'gói học viên *' + stTien(h1.gia) + '*' : '*miễn phí*') + '. Landing và tool cập nhật ngay lần mở sau.');
+  }
+  if (cmd === 'giahv'){
+    if (!arg) return hoi('🎓 Gói cho học viên khoá bao nhiêu tiền? Gửi `0` = miễn phí, hoặc ví dụ `20000`');
+    var th = /^0+$/.test(arg.trim()) ? 0 : docTien(arg);
+    if (th === 0 ? false : (!th || th < 1000)) return hoi('Chưa hiểu số tiền. Gửi `0` hoặc ví dụ `20000`.');
+    var h2 = stHV(); h2.gia = th; P.setProperty('ST_HV', JSON.stringify(h2));
+    return tgSend(chatId, '✅ Gói học viên khoá: *' + (h2.gia ? stTien(h2.gia) : 'miễn phí') + '* · ' + (h2.ngay ? h2.ngay + ' ngày' : 'suốt đời') + '. Landing cập nhật ngay lần mở sau.');
   }
   if (cmd === 'luotthu'){
     if (!arg) return hoi('🎁 Mỗi tài khoản mới được bao nhiêu lượt AI phân tích miễn phí? Ví dụ `10`');

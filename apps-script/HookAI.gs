@@ -54,7 +54,11 @@ var HOOK_TEMPLATES = ['highlight','editorial','glass','sticker','bubbles','timel
    Không có tài khoản thì không dùng được AI: tool mời họ đăng ký, vừa để giữ lượt vừa để cá nhân hoá. */
 function hookNguoi(b){
   var hv = aiDay(b.token);
-  if (hv) return {me:hv, loai:'hv'};
+  if (hv){
+    // học viên khoá được Pro trong số ngày bot đặt (/ngayhv); hết hạn thì báo để nâng cấp, không âm thầm trừ lượt
+    if (typeof stHVConHan === 'function' && !stHVConHan(hv)) return {me:hv, loai:'hv_het'};
+    return {me:hv, loai:'hv'};
+  }
   if (typeof ndTuToken === 'function'){
     var nd = ndTuToken(b.token);
     if (nd) return {me:{ma:'U'+nd.ma, ten:nd.ten, ten_goi:nd.ten, vaitro:'nd'}, loai: ndLaPro(nd) ? 'pro' : 'free', nd:nd};
@@ -114,6 +118,7 @@ function hookHoSoText(hs){
 function hookAi(b){
   var ai = hookNguoi(b);
   if (!ai) return jsonOut({ok:false, error: b.token ? 'het_phien' : 'can_dangky'});
+  if (ai.loai === 'hv_het') return jsonOut({ok:false, error:'het_han_hv', hv: (typeof stHV === 'function' ? stHV() : null)});
   var me = ai.me;
   ai.tool = (typeof stToolCua === 'function') ? stToolCua(b.mode) : 'hook';
   ai.dev  = String(b.dev || b.thu || '');
