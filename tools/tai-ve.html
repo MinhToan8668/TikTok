@@ -143,13 +143,13 @@
     <a class="ft" href="kich-ban.html"><span class="fi" aria-hidden="true">📝</span>Kịch bản viral</a>
     <a class="ft" href="hook-text.html"><span class="fi" aria-hidden="true">⚡</span>Hook viral</a>
     <a class="ft" href="cham-video.html"><span class="fi" aria-hidden="true">🎯</span>Chấm video của bạn</a>
-    <a class="ft on" href="#" aria-current="page"><span class="fi" aria-hidden="true">⬇️</span>Tải video</a>
+    <a class="ft on" href="#" aria-current="page" data-tool="taive"><span class="fi" aria-hidden="true">⬇️</span>Tải video</a>
   </nav>
 
   <main class="main">
     <section class="card hero">
       <h2>Dán link, tải về video · ảnh · âm thanh</h2>
-      <p class="hint">Dán link bài đăng hoặc cả đoạn chữ "Chia sẻ" copy từ app, tool tự tìm link. Miễn phí, không tốn lượt AI.</p>
+      <p class="hint">Dán link bài đăng hoặc cả đoạn chữ "Chia sẻ" copy từ app, tool tự tìm link. Học viên và Pro tải không giới hạn.</p>
       <div class="inrow">
         <input id="link" type="url" inputmode="url" autocomplete="off" placeholder="https://vt.tiktok.com/… · x.com/… · youtube.com/… · instagram.com/…" aria-label="Link bài đăng">
         <button class="btn" id="btnDan" type="button">📋 Dán</button>
@@ -177,7 +177,7 @@
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="tai-khoan.js?v=202609291200"></script>
+<script src="tai-khoan.js?v=202609291300"></script>
 <script>
 const $ = s => document.querySelector(s);
 const el = (t, c, txt) => { const e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; };
@@ -254,6 +254,7 @@ async function lay(tuLink) {
   const st = $('#st'), raw = tuLink || $('#link').value, link = timLink(raw);
   if (!link) { st.className = 'status err'; st.textContent = 'Chưa thấy link. Dán link bài đăng (bắt đầu bằng https://).'; $('#link').focus(); return; }
   $('#link').value = link;
+  if (!TK.canTai()) { st.className = 'status err'; st.textContent = 'Bạn đã dùng hết lượt tải miễn phí.'; return; }   // hết lượt: bảng Nâng cấp Pro / Đăng ký học viên
   const nen = nenCua(link);
   dangLay = true; $('#btnLay').disabled = true;
   st.className = 'status'; st.innerHTML = `<span class="spinner"></span>Đang lấy file từ ${TEN_NEN[nen] || 'trang'}…`;
@@ -298,6 +299,7 @@ async function lay(tuLink) {
   const n = kq.items.length;
   st.className = 'status ok'; st.textContent = `Tìm thấy ${n} file. Bấm Tải về ở file bạn cần.`;
   luuLichSu(link, kq);
+  TK.dungTai().then(veQuota);   // trừ 1 lượt sau khi lấy được file (học viên, Pro không trừ)
 }
 
 /* ── Vẽ kết quả ── */
@@ -422,8 +424,13 @@ $('#link').addEventListener('keydown', e => { if (e.key === 'Enter') { e.prevent
 $('#link').addEventListener('paste', () => setTimeout(() => { if (timLink($('#link').value)) lay(); }, 30));   // dán xong là tự lấy
 $('#btnDan').addEventListener('click', async () => { try { const t = await navigator.clipboard.readText(); if (!timLink(t)) { toast('Bộ nhớ tạm chưa có link'); return; } $('#link').value = timLink(t); lay(); } catch { toast('Trình duyệt chặn đọc bộ nhớ tạm, bấm giữ vào ô rồi Dán'); $('#link').focus(); } });
 $('#acctBtn').addEventListener('click', () => TK.mo());
-TK.khoiDong({ api: API, tool: 'taive', onDoi: me => { $('#quota').textContent = 'Miễn phí · không tốn lượt AI'; $('#acctBtn').textContent = me ? (me.loai === 'hv' ? 'Học viên' : me.pro ? '✦ Pro' : 'Free') : 'Đăng ký'; } });
-$('#quota').textContent = 'Miễn phí · không tốn lượt AI';
+function veQuota() {
+  const con = TK.luotTai(), me = TK.me;
+  $('#quota').textContent = con === Infinity ? 'Tải miễn phí không giới hạn' : con > 0 ? `Miễn phí · còn ${con} lần tải` : 'Hết lượt tải miễn phí';
+  $('#acctBtn').textContent = me ? (me.loai === 'hv' ? 'Học viên' : me.pro ? '✦ Pro' : 'Free') : 'Đăng ký';
+}
+TK.khoiDong({ api: API, tool: 'taive', onDoi: veQuota });
+veQuota();
 veLichSu();
 const qLink = new URLSearchParams(location.search).get('link');
 if (qLink) { $('#link').value = qLink; history.replaceState(null, '', location.pathname); lay(); }

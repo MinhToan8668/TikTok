@@ -305,6 +305,8 @@ Dán link là tải được video, ảnh, âm thanh. Không cần đăng nhập
 | Instagram, Facebook, Threads, Reddit | Tùy bài công khai; đầy đủ khi có cobalt | cobalt, không có thì đọc thẻ og: |
 | Link thẳng tới file .mp4/.jpg/.mp3 | File đó | Trình duyệt |
 
+**Lượt dùng:** học viên và Pro tải không giới hạn. Khách (chưa đăng nhập hoặc tài khoản Free) được `ST_LUOT_TAI` lần, mặc định 10, đổi bằng bot `/luottai 20`. Tài khoản Free do máy chủ đếm (cột `luot_tai`, tự thêm vào sheet NguoiDung). Người chưa đăng nhập thì đếm trong trình duyệt. Còn lượt thì tab Tải video có nhãn FREE ở góc, hết lượt thì nhãn mất. Bấm tiếp sẽ hiện bảng "Nâng cấp Pro / Đăng ký học viên". Bảng này cũng hiện ở Soi, Kịch bản, Chấm video khi hết lượt AI.
+
 **Tải file:** trình duyệt tải thẳng trước. Nếu bị chặn thì máy chủ tải hộ (tối đa 35MB). Vẫn không được thì nút đổi thành "Mở để lưu".
 
 **Muốn tải đủ YouTube / Instagram / Facebook:** tự chạy một máy [cobalt](https://github.com/imputnet/cobalt) (Docker, VPS khoảng 5$/tháng), bật API key. Sau đó thêm vào Script properties: `COBALT_URL` = `https://địa-chỉ-cobalt-của-bạn` và `COBALT_KEY` = key đã tạo. Không cần sửa code. Cobalt công khai (api.cobalt.tools) đã khóa, không dùng được.

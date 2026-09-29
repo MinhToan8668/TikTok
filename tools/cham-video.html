@@ -216,7 +216,7 @@
     <a class="ft" href="kich-ban.html"><span class="fi" aria-hidden="true">📝</span>Kịch bản viral</a>
     <a class="ft" href="hook-text.html"><span class="fi" aria-hidden="true">⚡</span>Hook viral</a>
     <a class="ft on" href="#" aria-current="page"><span class="fi" aria-hidden="true">🎯</span>Chấm video của bạn</a>
-    <a class="ft" href="tai-ve.html"><span class="fi" aria-hidden="true">⬇️</span>Tải video</a>
+    <a class="ft" href="tai-ve.html" data-tool="taive"><span class="fi" aria-hidden="true">⬇️</span>Tải video</a>
   </nav>
 
   <div class="grid" id="grid">
@@ -320,7 +320,7 @@
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="tai-khoan.js?v=202609290408"></script>
+<script src="tai-khoan.js?v=202609291300"></script>
 <script>
 const $ = s => document.querySelector(s);
 const el = (t, c, txt) => { const e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; };
@@ -444,7 +444,7 @@ function veQuota() {
   q.textContent = `${me.ten ? me.ten + ' · ' : ''}còn ${con == null ? '?' : con}/${han == null ? '?' : han} lượt chấm video`;
 }
 async function loadQuota() { if (DEMO) { $('#quota').textContent = 'Bản demo'; return; } await TK.nap(); }
-function openUpsell(title, text) { TK.mo(TK.me ? 'home' : 'signup', [title, text].filter(Boolean).join(' · ')); }
+function openUpsell(title) { TK.moHet(null, title); }   // bảng hết lượt: Nâng cấp Pro hoặc Đăng ký học viên
 
 /* ---------- hồ sơ kênh → form ---------- */
 let hsDien = {};

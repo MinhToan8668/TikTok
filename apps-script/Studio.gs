@@ -56,7 +56,7 @@ function stHVConHan(hv){
 var ST_SHEET       = 'NguoiDung';
 var ST_HEADERS     = ['ma','email','sdt','ten','salt','hash','goi','pro_han','luot_dung',
                       'token','token_han','tao','dangnhap_cuoi','trangthai','ghichu',
-                      'ho_so','luot_kb','luot_soi','thiet_bi','canh_bao','luot_cham'];
+                      'ho_so','luot_kb','luot_soi','thiet_bi','canh_bao','luot_cham','luot_tai'];
 
 /* Hạn mức lượt AI cho tài khoản MIỄN PHÍ, tính theo từng tool (bot: /luotthu, /luotkb, /luotsoi).
    Pro và học viên không dùng mấy con số này, họ tính theo hạn mức ngày HOOK_AI_DAILY. */
@@ -66,12 +66,15 @@ var ST_LUOT_CHAM_MD = 1;       // chấm video của chính học viên (AI ph�
 var ST_LUOT_KB   = stSo('ST_LUOT_KB',   ST_LUOT_KB_MD);
 var ST_LUOT_SOI  = stSo('ST_LUOT_SOI',  ST_LUOT_SOI_MD);
 var ST_LUOT_CHAM = stSo('ST_LUOT_CHAM', ST_LUOT_CHAM_MD);
+var ST_LUOT_TAI_MD = 10;       // tool Tải video (không tốn AI): khách được bấy nhiêu lần, học viên và Pro không giới hạn. Bot: /luottai
+var ST_LUOT_TAI  = stSo('ST_LUOT_TAI', ST_LUOT_TAI_MD);
 /* Mỗi tool một cột đếm riêng. 'hook' giữ nguyên cột cũ luot_dung để không mất số liệu. */
 var ST_TOOL = {
   hook:   {cot:'luot_dung', ten:'AI phân tích hook', han:function(){ return ST_LUOT_THU  }},
   script: {cot:'luot_kb',   ten:'chấm kịch bản',     han:function(){ return ST_LUOT_KB   }},
   soi:    {cot:'luot_soi',  ten:'soi video viral',   han:function(){ return ST_LUOT_SOI  }},
-  cham:   {cot:'luot_cham', ten:'chấm video của bạn', han:function(){ return ST_LUOT_CHAM }}
+  cham:   {cot:'luot_cham', ten:'chấm video của bạn', han:function(){ return ST_LUOT_CHAM }},
+  taive:  {cot:'luot_tai',  ten:'tải video',          han:function(){ return ST_LUOT_TAI  }}
 };
 function stToolCua(mode){
   if (mode === 'script' || mode === 'viet') return 'script';
@@ -141,8 +144,8 @@ function ndCoHs(hs){ var c = 0; ST_HS_TRUONG.forEach(function(k){ if (hs[k]) c++
 function ndHoSo(nd){
   return {loai:'nd', ma:nd.ma, ten:nd.ten, email:nd.email, sdt:nd.sdt, pro:ndLaPro(nd),
           pro_han:nd.pro_han, luot_con:ndLuotCon(nd), luot_thu:ST_LUOT_THU,
-          luot: {hook:ndLuotCon(nd,'hook'), script:ndLuotCon(nd,'script'), soi:ndLuotCon(nd,'soi'), cham:ndLuotCon(nd,'cham')},
-          han:  {hook:ST_LUOT_THU, script:ST_LUOT_KB, soi:ST_LUOT_SOI, cham:ST_LUOT_CHAM},
+          luot: {hook:ndLuotCon(nd,'hook'), script:ndLuotCon(nd,'script'), soi:ndLuotCon(nd,'soi'), cham:ndLuotCon(nd,'cham'), taive:ndLuotCon(nd,'taive')},
+          han:  {hook:ST_LUOT_THU, script:ST_LUOT_KB, soi:ST_LUOT_SOI, cham:ST_LUOT_CHAM, taive:ST_LUOT_TAI},
           ho_so: hsHienDung(nd.email, nd.sdt, nd), ho_so_nguon: hsNguon(nd.email, nd.sdt, nd)};
 }
 
@@ -194,7 +197,7 @@ function stZalo(){
 }
 function stCauHinh(){
   return jsonOut({ok:true, goi: stGoi(), bank: stNganHang(), zalo: stZalo(), hv: stHV(),
-    luot_thu: ST_LUOT_THU, luot: {hook: ST_LUOT_THU, script: ST_LUOT_KB, soi: ST_LUOT_SOI, cham: ST_LUOT_CHAM}});
+    luot_thu: ST_LUOT_THU, luot: {hook: ST_LUOT_THU, script: ST_LUOT_KB, soi: ST_LUOT_SOI, cham: ST_LUOT_CHAM, taive: ST_LUOT_TAI}});
 }
 
 /* ── đăng ký: không cần duyệt, có ngay lượt AI miễn phí ── */
@@ -426,7 +429,7 @@ function stDanhSach(b){
         so_truong: ndCoHs(hs), luot:null, ho_so:hs});
     });
   }catch(e){ ghiLoi('stDanhSach/regs', e); }
-  return jsonOut({ok:true, ds:ds, han:{hook:ST_LUOT_THU, script:ST_LUOT_KB, soi:ST_LUOT_SOI, cham:ST_LUOT_CHAM}});
+  return jsonOut({ok:true, ds:ds, han:{hook:ST_LUOT_THU, script:ST_LUOT_KB, soi:ST_LUOT_SOI, cham:ST_LUOT_CHAM, taive:ST_LUOT_TAI}});
 }
 function stLichSu(b){
   var hv = aiDay(b.token);
@@ -440,7 +443,7 @@ function stDungLuot(b){
   var nd = ndTuToken(b.token);
   if (!nd){ return aiDay(b.token) ? jsonOut({ok:true, pro:true}) : jsonOut({ok:false, error:'het_phien'}); }
   if (ndLaPro(nd)) return jsonOut({ok:true, pro:true});
-  var con = stTruLuotThu(nd.ma);
+  var con = stTruLuot(nd.ma, ST_TOOL[b.tool] ? String(b.tool) : 'hook');   // tool Tải video gửi tool:'taive'
   if (con < 0) return jsonOut({ok:false, error:'het_luot_thu', luot_con:0});
   return jsonOut({ok:true, luot_con:con});
 }
@@ -723,7 +726,7 @@ function stNapHoSoMau(){
 
 /* ═══════ LỆNH BOT TELEGRAM (chỉ chat quản trị) ═══════
    Code.gs gọi:  if (quanTri && studioCoLenh(cmd)) return studioLenh(cmd, arg, chatId);  */
-var LENH_STUDIO = ['studio','stk','giapro','ngaypro','ngayhv','giahv','luotthu','luotkb','luotsoi','luotcham','luotai','mopro','tatpro','dsck','timnd','ckkhoa','tienkhoa','hoso','lichsu','dshv','naphoso'];
+var LENH_STUDIO = ['studio','stk','giapro','ngaypro','ngayhv','giahv','luotthu','luotkb','luotsoi','luotcham','luottai','luotai','mopro','tatpro','dsck','timnd','ckkhoa','tienkhoa','hoso','lichsu','dshv','naphoso'];
 function studioCoLenh(cmd){ return LENH_STUDIO.indexOf(cmd) > -1; }
 
 var ST_MA_NH = {vietcombank:'VCB', vcb:'VCB', mb:'MB', mbbank:'MB', quandoi:'MB', techcombank:'TCB', tcb:'TCB',
@@ -774,6 +777,7 @@ function studioLenh(cmd, arg, chatId){
       '📝 /luotkb `3` — lượt chấm kịch bản cho tài khoản mới',
       '🔎 /luotsoi `1` — lượt soi video cho tài khoản mới',
       '🎯 /luotcham `1` — lượt chấm video của bạn cho tài khoản mới',
+      '⬇️ /luottai `10` — lượt tải video miễn phí cho khách (học viên, Pro không giới hạn)',
       '🤖 /luotai `20` — lượt AI mỗi ngày của Pro và học viên',
       '🧾 /dsck — giao dịch đang chờ (Pro và học phí), bấm nút để xác nhận',
       '🎓 /ckkhoa `bat` · `tat` — hiện màn chuyển khoản sau khi học viên điền form',
@@ -849,6 +853,12 @@ function studioLenh(cmd, arg, chatId){
     var ncham = parseInt(arg, 10); if (isNaN(ncham) || ncham < 0 || ncham > 1000) return hoi('Gửi một con số từ 0 đến 1000.');
     P.setProperty('ST_LUOT_CHAM', String(ncham));
     return tgSend(chatId, '✅ Tài khoản Free giờ có *' + ncham + '* lượt chấm video của bạn.');
+  }
+  if (cmd === 'luottai'){
+    if (!arg) return hoi('⬇️ Khách được tải video miễn phí bao nhiêu lần? Ví dụ `10` (học viên và Pro luôn không giới hạn)');
+    var ntai = parseInt(arg, 10); if (isNaN(ntai) || ntai < 0 || ntai > 100000) return hoi('Gửi một con số từ 0 đến 100000.');
+    P.setProperty('ST_LUOT_TAI', String(ntai));
+    return tgSend(chatId, '✅ Khách giờ được tải video miễn phí *' + ntai + '* lần. Học viên và Pro vẫn không giới hạn.');
   }
   if (cmd === 'dshv'){
     var dsAll = moiND();
