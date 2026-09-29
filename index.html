@@ -145,6 +145,7 @@ nav .nav-link{color:#33420a}
 nav .nav-link:hover,nav .nav-link.hot{color:#1c2600}
 nav .nav-link.hot i{background:#ff4d1f;color:#fff;box-shadow:0 2px 0 rgba(28,38,0,.35);
   transform:rotate(-5deg);display:inline-block;animation:freeNhay 2.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.8)}}
 @keyframes freeNhay{0%,100%{transform:rotate(-5deg) scale(1)}50%{transform:rotate(-5deg) scale(1.12)}}
 @media(prefers-reduced-motion:reduce){nav .nav-link.hot i{animation:none}}
 nav .nav-slots{color:#33420a}
@@ -176,11 +177,32 @@ nav .burger{border-color:rgba(28,38,0,.35)}
 .burger.on span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
 .burger.on span:nth-child(2){opacity:0}
 .burger.on span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
-#drawer{display:none;border-top:1.5px solid var(--line);background:var(--paper);padding:8px var(--pad) 20px}
+/* menu điện thoại: cùng nền lime, cùng nhãn FREE cam đỏ, cùng hai nút như thanh menu máy tính */
+#drawer{display:none;border-top:1.5px solid rgba(28,38,0,.18);background:var(--lime);
+  padding:10px var(--pad) calc(16px + env(safe-area-inset-bottom));
+  max-height:calc(100dvh - 72px);overflow-y:auto;overscroll-behavior:contain}
 #drawer.on{display:block}
-#drawer a{display:block;padding:14px 0;border-bottom:1px solid var(--line);
-  font-size:15px;color:var(--ink-soft);text-decoration:none;font-weight:500}
-#drawer .btn{width:100%;margin-top:18px}
+#drawer a{text-decoration:none;color:#1c2600}
+.dr-hot{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:4px 0 8px}
+.dr-hot a{display:flex;align-items:center;justify-content:space-between;gap:6px;white-space:nowrap;
+  background:var(--paper-lt);border:1.5px solid #1c2600;border-radius:14px;padding:12px 11px;
+  font-family:var(--disp);font-weight:800;font-size:14.5px;box-shadow:0 4px 0 rgba(28,38,0,.28)}
+.dr-hot a:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(28,38,0,.28)}
+.dr-hot i{font-style:normal;font-size:9.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+  background:#ff4d1f;color:#fff;border-radius:999px;padding:2px 7px;box-shadow:0 2px 0 rgba(28,38,0,.35);
+  transform:rotate(-5deg);display:inline-block;animation:freeNhay 2.4s ease-in-out infinite;flex-shrink:0}
+@media(prefers-reduced-motion:reduce){.dr-hot i{animation:none}}
+.dr-list{display:grid;grid-template-columns:1fr 1fr;column-gap:14px}
+.dr-list a{display:block;padding:12px 2px;border-bottom:1px solid rgba(28,38,0,.16);
+  font-size:14.5px;font-weight:600;color:#2a3608}
+.dr-list a:active{color:#1c2600}
+.dr-cta{margin-top:14px}
+.dr-slots{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12.5px;color:#33420a;margin-bottom:10px}
+.dr-slots b{color:#1c2600;font-weight:800}
+.dr-slots .dot{width:7px;height:7px;border-radius:50%;background:#1c2600;animation:pulse 1.8s infinite}
+.dr-nut{display:grid;grid-template-columns:1fr 1.25fr;gap:8px}
+.dr-nut .btn{width:100%}
+.dr-hv{background:var(--paper-lt);color:#1c2600;box-shadow:0 5px 0 rgba(28,38,0,.28)}
 
 /* ═══════════ HERO ═══════════ */
 .hero{position:relative;padding:clamp(40px,6vw,80px) 0 clamp(48px,6vw,80px);overflow:hidden;background:transparent;color:#1c2600}
@@ -680,15 +702,22 @@ footer a:hover{color:var(--lime-deep)}
 
 /* ═══════════ STICKY MOBILE CTA ═══════════ */
 #sticky{display:none;position:fixed;left:0;right:0;bottom:0;z-index:105;
-  background:rgba(249,232,221,.97);backdrop-filter:blur(16px);border-top:1.5px solid var(--line-dk);
-  padding:11px 14px calc(11px + env(safe-area-inset-bottom));
+  background:rgba(153,223,0,.97);backdrop-filter:blur(16px);border-top:1.5px solid rgba(28,38,0,.22);
+  box-shadow:0 -10px 30px -18px rgba(28,38,0,.45);
+  padding:10px 14px calc(10px + env(safe-area-inset-bottom));
   transform:translateY(110%);transition:transform .35s var(--ease)}
 #sticky.on{transform:none}
 .sticky-in{display:flex;align-items:center;gap:12px;max-width:520px;margin:0 auto}
-.sticky-txt{flex:1;min-width:0}
-.sticky-txt b{display:block;font-family:var(--disp);font-size:14px;color:var(--ink);font-weight:800}
-.sticky-txt span{font-size:11.5px;color:var(--quiet);display:block;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sticky-txt{flex:1;min-width:0;line-height:1.15}
+.sticky-txt small{display:block;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#33420a}
+.sticky-txt b{display:flex;align-items:baseline;gap:7px;font-family:var(--disp);font-weight:800;color:#1c2600;margin:1px 0 2px}
+.sticky-txt b span{font-size:22px;letter-spacing:-.02em}
+.sticky-txt b s{font-size:13px;font-weight:600;color:#4a5a14;text-decoration-thickness:1.5px}
+.sticky-txt b s:empty{display:none}
+.sticky-slot{display:flex;align-items:center;gap:5px;font-size:11.5px;color:#2a3608;font-weight:600;min-width:0}
+.sticky-slot i{width:6px;height:6px;border-radius:50%;background:#ff4d1f;flex-shrink:0;animation:pulse 1.8s infinite}
+.sticky-slot em{font-style:normal;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sticky-nut{flex-shrink:0;padding-left:18px;padding-right:18px;box-shadow:0 5px 0 rgba(28,38,0,.35)}
 
 /* ═══════════ MODAL + FORM ═══════════ */
 .ov{display:none;position:fixed;inset:0;z-index:200;background:rgba(38,33,15,.5);
@@ -1347,20 +1376,29 @@ body.hv-mode{padding-bottom:0}
     </div>
   </div>
   <div id="drawer">
-    <a href="#toolviral">Viral Studio free</a>
-    <a href="#soikenh">Soi kênh miễn phí</a>
-    <a href="#cogi">Nhận được gì</a>
-    <a href="#editkem">Edit kèm 1:1</a>
-    <a href="#ketqua">Học viên cũ</a>
-    <a href="#nguyentac">Lớp dạy kiểu gì</a>
-    <a href="#tuan">Một tuần trong lớp</a>
-    <a href="#lotrinh">Lộ trình 30 ngày</a>
-    <a href="#mentors">Người dạy</a>
-    <a href="#congdong">Group cộng đồng</a>
-    <a href="#hocphi">Học phí</a>
-    <a href="#faq">Hỏi đáp</a>
-    <button class="btn btn-lime btn-md" data-hv-mo style="margin-top:18px">Khu học viên →</button>
-    <button class="btn btn-ink btn-md" data-open>Đăng ký học →</button>
+    <div class="dr-hot">
+      <a href="#toolviral"><span>Viral Studio</span><i>free</i></a>
+      <a href="#soikenh"><span>Soi kênh</span><i>free</i></a>
+    </div>
+    <div class="dr-list">
+      <a href="#cogi">Nhận được gì</a>
+      <a href="#editkem">Edit kèm 1:1</a>
+      <a href="#ketqua">Học viên cũ</a>
+      <a href="#nguyentac">Lớp dạy kiểu gì</a>
+      <a href="#tuan">Một tuần trong lớp</a>
+      <a href="#lotrinh">Lộ trình 30 ngày</a>
+      <a href="#mentors">Người dạy</a>
+      <a href="#congdong">Group cộng đồng</a>
+      <a href="#hocphi">Học phí</a>
+      <a href="#faq">Hỏi đáp</a>
+    </div>
+    <div class="dr-cta">
+      <div class="dr-slots"><span class="dot"></span>còn <b data-bind="computed.remaining">—</b> chỗ · học phí sớm <b data-bind="computed.price.earlyBirdShort">—</b></div>
+      <div class="dr-nut">
+        <button class="btn btn-md dr-hv" data-hv-mo>Khu học viên</button>
+        <button class="btn btn-ink btn-md" data-open>Đăng ký học →</button>
+      </div>
+    </div>
   </div>
 </nav>
 
@@ -1993,10 +2031,11 @@ body.hv-mode{padding-bottom:0}
 <div id="sticky">
   <div class="sticky-in">
     <div class="sticky-txt">
-      <b data-bind="computed.price.earlyBirdShort">—</b>
-      <span data-tpl="{{computed.cohortLabel}} · còn {{computed.remaining}} chỗ đăng ký sớm"></span>
+      <small>Học phí đăng ký sớm</small>
+      <b><s data-bind="computed.price.regularShort"></s><span data-bind="computed.price.earlyBirdShort">—</span></b>
+      <span class="sticky-slot"><i></i><em data-tpl="{{computed.cohortLabel}} · còn {{computed.remaining}} chỗ"></em></span>
     </div>
-    <button class="btn btn-ink btn-md" data-open data-cta>Đăng ký học →</button>
+    <button class="btn btn-ink btn-md sticky-nut" data-open data-cta>Đăng ký học →</button>
   </div>
 </div>
 
