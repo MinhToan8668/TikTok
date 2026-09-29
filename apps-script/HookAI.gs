@@ -762,30 +762,38 @@ function soiTiLe(s){
 }
 
 function hookSoi(b, ai, provider, key){
-  var me = ai.me;
+  var me = ai.me, T0 = Date.now(), hetGio = T0 + CHAM_HET_GIO_MS;   // cùng ngân sách 330 giây như Chấm video
   var loiThoai = String(b.loi_thoai || '').slice(0, 5000).trim();
   var muonVideo = !!(b.file_uri || b.video_b64 || (b.link && /^(tiktok|youtube)$/.test(String(b.nen || soiNen(String(b.link || '')))) && b.tu_video !== false));
   if (!muonVideo && kbDemChu(loiThoai) < 8) return jsonOut({ok:false, error:'thieu_text'});
   var img = String(b.image || '');
   if (img.length > 1500000) return jsonOut({ok:false, error:'anh_qua_lon'});
+  if (b.video_b64 && String(b.video_b64).length > CHAM_B64_TOI_DA) return jsonOut({ok:false, error:'video_qua_lon', chi_tiet:'base64 ' + String(b.video_b64).length});
   // Video chỉ Gemini đọc được; đang chạy Claude thì mượn key Gemini cho phần này
   var gkey = key;
   if (muonVideo && provider !== 'gemini'){ gkey = hookCfg('GEMINI_API_KEY'); if (!gkey) return jsonOut({ok:false, error:'can_gemini'}); }
+  var soGoc = (b.so_lieu && typeof b.so_lieu === 'object') ? b.so_lieu : {};
+  var so = {}; ['view','like','cmt','luu','share','giay'].forEach(function(k){ var v = Math.round(Number(soGoc[k]) || 0); if (isFinite(v) && v > 0) so[k] = v; });
+  if (so.giay > CHAM_GIAY_TOI_DA) return jsonOut({ok:false, error:'video_qua_dai', chi_tiet: so.giay + 's'});
 
   var han = hookHan(ai);
   var khongGioiHan = me.vaitro === 'mentor';
   var con = hookTru(ai, han);
   if (con < 0) return jsonOut({ok:false, error: ai.loai === 'free' ? 'het_luot_thu' : 'het_luot', han:han, tool: ai.tool});
 
+  // Từ đây lượt đã bị trừ: mọi lỗi bất ngờ đều hoàn lượt đúng một lần, không để rơi ra doPost.
+  var nhan = '[soi:' + String(b.nen || 'tiktok') + (muonVideo ? ':video' : ':chu') + '] ' + (b.tac_gia ? String(b.tac_gia).slice(0, 30) + ' · ' : '') + (loiThoai || String(b.caption || '')).slice(0, 60);
+  var daHoan = false, hoan = function(){ if (!daHoan){ daHoan = true; hookHoan(ai); } };
+  try{
   var media = null, canhBao = '', video = null;
   if (muonVideo){
     video = soiLayVideo(b, gkey);
     if (video.ok) media = [video.part];
     else if (kbDemChu(loiThoai) >= 8) canhBao = 'Không tải được video (' + (video.loi || video.error) + '), AI mổ trên lời thoại bạn dán.';
-    else { hookHoan(ai); return jsonOut({ok:false, error: video.error || 'khong_tai_duoc_video', chi_tiet: String(video.loi || '').slice(0, me.vaitro === 'mentor' ? 600 : 220)}); }
+    else { hoan(); return jsonOut({ok:false, error: video.error || 'khong_tai_duoc_video', chi_tiet: String(video.loi || '').slice(0, me.vaitro === 'mentor' ? 600 : 220)}); }
   }
-  var so = b.so_lieu && typeof b.so_lieu === 'object' ? b.so_lieu : {};
-  if (video && video.tw && video.tw.so_lieu){ var ts = video.tw.so_lieu; ['view','like','cmt','luu','share','giay'].forEach(function(k){ if (!(Number(so[k]) > 0) && Number(ts[k]) > 0) so[k] = ts[k]; }); }
+  if (video && video.tw && video.tw.so_lieu){ var ts = video.tw.so_lieu; ['view','like','cmt','luu','share','giay'].forEach(function(k){ if (!(Number(so[k]) > 0) && Number(ts[k]) > 0) so[k] = Math.round(Number(ts[k])); }); }
+  if (Date.now() > hetGio - 60000){ hoan(); hookLog(me, nhan, false, 'het gio sau khi tai video ' + Math.round((Date.now() - T0) / 1000) + 's', 0, 0, '', ai); return jsonOut({ok:false, error:'het_gio'}); }
   var soChu = kbDemChu(loiThoai);
   var giay = Number(so.giay) > 0 ? Math.round(Number(so.giay)) : (soChu ? Math.round(soChu / 2.8 * 1.06) : 0);
   var chuDe = String(b.chu_de || '').slice(0, 200), doiTuong = String(b.doi_tuong || '').slice(0, 200), sanPham = String(b.san_pham || '').slice(0, 150);
@@ -850,11 +858,10 @@ function hookSoi(b, ai, provider, key){
       dung_copy:{type:'array', items:{type:'string'}}, lam_ngay:{type:'string'}
     } };
 
-  var kq = media ? goiGemini(gkey, '', prompt, schema, 9000, media, 0.3)
-         : provider === 'claude' ? goiClaude(key, img, prompt, schema, 8000, 0.3) : goiGemini(key, img, prompt, schema, 8000, null, 0.3);
-  var nhan = '[soi:' + String(b.nen || 'tiktok') + (media ? ':video' : ':chu') + '] ' + (b.tac_gia ? String(b.tac_gia).slice(0, 30) + ' · ' : '') + (loiThoai || String(b.caption || '')).slice(0, 60);
+  var kq = media ? goiGemini(gkey, '', prompt, schema, 9000, media, 0.3, hetGio)
+         : provider === 'claude' ? goiClaude(key, img, prompt, schema, 8000, 0.3) : goiGemini(key, img, prompt, schema, 8000, null, 0.3, hetGio);
   if (!kq.ok){
-    hookHoan(ai);
+    hoan();
     hookLog(me, nhan, false, kq.loi, kq.vin || 0, kq.vout || 0, kq.model, ai);
     return jsonOut({ok:false, error: kq.error, chi_tiet: String(kq.loi || '').slice(0, me.vaitro === 'mentor' ? 400 : 160)});
   }
@@ -878,8 +885,15 @@ function hookSoi(b, ai, provider, key){
   mk.hooks = (Array.isArray(mk.hooks) ? mk.hooks : []).slice(0, 3).map(function(h){ return { formula: String(h.formula || '').slice(0, 60), text: String(h.text || '').slice(0, 160) }; });
   d.muon_khuon = mk;
   d.meta = { giay: giay, so_chu: soChu, toc_do: giay ? Math.round(soChu / giay * 100) / 100 : 0, ti_le: soiTiLe(so), so_lieu: so, nguon: media ? video.nguon : 'chu', kich_thuoc: video && video.kich_thuoc || 0, canh_bao: canhBao };
+  daHoan = true;   // đã có kết quả: log hỏng thì không hoàn lượt
   hookLog(me, nhan, true, '', kq.vin || 0, kq.vout || 0, kq.model, ai);
   return jsonOut({ok:true, data:d, con: khongGioiHan ? null : con, han:han, loai:ai.loai, tool:ai.tool, luot: hookLuotCon(ai)});
+  }catch(err){
+    hoan();
+    ghiLoi('hookSoi ' + me.ma, err);
+    hookLog(me, nhan, false, 'nem loi: ' + String(err && err.message || err).slice(0, 200), 0, 0, '', ai);
+    return jsonOut({ok:false, error:'loi_ai', chi_tiet: me.vaitro === 'mentor' ? String(err && err.message || err).slice(0, 300) : ''});
+  }
 }
 
 /* Sau khi soi xong, học viên đổi sang khung kịch bản khác: chỉ cần công thức đã rút + thông tin kênh,
