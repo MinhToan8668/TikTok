@@ -299,7 +299,7 @@
             <li><b>7 thang điểm:</b> hook 3 giây, giữ chân, nội dung, hình ảnh, âm thanh, dựng, kết — mỗi thang một nhận xét có mốc giây.</li>
             <li><b>Cái đang làm tốt</b> để bạn giữ, và <b>chỗ cần lưu ý theo từng giây</b> trên dòng thời gian.</li>
             <li><b>Sửa video này:</b> việc làm được ngay với đúng footage đang có. <b>Lần sau:</b> quay, thu âm, dựng khác đi chỗ nào.</li>
-            <li><b>3 hook mở lại</b> để A/B, và <b>3 kịch bản tiếp theo</b> nối từ chính video này, bấm một nút là sang tab Kịch bản viral viết tiếp.</li>
+            <li><b>3 hook mở lại</b> để A/B, và <b>3 kịch bản tiếp theo</b> nối từ chính video này — bấm một nút là AI <b>viết trọn bài</b> bên tab Kịch bản viral (tốn 1 lượt).</li>
           </ul>
         </div>
         <div id="kqBody" hidden></div>
@@ -309,7 +309,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="tai-khoan.js?v=202609281609"></script>
+<script src="tai-khoan.js?v=202609290232"></script>
 <script>
 const $ = s => document.querySelector(s);
 const el = (t, c, txt) => { const e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; };
@@ -579,8 +579,9 @@ function renderKq(d, so, tuLuu) {
       const w = el('div', 'idea'); const t = el('div'); t.append(el('span', 'n', String(i + 1))); t.append(el('b', 't', k.tieu_de)); w.append(t);
       w.append(el('div', 'hook', k.hook)); w.append(el('span', 'chip', 'Khung: ' + (KHUNG_TEN[k.khung] || k.khung)));
       w.append(el('p', null, k.y_tuong)); if (k.vi_sao) w.append(el('p', 'why', 'Vì sao: ' + k.vi_sao));
-      const rw = el('div', 'row'); const go = el('a', 'btn pro', 'Viết kịch bản này →'); go.href = 'kich-ban.html';
-      go.onclick = () => ls.set('kb.import', JSON.stringify({ khung: k.khung, chuDe: $('#chuDe').value.trim(), doiTuong: $('#doiTuong').value.trim(), sanPham: $('#sanPham').value.trim(), phan: [k.hook, k.y_tuong], canh: [], nguon: 'gợi ý sau khi chấm video' }));
+      const rw = el('div', 'row'); const go = el('a', 'btn pro'); go.innerHTML = 'AI viết trọn kịch bản này → <small style="font-weight:500;opacity:.8">· 1 lượt AI</small>'; go.href = 'kich-ban.html';
+      go.onclick = () => ls.set('kb.import', JSON.stringify({ khung: k.khung, chuDe: $('#chuDe').value.trim(), doiTuong: $('#doiTuong').value.trim(), sanPham: $('#sanPham').value.trim(), phan: [k.hook, k.y_tuong], canh: [], nguon: 'gợi ý sau khi chấm video', viet: true,
+        ngu_canh: { loai: 'cham', verdict: (d.tom_tat || {}).verdict || '', manh: d.manh || [], luu_y: (d.luu_y || []).map(m => m.giay + 's: ' + m.van_de + ' → ' + m.sua), lan_sau: [].concat((d.lan_sau || {}).quay || [], (d.lan_sau || {}).thu_am || [], (d.lan_sau || {}).dung_phim || []), huong_di: d.huong_di || '', y_tuong: { tieu_de: k.tieu_de, hook: k.hook, y_tuong: k.y_tuong, vi_sao: k.vi_sao } } }));
       const c = el('button', 'btn', 'Chép'); c.type = 'button'; c.onclick = () => copyText(`${k.tieu_de}\nHook: ${k.hook}\nKhung: ${KHUNG_TEN[k.khung] || k.khung}\n${k.y_tuong}`); rw.append(go, c); w.append(rw); box.append(w);
     });
   }

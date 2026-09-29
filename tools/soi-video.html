@@ -352,7 +352,7 @@
             <li><b>Cửa 2 · Xem hết:</b> đi theo khung kịch bản nào, <b>móc mới rơi ở giây bao nhiêu</b>, cao trào ở đâu, chỗ nào chùng.</li>
             <li><b>Cửa 3 · Lặp lại được:</b> rút thành công thức một dòng và khuôn có chỗ trống, tách kỹ thuật mượn được với chất liệu riêng không copy được.</li>
             <li>Đọc bình luận để biết người xem đồng cảm với gì; đọc số theo thứ tự của khoá.</li>
-            <li><b>Áp sang kênh bạn:</b> 3 hook mượn khuôn, khung kịch bản kèm gợi ý từng phần, bấm một nút là sang tab Kịch bản viral viết tiếp.</li>
+            <li><b>Áp sang kênh bạn:</b> 3 hook mượn khuôn, khung kịch bản kèm gợi ý từng phần — bấm một nút là AI <b>viết trọn bài</b> bên tab Kịch bản viral (tốn 1 lượt).</li>
           </ul>
         </div>
         <div id="kqBody" hidden></div>
@@ -374,7 +374,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="tai-khoan.js?v=202609281609"></script>
+<script src="tai-khoan.js?v=202609290232"></script>
 <script>
 const $ = s => document.querySelector(s);
 const el = (t, c, txt) => { const e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; };
@@ -695,9 +695,11 @@ function renderKq(d, so, tuLuu) {
       if (k !== mk.khung && src.ly_do) { const f = el('div'); f.append(Object.assign(el('span', 'fit ' + (src.hop_khong ? 'ok' : 'no')), { textContent: src.hop_khong ? '✓ Công thức lắp được vào khung này' : '✕ Khung này chưa hợp công thức' })); f.append(el('p', 'note', src.ly_do)); holder.append(f); }
       holder.append(el('div', 'note', 'Lời thoại mẫu từng phần (chỗ [ ] thay bằng chuyện thật của bạn) và cảnh quay'));
       (src.phan || []).forEach((p, i) => { const g = el('div', 'thoai'); g.append(el('b', null, (i + 1) + ' · ' + p.ten)); const pt = el('p'); pt.innerHTML = markHtml(p.thoai || p.goi_y || '(AI chưa viết lời cho phần này)'); g.append(pt); if (p.canh_quay) g.append(el('small', null, p.canh_quay)); holder.append(g); });
-      const rw = el('div', 'row'); const go = el('a', 'btn pro', 'Viết kịch bản theo khung này →'); go.href = 'kich-ban.html'; go.onclick = () => { ls.set('kb.import', JSON.stringify({ khung: k, chuDe: $('#chuDe').value.trim(), doiTuong: $('#doiTuong').value.trim(), sanPham: $('#sanPham').value.trim(), phan: (src.phan || []).map(p => p.thoai || p.goi_y || ''), canh: (src.phan || []).map(p => p.canh_quay || ''), nguon: state.link.tac_gia ? '@' + state.link.tac_gia : '' })); };
+      const rw = el('div', 'row'); const go = el('a', 'btn pro'); go.innerHTML = 'AI viết trọn kịch bản theo khung này → <small style="font-weight:500;opacity:.8">· 1 lượt AI</small>'; go.href = 'kich-ban.html'; go.onclick = () => { ls.set('kb.import', JSON.stringify({ khung: k, chuDe: $('#chuDe').value.trim(), doiTuong: $('#doiTuong').value.trim(), sanPham: $('#sanPham').value.trim(), phan: (src.phan || []).map(p => p.thoai || p.goi_y || ''), canh: (src.phan || []).map(p => p.canh_quay || ''), nguon: state.link.tac_gia ? '@' + state.link.tac_gia : '', viet: true,
+        ngu_canh: { loai: 'soi', tac_gia: state.link.tac_gia ? '@' + state.link.tac_gia : '', tom_tat: [(d.tom_tat || {}).nganh, (d.tom_tat || {}).dang, (d.tom_tat || {}).verdict].filter(Boolean).join(' · '), cong_thuc: (d.cua3 || {}).cong_thuc || '', khuon: (d.cua3 || {}).khuon || [], ky_thuat: (d.cua3 || {}).ky_thuat_muon_duoc || [], chat_lieu: (d.cua3 || {}).chat_lieu_rieng || [], hooks: (mk.hooks || []).map(h => h.text), loi_thoai: ((d.boc || {}).loi_thoai || []).map(m => m.text).join(' ').slice(0, 1200) || $('#loiThoai').value.slice(0, 1200) } })); };
+      const goKhung = el('a', 'btn', 'Chỉ lấy khung, tự viết →'); goKhung.href = 'kich-ban.html'; goKhung.onclick = () => { ls.set('kb.import', JSON.stringify({ khung: k, chuDe: $('#chuDe').value.trim(), doiTuong: $('#doiTuong').value.trim(), sanPham: $('#sanPham').value.trim(), phan: (src.phan || []).map(p => p.thoai || p.goi_y || ''), canh: (src.phan || []).map(p => p.canh_quay || ''), nguon: state.link.tac_gia ? '@' + state.link.tac_gia : '' })); };
       const cp = el('button', 'btn', 'Chép lời thoại'); cp.type = 'button'; cp.onclick = () => copyText((src.phan || []).map((p, i) => `[${p.ten}]\n${(p.thoai || p.goi_y || '').replace(/\*\*/g, '')}` + (p.canh_quay ? `\n🎬 ${p.canh_quay}` : '')).join('\n\n'));
-      rw.append(go, cp); holder.append(rw);
+      rw.append(go, goKhung, cp); holder.append(rw);
       const yc = src.y_chinh && src.y_chinh.length ? src.y_chinh : mk.y_chinh; if ((yc || []).length) { holder.append(el('div', 'note', 'Ý chính để quay')); holder.append(ul(yc)); }
       const ly = src.luu_y || mk.luu_y; if (ly) holder.append(el('p', 'note', '⚠︎ ' + ly));
     };

@@ -56,7 +56,7 @@ var ST_TOOL = {
   cham:   {cot:'luot_cham', ten:'chấm video của bạn', han:function(){ return ST_LUOT_CHAM }}
 };
 function stToolCua(mode){
-  if (mode === 'script') return 'script';
+  if (mode === 'script' || mode === 'viet') return 'script';
   if (mode === 'soi' || mode === 'link' || mode === 'apkhuon') return 'soi';
   if (mode === 'cham') return 'cham';
   return 'hook';
