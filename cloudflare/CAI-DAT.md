@@ -30,6 +30,23 @@ Không cài thì mọi tool vẫn chạy như cũ, chỉ ẩn ba tính năng tr�
    [`cloudflare/worker.js`](worker.js) vào, bấm **Deploy** (góc phải trên).
 5. Mở link máy chủ trên trình duyệt. Thấy dòng `{"ok":true,"ten":"Viral Studio · máy chủ Cloudflare"...` là xong bước này.
 
+### Nếu bấm Deploy mà báo "An unknown error occurred"
+
+Lỗi này của trang Cloudflare, hay gặp với tài khoản mới. Làm lần lượt tới khi được:
+
+1. Mở email đăng ký, bấm link **xác nhận email** của Cloudflare (chưa xác nhận thì không tạo Worker được). Tải lại trang rồi Deploy lại.
+2. Vào **Workers & Pages** → **Overview**, cột phải có **Your subdomain** (tên-tài-khoản.workers.dev). Nếu chưa có, bấm đặt tên trước, rồi quay lại tạo Worker.
+3. Đổi **Worker name** thành chữ thường không dấu, ví dụ `viral-studio`.
+4. Thử bằng cửa sổ ẩn danh (tắt chặn quảng cáo) hoặc trình duyệt khác; chờ 5–10 phút rồi thử lại.
+5. Vẫn lỗi thì cài theo **cách B** dưới đây, không cần bấm Deploy Hello World.
+
+### Cách B · Nối thẳng GitHub (không dán code)
+
+1. **Workers & Pages** → **Create** → tab **Workers** → **Import a repository** → **Connect GitHub**, chọn repo `TikTok`.
+2. **Root directory**: gõ `cloudflare`. Build command để trống, Deploy command giữ `npx wrangler deploy`. Bấm **Deploy**.
+3. Từ đó mỗi lần repo có bản `worker.js` mới, Cloudflare tự cài lại. Link máy chủ dạng `https://viral-studio.<tên-tài-khoản>.workers.dev`.
+4. Làm tiếp **Bước 3** (thêm key) và **Bước 4** như thường.
+
 ## Bước 3 · Thêm key (3 phút)
 
 Trong trang Worker vừa tạo → **Settings** → **Variables and Secrets** → **Add**. Thêm lần lượt, mỗi dòng bấm **Deploy** sau khi thêm:

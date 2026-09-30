@@ -1,0 +1,7 @@
+# Cấu hình để cài máy chủ bằng cách nối GitHub (Workers & Pages → Create → Import a repository → chọn repo này,
+# Root directory: cloudflare) hoặc bằng lệnh: npx wrangler deploy (trong thư mục cloudflare).
+# Key vẫn thêm trên trang Cloudflare: Settings → Variables and Secrets (GEMINI_API_KEYS, PEXELS_KEY, APPS_SCRIPT_URL…).
+name = "viral-studio"
+main = "worker.js"
+compatibility_date = "2025-09-01"
+workers_dev = true
