@@ -70,17 +70,24 @@ function veMark(px,py,s,brick,play,dot){
   cx.restore();
 }
 
-/* Lưới kẻ: ô nhỏ 60px, cứ 5 ô một đường đậm */
-function veLuoi(mauMo,mauDam){
-  var i;
-  cx.lineWidth=1.5; cx.strokeStyle=mauMo; cx.beginPath();
-  for(i=60;i<1920;i+=60){ cx.moveTo(i+.5,0); cx.lineTo(i+.5,1080); }
-  for(i=60;i<1080;i+=60){ cx.moveTo(0,i+.5); cx.lineTo(1920,i+.5); }
+/* Lưới kẻ mờ: ô nhỏ buoc px, cứ 5 ô một đường rõ hơn một chút */
+function veLuoi(buoc,mauMo,mauDam){
+  var i, dam=buoc*5;
+  cx.lineWidth=1; cx.strokeStyle=mauMo; cx.beginPath();
+  for(i=buoc;i<1920;i+=buoc){ cx.moveTo(i+.5,0); cx.lineTo(i+.5,1080); }
+  for(i=buoc;i<1080;i+=buoc){ cx.moveTo(0,i+.5); cx.lineTo(1920,i+.5); }
   cx.stroke();
-  cx.lineWidth=3; cx.strokeStyle=mauDam; cx.beginPath();
-  for(i=300;i<1920;i+=300){ cx.moveTo(i+.5,0); cx.lineTo(i+.5,1080); }
-  for(i=300;i<1080;i+=300){ cx.moveTo(0,i+.5); cx.lineTo(1920,i+.5); }
+  cx.lineWidth=1; cx.strokeStyle=mauDam; cx.beginPath();
+  for(i=dam;i<1920;i+=dam){ cx.moveTo(i+.5,0); cx.lineTo(i+.5,1080); }
+  for(i=dam;i<1080;i+=dam){ cx.moveTo(0,i+.5); cx.lineTo(1920,i+.5); }
   cx.stroke();
+}
+
+/* Chữ căn phải, trả về bề rộng để vẽ gạch chân */
+function chuPhai(t,x,y){
+  var w=cx.measureText(t).width;
+  cx.fillText(t,x-w,y);
+  return w;
 }
 
 /* Nền sáng / tối: logo vừa, tên cùng hàng bên phải */
@@ -105,22 +112,47 @@ function veCoBan(ten){
   ro(0,1058,1920,22,0);                       // vạch lime đáy khung
 }
 
-/* Nền lime kẻ lưới: logo to xếp dọc góc trái, tên mentor góc phải trên */
+/* Nền lime kẻ lưới: dịu mắt, logo to góc trái, tên mentor góc phải trên */
 function veLime(ten){
-  cx.fillStyle=LIME; cx.fillRect(0,0,1920,1080);
-  veLuoi('rgba(38,33,15,.10)','rgba(38,33,15,.20)');
+  var g=cx.createLinearGradient(0,0,1920,1080);   // chuyển sắc nhẹ cho đỡ phẳng
+  g.addColorStop(0,'#aeea2b'); g.addColorStop(.5,LIME); g.addColorStop(1,'#8ed200');
+  cx.fillStyle=g; cx.fillRect(0,0,1920,1080);
 
-  veMark(80,56,4,INK,PAPER,INK);              // viên gạch hôm nay đổi sang màu giấy cho nổi trên lime
+  var q=cx.createRadialGradient(420,240,40,420,240,1180);  // quầng sáng sau logo
+  q.addColorStop(0,'rgba(255,255,255,.26)'); q.addColorStop(1,'rgba(255,255,255,0)');
+  cx.fillStyle=q; cx.fillRect(0,0,1920,1080);
 
-  cx.fillStyle=INK; cx.textBaseline='alphabetic';
-  cx.font='800 76px "Bricolage Grotesque",sans-serif';
-  cx.fillText('Tự Mình Xây Kênh',84,366);
+  veLuoi(48,'rgba(255,255,255,.11)','rgba(255,255,255,.17)');  // lưới sáng, mảnh 1px
 
-  cx.font='800 100px "Bricolage Grotesque",sans-serif';
-  var w=cx.measureText(ten).width, x=1832-w;
-  cx.fillText(ten,x,168);
-  cx.fillStyle=PAPER; ro(x,200,w,12,6);       // gạch chân giấy dưới tên
-  cx.fillStyle=INK;   ro(0,1058,1920,22,0);   // vạch mực đáy khung
+  cx.save(); cx.globalAlpha=.06;                  // gạch chìm góc phải dưới cho có chiều sâu
+  veMark(1246,452,8.9,'#ffffff','#ffffff','#ffffff');
+  cx.restore();
+
+  var d=cx.createLinearGradient(0,700,0,1080);    // tối chân khung, chữ ở dưới vẫn đọc được
+  d.addColorStop(0,'rgba(38,33,15,0)'); d.addColorStop(1,'rgba(38,33,15,.08)');
+  cx.fillStyle=d; cx.fillRect(0,700,1920,380);
+
+  veMark(96,74,3.4,INK,PAPER,INK);                // viên gạch hôm nay màu giấy cho nổi trên lime
+
+  cx.textBaseline='alphabetic';
+  cx.fillStyle=INK;
+  cx.font='800 58px "Bricolage Grotesque",sans-serif';
+  cx.letterSpacing='1px';
+  cx.fillText('Tự Mình Xây Kênh',100,344);
+  cx.letterSpacing='0px';
+
+  cx.fillStyle='rgba(38,33,15,.58)';              // nhãn nhỏ trên tên mentor
+  cx.font='800 24px "Bricolage Grotesque",sans-serif';
+  cx.letterSpacing='7px';
+  chuPhai('MENTOR',1824,120);
+  cx.letterSpacing='0px';
+
+  cx.fillStyle=INK;
+  cx.font='800 92px "Bricolage Grotesque",sans-serif';
+  chuPhai(ten,1824,214);
+  ro(1824-132,248,132,7,4);                       // gạch chân ngắn, không kéo hết tên
+
+  cx.fillStyle='rgba(38,33,15,.85)'; ro(0,1070,1920,10,0);   // vạch mực mảnh đáy khung
 }
 
 function ve(){
@@ -131,8 +163,9 @@ function ve(){
 function veKhiSanFont(){
   var f1=document.fonts.load('800 100px "Bricolage Grotesque"');
   var f2=document.fonts.load('800 78px "Bricolage Grotesque"');
-  var f3=document.fonts.load('800 76px "Bricolage Grotesque"');
-  Promise.all([f1,f2,f3]).then(ve).catch(ve);
+  var f3=document.fonts.load('800 58px "Bricolage Grotesque"');
+  var f4=document.fonts.load('800 92px "Bricolage Grotesque"');
+  Promise.all([f1,f2,f3,f4]).then(ve).catch(ve);
 }
 
 document.getElementById('ten').addEventListener('input',ve);
