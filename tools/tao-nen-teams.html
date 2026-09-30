@@ -48,6 +48,7 @@
 
 <script>
 var LIME='#99df00', PAPER='#f9e8dd', INK='#26210f', MOSS='#1b220d';
+var TEN_KENH='Tự Mình Xây Kênh';
 var kieu='sang';                                  // sang | toi | lime
 var cv=document.getElementById('cv'), cx=cv.getContext('2d');
 
@@ -91,6 +92,22 @@ function veLuoi(){
   cx.drawImage(lc,0,0); cx.restore();
 }
 
+/* Lockup chuẩn, số đo lấy từ assets/brand/tmxk-lockup.svg (hệ 387×72):
+   gạch đặt tại (6,4), chữ bắt đầu x=84.6, chân chữ y=47, cao cap-height 22.44.
+   Trả về mép phải của lockup để còn chừa chỗ cho tên mentor. */
+function veLockup(px,py,s,brick,play,dot,chu){
+  cx.save(); cx.translate(px,py); cx.scale(s,s);
+  veMark(6,4,1,brick,play,dot);
+  cx.font='800 100px "Bricolage Grotesque",sans-serif';
+  var cap=cx.measureText('H').actualBoundingBoxAscent||72;   // cap-height ứng với cỡ 100
+  cx.font='800 '+(2244/cap).toFixed(2)+'px "Bricolage Grotesque",sans-serif';
+  cx.fillStyle=chu; cx.textBaseline='alphabetic';
+  var w=cx.measureText(TEN_KENH).width;
+  cx.fillText(TEN_KENH,84.6,47);
+  cx.restore();
+  return px+(84.6+w)*s;
+}
+
 /* Chữ căn phải, trả về bề rộng để vẽ gạch chân */
 function chuPhai(t,x,y){
   var w=cx.measureText(t).width;
@@ -122,28 +139,28 @@ function veCoBan(ten){
 
 /* Nền lime kẻ lưới: dịu mắt, logo to góc trái, tên mentor góc phải trên */
 function veLime(ten){
-  cx.fillStyle=LIME; cx.fillRect(0,0,1920,1080);   // lime phẳng đúng như nền trang chủ
+  var DONG=184, TRAI=184, PHAI=1840, s=2.4;   // chân chữ và hai mép đều nằm trên đường lưới
+
+  cx.fillStyle=LIME; cx.fillRect(0,0,1920,1080);
   veLuoi();
 
-  veMark(96,74,3.4,INK,PAPER,INK);                // viên gạch hôm nay màu giấy cho nổi trên lime
+  var mep=veLockup(TRAI-10*s,DONG-47*s,s,INK,PAPER,INK,INK);
 
   cx.textBaseline='alphabetic';
-  cx.fillStyle=INK;
-  cx.font='800 58px "Bricolage Grotesque",sans-serif';
-  cx.letterSpacing='1px';
-  cx.fillText('Tự Mình Xây Kênh',100,344);
-  cx.letterSpacing='0px';
-
-  cx.fillStyle='rgba(38,33,15,.58)';              // nhãn nhỏ trên tên mentor
+  cx.fillStyle='rgba(38,33,15,.58)';          // nhãn nhỏ trên tên mentor
   cx.font='800 24px "Bricolage Grotesque",sans-serif';
   cx.letterSpacing='7px';
-  chuPhai('MENTOR',1824,120);
+  chuPhai('MENTOR',PHAI,DONG-84);
   cx.letterSpacing='0px';
 
-  cx.fillStyle=INK;
-  cx.font='800 92px "Bricolage Grotesque",sans-serif';
-  chuPhai(ten,1824,214);
-  ro(1824-132,248,132,7,4);                       // gạch chân ngắn, không kéo hết tên
+  cx.fillStyle=INK;                           // tên dài thì co lại, không đè vào lockup
+  var co=72, rong=PHAI-mep-120;
+  cx.font='800 '+co+'px "Bricolage Grotesque",sans-serif';
+  while(cx.measureText(ten).width>rong && co>44){
+    co-=4; cx.font='800 '+co+'px "Bricolage Grotesque",sans-serif';
+  }
+  chuPhai(ten,PHAI,DONG);
+  ro(PHAI-132,DONG+30,132,7,4);               // gạch chân ngắn, căn mép phải
 
   cx.fillStyle='rgba(38,33,15,.85)'; ro(0,1070,1920,10,0);   // vạch mực mảnh đáy khung
 }
