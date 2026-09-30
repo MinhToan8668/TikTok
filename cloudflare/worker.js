@@ -7,15 +7,21 @@
      GET  /media?u=    → phát lại file Pexels có CORS + Range (xem trước, xuất video)
      GET  /tai?u=&ten= → tải hộ file video/ảnh/nhạc từ CDN các nền tảng, không giới hạn 35MB, có tên file
      POST /tts         → lồng tiếng AI tiếng Việt (Gemini TTS), trả WAV; trừ lượt qua Apps Script
+     POST /agent       → Trợ lý dựng kiểu agent: nhận yêu cầu + trạng thái dự án, hỏi LLM có tool-calling
+                         (bộ lệnh học theo Vyra MCP), trả về lệnh để tab chạy lên dòng thời gian; lặp tới khi xong.
+                         Đổi nhà cung cấp AI bằng biến LLM_PROVIDER = gemini | claude | openai (+ key tương ứng).
 
    Biến môi trường (Settings → Variables and Secrets):
      GEMINI_API_KEYS   một hoặc nhiều key Gemini, cách nhau dấu phẩy (Secret)
      PEXELS_KEY        key miễn phí tại pexels.com/api (Secret)
      APPS_SCRIPT_URL   link /exec của Apps Script (để kiểm đăng nhập + trừ lượt khi lồng tiếng)
      ORIGINS           (tuỳ chọn) các trang được gọi, cách nhau dấu phẩy. Mặc định: GitHub Pages của khoá
+     LLM_PROVIDER      (tuỳ chọn) gemini (mặc định) | claude | openai — AI cho Trợ lý dựng agent
+     LLM_MODEL         (tuỳ chọn) tên model; mặc định gemini-3.5-flash / claude-sonnet-4-5 / gpt-4.1
+     ANTHROPIC_API_KEY, OPENAI_API_KEY   (Secret) key khi chọn claude / openai
    ═══════════════════════════════════════════════════════════════════════════ */
 
-const PHIEN_BAN = '2026.10.01';
+const PHIEN_BAN = '2026.10.02';
 const ORIGIN_MD = 'https://minhtoan8668.github.io,http://localhost:8765,http://127.0.0.1:8765';
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0 Safari/537.36';
 const TTS_MODELS = ['gemini-3.8-flash-lite-tts', 'gemini-3.8-flash-tts', 'gemini-2.5-flash-preview-tts'];
@@ -30,10 +36,11 @@ export default {
     const cors = corsCho(req, env);
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: { ...cors, 'access-control-max-age': '86400' } });
     try {
-      if (path === '/') return json({ ok: true, ten: 'Viral Studio · máy chủ Cloudflare', phien_ban: PHIEN_BAN, dich_vu: { broll: !!env.PEXELS_KEY, tts: !!dsKey(env).length, tai: true, kiem_luot: !!env.APPS_SCRIPT_URL } }, cors);
+      if (path === '/') return json({ ok: true, ten: 'Viral Studio · máy chủ Cloudflare', phien_ban: PHIEN_BAN, dich_vu: { broll: !!env.PEXELS_KEY, tts: !!dsKey(env).length, tai: true, kiem_luot: !!env.APPS_SCRIPT_URL, agent: !!llmCoKey(env), agent_ncc: llmNcc(env) } }, cors);
       if (path === '/broll' && req.method === 'GET') return json(await timBroll(url, env, ctx), cors);
       if (path === '/media' && req.method === 'GET') return media(req, url, cors);
       if (path === '/tai' && req.method === 'GET') return taiHo(req, url, cors);
+      if (path === '/agent' && req.method === 'POST') { if (!cors['access-control-allow-origin']) return json({ ok: false, error: 'origin' }, cors, 403); return agent(req, env, cors); }
       if (path === '/tts' && req.method === 'POST') { if (!cors['access-control-allow-origin']) return json({ ok: false, error: 'origin' }, cors, 403); return tts(req, env, cors); }
       return json({ ok: false, error: 'khong_co' }, cors, 404);
     } catch (e) { return json({ ok: false, error: 'loi_may_chu', chi_tiet: String(e && e.message || e).slice(0, 200) }, cors, 500); }
@@ -157,4 +164,113 @@ function pcmSangWav(pcm, rate) {
   w(0, 'RIFF'); v.setUint32(4, 36 + pcm.length, true); w(8, 'WAVE'); w(12, 'fmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
   v.setUint32(24, rate, true); v.setUint32(28, rate * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true); w(36, 'data'); v.setUint32(40, pcm.length, true);
   const out = new Uint8Array(44 + pcm.length); out.set(new Uint8Array(h), 0); out.set(pcm, 44); return out;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Trợ lý dựng kiểu agent. Bộ lệnh (tool) học theo Vyra MCP; tab trình dựng là nơi chạy lệnh,
+   máy chủ chỉ hỏi LLM. Đổi AI: LLM_PROVIDER = gemini | claude | openai, key tương ứng, LLM_MODEL tuỳ chọn.
+   Lịch sử (lich_su) do tab giữ, dạng trung lập: {vai:'nd',text} · {vai:'ai',text,goi:[{id,ten,args}]} · {vai:'tool',kq:[{id,ten,text,image?,isError}]}
+   ═══════════════════════════════════════════════════════════════════════════ */
+const AGENT_TOOLS = [
+  ['xem_du_an', 'Xem toàn bộ dự án: footage (src_id, tên, giây, loại, mô tả, số câu, cảnh), V1 (i, src_id, bd, kt, chuyển cảnh, lời), b-roll V2, đồ hoạ O1, lồng tiếng A2, cài đặt, tổng giây. Trạng thái mới nhất đã đính kèm mỗi lượt, chỉ gọi khi cần xem lại sau nhiều thay đổi.', {}],
+  ['xem_loi_thoai', 'Lời thoại đã chép của một footage: từng câu (bd, kt giây trong source, text, loại noi|hay|vap|lap|lac) và câu nào đang trên V1. tu=true trả cả từng từ.', { src_id: { type: 'string' }, tu: { type: 'boolean' } }],
+  ['tim_footage', 'Tìm trong footage theo câu nói, mô tả cảnh hoặc tag. Trả cảnh/câu khớp kèm src_id, bd, kt.', { q: { type: 'string' } }, ['q']],
+  ['them_doan', 'Thêm một đoạn (src_id, bd→kt giây trong source) vào V1. vi_tri = chỉ số chèn (mặc định cuối). chuyen = cat|fade|slide|zoom|wipe|whip|flash|glitch|circle|blur.', { src_id: { type: 'string' }, bd: { type: 'number' }, kt: { type: 'number' }, vi_tri: { type: 'integer' }, chuyen: { type: 'string' } }, ['src_id', 'bd', 'kt']],
+  ['sua_doan', 'Sửa đoạn V1 thứ i: bd/kt (giây trong source), chuyen, chuyen_dai (0.2–1.2s), truot (trượt khúc lấy trong source ±giây, giữ độ dài).', { i: { type: 'integer' }, bd: { type: 'number' }, kt: { type: 'number' }, chuyen: { type: 'string' }, chuyen_dai: { type: 'number' }, truot: { type: 'number' } }, ['i']],
+  ['xoa_doan', 'Xoá đoạn V1 thứ i (ripple: chữ, đồ hoạ, b-roll sau dồn lên).', { i: { type: 'integer' } }, ['i']],
+  ['tach_doan', 'Tách đoạn V1 tại giây tl trên dòng thời gian.', { tl: { type: 'number' } }, ['tl']],
+  ['sap_xep_doan', 'Đổi thứ tự V1: thu_tu là mảng chỉ số cũ theo thứ tự mới, ví dụ [2,0,1].', { thu_tu: { type: 'array', items: { type: 'integer' } } }, ['thu_tu']],
+  ['bo_vap', 'Cắt bỏ mọi câu vấp, lặp, lạc đề khỏi V1.', {}],
+  ['hit_beat', 'Kéo mép các đoạn về beat nhạc gần nhất (cần có nhạc nền).', {}],
+  ['dat_broll', 'Đặt b-roll lên V2: src_id, bd→kt trong source, t_bd giây bắt đầu trên dòng thời gian, kieu = full | pip.', { src_id: { type: 'string' }, bd: { type: 'number' }, kt: { type: 'number' }, t_bd: { type: 'number' }, kieu: { type: 'string' } }, ['src_id', 'bd', 'kt', 't_bd']],
+  ['xoa_broll', 'Xoá b-roll theo id.', { id: { type: 'string' } }, ['id']],
+  ['them_do_hoa', 'Thêm đồ hoạ O1: kieu = tieu_de|lower_third|danh_sach|tien_do|trich_dan|dem_so|khung_nhan|mui_ten|vong_xoay|nhan_goc; bd, kt giây trên dòng thời gian; text, phu.', { kieu: { type: 'string' }, bd: { type: 'number' }, kt: { type: 'number' }, text: { type: 'string' }, phu: { type: 'string' } }, ['kieu', 'bd', 'kt']],
+  ['sua_do_hoa', 'Sửa đồ hoạ theo id: bd, kt, text, phu.', { id: { type: 'string' }, bd: { type: 'number' }, kt: { type: 'number' }, text: { type: 'string' }, phu: { type: 'string' } }, ['id']],
+  ['xoa_do_hoa', 'Xoá đồ hoạ theo id.', { id: { type: 'string' } }, ['id']],
+  ['cai_dat', 'Đổi cài đặt chung. hook: chữ 3 giây đầu. phu_de: {bat, kieu highlight|pill|vien|emoji|toi|pop|rise, cum 2–6, nhan_manh "từ, từ", mau xanh|vang|cam|lam|hong, vi_tri 0.62|0.78|0.86}. khung: cat|bam_mat|mo. nen: {kieu giu|mo|mau|toi, mau #hex}. font: be_vietnam|montserrat|bricolage|lexend|oswald|anton|playfair. zoom_nhan. chuyen_mac_dinh. ten_du_an.', { hook: { type: 'string' }, phu_de: { type: 'object' }, khung: { type: 'string' }, nen: { type: 'object' }, font: { type: 'string' }, zoom_nhan: { type: 'boolean' }, chuyen_mac_dinh: { type: 'string' }, ten_du_an: { type: 'string' } }],
+  ['hieu_footage', 'Cho AI hiểu một footage chưa hiểu (chép lời từng từ, cảnh, khoảnh khắc). Tốn 1 lượt Dựng video của người dùng, chờ 10–60s.', { src_id: { type: 'string' } }, ['src_id']],
+  ['tro_ly_dung', 'Dựng bản nháp toàn bộ một phát theo yêu cầu (xếp câu, phụ đề, đồ hoạ, chuyển cảnh, b-roll) khi dòng thời gian còn trống. che_do = ky|nhanh.', { yeu_cau: { type: 'string' }, che_do: { type: 'string' } }, ['yeu_cau']],
+  ['tim_broll_kho', 'Tìm kho B-roll miễn phí (Pexels). huong = doc|ngang. Trả id, giây, tác giả.', { q: { type: 'string' }, huong: { type: 'string' } }, ['q']],
+  ['them_broll_kho', 'Tải một video từ kết quả tim_broll_kho (id) vào footage, rồi dùng dat_broll để đặt lên V2.', { id: { type: 'string' } }, ['id']],
+  ['long_tieng', 'Tạo lồng tiếng AI tiếng Việt đặt lên A2 tại t_bd. giong: nu_am|nu_tre|nu_diu|nu_sang|nam_tram|nam_tre|nam_am|nam_manh. Tốn 1 lượt Dựng video.', { text: { type: 'string' }, giong: { type: 'string' }, cach: { type: 'string' }, t_bd: { type: 'number' } }, ['text']],
+  ['xem_khung', 'Xem ảnh khung hình tại giây t trên dòng thời gian để tự kiểm bố cục, phụ đề, đồ hoạ trước khi kết luận.', { t: { type: 'number' } }, ['t']],
+  ['xuat_phu_de', 'Trả phụ đề SRT theo dòng thời gian.', {}],
+  ['xuat_video', 'Dựng và lưu video xuống máy người dùng. Chỉ gọi khi người dùng yêu cầu xuất. do_phan_giai = 720|1080|1440.', { do_phan_giai: { type: 'integer' } }],
+  ['luu_du_an', 'Trả JSON dự án.', {}],
+  ['hoan_tac', 'Hoàn tác thao tác gần nhất.', {}]
+];
+const AGENT_HE_THONG = `Bạn là Trợ lý dựng của Viral Studio (khoá Tự Mình Xây Kênh), làm việc ngay trên dòng thời gian của người dùng bằng các tool. Nói tiếng Việt có dấu, ngắn gọn.
+Quy tắc:
+- Trạng thái dự án mới nhất được đính kèm trong tin nhắn (JSON). Đơn vị: giây. bd/kt của đoạn là giây trong source; tl, t_bd, bd/kt của đồ hoạ là giây trên dòng thời gian. Footage chỉ dùng được khi trang_thai = "xong" (nếu chưa, gọi hieu_footage, báo tốn lượt).
+- Làm đúng yêu cầu, không tự ý làm quá. Sửa nhỏ thì dùng từng lệnh (sua_doan, tach_doan, them_do_hoa…); dựng mới từ dòng thời gian trống thì có thể dùng tro_ly_dung rồi tinh chỉnh.
+- Video ngắn: 3 giây đầu phải mạnh, mỗi ý 3–5 giây, bỏ vấp/lặp/lạc, phụ đề bật, đồ hoạ vừa đủ (tiêu đề 2s đầu, nhãn góc cho bước, thanh tiến độ).
+- Sau khi đặt đồ hoạ hoặc đổi khung/nền, gọi xem_khung ở thời điểm liên quan để tự kiểm rồi sửa nếu chữ chồng mặt hay lệch. Tối đa ~12 lệnh một lượt.
+- Không gọi xuat_video, long_tieng, hieu_footage nếu người dùng không yêu cầu hoặc chưa cần. Không bịa lời thoại.
+- Kết thúc bằng 1–3 câu tóm tắt đã làm gì và gợi ý bước tiếp (không liệt kê lại từng lệnh).`;
+function llmNcc(env) { const p = String(env.LLM_PROVIDER || 'gemini').toLowerCase(); return /claude|anthropic/.test(p) ? 'claude' : /openai|gpt/.test(p) ? 'openai' : 'gemini'; }
+function llmCoKey(env) { const n = llmNcc(env); return n === 'claude' ? !!env.ANTHROPIC_API_KEY : n === 'openai' ? !!env.OPENAI_API_KEY : dsKey(env).length > 0; }
+function llmModel(env) { return env.LLM_MODEL || { gemini: 'gemini-3.5-flash', claude: 'claude-sonnet-4-5', openai: 'gpt-4.1' }[llmNcc(env)]; }
+async function agent(req, env, cors) {
+  let b = {}; try { b = await req.json(); } catch { }
+  const ls = Array.isArray(b.lich_su) ? b.lich_su : []; if (!ls.length) return json({ ok: false, error: 'thieu_lich_su' }, cors, 400);
+  if (!llmCoKey(env)) return json({ ok: false, error: 'chua_co_key_' + llmNcc(env) }, cors, 503);
+  if (!env.APPS_SCRIPT_URL) return json({ ok: false, error: 'chua_noi_apps_script' }, cors, 503);
+  let luotCon = null;
+  if (!(+b.buoc)) {   // bước đầu của một lượt: trừ 1 lượt chat (Free), Pro/học viên trả ok
+    let kiem = {}; try { const r = await fetch(env.APPS_SCRIPT_URL, { method: 'POST', headers: { 'content-type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'st_use', token: String(b.token || ''), tool: 'chat' }), redirect: 'follow' }); kiem = await r.json(); } catch { return json({ ok: false, error: 'khong_noi_duoc_apps_script' }, cors, 502); }
+    if (!kiem.ok) return json({ ok: false, error: kiem.error || 'het_phien' }, cors, 402);
+    luotCon = kiem.luot_con == null ? null : kiem.luot_con;
+  }
+  const hs = b.ho_so && typeof b.ho_so === 'object' ? Object.entries(b.ho_so).filter(([k, v]) => v).map(([k, v]) => k + ': ' + String(v).slice(0, 200)).join('; ') : '';
+  const heThong = AGENT_HE_THONG + (hs ? '\nHồ sơ kênh người dùng: ' + hs : '');
+  const duAn = 'Trạng thái dự án hiện tại:\n' + JSON.stringify(b.du_an || {}).slice(0, 60000);
+  try {
+    const kq = await ({ gemini: goiGeminiAgent, claude: goiClaudeAgent, openai: goiOpenAIAgent })[llmNcc(env)](env, heThong, ls, duAn);
+    return json({ ok: true, text: kq.text || '', ky_text: kq.ky_text, goi: kq.goi || [], luot_con: luotCon, ncc: llmNcc(env), model: llmModel(env) }, cors);
+  } catch (e) { return json({ ok: false, error: 'llm_loi', chi_tiet: String(e && e.message || e).slice(0, 300), luot_con: luotCon }, cors, 502); }
+}
+/* ── Gemini: functionDeclarations, functionCall / functionResponse ── */
+async function goiGeminiAgent(env, heThong, ls, duAn) {
+  const contents = []; const cuoiNd = ls.map(m => m.vai).lastIndexOf('nd');
+  ls.forEach((m, i) => {
+    if (m.vai === 'nd') contents.push({ role: 'user', parts: [{ text: m.text + (i === cuoiNd ? '\n\n' + duAn : '') }] });
+    else if (m.vai === 'ai') { const parts = []; if (m.text) { const p = { text: m.text }; if (m.ky_text) p.thoughtSignature = m.ky_text; parts.push(p); } (m.goi || []).forEach(g => { const p = { functionCall: { name: g.ten, args: g.args || {} } }; if (g.ky) p.thoughtSignature = g.ky; parts.push(p); }); if (parts.length) contents.push({ role: 'model', parts }); }   // Gemini 3: phải gửi lại thoughtSignature của từng part
+    else if (m.vai === 'tool') { const parts = []; (m.kq || []).forEach(k => { parts.push({ functionResponse: { name: k.ten, response: { ket_qua: (k.text || '').slice(0, 30000), loi: !!k.isError } } }); if (k.image && k.image.data) parts.push({ inlineData: { mimeType: k.image.mime || 'image/png', data: k.image.data } }); }); contents.push({ role: 'user', parts }); }
+  });
+  // trạng thái mới nhất luôn đi kèm lượt tool gần nhất để model không dùng số cũ
+  const last = contents[contents.length - 1]; if (last && last.role === 'user' && !/Trạng thái dự án/.test(JSON.stringify(last.parts).slice(0, 200))) last.parts.push({ text: duAn });
+  const body = { systemInstruction: { parts: [{ text: heThong }] }, contents, tools: [{ functionDeclarations: AGENT_TOOLS.map(([name, description, props, required]) => ({ name, description, parameters: { type: 'object', properties: props, required: required || [] } })) }], generationConfig: { temperature: 0.4, maxOutputTokens: 2000 } };
+  let j, model = llmModel(env);
+  try { j = await goiGemini(env, model, body); }
+  catch (e) { if (!/429|503|RESOURCE_EXHAUSTED|overloaded/i.test(String(e.message)) || model === 'gemini-3.5-flash-lite') throw e; model = 'gemini-3.5-flash-lite'; j = await goiGemini(env, model, body); }   // hết hạn mức model chính → lùi về flash-lite
+  const parts = ((((j.candidates || [])[0] || {}).content || {}).parts || []);
+  const tp = parts.find(p => p.text && p.thoughtSignature);
+  return { text: parts.filter(p => p.text).map(p => p.text).join('\n').trim(), ky_text: tp ? tp.thoughtSignature : undefined, goi: parts.filter(p => p.functionCall).map((p, k) => ({ id: 'g' + Date.now().toString(36) + k, ten: p.functionCall.name, args: p.functionCall.args || {}, ky: p.thoughtSignature })) };
+}
+/* ── Claude (Anthropic Messages API): tools, tool_use / tool_result (ảnh nằm trong tool_result) ── */
+async function goiClaudeAgent(env, heThong, ls, duAn) {
+  const messages = []; const cuoiNd = ls.map(m => m.vai).lastIndexOf('nd');
+  ls.forEach((m, i) => {
+    if (m.vai === 'nd') messages.push({ role: 'user', content: m.text + (i === cuoiNd ? '\n\n' + duAn : '') });
+    else if (m.vai === 'ai') { const c = []; if (m.text) c.push({ type: 'text', text: m.text }); (m.goi || []).forEach(g => c.push({ type: 'tool_use', id: g.id, name: g.ten, input: g.args || {} })); if (c.length) messages.push({ role: 'assistant', content: c }); }
+    else if (m.vai === 'tool') { const c = (m.kq || []).map(k => { const content = [{ type: 'text', text: (k.text || '').slice(0, 30000) }]; if (k.image && k.image.data) content.push({ type: 'image', source: { type: 'base64', media_type: k.image.mime || 'image/png', data: k.image.data } }); return { type: 'tool_result', tool_use_id: k.id, content, is_error: !!k.isError }; }); c.push({ type: 'text', text: duAn }); messages.push({ role: 'user', content: c }); }
+  });
+  const r = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: { 'content-type': 'application/json', 'x-api-key': env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' }, body: JSON.stringify({ model: llmModel(env), max_tokens: 2000, system: heThong, messages, tools: AGENT_TOOLS.map(([name, description, props, required]) => ({ name, description, input_schema: { type: 'object', properties: props, required: required || [] } })) }) });
+  if (!r.ok) throw new Error('claude ' + r.status + ' ' + (await r.text()).slice(0, 200));
+  const j = await r.json(); const c = j.content || [];
+  return { text: c.filter(x => x.type === 'text').map(x => x.text).join('\n').trim(), goi: c.filter(x => x.type === 'tool_use').map(x => ({ id: x.id, ten: x.name, args: x.input || {} })) };
+}
+/* ── OpenAI Chat Completions: tools/function, tool_calls, role tool (ảnh gửi thêm bằng image_url) ── */
+async function goiOpenAIAgent(env, heThong, ls, duAn) {
+  const messages = [{ role: 'system', content: heThong }]; const cuoiNd = ls.map(m => m.vai).lastIndexOf('nd');
+  ls.forEach((m, i) => {
+    if (m.vai === 'nd') messages.push({ role: 'user', content: m.text + (i === cuoiNd ? '\n\n' + duAn : '') });
+    else if (m.vai === 'ai') { const msg = { role: 'assistant', content: m.text || null }; if (m.goi && m.goi.length) msg.tool_calls = m.goi.map(g => ({ id: g.id, type: 'function', function: { name: g.ten, arguments: JSON.stringify(g.args || {}) } })); messages.push(msg); }
+    else if (m.vai === 'tool') { const anh = []; (m.kq || []).forEach(k => { messages.push({ role: 'tool', tool_call_id: k.id, content: (k.isError ? 'LỖI: ' : '') + (k.text || '').slice(0, 30000) }); if (k.image && k.image.data) anh.push({ type: 'image_url', image_url: { url: 'data:' + (k.image.mime || 'image/png') + ';base64,' + k.image.data } }); }); messages.push({ role: 'user', content: [{ type: 'text', text: (anh.length ? 'Ảnh khung hình vừa xem ở trên.\n' : '') + duAn }, ...anh] }); }
+  });
+  const r = await fetch('https://api.openai.com/v1/chat/completions', { method: 'POST', headers: { 'content-type': 'application/json', authorization: 'Bearer ' + env.OPENAI_API_KEY }, body: JSON.stringify({ model: llmModel(env), messages, tools: AGENT_TOOLS.map(([name, description, props, required]) => ({ type: 'function', function: { name, description, parameters: { type: 'object', properties: props, required: required || [] } } })), temperature: 0.4 }) });
+  if (!r.ok) throw new Error('openai ' + r.status + ' ' + (await r.text()).slice(0, 200));
+  const j = await r.json(); const m = (((j.choices || [])[0] || {}).message) || {};
+  return { text: (m.content || '').trim(), goi: (m.tool_calls || []).map(t => { let a = {}; try { a = JSON.parse(t.function.arguments || '{}'); } catch { } return { id: t.id, ten: t.function.name, args: a }; }) };
 }
