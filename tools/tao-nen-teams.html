@@ -33,12 +33,13 @@
 <body>
 <div class="card">
   <h1>Tạo nền gọi MS Teams</h1>
-  <p class="sub">Điền tên → chọn nền sáng/tối → bấm tải. Ảnh xuất ra 1920×1080.</p>
+  <p class="sub">Điền tên → chọn kiểu nền → bấm tải. Ảnh xuất ra 1920×1080.</p>
   <div class="row">
     <input id="ten" type="text" value="Minh Toàn" maxlength="30" placeholder="Tên giảng viên">
     <div class="seg">
       <button id="bSang" class="on" type="button">☀️ Sáng</button>
       <button id="bToi" type="button">🌙 Tối</button>
+      <button id="bLime" type="button">🟩 Lime kẻ lưới</button>
     </div>
   </div>
   <canvas id="cv" width="1920" height="1080"></canvas>
@@ -46,7 +47,8 @@
 </div>
 
 <script>
-var LIME='#99df00', toiMode=false;
+var LIME='#99df00', PAPER='#f9e8dd', INK='#26210f', MOSS='#1b220d';
+var kieu='sang';                                  // sang | toi | lime
 var cv=document.getElementById('cv'), cx=cv.getContext('2d');
 
 function ro(x,y,w,h,r){ // rounded rect
@@ -68,12 +70,26 @@ function veMark(px,py,s,brick,play,dot){
   cx.restore();
 }
 
-function ve(){
-  var ten=(document.getElementById('ten').value||'').trim()||' ';
-  var bg   = toiMode ? '#1b220d' : '#f9e8dd';
-  var chu  = toiMode ? '#f7f2e9' : '#26210f';
-  var brick= toiMode ? '#f4efe6' : '#26210f';
-  var dot  = toiMode ? '#1b220d' : '#26210f';
+/* Lưới kẻ: ô nhỏ 60px, cứ 5 ô một đường đậm */
+function veLuoi(mauMo,mauDam){
+  var i;
+  cx.lineWidth=1.5; cx.strokeStyle=mauMo; cx.beginPath();
+  for(i=60;i<1920;i+=60){ cx.moveTo(i+.5,0); cx.lineTo(i+.5,1080); }
+  for(i=60;i<1080;i+=60){ cx.moveTo(0,i+.5); cx.lineTo(1920,i+.5); }
+  cx.stroke();
+  cx.lineWidth=3; cx.strokeStyle=mauDam; cx.beginPath();
+  for(i=300;i<1920;i+=300){ cx.moveTo(i+.5,0); cx.lineTo(i+.5,1080); }
+  for(i=300;i<1080;i+=300){ cx.moveTo(0,i+.5); cx.lineTo(1920,i+.5); }
+  cx.stroke();
+}
+
+/* Nền sáng / tối: logo vừa, tên cùng hàng bên phải */
+function veCoBan(ten){
+  var toi  = kieu==='toi';
+  var bg   = toi ? MOSS  : PAPER;
+  var chu  = toi ? '#f7f2e9' : INK;
+  var brick= toi ? '#f4efe6' : INK;
+  var dot  = toi ? MOSS  : INK;
 
   cx.fillStyle=bg; cx.fillRect(0,0,1920,1080);
   veMark(84,76,2.05,brick,LIME,dot);
@@ -89,15 +105,40 @@ function ve(){
   ro(0,1058,1920,22,0);                       // vạch lime đáy khung
 }
 
+/* Nền lime kẻ lưới: logo to xếp dọc góc trái, tên mentor góc phải trên */
+function veLime(ten){
+  cx.fillStyle=LIME; cx.fillRect(0,0,1920,1080);
+  veLuoi('rgba(38,33,15,.10)','rgba(38,33,15,.20)');
+
+  veMark(80,56,4,INK,PAPER,INK);              // viên gạch hôm nay đổi sang màu giấy cho nổi trên lime
+
+  cx.fillStyle=INK; cx.textBaseline='alphabetic';
+  cx.font='800 76px "Bricolage Grotesque",sans-serif';
+  cx.fillText('Tự Mình Xây Kênh',84,366);
+
+  cx.font='800 100px "Bricolage Grotesque",sans-serif';
+  var w=cx.measureText(ten).width, x=1832-w;
+  cx.fillText(ten,x,168);
+  cx.fillStyle=PAPER; ro(x,200,w,12,6);       // gạch chân giấy dưới tên
+  cx.fillStyle=INK;   ro(0,1058,1920,22,0);   // vạch mực đáy khung
+}
+
+function ve(){
+  var ten=(document.getElementById('ten').value||'').trim()||' ';
+  if(kieu==='lime') veLime(ten); else veCoBan(ten);
+}
+
 function veKhiSanFont(){
   var f1=document.fonts.load('800 100px "Bricolage Grotesque"');
   var f2=document.fonts.load('800 78px "Bricolage Grotesque"');
-  Promise.all([f1,f2]).then(ve).catch(ve);
+  var f3=document.fonts.load('800 76px "Bricolage Grotesque"');
+  Promise.all([f1,f2,f3]).then(ve).catch(ve);
 }
 
 document.getElementById('ten').addEventListener('input',ve);
-document.getElementById('bSang').onclick=function(){toiMode=false;chon(this);ve()};
-document.getElementById('bToi').onclick=function(){toiMode=true;chon(this);ve()};
+document.getElementById('bSang').onclick=function(){kieu='sang';chon(this);ve()};
+document.getElementById('bToi').onclick =function(){kieu='toi'; chon(this);ve()};
+document.getElementById('bLime').onclick=function(){kieu='lime';chon(this);ve()};
 function chon(b){
   document.querySelectorAll('.seg button').forEach(function(x){x.classList.remove('on')});
   b.classList.add('on');
@@ -108,7 +149,7 @@ document.getElementById('tai').onclick=function(){
     .normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D')
     .replace(/[^\w]+/g,'-').toLowerCase();
   var a=document.createElement('a');
-  a.download='nen-teams-'+ten+(toiMode?'-toi':'-sang')+'.png';
+  a.download='nen-teams-'+ten+'-'+kieu+'.png';
   a.href=cv.toDataURL('image/png');
   a.click();
 };
