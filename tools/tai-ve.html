@@ -383,12 +383,26 @@ async function taiHo(it) {
   const bin = atob(r.b64), arr = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
   return new Blob([arr], { type: r.mime || '' });
 }
+/* máy chủ phụ Cloudflare (mentor cài, bot /maychu): stream file lớn về thẳng máy, có tên file. Không giới hạn 35MB. */
+async function taiHoCF(it, bar) {
+  const mc = await TK.mayChu(); if (!mc.url) throw new Error('khong_co_may_chu');
+  const u = mc.url + '/tai?u=' + encodeURIComponent(it.url) + '&ten=' + encodeURIComponent(tenFile(it, ''));
+  const r = await fetch(u); if (!r.ok) { const e = new Error('cf ' + r.status); e.ma = 'cf_' + r.status; throw e; }
+  const tong = Number(r.headers.get('content-length')) || it.size || 0;
+  if (!r.body || !tong || !bar) return r.blob();
+  const rd = r.body.getReader(), khuc = []; let da = 0; bar.hidden = false;
+  for (;;) { const { done, value } = await rd.read(); if (done) break; khuc.push(value); da += value.length; bar.firstChild.style.width = Math.min(100, da / tong * 100) + '%'; }
+  return new Blob(khuc, { type: r.headers.get('content-type') || '' });
+}
 async function taiFile(it, btn, bar) {
   const cu = btn.textContent; btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Đang tải';
   try {
     let blob;
     try { blob = await taiThang(it, bar); }
-    catch (e) { btn.innerHTML = '<span class="spinner"></span>Máy chủ tải hộ'; blob = await taiHo(it); }
+    catch (e) {
+      btn.innerHTML = '<span class="spinner"></span>Máy chủ tải hộ';
+      try { blob = await taiHoCF(it, bar); } catch (e2) { blob = await taiHo(it); }   // Cloudflare (không giới hạn) → Apps Script (≤35MB)
+    }
     if (!blob || blob.size < 500) throw new Error('rong');
     luuBlob(blob, tenFile(it, blob.type)); toast('Đã tải: ' + tenFile(it, blob.type));
     btn.textContent = '✓ Đã tải';

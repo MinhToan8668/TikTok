@@ -363,6 +363,16 @@ Mỗi lượt hỏi đáp với trợ lý (của học viên, khách và cả me
 Cách hiệu quả nhất là **bật billing (Tier 1)** cho project của key chính. Hạn mức mỗi phút tăng lên hàng chục lần, trả tiền theo lượng dùng (bản flash rất rẻ). Làm vậy là hết cảnh 429 và phải chờ.
 Video đã tải lên Files API chỉ key của đúng project đó đọc được, nên lượt có video lớn luôn dùng key chính.
 
+## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
+
+Cài theo [`cloudflare/CAI-DAT.md`](../cloudflare/CAI-DAT.md) (khoảng 10 phút, không cần thẻ). Có máy chủ này tool thêm:
+
+- **Dựng video → Footage → Kho B-roll miễn phí**: tìm video stock Pexels bằng tiếng Việt (máy chủ tự dịch từ khoá nếu ít kết quả), bấm là vào footage, kéo vào V2. Không tốn lượt.
+- **Dựng video → Thuộc tính → Lồng tiếng AI (A2)**: gõ lời (hoặc để trống lấy câu tại đầu phát / hook), chọn 8 giọng nam nữ, ghi cách đọc, bấm Tạo. Giọng đặt lên track A2 tại đầu phát, kéo được, khi phát tiếng gốc hạ còn 25% và nhạc hạ như khi có lời. Lưu cả trong file dự án. Tốn 1 lượt Dựng video mỗi lần (Pro, học viên không giới hạn).
+- **Tải video**: file lớn hơn 35MB tải qua máy chủ Cloudflare, stream thẳng về máy, có tên file.
+
+Bot: `/maychu <link>` để nối, `/maychu` để xem tình trạng, `/maychu xoa` để tắt. Script property tương ứng: `CF_URL`.
+
 ## Tool 6 · Dựng video (tools/dung-video.html + DungVideo.gs)
 
 Trình dựng kiểu Vyra, giao diện tối chuyên nghiệp: **Footage → AI hiểu footage → ra lệnh cho Trợ lý dựng → sửa trên dòng thời gian nhiều track → xuất ngay trên máy.** Hợp talking head, vlog, lồng tiếng, montage có nhạc.

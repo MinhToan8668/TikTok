@@ -210,8 +210,13 @@ function stZalo(){
 function stCauHinh(){
   var gk = {}; try{ gk = (getConfig() || {}).pricing || {}; }catch(e){}   // học phí khoá (bot /giasom, /gia) để bảng Nâng cấp so sánh
   return jsonOut({ok:true, goi: stGoi(), bank: stNganHang(), zalo: stZalo(), hv: stHV(), khoa: {gia_som: Number(gk.earlyBird) || 0, gia_goc: Number(gk.regular) || 0},
-    luot_thu: ST_LUOT_THU, luot: {hook: ST_LUOT_THU, script: ST_LUOT_KB, soi: ST_LUOT_SOI, cham: ST_LUOT_CHAM, taive: ST_LUOT_TAI, chat: ST_LUOT_CHAT, dung: ST_LUOT_DUNG}});
+    luot_thu: ST_LUOT_THU, luot: {hook: ST_LUOT_THU, script: ST_LUOT_KB, soi: ST_LUOT_SOI, cham: ST_LUOT_CHAM, taive: ST_LUOT_TAI, chat: ST_LUOT_CHAT, dung: ST_LUOT_DUNG},
+    may_chu: stMayChu()});   // máy chủ phụ Cloudflare (bot /maychu): kho B-roll, lồng tiếng AI, tải hộ file lớn
 }
+
+/* ── máy chủ phụ Cloudflare Workers (cloudflare/worker.js, hướng dẫn cloudflare/CAI-DAT.md).
+   Bot: /maychu https://ten.tai-khoan.workers.dev · /maychu xoa. Không cài thì tool vẫn chạy, chỉ thiếu kho B-roll, lồng tiếng, tải hộ >35MB. ── */
+function stMayChu(){ return String(cfgProp('CF_URL') || '').trim().replace(/\/+$/, ''); }
 
 /* ── đăng ký: không cần duyệt, có ngay lượt AI miễn phí ── */
 function stDangKy(b){
@@ -742,7 +747,7 @@ function stNapHoSoMau(){
 
 /* ═══════ LỆNH BOT TELEGRAM (chỉ chat quản trị) ═══════
    Code.gs gọi:  if (quanTri && studioCoLenh(cmd)) return studioLenh(cmd, arg, chatId);  */
-var LENH_STUDIO = ['studio','stk','giapro','ngaypro','ngayhv','giahv','uudaihv','luotthu','luotkb','luotsoi','luotcham','luottai','luotchat','luotdung','luotai','baihoc','duyetbh','tatbh','xoabh','day','chatngay','tuvan','tonghop','mopro','tatpro','dsck','timnd','ckkhoa','tienkhoa','hoso','lichsu','dshv','naphoso'];
+var LENH_STUDIO = ['studio','stk','giapro','ngaypro','ngayhv','giahv','uudaihv','maychu','luotthu','luotkb','luotsoi','luotcham','luottai','luotchat','luotdung','luotai','baihoc','duyetbh','tatbh','xoabh','day','chatngay','tuvan','tonghop','mopro','tatpro','dsck','timnd','ckkhoa','tienkhoa','hoso','lichsu','dshv','naphoso'];
 function studioCoLenh(cmd){ return LENH_STUDIO.indexOf(cmd) > -1; }
 
 var ST_MA_NH = {vietcombank:'VCB', vcb:'VCB', mb:'MB', mbbank:'MB', quandoi:'MB', techcombank:'TCB', tcb:'TCB',
@@ -798,6 +803,7 @@ function studioLenh(cmd, arg, chatId){
       '⬇️ /luottai `10` — lượt tải video miễn phí cho khách (học viên, Pro không giới hạn)',
       '🎞 /luotdung `2` — số source AI nhận diện miễn phí ở tool Dựng video cho tài khoản Free',
       '💬 /luotchat `15` — tin chat với Trợ lý AI cho tài khoản Free · /chatngay `60` — mỗi ngày cho Pro, học viên',
+      '☁️ /maychu `https://…workers.dev` — máy chủ phụ Cloudflare (kho B-roll, lồng tiếng AI, tải hộ file lớn) · hiện: ' + (stMayChu() ? '`' + stMayChu() + '`' : '_chưa cài_'),
       '🧠 /baihoc — bộ nhớ AI · /day `nội dung` — dạy AI · /duyetbh /tatbh /xoabh `id`',
       '💬 /tuvan — học viên đang hỏi trợ lý gì · /tonghop — AI tự rút bài học từ các lượt tư vấn mới',
       '🤖 /luotai `20` — lượt AI mỗi ngày của Pro và học viên',
@@ -851,6 +857,15 @@ function studioLenh(cmd, arg, chatId){
     if (th === 0 ? false : (!th || th < 1000)) return hoi('Chưa hiểu số tiền. Gửi `0` hoặc ví dụ `20000`.');
     var h2 = stHV(); h2.gia = th; P.setProperty('ST_HV', JSON.stringify(h2));
     return tgSend(chatId, '✅ Gói học viên khoá: *' + (h2.gia ? stTien(h2.gia) : 'miễn phí') + '* · ' + (h2.ngay ? h2.ngay + ' ngày' : 'suốt đời') + '. Landing cập nhật ngay lần mở sau.');
+  }
+  if (cmd === 'maychu'){
+    if (!arg) return hoi('☁️ Gửi link máy chủ Cloudflare Worker (dạng `https://ten.tai-khoan.workers.dev`), xem hướng dẫn cài trong `cloudflare/CAI-DAT.md`. Gửi `xoa` để tắt.' + (stMayChu() ? '\n\nHiện: `' + stMayChu() + '`' : ''));
+    if (/^(xoa|xóa|0)$/i.test(arg.trim())){ P.deleteProperty('CF_URL'); return tgSend(chatId, '✅ Đã tắt máy chủ phụ. Tool vẫn chạy bằng Apps Script.'); }
+    var cf = String(arg).trim().replace(/\/+$/, '');
+    if (!/^https:\/\/[a-z0-9.-]+\.[a-z]{2,}(\/[^\s]*)?$/i.test(cf)) return tgSend(chatId, '⚠️ Link phải bắt đầu bằng https:// (ví dụ `https://viral-studio.abc.workers.dev`).');
+    var tt = ''; try{ var rr = UrlFetchApp.fetch(cf + '/', {muteHttpExceptions:true, followRedirects:true}); var jj = JSON.parse(rr.getContentText()); if (jj.ok){ var dv = jj.dich_vu || {}; tt = '\n\nMáy chủ trả lời ✅ phiên bản ' + jj.phien_ban + '\n• Kho B-roll: ' + (dv.broll ? '✅' : '❌ thiếu PEXELS_KEY') + '\n• Lồng tiếng AI: ' + (dv.tts ? '✅' : '❌ thiếu GEMINI_API_KEYS') + '\n• Kiểm lượt: ' + (dv.kiem_luot ? '✅' : '❌ thiếu APPS_SCRIPT_URL'); } else tt = '\n\n⚠️ Link mở được nhưng không phải máy chủ Viral Studio.'; }catch(e){ tt = '\n\n⚠️ Chưa gọi được máy chủ (' + String(e).slice(0, 80) + '). Vẫn lưu, kiểm lại sau.'; }
+    P.setProperty('CF_URL', cf);
+    return tgSend(chatId, '✅ Máy chủ phụ: `' + cf + '`' + tt);
   }
   if (cmd === 'uudaihv'){
     if (!arg) return hoi('🎁 Gửi câu ưu đãi cho học viên, hiện trong bảng Nâng cấp Pro. Ví dụ `Tặng Pro suốt khoá + 1 buổi sửa kênh 1:1`. Gửi `xoa` để về câu mặc định.');

@@ -503,6 +503,16 @@
     try { var r = await goi({ action: 'st_cfg' }); if (r.ok) TK.cfg = r; } catch (e) { }
     return TK.cfg;
   }
+  /* máy chủ phụ Cloudflare (bot /maychu). Trả '' nếu mentor chưa cài: tool tự ẩn kho B-roll, lồng tiếng, tải hộ lớn.
+     Dò một lần bằng GET / để biết máy chủ có key gì (dich_vu), nhớ trong phiên. */
+  var mayChuNho = null;
+  async function mayChu() {
+    var c = await napCfg(), u = (c && c.may_chu) ? String(c.may_chu).replace(/\/+$/, '') : '';
+    if (!u) return { url: '', dich_vu: {} };
+    if (mayChuNho && mayChuNho.url === u) return mayChuNho;
+    var dv = {}; try { var ctl = new AbortController(); setTimeout(function () { ctl.abort(); }, 6000); var r = await fetch(u + '/', { signal: ctl.signal }); var j = await r.json(); if (j.ok) dv = j.dich_vu || {}; } catch (e) { }
+    mayChuNho = { url: u, dich_vu: dv }; return mayChuNho;
+  }
   var goiChon = null;   // gói người dùng vừa chọn trong bảng Nâng cấp
   function dsGoi() { return (TK.cfg && TK.cfg.goi && TK.cfg.goi.length) ? TK.cfg.goi : []; }
   function goiPro() { return goiChon || dsGoi()[0] || { ten: 'Pro', gia: 0, ngay: 0 }; }
@@ -947,7 +957,7 @@
   }
 
   global.TK = {
-    khoiDong: khoiDong, nap: nap, mo: mo, dong: dong, canCo: canCo, moHet: moHet,
+    khoiDong: khoiDong, nap: nap, mo: mo, dong: dong, canCo: canCo, moHet: moHet, mayChu: mayChu,
     goiNen: goiNen, nhanViec: nhanViec, viecDangCho: function () { return dsViec(); },
     luotTai: luotTai, canTai: canTai, dungTai: dungTai, veNhanFree: veNhanFree,
     goi: goi, loiMang: loiMang, loiMayChu: loiMayChu,   // tool dùng chung một cách gọi API và một cách phân loại lỗi
