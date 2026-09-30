@@ -363,6 +363,10 @@ Mỗi lượt hỏi đáp với trợ lý (của học viên, khách và cả me
 Cách hiệu quả nhất là **bật billing (Tier 1)** cho project của key chính. Hạn mức mỗi phút tăng lên hàng chục lần, trả tiền theo lượng dùng (bản flash rất rẻ). Làm vậy là hết cảnh 429 và phải chờ.
 Video đã tải lên Files API chỉ key của đúng project đó đọc được, nên lượt có video lớn luôn dùng key chính.
 
+### Xoá nền người nói (chạy trên máy, không tốn lượt)
+
+Thuộc tính → **Nền người nói**: Giữ nguyên · Xoá nền → nhoè · Xoá nền → màu (chọn màu) · Xoá nền → tối. Lần đầu bật, trình duyệt tải mô hình MediaPipe Selfie Segmenter (~10MB, tải một lần), sau đó tách người khỏi nền cho từng khung khi xem trước và khi xuất; tương thích cả ba kiểu khung dọc (cắt giữa, bám mặt, giữ nguyên). Không thấy người trong khung thì vẽ như thường, nên bật nhầm trên b-roll cũng không hỏng hình. Mép người đẹp nhất khi nền phẳng, ánh sáng đều; xuất video chậm hơn bình thường. Lưu trong file dự án (`nenKieu`, `nenMau`).
+
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 
 Cài theo [`cloudflare/CAI-DAT.md`](../cloudflare/CAI-DAT.md) (khoảng 10 phút, không cần thẻ). Có máy chủ này tool thêm:

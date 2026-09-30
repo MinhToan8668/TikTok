@@ -357,6 +357,9 @@
           <h3>Hook & khung</h3>
           <label class="full"><span>Hook chữ 3 giây đầu</span><input type="text" id="hook" placeholder="Để trống = không có"></label>
           <label><span>Khung dọc</span><select id="khungKieu"><option value="cat">Cắt giữa 9:16</option><option value="bam_mat">Bám theo mặt (tự dò)</option><option value="mo">Giữ nguyên, nền mờ</option></select></label>
+          <label><span>Nền người nói</span><select id="nenKieu" title="Xoá nền chạy trên máy bằng AI, không tốn lượt. Hợp video một người nói trước camera."><option value="giu">Giữ nguyên</option><option value="mo">Xoá nền → nhoè</option><option value="mau">Xoá nền → màu</option><option value="toi">Xoá nền → tối</option></select></label>
+          <label id="nenMauHang" hidden><span>Màu nền</span><input type="color" id="nenMau" value="#99DF00"></label>
+          <div class="quota" id="nenTt" hidden></div>
           <label><span>Font chữ</span><select id="font"><option value="be_vietnam">Be Vietnam Pro</option><option value="montserrat">Montserrat</option><option value="bricolage">Bricolage</option><option value="lexend">Lexend</option><option value="oswald">Oswald (hẹp)</option><option value="anton">Anton (đập)</option><option value="playfair">Playfair (thanh lịch)</option></select></label>
           <label><span>Zoom nhấn</span><input type="checkbox" id="zoomOn" checked></label>
           <div id="tiengHop" hidden><h3>Lồng tiếng AI (A2)</h3>
@@ -576,11 +579,13 @@ async function hieu(s) {
 
 /* ═════════ dò mặt (MediaPipe Face Detector, chạy WASM tại máy; không có thì FaceDetector của trình duyệt; không có nữa thì giữ giữa) ═════════ */
 let mpDet = null, mpLoi = false;
+const MP_URL = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/';
+let mpMod = null;
+async function mpModule() { if (!mpMod) mpMod = (async () => { const m = await import(MP_URL + 'vision_bundle.mjs'); const vision = await m.FilesetResolver.forVisionTasks(MP_URL + 'wasm'); return { m, vision }; })().catch(e => { mpMod = null; throw e; }); return mpMod; }
 async function mpNap() {
   if (mpDet || mpLoi) return mpDet;
   try {
-    const m = await import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs');
-    const vision = await m.FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm');
+    const { m, vision } = await mpModule();
     mpDet = await m.FaceDetector.createFromOptions(vision, { baseOptions: { modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/1/blaze_face_short_range.tflite' }, runningMode: 'IMAGE', minDetectionConfidence: 0.5 });
   } catch (e) { console.warn('mediapipe', e); mpLoi = true; }
   return mpDet;
@@ -735,6 +740,7 @@ function dongBoTick() { $$('.cau').forEach(d => { const s = srcCua(d.dataset.src
 function vePh() { $('#ph').style.left = (64 + P.t * PX()) + 'px'; const sc = $('#tlScroll'), x = P.t * PX(); if (P.dang && (x < sc.scrollLeft || x > sc.scrollLeft + sc.clientWidth - 120)) sc.scrollLeft = Math.max(0, x - 80); }
 $('#zoomTl').addEventListener('input', () => { P.pxs = +$('#zoomTl').value; veTl(); });
 $('#btnSnap').onclick = () => { P.snap = !P.snap; $('#btnSnap').setAttribute('aria-pressed', String(P.snap)); };
+$('#nenKieu').addEventListener('change', () => { const k = $('#nenKieu').value; $('#nenMauHang').hidden = k !== 'mau'; if (k !== 'giu') segNap(); else $('#nenTt').hidden = true; segNho = { khoa: '', cv: null }; if (!P.dang) veKhung(); });
 $('#btnSlip').onclick = () => { P.slip = !P.slip; $('#btnSlip').setAttribute('aria-pressed', String(P.slip)); toast(P.slip ? 'Trượt: kéo đoạn V1 để đổi khúc lấy trong source, độ dài giữ nguyên' : 'Đã tắt Trượt'); };
 $('#btnRipple').onclick = () => { P.ripple = !P.ripple; $('#btnRipple').setAttribute('aria-pressed', String(P.ripple)); };
 $('#chuyenMacDinh').onchange = () => { luuHoanTac(); const v = $('#chuyenMacDinh').value; P.clips.forEach((c, i) => { if (i < P.clips.length - 1) c.chuyen = v; }); if (v !== 'cat') gltNap(); veTl(); veKhung(); };
@@ -749,10 +755,10 @@ $('#cv').addEventListener('pointerdown', e => {
   cv.addEventListener('pointermove', mv); cv.addEventListener('pointerup', up);
 });
 /* lưu / mở dự án: dòng thời gian + cài đặt, footage nhận lại theo tên + cỡ file */
-function duAnJson() { return { v: 3, ten: $('#tenDuAn').value, srcs: P.srcs.map(s => ({ id: s.id, ten: s.ten, size: s.file.size, loai: s.loai, giay: s.giay, w: s.w, h: s.h, tu: s.tu, cau: s.cau, canh: s.canh, khoanh_khac: s.khoanh_khac, loai_canh: s.loai_canh, mo_ta: s.mo_ta, mat: s.mat, hook_goi_y: s.hook_goi_y, nhan_manh: s.nhan_manh })), clips: P.clips, gfx: P.gfx, broll: P.broll, tieng: P.tieng.map(t => ({ id: t.id, text: t.text, giong: t.giong, cach: t.cach, giay: t.giay, t_bd: t.t_bd, b64: t.b64 })), zoom: P.zoom, beat: P.beat, nhacTen: P.nhac && P.nhac.ten, pdY: P.pdY, lichSu: P.lichSu.slice(-10), cai: Object.fromEntries(['hook', 'phuDe', 'pdKieu', 'pdCum', 'pdNhan', 'khungKieu', 'zoomOn', 'duckNoi', 'duckBroll', 'font', 'doPhanGiai'].map(id => [id, $('#' + id).type === 'checkbox' ? $('#' + id).checked : $('#' + id).value])), mau: mauNhan() }; }
+function duAnJson() { return { v: 3, ten: $('#tenDuAn').value, srcs: P.srcs.map(s => ({ id: s.id, ten: s.ten, size: s.file.size, loai: s.loai, giay: s.giay, w: s.w, h: s.h, tu: s.tu, cau: s.cau, canh: s.canh, khoanh_khac: s.khoanh_khac, loai_canh: s.loai_canh, mo_ta: s.mo_ta, mat: s.mat, hook_goi_y: s.hook_goi_y, nhan_manh: s.nhan_manh })), clips: P.clips, gfx: P.gfx, broll: P.broll, tieng: P.tieng.map(t => ({ id: t.id, text: t.text, giong: t.giong, cach: t.cach, giay: t.giay, t_bd: t.t_bd, b64: t.b64 })), zoom: P.zoom, beat: P.beat, nhacTen: P.nhac && P.nhac.ten, pdY: P.pdY, lichSu: P.lichSu.slice(-10), cai: Object.fromEntries(['hook', 'phuDe', 'pdKieu', 'pdCum', 'pdNhan', 'khungKieu', 'nenKieu', 'nenMau', 'zoomOn', 'duckNoi', 'duckBroll', 'font', 'doPhanGiai'].map(id => [id, $('#' + id).type === 'checkbox' ? $('#' + id).checked : $('#' + id).value])), mau: mauNhan() }; }
 $('#btnLuuDA').onclick = () => { const blob = new Blob([JSON.stringify(duAnJson())], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = (($('#tenDuAn').value.trim() || 'du-an').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').replace(/[^A-Za-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'du-an') + '.tmxk.json'; a.click(); toast('Đã lưu dự án. Mở lại thì thêm lại đúng các file footage.'); };
 $('#btnMoDA').onclick = () => $('#moDAIn').click();
-$('#moDAIn').onchange = async e => { const f = e.target.files[0]; if (!f) return; try { const o = JSON.parse(await f.text()); P.duAnCho = o; $('#tenDuAn').value = o.ten || 'Video mới'; Object.keys(o.cai || {}).forEach(id => { const x = $('#' + id); if (!x) return; if (x.type === 'checkbox') x.checked = !!o.cai[id]; else x.value = o.cai[id]; }); if (o.mau) $$('#pdMau button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.m === o.mau))); P.pdY = o.pdY || 0.78; P.lichSu = o.lichSu || []; P.tieng = (o.tieng || []).filter(t => t.b64).map(t => ({ ...t, url: URL.createObjectURL(new Blob([Uint8Array.from(atob(t.b64), c => c.charCodeAt(0))], { type: 'audio/wav' })) })); veTl(); veDs(); capNhatFont(); docTuNhan(); nhanDuAn(); toast('Đã mở dự án. Thêm lại ' + (o.srcs || []).length + ' file footage: ' + (o.srcs || []).map(x => x.ten).join(', ')); doiTab('footage'); } catch { toast('File dự án không đọc được'); } e.target.value = ''; };
+$('#moDAIn').onchange = async e => { const f = e.target.files[0]; if (!f) return; try { const o = JSON.parse(await f.text()); P.duAnCho = o; $('#tenDuAn').value = o.ten || 'Video mới'; Object.keys(o.cai || {}).forEach(id => { const x = $('#' + id); if (!x) return; if (x.type === 'checkbox') x.checked = !!o.cai[id]; else x.value = o.cai[id]; }); if (o.mau) $$('#pdMau button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.m === o.mau))); P.pdY = o.pdY || 0.78; P.lichSu = o.lichSu || []; P.tieng = (o.tieng || []).filter(t => t.b64).map(t => ({ ...t, url: URL.createObjectURL(new Blob([Uint8Array.from(atob(t.b64), c => c.charCodeAt(0))], { type: 'audio/wav' })) })); veTl(); veDs(); capNhatFont(); docTuNhan(); $('#nenMauHang').hidden = $('#nenKieu').value !== 'mau'; if (segBat()) segNap(); nhanDuAn(); toast('Đã mở dự án. Thêm lại ' + (o.srcs || []).length + ' file footage: ' + (o.srcs || []).map(x => x.ten).join(', ')); doiTab('footage'); } catch { toast('File dự án không đọc được'); } e.target.value = ''; };
 /* footage thêm vào khớp tên + cỡ với dự án đang chờ → gắn lại id, lời thoại, dòng thời gian */
 function nhanDuAn() { const o = P.duAnCho; if (!o) return; let du = 0; P.srcs.forEach(s => { const m = (o.srcs || []).find(x => x.ten === s.ten && x.size === s.file.size && !x.daGan); if (!m) return; m.daGan = true; du++; const cu = s.id; Object.assign(s, { id: m.id, tu: m.tu || [], cau: m.cau || [], canh: m.canh || [], khoanh_khac: m.khoanh_khac || [], loai_canh: m.loai_canh, mo_ta: m.mo_ta, mat: m.mat || [], hook_goi_y: m.hook_goi_y || [], nhan_manh: m.nhan_manh || [], tt: (m.cau && m.cau.length) || (m.canh && m.canh.length) ? 'xong' : s.tt }); }); if (du && du === (o.srcs || []).length) { P.clips = o.clips || []; P.gfx = o.gfx || []; P.broll = o.broll || []; P.zoom = o.zoom || []; if (!P.beat.length && o.beat) P.beat = o.beat; P.duAnCho = null; veTl(); veLoi(); veKhung(); toast('Đã khôi phục dòng thời gian của dự án'); } else if (du) { veSrcs(); veLoi(); toast('Đã nhận ' + du + '/' + (o.srcs || []).length + ' footage, thêm nốt phần còn lại'); } }
 /* mốc hít: beat, mép câu (trên dòng thời gian) */
@@ -831,7 +837,7 @@ Object.keys(GX).forEach(k => { const b = el('button'); b.type = 'button'; b.inne
 $$('#pdMau button').forEach(b => b.onclick = () => { $$('#pdMau button').forEach(x => x.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); veKhung(); });
 const mauNhan = () => ($('#pdMau [aria-pressed="true"]') || {}).dataset?.m || '#99DF00';
 function docTuNhan() { P.tuNhan = $('#pdNhan').value.split(/[,;]/).map(x => x.trim().toLowerCase()).filter(Boolean); }
-['hook', 'phuDe', 'pdKieu', 'pdCum', 'pdNhan', 'khungKieu', 'zoomOn', 'duckNoi', 'duckBroll', 'snapBeat'].forEach(id => $('#' + id).addEventListener('input', () => { docTuNhan(); veTl(); if (!P.dang) veKhung(); }));
+['hook', 'phuDe', 'pdKieu', 'pdCum', 'pdNhan', 'khungKieu', 'nenMau', 'zoomOn', 'duckNoi', 'duckBroll', 'snapBeat'].forEach(id => $('#' + id).addEventListener('input', () => { docTuNhan(); veTl(); if (!P.dang) veKhung(); }));
 $('#nhacIn').onchange = async e => { const f = e.target.files[0]; if (!f) return; $('#nhacTt').textContent = 'Đang đo beat…'; try { const ab = await giaiMaAm(f); P.beat = doBeat(ab); P.nhac = { ten: f.name, url: URL.createObjectURL(f), giay: ab.duration }; if (nhacEl) { nhacEl.pause(); nhacEl = null; nhacGain = null; } $('#nhacTt').textContent = '✓ ' + f.name + ' · ' + fmt(ab.duration) + ' · ' + P.beat.length + ' beat' + (P.beat.length > 4 ? ' (~' + Math.round(60 / ((P.beat[P.beat.length - 1] - P.beat[0]) / (P.beat.length - 1))) + ' BPM)' : ''); veTl(); toast('Đã đo ' + P.beat.length + ' beat. Bật 🧲 Hít để mép đoạn bám beat, hoặc bảo trợ lý "cắt theo beat".'); } catch (err) { $('#nhacTt').textContent = 'Không đọc được file nhạc.'; } };
 
 /* ═════════ phụ đề theo cụm từ ═════════ */
@@ -933,10 +939,64 @@ function gltVe(kieu, tu, den, p, W, H) {
 }
 /* khung nền (V1 + b-roll V2) của một thời điểm; nguon = 'chinh' dùng s.el, 'phu' dùng s.el2 (đã tự seek) */
 const nenCv = document.createElement('canvas'), snapCv = document.createElement('canvas');
+/* ═════════ xoá nền người nói: MediaPipe Selfie Segmenter chạy trên máy, không tốn lượt ═════════
+   Mặt nạ tính trên khung nhỏ (cạnh dài 256px) rồi áp lên người bằng destination-in theo đúng phép crop đang dùng,
+   nên hoạt động với cả ba kiểu khung (cắt giữa, bám mặt, giữ nguyên). Không thấy người thì vẽ như thường. */
+let segModel = null, segLoi = false, segDangNap = null, segNho = { khoa: '', cv: null };
+const segCv = document.createElement('canvas'), maskCv = document.createElement('canvas'), fgCv = document.createElement('canvas');
+function segBat() { return $('#nenKieu').value !== 'giu'; }
+async function segNap() {
+  if (segModel || segLoi) return segModel; if (segDangNap) return segDangNap;
+  $('#nenTt').hidden = false; $('#nenTt').textContent = 'Đang tải mô hình xoá nền (~10MB, một lần)…';
+  segDangNap = (async () => {
+    try {
+      const { m, vision } = await mpModule();
+      const opt = d => ({ baseOptions: { modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_segmenter/float16/latest/selfie_segmenter.tflite', delegate: d }, runningMode: 'IMAGE', outputCategoryMask: false, outputConfidenceMasks: true });
+      try { segModel = await m.ImageSegmenter.createFromOptions(vision, opt('GPU')); } catch (e) { console.warn('segmenter GPU', e); segModel = await m.ImageSegmenter.createFromOptions(vision, opt('CPU')); }
+      $('#nenTt').textContent = '✓ Xoá nền chạy trên máy này, không tốn lượt. Mép người đẹp nhất khi nền phẳng, ánh sáng đều. Xuất video sẽ chậm hơn bình thường.';
+    } catch (e) { console.warn('segmenter', e); segLoi = true; $('#nenTt').textContent = '⚠ Máy này chưa tải được mô hình xoá nền (cần mạng và WebAssembly). Đang vẽ nền gốc.'; }
+    segDangNap = null; if (!P.dang) veKhung(); return segModel;
+  })();
+  return segDangNap;
+}
+/* mặt nạ người của một khung hình: canvas cùng tỉ lệ với source, alpha = độ tin là người */
+function segMask(s, im, tSrc) {
+  const khoa = s.id + '|' + tSrc.toFixed(2); if (segNho.khoa === khoa) return segNho.cv;
+  const iw = s.w || 1, ih = s.h || 1, sc = 256 / Math.max(iw, ih), w = Math.max(16, Math.round(iw * sc)), h = Math.max(16, Math.round(ih * sc));
+  if (segCv.width !== w || segCv.height !== h) { segCv.width = w; segCv.height = h; maskCv.width = w; maskCv.height = h; }
+  segCv.getContext('2d').drawImage(im, 0, 0, w, h);
+  let r; try { r = segModel.segment(segCv); } catch (e) { console.warn('segment', e); return null; }
+  try {
+    const ms = r.confidenceMasks || []; if (!ms.length) return null;
+    const m = ms.length >= 2 ? ms[1] : ms[0], mw = m.width, mh = m.height, a = m.getAsFloat32Array();
+    // mô hình 1 lớp có thể trả độ tin của nền: người nói thường ở giữa khung, mép trên là nền → so để biết chiều
+    let giua = 0, ng = 0, mep = 0, nm = 0;
+    for (let y = 0; y < mh; y++) for (let x = 0; x < mw; x++) { const v = a[y * mw + x]; if (x > mw * 0.35 && x < mw * 0.65 && y > mh * 0.3 && y < mh * 0.8) { giua += v; ng++; } if (y < mh * 0.06) { mep += v; nm++; } }
+    giua /= ng || 1; mep /= nm || 1; const dao = ms.length < 2 && mep > 0.6 && giua < 0.4;   // chỉ đảo khi rõ ràng mép là 'người' còn giữa là 'nền'
+    let tong = 0; const g = maskCv.getContext('2d'), id = g.createImageData(mw, mh), d = id.data;
+    for (let i = 0; i < a.length; i++) { let v = dao ? 1 - a[i] : a[i]; v = v < 0.25 ? 0 : v > 0.75 ? 1 : (v - 0.25) * 2; tong += v; d[i * 4 + 3] = v * 255; }
+    if (tong / a.length < 0.02) { segNho = { khoa, cv: null }; return null; }   // không thấy người: vẽ như thường
+    if (maskCv.width !== mw || maskCv.height !== mh) { maskCv.width = mw; maskCv.height = mh; }
+    g.putImageData(id, 0, 0); segNho = { khoa, cv: maskCv }; return maskCv;
+  } finally { try { r.close(); } catch {} }
+}
 function veNguon(ctx, W, H, s, im, tSrc, z) {
-  const iw = s.w || 1, ih = s.h || 1, kieu = $('#khungKieu').value;
-  if (kieu === 'mo' && iw / ih > W / H) { ctx.save(); ctx.filter = 'blur(28px) brightness(.55)'; const sc = H / ih; ctx.drawImage(im, W / 2 - iw * sc / 2, 0, iw * sc, H); ctx.restore(); const sc2 = (W / iw) * z, hh = ih * sc2; ctx.drawImage(im, W / 2 - iw * sc2 / 2, H / 2 - hh / 2, iw * sc2, hh); return; }
-  if (kieu === 'bam_mat' && s.mat && s.mat.length && iw / ih > W / H) { const cw = ih * W / H / z, ch = ih / z, cx0 = Math.max(cw / 2, Math.min(iw - cw / 2, cxTai(s, tSrc) * iw)), cy0 = ih / 2; ctx.drawImage(im, cx0 - cw / 2, cy0 - ch / 2, cw, ch, 0, 0, W, H); return; }
+  const nen = $('#nenKieu').value;
+  if (nen === 'giu' || s.loai !== 'video' || !segModel) { veNguonThuong(ctx, W, H, s, im, tSrc, z, im, false); return; }
+  const mk = segMask(s, im, tSrc); if (!mk) { veNguonThuong(ctx, W, H, s, im, tSrc, z, im, false); return; }
+  if (nen === 'mo') { ctx.save(); ctx.filter = 'blur(22px) brightness(.62)'; veNguonThuong(ctx, W, H, s, im, tSrc, z, im, true); ctx.restore(); }
+  else if (nen === 'mau') { ctx.fillStyle = $('#nenMau').value || '#99DF00'; ctx.fillRect(0, 0, W, H); }
+  else { const gr = ctx.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, '#1b1f24'); gr.addColorStop(1, '#05060a'); ctx.fillStyle = gr; ctx.fillRect(0, 0, W, H); }
+  if (fgCv.width !== W || fgCv.height !== H) { fgCv.width = W; fgCv.height = H; }
+  const g = fgCv.getContext('2d'); g.clearRect(0, 0, W, H); veNguonThuong(g, W, H, s, im, tSrc, z, im, true);
+  g.save(); g.globalCompositeOperation = 'destination-in'; g.filter = 'blur(' + Math.max(1, W / 540) + 'px)'; veNguonThuong(g, W, H, s, im, tSrc, z, mk, true); g.restore();
+  ctx.drawImage(fgCv, 0, 0);
+}
+/* vẽ source (hoặc mặt nạ cùng tỉ lệ) theo kiểu khung; khongNen = bỏ lớp nền mờ của kiểu 'mo' */
+function veNguonThuong(ctx, W, H, s, im, tSrc, z, anh, khongNen) {
+  const iw = s.w || 1, ih = s.h || 1, kieu = $('#khungKieu').value; im = anh; const k = ((anh.videoWidth || anh.naturalWidth || anh.width) || iw) / iw;   // mặt nạ nhỏ hơn source: đổi toạ độ cắt
+  if (kieu === 'mo' && iw / ih > W / H) { if (!khongNen) { ctx.save(); ctx.filter = 'blur(28px) brightness(.55)'; const sc = H / ih; ctx.drawImage(im, W / 2 - iw * sc / 2, 0, iw * sc, H); ctx.restore(); } const sc2 = (W / iw) * z, hh = ih * sc2; ctx.drawImage(im, W / 2 - iw * sc2 / 2, H / 2 - hh / 2, iw * sc2, hh); return; }
+  if (kieu === 'bam_mat' && s.mat && s.mat.length && iw / ih > W / H) { const cw = ih * W / H / z, ch = ih / z, cx0 = Math.max(cw / 2, Math.min(iw - cw / 2, cxTai(s, tSrc) * iw)), cy0 = ih / 2; ctx.drawImage(im, (cx0 - cw / 2) * k, (cy0 - ch / 2) * k, cw * k, ch * k, 0, 0, W, H); return; }
   const sc = Math.max(W / iw, H / ih) * z; ctx.drawImage(im, W / 2 - iw * sc / 2, H / 2 - ih * sc / 2, iw * sc, ih * sc);
 }
 function veNen(ctx, W, H, t, nguon) {
@@ -1003,6 +1063,7 @@ async function phat(xuat) {
   const canvas = xuat ? Object.assign(document.createElement('canvas'), { width: W, height: H }) : cv, ctx = canvas.getContext('2d');
   let rec = null, khuc = [];
   try { await document.fonts.load('900 40px ' + (FONT_CSS[$('#font').value] || FONT_CSS.be_vietnam)); } catch {}
+  if (segBat() && !segModel && !segLoi) { try { await segNap(); } catch {} }
   if (P.clips.some(c => c.chuyen && c.chuyen !== 'cat')) await gltNap();
   if (xuat) {
     const stream = canvas.captureStream(30); dest.stream.getAudioTracks().forEach(t => stream.addTrack(t));
