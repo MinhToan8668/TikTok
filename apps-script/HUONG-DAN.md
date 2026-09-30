@@ -390,6 +390,17 @@ Track **O2** chữ (phụ đề tự sinh + hook), **O1** đồ hoạ, **V1** vi
 ### Xuất
 canvas.captureStream + MediaRecorder, thời gian thực (60 giây video ≈ 60 giây), 1080×1920 hoặc 720×1280. Chrome máy tính và Safari ra MP4; Chromium không có H.264 ra WebM (TikTok web vẫn nhận). Không dựng trên máy chủ nên không vướng 6 phút của Apps Script.
 
-**Giới hạn:** chưa có chuyển cảnh và B-roll tự chèn từ kho; điện thoại nên dùng footage dưới 3 phút; tải lại trang phải thêm lại file (kết quả hiểu thì còn); mỗi lượt AI mất 1–2 phút trên key miễn phí.
+### Bản v3: chuyển cảnh, B-roll, bám mặt, font, Trượt/Ripple, dự án
+- **Chuyển cảnh:** lõi [gl-transitions](https://gl-transitions.com/) (MIT, 67 shader; bộ shader-transitions của HyperFrames cũng từ họ này) chạy WebGL tại máy. Dùng 10 kiểu: cắt, mờ, trượt, zoom, quét, whip, chớp, glitch, vòng tròn, nhoè. AI chọn theo nội dung (talking head cắt thẳng, montage whip/chớp ở beat); chỉnh từng đoạn ở Thuộc tính hoặc chọn mặc định trên thanh công cụ. Không có WebGL thì rơi về mờ dần 2D.
+- **Track V2 b-roll:** kéo một cảnh từ footage thả vào V2, hoặc bảo trợ lý "chèn b-roll". Kiểu che toàn khung hoặc khung nhỏ phía trên. Tắt tiếng, tự mờ vào/ra 0,25s.
+- **Bám theo mặt:** source ngang có người nói → trang tự dò mặt bằng MediaPipe Face Detector (WASM của Google, chạy tại máy, không tốn lượt; không tải được thì dùng FaceDetector của trình duyệt, không có nữa thì giữ giữa). Khung dọc "Bám theo mặt" crop theo tâm mặt, làm mượt ±1,2 giây.
+- **Font:** 7 font Google có tiếng Việt (Be Vietnam Pro, Montserrat, Bricolage, Lexend, Oswald, Anton, Playfair). AI gợi ý theo ngách, đổi ở Thuộc tính.
+- **Phụ đề:** thêm kiểu "bật từng từ" và "nổi lên từng từ"; kéo phụ đề lên xuống ngay trên khung xem trước.
+- **Thanh công cụ:** ↔ Trượt (kéo đoạn V1 để đổi khúc lấy trong source, giữ độ dài), ⇤ Ripple (xoá/cắt V1 thì chữ, đồ hoạ, b-roll phía sau dồn theo), chuyển cảnh mặc định.
+- **Dự án:** 💾 Lưu ra file `.tmxk.json` (dòng thời gian, phụ đề, đồ hoạ, cài đặt, kết quả hiểu footage). 📂 Mở lại rồi thêm đúng các file footage là khôi phục.
+- **Chế độ Nhanh/Kỹ** cho trợ lý dựng (như nút Fast của Vyra): Nhanh dùng flash-lite trả lời trong vài giây, Kỹ dùng flash.
+- **Xuất 1440×2560** cho máy mạnh.
+
+**Giới hạn:** chưa có B-roll từ kho ảnh ngoài (Pexels) vì video kho không cho vẽ lên canvas; điện thoại nên dùng footage dưới 3 phút; tải lại trang phải thêm lại file (kết quả hiểu thì còn); mỗi lượt AI mất 1–2 phút trên key miễn phí.
 
 **Đã học từ:** [Vyra](https://www.usevyra.com/ai-video-editor) (luồng footage understanding → chat → timeline → export tại máy, beat sync, ducking), [HyperFrames](https://github.com/heygen-com/hyperframes) (đồ hoạ seekable theo thời gian, catalog caption/kinetic), [Omniclip](https://github.com/omni-media/omniclip), [OpenCut](https://opencut.dev/), [OpenReel](https://github.com/Augani/openreel-video) (dựng và xuất hoàn toàn trong trình duyệt).

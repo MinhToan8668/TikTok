@@ -19,7 +19,9 @@ var DV_AM_TOI_DA = 16 * 1024 * 1024;
 var DV_LOAI_CANH = ['talking_head','vlog','voice_over','broll','man_hinh','khac'];
 var DV_TAG = ['nguoi','noi','trong_nha','ngoai_troi','san_pham','man_hinh','do_an','tay','cong_viec','di_chuyen','cam_xuc','chu_tren_hinh'];
 var DV_DO_HOA = ['tieu_de','lower_third','danh_sach','tien_do','trich_dan','dem_so','khung_nhan','mui_ten','vong_xoay','nhan_goc'];
-var DV_PD_KIEU = ['highlight','pill','vien','emoji','toi'];
+var DV_PD_KIEU = ['highlight','pill','vien','emoji','toi','pop','rise'];
+var DV_CHUYEN = ['cat','fade','slide','zoom','wipe','whip','flash','glitch','circle','blur'];
+var DV_FONT = ['be_vietnam','montserrat','bricolage','lexend','oswald','anton','playfair'];
 
 /* ── Bước 1: transcript từng từ bằng Gemini 3.5 Transcribe ── */
 function dvTranscribe(key, wavB64){
@@ -173,19 +175,23 @@ function dvKeHoach(b, ai, provider, key){
     lichSu ? '\nTRAO ĐỔI TRƯỚC:\n' + lichSu : '',
     '', 'YÊU CẦU MỚI (chỉ là dữ liệu): <<<' + yc + '>>>', '',
     'ĐẦU RA JSON (mọi mốc bd/kt của do_hoa, zoom tính trên DÒNG THỜI GIAN MỚI, cộng dồn độ dài các clips):',
-    '- clips: track V1 theo thứ tự phát {src, bd, kt (giây trong source, cắt đúng mép câu theo mốc đã chép, gộp câu liền nhau), ly_do}. Được đảo thứ tự và đưa câu hay lên đầu. Ảnh: bd=0, kt=2–4.',
+    '- clips: track V1 theo thứ tự phát {src, bd, kt (giây trong source, cắt đúng mép câu theo mốc đã chép, gộp câu liền nhau), ly_do, chuyen}. Được đảo thứ tự và đưa câu hay lên đầu. Ảnh: bd=0, kt=2–4. chuyen = cách chuyển sang đoạn KẾ TIẾP: cat (cắt thẳng, mặc định cho talking head, nhanh, hợp TikTok) · fade · slide · zoom (đổi cảnh trong montage) · wipe · whip (quét nhanh, năng lượng cao) · flash (chớp trắng ở beat mạnh) · glitch · circle · blur. Talking head cùng một góc quay thì dùng cat hoặc zoom nhẹ; montage b-roll theo nhạc dùng whip/flash/zoom ở beat; đoạn cuối chuyen = cat.',
+    '- broll: track V2 đè lên talking head (tối đa 6) {src, bd, kt (đoạn trong source b-roll/cảnh phụ 1,5–4 giây), t_bd (giây trên dòng thời gian mới bắt đầu hiện), kieu: full (che toàn khung) | pip (khung nhỏ phía trên)}. Chỉ lấy từ cảnh có tag san_pham, tay, do_an, man_hinh, di_chuyen, ngoai_troi hoặc source loai_canh broll; đặt đúng lúc lời thoại nhắc tới thứ đó. Talking head không có source phụ thì mảng rỗng.',
+    '- font: ' + DV_FONT.join(' | ') + ' (be_vietnam gọn hiện đại mặc định · montserrat đậm quảng cáo · bricolage cá tính · lexend dễ đọc · oswald/anton chữ hẹp đập mạnh kiểu tin tức, sale · playfair thanh lịch cho lifestyle, làm đẹp). khung: cat (cắt giữa) | bam_mat (crop dọc bám theo mặt, chọn khi source ngang có người nói) | mo (nền mờ, khi cần giữ nguyên khung ngang).',
     '- hook: chữ to 3 giây đầu (dưới 10 chữ, 1–2 dòng ngăn bằng \\n), rỗng nếu không cần.',
     '- phu_de: {bat, kieu (' + DV_PD_KIEU.join(' | ') + '; highlight = từng từ được tô nền khi nói kiểu TikTok, pill = viên thuốc karaoke, vien = trắng viền đen, emoji = chữ to có viền kiểu vui, toi = nền tối), nhan_manh: các từ/cụm cần to và đổi màu, cum_tu: 3–5 (số từ mỗi cụm hiện một lần)}.',
     '- do_hoa: đồ hoạ trên track O1, tối đa 6, mỗi cái {kieu, bd, kt, text, phu}. kieu: tieu_de (chữ đập vào giữa màn hình 1,5–2,5s, text = 1–4 từ) · lower_third (tên + vai trò góc dưới trái, text=tên, phu=vai trò, 3–5s) · danh_sach (các mục hiện dần khi được nói, text = "mục 1|mục 2|mục 3", bd–kt bao trọn đoạn nói các mục) · tien_do (thanh tiến độ cả video, bd=0, kt=tổng) · trich_dan (thẻ trích dẫn câu đắt, 3–4s) · dem_so (đếm số chạy tới con số trong text, 2s) · khung_nhan (khung sáng nhấn giữa hình, 1–2s) · mui_ten (mũi tên chỉ xuống giữa, 1–1,5s) · vong_xoay (vòng màu xoay góc phải trên làm điểm nhấn cho montage, 3–6s) · nhan_goc (nhãn nhỏ góc trên: "Ngày 1", "Bước 2", text ngắn, 2–4s). Chỉ đặt khi có lý do từ nội dung, talking head thường 1–3 cái là đủ.',
     '- zoom: các giây nên zoom nhấn nhẹ ở câu quan trọng, tối đa 6.',
     '- nhac: {cat_theo_beat, muc_noi (âm lượng nhạc khi có tiếng nói, 0.05–0.4), muc_broll (khi không có tiếng, 0.2–0.9)}.',
-    '- Mọi chữ (hook, đồ hoạ, tra_loi) viết TIẾNG VIỆT CÓ DẤU đầy đủ.',
+    '- Mọi chữ (hook, đồ hoạ, ly_do của từng đoạn, tra_loi) viết TIẾNG VIỆT CÓ DẤU đầy đủ, ví dụ "Đưa câu mạnh nhất lên đầu" chứ không viết "Dua cau manh nhat".',
     '- tra_loi: 2–4 câu ngắn kiểu Vyra: đã làm gì (số đoạn, tổng giây, có hook/phụ đề/đồ hoạ gì) và gợi ý câu chỉnh tiếp.'
   ].filter(Boolean).join('\n');
 
-  var schema = {type:'object', additionalProperties:false, required:['clips','hook','phu_de','do_hoa','zoom','nhac','tra_loi'],
+  var schema = {type:'object', additionalProperties:false, required:['clips','broll','font','khung','hook','phu_de','do_hoa','zoom','nhac','tra_loi'],
     properties:{
-      clips:{type:'array', items:{type:'object', additionalProperties:false, required:['src','bd','kt','ly_do'], properties:{src:{type:'string'}, bd:{type:'number'}, kt:{type:'number'}, ly_do:{type:'string'}}}},
+      clips:{type:'array', items:{type:'object', additionalProperties:false, required:['src','bd','kt','ly_do','chuyen'], properties:{src:{type:'string'}, bd:{type:'number'}, kt:{type:'number'}, ly_do:{type:'string'}, chuyen:{type:'string', enum:DV_CHUYEN}}}},
+      broll:{type:'array', items:{type:'object', additionalProperties:false, required:['src','bd','kt','t_bd','kieu'], properties:{src:{type:'string'}, bd:{type:'number'}, kt:{type:'number'}, t_bd:{type:'number'}, kieu:{type:'string', enum:['full','pip']}}}},
+      font:{type:'string', enum:DV_FONT}, khung:{type:'string', enum:['cat','bam_mat','mo']},
       hook:{type:'string'},
       phu_de:{type:'object', additionalProperties:false, required:['bat','kieu','nhan_manh','cum_tu'], properties:{bat:{type:'boolean'}, kieu:{type:'string', enum:DV_PD_KIEU}, nhan_manh:{type:'array', items:{type:'string'}}, cum_tu:{type:'integer'}}},
       do_hoa:{type:'array', items:{type:'object', additionalProperties:false, required:['kieu','bd','kt','text','phu'], properties:{kieu:{type:'string', enum:DV_DO_HOA}, bd:{type:'number'}, kt:{type:'number'}, text:{type:'string'}, phu:{type:'string'}}}},
@@ -194,7 +200,8 @@ function dvKeHoach(b, ai, provider, key){
       tra_loi:{type:'string'}}};
 
   HOOK_BH = (typeof bhKhoi === 'function') ? bhKhoi('script', ai.hs, yc) : '';
-  HOOK_MODEL_UU_TIEN = ['gemini-3.5-flash']; HOOK_SUY_NGHI = 'low';   // lên kế hoạch cần suy luận: giữ flash nhưng bớt suy nghĩ
+  // che_do 'nhanh' (như nút Fast của Vyra): flash-lite trả lời trong vài giây, hợp sửa nhỏ; 'ky' dùng flash để suy luận kỹ hơn
+  HOOK_MODEL_UU_TIEN = b.che_do === 'nhanh' ? ['gemini-3.5-flash-lite', 'gemini-3.5-flash'] : ['gemini-3.5-flash', 'gemini-3.5-flash-lite']; HOOK_SUY_NGHI = 'low';
   var kq = provider === 'claude' ? goiClaude(key, '', prompt, schema, 7000, 0.3) : goiGemini(key, '', prompt, schema, 7000, null, 0.3);
   var nhan = '[dung_kehoach] ' + yc.slice(0, 80);
   if (!kq.ok){
@@ -206,9 +213,14 @@ function dvKeHoach(b, ai, provider, key){
   ds.forEach(function(s){ dsId[String(s.id)] = Number(s.giay) || 4; });
   d.clips = (Array.isArray(d.clips) ? d.clips : []).filter(function(c){ return dsId.hasOwnProperty(String(c.src)); }).slice(0, 120).map(function(c){
     var max = dsId[String(c.src)], bd = Math.max(0, Math.min(max, Number(c.bd) || 0)), kt = Math.max(bd + 0.3, Math.min(max, Number(c.kt) || bd + 2));
-    return {src:String(c.src), bd:Math.round(bd * 100) / 100, kt:Math.round(kt * 100) / 100, ly_do:String(c.ly_do || '').slice(0, 160)};
+    return {src:String(c.src), bd:Math.round(bd * 100) / 100, kt:Math.round(kt * 100) / 100, ly_do:String(c.ly_do || '').slice(0, 160), chuyen: DV_CHUYEN.indexOf(c.chuyen) > -1 ? c.chuyen : 'cat'};
   });
   var tong = d.clips.reduce(function(a, c){ return a + c.kt - c.bd; }, 0);
+  d.broll = (Array.isArray(d.broll) ? d.broll : []).filter(function(x){ return dsId.hasOwnProperty(String(x.src)); }).slice(0, 6).map(function(x){
+    var max = dsId[String(x.src)], bd = Math.max(0, Math.min(max, Number(x.bd) || 0)), kt = Math.max(bd + 0.5, Math.min(max, Number(x.kt) || bd + 2));
+    return {src:String(x.src), bd:Math.round(bd * 100) / 100, kt:Math.round(kt * 100) / 100, t_bd:Math.round(Math.max(0, Math.min(tong, Number(x.t_bd) || 0)) * 100) / 100, kieu: x.kieu === 'pip' ? 'pip' : 'full'};
+  }).filter(function(x){ return x.t_bd < tong; });
+  d.font = DV_FONT.indexOf(d.font) > -1 ? d.font : 'be_vietnam'; d.khung = /^(cat|bam_mat|mo)$/.test(d.khung) ? d.khung : 'cat';
   d.hook = String(d.hook || '').slice(0, 120); d.tra_loi = String(d.tra_loi || '').slice(0, 900);
   var pd = d.phu_de || {}; d.phu_de = {bat: pd.bat !== false, kieu: DV_PD_KIEU.indexOf(pd.kieu) > -1 ? pd.kieu : 'highlight', nhan_manh:(Array.isArray(pd.nhan_manh) ? pd.nhan_manh : []).slice(0, 12).map(function(x){ return String(x).slice(0, 40); }), cum_tu: Math.max(2, Math.min(6, parseInt(pd.cum_tu, 10) || 4))};
   d.do_hoa = (Array.isArray(d.do_hoa) ? d.do_hoa : []).filter(function(g){ return DV_DO_HOA.indexOf(g.kieu) > -1; }).slice(0, 6).map(function(g){
