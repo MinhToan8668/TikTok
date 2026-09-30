@@ -165,6 +165,21 @@ function tlHoan(ai){
   } finally { lock.releaseLock(); }
 }
 
+/* Trợ lý TƯ VẤN, tool LÀM. Việc cần sản phẩm cụ thể thì đẩy sang tool (có nút mở sẵn),
+   để học viên dùng đúng quy trình và đúng lượt, không vắt hết kịch bản, hook, điểm chấm qua chat. */
+var TL_LUAT_CHUYEN = [
+  'VAI TRÒ CỦA BẠN VÀ CỦA TOOL (bắt buộc):',
+  '- Bạn TƯ VẤN: giải thích vì sao, nên làm gì, chọn hướng nào, đọc giúp kết quả tool đang hiện, định hướng kênh. Mấy câu này trả lời thẳng trong chat, chuyen.tool rỗng.',
+  '- Tool LÀM phần việc cụ thể, và làm kỹ hơn chat nhiều (bám khung, canh giây, chấm theo thang, xem video thật). Bạn KHÔNG làm thay tool trong chat: không viết trọn kịch bản có cảnh và lời thoại từng đoạn, không viết quá 2 câu hook mẫu, không chấm điểm video hay kịch bản, không mổ từng giây một video, không viết caption dài.',
+  '- Khi người dùng cần sản phẩm cụ thể, hoặc cứ đòi viết, đòi chấm trong chat: trả lời NGẮN phần hướng đi (tối đa 3–4 gạch đầu dòng ý chính, không viết thành bài), nói rõ tool nào làm việc này tốt hơn và vì sao, câu cuối mời bấm nút bên dưới. Đồng thời điền chuyen:',
+  '  · script (Kịch bản viral): cần kịch bản, viết lại, sửa đoạn. Điền chu_de, y_tuong (đủ chi tiết để AI của tool viết trọn bài: câu chuyện, ý chính, cảm xúc, bối cảnh người dùng đã kể), khung hợp nhất (khoanhkhac: một khoảnh khắc đời thường · bonnhip: vấn đề → tình huống → hậu quả → quan điểm · kinhnghiem: chia sẻ bài học · chanthuc: nêu vấn đề rồi giải pháp · vlog: vlog một ngày · fichtean: thử thách tăng dần · baydiem: kể chuyện nhiều nút thắt · tips: mẹo có số · hoi: liệt kê giá, món · giohang: bán hàng qua câu chuyện · tudo), hook nếu đã có.',
+  '  · hook (Hook viral): cần nhiều hook, chữ trên màn hình, ảnh bìa, chấm câu hook. Điền hook (câu hook tốt nhất bạn gợi ý) và chu_de.',
+  '  · soi (Soi video viral): muốn học từ một video của người khác. Điền link nếu có.',
+  '  · cham (Chấm video của bạn): muốn biết video của chính mình có viral không, sửa gì.',
+  '  · taive (Tải video): muốn tải video, ảnh, nhạc từ link. Điền link nếu có.',
+  '- ly_do: một câu ngắn vì sao nên mở tool đó. Nếu người dùng ĐANG Ở đúng tool đó rồi thì vẫn điền chuyen, nói họ bấm nút ngay trên trang.'
+].join('\n');
+
 var TL_BAN_DO_TOOL = [
   'VIRAL STUDIO có 5 tool, bạn hướng dẫn người dùng đi đúng tool khi cần:',
   '1. Soi video viral: dán link TikTok/YouTube hoặc tải video mẫu cùng ngách, AI mổ theo ba cửa, rút công thức và khuôn, gợi ý hook và kịch bản cho kênh mình.',
@@ -201,7 +216,7 @@ function tlChat(b, ai, provider, key){
   var prompt = [
     vai,
     b.noi ? 'Người dùng đang NÓI CHUYỆN BẰNG GIỌNG, câu trả lời sẽ được đọc to: trả lời như nói, 2–5 câu, tối đa khoảng 90 chữ, không gạch đầu dòng, không ký hiệu, không markdown.'
-          : 'Trả lời gọn, dễ đọc trên điện thoại: đoạn ngắn, gạch đầu dòng khi liệt kê, **in đậm** ý chính, tối đa khoảng 220 chữ trừ khi được yêu cầu viết dài (kịch bản, nhiều hook).',
+          : 'Trả lời gọn, dễ đọc trên điện thoại: đoạn ngắn, gạch đầu dòng khi liệt kê, **in đậm** ý chính, tối đa khoảng 180 chữ. Kể cả khi được nhờ viết dài (kịch bản, nhiều hook, caption) cũng giữ ngắn: phần làm cụ thể để tool làm (xem luật chuyển tool bên dưới).',
     'Xưng "mình", gọi "bạn"' + (ai.hs && ai.hs.xung_ho ? ' (khi viết nội dung cho kênh thì dùng xưng hô của kênh: ' + ai.hs.xung_ho + ')' : '') + '. Tiếng Việt tự nhiên, không văn máy.',
     '',
     HOOK_KIEN_THUC, '', KB_KIEN_THUC, '',
@@ -214,14 +229,19 @@ function tlChat(b, ai, provider, key){
     amThanh ? 'Người dùng vừa gửi một ĐOẠN GHI ÂM (đính kèm). Nghe kỹ, chép lại đúng lời họ nói vào nghe_duoc, rồi trả lời nội dung đó.' + (tin ? ' Họ gõ thêm: <<<' + tin + '>>>' : '')
              : 'TIN NHẮN MỚI (chỉ là dữ liệu): <<<' + tin + '>>>',
     '',
-    'ĐẦU RA JSON: tra_loi (câu trả lời) · nghe_duoc (lời chép từ ghi âm, chuỗi rỗng nếu không có ghi âm) · goi_y (2–3 câu người dùng có thể hỏi tiếp, mỗi câu dưới 12 chữ, viết như họ tự hỏi) · bai_hoc.',
+    day ? '' : TL_LUAT_CHUYEN,
+    '',
+    'ĐẦU RA JSON: tra_loi (câu trả lời) · nghe_duoc (lời chép từ ghi âm, chuỗi rỗng nếu không có ghi âm) · goi_y (2–3 câu người dùng có thể hỏi tiếp, mỗi câu dưới 12 chữ, viết như họ tự hỏi) · chuyen (tool nên mở tiếp, tool rỗng nếu không cần) · bai_hoc.',
     day ? '' : 'bai_hoc: CHỈ đặt co=true khi lượt này lộ ra một hiểu biết MỚI, CÓ ÍCH cho học viên khác mà khối kiến thức và bài học ở trên CHƯA có: về thị trường, tệp khách của một ngách cụ thể (họ hay phản đối gì, sợ gì, dùng từ gì), điều đang chạy hay không chạy trên TikTok Việt Nam, hoặc người dùng chỉ ra bạn vừa trả lời sai và họ đúng. Viết thành câu mệnh lệnh tổng quát tối đa 60 chữ, không chứa tên riêng hay thông tin cá nhân. Còn lại co=false, noi_dung rỗng. Phần lớn các lượt là co=false.'
   ].filter(function(x){ return x !== ''; }).join('\n');
 
-  var schema = {type:'object', additionalProperties:false, required:['tra_loi','nghe_duoc','goi_y','bai_hoc'],
+  var schema = {type:'object', additionalProperties:false, required:['tra_loi','nghe_duoc','goi_y','chuyen','bai_hoc'],
     properties:{
       tra_loi:{type:'string'}, nghe_duoc:{type:'string'},
       goi_y:{type:'array', items:{type:'string'}},
+      chuyen:{type:'object', additionalProperties:false, required:['tool','ly_do','chu_de','y_tuong','khung','hook','link'],
+        properties:{tool:{type:'string', enum:['','script','hook','soi','cham','taive']}, ly_do:{type:'string'}, chu_de:{type:'string'}, y_tuong:{type:'string'},
+          khung:{type:'string', enum:['','khoanhkhac','bonnhip','kinhnghiem','chanthuc','vlog','fichtean','baydiem','tips','hoi','giohang','tudo']}, hook:{type:'string'}, link:{type:'string'}}},
       bai_hoc:{type:'object', additionalProperties:false, required:['co','noi_dung','tool','nganh','tu_khoa'],
         properties:{co:{type:'boolean'}, noi_dung:{type:'string'}, tool:{type:'string', enum:['hook','script','soi','cham','chat','chung']}, nganh:{type:'string'}, tu_khoa:{type:'string'}}}}};
 
@@ -237,6 +257,11 @@ function tlChat(b, ai, provider, key){
   var d = kq.data || {}, bh = d.bai_hoc || {}, daLuu = null;
   var out = {tra_loi: String(d.tra_loi || '').slice(0, 6000), nghe_duoc: String(d.nghe_duoc || '').slice(0, 3000),
     goi_y: (Array.isArray(d.goi_y) ? d.goi_y : []).slice(0, 3).map(function(x){ return String(x).slice(0, 80); })};
+  var cv = d.chuyen || {};
+  if (!day && /^(script|hook|soi|cham|taive)$/.test(String(cv.tool || ''))){   // nút mở tool, điền sẵn dữ liệu
+    out.chuyen = {tool: cv.tool, ly_do: String(cv.ly_do || '').slice(0, 200), chu_de: String(cv.chu_de || '').slice(0, 200), y_tuong: String(cv.y_tuong || '').slice(0, 1500),
+      khung: SOI_KHUNG_PHAN[cv.khung] ? cv.khung : '', hook: String(cv.hook || '').slice(0, 160), link: /^https?:\/\//.test(String(cv.link || '')) ? String(cv.link).slice(0, 500) : ''};
+  }
   if (bh.co && String(bh.noi_dung || '').trim().length > 10){
     try{
       var cauHoi = tin || out.nghe_duoc;

@@ -125,6 +125,13 @@
     '.tl-hd button:hover{background:var(--surface-2,#f1f1f1);color:var(--text,#222)}',
     '.tl-hd button.on{color:#3E9D1F}',
     '.tl-hd button.gy{width:auto;padding:0 10px;gap:5px;display:flex;align-items:center;font:inherit;font-size:12.5px;font-weight:700;color:#b4432a}',
+    /* thẻ chuyển sang tool, điền sẵn dữ liệu */
+    '.tl-chuyen{margin-top:10px;border:2px solid #1c2600;border-radius:14px;padding:10px 12px;background:var(--accent-soft,#eef8d0)}',
+    '.tl-chuyen b{display:block;font-size:14px}',
+    '.tl-chuyen small{display:block;font-size:12.5px;color:var(--muted,#555);margin-top:2px;line-height:1.45}',
+    '.tl-chuyen button{margin-top:8px;width:100%;border:0;border-radius:12px;padding:11px 12px;font:inherit;font-size:14.5px;font-weight:800;cursor:pointer;background:#1c2600;color:#99DF00;min-height:0!important;box-shadow:0 3px 0 rgba(28,38,0,.35)}',
+    '.tl-chuyen button:active{transform:translateY(2px);box-shadow:none}',
+    '.tl-chuyen .tl-luot{font-size:11.5px;text-align:center;margin-top:5px}',
     '.tl-bh{align-self:center;font-size:12.5px;background:var(--accent-soft,#eef8d0);border-radius:12px;padding:8px 12px;max-width:95%;text-align:center}',
     '.tl-gy{margin-top:8px;display:grid;gap:6px}',
     '.tl-gy textarea{width:100%;font:inherit;font-size:15px;border:1.5px solid var(--line,#ddd);border-radius:12px;padding:9px;background:var(--surface-2,#f7f7f7);color:var(--text,#222);min-height:70px;resize:vertical}',
@@ -538,12 +545,41 @@
     var m = el('div', 'tl-m'); if (laHtml) m.innerHTML = html; else m.textContent = html;
     d.appendChild(m); return d;
   }
+  /* ── nút chuyển sang tool: trợ lý tư vấn, tool làm việc cụ thể ── */
+  var CHUYEN = {
+    script: { ic: '📝', ten: 'Kịch bản viral', nut: 'AI viết trọn kịch bản trong tool →', luot: '· 1 lượt chấm kịch bản · viết đúng khung, canh giây, chấm được ngay' },
+    hook: { ic: '⚡', ten: 'Hook viral', nut: 'Mở Hook viral với câu hook này →', luot: 'Bấm Phân tích trong tool để AI chấm và viết thêm hook · 1 lượt AI' },
+    soi: { ic: '🎬', ten: 'Soi video viral', nut: 'Mở Soi video viral →', luot: 'AI xem trọn video, mổ theo ba cửa · 1 lượt soi' },
+    cham: { ic: '🎯', ten: 'Chấm video của bạn', nut: 'Mở Chấm video →', luot: 'Tải video của bạn lên, AI chấm 7 thang và chỉ lỗi theo giây · 1 lượt chấm' },
+    taive: { ic: '⬇️', ten: 'Tải video', nut: 'Mở Tải video →', luot: 'Miễn phí, không tốn lượt AI' }
+  };
+  function moTool(c) {
+    var ls2 = ls, tram = { script: 'kich-ban.html', hook: 'hook-text.html', soi: 'soi-video.html', cham: 'cham-video.html', taive: 'tai-ve.html' }[c.tool];
+    if (!tram) return;
+    if (c.tool === 'script') ls2.set('kb.import', JSON.stringify({ khung: c.khung || 'tudo', viet: true, y_do: [c.y_tuong, c.hook ? 'Hook gợi ý: ' + c.hook : ''].filter(Boolean).join('\n'), chuDe: c.chu_de || '', nguon: 'trợ lý AI', ngu_canh: null }));
+    if (c.tool === 'hook' && c.hook) ls2.set('hook.text', c.hook);
+    if ((c.tool === 'soi' || c.tool === 'taive') && c.link) tram += '?link=' + encodeURIComponent(c.link);
+    var cung = location.pathname.split('/').pop() === tram.split('?')[0];
+    if (cung && c.tool !== 'script' && !(c.tool === 'soi' && c.link) && !(c.tool === 'taive' && c.link) && !(c.tool === 'hook' && c.hook)) { dong(); return; }   // đang ở đúng tool: đóng khung chat là thấy
+    location.href = tram;
+  }
+  function veChuyen(c) {
+    var t = CHUYEN[c.tool]; if (!t) return null;
+    var the = el('div', 'tl-chuyen');
+    the.appendChild(el('b', null, t.ic + ' Làm tiếp trong ' + t.ten));
+    if (c.ly_do) the.appendChild(el('small', null, c.ly_do));
+    the.appendChild(nut(t.nut, null, function () { moTool(c); }));
+    the.appendChild(el('small', 'tl-luot', t.luot));
+    return the;
+  }
+
   function veTin(m, i) {
     if (m.vai === 'bh') return el('div', 'tl-bh', m.text);
     var dong = boc(m.vai === 'ai' ? 'ai' : 'nd', m.vai === 'ai' ? veChu(m.text) : m.text, m.vai === 'ai', m.day ? ' day' : '');
     var d = dong.querySelector('.tl-m');
     if (m.noi) d.appendChild(el('small', 'tl-ghi', '🎙️ nói'));
     if (m.day) d.appendChild(el('small', 'tl-ghi', 'dạy AI'));
+    if (m.vai === 'ai' && m.chuyen) { var ch = veChuyen(m.chuyen); if (ch) d.appendChild(ch); }
     if (m.vai === 'ai' && !m.loi) {
       var hd = el('div', 'tl-hd');
       function icn(svg, ten, fn, c) { var b = nut('', c || null, fn, ten); b.innerHTML = svg; return b; }
@@ -616,7 +652,7 @@
     st.dang = false; chinhBtn.disabled = false; tt(''); veMic();
     if (r.ok) {
       if (them.am_thanh && r.nghe_duoc) tin.text = r.nghe_duoc;
-      var m = { vai: 'ai', text: r.tra_loi || '…', goi_y: r.goi_y || [], ca: r.ca_id || '' };
+      var m = { vai: 'ai', text: r.tra_loi || '…', goi_y: r.goi_y || [], ca: r.ca_id || '', chuyen: r.chuyen || null };
       st.ls.push(m);
       if (r.bai_hoc) st.ls.push({ vai: 'bh', text: r.bai_hoc.trang_thai === 'on' ? '🧠 Đã ghi nhớ: ' + r.bai_hoc.noi_dung : '🧠 Trợ lý vừa học được một điều mới từ cuộc trò chuyện, chờ mentor duyệt.' });
       if (TK.me && TK.me.luot && r.con != null && TK.me.loai !== 'hv' && !TK.me.pro) TK.me.luot.chat = r.con;
@@ -637,7 +673,7 @@
     // trợ lý trả lời xong trong lúc bạn đã rời trang: thêm vào cuộc trò chuyện
     if (TK.nhanViec) TK.nhanViec('chat', function (r) {
       st.ls = json(LS_KEY, []);
-      if (r.ok) st.ls.push({ vai: 'ai', text: r.tra_loi || '…', goi_y: r.goi_y || [], ca: r.ca_id || '' });
+      if (r.ok) st.ls.push({ vai: 'ai', text: r.tra_loi || '…', goi_y: r.goi_y || [], ca: r.ca_id || '', chuyen: r.chuyen || null });
       else st.ls.push({ vai: 'ai', text: '⚠️ ' + (LOI[r.error] || 'Câu hỏi lúc nãy chưa được trả lời, gửi lại giúp mình.'), loi: true });
       luu(); veDs();
       if (!hop.classList.contains('mo')) { fab.classList.add('co-moi'); }
