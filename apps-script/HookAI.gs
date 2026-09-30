@@ -84,7 +84,7 @@ function hookHoan(ai){
 /* Lượt còn của cả ba tool, để tool hiện đúng "còn mấy lượt soi / kịch bản / hook". */
 function hookLuotCon(ai){
   if (ai.loai !== 'free' || !ai.nd) return null;
-  return {hook: ndLuotCon(ai.nd,'hook'), script: ndLuotCon(ai.nd,'script'), soi: ndLuotCon(ai.nd,'soi'), cham: ndLuotCon(ai.nd,'cham')};
+  return {hook: ndLuotCon(ai.nd,'hook'), script: ndLuotCon(ai.nd,'script'), soi: ndLuotCon(ai.nd,'soi'), cham: ndLuotCon(ai.nd,'cham'), chat: ndLuotCon(ai.nd,'chat')};
 }
 function hookHoSo(ai, b){
   var hs = {};
@@ -125,10 +125,20 @@ function hookAi(b){
   ai.dev  = String(b.dev || b.thu || '');
   ai.hs   = hookHoSo(ai, b);
   if (ai.nd && ai.dev && typeof stGhiThietBi === 'function') stGhiThietBi(ai.nd, ai.dev);
+  // Trợ lý AI (TroLy.gs): danh sách và bật tắt bài học không cần gọi AI
+  if (b.mode === 'bh_ds') return tlDs(ai);
+  if (b.mode === 'bh_sua') return tlSua(b, ai);
+  // Bài học mentor đã dạy: chọn bài hợp tool + ngách + nội dung, goiGemini / goiClaude tự chèn vào đầu prompt
+  HOOK_BH = '';
+  if (typeof bhKhoi === 'function' && /^(|script|soi|cham|viet|design|apkhuon|layer)$/.test(String(b.mode || '')))
+    try{ HOOK_BH = bhKhoi(ai.tool, ai.hs, String(b.text || b.chu_de || b.y_do || b.loi_thoai || '').slice(0, 400)); }catch(e){ HOOK_BH = ''; }
 
   var provider = (hookCfg('HOOK_AI_PROVIDER') || 'gemini').toLowerCase();
   var key = provider === 'claude' ? cfgProp('ANTHROPIC_API_KEY') : hookCfg('GEMINI_API_KEY');
   if (!key) return jsonOut({ok:false, error:'chua_cai_key'});
+
+  if (b.mode === 'chat') return tlChat(b, ai, provider, key);         // Trợ lý AI: trò chuyện gõ hoặc nói, tự học qua tư vấn (TroLy.gs)
+  if (b.mode === 'bh_them') return tlGopY(b, ai, provider, key);      // góp ý cho AI: mentor có hiệu lực ngay, học viên chờ duyệt
 
   if (b.mode === 'script') return hookScript(b, ai, provider, key);   // chấm kịch bản viral, khách thử cũng dùng được
   if (b.mode === 'link') return soiLink(b);                            // Soi video: lấy caption, tên kênh, ảnh bìa qua oEmbed, không tốn lượt
@@ -215,6 +225,7 @@ function schemaRutGon(sc){
 /* hetGio: mốc Date.now() phải trả kết quả trước đó. Apps Script giết script ở 6 phút, nên hàm gọi
    (đã tốn thời gian tải video) truyền mốc này xuống để không có lần thử nào bắt đầu quá muộn. */
 function goiGemini(key, img, prompt, schema, maxTok, media, nhiet, hetGio){
+  if (typeof HOOK_BH === 'string' && HOOK_BH) prompt = HOOK_BH + '\n\n' + prompt;   // bài học mentor (TroLy.gs)
   schema = schema || HOOK_SCHEMA; maxTok = maxTok || 6000;
   nhiet = (nhiet == null) ? 0.7 : nhiet;   // chấm điểm dùng ~0.15 cho ra đều tay, sáng tác dùng 0.7–0.8
   var hanGio = Math.min(Date.now() + 300000, Number(hetGio) || Infinity);
@@ -276,6 +287,7 @@ function goiGemini(key, img, prompt, schema, maxTok, media, nhiet, hetGio){
 
 /* ── Claude: trả tiền theo lượt, chất lượng tiếng Việt tốt hơn ── */
 function goiClaude(key, img, prompt, schema, maxTok, nhiet){
+  if (typeof HOOK_BH === 'string' && HOOK_BH) prompt = HOOK_BH + '\n\n' + prompt;
   schema = schema || HOOK_SCHEMA; maxTok = maxTok || 6000;
   var model = hookCfg('HOOK_AI_MODEL') || 'claude-opus-5';
   var noiDung = [];

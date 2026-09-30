@@ -13,7 +13,7 @@
   'use strict';
 
   var ND_KEY = 'vs_user', HV_KEY = 'tmxk_hv', DEV_KEY = 'vs_dev', HS_KEY = 'vs_hoso_tam';
-  var TOOL_TEN = { hook: 'AI phân tích hook', script: 'chấm kịch bản', soi: 'soi video viral', cham: 'chấm video của bạn', taive: 'tải video' };
+  var TOOL_TEN = { hook: 'AI phân tích hook', script: 'chấm kịch bản', soi: 'soi video viral', cham: 'chấm video của bạn', taive: 'tải video', chat: 'trò chuyện với trợ lý AI' };
 
   var ls = {
     get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
@@ -359,7 +359,7 @@
 
     if (!laPro()) {
       var lu = el('div', 'tk-luot'), l = a.luot || {}, h = a.han || {};
-      [['hook', 'Hook'], ['script', 'Kịch bản'], ['soi', 'Soi video'], ['cham', 'Chấm video'], ['taive', 'Tải video']].forEach(function (p) {
+      [['hook', 'Hook'], ['script', 'Kịch bản'], ['soi', 'Soi video'], ['cham', 'Chấm video'], ['taive', 'Tải video'], ['chat', 'Chat trợ lý']].forEach(function (p) {
         var con = l[p[0]], sp = el('span', con === 0 ? 'het' : null, p[1] + ': còn ' + (con == null ? '?' : con) + '/' + (h[p[0]] == null ? '?' : h[p[0]]));
         lu.appendChild(sp);
       });
@@ -646,7 +646,8 @@
     } catch (e) { TK.napLoi = e; }   // mất mạng hay máy chủ lỗi: giữ TK.me cũ, đừng coi là hết phiên
     bao(); return TK.me;
   }
-  function bao() { if (typeof TK.onDoi === 'function') { try { TK.onDoi(TK.me); } catch (e) { } } }
+  var ngheDs = [];   // phần khác (tro-ly.js) đăng ký nghe khi tài khoản đổi, không đè onDoi của tool
+  function bao() { if (typeof TK.onDoi === 'function') { try { TK.onDoi(TK.me); } catch (e) { } } ngheDs.forEach(function (f) { try { f(TK.me); } catch (e) { } }); }
 
   /* ── cổng chặn trước khi gọi AI ── */
   async function canCo(tool) {
@@ -869,6 +870,8 @@
     token: token, dev: dev, hoSo: hoSo, luuHoSoTam: luuHoSoTam,
     laPro: laPro, laMentor: laMentor, luotCon: luotCon, oMoiHoSo: oMoiHoSo, ganO: ganO, ghiTruong: ghiTruong, taiVideo: taiVideo, zalo: zalo, giaPro: nhanGia,
     get me() { return TK.me; }, get vai() { return TK.vaiHoSo; },
-    dat: function (k, v) { TK[k] = v; }
+    dat: function (k, v) { TK[k] = v; },
+    nghe: function (f) { if (typeof f === 'function') ngheDs.push(f); },
+    get tool() { return TK.tool; }
   };
 })(window);

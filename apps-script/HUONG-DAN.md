@@ -310,3 +310,25 @@ Dán link là tải được video, ảnh, âm thanh. Không cần đăng nhập
 **Tải file:** trình duyệt tải thẳng trước. Nếu bị chặn thì máy chủ tải hộ (tối đa 35MB). Vẫn không được thì nút đổi thành "Mở để lưu".
 
 **Muốn tải đủ YouTube / Instagram / Facebook:** tự chạy một máy [cobalt](https://github.com/imputnet/cobalt) (Docker, VPS khoảng 5$/tháng), bật API key. Sau đó thêm vào Script properties: `COBALT_URL` = `https://địa-chỉ-cobalt-của-bạn` và `COBALT_KEY` = key đã tạo. Không cần sửa code. Cobalt công khai (api.cobalt.tools) đã khóa, không dùng được.
+
+## Trợ lý AI · trò chuyện, nói, tự học (tools/tro-ly.js + TroLy.gs)
+
+Nút tròn **🤖 Hỏi trợ lý AI** ở góc trái dưới của cả 5 tool.
+
+- **Gõ hoặc nói:** bấm 🎙️ để nói. Chrome, Edge, Safari nhận giọng ngay trên máy. Trình duyệt không có nhận giọng thì ghi âm rồi gửi cho Gemini nghe. 🔊 bật đọc to câu trả lời. 🗣️ là chế độ nói chuyện rảnh tay: nói, nghe trả lời, rồi tự nghe tiếp.
+- **Hiểu ngữ cảnh:** trợ lý đọc kết quả đang hiện ở tool (bài soi, điểm chấm, kịch bản, hook), hồ sơ kênh và 12 tin gần nhất. Học viên hỏi "sao điểm hook thấp?" là nó biết đang nói tới cái gì.
+- **Lượt:** tài khoản Free được 15 tin (`/luotchat`). Pro và học viên được 60 tin mỗi ngày (`/chatngay`). Mentor không giới hạn. Chưa đăng nhập thì được mời tạo tài khoản. Free hết tin thì hiện bảng Nâng cấp.
+
+### Tự học: bộ nhớ bài học (sheet `AiBaiHoc`)
+
+Bài học đang bật được chèn vào đầu prompt của **mọi tool AI** (hook, kịch bản, soi, chấm, viết, chat). Mỗi lượt gọi AI chỉ lấy tối đa 15 bài hợp nhất với tool, ngách và câu hỏi.
+
+| Nguồn | Cách tạo | Hiệu lực |
+|---|---|---|
+| Mentor dạy | Bật **🎓 Chế độ dạy AI** trong khung chat rồi nói hoặc gõ | Dùng ngay |
+| Mentor góp ý | Bấm **✍️ Góp ý cho AI** dưới câu trả lời | Dùng ngay |
+| Telegram | `/day nội dung` | Dùng ngay |
+| AI tự rút khi tư vấn học viên | AI thấy một hiểu biết mới về thị trường hoặc ngách | Chờ duyệt, bot báo kèm `/duyetbh id` |
+| Học viên bấm 👎 kèm lý do | Góp ý của học viên | Chờ duyệt |
+
+Quản lý: nút **🧠 Bộ nhớ AI** trong khung chat (chỉ mentor thấy), hoặc bot `/baihoc`, `/duyetbh id`, `/tatbh id`, `/xoabh id`. Mỗi học viên tạo tối đa 3 bài chờ duyệt mỗi ngày để bot không bị spam. Muốn sửa câu chữ một bài học thì sửa thẳng trong sheet `AiBaiHoc` (bộ nhớ đệm tự làm mới sau 10 phút).
