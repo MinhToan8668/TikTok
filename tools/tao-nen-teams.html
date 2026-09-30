@@ -70,17 +70,25 @@ function veMark(px,py,s,brick,play,dot){
   cx.restore();
 }
 
-/* Lưới kẻ mờ: ô nhỏ buoc px, cứ 5 ô một đường rõ hơn một chút */
-function veLuoi(buoc,mauMo,mauDam){
-  var i, dam=buoc*5;
-  cx.lineWidth=1; cx.strokeStyle=mauMo; cx.beginPath();
-  for(i=buoc;i<1920;i+=buoc){ cx.moveTo(i+.5,0); cx.lineTo(i+.5,1080); }
-  for(i=buoc;i<1080;i+=buoc){ cx.moveTo(0,i+.5); cx.lineTo(1920,i+.5); }
-  cx.stroke();
-  cx.lineWidth=1; cx.strokeStyle=mauDam; cx.beginPath();
-  for(i=dam;i<1920;i+=dam){ cx.moveTo(i+.5,0); cx.lineTo(i+.5,1080); }
-  for(i=dam;i<1080;i+=dam){ cx.moveTo(0,i+.5); cx.lineTo(1920,i+.5); }
-  cx.stroke();
+/* Lưới y như landing page: ô 184×92, đường mực #1c2600 1.5px, mờ 9%, tan dần ở giữa khung */
+function veLuoi(){
+  var lc=document.createElement('canvas'); lc.width=1920; lc.height=1080;
+  var lx=lc.getContext('2d'), i;
+  lx.fillStyle='#1c2600';
+  for(i=0;i<1080;i+=92)  lx.fillRect(0,i,1920,1.5);
+  for(i=0;i<1920;i+=184) lx.fillRect(i,0,1.5,1080);
+
+  lx.globalCompositeOperation='destination-in';   // mặt nạ ellipse: giữa trống, ra rìa mới hiện lưới
+  lx.translate(960,486); lx.scale(1,626.4/1190.4);
+  var m=lx.createRadialGradient(0,0,0,0,0,1190.4);
+  m.addColorStop(0,  'rgba(0,0,0,0)');
+  m.addColorStop(.38,'rgba(0,0,0,0)');
+  m.addColorStop(.72,'rgba(0,0,0,.55)');
+  m.addColorStop(1,  'rgba(0,0,0,1)');
+  lx.fillStyle=m; lx.fillRect(-2400,-2400,4800,4800);
+
+  cx.save(); cx.globalAlpha=.09; cx.filter='blur(.6px)';
+  cx.drawImage(lc,0,0); cx.restore();
 }
 
 /* Chữ căn phải, trả về bề rộng để vẽ gạch chân */
@@ -114,23 +122,8 @@ function veCoBan(ten){
 
 /* Nền lime kẻ lưới: dịu mắt, logo to góc trái, tên mentor góc phải trên */
 function veLime(ten){
-  var g=cx.createLinearGradient(0,0,1920,1080);   // chuyển sắc nhẹ cho đỡ phẳng
-  g.addColorStop(0,'#aeea2b'); g.addColorStop(.5,LIME); g.addColorStop(1,'#8ed200');
-  cx.fillStyle=g; cx.fillRect(0,0,1920,1080);
-
-  var q=cx.createRadialGradient(420,240,40,420,240,1180);  // quầng sáng sau logo
-  q.addColorStop(0,'rgba(255,255,255,.26)'); q.addColorStop(1,'rgba(255,255,255,0)');
-  cx.fillStyle=q; cx.fillRect(0,0,1920,1080);
-
-  veLuoi(48,'rgba(255,255,255,.11)','rgba(255,255,255,.17)');  // lưới sáng, mảnh 1px
-
-  cx.save(); cx.globalAlpha=.06;                  // gạch chìm góc phải dưới cho có chiều sâu
-  veMark(1246,452,8.9,'#ffffff','#ffffff','#ffffff');
-  cx.restore();
-
-  var d=cx.createLinearGradient(0,700,0,1080);    // tối chân khung, chữ ở dưới vẫn đọc được
-  d.addColorStop(0,'rgba(38,33,15,0)'); d.addColorStop(1,'rgba(38,33,15,.08)');
-  cx.fillStyle=d; cx.fillRect(0,700,1920,380);
+  cx.fillStyle=LIME; cx.fillRect(0,0,1920,1080);   // lime phẳng đúng như nền trang chủ
+  veLuoi();
 
   veMark(96,74,3.4,INK,PAPER,INK);                // viên gạch hôm nay màu giấy cho nổi trên lime
 
