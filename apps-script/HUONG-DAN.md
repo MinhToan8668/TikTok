@@ -332,3 +332,15 @@ Bài học đang bật được chèn vào đầu prompt của **mọi tool AI**
 | Học viên bấm 👎 kèm lý do | Góp ý của học viên | Chờ duyệt |
 
 Quản lý: nút **🧠 Bộ nhớ AI** trong khung chat (chỉ mentor thấy), hoặc bot `/baihoc`, `/duyetbh id`, `/tatbh id`, `/xoabh id`. Mỗi học viên tạo tối đa 3 bài chờ duyệt mỗi ngày để bot không bị spam. Muốn sửa câu chữ một bài học thì sửa thẳng trong sheet `AiBaiHoc` (bộ nhớ đệm tự làm mới sau 10 phút).
+
+### Mentor tra lượt tư vấn và dạy AI trên từng case (sheet `AiTuVan`)
+
+Mỗi lượt hỏi đáp với trợ lý (của học viên, khách và cả mentor) được lưu thành một case: ai hỏi, ở tool nào, câu hỏi, câu AI trả lời, kết quả tool lúc đó, 👍/👎 và lời chê.
+
+- Trong khung Trợ lý bấm **💬 Tư vấn học viên**. Số đỏ trên nút là số lượt chưa dạy. Lọc theo: Chưa dạy · 👎 Bị chê · 🎓 Đã dạy · ✓ Tốt · Tất cả · Của mentor. Tìm được theo tên, email hoặc nội dung.
+- Trên mỗi case:
+  - **🎓 Dạy AI case này**: gõ hoặc nói AI sai ở đâu, nên tư vấn thế nào. AI chuyển lời dạy thành bài học có hiệu lực ngay.
+  - **✓ Trả lời tốt**: AI ghi nhớ hướng trả lời đó cho các câu hỏi tương tự.
+- **🧠 Cho AI tự rút bài học từ các lượt mới**: AI đọc các lượt kể từ lần tổng hợp trước (cần ít nhất 5 lượt, mỗi lần đọc tối đa 80 lượt), bỏ qua điều đã có trong bộ nhớ, rút tối đa 5 bài học **chờ duyệt**.
+- Bot: `/tuvan` xem nhanh học viên đang hỏi gì. `/tonghop` là tổng hợp ngay.
+- Muốn AI tự tổng hợp lúc 21h mỗi tối và báo bot: trong Apps Script chọn hàm `caiTongHopHangNgay` rồi bấm **Run** một lần.

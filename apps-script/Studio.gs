@@ -731,7 +731,7 @@ function stNapHoSoMau(){
 
 /* ═══════ LỆNH BOT TELEGRAM (chỉ chat quản trị) ═══════
    Code.gs gọi:  if (quanTri && studioCoLenh(cmd)) return studioLenh(cmd, arg, chatId);  */
-var LENH_STUDIO = ['studio','stk','giapro','ngaypro','ngayhv','giahv','uudaihv','luotthu','luotkb','luotsoi','luotcham','luottai','luotchat','luotai','baihoc','duyetbh','tatbh','xoabh','day','chatngay','mopro','tatpro','dsck','timnd','ckkhoa','tienkhoa','hoso','lichsu','dshv','naphoso'];
+var LENH_STUDIO = ['studio','stk','giapro','ngaypro','ngayhv','giahv','uudaihv','luotthu','luotkb','luotsoi','luotcham','luottai','luotchat','luotai','baihoc','duyetbh','tatbh','xoabh','day','chatngay','tuvan','tonghop','mopro','tatpro','dsck','timnd','ckkhoa','tienkhoa','hoso','lichsu','dshv','naphoso'];
 function studioCoLenh(cmd){ return LENH_STUDIO.indexOf(cmd) > -1; }
 
 var ST_MA_NH = {vietcombank:'VCB', vcb:'VCB', mb:'MB', mbbank:'MB', quandoi:'MB', techcombank:'TCB', tcb:'TCB',
@@ -787,6 +787,7 @@ function studioLenh(cmd, arg, chatId){
       '⬇️ /luottai `10` — lượt tải video miễn phí cho khách (học viên, Pro không giới hạn)',
       '💬 /luotchat `15` — tin chat với Trợ lý AI cho tài khoản Free · /chatngay `60` — mỗi ngày cho Pro, học viên',
       '🧠 /baihoc — bộ nhớ AI · /day `nội dung` — dạy AI · /duyetbh /tatbh /xoabh `id`',
+      '💬 /tuvan — học viên đang hỏi trợ lý gì · /tonghop — AI tự rút bài học từ các lượt tư vấn mới',
       '🤖 /luotai `20` — lượt AI mỗi ngày của Pro và học viên',
       '🧾 /dsck — giao dịch đang chờ (Pro và học phí), bấm nút để xác nhận',
       '🎓 /ckkhoa `bat` · `tat` — hiện màn chuyển khoản sau khi học viên điền form',

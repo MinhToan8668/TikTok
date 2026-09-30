@@ -128,6 +128,8 @@ function hookAi(b){
   // Trợ lý AI (TroLy.gs): danh sách và bật tắt bài học không cần gọi AI
   if (b.mode === 'bh_ds') return tlDs(ai);
   if (b.mode === 'bh_sua') return tlSua(b, ai);
+  if (b.mode === 'ca_ds') return caDs(b, ai);                         // mentor tra các lượt tư vấn của học viên
+  if (b.mode === 'ca_danhgia') return caDanhGia(b, ai);
   // Bài học mentor đã dạy: chọn bài hợp tool + ngách + nội dung, goiGemini / goiClaude tự chèn vào đầu prompt
   HOOK_BH = '';
   if (typeof bhKhoi === 'function' && /^(|script|soi|cham|viet|design|apkhuon|layer)$/.test(String(b.mode || '')))
@@ -139,6 +141,8 @@ function hookAi(b){
 
   if (b.mode === 'chat') return tlChat(b, ai, provider, key);         // Trợ lý AI: trò chuyện gõ hoặc nói, tự học qua tư vấn (TroLy.gs)
   if (b.mode === 'bh_them') return tlGopY(b, ai, provider, key);      // góp ý cho AI: mentor có hiệu lực ngay, học viên chờ duyệt
+  if (b.mode === 'ca_day') return caDay(b, ai, provider, key);        // mentor dạy AI trên đúng một lượt tư vấn
+  if (b.mode === 'bh_tonghop') return caTongHopApi(ai);                // AI tự rút bài học từ các lượt tư vấn mới
 
   if (b.mode === 'script') return hookScript(b, ai, provider, key);   // chấm kịch bản viral, khách thử cũng dùng được
   if (b.mode === 'link') return soiLink(b);                            // Soi video: lấy caption, tên kênh, ảnh bìa qua oEmbed, không tốn lượt

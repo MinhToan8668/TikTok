@@ -24,7 +24,7 @@ var BH_HEADERS = ['id','thoi_gian','nguon','nguoi','tool','nganh','tu_khoa','bai
 var BH_TOI_DA_PROMPT = 3500;          // số ký tự bài học tối đa chèn vào một prompt
 var BH_CHO_MOI_NGUOI_NGAY = 3;        // AI tự đề xuất tối đa bấy nhiêu bài chờ duyệt / học viên / ngày
 var TL_CHAT_NGAY_MD = 60;             // Pro, học viên: số tin chat mỗi ngày (bot /chatngay). Mentor không giới hạn.
-var TL_LENH = ['baihoc','duyetbh','tatbh','xoabh','day','chatngay'];
+var TL_LENH = ['baihoc','duyetbh','tatbh','xoabh','day','chatngay','tuvan','tonghop'];
 var TL_TEN_TOOL = {hook:'Hook viral', script:'Kịch bản viral', soi:'Soi video viral', cham:'Chấm video của bạn', taive:'Tải video', chat:'Trò chuyện', chung:'mọi tool'};
 
 /* Bài học đang chọn cho lượt gọi hiện tại. hookAi đặt, goiGemini / goiClaude chèn vào đầu prompt. */
@@ -250,6 +250,11 @@ function tlChat(b, ai, provider, key){
     }catch(e){ ghiLoi('tlChat/baiHoc', e); }
   }
   if (daLuu) out.bai_hoc = {id: daLuu.id, noi_dung: daLuu.bai_hoc, trang_thai: daLuu.trang_thai};
+  // lưu nguyên lượt hỏi đáp để mentor tra lại và dạy AI trên đúng case này
+  try{
+    var ca = caThem(ai, {tool: toolDang, hoi: tin || out.nghe_duoc, tra_loi: out.tra_loi, ket_qua_tool: nc.ket_qua, day: day, bai_hoc_id: daLuu ? daLuu.id : ''});
+    if (ca) out.ca_id = ca.id;
+  }catch(e){ ghiLoi('tlChat/caThem', e); }
   hookLog(me, nhan, true, '', kq.vin || 0, kq.vout || 0, kq.model, ai);
   out.ok = true; out.con = tlLaMentor(ai) ? null : con; out.luot = hookLuotCon(ai);
   return jsonOut(out);
@@ -267,6 +272,7 @@ function tlGopY(b, ai, provider, key){
   var x = bhThem({nguon: laMentor ? 'mentor_gopy' : 'hv_gopy', nguoi: ai.me.ten_goi || ai.me.ten, tool: c.tool || tool,
     nganh: c.nganh, tu_khoa: c.tu_khoa, bai_hoc: c.bai_hoc, ngu_canh: 'Góp ý gốc: ' + tho + (nguCanh ? '\n---\n' + nguCanh : ''), trang_thai: laMentor ? 'on' : 'cho'});
   if (!laMentor) bhBaoMentor(x);
+  if (b.ca_id){ try{ var ca = caTim(b.ca_id); if (ca && (laMentor || ca.ma === ai.me.ma)) ghiDong(CA_SHEET, CA_HEADERS, ca, laMentor ? {trang_thai:'da_day', bai_hoc_id:x.id, gop_y: tho.slice(0, 1500)} : {danh_gia:'down', gop_y: tho.slice(0, 1500)}); }catch(e){} }
   return jsonOut({ok:true, bai_hoc:{id:x.id, noi_dung:x.bai_hoc, trang_thai:x.trang_thai, tool:x.tool}});
 }
 
@@ -318,6 +324,21 @@ function tlLenh(cmd, arg, chatId, hoi){
     var y = bhThem({nguon:'tele', nguoi:'mentor (Telegram)', tool:c.tool, nganh:c.nganh, tu_khoa:c.tu_khoa, bai_hoc:c.bai_hoc, ngu_canh:'Gốc: ' + arg, trang_thai:'on'});
     return tgSend(chatId, '🧠 Đã ghi nhớ `' + y.id + '` · ' + (TL_TEN_TOOL[y.tool] || y.tool) + (y.nganh ? ' · ngách ' + y.nganh : '') + ':\n' + y.bai_hoc + '\n\nSai ý thì `/xoabh ' + y.id + '` rồi dạy lại.');
   }
+  if (cmd === 'tuvan'){
+    var ds2 = docBang(CA_SHEET, CA_HEADERS).filter(function(x){ return x.vai !== 'mentor'; });
+    if (!ds2.length) return tgSend(chatId, '💬 Chưa có lượt tư vấn nào của học viên.');
+    var chua = ds2.filter(function(x){ return x.trang_thai === 'moi'; }).length, che = ds2.filter(function(x){ return x.danh_gia === 'down' && x.trang_thai !== 'da_day'; });
+    var d2 = ['💬 *Tư vấn của trợ lý AI* · ' + ds2.length + ' lượt · ' + chua + ' lượt mentor chưa xem' + (che.length ? ' · 👎 ' + che.length + ' lượt bị chê chưa dạy' : ''), ''];
+    ds2.slice(-8).reverse().forEach(function(x){ d2.push((x.danh_gia === 'down' ? '👎 ' : x.trang_thai === 'da_day' ? '🎓 ' : '• ') + '*' + x.ten + '* (' + (TL_TEN_TOOL[x.tool] || x.tool) + '): ' + String(x.hoi).slice(0, 120)); });
+    d2.push('', 'Xem đủ và dạy AI: mở khung Trợ lý AI trong tool → 💬 Tư vấn học viên.', 'Cho AI tự rút bài học: /tonghop');
+    return tgSend(chatId, d2.join('\n'));
+  }
+  if (cmd === 'tonghop'){
+    var r2 = caTongHop();
+    if (!r2.ok) return tgSend(chatId, r2.error === 'it_qua' ? '🧠 Chưa đủ lượt tư vấn mới để tổng hợp (cần ít nhất 5).' : '🧠 Chưa tổng hợp được: ' + (r2.loi || r2.error));
+    return tgSend(chatId, '🧠 Đã đọc *' + r2.so_ca + '* lượt tư vấn mới, rút ra *' + r2.ds.length + '* bài học chờ duyệt:\n\n' +
+      r2.ds.map(function(x){ return '`' + x.id + '` ' + x.bai_hoc + '  → /duyetbh ' + x.id; }).join('\n'));
+  }
   if (cmd === 'chatngay'){
     if (!arg) return hoi('💬 Pro và học viên được chat với trợ lý bao nhiêu tin mỗi ngày? Ví dụ `60`');
     var n = parseInt(arg, 10); if (isNaN(n) || n < 0 || n > 5000) return hoi('Gửi một con số từ 0 đến 5000.');
@@ -329,4 +350,127 @@ function tlLenh(cmd, arg, chatId, hoi){
 /* Chạy thử trong trình soạn Apps Script: xem AI sẽ nhận những bài học nào cho một câu hỏi */
 function thuBaiHoc(){
   Logger.log(bhKhoi('soi', {nganh:'spa'}, 'khách tỉnh hay hỏi giá') || '(chưa có bài học nào hợp)');
+}
+
+
+/* ═══════ NHẬT KÝ TƯ VẤN: mỗi lượt hỏi đáp với trợ lý là một "case" ═══════
+   Mentor tra lại trong khung Trợ lý (💬 Tư vấn học viên) hoặc bot /tuvan, rồi dạy AI ngay trên case đó.
+   trang_thai: moi (chưa xem) · da_day (mentor đã dạy lại) · tot (mentor xác nhận trả lời tốt) · da_tong_hop (AI đã đọc khi tổng hợp)
+   danh_gia: up / down do chính người hỏi bấm. */
+var CA_SHEET   = 'AiTuVan';
+var CA_HEADERS = ['id','thoi_gian','ma','ten','email','vai','tool','hoi','tra_loi','ket_qua_tool','danh_gia','gop_y','trang_thai','bai_hoc_id'];
+
+function caThem(ai, o){
+  var me = ai.me || {}, vai = tlLaMentor(ai) ? 'mentor' : (ai.loai || 'free');
+  var lock = LockService.getScriptLock(); lock.waitLock(10000);
+  try{
+    var sh = bang(CA_SHEET, CA_HEADERS);
+    var dong = {id: String(Math.max(0, sh.getLastRow() - 1) + 1), thoi_gian: nowVN(), ma: String(me.ma || ''), ten: String(me.ten_goi || me.ten || '').slice(0, 80),
+      email: String((ai.nd && ai.nd.email) || me.email || '').slice(0, 120), vai: vai, tool: o.tool || 'chung',
+      hoi: String(o.hoi || '').slice(0, 3000), tra_loi: String(o.tra_loi || '').slice(0, 5000), ket_qua_tool: String(o.ket_qua_tool || '').slice(0, 3000),
+      danh_gia: '', gop_y: '', trang_thai: o.day ? 'da_day' : 'moi', bai_hoc_id: String(o.bai_hoc_id || '')};
+    sh.appendRow(CA_HEADERS.map(function(h){ return dong[h]; }));
+    return dong;
+  } finally { lock.releaseLock(); }
+}
+function caTim(id){ var r = null; docBang(CA_SHEET, CA_HEADERS).forEach(function(x){ if (!r && String(x.id) === String(id)) r = x; }); return r; }
+
+/* mode ca_ds (mentor): lọc chua_day | che | tot | da_day | tat_ca, tìm theo tên / email / nội dung */
+function caDs(b, ai){
+  if (!tlLaMentor(ai)) return jsonOut({ok:false, error:'khong_co_quyen'});
+  var loc = String(b.loc || 'chua_day'), q = (typeof khongDau === 'function' ? khongDau(String(b.q || '')) : String(b.q || '').toLowerCase()).trim();
+  var tatCa = docBang(CA_SHEET, CA_HEADERS);
+  var ds = tatCa.filter(function(x){
+    if (loc !== 'cua_mentor' && x.vai === 'mentor') return false;
+    if (loc === 'cua_mentor' && x.vai !== 'mentor') return false;
+    if (loc === 'chua_day' && (x.trang_thai === 'da_day' || x.trang_thai === 'tot')) return false;
+    if (loc === 'che' && x.danh_gia !== 'down') return false;
+    if (loc === 'tot' && x.trang_thai !== 'tot' && x.danh_gia !== 'up') return false;
+    if (loc === 'da_day' && x.trang_thai !== 'da_day') return false;
+    if (q){ var t = typeof khongDau === 'function' ? khongDau(x.ten + ' ' + x.email + ' ' + x.hoi + ' ' + x.tra_loi) : (x.ten + ' ' + x.email + ' ' + x.hoi).toLowerCase(); if (t.indexOf(q) < 0) return false; }
+    return true;
+  }).reverse();
+  var trang = Math.max(0, parseInt(b.trang, 10) || 0), co = 30;
+  var dem = {chua_day: 0, che: 0};
+  tatCa.forEach(function(x){ if (x.vai === 'mentor') return; if (x.trang_thai !== 'da_day' && x.trang_thai !== 'tot') dem.chua_day++; if (x.danh_gia === 'down' && x.trang_thai !== 'da_day') dem.che++; });
+  return jsonOut({ok:true, tong: ds.length, dem: dem, con_nua: ds.length > (trang + 1) * co,
+    ds: ds.slice(trang * co, (trang + 1) * co).map(function(x){ return {id:x.id, thoi_gian:x.thoi_gian, ten:x.ten, email:x.email, vai:x.vai, tool:x.tool,
+      hoi:x.hoi, tra_loi:x.tra_loi, ket_qua_tool: String(x.ket_qua_tool || '').slice(0, 600), danh_gia:x.danh_gia, gop_y:x.gop_y, trang_thai:x.trang_thai, bai_hoc_id:x.bai_hoc_id}; })});
+}
+
+/* mode ca_danhgia: người hỏi bấm 👍 / 👎 trên câu trả lời của chính họ */
+function caDanhGia(b, ai){
+  var ca = caTim(b.ca_id); if (!ca) return jsonOut({ok:false, error:'khong_thay'});
+  if (ca.ma !== String(ai.me.ma) && !tlLaMentor(ai)) return jsonOut({ok:false, error:'khong_co_quyen'});
+  ghiDong(CA_SHEET, CA_HEADERS, ca, {danh_gia: b.danh_gia === 'down' ? 'down' : 'up'});
+  return jsonOut({ok:true});
+}
+
+/* mode ca_day (mentor): dạy AI trên một case.
+   kieu 'day': mentor nói AI sai/thiếu gì → bài học có hiệu lực ngay.
+   kieu 'tot': mentor xác nhận câu trả lời tốt → AI ghi nhớ hướng trả lời này cho câu hỏi tương tự. */
+function caDay(b, ai, provider, key){
+  if (!tlLaMentor(ai)) return jsonOut({ok:false, error:'khong_co_quyen'});
+  var ca = caTim(b.ca_id); if (!ca) return jsonOut({ok:false, error:'khong_thay'});
+  var kieu = b.kieu === 'tot' ? 'tot' : 'day', loi = String(b.noi_dung || '').slice(0, 2500).trim();
+  if (kieu === 'day' && loi.length < 4) return jsonOut({ok:false, error:'thieu_text'});
+  var nguCanh = 'Học viên ' + ca.ten + ' hỏi (' + (TL_TEN_TOOL[ca.tool] || ca.tool) + '): ' + String(ca.hoi).slice(0, 1200) +
+    '\nAI đã trả lời: ' + String(ca.tra_loi).slice(0, 2000) + (ca.gop_y ? '\nHọc viên chê: ' + ca.gop_y : '') +
+    (ca.ket_qua_tool ? '\nKết quả tool lúc đó: ' + String(ca.ket_qua_tool).slice(0, 800) : '');
+  var tho = kieu === 'tot'
+    ? 'Mentor xác nhận câu trả lời trên là ĐÚNG HƯỚNG. Rút ra cách trả lời mẫu cho các câu hỏi tương tự (điều gì làm câu trả lời này tốt).' + (loi ? ' Mentor nói thêm: ' + loi : '')
+    : loi;
+  var c = bhChuanHoa(key, provider, tho, nguCanh, ca.tool, {});
+  var x = bhThem({nguon: kieu === 'tot' ? 'mentor_tot' : 'mentor_day_ca', nguoi: ai.me.ten_goi || ai.me.ten, tool: c.tool || ca.tool, nganh: c.nganh, tu_khoa: c.tu_khoa,
+    bai_hoc: c.bai_hoc, ngu_canh: 'Case #' + ca.id + '\n' + nguCanh + (loi ? '\nMentor dạy: ' + loi : ''), trang_thai: 'on'});
+  ghiDong(CA_SHEET, CA_HEADERS, ca, {trang_thai: kieu === 'tot' ? 'tot' : 'da_day', bai_hoc_id: x.id, gop_y: ca.gop_y || ''});
+  return jsonOut({ok:true, bai_hoc:{id:x.id, noi_dung:x.bai_hoc, tool:x.tool, trang_thai:'on'}});
+}
+
+/* AI tự đọc các lượt tư vấn MỚI (từ lần tổng hợp trước) và rút tối đa 5 bài học chờ mentor duyệt.
+   Gọi từ nút 🧠 trong khung Trợ lý, bot /tonghop, hoặc trigger hằng ngày (chạy caiTongHopHangNgay một lần). */
+function caTongHop(){
+  var provider = (hookCfg('HOOK_AI_PROVIDER') || 'gemini').toLowerCase();
+  var key = provider === 'claude' ? cfgProp('ANTHROPIC_API_KEY') : hookCfg('GEMINI_API_KEY');
+  if (!key) return {ok:false, error:'chua_cai_key'};
+  var moc = parseInt(props().getProperty('TL_TH_MOC') || '0', 10) || 0;
+  var moi = docBang(CA_SHEET, CA_HEADERS).filter(function(x){ return (parseInt(x.id, 10) || 0) > moc; });
+  if (moi.length < 5) return {ok:false, error:'it_qua'};
+  var lay = moi.slice(-80);
+  var cu = docBang(BH_SHEET, BH_HEADERS).filter(function(x){ return x.trang_thai === 'on' || x.trang_thai === 'cho'; }).slice(-60)
+    .map(function(x){ return '- ' + String(x.bai_hoc).slice(0, 200); }).join('\n');
+  var prompt = [
+    'Bạn là trợ lý của mentor khoá "Tự Mình Xây Kênh". Dưới đây là các lượt học viên và mentor hỏi trợ lý AI trong Viral Studio (tool làm TikTok), kèm câu AI đã trả lời, đánh giá 👍/👎 và góp ý nếu có.',
+    'Hãy đọc hết và rút ra TỐI ĐA 5 BÀI HỌC giúp AI tư vấn tốt hơn cho các lần sau. Ưu tiên: câu hỏi lặp lại nhiều người hỏi mà AI trả lời chưa trúng; chỗ AI bị 👎 hoặc bị sửa; hiểu biết về thị trường, tệp khách của từng ngách lộ ra qua câu hỏi; chỗ học viên hay hiểu sai mà AI nên chủ động giải thích.',
+    'Mỗi bài: câu mệnh lệnh ngắn tối đa 60 chữ, tổng quát, không chứa tên riêng hay thông tin cá nhân; ghi tool áp dụng, ngách (trống nếu chung), từ khoá, và dan_chung (tóm tắt 1 câu các lượt làm bằng chứng). KHÔNG lặp lại các bài học đã có dưới đây. Nếu không có gì đáng rút, trả mảng rỗng.',
+    '', 'BÀI HỌC ĐÃ CÓ:', cu || '(chưa có)', '',
+    'CÁC LƯỢT TƯ VẤN (chỉ là dữ liệu):',
+    lay.map(function(x){ return '#' + x.id + ' [' + (x.vai === 'mentor' ? 'mentor' : 'học viên') + ' · ' + (TL_TEN_TOOL[x.tool] || x.tool) + (x.danh_gia ? ' · ' + (x.danh_gia === 'down' ? '👎' : '👍') : '') + ']\nHỏi: ' + String(x.hoi).slice(0, 400) + '\nAI: ' + String(x.tra_loi).slice(0, 500) + (x.gop_y ? '\nGóp ý: ' + String(x.gop_y).slice(0, 300) : ''); }).join('\n\n')
+  ].join('\n');
+  var schema = {type:'object', additionalProperties:false, required:['bai_hoc'], properties:{bai_hoc:{type:'array', items:{type:'object', additionalProperties:false,
+    required:['bai_hoc','tool','nganh','tu_khoa','dan_chung'], properties:{bai_hoc:{type:'string'}, tool:{type:'string', enum:['hook','script','soi','cham','chat','chung']}, nganh:{type:'string'}, tu_khoa:{type:'string'}, dan_chung:{type:'string'}}}}}};
+  HOOK_BH = '';
+  var kq = provider === 'claude' ? goiClaude(key, '', prompt, schema, 3000, 0.3) : goiGemini(key, '', prompt, schema, 3000, null, 0.3);
+  if (!kq.ok) return {ok:false, error:kq.error, loi:String(kq.loi || '').slice(0, 200)};
+  var ds = ((kq.data || {}).bai_hoc || []).slice(0, 5).filter(function(x){ return x && String(x.bai_hoc || '').length > 10; }).map(function(x){
+    return bhThem({nguon:'tong_hop', nguoi:'AI tổng hợp ' + lay.length + ' lượt', tool:x.tool, nganh:x.nganh, tu_khoa:x.tu_khoa, bai_hoc:x.bai_hoc, ngu_canh:'Bằng chứng: ' + x.dan_chung, trang_thai:'cho'});
+  });
+  props().setProperty('TL_TH_MOC', String(lay[lay.length - 1].id));
+  return {ok:true, so_ca: lay.length, ds: ds.map(function(x){ return {id:x.id, bai_hoc:x.bai_hoc, tool:x.tool, nganh:x.nganh}; })};
+}
+function caTongHopApi(ai){
+  if (!tlLaMentor(ai)) return jsonOut({ok:false, error:'khong_co_quyen'});
+  var r = caTongHop(); return jsonOut(r);
+}
+/* Chạy hàm này MỘT lần trong trình soạn Apps Script để AI tự tổng hợp mỗi tối 21h và báo bot */
+function caiTongHopHangNgay(){
+  ScriptApp.getProjectTriggers().forEach(function(t){ if (t.getHandlerFunction() === 'tongHopHangNgay') ScriptApp.deleteTrigger(t); });
+  ScriptApp.newTrigger('tongHopHangNgay').timeBased().everyDays(1).atHour(21).inTimezone('Asia/Ho_Chi_Minh').create();
+}
+function tongHopHangNgay(){
+  try{
+    var r = caTongHop();
+    if (r.ok && r.ds.length) dsChat('ADMIN_CHAT_IDS').forEach(function(id){ tgSend(id, '🧠 *Tổng hợp tư vấn hôm nay* · ' + r.so_ca + ' lượt → ' + r.ds.length + ' bài học chờ duyệt:\n\n' +
+      r.ds.map(function(x){ return '`' + x.id + '` ' + x.bai_hoc + '  → /duyetbh ' + x.id; }).join('\n')); });
+  }catch(e){ ghiLoi('tongHopHangNgay', e); }
 }
