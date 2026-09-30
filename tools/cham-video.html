@@ -320,7 +320,7 @@
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="tai-khoan.js?v=202609301000"></script>
+<script src="tai-khoan.js?v=202609301800"></script>
 <script>
 const $ = s => document.querySelector(s);
 const el = (t, c, txt) => { const e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; };
@@ -465,7 +465,7 @@ let busy = false;
 async function goiCoThuLai(body) {
   const st = $('#chamStatus');
   for (let lan = 0; ; lan++) {
-    const r = await callApi(body);
+    const r = await TK.goiNen(body, { tool: 'cham', nhan: 'Chấm video' });   // chạy nền: rời trang vẫn nhận được kết quả
     if (r.ok || r.error !== 'ban_qua' || lan >= 2) return r;
     for (let g = 20; g > 0; g--) { st.className = 'status'; st.innerHTML = `<span class="spinner"></span>AI của Google đang quá tải, tự thử lại sau ${g} giây (lần ${lan + 2}/3)…`; await new Promise(z => setTimeout(z, 1000)); }
   }
@@ -516,6 +516,14 @@ async function cham() {
   finally { clearInterval(tick); busy = false; btn.disabled = false; }
 }
 
+/* Kết quả chấm về trong lúc bạn đã rời trang (xem TK.goiNen) */
+TK.nhanViec('cham', r => {
+  const st = $('#chamStatus');
+  if (!r.ok || !r.data || !r.data.thang) { st.className = 'status err'; st.textContent = 'Lượt chấm lúc nãy chưa xong: ' + (ERR[r.error] || r.error || 'lỗi') + (r.chi_tiet ? ' Mã lỗi: ' + r.chi_tiet : ''); return; }
+  state.kq = r.data; renderKq(r.data, docSo());
+  st.className = 'status ok'; st.textContent = 'Kết quả chấm đã xong trong lúc bạn rời trang.';
+  if (r.luot && TK.me) { TK.me.luot = r.luot; veQuota(); }
+});
 /* ---------- lưu kết quả ---------- */
 function luuKq(d, so) { if (DEMO) return; ls.set('cham.kq', JSON.stringify({ d, so, ten: state.file ? state.file.name : (state.link.tac_gia ? '@' + state.link.tac_gia : ''), link: $('#link').value.trim(), at: Date.now() })); }
 function xoaKq() { ls.del('cham.kq'); state.kq = null; $('#kqBody').hidden = true; $('#kqEmpty').hidden = false; $('#sumBar').hidden = true; $('#grid').classList.remove('has-kq', 'edit'); }
@@ -704,6 +712,6 @@ $('#btnClear').addEventListener('click', () => xoaHet(true));
 TK.khoiDong({ api: API, tool: 'cham', onDoi: () => { veQuota(); dienTuHoSo(); } });
 loadQuota();
 </script>
-<script src="tro-ly.js?v=202609301500"></script>
+<script src="tro-ly.js?v=202609301800"></script>
 </body>
 </html>

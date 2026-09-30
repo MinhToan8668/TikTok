@@ -344,3 +344,21 @@ Mỗi lượt hỏi đáp với trợ lý (của học viên, khách và cả me
 - **🧠 Cho AI tự rút bài học từ các lượt mới**: AI đọc các lượt kể từ lần tổng hợp trước (cần ít nhất 5 lượt, mỗi lần đọc tối đa 80 lượt), bỏ qua điều đã có trong bộ nhớ, rút tối đa 5 bài học **chờ duyệt**.
 - Bot: `/tuvan` xem nhanh học viên đang hỏi gì. `/tonghop` là tổng hợp ngay.
 - Muốn AI tự tổng hợp lúc 21h mỗi tối và báo bot: trong Apps Script chọn hàm `caiTongHopHangNgay` rồi bấm **Run** một lần.
+
+## Chạy nhanh hơn, chạy nền, nhiều Gemini key
+
+**AI chạy nền:** Soi video, Chấm video, Chấm kịch bản, AI viết bài và Trợ lý đều gửi kèm `job_id`. Máy chủ chạy nốt dù người dùng tắt màn hình, chuyển app, sang tool khác hay đóng tab, rồi giữ kết quả 6 giờ (CacheService).
+- Mạng đứt giữa chừng: trang tự hỏi lại theo job_id, không phải chạy lại, không tốn thêm lượt.
+- Đã rời trang: mở bất kỳ tool nào sẽ hiện "✓ Soi video đã xong · Xem →". Bấm vào là thấy kết quả.
+- Đang ở tab hoặc app khác: tiêu đề tab nhấp nháy. Nếu đã cho phép thông báo thì có thông báo của trình duyệt.
+
+**Vì sao chậm hoặc kẹt khi đông người, và đã sửa gì:**
+1. Mỗi lượt AI đọc lại cả sheet NguoiDung 3–4 lần. Giờ đọc một lần cho cả lượt. Riêng chỗ trừ lượt vẫn đọc bản mới nhất trong khoá, để hai yêu cầu cùng lúc không trừ trùng.
+2. Lưu lượt tư vấn trước đây khoá cả script, nhiều người chat phải xếp hàng. Giờ không khoá nữa: id theo thời gian nên không bị trùng.
+3. Chat chỉ nạp phần kiến thức của tool đang mở, nên đầu vào ngắn hơn và trả lời nhanh hơn.
+4. Nhiều Gemini key xoay vòng (xem dưới). Key nào bị 429 thì chuyển ngay sang key khác, không ngồi chờ.
+
+**Thêm key:** Script properties → thêm `GEMINI_API_KEYS`, dán các key cách nhau dấu phẩy. `GEMINI_API_KEY` vẫn là key chính.
+⚠️ Hạn mức Gemini tính theo **project**, không tính theo key. Các key phải tạo ở **các project Google Cloud khác nhau** (AI Studio → Create API key → Create in new project) thì mới cộng dồn được. Nhiều key cùng một project không nhanh hơn chút nào.
+Cách hiệu quả nhất là **bật billing (Tier 1)** cho project của key chính. Hạn mức mỗi phút tăng lên hàng chục lần, trả tiền theo lượng dùng (bản flash rất rẻ). Làm vậy là hết cảnh 429 và phải chờ.
+Video đã tải lên Files API chỉ key của đúng project đó đọc được, nên lượt có video lớn luôn dùng key chính.

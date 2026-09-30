@@ -156,6 +156,9 @@
     '@keyframes tkFree{0%,100%{transform:rotate(8deg) scale(1)}50%{transform:rotate(8deg) scale(1.12)}}',
     '@media (prefers-reduced-motion:reduce){.ft-free{animation:none}}',
     /* bảng hết lượt: hai đường đi tiếp */
+    '.tk-viec{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 76px);z-index:58;display:flex;align-items:center;gap:12px;background:#1c2600;color:#F3F0E4;border-radius:999px;padding:8px 8px 8px 16px;font-size:14px;font-weight:700;box-shadow:0 10px 30px rgba(0,0,0,.3);max-width:calc(100vw - 24px)}',
+    '.tk-viec a{background:#99DF00;color:#1c2600;border-radius:999px;padding:7px 14px;text-decoration:none;font-weight:800;white-space:nowrap}',
+    '.tk-viec button{border:0;background:transparent;color:#F3F0E4;font-size:15px;cursor:pointer;padding:4px 8px;min-height:0!important}',
     '.tk-het{display:grid;gap:10px;margin-top:12px}',
     '.tk-het > div{border:2px solid var(--text,#222);border-radius:14px;padding:12px 14px;font-size:13px;line-height:1.55;box-shadow:0 4px 0 rgba(28,38,0,.28)}',
     '.tk-het > div.pro{background:var(--accent-soft,#eef8d0)}',
@@ -635,6 +638,86 @@
     veNhanFree();
   }
 
+  /* ── VIỆC CHẠY NỀN ──
+     goiNen gửi kèm job_id. Máy chủ chạy nốt kể cả khi trình duyệt tắt màn hình, chuyển app hay rời trang,
+     rồi cất kết quả 6 giờ. Mạng đứt giữa chừng thì hỏi lại theo job_id; rời trang thì lần mở tool sau
+     tự nhận kết quả (nhanViec), hoặc báo "Xong · Xem" dẫn về đúng tool. */
+  var VIEC_KEY = 'vs_viec', xuLyViec = {}, dangCho = {};
+  function dsViec() { var d = json(VIEC_KEY); return Array.isArray(d) ? d : []; }
+  function luuViec(d) { ls.set(VIEC_KEY, JSON.stringify(d.slice(-12))); }
+  function boViec(id) { luuViec(dsViec().filter(function (x) { return x.id !== id; })); }
+  function ngu(ms) { return new Promise(function (z) { setTimeout(z, ms); }); }
+  function xinThongBao() { try { if (global.Notification && Notification.permission === 'default') Notification.requestPermission(); } catch (e) { } }
+  var tieuDeGoc = document.title, nhayT = null;
+  function baoXong(v, r) {
+    if (!document.hidden) return;
+    var chu = (r && r.ok === false ? '⚠️ ' : '✓ ') + (v.nhan || 'AI') + (r && r.ok === false ? ' chưa xong' : ' đã xong');
+    try { if (global.Notification && Notification.permission === 'granted') new Notification('Viral Studio', { body: chu, tag: v.id }); } catch (e) { }
+    clearInterval(nhayT); var bat = false;
+    nhayT = setInterval(function () { bat = !bat; document.title = bat ? chu : tieuDeGoc; }, 1200);
+  }
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) { clearInterval(nhayT); document.title = tieuDeGoc; } });
+  async function hoiViec(v) {
+    try { return await goi({ action: 'hook_ai', mode: 'job_kq', job_id: v.id }); } catch (e) { return null; }
+  }
+  /* chờ kết quả một việc: hỏi mỗi 6 giây, tối đa 8 phút kể từ lúc gửi; quá hạn thì hỏi đúng một lần (máy chủ giữ 6 giờ) */
+  async function choViec(v) {
+    var het = v.t0 + 8 * 60000;
+    for (var lan = 0; ; lan++) {
+      var r = await hoiViec(v);
+      if (r && r.error !== 'dang_chay' && r.error !== 'khong_thay') return r;
+      if (r && r.error === 'khong_thay' && Date.now() - v.t0 > 30000) return null;   // máy chủ chưa từng nhận việc này
+      if (Date.now() > het) return null;
+      await ngu(6000);
+    }
+  }
+  async function goiNen(body, info) {
+    info = info || {};
+    var v = { id: 'j' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10), tool: info.tool || TK.tool, nhan: info.nhan || 'AI', t0: Date.now(), trang: (location.pathname.split('/').pop() || ''), them: info.them || null };
+    luuViec(dsViec().concat([v])); dangCho[v.id] = 1; xinThongBao();
+    var b2 = {}; for (var k in body) b2[k] = body[k]; b2.job_id = v.id;
+    try {
+      var r = await goi(b2);
+      boViec(v.id); delete dangCho[v.id]; baoXong(v, r); return r;
+    } catch (e) {
+      // mạng đứt hoặc trình duyệt treo kết nối khi chuyển app: máy chủ vẫn đang chạy, hỏi lại theo job_id
+      var r2 = await choViec(v);
+      boViec(v.id); delete dangCho[v.id];
+      if (r2) { baoXong(v, r2); return r2; }
+      throw e;
+    }
+  }
+  /* trang tool đăng ký cách hiện kết quả cho loại việc của mình */
+  function nhanViec(tool, fn) {
+    xuLyViec[tool] = fn;
+    var k = 'vs_viec_xong_' + tool, o = json(k);
+    if (o && o.r) { ls.del(k); setTimeout(function () { try { fn(o.r, o.v); } catch (e) { } }, 60); }   // đợi trang dựng xong rồi mới đổ kết quả
+  }
+  var tbViec = null;
+  function hienTbViec(v, r) {
+    napCss();
+    if (!tbViec) { tbViec = document.createElement('div'); tbViec.className = 'tk-viec'; document.body.appendChild(tbViec); }
+    tbViec.innerHTML = '';
+    var t = el('span', null, (r && r.ok === false ? '⚠️ ' : '✓ ') + (v.nhan || 'AI') + (r && r.ok === false ? ' bị lỗi' : ' đã xong'));
+    var a = el('a', null, 'Xem →'); a.href = v.trang || '#';
+    var x = el('button', null, '✕'); x.type = 'button'; x.onclick = function () { tbViec.remove(); tbViec = null; };
+    tbViec.appendChild(t); tbViec.appendChild(a); tbViec.appendChild(x);
+  }
+  /* mở trang: nhận nốt các việc gửi từ lần trước (đã rời trang trước khi có kết quả) */
+  function tiepViec() {
+    dsViec().forEach(function (v) {
+      if (dangCho[v.id]) return;
+      if (Date.now() - v.t0 > 6 * 3600000) { boViec(v.id); return; }
+      dangCho[v.id] = 1;
+      choViec(v).then(function (r) {
+        delete dangCho[v.id]; boViec(v.id);
+        if (!r) return;
+        if (xuLyViec[v.tool]) { try { xuLyViec[v.tool](r, v); } catch (e) { } baoXong(v, r); }
+        else { ls.set('vs_viec_xong_' + v.tool, JSON.stringify({ r: r, v: v })); hienTbViec(v, r); baoXong(v, r); }
+      });
+    });
+  }
+
   /* ── nạp hồ sơ tài khoản ── */
   async function nap() {
     var t = token();
@@ -790,7 +873,8 @@
     var cu = opt.onDoi;
     TK.onDoi = function (me) { if (TK._veMoi) { try { TK._veMoi(); } catch (e) { } } veNutPro(); veNhanFree(); if (cu) cu(me); };
     napCss();
-    napCfg().then(bao);   // có giá và hạn mức từ máy chủ: vẽ lại nút Pro, nhãn FREE, dòng lượt của tool
+    napCfg().then(bao);
+    setTimeout(tiepViec, 300);   // có giá và hạn mức từ máy chủ: vẽ lại nút Pro, nhãn FREE, dòng lượt của tool
     veNhanFree();
     nap();
     return TK;
@@ -864,6 +948,7 @@
 
   global.TK = {
     khoiDong: khoiDong, nap: nap, mo: mo, dong: dong, canCo: canCo, moHet: moHet,
+    goiNen: goiNen, nhanViec: nhanViec, viecDangCho: function () { return dsViec(); },
     luotTai: luotTai, canTai: canTai, dungTai: dungTai, veNhanFree: veNhanFree,
     goi: goi, loiMang: loiMang, loiMayChu: loiMayChu,   // tool dùng chung một cách gọi API và một cách phân loại lỗi
     moHocVien: function () { tab = 'signup'; kieu = 'hv'; mo('signup'); },

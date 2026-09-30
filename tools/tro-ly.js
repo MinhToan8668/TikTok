@@ -67,6 +67,7 @@
     '.tl-fab .tl-av{width:38px;height:38px}',
     '.tl-fab .tl-on{position:absolute;left:37px;top:6px;width:10px;height:10px;border-radius:50%;background:#99DF00;border:2px solid #1c2600}',
     '.tl-fab.an{display:none}',
+    '.tl-fab.co-moi .tl-on{background:#ff5a24;animation:tlNghe 1.2s infinite}',
     '.tl-av{width:36px;height:36px;border-radius:50%;background:#99DF00;display:grid;place-items:center;flex:none}',
     '.tl-av svg{width:70%;height:70%}',
     '.tl-av.nho{width:26px;height:26px}',
@@ -363,7 +364,7 @@
   function coGian() { nhap.style.height = 'auto'; nhap.style.height = Math.min(120, nhap.scrollHeight) + 'px'; }
 
   function mo() {
-    dung(); hop.classList.add('mo'); nen.classList.add('mo'); fab.classList.add('an');
+    dung(); hop.classList.add('mo'); nen.classList.add('mo'); fab.classList.add('an'); fab.classList.remove('co-moi');
     var t = toolHienTai();
     hop.querySelector('.tl-phu').textContent = t !== 'chung' ? 'Đang xem: ' + TEN_TOOL[t] : 'Tự Mình Xây Kênh · sẵn sàng tư vấn';
     if (global.innerWidth <= 560) { try { document.documentElement.style.overflow = 'hidden'; } catch (e) { } }
@@ -609,8 +610,8 @@
     tt(them.am_thanh ? 'Trợ lý đang nghe đoạn ghi âm…' : '');
     var r;
     try {
-      r = await TK.goi({ action: 'hook_ai', mode: 'chat', token: TK.token(), dev: TK.dev(), tin: chu, am_thanh: them.am_thanh || '', am_mime: them.am_mime || '',
-        lich_su: lichSu, ngu_canh: nguCanh(), ho_so: TK.hoSo(), noi: !!(them.noi || them.am_thanh || st.hoiThoai), day: day });
+      r = await TK.goiNen({ action: 'hook_ai', mode: 'chat', token: TK.token(), dev: TK.dev(), tin: chu, am_thanh: them.am_thanh || '', am_mime: them.am_mime || '',
+        lich_su: lichSu, ngu_canh: nguCanh(), ho_so: TK.hoSo(), noi: !!(them.noi || them.am_thanh || st.hoiThoai), day: day }, { tool: 'chat', nhan: 'Trợ lý trả lời' });
     } catch (e) { r = { ok: false, error: TK.loiMang(e) ? 'mang' : 'may_chu' }; }
     st.dang = false; chinhBtn.disabled = false; tt(''); veMic();
     if (r.ok) {
@@ -633,6 +634,14 @@
 
   function khoi() {
     dung();
+    // trợ lý trả lời xong trong lúc bạn đã rời trang: thêm vào cuộc trò chuyện
+    if (TK.nhanViec) TK.nhanViec('chat', function (r) {
+      st.ls = json(LS_KEY, []);
+      if (r.ok) st.ls.push({ vai: 'ai', text: r.tra_loi || '…', goi_y: r.goi_y || [], ca: r.ca_id || '' });
+      else st.ls.push({ vai: 'ai', text: '⚠️ ' + (LOI[r.error] || 'Câu hỏi lúc nãy chưa được trả lời, gửi lại giúp mình.'), loi: true });
+      luu(); veDs();
+      if (!hop.classList.contains('mo')) { fab.classList.add('co-moi'); }
+    });
     if (TK.nghe) TK.nghe(function () { veMentor(); if (hop && hop.classList.contains('mo')) veDs(); });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', khoi); else khoi();

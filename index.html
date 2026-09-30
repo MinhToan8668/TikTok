@@ -1114,6 +1114,28 @@ body.hv-mode{padding-bottom:0}
 .hs-chitiet dt{font-weight:700;font-size:12px;color:var(--quiet);margin-top:6px}
 .hs-chitiet dd{margin:0}
 .hs-ls{margin-top:8px;font-size:12.5px;line-height:1.7}
+/* tư vấn AI: mentor đọc lại học viên hỏi trợ lý gì, dạy AI ngay trên case */
+.hs-tv{border:1.5px solid var(--ink);border-radius:16px;padding:14px;margin:0 0 14px;background:var(--bg)}
+.hs-tv-dau{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.hs-tv-dau b{font-size:15px}
+.hs-tv-dau .so{background:#ff5a24;color:#fff;border-radius:999px;font-size:11.5px;font-weight:800;padding:1px 8px}
+.hs-loc{display:flex;gap:6px;flex-wrap:wrap}
+.hs-loc button{font:inherit;font-size:12.5px;font-weight:700;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:5px 11px;cursor:pointer}
+.hs-loc button.on{background:var(--ink);color:#99DF00;border-color:var(--ink)}
+.ca-the{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:8px;font-size:13px;line-height:1.55;background:var(--paper-lt,#fff)}
+.ca-the.che{border:2px solid #ff5a24}
+.ca-the .ca-dau{font-size:12px;color:var(--quiet);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.ca-the .ca-dau b{color:var(--ink)}
+.ca-the .nhan{font-size:11px;font-weight:800;border-radius:999px;padding:0 7px;background:var(--line)}
+.ca-the .nhan.do{background:#ff5a24;color:#fff}.ca-the .nhan.xanh{background:#99DF00;color:#1c2600}
+.ca-the .hoi{font-weight:700;margin:5px 0}
+.ca-the .dap{background:rgba(153,223,0,.12);border-radius:8px;padding:7px 9px;white-space:pre-wrap;max-height:110px;overflow:auto}
+.ca-the .che-chu{color:#b4432a;margin-top:5px;font-size:12.5px}
+.ca-the .ca-nut{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;align-items:flex-start}
+.ca-the .ca-nut button{font:inherit;font-size:12.5px;font-weight:800;border:0;border-radius:10px;padding:7px 12px;cursor:pointer;height:auto;min-height:0;line-height:1.3;width:auto;flex:none}
+.ca-the .ca-nut .day{background:#ff5a24;color:#fff}.ca-the .ca-nut .tot{background:#99DF00;color:#1c2600}
+.ca-the textarea{width:100%;margin-top:8px;font:inherit;font-size:15px;border:1.5px solid var(--line);border-radius:10px;padding:8px;min-height:70px;resize:vertical;background:#fff;color:var(--ink)}
+.ca-the .ghi{margin-top:6px;font-size:12.5px;background:rgba(153,223,0,.18);border-radius:8px;padding:6px 9px}
 .hs-ls div{border-bottom:1px solid var(--line);padding:3px 0}
 .hs-ls .gio{color:var(--faint);font-variant-numeric:tabular-nums;margin-right:6px}
 /* hồ sơ kênh của chính học viên trong khu học viên */
@@ -3703,7 +3725,10 @@ function hvVeDsHocVien(ds){
   var o = $('#hvHS');
   if (!ds.length){ o.innerHTML = '<div class="hv-trong">Chưa có ai điền form đăng ký hay tạo tài khoản Viral Studio.</div>'; return; }
   var co = ds.filter(function(x){ return x.so_truong }).length;
-  var h = ['<div class="hv-trong">' + ds.length + ' người · ' + co + ' người đã có hồ sơ kênh</div>'];
+  var h = ['<div class="hs-tv" id="hsTv"><div class="hs-tv-dau"><b>💬 Học viên hỏi trợ lý AI</b><span class="so" id="hsTvSo" hidden></span>' +
+    '<div class="hs-loc" id="hsTvLoc"><button type="button" data-loc="chua_day" class="on">Chưa dạy</button><button type="button" data-loc="che">👎 Bị chê</button><button type="button" data-loc="da_day">🎓 Đã dạy</button><button type="button" data-loc="tat_ca">Tất cả</button></div></div>' +
+    '<div id="hsTvDs"><div class="hv-trong">Đang tải…</div></div></div>',
+    '<div class="hv-trong">' + ds.length + ' người · ' + co + ' người đã có hồ sơ kênh</div>'];
   ds.forEach(function(x, i){
     var nhanGoi = x.goi === 'pro' ? 'Pro' : x.goi === 'dk' ? 'mới đăng ký khoá' : 'Free';
     var lop = x.goi === 'pro' ? '' : x.goi === 'dk' ? ' dk' : ' free';
@@ -3718,7 +3743,8 @@ function hvVeDsHocVien(ds){
       (x.ma ? '' : ' · chưa có tài khoản Viral Studio') + '</div>');
     h.push('<div class="hs-nuts">' +
       (x.so_truong ? '<button type="button" data-hs-ho="' + i + '">Xem hồ sơ kênh</button>' : '') +
-      (x.ma ? '<button type="button" data-hs-ls="' + i + '">Lịch sử dùng AI</button>' : '') + '</div>');
+      (x.ma ? '<button type="button" data-hs-ls="' + i + '">Lịch sử dùng AI</button>' : '') +
+      (x.ma || x.email ? '<button type="button" data-hs-tv="' + i + '">💬 Tư vấn AI</button>' : '') + '</div>');
     h.push('<div class="hs-chitiet" data-ct="' + i + '" style="display:none"></div>');
     h.push('</div>');
   });
@@ -3729,6 +3755,76 @@ function hvVeDsHocVien(ds){
   o.querySelectorAll('[data-hs-ls]').forEach(function(b){
     b.addEventListener('click', function(){ hvHienLichSu(ds[+b.dataset.hsLs], b); });
   });
+  o.querySelectorAll('[data-hs-tv]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var x = ds[+b.dataset.hsTv], ct = hvOChiTiet(b);
+      if (ct.dataset.dang === 'tv' && ct.style.display !== 'none'){ ct.style.display = 'none'; return; }
+      ct.dataset.dang = 'tv'; ct.style.display = '';
+      hvTaiTuVan(ct, {loc:'tat_ca', email:x.email || '', ma:x.ma || ''}, 'Người này chưa hỏi trợ lý AI lần nào.');
+    });
+  });
+  $('#hsTvLoc').querySelectorAll('button').forEach(function(b){
+    b.addEventListener('click', function(){
+      $('#hsTvLoc').querySelectorAll('button').forEach(function(x){ x.classList.toggle('on', x === b); });
+      hvTaiTuVan($('#hsTvDs'), {loc:b.dataset.loc}, b.dataset.loc === 'chua_day' ? 'Không còn lượt nào chưa dạy 🎉' : 'Chưa có lượt nào.');
+    });
+  });
+  hvTaiTuVan($('#hsTvDs'), {loc:'chua_day'}, 'Không còn lượt nào chưa dạy 🎉');
+}
+
+/* ── lượt tư vấn của trợ lý AI (TroLy.gs · sheet AiTuVan) ── */
+var TV_TOOL = {soi:'Soi video', script:'Kịch bản', hook:'Hook', cham:'Chấm video', taive:'Tải video', chung:'Trò chuyện'};
+function hvTaiTuVan(o, loc, rong, trang){
+  trang = trang || 0;
+  if (!trang) o.innerHTML = '<div class="hv-trong">Đang tải…</div>';
+  var q = {token:HV.token, mode:'ca_ds', trang:trang}; for (var k in loc) q[k] = loc[k];
+  hvGoi('hook_ai', q).then(function(r){
+    var cu = o.querySelector('.hv-trong'); if (cu) cu.remove();
+    var them = o.querySelector('[data-tv-them]'); if (them) them.remove();
+    if (!r || !r.ok){ o.insertAdjacentHTML('beforeend', '<div class="hv-trong">' + (r && r.error === 'khong_co_quyen' ? 'Chỉ mentor xem được.' : r && (r.error === 'unknown_action' || r.error === 'thieu_text') ? 'Máy chủ chưa có TroLy.gs mới. Dán TroLy.gs, HookAI.gs rồi Deploy, chọn New version.' : 'Chưa tải được' + (r && r.error ? ' (' + esc(r.error) + ')' : '') + '.') + '</div>'); return; }
+    if (!loc.email && !loc.ma && r.dem){ var so = $('#hsTvSo'); if (so){ so.hidden = !r.dem.chua_day; so.textContent = r.dem.chua_day + ' chưa dạy'; } }
+    if (!r.ds.length && !trang){ o.insertAdjacentHTML('beforeend', '<div class="hv-trong">' + rong + '</div>'); return; }
+    r.ds.forEach(function(c){ o.appendChild(hvVeCa(c)); });
+    if (r.con_nua){
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'hs-nuts'; b.setAttribute('data-tv-them', '1');
+      b.style.cssText = 'margin-top:8px;font:inherit;font-size:13px;font-weight:700;border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:6px 14px;cursor:pointer';
+      b.textContent = 'Xem thêm'; b.onclick = function(){ hvTaiTuVan(o, loc, rong, trang + 1); };
+      o.appendChild(b);
+    }
+  }).catch(function(){ o.innerHTML = '<div class="hv-trong">Không kết nối được máy chủ.</div>'; });
+}
+function hvVeCa(c){
+  var d = document.createElement('div');
+  d.className = 'ca-the' + (c.danh_gia === 'down' && c.trang_thai !== 'da_day' ? ' che' : '');
+  d.innerHTML = '<div class="ca-dau"><b>' + esc(c.ten || '(không tên)') + '</b><span>' + esc(TV_TOOL[c.tool] || c.tool) + ' · ' + esc(c.thoi_gian) + '</span>' +
+    (c.vai === 'mentor' ? '<span class="nhan">mentor</span>' : '') +
+    (c.danh_gia === 'down' ? '<span class="nhan do">👎 chê</span>' : c.danh_gia === 'up' ? '<span class="nhan">👍</span>' : '') +
+    (c.trang_thai === 'da_day' ? '<span class="nhan xanh">🎓 đã dạy</span>' : c.trang_thai === 'tot' ? '<span class="nhan xanh">✓ tốt</span>' : '') + '</div>' +
+    '<div class="hoi">“' + esc(c.hoi) + '”</div><div class="dap">' + esc(String(c.tra_loi || '').replace(/\*\*/g, '')) + '</div>' +
+    (c.gop_y ? '<div class="che-chu">' + (c.trang_thai === 'da_day' ? '🎓 Mentor dạy: ' : 'Học viên chê: ') + esc(c.gop_y) + '</div>' : '') +
+    '<div class="ca-nut"><button type="button" class="day">🎓 ' + (c.trang_thai === 'da_day' ? 'Dạy thêm' : 'Dạy AI case này') + '</button>' +
+    (c.trang_thai !== 'da_day' && c.trang_thai !== 'tot' ? '<button type="button" class="tot">✓ Trả lời tốt</button>' : '') + '</div>';
+  var nut = d.querySelector('.ca-nut');
+  d.querySelector('.day').onclick = function(){
+    if (d.querySelector('textarea')) return;
+    var ta = document.createElement('textarea'); ta.placeholder = 'AI trả lời sai hay thiếu chỗ nào? Case này nên tư vấn thế nào? Viết như đang dạy học viên.';
+    var gui = document.createElement('button'); gui.type = 'button'; gui.className = 'day'; gui.textContent = 'Dạy AI';
+    var w = document.createElement('div'); w.className = 'ca-nut'; w.appendChild(gui);
+    d.insertBefore(ta, nut); d.insertBefore(w, nut); nut.hidden = true; ta.focus();
+    gui.onclick = function(){ hvDayCa(d, c, 'day', ta.value.trim(), gui); };
+  };
+  var tot = d.querySelector('.tot'); if (tot) tot.onclick = function(){ hvDayCa(d, c, 'tot', '', tot); };
+  return d;
+}
+function hvDayCa(d, c, kieu, noiDung, nut){
+  if (kieu === 'day' && noiDung.length < 4){ alert('Viết điều muốn dạy AI trước đã.'); return; }
+  nut.disabled = true; nut.textContent = 'AI đang ghi nhớ…';
+  hvGoi('hook_ai', {token:HV.token, mode:'ca_day', ca_id:c.id, kieu:kieu, noi_dung:noiDung}).then(function(r){
+    if (!r || !r.ok){ nut.disabled = false; nut.textContent = 'Gửi lại'; alert('Chưa dạy được' + (r && r.error ? ' (' + r.error + ')' : '') + '.'); return; }
+    c.trang_thai = kieu === 'tot' ? 'tot' : 'da_day'; if (kieu === 'day') c.gop_y = noiDung;
+    var moi = hvVeCa(c); d.replaceWith(moi);
+    moi.insertAdjacentHTML('beforeend', '<div class="ghi">🧠 Đã ghi nhớ, dùng ngay cho mọi tool: ' + esc(r.bai_hoc.noi_dung) + '</div>');
+  }).catch(function(){ nut.disabled = false; nut.textContent = 'Gửi lại'; });
 }
 
 function hvOChiTiet(nut){ return nut.closest('.hs-the').querySelector('.hs-chitiet'); }

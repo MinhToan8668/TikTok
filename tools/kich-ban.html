@@ -265,7 +265,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="tai-khoan.js?v=202609301000"></script>
+<script src="tai-khoan.js?v=202609301800"></script>
 <script>
 const $ = s => document.querySelector(s);
 const el = (t, c, txt) => { const e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; };
@@ -480,7 +480,7 @@ async function cham() {
   try {
     let r;
     if (DEMO) { await new Promise(z => setTimeout(z, 1200)); r = { ok: true, data: demoData(parts), con: 9, han: 10 }; }
-    else r = await callApi({ action: 'hook_ai', mode: 'script', token: TK.token(), dev: TK.dev(), ho_so: TK.hoSo(), khung: state.khung, phan: parts, chu_de: $('#chuDe').value.trim(), doi_tuong: $('#doiTuong').value.trim(), muc_tieu: state.mucTieu, xung_ho: $('#xungHo').value, dang: state.dang, toc_do: state.tocDo, san_pham: $('#sanPham').value.trim() });
+    else r = await TK.goiNen({ action: 'hook_ai', mode: 'script', token: TK.token(), dev: TK.dev(), ho_so: TK.hoSo(), khung: state.khung, phan: parts, chu_de: $('#chuDe').value.trim(), doi_tuong: $('#doiTuong').value.trim(), muc_tieu: state.mucTieu, xung_ho: $('#xungHo').value, dang: state.dang, toc_do: state.tocDo, san_pham: $('#sanPham').value.trim() }, { tool: 'script', nhan: 'Chấm kịch bản', them: { khung: state.khung } });
     clearInterval(tick);
     if (!r.ok) {
       st.className = 'status err'; st.textContent = (ERR[r.error] || 'Có lỗi khi gọi AI, thử lại sau.') + (r.chi_tiet ? ' Mã lỗi: ' + r.chi_tiet : '');
@@ -547,6 +547,27 @@ bindSeg('tocDo', v => { state.tocDo = v; updateTimes(); saveDraft(); });
 ['chuDe', 'doiTuong', 'xungHo', 'sanPham'].forEach(id => $('#' + id).addEventListener('input', saveDraft));
 /* AI viết trọn bài vào khung đang chọn. Dùng khi nhận đề xuất từ Soi video / Chấm video (tự chạy), hoặc bấm tay. */
 let dangViet = false;
+/* đổ bài AI viết vào từng phần của khung K */
+function apViet(d, K) {
+  state.text[K.k] = state.text[K.k] || {}; state.canh[K.k] = state.canh[K.k] || {};
+  (d.phan || []).forEach((p, i) => { const id = K.phan[i] && K.phan[i][0]; if (!id) return; if (p.thoai) state.text[K.k][id] = p.thoai; if (p.canh_quay || p.chu_man_hinh) state.canh[K.k][id] = [p.canh_quay, p.chu_man_hinh ? 'Chữ màn hình: ' + p.chu_man_hinh.replace(/\n/g, ' / ') : ''].filter(Boolean).join(' · '); });
+  state.kq = null; try { localStorage.removeItem('kb.kq'); } catch {} buildPhan(); updateTimes(); saveDraft();
+  if (d.hook_chu) ls.set('hook.text', d.hook_chu);
+}
+/* Kết quả về trong lúc bạn đã rời trang (xem TK.goiNen) */
+TK.nhanViec('viet', (r, v) => {
+  const st = $('#chamStatus'); if (!r.ok) { st.className = 'status err'; st.textContent = 'Lượt AI viết lúc nãy chưa xong: ' + (ERR[r.error] || r.error || 'lỗi'); return; }
+  const K = KHUNG.find(x => x.k === (v.them && v.them.khung)) || khungHienTai();
+  if (state.khung !== K.k) { state.khung = K.k; buildKhung(); }
+  apViet(r.data || {}, K);
+  st.className = 'status ok'; st.textContent = 'AI đã viết xong bài trong lúc bạn rời trang. Sửa chỗ [ ] thành chuyện thật của bạn rồi bấm Chấm kịch bản.';
+});
+TK.nhanViec('script', (r, v) => {
+  const st = $('#chamStatus'); if (!r.ok || !r.data || !r.data.score) { st.className = 'status err'; st.textContent = 'Lượt chấm kịch bản lúc nãy chưa xong: ' + (ERR[r.error] || r.error || 'lỗi'); return; }
+  if (v.them && v.them.khung && v.them.khung !== state.khung) { state.khung = v.them.khung; buildKhung(); buildPhan(); }
+  const parts = goiKichBan(); state.kq = r.data; renderKq(r.data, parts); updateTimes(); try { ls.set('kb.kq', JSON.stringify({ khung: state.khung, d: r.data, parts })); } catch {}
+  st.className = 'status ok'; st.textContent = 'Kết quả chấm kịch bản đã xong trong lúc bạn rời trang.';
+});
 async function vietBangAI(im) {
   if (dangViet) return;
   if (!DEMO && !(await TK.canCo('script'))) return;
@@ -557,7 +578,7 @@ async function vietBangAI(im) {
     const hienCo = K.phan.map(([k]) => (state.text[K.k] || {})[k] || '');
     let r;
     if (DEMO) { await new Promise(z => setTimeout(z, 1000)); r = { ok: true, con: 2, han: 3, data: { phan: K.phan.map(([k, ten]) => ({ ten, thoai: 'Lời thoại mẫu (demo) cho phần "' + ten + '": mình kể chuyện [chi tiết thật] cho mấy bạn nghe.', canh_quay: 'Quay cận, ánh sáng cửa sổ.', chu_man_hinh: '' })), hook_chu: 'Chữ hook **demo**', ghi_chu: 'Bản demo.', giay_uoc: 70 } }; }
-    else r = await callApi({ action: 'hook_ai', mode: 'viet', token: TK.token(), dev: TK.dev(), ho_so: TK.hoSo(), khung: K.k, chu_de: $('#chuDe').value.trim(), doi_tuong: $('#doiTuong').value.trim(), san_pham: $('#sanPham').value.trim(), muc_tieu: state.mucTieu, xung_ho: $('#xungHo').value, dang: state.dang, toc_do: state.tocDo, ngu_canh: im && im.ngu_canh || null, y_do: im && im.y_do || '', phan_hien_co: hienCo });
+    else r = await TK.goiNen({ action: 'hook_ai', mode: 'viet', token: TK.token(), dev: TK.dev(), ho_so: TK.hoSo(), khung: K.k, chu_de: $('#chuDe').value.trim(), doi_tuong: $('#doiTuong').value.trim(), san_pham: $('#sanPham').value.trim(), muc_tieu: state.mucTieu, xung_ho: $('#xungHo').value, dang: state.dang, toc_do: state.tocDo, ngu_canh: im && im.ngu_canh || null, y_do: im && im.y_do || '', phan_hien_co: hienCo }, { tool: 'viet', nhan: 'AI viết kịch bản', them: { khung: K.k } });
     clearInterval(tick);
     if (!r.ok) {
       st.className = 'status err'; st.textContent = (ERR[r.error] || 'AI chưa viết được, thử lại.') + (r.chi_tiet ? ' Mã lỗi: ' + r.chi_tiet : '');
@@ -565,10 +586,7 @@ async function vietBangAI(im) {
       if (r.error === 'unknown_action' || r.error === 'thieu_text' && !$('#chuDe').value) st.textContent = r.error === 'unknown_action' ? 'Máy chủ đang chạy HookAI.gs bản cũ nên chưa có AI viết bài. Mentor dán HookAI.gs mới rồi Deploy, chọn New version.' : st.textContent;
       return false;
     }
-    const d = r.data || {}; state.text[K.k] = state.text[K.k] || {}; state.canh[K.k] = state.canh[K.k] || {};
-    (d.phan || []).forEach((p, i) => { const id = K.phan[i] && K.phan[i][0]; if (!id) return; if (p.thoai) state.text[K.k][id] = p.thoai; if (p.canh_quay || p.chu_man_hinh) state.canh[K.k][id] = [p.canh_quay, p.chu_man_hinh ? 'Chữ màn hình: ' + p.chu_man_hinh.replace(/\n/g, ' / ') : ''].filter(Boolean).join(' · '); });
-    state.kq = null; try { localStorage.removeItem('kb.kq'); } catch {} buildPhan(); updateTimes(); saveDraft();
-    if (d.hook_chu) ls.set('hook.text', d.hook_chu);
+    const d = r.data || {}; apViet(d, K);
     st.className = 'status ok'; st.textContent = `AI đã viết xong ${nguon ? nguon + ' ' : ''}(≈${d.giay_uoc || '?'} giây${d.so_chu ? ', ' + d.so_chu + ' chữ' : ''}). ${d.ghi_chu || ''} Sửa chỗ [ ] thành chuyện thật của bạn rồi bấm Chấm kịch bản.` + (r.con != null ? ` Còn ${r.con}/${r.han} lượt.` : '');
     if (r.luot && TK.me) { TK.me.luot = r.luot; veQuota(); }
     toast('AI đã viết trọn bài, đọc lại và sửa chi tiết thật nhé'); return true;
@@ -593,6 +611,6 @@ TK.khoiDong({ api: API, tool: 'script', onDoi: () => { veQuota(); dienTuHoSo(); 
 if (imViet) { const im = imViet; imViet = null; setTimeout(async () => { if (!DEMO) await TK.nap(); $('#chamStatus').className = 'status'; $('#chamStatus').textContent = 'Đã nhận đề xuất, AI sắp viết trọn kịch bản…'; vietBangAI(im); }, 600); }
 loadQuota();
 </script>
-<script src="tro-ly.js?v=202609301500"></script>
+<script src="tro-ly.js?v=202609301800"></script>
 </body>
 </html>

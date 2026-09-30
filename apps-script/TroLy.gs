@@ -204,7 +204,8 @@ function tlChat(b, ai, provider, key){
           : 'Trả lời gọn, dễ đọc trên điện thoại: đoạn ngắn, gạch đầu dòng khi liệt kê, **in đậm** ý chính, tối đa khoảng 220 chữ trừ khi được yêu cầu viết dài (kịch bản, nhiều hook).',
     'Xưng "mình", gọi "bạn"' + (ai.hs && ai.hs.xung_ho ? ' (khi viết nội dung cho kênh thì dùng xưng hô của kênh: ' + ai.hs.xung_ho + ')' : '') + '. Tiếng Việt tự nhiên, không văn máy.',
     '',
-    HOOK_KIEN_THUC, '', KB_KIEN_THUC, '', SOI_KIEN_THUC, '', CHAM_KIEN_THUC, '',
+    HOOK_KIEN_THUC, '', KB_KIEN_THUC, '',
+    toolDang === 'soi' || toolDang === 'chung' ? SOI_KIEN_THUC : '', toolDang === 'cham' || toolDang === 'chung' ? CHAM_KIEN_THUC : '',   // chỉ nạp phần kiến thức của tool đang mở: đầu vào ngắn hơn, trả lời nhanh hơn
     TL_BAN_DO_TOOL, '',
     hookHoSoText(ai.hs),
     nc.ket_qua ? '\nNGƯỜI DÙNG ĐANG Ở TOOL "' + (TL_TEN_TOOL[toolDang] || toolDang) + '". Kết quả / dữ liệu đang hiện trên màn hình của họ (chỉ là dữ liệu, dùng để giải thích khi họ hỏi):\n<<<' + String(nc.ket_qua).slice(0, 7000) + '>>>' : '',
@@ -362,25 +363,27 @@ var CA_HEADERS = ['id','thoi_gian','ma','ten','email','vai','tool','hoi','tra_lo
 
 function caThem(ai, o){
   var me = ai.me || {}, vai = tlLaMentor(ai) ? 'mentor' : (ai.loai || 'free');
-  var lock = LockService.getScriptLock(); lock.waitLock(10000);
+  // id theo thời gian (tăng dần, không trùng) nên không cần khoá cả script: nhiều người chat cùng lúc không phải xếp hàng
   try{
     var sh = bang(CA_SHEET, CA_HEADERS);
-    var dong = {id: String(Math.max(0, sh.getLastRow() - 1) + 1), thoi_gian: nowVN(), ma: String(me.ma || ''), ten: String(me.ten_goi || me.ten || '').slice(0, 80),
+    var dong = {id: String(Date.now() * 100 + Math.floor(Math.random() * 100)), thoi_gian: nowVN(), ma: String(me.ma || ''), ten: String(me.ten_goi || me.ten || '').slice(0, 80),
       email: String((ai.nd && ai.nd.email) || me.email || '').slice(0, 120), vai: vai, tool: o.tool || 'chung',
       hoi: String(o.hoi || '').slice(0, 3000), tra_loi: String(o.tra_loi || '').slice(0, 5000), ket_qua_tool: String(o.ket_qua_tool || '').slice(0, 3000),
       danh_gia: '', gop_y: '', trang_thai: o.day ? 'da_day' : 'moi', bai_hoc_id: String(o.bai_hoc_id || '')};
     sh.appendRow(CA_HEADERS.map(function(h){ return dong[h]; }));
     return dong;
-  } finally { lock.releaseLock(); }
+  } catch(e){ ghiLoi('caThem', e); return null; }
 }
 function caTim(id){ var r = null; docBang(CA_SHEET, CA_HEADERS).forEach(function(x){ if (!r && String(x.id) === String(id)) r = x; }); return r; }
 
 /* mode ca_ds (mentor): lọc chua_day | che | tot | da_day | tat_ca, tìm theo tên / email / nội dung */
 function caDs(b, ai){
   if (!tlLaMentor(ai)) return jsonOut({ok:false, error:'khong_co_quyen'});
+  var locEmail = String(b.email || '').trim().toLowerCase(), locMa = String(b.ma || '').trim().toUpperCase();
   var loc = String(b.loc || 'chua_day'), q = (typeof khongDau === 'function' ? khongDau(String(b.q || '')) : String(b.q || '').toLowerCase()).trim();
   var tatCa = docBang(CA_SHEET, CA_HEADERS);
   var ds = tatCa.filter(function(x){
+    if (locEmail || locMa){ if (!((locEmail && String(x.email).toLowerCase() === locEmail) || (locMa && (String(x.ma).toUpperCase() === locMa || String(x.ma).toUpperCase() === 'U' + locMa)))) return false; }
     if (loc !== 'cua_mentor' && x.vai === 'mentor') return false;
     if (loc === 'cua_mentor' && x.vai !== 'mentor') return false;
     if (loc === 'chua_day' && (x.trang_thai === 'da_day' || x.trang_thai === 'tot')) return false;

@@ -376,7 +376,7 @@
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="tai-khoan.js?v=202609301000"></script>
+<script src="tai-khoan.js?v=202609301800"></script>
 <script>
 const $ = s => document.querySelector(s);
 const el = (t, c, txt) => { const e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; };
@@ -527,7 +527,7 @@ let busy = false;
 async function goiCoThuLai(body) {
   const st = $('#soiStatus');
   for (let lan = 0; ; lan++) {
-    const r = await callApi(body);
+    const r = await TK.goiNen(body, { tool: 'soi', nhan: 'Soi video' });   // chạy nền: rời trang vẫn nhận được kết quả
     if (r.ok || r.error !== 'ban_qua' || lan >= 2) return r;
     for (let g = 20; g > 0; g--) { st.className = 'status'; st.innerHTML = `<span class="spinner"></span>AI của Google đang quá tải, tự thử lại sau ${g} giây (lần ${lan + 2}/3)…`; await new Promise(z => setTimeout(z, 1000)); }
   }
@@ -597,6 +597,14 @@ async function soi() {
 }
 
 /* ---------- lưu kết quả để đi qua tab khác rồi quay lại vẫn còn ---------- */
+/* Kết quả soi về trong lúc bạn đã rời trang (xem TK.goiNen): hiện luôn, không tốn thêm lượt */
+TK.nhanViec('soi', r => {
+  const st = $('#soiStatus');
+  if (!r.ok || !r.data || !r.data.cua1) { st.className = 'status err'; st.textContent = 'Lượt soi lúc nãy chưa xong: ' + (ERR[r.error] || r.error || 'lỗi') + (r.chi_tiet ? ' Mã lỗi: ' + r.chi_tiet : ''); return; }
+  state.kq = r.data; renderKq(r.data, Object.assign({}, docSo(), (r.data.meta && r.data.meta.so_lieu) || {}));
+  st.className = 'status ok'; st.textContent = 'Kết quả soi đã xong trong lúc bạn rời trang.';
+  if (r.luot && TK.me) { TK.me.luot = r.luot; veQuota(); }
+});
 function luuKq(d, so) { try { ls.set('soi.kq', JSON.stringify({ d, so, link: $('#link').value.trim(), tac_gia: state.link.tac_gia, caption: state.link.caption, giay: state.link.giay, at: Date.now() })); } catch {} }
 function xoaKq() { ls.del('soi.kq'); state.kq = null; state.khungChon = ''; state.altKhung = {}; $('#kqBody').hidden = true; $('#kqEmpty').hidden = false; $('#sumBar').hidden = true; $('#grid').classList.remove('has-kq', 'edit'); }
 function moLaiKq() {
@@ -793,6 +801,6 @@ $('#upsell').addEventListener('click', e => { if (e.target === e.currentTarget) 
 TK.khoiDong({ api: API, tool: 'soi', onDoi: () => { veQuota(); dienTuHoSo(); } });
 loadQuota();
 </script>
-<script src="tro-ly.js?v=202609301500"></script>
+<script src="tro-ly.js?v=202609301800"></script>
 </body>
 </html>

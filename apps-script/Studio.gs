@@ -122,7 +122,11 @@ function stNangCap(){
     sh.getRange(1, n + 1, sh.getMaxRows(), them.length).setNumberFormat('@');
   }catch(e){ ghiLoi('stNangCap', e); }
 }
-function moiND(){  stNangCap(); return docBang(ST_SHEET, ST_HEADERS, {token_han:oMoc, pro_han:oMoc}); }
+/* Đọc bảng NguoiDung một lần cho cả lượt chạy (trước đây một yêu cầu AI đọc lại cả sheet 3–4 lần).
+   Mọi chỗ ghi đi qua ndGhi để bản nhớ khớp sheet; chỗ trừ lượt đọc lại bản mới nhất trong khoá. */
+var ST_ND_NHO = null;
+function moiND(){ if (ST_ND_NHO) return ST_ND_NHO; stNangCap(); ST_ND_NHO = docBang(ST_SHEET, ST_HEADERS, {token_han:oMoc, pro_han:oMoc}); return ST_ND_NHO; }
+function ndGhi(tenBang, headers, cu, sua){ ghiDong(tenBang, headers, cu, sua); for (var k in sua) cu[k] = sua[k]; }
 function moiPay(){ return docBang(ST_PAY_SHEET, ST_PAY_HEADERS); }
 function ndTheoEmail(e){ e = chuanEmail(e); var r = null; moiND().forEach(function(x){ if (!r && chuanEmail(x.email) === e) r = x }); return r; }
 function ndTheoMa(ma){ ma = String(ma||'').toUpperCase(); var r = null; moiND().forEach(function(x){ if (!r && String(x.ma).toUpperCase() === ma) r = x }); return r; }
@@ -157,7 +161,7 @@ function ndHoSo(nd){
 function ndCapToken(nd){
   var token = 'U' + nd.ma + '.' + chuoiNgauNhien(40);
   var han = new Date(); han.setDate(han.getDate() + PHIEN_NGAY);
-  ghiDong(ST_SHEET, ST_HEADERS, nd, {token: bamNhanh(token), token_han: han.toISOString(), dangnhap_cuoi: nowVN()});
+  ndGhi(ST_SHEET, ST_HEADERS, nd, {token: bamNhanh(token), token_han: han.toISOString(), dangnhap_cuoi: nowVN()});
   return token;
 }
 function ndTuToken(token, ds){
@@ -222,6 +226,7 @@ function stDangKy(b){
     var ds = moiND();
     if (ds.some(function(r){ return chuanEmail(r.email) === email })) return jsonOut({ok:false, error:'da_ton_tai'});
     var ma = maTaiKhoan(ds), salt = chuoiNgauNhien(16);
+    ST_ND_NHO = null;
     bang(ST_SHEET, ST_HEADERS).appendRow([ma, email, sdt, ten, salt, bamMK(pass, salt),
       'free', '', '0', '', '', nowVN(), '', 'active', String(b.nguon||'viral-studio')]);
     nd = ndTheoMa(ma);
@@ -282,11 +287,12 @@ function stTruLuot(ma, tool){
   var t = ST_TOOL[tool] || ST_TOOL.hook;
   var lock = LockService.getScriptLock(); lock.waitLock(10000);
   try{
+    ST_ND_NHO = null;                                   // trong khoá: đọc số lượt mới nhất, kẻo hai yêu cầu cùng lúc trừ trùng
     var nd = ndTheoMa(ma); if (!nd) return -1;
     var han = t.han(), da = parseInt(nd[t.cot], 10) || 0;
     if (da >= han) return -1;
     var sua = {}; sua[t.cot] = String(da + 1);
-    ghiDong(ST_SHEET, ST_HEADERS, nd, sua);
+    ndGhi(ST_SHEET, ST_HEADERS, nd, sua);
     return han - da - 1;
   } finally { lock.releaseLock(); }
 }
@@ -294,9 +300,10 @@ function stHoanLuot(ma, tool){
   var t = ST_TOOL[tool] || ST_TOOL.hook;
   var lock = LockService.getScriptLock(); lock.waitLock(10000);
   try{
+    ST_ND_NHO = null;
     var nd = ndTheoMa(ma); if (!nd) return;
     var da = parseInt(nd[t.cot], 10) || 0;
-    if (da > 0){ var sua = {}; sua[t.cot] = String(da - 1); ghiDong(ST_SHEET, ST_HEADERS, nd, sua); }
+    if (da > 0){ var sua = {}; sua[t.cot] = String(da - 1); ndGhi(ST_SHEET, ST_HEADERS, nd, sua); }
   } finally { lock.releaseLock(); }
 }
 function stTruLuotThu(ma){ return stTruLuot(ma, 'hook'); }     // tên cũ, giữ cho phần gọi sẵn
@@ -340,7 +347,7 @@ function stGhiThietBi(nd, dev){
       sua.canh_bao = String(luc);
       stBaoDungChung(moi, ds);
     }
-    ghiDong(ST_SHEET, ST_HEADERS, moi, sua);
+    ndGhi(ST_SHEET, ST_HEADERS, moi, sua);
   }catch(e){ ghiLoi('stGhiThietBi', e); }
   finally { try{ lock.releaseLock(); }catch(e){} }
 }
@@ -398,14 +405,14 @@ function stLuuHoSo(b){
     if (!em && !st) return jsonOut({ok:false, error:'khong_thay'});
     var tenD = b.ten_dich || (dich ? dich.ten : '');
     hsGhi(em, st, tenD, hs, 'mentor');
-    if (dich) ghiDong(ST_SHEET, ST_HEADERS, dich, {ho_so: JSON.stringify(hs)});
+    if (dich) ndGhi(ST_SHEET, ST_HEADERS, dich, {ho_so: JSON.stringify(hs)});
     stBaoHoSo(tenD, em, st, hs, 'mentor điền hộ');
     return jsonOut({ok:true, ho_so: hs});
   }
 
   var email = nd ? nd.email : hv.email, sdt = nd ? nd.sdt : '', ten = nd ? nd.ten : (hv.ten_goi || hv.ten);
   hsGhi(email, sdt, ten, hs, 'sua_tay');
-  if (nd) ghiDong(ST_SHEET, ST_HEADERS, nd, {ho_so: JSON.stringify(hs)});
+  if (nd) ndGhi(ST_SHEET, ST_HEADERS, nd, {ho_so: JSON.stringify(hs)});
   stBaoHoSo(ten, email, sdt, hs, nd ? (ndLaPro(nd) ? 'tài khoản Pro tự điền' : 'tài khoản Free tự điền') : 'học viên tự điền');
   return jsonOut({ok:true, ho_so: hs});
 }
@@ -505,7 +512,7 @@ function stKichHoat(maCk, nguon){
     var nd = ndTheoMa(p.ma_nd); if (!nd) return {ok:false, loi:'khong_thay_nguoi'};
     var goc = ndLaPro(nd) ? new Date(nd.pro_han) : new Date();
     goc.setDate(goc.getDate() + (parseInt(p.ngay,10) || 30));
-    ghiDong(ST_SHEET, ST_HEADERS, nd, {goi:'pro', pro_han: goc.toISOString()});
+    ndGhi(ST_SHEET, ST_HEADERS, nd, {goi:'pro', pro_han: goc.toISOString()});
     ghiDong(ST_PAY_SHEET, ST_PAY_HEADERS, p, {trangthai:'da_nhan', xac_nhan: nowVN(), nguon: nguon});
     return {ok:true, p:p, nd:nd, han:goc};
   } finally { lock.releaseLock(); }
@@ -720,7 +727,7 @@ function stNapHoSoMau(){
       ST_HS_MAU[k].khop.forEach(function(t){ if (!key && ten.indexOf(khongDau(t)) > -1) key = k });
     });
     if (!key) { ket.push('không khớp mẫu nào: ' + nd.ten); return; }
-    ghiDong(ST_SHEET, ST_HEADERS, nd, {ho_so: JSON.stringify(stHsMau(key))});
+    ndGhi(ST_SHEET, ST_HEADERS, nd, {ho_so: JSON.stringify(stHsMau(key))});
     hsGhi(nd.email, nd.sdt, nd.ten, stHsMau(key), 'mau');
     ket.push('✅ ' + nd.ten + ' ← ' + ST_HS_MAU[key].ten_goi);
   });
@@ -946,7 +953,7 @@ function studioLenh(cmd, arg, chatId){
   if (cmd === 'naphoso'){
     var khoaMau = (arg.split(/\s+/)[1] || '').toLowerCase();
     if (!ST_HS_MAU[khoaMau]) return hoi('📥 Gửi `email` kèm tên mẫu: `duong` · `duy` · `phong` · `hai`.\nVí dụ: `ban@gmail.com duong`');
-    ghiDong(ST_SHEET, ST_HEADERS, nd, {ho_so: JSON.stringify(stHsMau(khoaMau))});
+    ndGhi(ST_SHEET, ST_HEADERS, nd, {ho_so: JSON.stringify(stHsMau(khoaMau))});
     hsGhi(nd.email, nd.sdt, nd.ten, stHsMau(khoaMau), 'mau');
     return tgSend(chatId, '✅ Đã nạp hồ sơ *' + ST_HS_MAU[khoaMau].ten_goi + '* cho *' + nd.ten + '*.\nHọ sửa lại được trong tool ở mục Tài khoản → Hồ sơ kênh.');
   }
@@ -973,11 +980,11 @@ function studioLenh(cmd, arg, chatId){
   if (cmd === 'mopro'){
     var so2 = parseInt(arg.split(/\s+/)[1], 10) || (stGoi()[0] || {}).ngay || 30;
     var goc = ndLaPro(nd) ? new Date(nd.pro_han) : new Date(); goc.setDate(goc.getDate() + so2);
-    ghiDong(ST_SHEET, ST_HEADERS, nd, {goi:'pro', pro_han: goc.toISOString()});
+    ndGhi(ST_SHEET, ST_HEADERS, nd, {goi:'pro', pro_han: goc.toISOString()});
     return tgSend(chatId, '✅ Đã mở Pro cho *' + nd.ten + '* thêm ' + so2 + ' ngày, tới *' + stHan(goc) + '*.');
   }
   if (cmd === 'tatpro'){
-    ghiDong(ST_SHEET, ST_HEADERS, nd, {goi:'free', pro_han: ''});
+    ndGhi(ST_SHEET, ST_HEADERS, nd, {goi:'free', pro_han: ''});
     return tgSend(chatId, '⛔ Đã tắt Pro của *' + nd.ten + '*.');
   }
 }

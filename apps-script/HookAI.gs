@@ -115,7 +115,45 @@ function hookHoSoText(hs){
     'nếu điều họ đang viết đi ngược hồ sơ này thì nói thẳng ra):'].join(' ') + '\n' + dong.join('\n');
 }
 
+/* ═══════ VIỆC CHẠY NỀN ═══════
+   Trang gửi kèm job_id. Máy chủ ghi "đang chạy" ngay, chạy xong cất nguyên kết quả 6 giờ trong CacheService.
+   Người dùng chuyển app, tắt màn hình, sang tool khác hay đóng tab: Apps Script vẫn chạy nốt,
+   quay lại trang hỏi mode:'job_kq' là lấy được kết quả, không mất lượt, không phải chạy lại. */
+var JOB_KHUC = 90000;   // CacheService giữ tối đa 100KB mỗi khoá: kết quả dài thì cắt khúc
+function jobKhoa(id){ return 'job_' + id; }
+function jobGhi(id, chu){
+  try{
+    var c = CacheService.getScriptCache(), n = Math.ceil(chu.length / JOB_KHUC) || 1, o = {};
+    for (var i = 0; i < n; i++) o[jobKhoa(id) + '_' + i] = chu.slice(i * JOB_KHUC, (i + 1) * JOB_KHUC);
+    o[jobKhoa(id)] = JSON.stringify({n:n, t:Date.now()});
+    c.putAll(o, 21600);
+  }catch(e){}
+}
+function jobKq(b){
+  var id = String(b.job_id || '');
+  if (!/^[A-Za-z0-9_-]{12,48}$/.test(id)) return jsonOut({ok:false, error:'khong_thay'});
+  var c = CacheService.getScriptCache(), m = null;
+  try{ m = JSON.parse(c.get(jobKhoa(id)) || 'null'); }catch(e){}
+  if (!m) return jsonOut({ok:false, error:'khong_thay'});
+  if (m.dang) return jsonOut({ok:false, error:'dang_chay', giay: Math.round((Date.now() - m.t) / 1000)});
+  var ks = []; for (var i = 0; i < m.n; i++) ks.push(jobKhoa(id) + '_' + i);
+  var all = c.getAll(ks), chu = ks.map(function(k){ return all[k] || '' }).join('');
+  if (!chu) return jsonOut({ok:false, error:'khong_thay'});
+  return ContentService.createTextOutput(chu).setMimeType(ContentService.MimeType.JSON);
+}
 function hookAi(b){
+  if (b.mode === 'job_kq') return jobKq(b);
+  var id = /^[A-Za-z0-9_-]{12,48}$/.test(String(b.job_id || '')) ? String(b.job_id) : '';
+  if (!id) return hookAiChinh(b);
+  try{ CacheService.getScriptCache().put(jobKhoa(id), JSON.stringify({dang:1, t:Date.now()}), 21600); }catch(e){}
+  var out;
+  try{ out = hookAiChinh(b); }
+  catch(err){ jobGhi(id, JSON.stringify({ok:false, error:'internal'})); throw err; }
+  try{ jobGhi(id, out.getContent()); }catch(e){}
+  return out;
+}
+
+function hookAiChinh(b){
   if (b.mode === 'taive' || b.mode === 'taive_file') return taiVe(b);   // tool Tải về (TaiVe.gs): không cần đăng nhập, không tốn lượt AI
   var ai = hookNguoi(b);
   if (!ai) return jsonOut({ok:false, error: b.token ? 'het_phien' : 'can_dangky'});
@@ -228,6 +266,22 @@ function schemaRutGon(sc){
 
 /* hetGio: mốc Date.now() phải trả kết quả trước đó. Apps Script giết script ở 6 phút, nên hàm gọi
    (đã tốn thời gian tải video) truyền mốc này xuống để không có lần thử nào bắt đầu quá muộn. */
+/* ═══════ NHIỀU GEMINI KEY ═══════
+   GEMINI_API_KEY là key chính. Thêm key phụ vào Script properties GEMINI_API_KEYS (cách nhau dấu phẩy hoặc xuống dòng).
+   Mỗi lượt gọi bắt đầu ở key kế tiếp (xoay vòng); key nào bị 429 thì nghỉ 60 giây, chuyển ngay key khác thay vì ngồi chờ.
+   Hạn mức Gemini tính theo PROJECT: các key phải tạo ở các project Google Cloud KHÁC NHAU mới cộng dồn được.
+   Video đã đưa lên Files API chỉ key của đúng project đó đọc được, nên lượt có file_uri luôn dùng key chính. */
+function gemDsKey(key){
+  var ds = [key];
+  String(cfgProp('GEMINI_API_KEYS') || '').split(/[\s,;]+/).forEach(function(k){ k = k.trim(); if (k && ds.indexOf(k) < 0) ds.push(k); });
+  return ds.filter(Boolean);
+}
+function gemKeyNghi(k, giay){ try{ CacheService.getScriptCache().put('gk_nghi_' + Utilities.base64EncodeWebSafe(Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, k)).slice(0, 16), '1', giay || 60); }catch(e){} }
+function gemKeyDangNghi(k){ try{ return !!CacheService.getScriptCache().get('gk_nghi_' + Utilities.base64EncodeWebSafe(Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, k)).slice(0, 16)); }catch(e){ return false; } }
+function gemKeyBatDau(n){
+  if (n < 2) return 0;
+  try{ var c = CacheService.getScriptCache(), v = (parseInt(c.get('gk_rr') || '0', 10) || 0) + 1; c.put('gk_rr', String(v % 100000), 21600); return v % n; }catch(e){ return 0; }
+}
 function goiGemini(key, img, prompt, schema, maxTok, media, nhiet, hetGio){
   if (typeof HOOK_BH === 'string' && HOOK_BH) prompt = HOOK_BH + '\n\n' + prompt;   // bài học mentor (TroLy.gs)
   schema = schema || HOOK_SCHEMA; maxTok = maxTok || 6000;
@@ -247,6 +301,10 @@ function goiGemini(key, img, prompt, schema, maxTok, media, nhiet, hetGio){
     {ten:'tudo',       gc:{responseMimeType:'application/json', maxOutputTokens: maxTok, temperature: nhiet}}
   ];
   var loiCuoi = '', modelCuoi = models[0], quaTai = false;
+  var coFileRieng = Array.isArray(media) && media.some(function(p){ return p && p.file_data && /generativelanguage\.googleapis\.com/.test(String(p.file_data.file_uri || '')); });
+  var dsKey = coFileRieng ? [key] : gemDsKey(key);
+  var kk = gemKeyBatDau(dsKey.length), daThuKey = 0;
+  for (var q = 0; q < dsKey.length && gemKeyDangNghi(dsKey[kk]); q++) kk = (kk + 1) % dsKey.length;   // bỏ qua key đang nghỉ
   for (var mi = 0; mi < models.length; mi++){
     var model = models[mi]; modelCuoi = model;
     var soLanCho = 0, CHO = [3000, 8000];           // quá tải: chờ 3 giây rồi 8 giây trên cùng model, rồi mới đổi
@@ -258,7 +316,7 @@ function goiGemini(key, img, prompt, schema, maxTok, media, nhiet, hetGio){
       try{
         res = UrlFetchApp.fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':generateContent', {
           method:'post', contentType:'application/json', muteHttpExceptions:true,
-          headers:{ 'x-goog-api-key': key }, payload: JSON.stringify(req)
+          headers:{ 'x-goog-api-key': dsKey[kk] }, payload: JSON.stringify(req)
         });
         ma = res.getResponseCode(); raw = res.getContentText();
       }catch(err){ return {ok:false, error:'loi_mang', loi:'mang: '+err, model:model}; }
@@ -276,7 +334,13 @@ function goiGemini(key, img, prompt, schema, maxTok, media, nhiet, hetGio){
         return {ok:true, data:data, vin:vin, vout:vout, model:model+'/'+kieu[ki].ten};
       }
       loiCuoi = model+'/'+kieu[ki].ten+' http '+ma+': '+String(raw).slice(0,400);
-      if (ma === 401 || ma === 403 || /API_KEY_INVALID|API key not valid/.test(raw)) return {ok:false, error:'sai_key', loi:loiCuoi, model:model};
+      if (ma === 401 || ma === 403 || /API_KEY_INVALID|API key not valid/.test(raw)){
+        if (dsKey.length > 1 && daThuKey < dsKey.length - 1){ gemKeyNghi(dsKey[kk], 600); kk = (kk + 1) % dsKey.length; daThuKey++; ki--; continue; }   // key phụ hỏng: bỏ qua 10 phút, dùng key khác
+        return {ok:false, error:'sai_key', loi:loiCuoi, model:model};
+      }
+      if (ma === 429 && dsKey.length > 1 && daThuKey < dsKey.length - 1){   // key này hết hạn mức phút: đổi key ngay, không ngồi chờ
+        gemKeyNghi(dsKey[kk], 60); kk = (kk + 1) % dsKey.length; daThuKey++; quaTai = true; ki--; continue;
+      }
       if (ma === 429 || ma === 503 || ma === 500){
         quaTai = true;
         if (soLanCho < CHO.length && Date.now() < hanGio - (media ? 170000 : 90000)){ Utilities.sleep(CHO[soLanCho++]); ki--; continue; }   // thử lại đúng kiểu này nếu còn dư giờ
