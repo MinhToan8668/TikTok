@@ -56,7 +56,7 @@ function stHVConHan(hv){
 var ST_SHEET       = 'NguoiDung';
 var ST_HEADERS     = ['ma','email','sdt','ten','salt','hash','goi','pro_han','luot_dung',
                       'token','token_han','tao','dangnhap_cuoi','trangthai','ghichu',
-                      'ho_so','luot_kb','luot_soi','thiet_bi','canh_bao','luot_cham','luot_tai','luot_chat'];
+                      'ho_so','luot_kb','luot_soi','thiet_bi','canh_bao','luot_cham','luot_tai','luot_chat','luot_dung'];
 
 /* Hạn mức lượt AI cho tài khoản MIỄN PHÍ, tính theo từng tool (bot: /luotthu, /luotkb, /luotsoi).
    Pro và học viên không dùng mấy con số này, họ tính theo hạn mức ngày HOOK_AI_DAILY. */
@@ -70,6 +70,8 @@ var ST_LUOT_TAI_MD = 10;       // tool Tải video (không tốn AI): khách đ�
 var ST_LUOT_TAI  = stSo('ST_LUOT_TAI', ST_LUOT_TAI_MD);
 var ST_LUOT_CHAT_MD = 15;      // trò chuyện với Trợ lý AI: số tin miễn phí của tài khoản Free. Bot: /luotchat
 var ST_LUOT_CHAT = stSo('ST_LUOT_CHAT', ST_LUOT_CHAT_MD);
+var ST_LUOT_DUNG_MD = 2;       // Dựng video: số source AI nhận diện miễn phí cho tài khoản Free. Bot: /luotdung
+var ST_LUOT_DUNG = stSo('ST_LUOT_DUNG', ST_LUOT_DUNG_MD);
 /* Mỗi tool một cột đếm riêng. 'hook' giữ nguyên cột cũ luot_dung để không mất số liệu. */
 var ST_TOOL = {
   hook:   {cot:'luot_dung', ten:'AI phân tích hook', han:function(){ return ST_LUOT_THU  }},
@@ -77,13 +79,15 @@ var ST_TOOL = {
   soi:    {cot:'luot_soi',  ten:'soi video viral',   han:function(){ return ST_LUOT_SOI  }},
   cham:   {cot:'luot_cham', ten:'chấm video của bạn', han:function(){ return ST_LUOT_CHAM }},
   taive:  {cot:'luot_tai',  ten:'tải video',          han:function(){ return ST_LUOT_TAI  }},
-  chat:   {cot:'luot_chat', ten:'trò chuyện với trợ lý', han:function(){ return ST_LUOT_CHAT }}
+  chat:   {cot:'luot_chat', ten:'trò chuyện với trợ lý', han:function(){ return ST_LUOT_CHAT }},
+  dung:   {cot:'luot_dung', ten:'dựng video',           han:function(){ return ST_LUOT_DUNG }}
 };
 function stToolCua(mode){
   if (mode === 'script' || mode === 'viet') return 'script';
   if (mode === 'soi' || mode === 'link' || mode === 'apkhuon') return 'soi';
   if (mode === 'cham') return 'cham';
-  if (mode === 'chat' || mode === 'bh_them') return 'chat';
+  if (mode === 'chat' || mode === 'bh_them' || mode === 'dung_ke_hoach') return 'chat';
+  if (mode === 'dung_nhan') return 'dung';
   return 'hook';
 }
 
@@ -152,8 +156,8 @@ function ndCoHs(hs){ var c = 0; ST_HS_TRUONG.forEach(function(k){ if (hs[k]) c++
 function ndHoSo(nd){
   return {loai:'nd', ma:nd.ma, ten:nd.ten, email:nd.email, sdt:nd.sdt, pro:ndLaPro(nd),
           pro_han:nd.pro_han, luot_con:ndLuotCon(nd), luot_thu:ST_LUOT_THU,
-          luot: {hook:ndLuotCon(nd,'hook'), script:ndLuotCon(nd,'script'), soi:ndLuotCon(nd,'soi'), cham:ndLuotCon(nd,'cham'), taive:ndLuotCon(nd,'taive'), chat:ndLuotCon(nd,'chat')},
-          han:  {hook:ST_LUOT_THU, script:ST_LUOT_KB, soi:ST_LUOT_SOI, cham:ST_LUOT_CHAM, taive:ST_LUOT_TAI, chat:ST_LUOT_CHAT},
+          luot: {hook:ndLuotCon(nd,'hook'), script:ndLuotCon(nd,'script'), soi:ndLuotCon(nd,'soi'), cham:ndLuotCon(nd,'cham'), taive:ndLuotCon(nd,'taive'), chat:ndLuotCon(nd,'chat'), dung:ndLuotCon(nd,'dung')},
+          han:  {hook:ST_LUOT_THU, script:ST_LUOT_KB, soi:ST_LUOT_SOI, cham:ST_LUOT_CHAM, taive:ST_LUOT_TAI, chat:ST_LUOT_CHAT, dung:ST_LUOT_DUNG},
           ho_so: hsHienDung(nd.email, nd.sdt, nd), ho_so_nguon: hsNguon(nd.email, nd.sdt, nd)};
 }
 
@@ -206,7 +210,7 @@ function stZalo(){
 function stCauHinh(){
   var gk = {}; try{ gk = (getConfig() || {}).pricing || {}; }catch(e){}   // học phí khoá (bot /giasom, /gia) để bảng Nâng cấp so sánh
   return jsonOut({ok:true, goi: stGoi(), bank: stNganHang(), zalo: stZalo(), hv: stHV(), khoa: {gia_som: Number(gk.earlyBird) || 0, gia_goc: Number(gk.regular) || 0},
-    luot_thu: ST_LUOT_THU, luot: {hook: ST_LUOT_THU, script: ST_LUOT_KB, soi: ST_LUOT_SOI, cham: ST_LUOT_CHAM, taive: ST_LUOT_TAI, chat: ST_LUOT_CHAT}});
+    luot_thu: ST_LUOT_THU, luot: {hook: ST_LUOT_THU, script: ST_LUOT_KB, soi: ST_LUOT_SOI, cham: ST_LUOT_CHAM, taive: ST_LUOT_TAI, chat: ST_LUOT_CHAT, dung: ST_LUOT_DUNG}});
 }
 
 /* ── đăng ký: không cần duyệt, có ngay lượt AI miễn phí ── */
@@ -441,7 +445,7 @@ function stDanhSach(b){
         so_truong: ndCoHs(hs), luot:null, ho_so:hs});
     });
   }catch(e){ ghiLoi('stDanhSach/regs', e); }
-  return jsonOut({ok:true, ds:ds, han:{hook:ST_LUOT_THU, script:ST_LUOT_KB, soi:ST_LUOT_SOI, cham:ST_LUOT_CHAM, taive:ST_LUOT_TAI, chat:ST_LUOT_CHAT}});
+  return jsonOut({ok:true, ds:ds, han:{hook:ST_LUOT_THU, script:ST_LUOT_KB, soi:ST_LUOT_SOI, cham:ST_LUOT_CHAM, taive:ST_LUOT_TAI, chat:ST_LUOT_CHAT, dung:ST_LUOT_DUNG}});
 }
 function stLichSu(b){
   var hv = aiDay(b.token);
@@ -738,7 +742,7 @@ function stNapHoSoMau(){
 
 /* ═══════ LỆNH BOT TELEGRAM (chỉ chat quản trị) ═══════
    Code.gs gọi:  if (quanTri && studioCoLenh(cmd)) return studioLenh(cmd, arg, chatId);  */
-var LENH_STUDIO = ['studio','stk','giapro','ngaypro','ngayhv','giahv','uudaihv','luotthu','luotkb','luotsoi','luotcham','luottai','luotchat','luotai','baihoc','duyetbh','tatbh','xoabh','day','chatngay','tuvan','tonghop','mopro','tatpro','dsck','timnd','ckkhoa','tienkhoa','hoso','lichsu','dshv','naphoso'];
+var LENH_STUDIO = ['studio','stk','giapro','ngaypro','ngayhv','giahv','uudaihv','luotthu','luotkb','luotsoi','luotcham','luottai','luotchat','luotdung','luotai','baihoc','duyetbh','tatbh','xoabh','day','chatngay','tuvan','tonghop','mopro','tatpro','dsck','timnd','ckkhoa','tienkhoa','hoso','lichsu','dshv','naphoso'];
 function studioCoLenh(cmd){ return LENH_STUDIO.indexOf(cmd) > -1; }
 
 var ST_MA_NH = {vietcombank:'VCB', vcb:'VCB', mb:'MB', mbbank:'MB', quandoi:'MB', techcombank:'TCB', tcb:'TCB',
@@ -792,6 +796,7 @@ function studioLenh(cmd, arg, chatId){
       '🔎 /luotsoi `1` — lượt soi video cho tài khoản mới',
       '🎯 /luotcham `1` — lượt chấm video của bạn cho tài khoản mới',
       '⬇️ /luottai `10` — lượt tải video miễn phí cho khách (học viên, Pro không giới hạn)',
+      '🎞 /luotdung `2` — số source AI nhận diện miễn phí ở tool Dựng video cho tài khoản Free',
       '💬 /luotchat `15` — tin chat với Trợ lý AI cho tài khoản Free · /chatngay `60` — mỗi ngày cho Pro, học viên',
       '🧠 /baihoc — bộ nhớ AI · /day `nội dung` — dạy AI · /duyetbh /tatbh /xoabh `id`',
       '💬 /tuvan — học viên đang hỏi trợ lý gì · /tonghop — AI tự rút bài học từ các lượt tư vấn mới',
@@ -876,6 +881,12 @@ function studioLenh(cmd, arg, chatId){
     var ncham = parseInt(arg, 10); if (isNaN(ncham) || ncham < 0 || ncham > 1000) return hoi('Gửi một con số từ 0 đến 1000.');
     P.setProperty('ST_LUOT_CHAM', String(ncham));
     return tgSend(chatId, '✅ Tài khoản Free giờ có *' + ncham + '* lượt chấm video của bạn.');
+  }
+  if (cmd === 'luotdung'){
+    if (!arg) return hoi('🎞 Tài khoản Free được AI nhận diện bao nhiêu source ở tool Dựng video? Ví dụ `2`');
+    var ndg = parseInt(arg, 10); if (isNaN(ndg) || ndg < 0 || ndg > 100000) return hoi('Gửi một con số từ 0 đến 100000.');
+    P.setProperty('ST_LUOT_DUNG', String(ndg));
+    return tgSend(chatId, '✅ Tài khoản Free giờ được AI nhận diện *' + ndg + '* source ở tool Dựng video.');
   }
   if (cmd === 'luotchat'){
     if (!arg) return hoi('💬 Tài khoản Free được chat với Trợ lý AI bao nhiêu tin? Ví dụ `15`');

@@ -362,3 +362,20 @@ Mỗi lượt hỏi đáp với trợ lý (của học viên, khách và cả me
 ⚠️ Hạn mức Gemini tính theo **project**, không tính theo key. Các key phải tạo ở **các project Google Cloud khác nhau** (AI Studio → Create API key → Create in new project) thì mới cộng dồn được. Nhiều key cùng một project không nhanh hơn chút nào.
 Cách hiệu quả nhất là **bật billing (Tier 1)** cho project của key chính. Hạn mức mỗi phút tăng lên hàng chục lần, trả tiền theo lượng dùng (bản flash rất rẻ). Làm vậy là hết cảnh 429 và phải chờ.
 Video đã tải lên Files API chỉ key của đúng project đó đọc được, nên lượt có video lớn luôn dùng key chính.
+
+## Tool 6 · Dựng video (tools/dung-video.html + DungVideo.gs)
+
+Kiểu Vyra: thêm nguồn → AI nhận diện → nói yêu cầu → AI xếp dòng thời gian → sửa tay → xuất. Hợp talking head, vlog, lồng tiếng; không có hiệu ứng cầu kỳ.
+
+**Cài:** ➕ Script tên `DungVideo`, dán `DungVideo.gs`. Dán đè `HookAI.gs`, `Studio.gs`. Deploy → New version.
+
+**Cách chạy**
+1. **Nguồn:** kéo video, ảnh vào. Bấm **AI nhận diện** (1 lượt "dựng video" mỗi nguồn, Free mặc định 2 nguồn, bot `/luotdung`). Trình duyệt tự tách âm thanh thành WAV 16kHz (8kHz nếu dài hơn 5 phút, tối đa 12 phút), đo khoảng lặng, lấy 3–12 khung hình, gửi lên. AI chép lời theo giây và gắn nhãn từng câu: **vấp**, **lặp** (quay lại, giữ bản tốt), **lạc đề**, **câu hay**. Kết quả nhớ theo tên và cỡ file: đưa lại cùng file không tốn lượt.
+2. **Lời thoại:** bỏ tick câu nào là cắt câu đó (kiểu Descript). Sửa chữ tại chỗ để sửa phụ đề. Nút "Bỏ hết câu vấp, lặp, lạc đề".
+3. **AI dựng:** gõ hoặc bấm gợi ý ("Dựng bản đầu", "Rút còn 45 giây"…). Chỉ gửi chữ nên nhanh và nhẹ, tính vào lượt chat của Trợ lý. AI trả về dòng thời gian mới, hook chữ, điểm zoom. Nói tiếp để sửa.
+4. **Dòng thời gian:** bấm một đoạn để tách tại vị trí phát, đổi chỗ, nới hoặc cắt 0,3 giây ở đầu và cuối, xoá.
+5. **Xuất:** hook chữ to 3 giây đầu, phụ đề theo câu (3 kiểu), khung 9:16 (cắt giữa hoặc nền mờ), zoom nhấn nhẹ, nhạc nền tự nhỏ khi có tiếng nói. Video được dựng **ngay trên máy người dùng** bằng canvas + MediaRecorder theo thời gian thực (60 giây video ≈ 60 giây chờ), 1080×1920 hoặc 720×1280. Máy chủ không dựng nên không vướng 6 phút của Apps Script.
+
+**Định dạng xuất:** Chrome trên máy tính và Safari xuất MP4 (H.264). Chromium không có H.264 (Linux, một số Android) xuất WebM; TikTok web vẫn nhận WebM. Đừng chuyển tab lúc xuất, trang giữ màn hình sáng bằng Wake Lock nếu máy cho phép.
+
+**Giới hạn hiện tại:** không có chuyển cảnh, sticker, B-roll tự động; trên điện thoại nên dùng nguồn dưới 3 phút và xuất 720p; nguồn là file trên máy nên tải lại trang là phải thêm lại (lời thoại đã nhận diện thì còn).

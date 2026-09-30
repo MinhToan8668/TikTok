@@ -84,7 +84,7 @@ function hookHoan(ai){
 /* Lượt còn của cả ba tool, để tool hiện đúng "còn mấy lượt soi / kịch bản / hook". */
 function hookLuotCon(ai){
   if (ai.loai !== 'free' || !ai.nd) return null;
-  return {hook: ndLuotCon(ai.nd,'hook'), script: ndLuotCon(ai.nd,'script'), soi: ndLuotCon(ai.nd,'soi'), cham: ndLuotCon(ai.nd,'cham'), chat: ndLuotCon(ai.nd,'chat')};
+  return {hook: ndLuotCon(ai.nd,'hook'), script: ndLuotCon(ai.nd,'script'), soi: ndLuotCon(ai.nd,'soi'), cham: ndLuotCon(ai.nd,'cham'), chat: ndLuotCon(ai.nd,'chat'), dung: ndLuotCon(ai.nd,'dung')};
 }
 function hookHoSo(ai, b){
   var hs = {};
@@ -177,6 +177,8 @@ function hookAiChinh(b){
   var key = provider === 'claude' ? cfgProp('ANTHROPIC_API_KEY') : hookCfg('GEMINI_API_KEY');
   if (!key) return jsonOut({ok:false, error:'chua_cai_key'});
 
+  if (b.mode === 'dung_nhan') return dvNhan(b, ai, provider, key);       // Dựng video: AI chép lời theo giây, nhận diện source (DungVideo.gs)
+  if (b.mode === 'dung_ke_hoach') return dvKeHoach(b, ai, provider, key); // Dựng video: lên dòng thời gian theo yêu cầu, tính vào lượt chat
   if (b.mode === 'chat') return tlChat(b, ai, provider, key);         // Trợ lý AI: trò chuyện gõ hoặc nói, tự học qua tư vấn (TroLy.gs)
   if (b.mode === 'bh_them') return tlGopY(b, ai, provider, key);      // góp ý cho AI: mentor có hiệu lực ngay, học viên chờ duyệt
   if (b.mode === 'ca_day') return caDay(b, ai, provider, key);        // mentor dạy AI trên đúng một lượt tư vấn

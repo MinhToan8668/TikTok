@@ -182,6 +182,7 @@
     <a class="ft" href="hook-text.html"><span class="fi" aria-hidden="true">⚡</span>Hook viral</a>
     <a class="ft" href="cham-video.html"><span class="fi" aria-hidden="true">🎯</span>Chấm video của bạn</a>
     <a class="ft" href="tai-ve.html" data-tool="taive"><span class="fi" aria-hidden="true">⬇️</span>Tải video</a>
+    <a class="ft" href="dung-video.html"><span class="fi" aria-hidden="true">🎞️</span>Dựng video</a>
   </nav>
 
   <div class="grid">
@@ -265,7 +266,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="tai-khoan.js?v=202609301800"></script>
+<script src="tai-khoan.js?v=202610010900"></script>
 <script>
 const $ = s => document.querySelector(s);
 const el = (t, c, txt) => { const e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; };
@@ -611,6 +612,6 @@ TK.khoiDong({ api: API, tool: 'script', onDoi: () => { veQuota(); dienTuHoSo(); 
 if (imViet) { const im = imViet; imViet = null; setTimeout(async () => { if (!DEMO) await TK.nap(); $('#chamStatus').className = 'status'; $('#chamStatus').textContent = 'Đã nhận đề xuất, AI sắp viết trọn kịch bản…'; vietBangAI(im); }, 600); }
 loadQuota();
 </script>
-<script src="tro-ly.js?v=202609302000"></script>
+<script src="tro-ly.js?v=202610010900"></script>
 </body>
 </html>
