@@ -365,17 +365,31 @@ Video đã tải lên Files API chỉ key của đúng project đó đọc đư�
 
 ## Tool 6 · Dựng video (tools/dung-video.html + DungVideo.gs)
 
-Kiểu Vyra: thêm nguồn → AI nhận diện → nói yêu cầu → AI xếp dòng thời gian → sửa tay → xuất. Hợp talking head, vlog, lồng tiếng; không có hiệu ứng cầu kỳ.
+Trình dựng kiểu Vyra, giao diện tối chuyên nghiệp: **Footage → AI hiểu footage → ra lệnh cho Trợ lý dựng → sửa trên dòng thời gian nhiều track → xuất ngay trên máy.** Hợp talking head, vlog, lồng tiếng, montage có nhạc.
 
-**Cài:** ➕ Script tên `DungVideo`, dán `DungVideo.gs`. Dán đè `HookAI.gs`, `Studio.gs`. Deploy → New version.
+**Cài:** ➕ Script tên `DungVideo`, dán `DungVideo.gs`. Dán đè `HookAI.gs`, `Studio.gs`. Deploy → New version. Key Gemini phải dùng được model `gemini-3.5-transcribe` (key AI Studio thường có sẵn).
 
-**Cách chạy**
-1. **Nguồn:** kéo video, ảnh vào. Bấm **AI nhận diện** (1 lượt "dựng video" mỗi nguồn, Free mặc định 2 nguồn, bot `/luotdung`). Trình duyệt tự tách âm thanh thành WAV 16kHz (8kHz nếu dài hơn 5 phút, tối đa 12 phút), đo khoảng lặng, lấy 3–12 khung hình, gửi lên. AI chép lời theo giây và gắn nhãn từng câu: **vấp**, **lặp** (quay lại, giữ bản tốt), **lạc đề**, **câu hay**. Kết quả nhớ theo tên và cỡ file: đưa lại cùng file không tốn lượt.
-2. **Lời thoại:** bỏ tick câu nào là cắt câu đó (kiểu Descript). Sửa chữ tại chỗ để sửa phụ đề. Nút "Bỏ hết câu vấp, lặp, lạc đề".
-3. **AI dựng:** gõ hoặc bấm gợi ý ("Dựng bản đầu", "Rút còn 45 giây"…). Chỉ gửi chữ nên nhanh và nhẹ, tính vào lượt chat của Trợ lý. AI trả về dòng thời gian mới, hook chữ, điểm zoom. Nói tiếp để sửa.
-4. **Dòng thời gian:** bấm một đoạn để tách tại vị trí phát, đổi chỗ, nới hoặc cắt 0,3 giây ở đầu và cuối, xoá.
-5. **Xuất:** hook chữ to 3 giây đầu, phụ đề theo câu (3 kiểu), khung 9:16 (cắt giữa hoặc nền mờ), zoom nhấn nhẹ, nhạc nền tự nhỏ khi có tiếng nói. Video được dựng **ngay trên máy người dùng** bằng canvas + MediaRecorder theo thời gian thực (60 giây video ≈ 60 giây chờ), 1080×1920 hoặc 720×1280. Máy chủ không dựng nên không vướng 6 phút của Apps Script.
+### Hiểu footage (Footage Understanding)
+Bấm **✨ Hiểu footage** trên từng đoạn (1 lượt "dựng video" mỗi đoạn, Free mặc định 2, bot `/luotdung`). Trình duyệt tách WAV 16kHz, đo khoảng lặng, lấy 4–12 khung hình. Máy chủ chạy 2 bước:
+1. **Gemini 3.5 Transcribe** (Interactions API, `timestamp_granularities: word`) → từng từ có mốc giây, giữ cả "ờ, à". Nhanh (8 giây audio ≈ 2 giây).
+2. **Gemini Flash** đọc transcript + khung hình → gắn nhãn câu (**vấp / lặp / lạc đề / câu hay**), **cảnh** (mô tả + tag: người, nói, trong nhà, cận tay, sản phẩm…), **khoảnh khắc đáng giữ ★**, từ nên nhấn, hook gợi ý.
+Transcribe lỗi thì rơi về cách cũ (Flash nghe thẳng audio). Kết quả nhớ theo tên + cỡ file: đưa lại không tốn lượt. Ô **Tìm trong footage** tìm theo câu nói, mô tả cảnh, tag.
 
-**Định dạng xuất:** Chrome trên máy tính và Safari xuất MP4 (H.264). Chromium không có H.264 (Linux, một số Android) xuất WebM; TikTok web vẫn nhận WebM. Đừng chuyển tab lúc xuất, trang giữ màn hình sáng bằng Wake Lock nếu máy cho phép.
+### Trợ lý dựng (chat)
+Ra lệnh tự nhiên: "Dựng bản đầu…", "Tìm khoảnh khắc hay nhất ghép 30 giây", "Cắt b-roll theo beat", "Phụ đề kiểu TikTok nhấn các con số". AI nhận câu + cảnh + khoảnh khắc của mọi footage, beat nhạc, dòng thời gian hiện tại, video tham chiếu; trả về V1 (đoạn cắt), hook, phụ đề (kiểu, từ nhấn, số từ mỗi cụm), đồ hoạ O1, điểm zoom, mức nhạc. Chỉ gửi chữ nên tính vào lượt chat. Nói tiếp để sửa.
 
-**Giới hạn hiện tại:** không có chuyển cảnh, sticker, B-roll tự động; trên điện thoại nên dùng nguồn dưới 3 phút và xuất 720p; nguồn là file trên máy nên tải lại trang là phải thêm lại (lời thoại đã nhận diện thì còn).
+### Dòng thời gian
+Track **O2** chữ (phụ đề tự sinh + hook), **O1** đồ hoạ, **V1** video, **A1** nhạc (vạch xanh = chỗ có tiếng nói, nhạc tự nhỏ). Kéo thân để di chuyển (V1 đổi thứ tự), kéo mép để cắt. **🧲 Hít** vào beat và mép câu. Thanh công cụ: Xoá, Tách (tại đầu phát), Nhân đôi. Phím: Space phát, Delete xoá, Ctrl+Z hoàn tác. Cột phải: thuộc tính đoạn/đồ hoạ đang chọn.
+
+### Phụ đề karaoke, đồ hoạ, nhạc
+- Phụ đề theo cụm 2–6 từ, từ đang nói được **tô nền** (TikTok), hoặc viên thuốc karaoke, trắng viền đen, chữ to vui, nền tối. Từ nhấn to hơn và đổi màu (5 màu nhấn). Sửa chữ trong tab Lời thoại là phụ đề đổi theo.
+- 10 đồ hoạ "seekable" vẽ bằng canvas (ý tưởng từ catalog HyperFrames): tiêu đề đập, tên + vai trò, danh sách hiện dần theo lời nói, thanh tiến độ, thẻ trích dẫn, đếm số, khung nhấn, mũi tên, vòng màu xoay, nhãn góc. AI tự đặt hoặc thêm tay từ cột phải.
+- Nhạc: thêm file → máy đo beat (đỉnh năng lượng dải trầm) → chấm beat trên ruler, hít mép đoạn vào beat, AI "cắt theo beat". Nhạc tự nhỏ khi có tiếng nói (mặc định 12% / 60%), fade cuối.
+- Tham chiếu: đưa video mẫu → hiểu như footage (1 lượt) → rút nhịp (số cảnh, độ dài cảnh, từ/giây) để AI bắt chước.
+
+### Xuất
+canvas.captureStream + MediaRecorder, thời gian thực (60 giây video ≈ 60 giây), 1080×1920 hoặc 720×1280. Chrome máy tính và Safari ra MP4; Chromium không có H.264 ra WebM (TikTok web vẫn nhận). Không dựng trên máy chủ nên không vướng 6 phút của Apps Script.
+
+**Giới hạn:** chưa có chuyển cảnh và B-roll tự chèn từ kho; điện thoại nên dùng footage dưới 3 phút; tải lại trang phải thêm lại file (kết quả hiểu thì còn); mỗi lượt AI mất 1–2 phút trên key miễn phí.
+
+**Đã học từ:** [Vyra](https://www.usevyra.com/ai-video-editor) (luồng footage understanding → chat → timeline → export tại máy, beat sync, ducking), [HyperFrames](https://github.com/heygen-com/hyperframes) (đồ hoạ seekable theo thời gian, catalog caption/kinetic), [Omniclip](https://github.com/omni-media/omniclip), [OpenCut](https://opencut.dev/), [OpenReel](https://github.com/Augani/openreel-video) (dựng và xuất hoàn toàn trong trình duyệt).

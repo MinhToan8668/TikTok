@@ -284,14 +284,21 @@ function gemKeyBatDau(n){
   if (n < 2) return 0;
   try{ var c = CacheService.getScriptCache(), v = (parseInt(c.get('gk_rr') || '0', 10) || 0) + 1; c.put('gk_rr', String(v % 100000), 21600); return v % n; }catch(e){ return 0; }
 }
+/* Hàm gọi đặt trước khi gọi goiGemini để chọn model và mức suy nghĩ cho MỘT lượt (tự xoá sau lượt đó):
+   HOOK_MODEL_UU_TIEN = ['gemini-3.5-flash-lite']  → thử model này trước (việc dễ: gắn nhãn, chép lại → nhanh 10–20 lần)
+   HOOK_SUY_NGHI = 'low' | 'minimal'               → thinkingLevel cho model 3.5+ (bớt 15–20 giây mỗi lượt) */
+var HOOK_MODEL_UU_TIEN = null, HOOK_SUY_NGHI = '';
 function goiGemini(key, img, prompt, schema, maxTok, media, nhiet, hetGio){
   if (typeof HOOK_BH === 'string' && HOOK_BH) prompt = HOOK_BH + '\n\n' + prompt;   // bài học mentor (TroLy.gs)
+  var uuTien = Array.isArray(HOOK_MODEL_UU_TIEN) ? HOOK_MODEL_UU_TIEN.slice() : null, suyNghi = HOOK_SUY_NGHI || '';
+  HOOK_MODEL_UU_TIEN = null; HOOK_SUY_NGHI = '';
   schema = schema || HOOK_SCHEMA; maxTok = maxTok || 6000;
   nhiet = (nhiet == null) ? 0.7 : nhiet;   // chấm điểm dùng ~0.15 cho ra đều tay, sáng tác dùng 0.7–0.8
   var hanGio = Math.min(Date.now() + 300000, Number(hetGio) || Infinity);
   var cauHinh = hookCfg('HOOK_AI_MODEL');
   var coSan = geminiModels(key);
   var models = cauHinh ? [cauHinh].concat(coSan.filter(function(m){ return m !== cauHinh })) : coSan;
+  if (uuTien) models = uuTien.filter(function(m){ return coSan.indexOf(m) > -1 || !coSan.length; }).concat(models.filter(function(m){ return uuTien.indexOf(m) < 0; }));
   models = models.slice(0, 5);                         // tối đa 5 model để không quá thời gian của Apps Script
   var parts = [];
   if (Array.isArray(media)) media.forEach(function(p){ parts.push(p) });   // video hoặc file đã đưa lên Files API
@@ -313,7 +320,9 @@ function goiGemini(key, img, prompt, schema, maxTok, media, nhiet, hetGio){
     for (var ki = 0; ki < kieu.length; ki++){
       // Một lần Gemini xem video có thể mất 2–3 phút: chỉ bắt đầu khi còn đủ giờ, không thì trả về để hoàn lượt
       if (Date.now() > hanGio - (media ? 150000 : 45000)) return {ok:false, error: quaTai ? 'ban_qua' : 'het_gio', loi:'het gio · ' + loiCuoi, model:model};
-      var req = { contents:[{role:'user', parts:parts}], generationConfig: kieu[ki].gc };
+      var gc = kieu[ki].gc;
+      if (suyNghi && /gemini-(3\.[5-9]|[4-9])/.test(model)){ gc = JSON.parse(JSON.stringify(gc)); gc.thinkingConfig = {thinkingLevel: suyNghi}; }   // model cũ không nhận thinkingLevel
+      var req = { contents:[{role:'user', parts:parts}], generationConfig: gc };
       var res, ma, raw;
       try{
         res = UrlFetchApp.fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':generateContent', {

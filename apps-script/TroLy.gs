@@ -246,6 +246,7 @@ function tlChat(b, ai, provider, key){
         properties:{co:{type:'boolean'}, noi_dung:{type:'string'}, tool:{type:'string', enum:['hook','script','soi','cham','chat','chung']}, nganh:{type:'string'}, tu_khoa:{type:'string'}}}}};
 
   var media = amThanh ? [{inline_data:{mime_type: /^audio\//.test(amMime) ? amMime : 'audio/webm', data: amThanh}}] : null;
+  HOOK_SUY_NGHI = 'low';   // chat cần nhanh: bớt suy nghĩ, tiết kiệm ~15 giây mỗi câu
   var kq = provider === 'claude' ? goiClaude(key, '', prompt, schema, 2500, day ? 0.3 : 0.6)
                                  : goiGemini(key, '', prompt, schema, 2500, media, day ? 0.3 : 0.6, Date.now() + 300000);
   var nhan = '[chat' + (day ? ':day' : '') + (amThanh ? ':noi' : '') + '] ' + (tin || '(ghi âm)').slice(0, 80);
