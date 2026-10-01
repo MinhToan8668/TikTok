@@ -302,7 +302,7 @@
         <div class="epane on" data-pane="footage">
           <div class="drop" id="drop" tabindex="0" role="button"><b>＋ Thêm footage</b>Video quay thô, ảnh, nhiều đoạn cũng được. AI sẽ chép lời từng từ, nhận diện cảnh và khoảnh khắc đáng giữ.<input type="file" id="fileIn" accept="video/*,image/*" multiple hidden></div>
           <div class="tim"><input id="tim" type="search" placeholder="Tìm trong footage: câu nói, cảnh, tag…"></div>
-          <div class="kho" id="kho" hidden><div class="hang"><input id="khoQ" type="search" placeholder="Kho B-roll miễn phí: cận tay gõ phím, phố đêm…"><select id="khoHuong" title="Hướng video"><option value="doc">Dọc</option><option value="ngang">Ngang</option></select><button class="btn nho xanh" id="khoTim" type="button">Tìm</button></div><div class="kq" id="khoKq"></div><div class="quota" id="khoTt">Pexels · miễn phí, không tốn lượt AI. Bấm một video để thêm vào footage.</div></div>
+          <div class="kho" id="kho" hidden><div class="hang"><input id="khoQ" type="search" placeholder="Kho B-roll miễn phí: cận tay gõ phím, phố đêm…"><select id="khoHuong" title="Hướng video"><option value="doc">Dọc</option><option value="ngang">Ngang</option></select><button class="btn nho xanh" id="khoTim" type="button">Tìm</button></div><div class="kq" id="khoKq"></div><div class="quota" id="khoTt">Video stock miễn phí dùng thương mại, không tốn lượt AI. Bấm một video để thêm vào footage.</div></div>
           <div id="srcs" style="display:flex;flex-direction:column;gap:8px"></div>
           <div class="quota" id="srcStatus"></div>
         </div>
@@ -1277,7 +1277,7 @@ async function agentXuLy(ten, a) {
     }
     case 'hieu_footage': { const s = agentSrc(a.src_id); if (!s) throw new Error('Không thấy footage ' + a.src_id); if (s.loai !== 'video') throw new Error('Chỉ hiểu được video'); if (s.tt !== 'xong') { await hieu(s); } if (s.tt !== 'xong') return { isError: true, text: 'Chưa hiểu được: ' + (s.loi || s.tt) }; return { text: { src_id: s.id, loai_canh: s.loai_canh, mo_ta: s.mo_ta, so_cau: s.cau.length, so_canh: s.canh.length, canh: s.canh, khoanh_khac: s.khoanh_khac, hook_goi_y: s.hook_goi_y, nhan_manh: s.nhan_manh, cau: s.cau.map(c => ({ bd: c.bd, kt: c.kt, text: c.text, loai: c.loai })) } }; }
     case 'tro_ly_dung': { if (a.che_do) $('#cheDo').value = a.che_do === 'nhanh' ? 'nhanh' : 'ky'; const n = P.lichSu.length; await aiDung(String(a.yeu_cau || ''), true); const moi = P.lichSu.slice(n).filter(x => x.vai === 'ai').map(x => x.text).join('\n'); if (/^⚠️/.test(moi) || !moi) return { isError: true, text: moi || 'Trợ lý không trả lời (cần footage đã hiểu và còn lượt)' }; return { text: { tra_loi: moi, du_an: agentTomTat() } }; }
-    case 'tim_broll_kho': { if (!MC.dich_vu.broll) throw new Error('Máy chủ chưa có kho B-roll (PEXELS_KEY)'); const r = await fetch(MC.url + '/broll?q=' + encodeURIComponent(String(a.q || '')) + '&huong=' + (a.huong === 'ngang' ? 'ngang' : 'doc')); const j = await r.json(); if (!j.ok) throw new Error(j.error || 'kho lỗi'); AG.kho = j.items; AG.khoQ = String(a.q || ''); return { text: { tu_khoa: j.tu_khoa, items: j.items.map(it => ({ id: it.id, giay: it.giay, kich_thuoc: it.w + 'x' + it.h, tac_gia: it.tac_gia })) } }; }
+    case 'tim_broll_kho': { if (!MC.dich_vu.broll) throw new Error('Máy chủ chưa có kho B-roll (PIXABAY_KEY)'); const r = await fetch(MC.url + '/broll?q=' + encodeURIComponent(String(a.q || '')) + '&huong=' + (a.huong === 'ngang' ? 'ngang' : 'doc')); const j = await r.json(); if (!j.ok) throw new Error(j.error || 'kho lỗi'); AG.kho = j.items; AG.khoQ = String(a.q || ''); return { text: { tu_khoa: j.tu_khoa, items: j.items.map(it => ({ id: it.id, giay: it.giay, kich_thuoc: it.w + 'x' + it.h, tac_gia: it.tac_gia })) } }; }
     case 'them_broll_kho': { const it = AG.kho.find(x => x.id === a.id); if (!it) throw new Error('Gọi tim_broll_kho trước, rồi đưa id trong kết quả'); const nut = document.createElement('button'); nut.appendChild(document.createElement('span')); await themBroll(it, AG.khoQ || 'b-roll', nut); const s = P.srcs.find(z => z.ten === it.id + '.mp4'); if (!s) throw new Error('Không tải được video ' + it.id); return { text: { src_id: s.id, ten: s.ten, giay: s.giay } }; }
     case 'long_tieng': { if (!MC.dich_vu.tts) throw new Error('Máy chủ chưa có lồng tiếng (GEMINI_API_KEYS)'); $('#tiengText').value = String(a.text || ''); if (a.giong && TIENG_GIONG[a.giong]) $('#tiengGiong').value = a.giong; $('#tiengCach').value = String(a.cach || ''); if (a.t_bd != null) { P.t = Math.max(0, +a.t_bd); veKhung(); } const n = P.tieng.length; await taoTieng(); if (P.tieng.length === n) return { isError: true, text: $('#tiengTt').textContent }; const t = P.tieng[P.tieng.length - 1]; return { text: { id: t.id, t_bd: t.t_bd, giay: t.giay, giong: t.giong } }; }
     case 'xem_khung': { P.t = Math.max(0, Math.min(tongGiay(), +a.t || 0)); await veKhung(); vePh(); const d = cv.toDataURL('image/png'); return { text: 'Khung tại ' + fmt1(P.t) + 's / ' + fmt1(tongGiay()) + 's', image: { data: d.split(',')[1], mime: 'image/png' } }; }
@@ -1290,7 +1290,7 @@ async function agentXuLy(ten, a) {
 }
 function DV_CH(v) { return v && CHUYEN_TEN[v] ? v : 'cat'; }
 
-/* ═════════ máy chủ phụ Cloudflare (mentor cài, bot /maychu): kho B-roll Pexels + lồng tiếng AI ═════════ */
+/* ═════════ máy chủ phụ Cloudflare (mentor cài, bot /maychu): kho B-roll Pixabay/Pexels + lồng tiếng AI ═════════ */
 let MC = { url: '', dich_vu: {} };
 async function mayChuKhoiDong() { try { MC = await TK.mayChu(); } catch { } $('#kho').hidden = !(MC.url && MC.dich_vu.broll); $('#tiengHop').hidden = !(MC.url && MC.dich_vu.tts);  $('#aiChon').hidden = !(MC.url && MC.dich_vu.agent); }
 mayChuKhoiDong();
@@ -1299,10 +1299,10 @@ async function khoTim() {
   $('#khoTt').textContent = 'Đang tìm “' + q + '”…'; $('#khoKq').innerHTML = '';
   try {
     const r = await fetch(MC.url + '/broll?q=' + encodeURIComponent(q) + '&huong=' + $('#khoHuong').value); const j = await r.json();
-    if (!j.ok) { $('#khoTt').textContent = j.error === 'chua_co_pexels' ? 'Máy chủ chưa có PEXELS_KEY (mentor thêm ở Cloudflare).' : 'Kho chưa trả lời, thử lại.'; return; }
+    if (!j.ok) { $('#khoTt').textContent = j.error === 'chua_co_kho' || j.error === 'chua_co_pexels' ? 'Máy chủ chưa có key kho video (PIXABAY_KEY, mentor thêm ở Cloudflare).' : 'Kho chưa trả lời, thử lại.'; return; }
     if (!j.items.length) { $('#khoTt').textContent = 'Không có video hợp “' + q + '”, thử từ khác ngắn hơn.'; return; }
     j.items.forEach(it => { const b = el('button'); b.type = 'button'; b.title = 'Thêm vào footage · ' + it.tac_gia + ' · ' + fmt1(it.giay) + 's'; const im = el('img'); im.src = it.thumb; im.alt = ''; im.loading = 'lazy'; b.appendChild(im); b.appendChild(el('span', null, fmt1(it.giay) + 's · ' + it.tac_gia)); b.onclick = () => themBroll(it, q, b); $('#khoKq').appendChild(b); });
-    $('#khoTt').textContent = j.items.length + ' video' + (j.tu_khoa && j.tu_khoa !== q ? ' · tìm bằng “' + j.tu_khoa + '”' : '') + ' · Pexels miễn phí. Bấm để thêm vào footage, rồi kéo cảnh vào V2.';
+    $('#khoTt').textContent = j.items.length + ' video' + (j.tu_khoa && j.tu_khoa !== q ? ' · tìm bằng “' + j.tu_khoa + '”' : '') + ' · ' + (j.nguon || 'kho miễn phí') + '. Bấm để thêm vào footage, rồi kéo cảnh vào V2.';
   } catch (e) { $('#khoTt').textContent = 'Không gọi được máy chủ B-roll.'; }
 }
 async function themBroll(it, q, nut) {
@@ -1313,7 +1313,7 @@ async function themBroll(it, q, nut) {
     const blob = await r.blob(); const f = new File([blob], it.id + '.mp4', { type: 'video/mp4' });
     await themFile([f]);
     const s = P.srcs.find(z => z.ten === f.name); if (!s) throw new Error('khong_them_duoc');
-    Object.assign(s, { loai_canh: 'broll', mo_ta: 'B-roll kho: ' + q + ' (Pexels · ' + it.tac_gia + ')', tt: 'xong', canh: [{ bd: 0, kt: s.giay || it.giay, mo_ta: q, tags: ['broll', 'kho'] }], cau: [], tu: [], khoanh_khac: [] });
+    Object.assign(s, { loai_canh: 'broll', mo_ta: 'B-roll kho: ' + q + ' (' + it.tac_gia + ')', tt: 'xong', canh: [{ bd: 0, kt: s.giay || it.giay, mo_ta: q, tags: ['broll', 'kho'] }], cau: [], tu: [], khoanh_khac: [] });
     s.thumbs[0] = s.thumb; veSrcs(); veLoi(); toast('Đã thêm B-roll từ kho. Kéo cảnh vào V2 (che nhỏ góc hoặc toàn khung), hoặc bấm ＋ V1.');
     nut.querySelector('span').textContent = '✓ Đã thêm';
   } catch (e) { console.error('[kho]', e); toast('Không tải được video này, chọn video khác.'); nut.querySelector('span').textContent = cu; nut.disabled = false; }

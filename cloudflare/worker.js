@@ -3,8 +3,8 @@
    ─────────────────────────────────────────────────────────────────────────
    Làm những việc Apps Script không làm được hoặc làm chậm:
      GET  /            → tình trạng máy chủ (tool tự dò để bật tính năng)
-     GET  /broll       → tìm kho B-roll miễn phí (Pexels), trả link đã qua /media để vẽ lên canvas
-     GET  /media?u=    → phát lại file Pexels có CORS + Range (xem trước, xuất video)
+     GET  /broll       → tìm kho B-roll miễn phí (Pixabay và/hoặc Pexels), trả link đã qua /media để vẽ lên canvas
+     GET  /media?u=    → phát lại file Pixabay/Pexels có CORS + Range (xem trước, xuất video)
      GET  /tai?u=&ten= → tải hộ file video/ảnh/nhạc từ CDN các nền tảng, không giới hạn 35MB, có tên file
      POST /tts         → lồng tiếng AI tiếng Việt (Gemini TTS), trả WAV; trừ lượt qua Apps Script
      POST /agent       → Trợ lý dựng kiểu agent: nhận yêu cầu + trạng thái dự án, hỏi LLM có tool-calling
@@ -13,7 +13,8 @@
 
    Biến môi trường (Settings → Variables and Secrets):
      GEMINI_API_KEYS   một hoặc nhiều key Gemini, cách nhau dấu phẩy (Secret)
-     PEXELS_KEY        key miễn phí tại pexels.com/api (Secret)
+     PIXABAY_KEY       key miễn phí tại pixabay.com/api/docs (đăng nhập là thấy) (Secret)
+     PEXELS_KEY        (tuỳ chọn) key Pexels nếu có; có cả hai thì gộp kết quả (Secret)
      APPS_SCRIPT_URL   link /exec của Apps Script (để kiểm đăng nhập + trừ lượt khi lồng tiếng)
      ORIGINS           (tuỳ chọn) các trang được gọi, cách nhau dấu phẩy. Mặc định: GitHub Pages của khoá
      LLM_PROVIDER      (tuỳ chọn) gemini (mặc định) | claude | openai — AI cho Trợ lý dựng agent
@@ -21,14 +22,14 @@
      ANTHROPIC_API_KEY, OPENAI_API_KEY   (Secret) key khi chọn claude / openai
    ═══════════════════════════════════════════════════════════════════════════ */
 
-const PHIEN_BAN = '2026.10.02';
+const PHIEN_BAN = '2026.10.03';
 const ORIGIN_MD = 'https://minhtoan8668.github.io,http://localhost:8765,http://127.0.0.1:8765';
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0 Safari/537.36';
 const TTS_MODELS = ['gemini-3.8-flash-lite-tts', 'gemini-3.8-flash-tts', 'gemini-2.5-flash-preview-tts'];
 const TTS_GIONG = { nu_am: 'Kore', nu_tre: 'Leda', nu_diu: 'Aoede', nu_sang: 'Zephyr', nam_tram: 'Charon', nam_tre: 'Puck', nam_am: 'Orus', nam_manh: 'Fenrir' };
 /* CDN được tải hộ: chỉ tên miền chứa file của các nền tảng, để máy chủ không thành proxy mở */
-const HOST_TAI = /(^|\.)(tiktokcdn(-us|-eu)?\.com|tiktokcdn-us\.com|tikwm\.com|byteoversea\.com|ibyteimg\.com|byteimg\.com|douyinvod\.com|douyinpic\.com|douyinstatic\.com|twimg\.com|fxtwitter\.com|cdninstagram\.com|fbcdn\.net|bsky\.app|bsky\.network|pexels\.com|ytimg\.com|googlevideo\.com|xhscdn\.com|akamaized\.net|redd\.it|redditmedia\.com|pinimg\.com|vimeocdn\.com|threads\.net)$/i;
-const HOST_MEDIA = /(^|\.)(pexels\.com)$/i;
+const HOST_TAI = /(^|\.)(pixabay\.com|tiktokcdn(-us|-eu)?\.com|tiktokcdn-us\.com|tikwm\.com|byteoversea\.com|ibyteimg\.com|byteimg\.com|douyinvod\.com|douyinpic\.com|douyinstatic\.com|twimg\.com|fxtwitter\.com|cdninstagram\.com|fbcdn\.net|bsky\.app|bsky\.network|pexels\.com|ytimg\.com|googlevideo\.com|xhscdn\.com|akamaized\.net|redd\.it|redditmedia\.com|pinimg\.com|vimeocdn\.com|threads\.net)$/i;
+const HOST_MEDIA = /(^|\.)(pexels\.com|pixabay\.com)$/i;
 
 export default {
   async fetch(req, env, ctx) {
@@ -36,7 +37,7 @@ export default {
     const cors = corsCho(req, env);
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: { ...cors, 'access-control-max-age': '86400' } });
     try {
-      if (path === '/') return json({ ok: true, ten: 'Viral Studio · máy chủ Cloudflare', phien_ban: PHIEN_BAN, dich_vu: { broll: !!env.PEXELS_KEY, tts: !!dsKey(env).length, tai: true, kiem_luot: !!env.APPS_SCRIPT_URL, agent: !!llmCoKey(env), agent_ncc: llmNcc(env) } }, cors);
+      if (path === '/') return json({ ok: true, ten: 'Viral Studio · máy chủ Cloudflare', phien_ban: PHIEN_BAN, dich_vu: { broll: coKho(env), tts: !!dsKey(env).length, tai: true, kiem_luot: !!env.APPS_SCRIPT_URL, agent: !!llmCoKey(env), agent_ncc: llmNcc(env) } }, cors);
       if (path === '/broll' && req.method === 'GET') return json(await timBroll(url, env, ctx), cors);
       if (path === '/media' && req.method === 'GET') return media(req, url, cors);
       if (path === '/tai' && req.method === 'GET') return taiHo(req, url, cors);
@@ -74,35 +75,50 @@ async function goiGemini(env, model, body) {
 
 /* ── kho B-roll (Pexels): tìm tiếng Việt trước, ít kết quả thì nhờ Gemini dịch từ khoá ── */
 async function timBroll(url, env, ctx) {
-  if (!env.PEXELS_KEY) return { ok: false, error: 'chua_co_pexels' };
-  const q = String(url.searchParams.get('q') || '').trim().slice(0, 120); if (!q) return { ok: false, error: 'thieu_q' };
+  if (!coKho(env)) return { ok: false, error: 'chua_co_kho' };
+  const q = String(url.searchParams.get('q') || '').trim().slice(0, 100); if (!q) return { ok: false, error: 'thieu_q' };
   const doc = url.searchParams.get('huong') !== 'ngang', trang = Math.max(1, Math.min(5, +url.searchParams.get('trang') || 1));
-  const khoa = `broll:${doc ? 'd' : 'n'}:${trang}:${q.toLowerCase()}`;
+  const khoa = `broll2:${doc ? 'd' : 'n'}:${trang}:${q.toLowerCase()}`;
   const cache = globalThis.caches && caches.default, cKey = cache && new Request('https://cache.viral-studio/' + encodeURIComponent(khoa));
   if (cache) { const c = await cache.match(cKey); if (c) return c.json(); }
-  const tim = async (query, locale) => {
-    const p = new URLSearchParams({ query, per_page: '15', page: String(trang), orientation: doc ? 'portrait' : 'landscape', size: 'medium' }); if (locale) p.set('locale', locale);
-    const r = await fetch('https://api.pexels.com/videos/search?' + p, { headers: { authorization: env.PEXELS_KEY } });
-    if (!r.ok) throw new Error('pexels ' + r.status);
-    return (await r.json()).videos || [];
+  // Pixabay: không có lọc hướng cho video → lấy nhiều rồi lọc dọc/ngang; tìm được tiếng Việt (lang=vi)
+  const pixabay = async (query, vi) => {
+    if (!env.PIXABAY_KEY) return [];
+    const p = new URLSearchParams({ key: env.PIXABAY_KEY, q: query.slice(0, 100), per_page: '60', page: String(trang), safesearch: 'true', video_type: 'film' }); if (vi) p.set('lang', 'vi');
+    const r = await fetch('https://pixabay.com/api/videos/?' + p); if (!r.ok) throw new Error('pixabay ' + r.status);
+    return ((await r.json()).hits || []).map(h => {
+      const v = h.videos || {}, ds = ['medium', 'small', 'large', 'tiny'].map(k => v[k]).filter(x => x && x.url && x.width);
+      const f = ds.find(x => Math.max(x.width, x.height) <= 1280) || ds[0]; if (!f) return null;
+      return { id: 'pb' + h.id, giay: h.duration, w: f.width, h: f.height, thumb: f.thumbnail || (v.tiny || {}).thumbnail || '', link: f.url, goc: h.pageURL, tac_gia: (h.user || 'Pixabay') + ' · Pixabay' };
+    }).filter(Boolean);
   };
-  let vids = await tim(q, 'vi-VN'), tuKhoa = q;
-  if (vids.length < 4 && dsKey(env).length) {
+  const pexels = async (query, vi) => {
+    if (!env.PEXELS_KEY) return [];
+    const p = new URLSearchParams({ query, per_page: '15', page: String(trang), orientation: doc ? 'portrait' : 'landscape', size: 'medium' }); if (vi) p.set('locale', 'vi-VN');
+    const r = await fetch('https://api.pexels.com/videos/search?' + p, { headers: { authorization: env.PEXELS_KEY } }); if (!r.ok) throw new Error('pexels ' + r.status);
+    return ((await r.json()).videos || []).map(v => {
+      const fs = (v.video_files || []).filter(f => /mp4/.test(f.file_type || '') && f.width && f.height).sort((a, b) => b.width * b.height - a.width * a.height);
+      const f = fs.find(x => Math.max(x.width, x.height) <= 1280) || fs[fs.length - 1]; if (!f) return null;
+      return { id: 'px' + v.id, giay: v.duration, w: f.width, h: f.height, thumb: v.image, link: f.link, goc: v.url, tac_gia: ((v.user || {}).name || 'Pexels') + ' · Pexels' };
+    }).filter(Boolean);
+  };
+  const hopHuong = it => doc ? it.h >= it.w : it.w > it.h;
+  const tim = async (query, vi) => { const kq = await Promise.allSettled([pexels(query, vi), pixabay(query, vi)]); const ds = kq.flatMap(x => x.status === 'fulfilled' ? x.value : []); if (!ds.length && kq.every(x => x.status === 'rejected')) throw kq[0].reason; return ds; };
+  let vids = (await tim(q, true)).filter(hopHuong), tuKhoa = q;
+  if (vids.length < 6 && dsKey(env).length) {
     try {
       const j = await goiGemini(env, 'gemini-3.5-flash-lite', { contents: [{ parts: [{ text: 'Dịch cụm tìm kiếm stock video sau sang 2–4 từ khoá tiếng Anh ngắn gọn, chỉ trả về từ khoá, không giải thích: ' + q }] }], generationConfig: { maxOutputTokens: 30, temperature: 0.2 } });
       const en = (((j.candidates || [])[0] || {}).content || { parts: [] }).parts.map(p => p.text || '').join(' ').replace(/["\n]/g, ' ').trim().slice(0, 80);
-      if (en) { tuKhoa = en; const them = await tim(en, ''); const co = new Set(vids.map(v => v.id)); vids = vids.concat(them.filter(v => !co.has(v.id))); }
+      if (en) { tuKhoa = en; const co = new Set(vids.map(v => v.id)); vids = vids.concat((await tim(en, false)).filter(v => hopHuong(v) && !co.has(v.id))); }
     } catch { }
   }
-  const items = vids.slice(0, 18).map(v => {
-    const fs = (v.video_files || []).filter(f => /mp4/.test(f.file_type || '') && f.width && f.height).sort((a, b) => b.width * b.height - a.width * a.height);
-    const f = fs.find(x => Math.max(x.width, x.height) <= 1280) || fs[fs.length - 1]; if (!f) return null;
-    return { id: 'px' + v.id, giay: v.duration, w: f.width, h: f.height, thumb: v.image, url: `/media?u=${encodeURIComponent(f.link)}`, goc: v.url, tac_gia: (v.user || {}).name || 'Pexels' };
-  }).filter(Boolean);
-  const kq = { ok: true, items, tu_khoa: tuKhoa, nguon: 'Pexels · miễn phí, không cần ghi nguồn' };
-  if (cache && ctx) ctx.waitUntil(cache.put(cKey, new Response(JSON.stringify(kq), { headers: { 'content-type': 'application/json', 'cache-control': 'public, max-age=86400' } })));
+  const items = vids.slice(0, 18).map(({ link, ...it }) => ({ ...it, url: `/media?u=${encodeURIComponent(link)}` }));
+  const nguon = [env.PIXABAY_KEY && 'Pixabay', env.PEXELS_KEY && 'Pexels'].filter(Boolean).join(' + ');
+  const kq = { ok: true, items, tu_khoa: tuKhoa, nguon: nguon + ' · miễn phí dùng thương mại' };
+  if (cache && ctx) ctx.waitUntil(cache.put(cKey, new Response(JSON.stringify(kq), { headers: { 'content-type': 'application/json', 'cache-control': 'public, max-age=86400' } })));   // Pixabay yêu cầu cache 24h
   return kq;
 }
+function coKho(env) { return !!(env.PIXABAY_KEY || env.PEXELS_KEY); }
 
 /* ── phát lại file Pexels có CORS (canvas cần) và Range (video tua được) ── */
 async function media(req, url, cors) {

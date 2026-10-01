@@ -4,7 +4,7 @@ Máy chủ này làm ba việc Apps Script không làm được:
 
 | Việc | Ở tool nào | Cần key gì |
 |---|---|---|
-| **Kho B-roll miễn phí** (Pexels): gõ "cận tay gõ phím" là có video dọc để kéo vào V2 | Dựng video → tab Footage | `PEXELS_KEY` |
+| **Kho B-roll miễn phí** (Pixabay, thêm Pexels nếu có): gõ "cận tay gõ phím" là có video dọc để kéo vào V2 | Dựng video → tab Footage | `PIXABAY_KEY` |
 | **Lồng tiếng AI tiếng Việt** (8 giọng nam nữ, chỉnh cách đọc), đặt lên track A2 | Dựng video → Thuộc tính | `GEMINI_API_KEYS` |
 | **Tải hộ file lớn** (không còn giới hạn 35MB, có tên file) | Tải video | không cần |
 | **Trợ lý dựng kiểu agent**: AI tự thao tác từng lệnh lên dòng thời gian (thêm/cắt/tách/trượt đoạn, b-roll, đồ hoạ, cài đặt, xem khung hình tự kiểm), đổi được sang Claude hay GPT | Dựng video → Trợ lý dựng | `GEMINI_API_KEYS` (hoặc key Claude/OpenAI) |
@@ -54,7 +54,8 @@ Trong trang Worker vừa tạo → **Settings** → **Variables and Secrets** �
 | Variable name | Type | Value |
 |---|---|---|
 | `GEMINI_API_KEYS` | Secret | key Gemini đang dùng ở Apps Script. Nhiều key thì cách nhau dấu phẩy, máy chủ tự xoay khi key này hết hạn mức |
-| `PEXELS_KEY` | Secret | key miễn phí: vào <https://www.pexels.com/api/>, bấm **Get Started**, đăng ký, vào **Your API key** chép ra. Không giới hạn số lần dùng cho mục đích thường (200 lượt/giờ) |
+| `PIXABAY_KEY` | Secret | key miễn phí: đăng ký tài khoản tại <https://pixabay.com/accounts/register/>, xác nhận email, đăng nhập rồi mở <https://pixabay.com/api/docs/>. Kéo xuống mục **Parameters**, dòng `key` hiện sẵn key của anh (dạng `12345678-abc...`), chép ra. 100 lượt/phút, máy chủ tự nhớ kết quả 24 giờ nên dư dùng |
+| `PEXELS_KEY` | Secret | tuỳ chọn. Pexels đang tạm ngưng cấp key mới; ai có sẵn thì thêm để gộp thêm kết quả |
 | `APPS_SCRIPT_URL` | Text | link `/exec` của Apps Script (chính là link đang dán trong tool). Máy chủ dùng để kiểm đăng nhập và trừ lượt khi lồng tiếng |
 
 **Đổi AI cho Trợ lý dựng agent** (tuỳ chọn, mặc định Gemini dùng chung key trên):
@@ -104,8 +105,9 @@ Sau đó tải lại trang Dựng video: tab **Footage** có ô **Kho B-roll mi�
 
 | Hiện tượng | Nguyên nhân · cách sửa |
 |---|---|
-| Ô Kho B-roll không hiện | Bot `/maychu` chưa cài, hoặc thiếu `PEXELS_KEY`. Gửi `/maychu` (không kèm link) để xem tình trạng |
-| Tìm B-roll ra "Máy chủ chưa có PEXELS_KEY" | Thêm secret ở bước 3, nhớ bấm Deploy |
+| Ô Kho B-roll không hiện | Bot `/maychu` chưa cài, hoặc thiếu `PIXABAY_KEY`. Gửi `/maychu` (không kèm link) để xem tình trạng |
+| Tìm B-roll ra "Máy chủ chưa có key kho video" | Thêm secret `PIXABAY_KEY` ở bước 3, nhớ bấm Deploy |
+| Trang Pexels báo "New API key issuance is currently paused" | Bình thường, dùng Pixabay thay thế, không cần Pexels |
 | Lồng tiếng báo `origin` | Web đang chạy ở tên miền lạ. Thêm biến `ORIGINS` |
 | Lồng tiếng báo `khong_noi_duoc_apps_script` | `APPS_SCRIPT_URL` sai hoặc Apps Script chưa Deploy "Anyone" |
 | Lồng tiếng báo `tts_loi 429` | Key Gemini hết hạn mức phút. Thêm key thứ hai vào `GEMINI_API_KEYS` |
