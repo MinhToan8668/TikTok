@@ -290,6 +290,16 @@ Muốn tặng thêm lượt hoặc gia hạn tay: sửa cột `luot_dung` (số 
 - **Nhớ kết quả:** khoá theo mã tài khoản + video (file_uri / đầu file / link) + số liệu + giờ đăng + mục tiêu + ý định. Cùng bộ đó trong 6 giờ thì trả đúng kết quả cũ, hoàn lượt (`tu_bo_nho: true`). Đổi bất kỳ thông số nào là chấm mới. `meta` ghi thêm `model`, `luc`, `gio_dang`, `view_gio`.
 - Ô số liệu ở Chấm video và Soi video tự định dạng `12,887` khi rời ô; gõ `12.5K`, `1,2M` vẫn hiểu.
 
+## Gửi video cho Soi video / Chấm video (bản 10/2026): gửi nguyên file một lần
+
+Trước đây video trên 12MB phải cắt thành khúc 8MB, mỗi khúc đóng base64 rồi đi qua Apps Script (chậm, dễ rớt giữa chừng, tối đa 200MB). Giờ:
+
+1. Tool gọi `up_url`: Apps Script mở một phiên tải lên Gemini Files bằng key phân tích, kèm địa chỉ trang tool.
+2. Trình duyệt gửi **nguyên file thẳng lên Google** trong một lần, có thanh % và thời gian còn lại. Không base64, không qua Apps Script.
+3. Tool gọi `up_xong`: Apps Script chờ Google xử lý xong rồi trả `file_uri` để chấm/soi.
+
+Áp dụng cho mọi video trên 4MB, tối đa 1GB. Video nhỏ hơn 4MB vẫn gửi kèm trong một lần gọi như cũ. Nếu Apps Script chưa cập nhật hoặc mạng chặn, tool tự quay về cách cắt khúc cũ (tối đa 200MB), học viên không phải làm gì. Trang tool đặt ở tên miền khác `*.github.io` thì thêm Script property `UP_ORIGINS` (ví dụ `https://tuminhxaykenh.vn`).
+
 ## Tool 5 · Tải video (tools/tai-ve.html + TaiVe.gs)
 
 Dán link là tải được video, ảnh, âm thanh. Không cần đăng nhập, không tốn lượt AI.

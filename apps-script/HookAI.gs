@@ -190,7 +190,8 @@ function hookAiChinh(b){
   if (b.mode === 'apkhuon') return hookApKhuon(b, ai, provider, key); // sau khi soi: áp công thức đã rút sang một khung kịch bản khác, không tốn lượt
   if (b.mode === 'cham') return hookChamVideo(b, ai, provider, key);  // Chấm video CỦA CHÍNH học viên: khả năng viral, chỗ sửa, bài cho lần sau, kịch bản tiếp
   if (b.mode === 'viet') return hookVietKichBan(b, ai, provider, key); // Viết trọn kịch bản từ đề xuất của Soi video / Chấm video hoặc từ ý người dùng; tính 1 lượt chấm kịch bản
-  if (b.mode === 'up_start' || b.mode === 'up_chunk' || b.mode === 'up_done') return upVideo(b, ai);   // video lớn: gửi từng khúc 8MB, không tốn lượt
+  if (b.mode === 'up_url' || b.mode === 'up_xong') return upThang(b, ai);   // video: trình duyệt gửi nguyên file thẳng lên Google, không tốn lượt
+  if (b.mode === 'up_start' || b.mode === 'up_chunk' || b.mode === 'up_done') return upVideo(b, ai);   // dự phòng: gửi từng khúc 8MB qua Apps Script
   if (b.mode === 'design') return hookDesign(b, ai, provider, key);
   if (b.mode === 'layer'){
     if (ai.loai === 'free') return jsonOut({ok:false, error:'can_pro'});   // AI chỉnh chữ chỉ dành cho Pro và học viên
@@ -1383,12 +1384,46 @@ function upVideo(b, ai){
   }
   return jsonOut({ok:false, error:'unknown_action'});
 }
-/* Mở phiên resumable upload; trả về URL để bơm khúc. */
-function geminiUploadMoPhien(key, tongByte, mime, ten){
+/* ── Tải thẳng (bản 10/2026): Apps Script chỉ mở phiên resumable upload kèm Origin của trang tool,
+   Google cho phép trình duyệt gửi NGUYÊN file vào URL phiên đó (có CORS), không qua Apps Script,
+   không base64, không cắt khúc. Xong thì up_xong chờ file ACTIVE rồi trả file_uri.
+   Key dùng mở phiên chính là key phân tích (GEMINI_API_KEY), nên file luôn đọc được khi chấm/soi. ── */
+var UP_THANG_TOI_DA = 1024 * 1024 * 1024;   // 1GB (Gemini Files nhận tới 2GB)
+var UP_ORIGIN_OK = /^https:\/\/([a-z0-9-]+\.github\.io|localhost(:\d+)?|127\.0\.0\.1(:\d+)?)$|^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i;
+function upThang(b, ai){
+  var key = hookCfg('GEMINI_API_KEY'); if (!key) return jsonOut({ok:false, error:'can_gemini'});
+  if (b.mode === 'up_url'){
+    var tong = Number(b.size) || 0;
+    if (!tong || tong > UP_THANG_TOI_DA) return jsonOut({ok:false, error:'video_qua_lon', han: UP_THANG_TOI_DA});
+    var origin = String(b.origin || '').trim().replace(/\/+$/, '');
+    var them = String(cfgProp('UP_ORIGINS') || '').split(/[,\s]+/).filter(String);   // tên miền riêng (nếu có): Script property UP_ORIGINS
+    if (!UP_ORIGIN_OK.test(origin) && them.indexOf(origin) < 0) return jsonOut({ok:false, error:'origin_la'});
+    var mime = /^video\//.test(String(b.mime || '')) ? String(b.mime) : 'video/mp4';
+    var mo = geminiUploadMoPhien(key, tong, mime, String(b.ten || 'video'), origin);
+    if (!mo.ok) return jsonOut({ok:false, error:'khong_tai_duoc_video', chi_tiet: String(mo.loi || '').slice(0, 220)});
+    return jsonOut({ok:true, url: mo.url, han: UP_THANG_TOI_DA});
+  }
+  // up_xong: chờ file ACTIVE
+  var ten = String(b.file || '').trim();
+  if (!/^files\/[a-z0-9-]{4,64}$/.test(ten)) return jsonOut({ok:false, error:'thieu'});
+  var f = {};
+  for (var t = 0; t < 60; t++){
+    var g = UrlFetchApp.fetch('https://generativelanguage.googleapis.com/v1beta/' + ten, {muteHttpExceptions:true, headers:{'x-goog-api-key': key}});
+    if (g.getResponseCode() !== 200) return jsonOut({ok:false, error:'khong_tai_duoc_video', chi_tiet:'files.get http ' + g.getResponseCode() + ': ' + g.getContentText().slice(0, 160)});
+    f = JSON.parse(g.getContentText()) || {};
+    if (f.state === 'ACTIVE') return jsonOut({ok:true, file_uri: f.uri, mime: f.mimeType, size: Number(f.sizeBytes) || 0});
+    if (f.state === 'FAILED') return jsonOut({ok:false, error:'video_hong', chi_tiet:'Google không đọc được video này'});
+    Utilities.sleep(2000);
+  }
+  return jsonOut({ok:false, error:'khong_tai_duoc_video', chi_tiet:'xu ly video qua lau'});
+}
+
+/* Mở phiên resumable upload; trả về URL để bơm khúc. origin: trang tool sẽ gửi thẳng (để Google trả CORS). */
+function geminiUploadMoPhien(key, tongByte, mime, ten, origin){
   var r0 = UrlFetchApp.fetch('https://generativelanguage.googleapis.com/upload/v1beta/files', {
     method:'post', contentType:'application/json', muteHttpExceptions:true,
-    headers:{ 'x-goog-api-key': key, 'X-Goog-Upload-Protocol':'resumable', 'X-Goog-Upload-Command':'start',
-              'X-Goog-Upload-Header-Content-Length': String(tongByte), 'X-Goog-Upload-Header-Content-Type': mime },
+    headers: (function(h){ if (origin) h.Origin = origin; return h; })({ 'x-goog-api-key': key, 'X-Goog-Upload-Protocol':'resumable', 'X-Goog-Upload-Command':'start',
+              'X-Goog-Upload-Header-Content-Length': String(tongByte), 'X-Goog-Upload-Header-Content-Type': mime }),
     payload: JSON.stringify({file:{display_name: String(ten).slice(0, 80)}}) });
   if (r0.getResponseCode() !== 200) return {ok:false, loi:'start http ' + r0.getResponseCode() + ': ' + r0.getContentText().slice(0, 160)};
   var h = r0.getAllHeaders(), url = h['X-Goog-Upload-URL'] || h['x-goog-upload-url'];

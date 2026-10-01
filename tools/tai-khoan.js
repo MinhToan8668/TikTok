@@ -934,9 +934,34 @@
       catch (e) { if (t >= (lan || 2)) throw e; await new Promise(function (z) { setTimeout(z, 1500 * (t + 1)); }); }
     }
   }
+  /* Tải thẳng: Apps Script mở phiên, trình duyệt gửi nguyên file lên Google trong một lần (có % tiến độ),
+     nhanh gấp nhiều lần cắt khúc base64 qua Apps Script. Trả null nếu máy chủ chưa hỗ trợ để rơi về cách cũ. */
+  async function taiThangGoogle(file, bao) {
+    var mime = file.type || 'video/mp4';
+    bao(0, 'Đang mở phiên tải…');
+    var s0 = await goiLai({ action: 'hook_ai', mode: 'up_url', token: token(), dev: dev(), size: file.size, mime: mime, ten: file.name, origin: location.origin });
+    if (!s0.ok) { if (s0.error === 'video_qua_lon' || s0.error === 'het_phien' || s0.error === 'can_dangky') { var e0 = new Error(s0.error); e0.ma = s0.error; e0.han = s0.han; throw e0; } return null; }
+    var t0 = Date.now();
+    var kq = await new Promise(function (ok) {
+      var x = new XMLHttpRequest(); x.open('POST', s0.url);
+      x.setRequestHeader('X-Goog-Upload-Command', 'upload, finalize'); x.setRequestHeader('X-Goog-Upload-Offset', '0'); x.setRequestHeader('Content-Type', mime);
+      x.upload.onprogress = function (e) { if (!e.lengthComputable) return; var p = e.loaded / e.total, giay = (Date.now() - t0) / 1000, tocDo = e.loaded / Math.max(0.5, giay); bao(Math.round(p * 90), 'Đang tải ' + (e.loaded / 1048576).toFixed(1) + '/' + (e.total / 1048576).toFixed(1) + 'MB' + (giay > 2 && p < 1 ? ' · còn ~' + Math.max(1, Math.round((e.total - e.loaded) / tocDo)) + 's' : '') + '…'); };
+      x.onload = function () { var f = null; try { f = (JSON.parse(x.responseText) || {}).file; } catch (e) { } ok(x.status === 200 && f && f.name ? f : null); };
+      x.onerror = x.ontimeout = function () { ok(null); };
+      x.send(file);
+    });
+    if (!kq) return null;
+    bao(92, 'Đã tải xong, Google đang xử lý video…');
+    var d = await goiLai({ action: 'hook_ai', mode: 'up_xong', token: token(), dev: dev(), file: kq.name }, 1);
+    if (!d.ok) { var e2 = new Error(d.error || 'up_xong'); e2.ma = d.error; e2.chi_tiet = d.chi_tiet; throw e2; }
+    bao(100, 'AI đã nhận video');
+    return { file_uri: d.file_uri, mime: d.mime || mime, size: d.size || file.size, cach: 'thang' };
+  }
   async function taiVideo(file, onTienDo) {
     var bao = function (p, c) { if (typeof onTienDo === 'function') { try { onTienDo(p, c); } catch (e) { } } };
-    bao(0, 'Đang mở phiên tải…');
+    try { var th = await taiThangGoogle(file, bao); if (th) return th; } catch (e) { if (e.ma) throw e; }
+    if (file.size > 200 * 1048576) { var eL = new Error('video_qua_lon'); eL.ma = 'video_qua_lon'; eL.han = 200 * 1048576; throw eL; }
+    bao(0, 'Đang mở phiên tải (cách dự phòng)…');
     var s0 = await goiLai({ action: 'hook_ai', mode: 'up_start', token: token(), dev: dev(), size: file.size, mime: file.type || 'video/mp4', ten: file.name });
     if (!s0.ok) {
       // máy chủ chưa biết mode up_start (HookAI.gs bản cũ) thì rơi xuống nhánh mặc định và trả thieu_text / unknown_action

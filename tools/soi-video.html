@@ -288,7 +288,7 @@
         <div class="fileup" style="margin-top:8px">
           <label class="btn" for="videoFile">Hoặc tải file video lên</label>
           <input type="file" id="videoFile" accept="video/mp4,video/quicktime,video/webm,video/*">
-          <span class="note" id="videoNote">Dùng cho Facebook, Instagram, video tải về máy, hoặc khi link không tải được. Tối đa 200MB, file lớn tải theo từng khúc có tiến độ.</span>
+          <span class="note" id="videoNote">Dùng cho Facebook, Instagram, video tải về máy, hoặc khi link không tải được. Tối đa 1GB, gửi nguyên file một lần, có thanh tiến độ.</span>
           <button class="linkbtn" type="button" id="videoClear" hidden>Bỏ file</button>
         </div>
         <label class="lbl">Nền tảng</label>
@@ -377,7 +377,7 @@
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="tai-khoan.js?v=202610021000"></script>
+<script src="tai-khoan.js?v=202610021400"></script>
 <script>
 const $ = s => document.querySelector(s);
 const el = (t, c, txt) => { const e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; };
@@ -420,7 +420,7 @@ function updateSrc() {
   const map = { file: '▶ AI sẽ nghe file video bạn tải lên' + (state.file ? ` (${state.file.name}, ${(state.file.size / 1048576).toFixed(1)}MB${state.file.giay ? ', ' + state.file.giay + 's' : ''})` : ''), link: '▶ AI sẽ tự tải video từ link về nghe' + (state.link.giay ? ` (${state.link.giay}s)` : ''), text: '▶ AI mổ trên lời thoại bạn dán', '': 'Chưa có video hay lời thoại' };
   s.textContent = map[n]; s.className = 'srcline' + (n ? '' : ' off'); if (n === 'text' || n === '') $('#vidprev').hidden = !(state.link.tac_gia || state.link.caption || state.file);
   lo.textContent = (n === 'file' || n === 'link') ? '(tuỳ chọn: AI tự nghe từ video, dán vào nếu muốn AI ưu tiên bản của bạn)' : '(bắt buộc khi không có video)';
-  $('#videoNote').textContent = state.file ? `Đã chọn ${state.file.name} · ${(state.file.size / 1048576).toFixed(1)}MB` : 'Dùng cho Facebook, Instagram, video tải về máy, hoặc khi link không tải được. Tối đa 200MB, file lớn tải theo từng khúc có tiến độ.';
+  $('#videoNote').textContent = state.file ? `Đã chọn ${state.file.name} · ${(state.file.size / 1048576).toFixed(1)}MB` : 'Dùng cho Facebook, Instagram, video tải về máy, hoặc khi link không tải được. Tối đa 1GB, gửi nguyên file một lần, có thanh tiến độ.';
   $('#videoClear').hidden = !state.file;
 }
 function docSo() { return { view: soNhap($('#nView').value), like: soNhap($('#nLike').value), cmt: soNhap($('#nCmt').value), luu: soNhap($('#nLuu').value), share: soNhap($('#nShare').value), giay: soNhap($('#giay').value) }; }
@@ -495,13 +495,13 @@ function readVideoFile(file) { return new Promise((ok, no) => { const fr = new F
 function videoDuration(file) { return new Promise(ok => { try { const v = document.createElement('video'); v.preload = 'metadata'; const url = URL.createObjectURL(file); v.onloadedmetadata = () => { const d = Math.round(v.duration || 0); URL.revokeObjectURL(url); ok(isFinite(d) ? d : 0); }; v.onerror = () => { URL.revokeObjectURL(url); ok(0); }; v.src = url; } catch { ok(0); } }); }
 async function chonVideo(file) {
   if (!file) return;
-  if (file.size > 200 * 1048576) { toast('File quá 200MB. Cắt ngắn hoặc nén video trước.'); return; }
+  if (file.size > 1024 * 1048576) { toast('File quá 1GB. Cắt ngắn hoặc nén video trước.'); return; }
   $('#videoNote').textContent = 'Đang đọc file…';
   try {
-    const lon = file.size > 12 * 1048576;   // lớn thì giữ file, lúc soi mới cắt khúc tải lên
+    const lon = file.size > 4 * 1048576;   // trên 4MB: giữ file, lúc soi mới gửi thẳng lên Google
     const [b64, giay] = await Promise.all([lon ? Promise.resolve('') : readVideoFile(file), videoDuration(file)]);
     state.file = { file, b64, lon, mime: file.type || 'video/mp4', name: file.name, size: file.size, giay }; state.tuVideo = true;
-    if (giay && !$('#giay').value) { $('#giay').value = String(giay); updateCount(); } updateSrc(); toast(lon ? 'Đã chọn video, khi bấm Soi sẽ tải lên theo từng khúc' : 'Đã có video, bấm Soi video');
+    if (giay && !$('#giay').value) { $('#giay').value = String(giay); updateCount(); } updateSrc(); toast(lon ? 'Đã chọn video, bấm Soi để tải lên' : 'Đã có video, bấm Soi video');
   } catch { state.file = null; updateSrc(); toast('Không đọc được file'); }
 }
 function syncFrameUI() { const t = $('#frameThumb'); if (state.image) { t.src = 'data:image/jpeg;base64,' + state.image; t.hidden = false; $('#frameClear').hidden = false; $('#frameNote').textContent = state.imageFrom === 'link' ? 'Đang dùng ảnh bìa lấy từ link. Chọn ảnh khác nếu muốn AI đọc đúng giây đầu.' : 'Đã có ảnh chụp màn hình.'; } else { t.hidden = true; $('#frameClear').hidden = true; $('#frameNote').textContent = 'Lấy từ link sẽ tự có ảnh bìa. Ảnh chụp giây đầu tiên của video là tốt nhất.'; } }
@@ -521,7 +521,7 @@ async function loadQuota() { if (DEMO) { $('#quota').textContent = 'Bản demo';
 function openUpsell(title) { TK.moHet(null, title); }   // bảng hết lượt: Nâng cấp Pro hoặc Đăng ký học viên
 
 /* ---------- soi ---------- */
-const ERR = { can_dangky: 'Tạo tài khoản miễn phí để dùng AI, mất 30 giây.', het_han_hv: 'Gói Pro dành cho học viên của bạn đã hết hạn. Nâng cấp Pro để dùng tiếp, hoặc nhắn mentor.', khong_co_quyen: 'Tài khoản này không có quyền.', khong_tai_duoc_video: 'Không tải được video từ link này (video riêng tư, bị chặn hoặc dịch vụ tải đang nghẽn). Tải file video lên hoặc dán lời thoại rồi soi lại.', video_qua_lon: 'Video từ link hoặc gửi thẳng lớn hơn 45MB. Tải file lên (tối đa 200MB) hoặc xuất lại 720p.', video_qua_dai: 'Video dài quá 10 phút, AI không xem kịp. Cắt đoạn cần soi rồi gửi lại.', het_gio: 'Video quá nặng nên máy chủ không xem xong trong 5 phút. Lượt đã được hoàn, thử video ngắn hơn hoặc dán lời thoại.', loi_ai: 'AI trả lời lỗi giữa chừng, lượt đã được hoàn. Bấm Soi lại.', internal: 'Máy chủ gặp lỗi bất ngờ. Thử lại sau ít phút, nếu vẫn vậy báo mentor.', het_phien_tai: 'Phiên tải bị mất giữa chừng, bấm lại để tải từ đầu.', thieu_khuc: 'Tải lên bị thiếu một khúc, bấm Soi lại để gửi lại.', video_hong: 'File video không đọc được, thử xuất lại dạng MP4.', khong_co_video: 'Chưa có video hay lời thoại để soi.', can_gemini: 'Máy chủ đang chạy Claude, phần nghe video cần thêm GEMINI_API_KEY. Báo mentor.', het_thu: 'Bạn đã dùng hết 3 lượt AI thử. Tạo tài khoản miễn phí để có thêm 10 lượt.', het_luot_thu: 'Bạn đã dùng hết lượt AI miễn phí. Mua Pro 50k/tháng hoặc đăng ký học viên để dùng tiếp.', het_luot: 'Hết lượt AI hôm nay, mai quay lại nhé.', het_phien: 'Phiên đăng nhập hết hạn. Đăng nhập lại ở tab Hook viral.', thieu_text: 'Lời thoại quá ngắn để soi. Chép ít nhất vài câu.', anh_qua_lon: 'Ảnh quá lớn, chọn ảnh khác.', chua_cai_key: 'Máy chủ chưa cài khóa AI. Báo mentor.', sai_key: 'Khóa AI trên máy chủ không hợp lệ. Báo mentor.', ban_qua: 'AI của Google đang quá tải, đã tự thử lại 3 lần mà chưa được. Đợi 1–2 phút rồi bấm lại, video không phải tải lại.', tu_choi: 'AI không xử lý được nội dung này, thử bỏ bớt phần nhạy cảm.', loi_mang: 'Máy chủ không gọi được AI, thử lại.', unknown_action: 'Máy chủ chưa cập nhật.', may_chu_cu: 'Máy chủ đang chạy HookAI.gs bản cũ nên chưa nhận được video tải lên. Mentor dán HookAI.gs mới vào Apps Script rồi Deploy, chọn New version.' };
+const ERR = { can_dangky: 'Tạo tài khoản miễn phí để dùng AI, mất 30 giây.', het_han_hv: 'Gói Pro dành cho học viên của bạn đã hết hạn. Nâng cấp Pro để dùng tiếp, hoặc nhắn mentor.', khong_co_quyen: 'Tài khoản này không có quyền.', khong_tai_duoc_video: 'Không tải được video từ link này (video riêng tư, bị chặn hoặc dịch vụ tải đang nghẽn). Tải file video lên hoặc dán lời thoại rồi soi lại.', video_qua_lon: 'Video quá lớn. Video từ link tối đa 45MB; tải file lên được tới 1GB. Hoặc xuất lại 720p.', video_qua_dai: 'Video dài quá 10 phút, AI không xem kịp. Cắt đoạn cần soi rồi gửi lại.', het_gio: 'Video quá nặng nên máy chủ không xem xong trong 5 phút. Lượt đã được hoàn, thử video ngắn hơn hoặc dán lời thoại.', loi_ai: 'AI trả lời lỗi giữa chừng, lượt đã được hoàn. Bấm Soi lại.', internal: 'Máy chủ gặp lỗi bất ngờ. Thử lại sau ít phút, nếu vẫn vậy báo mentor.', het_phien_tai: 'Phiên tải bị mất giữa chừng, bấm lại để tải từ đầu.', thieu_khuc: 'Tải lên bị thiếu một khúc, bấm Soi lại để gửi lại.', video_hong: 'File video không đọc được, thử xuất lại dạng MP4.', khong_co_video: 'Chưa có video hay lời thoại để soi.', can_gemini: 'Máy chủ đang chạy Claude, phần nghe video cần thêm GEMINI_API_KEY. Báo mentor.', het_thu: 'Bạn đã dùng hết 3 lượt AI thử. Tạo tài khoản miễn phí để có thêm 10 lượt.', het_luot_thu: 'Bạn đã dùng hết lượt AI miễn phí. Mua Pro 50k/tháng hoặc đăng ký học viên để dùng tiếp.', het_luot: 'Hết lượt AI hôm nay, mai quay lại nhé.', het_phien: 'Phiên đăng nhập hết hạn. Đăng nhập lại ở tab Hook viral.', thieu_text: 'Lời thoại quá ngắn để soi. Chép ít nhất vài câu.', anh_qua_lon: 'Ảnh quá lớn, chọn ảnh khác.', chua_cai_key: 'Máy chủ chưa cài khóa AI. Báo mentor.', sai_key: 'Khóa AI trên máy chủ không hợp lệ. Báo mentor.', ban_qua: 'AI của Google đang quá tải, đã tự thử lại 3 lần mà chưa được. Đợi 1–2 phút rồi bấm lại, video không phải tải lại.', tu_choi: 'AI không xử lý được nội dung này, thử bỏ bớt phần nhạy cảm.', loi_mang: 'Máy chủ không gọi được AI, thử lại.', unknown_action: 'Máy chủ chưa cập nhật.', may_chu_cu: 'Máy chủ đang chạy HookAI.gs bản cũ nên chưa nhận được video tải lên. Mentor dán HookAI.gs mới vào Apps Script rồi Deploy, chọn New version.' };
 let busy = false;
 /* AI bận (Google trả 503/429): tự đếm ngược 20 giây rồi gọi lại, tối đa 2 lần. Video đã tải
    được dùng lại qua file_uri, và máy chủ đã hoàn lượt khi lỗi nên gọi lại không tốn thêm. */
