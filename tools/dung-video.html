@@ -1121,7 +1121,7 @@ function keoItem(d, k, i, bd, dai) {
     try { d.setPointerCapture(e.pointerId); } catch {}
     const y0 = e.clientY, hang0 = d.parentElement; let hangDich = null;
     const x0 = e.clientX, px = PX(), goc = JSON.parse(JSON.stringify(k === 'v' ? P.clips[i] : k === 'b' ? P.broll[i] : k === 't' ? { t_bd: P.tieng[i].t_bd } : k === 'a' ? P.am3[i] : P.gfx[i])); let daKeo = false, vtMoi = i;
-    luuHoanTac(); P.keoMuc = { b: P.broll, g: P.gfx, v: P.clips, a: P.am3, t: P.tieng }[k][i];
+    luuHoanTac(); P.dangKeo = true; P.keoMuc = { b: P.broll, g: P.gfx, v: P.clips, a: P.am3, t: P.tieng }[k][i];
     const move = ev => {
       const dx = (ev.clientX - x0) / px; if (Math.abs(ev.clientX - x0) > 3 || Math.abs(ev.clientY - y0) > 6) daKeo = true; if (!daKeo) return;
       if (!mep && ['b', 'g', 'v', 'a'].includes(k) && !P.slip) { const mm = { b: P.broll, g: P.gfx, v: P.clips, a: P.am3 }[k][i], h = Math.abs(ev.clientY - y0) > 14 ? hangDuoi(ev.clientY) : null, ok = h && h !== hang0 && hangHop(h, k, mm); $$('#tlIn .dich').forEach(x => x.classList.remove('dich')); hangDich = ok ? h : null; if (hangDich) hangDich.classList.add('dich'); if (k !== 'v') { d.style.transform = hangDich ? 'translateY(' + (hangDich.getBoundingClientRect().top - hang0.getBoundingClientRect().top) + 'px)' : ''; d.style.zIndex = hangDich ? 6 : ''; } else d.style.opacity = hangDich ? '.45' : ''; }
@@ -1140,8 +1140,8 @@ function keoItem(d, k, i, bd, dai) {
     };
     const up = () => {
       d.removeEventListener('pointermove', move); d.removeEventListener('pointerup', up); d.removeEventListener('pointercancel', up); $('#snapLine').style.display = 'none';
-      $$('#tlIn .dich').forEach(x => x.classList.remove('dich')); P.keoMuc = null; hienTip(null);
-      if (!daKeo) { P.hoanTac.pop(); return; }
+      const choVe = P.veTlCho; P.dangKeo = false; P.veTlCho = false; $$('#tlIn .dich').forEach(x => x.classList.remove('dich')); P.keoMuc = null; hienTip(null);
+      if (!daKeo) { P.hoanTac.pop(); if (choVe) veTl(); return; }
       if (hangDich) { if (k === 'a') { P.am3[i].lop = +hangDich.dataset.alop; datLopTha('a', P.am3[i]); } else if (k === 'v') v1LenLop(i, lopTuHang(hangDich)); else if (hangDich.classList.contains('v1')) lopXuongV1(i); else { const m = k === 'b' ? P.broll[i] : P.gfx[i]; m.lop = lopTuHang(hangDich); datLopTha(k, m); } veTl(); veLoi(); veKhung(); veProp(); toast(k === 'v' ? 'Đã đưa đoạn lên lớp phủ' : hangDich.classList.contains('v1') ? 'Đã đưa xuống track chính V1' : 'Đã đổi lớp'); return; }
       P.keoMuc = null; hienTip(null);
       if (k === 'b' || k === 'g' || k === 'a') { const m = { b: P.broll, g: P.gfx, a: P.am3 }[k][i]; if (m && datLopTha(k, m)) toast('Chồng giờ với mục khác trong hàng → đặt sang hàng ' + (k === 'a' ? 'âm thanh' : 'cùng loại') + ' khác'); }
@@ -2011,7 +2011,7 @@ async function tronAmThanh(tong, sr) {
 /* vẽ một khung tại t cho bản xuất: tua footage chính, b-roll và khung trước chuyển cảnh đúng giây rồi dùng chung veFrame */
 async function veKhungXuat(ctx, W, H, t) {
   const { clip, tSrc } = viTri(t);
-  if (clip >= 0) { const s = srcCua(P.clips[clip].src); if (s && s.el && s.loai === 'video') await seekTo(s.el, tSrc); }
+  if (clip >= 0) { const s = srcCua(P.clips[clip].src); if (s && s.el && s.loai === 'video') { await seekTo(s.el, tSrc); if (Math.abs(s.el.currentTime - tSrc) > 0.03) await seekTo(s.el, tSrc); } }   // máy bận làm lỡ lần tua → tua lại cho đúng khung
   for (const b of P.broll) { const k = tocC(b), dai = (b.kt - b.bd) / k; if (t >= b.t_bd && t < b.t_bd + dai) { const sb = srcCua(b.src); if (sb && sb.loai === 'video') await seekTo(elPhu(sb, 'elB'), b.bd + (t - b.t_bd) * k); } }
   const ch = chuyenTai(t), snap = ch ? await laySnapTruoc(W, H, ch.truoc) : null;
   veFrame(ctx, W, H, t, snap);
@@ -2310,6 +2310,9 @@ async function veTua() { if (tuaBan) { tuaCho = true; return; } tuaBan = true; t
 function khoiTaoLop() {
   $$('#tlIn .track[data-track="o1"], #tlIn .track[data-track="v3"], #tlIn .track[data-track="v2"]').forEach(tr => { tr.dataset.lop = LOP_MD[tr.dataset.track]; });
   hangLop();
+  const veTlGoc = veTl; veTl = function () { if (P.dangKeo) { P.veTlCho = true; return; } veTlGoc(); };   // đang kéo: hoãn vẽ lại (filmstrip, sóng âm chạy nền) để không mất mục đang kéo
+  const donKeo = () => { if (P.dangKeo) { P.dangKeo = false; if (P.veTlCho) { P.veTlCho = false; veTl(); } } hienTip(null); const sl = $('#snapLine'); if (sl) sl.style.display = 'none'; };   // luôn dọn ô độ dài / vạch hít khi thả chuột
+  document.addEventListener('pointerup', donKeo); document.addEventListener('pointercancel', donKeo);
   const tin = $('#tlIn'), sc = $('#tlScroll');
   tin.addEventListener('pointerdown', e => {
     if (e.button !== 0 || e.target.closest('.item') || e.target.closest('.lb') || e.target.closest('.moc') || e.target.closest('.lopMoi')) return;
