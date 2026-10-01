@@ -17,9 +17,12 @@
   h1{font-size:22px;font-weight:800;margin:0 0 4px}
   p.sub{margin:0 0 18px;font-size:14px;opacity:.65}
   .row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
-  input[type=text]{flex:1;min-width:200px;font:inherit;font-size:17px;font-weight:500;
-    padding:12px 14px;border:1.5px solid rgba(38,33,15,.22);border-radius:12px;background:var(--paper)}
-  input[type=text]:focus{outline:2px solid var(--lime);border-color:transparent}
+  input[type=text],select{flex:1;min-width:170px;font:inherit;font-size:17px;font-weight:500;
+    padding:12px 14px;border:1.5px solid rgba(38,33,15,.22);border-radius:12px;background:var(--paper);
+    color:var(--ink)}
+  select{flex:0 1 190px;cursor:pointer}
+  input[type=text]:focus,select:focus{outline:2px solid var(--lime);border-color:transparent}
+  [hidden]{display:none}
   .seg{display:flex;border:1.5px solid rgba(38,33,15,.22);border-radius:12px;overflow:hidden}
   .seg button{font:inherit;font-size:14px;font-weight:800;padding:12px 16px;border:0;
     background:#fff;color:var(--ink);cursor:pointer}
@@ -33,9 +36,20 @@
 <body>
 <div class="card">
   <h1>Tạo nền gọi MS Teams</h1>
-  <p class="sub">Điền tên → chọn kiểu nền → bấm tải. Ảnh xuất ra 1920×1080.</p>
+  <p class="sub">Điền tên, chọn vai trò và kiểu nền → bấm tải. Ảnh xuất ra 1920×1080.</p>
   <div class="row">
-    <input id="ten" type="text" value="Minh Toàn" maxlength="30" placeholder="Tên giảng viên">
+    <input id="ten" type="text" value="Minh Toàn" maxlength="30" placeholder="Tên người trên nền">
+    <select id="vai" aria-label="Vai trò">
+      <option value="MENTOR">Mentor</option>
+      <option value="TRỢ LÝ">Trợ lý</option>
+      <option value="GIẢNG VIÊN">Giảng viên</option>
+      <option value="TRỢ GIẢNG">Trợ giảng</option>
+      <option value="__khac">Vai trò khác…</option>
+      <option value="">Không hiện vai trò</option>
+    </select>
+    <input id="vaiKhac" type="text" maxlength="16" placeholder="Vai trò tự ghi" hidden>
+  </div>
+  <div class="row">
     <div class="seg">
       <button id="bSang" class="on" type="button">☀️ Sáng</button>
       <button id="bToi" type="button">🌙 Tối</button>
@@ -115,8 +129,19 @@ function chuPhai(t,x,y){
   return w;
 }
 
+/* Nhãn vai trò: chữ nhỏ giãn ô, căn mép phải. Để trống thì không vẽ gì.
+   Cộng bù 7px vì letterSpacing thừa một khoảng sau chữ cuối. */
+function veNhan(vai,x,y,mau){
+  if(!vai) return;
+  cx.fillStyle=mau; cx.textBaseline='alphabetic';
+  cx.font='800 24px "Bricolage Grotesque",sans-serif';
+  cx.letterSpacing='7px';
+  chuPhai(vai,x+7,y);
+  cx.letterSpacing='0px';
+}
+
 /* Nền sáng / tối: logo vừa, tên cùng hàng bên phải */
-function veCoBan(ten){
+function veCoBan(ten,vai){
   var toi  = kieu==='toi';
   var bg   = toi ? MOSS  : PAPER;
   var chu  = toi ? '#f7f2e9' : INK;
@@ -130,6 +155,9 @@ function veCoBan(ten){
   cx.font='800 78px "Bricolage Grotesque",sans-serif';
   cx.fillText('Tự Mình Xây Kênh',300,184);
 
+  veNhan(vai,1832,76, toi ? 'rgba(247,242,233,.62)' : 'rgba(38,33,15,.58)');
+
+  cx.fillStyle=chu;
   cx.font='800 100px "Bricolage Grotesque",sans-serif';
   var w=cx.measureText(ten).width, x=1832-w;
   cx.fillText(ten,x,168);
@@ -138,7 +166,7 @@ function veCoBan(ten){
 }
 
 /* Nền lime kẻ lưới: dịu mắt, logo to góc trái, tên mentor góc phải trên */
-function veLime(ten){
+function veLime(ten,vai){
   var DONG=184, TRAI=184, PHAI=1840, s=2.4;   // chân chữ và hai mép đều nằm trên đường lưới
 
   cx.fillStyle=LIME; cx.fillRect(0,0,1920,1080);
@@ -146,12 +174,7 @@ function veLime(ten){
 
   var mep=veLockup(TRAI-10*s,DONG-47*s,s,INK,PAPER,INK,INK);
 
-  cx.textBaseline='alphabetic';
-  cx.fillStyle='rgba(38,33,15,.58)';          // nhãn nhỏ trên tên mentor
-  cx.font='800 24px "Bricolage Grotesque",sans-serif';
-  cx.letterSpacing='7px';
-  chuPhai('MENTOR',PHAI,DONG-84);
-  cx.letterSpacing='0px';
+  veNhan(vai,PHAI,DONG-84,'rgba(38,33,15,.58)');
 
   cx.fillStyle=INK;                           // tên dài thì co lại, không đè vào lockup
   var co=72, rong=PHAI-mep-120;
@@ -165,9 +188,17 @@ function veLime(ten){
   cx.fillStyle='rgba(38,33,15,.85)'; ro(0,1070,1920,10,0);   // vạch mực mảnh đáy khung
 }
 
+/* Vai trò: chọn sẵn trong danh sách, hoặc tự ghi khi chọn "Vai trò khác…" */
+function layVai(){
+  var o=document.getElementById('vai'), k=document.getElementById('vaiKhac'), v=o.value;
+  k.hidden = v!=='__khac';
+  if(v==='__khac') v=k.value||'';
+  return v.trim().toUpperCase();
+}
+
 function ve(){
-  var ten=(document.getElementById('ten').value||'').trim()||' ';
-  if(kieu==='lime') veLime(ten); else veCoBan(ten);
+  var ten=(document.getElementById('ten').value||'').trim()||' ', vai=layVai();
+  if(kieu==='lime') veLime(ten,vai); else veCoBan(ten,vai);
 }
 
 function veKhiSanFont(){
@@ -179,6 +210,8 @@ function veKhiSanFont(){
 }
 
 document.getElementById('ten').addEventListener('input',ve);
+document.getElementById('vai').addEventListener('change',ve);
+document.getElementById('vaiKhac').addEventListener('input',ve);
 document.getElementById('bSang').onclick=function(){kieu='sang';chon(this);ve()};
 document.getElementById('bToi').onclick =function(){kieu='toi'; chon(this);ve()};
 document.getElementById('bLime').onclick=function(){kieu='lime';chon(this);ve()};
