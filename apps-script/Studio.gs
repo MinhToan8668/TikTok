@@ -86,7 +86,7 @@ function stToolCua(mode){
   if (mode === 'script' || mode === 'viet') return 'script';
   if (mode === 'soi' || mode === 'link' || mode === 'apkhuon') return 'soi';
   if (mode === 'cham') return 'cham';
-  if (mode === 'chat' || mode === 'bh_them' || mode === 'dung_ke_hoach') return 'chat';
+  if (mode === 'chat' || mode === 'bh_them' || mode === 'dung_ke_hoach' || mode === 'dung_shorts') return 'chat';
   if (mode === 'dung_nhan') return 'dung';
   return 'hook';
 }

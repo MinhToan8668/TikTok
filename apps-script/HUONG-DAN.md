@@ -377,6 +377,23 @@ Video đã tải lên Files API chỉ key của đúng project đó đọc đư�
 
 Thuộc tính → **Nền người nói**: Giữ nguyên · Xoá nền → nhoè · Xoá nền → màu (chọn màu) · Xoá nền → tối. Lần đầu bật, trình duyệt tải mô hình MediaPipe Selfie Segmenter (~10MB, tải một lần), sau đó tách người khỏi nền cho từng khung khi xem trước và khi xuất; tương thích cả ba kiểu khung dọc (cắt giữa, bám mặt, giữ nguyên). Không thấy người trong khung thì vẽ như thường, nên bật nhầm trên b-roll cũng không hỏng hình. Mép người đẹp nhất khi nền phẳng, ánh sáng đều; xuất video chậm hơn bình thường. Lưu trong file dự án (`nenKieu`, `nenMau`).
 
+### Bản đầy đủ (10/2026): tính năng kiểu CapCut + Vyra
+
+Đối chiếu bản research Vyra vs CapCut, trình dựng có thêm:
+
+- **Thuộc tính từng đoạn V1** (chọn đoạn → cột Thuộc tính): phóng to, vị trí ngang/dọc, xoay, độ mờ; **chuyển động keyframe** đầu → cuối đoạn (Zoom vào chậm, Zoom ra, Lia trái → phải, Lia xuống, hoặc tự chỉnh giá trị cuối); **tốc độ** 0,25× → 3× (dòng thời gian, phụ đề, beat tự tính lại, giữ cao độ giọng); **âm lượng** 0–200%, hiện dần vào / mờ dần ra; **màu**: 8 bộ lọc (Ấm, Lạnh, Sáng trong, Điện ảnh, Rực rỡ, Cổ điển, Trắng đen) + độ sáng, tương phản, bão hoà, nút áp cho mọi đoạn.
+- **Chữ tự do** và **Sticker** trong thư viện đồ hoạ: kéo thẳng trên khung xem trước, chọn màu, nền (viền, bóng, hộp), 8 hiệu ứng (bật, hiện dần, trượt, nổi lên, gõ chữ, nảy, lắc). Font Be Vietnam Pro giữ dấu chồng (Ẩ, Ễ, Ộ, Ở).
+- **Xoá phông xanh (chroma key)** và độ mờ cho b-roll V2.
+- **✂ Cắt khoảng lặng** (tab Lời thoại): bỏ khoảng im dài hơn 0,3–1,2 giây và tiếng ờ/ừm/à theo lời đã chép từng từ; đồ hoạ phía sau tự dồn; Ctrl+Z để hoàn tác.
+- **❄ Đóng băng khung** (phím F), **◆ Mốc** trên thước (phím M, chuột phải để xoá).
+- **Tỉ lệ khung** 9:16, 1:1, 4:5, 16:9; xuất 720p, 1080p, 1440p, **4K** theo cạnh ngắn.
+- **Phong cách** một chạm (Podcast bùng nổ, Vlog nhẹ nhàng, Tin nhanh, Điện ảnh, Năng động, Tối giản) và **lưu phong cách của bạn** dùng lại mọi dự án.
+- **Phiên bản** dòng thời gian (＋ Bản) và **✂ Tạo short**: AI cắt footage dài thành 2–5 short (~20/40/60 giây), mỗi short một phiên bản kèm điểm viral và hook (1 lượt chat, mode `dung_shorts` trong DungVideo.gs).
+- **Phím tắt** (⌨ hoặc ?): Space, S tách, Delete, Ctrl+D, Ctrl+Z, ← → từng khung, Shift + ← → 1 giây, J/L về điểm cắt, Home/End, M, F, +/−.
+- **Trợ lý agent** có thêm lệnh: thuộc tính/tốc độ/màu/keyframe trong `sua_doan`, chữ tự do và sticker, `cat_khoang_lang`, `dong_bang`, `them_moc`, `tao_shorts`, `mo_phien_ban`, tỉ lệ khung và phong cách trong `cai_dat` (31 lệnh).
+
+Chưa làm (cần máy chủ GPU hoặc dịch vụ trả phí): voice clone, tách giọng khỏi nhạc, upscale, theo dõi chuyển động đối tượng bất kỳ, kho nhạc bản quyền.
+
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 
 Cài theo [`cloudflare/CAI-DAT.md`](../cloudflare/CAI-DAT.md) (khoảng 10 phút, không cần thẻ). Có máy chủ này tool thêm:

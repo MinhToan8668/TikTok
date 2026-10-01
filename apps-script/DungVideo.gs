@@ -232,3 +232,48 @@ function dvKeHoach(b, ai, provider, key){
   hookLog(me, nhan, true, '', kq.vin || 0, kq.vout || 0, kq.model, ai);
   return jsonOut({ok:true, data:d});
 }
+
+/* ── Tạo nhiều short từ footage dài (giống AutoCut long→shorts của CapCut): AI đọc lời theo giây,
+   chọn N đoạn tự đứng được (có hook, một ý trọn), mỗi short là danh sách đoạn cắt. Tính 1 lượt chat. ── */
+function dvShorts(b, ai, provider, key){
+  var me = ai.me, ds = Array.isArray(b.nguon) ? b.nguon.slice(0, 10) : [];
+  if (!ds.length) return jsonOut({ok:false, error:'khong_co_video'});
+  var soLuong = Math.max(1, Math.min(5, parseInt(b.so_luong, 10) || 3)), doDai = Math.max(15, Math.min(90, parseInt(b.do_dai, 10) || 40));
+  var con = (typeof tlTru === 'function') ? tlTru(ai) : 1;
+  if (con < 0) return jsonOut({ok:false, error: ai.loai === 'free' ? 'het_luot_thu' : 'het_luot_chat', tool:'chat'});
+  var moTa = ds.map(function(s){
+    var cau = (Array.isArray(s.cau) ? s.cau : []).slice(0, 600).map(function(c){ return '  [' + (Number(c.bd) || 0).toFixed(1) + '–' + (Number(c.kt) || 0).toFixed(1) + '] ' + (c.loai && c.loai !== 'noi' ? '(' + c.loai + ') ' : '') + String(c.text || '').slice(0, 220); }).join('\n');
+    var kk = (Array.isArray(s.khoanh_khac) ? s.khoanh_khac : []).map(function(k){ return '  ★ [' + (Number(k.bd) || 0).toFixed(1) + '–' + (Number(k.kt) || 0).toFixed(1) + '] ' + String(k.ly_do || '').slice(0, 100); }).join('\n');
+    return 'SOURCE ' + String(s.id) + ' · ' + Math.round(Number(s.giay) || 0) + ' giây · ' + String(s.mo_ta || '').slice(0, 200) + '\n LỜI:\n' + (cau || ' (không có lời)') + (kk ? '\n KHOẢNH KHẮC:\n' + kk : '');
+  }).join('\n\n');
+  var prompt = [
+    'Bạn là editor TikTok của khoá "Tự Mình Xây Kênh". Từ footage dài dưới đây, cắt ra ĐÚNG ' + soLuong + ' video ngắn, mỗi video khoảng ' + doDai + ' giây (±30%).',
+    'Mỗi short phải tự đứng được: mở bằng câu gây tò mò hoặc câu mạnh nhất (3 giây đầu), nói trọn MỘT ý, kết có ý nghĩa. Các short không trùng nội dung.',
+    'Chỉ dùng câu có trong lời; bỏ câu (vap), (lap), (lac). Mỗi short gồm các đoạn {src, bd, kt} theo giây của source, có thể đảo thứ tự để câu mạnh lên đầu. Cắt sát mép câu.',
+    'ten: tên ngắn của short. hook: chữ 3 giây đầu (≤ 9 từ). ly_do: vì sao đoạn này hay. diem: 1–10 khả năng viral.',
+    'Mọi chữ viết TIẾNG VIỆT CÓ DẤU đầy đủ.',
+    '', moTa
+  ].join('\n');
+  var schema = {type:'object', properties:{shorts:{type:'array', items:{type:'object', properties:{
+    ten:{type:'string'}, hook:{type:'string'}, ly_do:{type:'string'}, diem:{type:'number'},
+    clips:{type:'array', items:{type:'object', properties:{src:{type:'string'}, bd:{type:'number'}, kt:{type:'number'}}, required:['src','bd','kt']}}},
+    required:['ten','hook','clips']}}}, required:['shorts']};
+  HOOK_MODEL_UU_TIEN = ['gemini-3.5-flash', 'gemini-3.5-flash-lite']; HOOK_SUY_NGHI = 'low';
+  var kq = provider === 'claude' ? goiClaude(key, '', prompt, schema, 6000, 0.4) : goiGemini(key, '', prompt, schema, 6000, null, 0.4);
+  var nhan = '[dung_shorts] ' + soLuong + 'x' + doDai + 's';
+  if (!kq.ok){
+    if (typeof tlHoan === 'function') tlHoan(ai);
+    hookLog(me, nhan, false, kq.loi, kq.vin || 0, kq.vout || 0, kq.model, ai);
+    return jsonOut({ok:false, error: kq.error, chi_tiet: String(kq.loi || '').slice(0, me.vaitro === 'mentor' ? 400 : 160)});
+  }
+  var dsId = {}; ds.forEach(function(s){ dsId[String(s.id)] = Number(s.giay) || 4; });
+  var shorts = (Array.isArray((kq.data || {}).shorts) ? kq.data.shorts : []).slice(0, soLuong).map(function(x){
+    var clips = (Array.isArray(x.clips) ? x.clips : []).filter(function(c){ return dsId.hasOwnProperty(String(c.src)); }).slice(0, 40).map(function(c){
+      var max = dsId[String(c.src)], bd = Math.max(0, Math.min(max, Number(c.bd) || 0)), kt = Math.max(bd + 0.3, Math.min(max, Number(c.kt) || bd + 2));
+      return {src:String(c.src), bd:Math.round(bd * 100) / 100, kt:Math.round(kt * 100) / 100};
+    });
+    return {ten:String(x.ten || 'Short').slice(0, 60), hook:String(x.hook || '').slice(0, 90), ly_do:String(x.ly_do || '').slice(0, 220), diem:Math.max(1, Math.min(10, Number(x.diem) || 5)), clips:clips};
+  }).filter(function(x){ return x.clips.length; });
+  hookLog(me, nhan, true, '', kq.vin || 0, kq.vout || 0, kq.model, ai);
+  return jsonOut({ok:true, data:{shorts:shorts}});
+}

@@ -179,6 +179,7 @@ function hookAiChinh(b){
 
   if (b.mode === 'dung_nhan') return dvNhan(b, ai, provider, key);       // Dựng video: AI chép lời theo giây, nhận diện source (DungVideo.gs)
   if (b.mode === 'dung_ke_hoach') return dvKeHoach(b, ai, provider, key); // Dựng video: lên dòng thời gian theo yêu cầu, tính vào lượt chat
+  if (b.mode === 'dung_shorts') return dvShorts(b, ai, provider, key);     // Dựng video: cắt footage dài thành nhiều short, tính vào lượt chat
   if (b.mode === 'chat') return tlChat(b, ai, provider, key);         // Trợ lý AI: trò chuyện gõ hoặc nói, tự học qua tư vấn (TroLy.gs)
   if (b.mode === 'bh_them') return tlGopY(b, ai, provider, key);      // góp ý cho AI: mentor có hiệu lực ngay, học viên chờ duyệt
   if (b.mode === 'ca_day') return caDay(b, ai, provider, key);        // mentor dạy AI trên đúng một lượt tư vấn

@@ -22,7 +22,7 @@
      ANTHROPIC_API_KEY, OPENAI_API_KEY   (Secret) key khi chọn claude / openai
    ═══════════════════════════════════════════════════════════════════════════ */
 
-const PHIEN_BAN = '2026.10.05';
+const PHIEN_BAN = '2026.10.06';
 /* link /exec của Apps Script đang dùng trong tool (công khai sẵn trong tools/*.html). Biến APPS_SCRIPT_URL trên Cloudflare, nếu có, sẽ được ưu tiên. */
 const APPS_SCRIPT_MD = 'https://script.google.com/macros/s/AKfycbyxe1nWupAl6VheDZHaU3Ojm-d6c8F_khhUMtkehNCLh5OnGW6f2uF0PKPYZ4eYUqyGjQ/exec';
 const asUrl = env => String(env.APPS_SCRIPT_URL || env.APPS_SCRIPT || APPS_SCRIPT_MD).trim();
@@ -196,7 +196,7 @@ const AGENT_TOOLS = [
   ['xem_loi_thoai', 'Lời thoại đã chép của một footage: từng câu (bd, kt giây trong source, text, loại noi|hay|vap|lap|lac) và câu nào đang trên V1. tu=true trả cả từng từ.', { src_id: { type: 'string' }, tu: { type: 'boolean' } }],
   ['tim_footage', 'Tìm trong footage theo câu nói, mô tả cảnh hoặc tag. Trả cảnh/câu khớp kèm src_id, bd, kt.', { q: { type: 'string' } }, ['q']],
   ['them_doan', 'Thêm một đoạn (src_id, bd→kt giây trong source) vào V1. vi_tri = chỉ số chèn (mặc định cuối). chuyen = cat|fade|slide|zoom|wipe|whip|flash|glitch|circle|blur.', { src_id: { type: 'string' }, bd: { type: 'number' }, kt: { type: 'number' }, vi_tri: { type: 'integer' }, chuyen: { type: 'string' } }, ['src_id', 'bd', 'kt']],
-  ['sua_doan', 'Sửa đoạn V1 thứ i: bd/kt (giây trong source), chuyen, chuyen_dai (0.2–1.2s), truot (trượt khúc lấy trong source ±giây, giữ độ dài).', { i: { type: 'integer' }, bd: { type: 'number' }, kt: { type: 'number' }, chuyen: { type: 'string' }, chuyen_dai: { type: 'number' }, truot: { type: 'number' } }, ['i']],
+  ['sua_doan', 'Sửa đoạn V1 thứ i. Cắt: bd/kt (giây trong source), truot (±giây, giữ độ dài). Chuyển: chuyen, chuyen_dai (0.2–1.2s). Khung: sc (phóng 0.3–3), x, y (lệch -0.6..0.6 theo khung), xoay (độ), mo (độ mờ 0–1). Chuyển động keyframe đầu→cuối: kf=true kèm sc2, x2, y2 (giá trị cuối đoạn; zoom vào chậm: sc 1 → sc2 1.15). Tốc độ toc: 0.25|0.5|0.75|1|1.25|1.5|2|3. Âm: am (0–2), fi/fo (giây hiện dần/mờ dần). Màu: loc khong|am|lanh|sang|dien_anh|ruc_ro|co_dien|trang_den, sang, tuong_phan (-50..50), bao_hoa (-100..100).', { i: { type: 'integer' }, bd: { type: 'number' }, kt: { type: 'number' }, chuyen: { type: 'string' }, chuyen_dai: { type: 'number' }, truot: { type: 'number' }, sc: { type: 'number' }, x: { type: 'number' }, y: { type: 'number' }, xoay: { type: 'number' }, mo: { type: 'number' }, kf: { type: 'boolean' }, sc2: { type: 'number' }, x2: { type: 'number' }, y2: { type: 'number' }, toc: { type: 'number' }, am: { type: 'number' }, fi: { type: 'number' }, fo: { type: 'number' }, loc: { type: 'string' }, sang: { type: 'number' }, tuong_phan: { type: 'number' }, bao_hoa: { type: 'number' } }, ['i']],
   ['xoa_doan', 'Xoá đoạn V1 thứ i (ripple: chữ, đồ hoạ, b-roll sau dồn lên).', { i: { type: 'integer' } }, ['i']],
   ['tach_doan', 'Tách đoạn V1 tại giây tl trên dòng thời gian.', { tl: { type: 'number' } }, ['tl']],
   ['sap_xep_doan', 'Đổi thứ tự V1: thu_tu là mảng chỉ số cũ theo thứ tự mới, ví dụ [2,0,1].', { thu_tu: { type: 'array', items: { type: 'integer' } } }, ['thu_tu']],
@@ -204,10 +204,10 @@ const AGENT_TOOLS = [
   ['hit_beat', 'Kéo mép các đoạn về beat nhạc gần nhất (cần có nhạc nền).', {}],
   ['dat_broll', 'Đặt b-roll lên V2: src_id, bd→kt trong source, t_bd giây bắt đầu trên dòng thời gian, kieu = full | pip.', { src_id: { type: 'string' }, bd: { type: 'number' }, kt: { type: 'number' }, t_bd: { type: 'number' }, kieu: { type: 'string' } }, ['src_id', 'bd', 'kt', 't_bd']],
   ['xoa_broll', 'Xoá b-roll theo id.', { id: { type: 'string' } }, ['id']],
-  ['them_do_hoa', 'Thêm đồ hoạ O1: kieu = tieu_de|lower_third|danh_sach|tien_do|trich_dan|dem_so|khung_nhan|mui_ten|vong_xoay|nhan_goc; bd, kt giây trên dòng thời gian; text, phu.', { kieu: { type: 'string' }, bd: { type: 'number' }, kt: { type: 'number' }, text: { type: 'string' }, phu: { type: 'string' } }, ['kieu', 'bd', 'kt']],
-  ['sua_do_hoa', 'Sửa đồ hoạ theo id: bd, kt, text, phu.', { id: { type: 'string' }, bd: { type: 'number' }, kt: { type: 'number' }, text: { type: 'string' }, phu: { type: 'string' } }, ['id']],
+  ['them_do_hoa', 'Thêm đồ hoạ O1: kieu = tieu_de|lower_third|danh_sach|tien_do|trich_dan|dem_so|khung_nhan|mui_ten|vong_xoay|nhan_goc|chu (chữ tự do)|sticker (emoji); bd, kt giây trên dòng thời gian; text, phu. Riêng chu/sticker: x, y (0–1 theo khung), co (cỡ 0.03–0.2, sticker tới 0.4), mau (#hex), nen vien|bong|hop|hop_mau|khong, hu (hiệu ứng) pop|mo|truot|len|go|nay|lac|khong. Xuống dòng bằng |.', { kieu: { type: 'string' }, bd: { type: 'number' }, kt: { type: 'number' }, text: { type: 'string' }, phu: { type: 'string' }, x: { type: 'number' }, y: { type: 'number' }, co: { type: 'number' }, mau: { type: 'string' }, nen: { type: 'string' }, hu: { type: 'string' } }, ['kieu', 'bd', 'kt']],
+  ['sua_do_hoa', 'Sửa đồ hoạ theo id: bd, kt, text, phu; với chu/sticker thêm x, y, co, mau, nen, hu.', { id: { type: 'string' }, bd: { type: 'number' }, kt: { type: 'number' }, text: { type: 'string' }, phu: { type: 'string' }, x: { type: 'number' }, y: { type: 'number' }, co: { type: 'number' }, mau: { type: 'string' }, nen: { type: 'string' }, hu: { type: 'string' } }, ['id']],
   ['xoa_do_hoa', 'Xoá đồ hoạ theo id.', { id: { type: 'string' } }, ['id']],
-  ['cai_dat', 'Đổi cài đặt chung. hook: chữ 3 giây đầu. phu_de: {bat, kieu highlight|pill|vien|emoji|toi|pop|rise, cum 2–6, nhan_manh "từ, từ", mau xanh|vang|cam|lam|hong, vi_tri 0.62|0.78|0.86}. khung: cat|bam_mat|mo. nen: {kieu giu|mo|mau|toi, mau #hex}. font: be_vietnam|montserrat|bricolage|lexend|oswald|anton|playfair. zoom_nhan. chuyen_mac_dinh. ten_du_an.', { hook: { type: 'string' }, phu_de: { type: 'object' }, khung: { type: 'string' }, nen: { type: 'object' }, font: { type: 'string' }, zoom_nhan: { type: 'boolean' }, chuyen_mac_dinh: { type: 'string' }, ten_du_an: { type: 'string' } }],
+  ['cai_dat', 'Đổi cài đặt chung. hook: chữ 3 giây đầu. phu_de: {bat, kieu highlight|pill|vien|emoji|toi|pop|rise, cum 2–6, nhan_manh "từ, từ", mau xanh|vang|cam|lam|hong, vi_tri 0.62|0.78|0.86}. khung: cat|bam_mat|mo. nen: {kieu giu|mo|mau|toi, mau #hex}. font: be_vietnam|montserrat|bricolage|lexend|oswald|anton|playfair. zoom_nhan. chuyen_mac_dinh. ten_du_an. ti_le: 9:16|1:1|4:5|16:9. phong_cach: tên trong danh sách phong_cach của dự án (hormozi, vlog, tin_tuc, dien_anh, nang_dong, toi_gian…).', { ti_le: { type: 'string' }, phong_cach: { type: 'string' }, hook: { type: 'string' }, phu_de: { type: 'object' }, khung: { type: 'string' }, nen: { type: 'object' }, font: { type: 'string' }, zoom_nhan: { type: 'boolean' }, chuyen_mac_dinh: { type: 'string' }, ten_du_an: { type: 'string' } }],
   ['hieu_footage', 'Cho AI hiểu một footage chưa hiểu (chép lời từng từ, cảnh, khoảnh khắc). Tốn 1 lượt Dựng video của người dùng, chờ 10–60s.', { src_id: { type: 'string' } }, ['src_id']],
   ['tro_ly_dung', 'Dựng bản nháp toàn bộ một phát theo yêu cầu (xếp câu, phụ đề, đồ hoạ, chuyển cảnh, b-roll) khi dòng thời gian còn trống. che_do = ky|nhanh.', { yeu_cau: { type: 'string' }, che_do: { type: 'string' } }, ['yeu_cau']],
   ['tim_broll_kho', 'Tìm kho B-roll miễn phí (Pexels). huong = doc|ngang. Trả id, giây, tác giả.', { q: { type: 'string' }, huong: { type: 'string' } }, ['q']],
@@ -217,7 +217,12 @@ const AGENT_TOOLS = [
   ['xuat_phu_de', 'Trả phụ đề SRT theo dòng thời gian.', {}],
   ['xuat_video', 'Dựng và lưu video xuống máy người dùng. Chỉ gọi khi người dùng yêu cầu xuất. do_phan_giai = 720|1080|1440.', { do_phan_giai: { type: 'integer' } }],
   ['luu_du_an', 'Trả JSON dự án.', {}],
-  ['hoan_tac', 'Hoàn tác thao tác gần nhất.', {}]
+  ['hoan_tac', 'Hoàn tác thao tác gần nhất.', {}],
+  ['cat_khoang_lang', 'Cắt khoảng im giữa các câu dài hơn nguong giây (mặc định 0.5) và tiếng ờ/ừm/à (bo_dem, mặc định true) trên V1, dựa vào lời đã chép từng từ; đồ hoạ phía sau tự dồn theo.', { nguong: { type: 'number' }, bo_dem: { type: 'boolean' } }],
+  ['dong_bang', 'Đóng băng khung hình (freeze frame) tại giây tl trên dòng thời gian, giữ trong giay giây (mặc định 1.5).', { tl: { type: 'number' }, giay: { type: 'number' } }],
+  ['them_moc', 'Đặt mốc (marker) tại giây t trên dòng thời gian, kèm tên.', { t: { type: 'number' }, ten: { type: 'string' } }],
+  ['tao_shorts', 'Cắt footage dài thành nhiều short (so_luong 1–5, do_dai 15–90 giây mỗi short), mỗi short thành một phiên bản và mở short đầu. Tốn 1 lượt chat của người dùng; chỉ gọi khi người dùng muốn nhiều short.', { so_luong: { type: 'integer' }, do_dai: { type: 'integer' } }],
+  ['mo_phien_ban', 'Mở phiên bản thứ i (xem danh sách phien_ban trong dự án).', { i: { type: 'integer' } }, ['i']]
 ];
 const AGENT_HE_THONG = `Bạn là Trợ lý dựng của Viral Studio (khoá Tự Mình Xây Kênh), làm việc ngay trên dòng thời gian của người dùng bằng các tool. Nói tiếng Việt có dấu, ngắn gọn.
 Quy tắc:
@@ -226,6 +231,8 @@ Quy tắc:
 - Video ngắn: 3 giây đầu phải mạnh, mỗi ý 3–5 giây, bỏ vấp/lặp/lạc, phụ đề bật, đồ hoạ vừa đủ (tiêu đề 2s đầu, nhãn góc cho bước, thanh tiến độ).
 - Sau khi đặt đồ hoạ hoặc đổi khung/nền, gọi xem_khung ở thời điểm liên quan để tự kiểm rồi sửa nếu chữ chồng mặt hay lệch. Tối đa ~12 lệnh một lượt.
 - Không gọi xuat_video, long_tieng, hieu_footage nếu người dùng không yêu cầu hoặc chưa cần. Không bịa lời thoại.
+- Mỗi lệnh chỉ gọi MỘT lần: kết quả lệnh và trạng thái dự án đính kèm đã phản ánh thay đổi, không gọi lại lệnh đã thành công. Gọi được nhiều lệnh cùng lúc khi chúng độc lập.
+- Cắt dead air: dùng cat_khoang_lang. Chữ tự do/emoji: them_do_hoa kieu chu/sticker. Tốc độ, zoom chậm, màu, âm lượng: sua_doan. Khung vuông/ngang, phong cách: cai_dat. Nhiều short từ video dài: tao_shorts (tốn lượt, chỉ khi được yêu cầu).
 - Kết thúc bằng 1–3 câu tóm tắt đã làm gì và gợi ý bước tiếp (không liệt kê lại từng lệnh).`;
 /* vé cho một lượt agent: HMAC(token người dùng + hạn 10 phút) ký bằng khoá bí mật của máy chủ.
    Bước đầu đã kiểm đăng nhập và trừ lượt qua Apps Script, các bước sau chỉ cần vé, không gọi Apps Script lại. */
