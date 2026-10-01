@@ -418,6 +418,18 @@ Làm theo tài liệu tính năng CapCut, ngay trong trình dựng hiện có (k
 - **Xuất chính xác từng khung** (WebCodecs + mediabunny): vẽ từng khung bằng đúng bộ vẽ của khung xem trước nên bản xuất giống hệt (đã kiểm ở giây 5/15/25), không rớt khung, nhanh hơn thời gian thực với 720p, chạy nền được. Cài đặt (Thuộc tính → Xuất): **MP4 H.264**, MP4 AV1, WebM VP9, **chỉ âm thanh WAV**; 24/25/30/60 khung/giây; chất lượng Vừa/Cao/Rất cao. Máy không mã hoá được codec đã chọn thì tool tự dùng codec khác và báo rõ; trình duyệt cũ không có WebCodecs thì tự ghi thời gian thực như trước (hoặc chọn "Ghi thời gian thực").
 - **Trợ lý agent: 45 lệnh**, thêm `keyframe`, `sua_broll` (lớp V3, vừa khung, màu, hoạt ảnh), `ap_tat_ca` (lọc/hiệu ứng/chuyển cảnh cho mọi đoạn), `cat_dau_phat` (Q/W), `nhan_doi`, `mau_chu`, `phu_de_mau`, `nhap_srt`, `nen_khung`, `them_am_thanh`, `sua_am_thanh`, `tach_am_thanh`, `chuan_hoa_am`; `sua_doan` nhận màu nâng cao, hiệu ứng, lật, hoạt ảnh; `sua_do_hoa` nhận đủ kiểu chữ; `xuat_video` nhận fps, định dạng, chất lượng.
 
+### Giao diện kiểu CapCut desktop (10/2026)
+
+Học theo giao diện CapCut và bố cục mã nguồn mở OpenCut (bản classic):
+
+- **Toàn màn hình làm việc** mặc định trên máy tính (nút ⛶ góc trên để thoát / vào lại), nền tối, màu nhấn cyan, nút **Xuất** góc phải.
+- **Kéo đổi cỡ** khung trái, khung phải và chiều cao dòng thời gian (bấm đúp tay kéo để đặt lại); máy nhớ kích cỡ.
+- **10 tab icon** bên trái: Media · Âm thanh · Văn bản · Nhãn dán · Hiệu ứng · Chuyển cảnh · Bộ lọc · Phụ đề · Đồ hoạ · Trợ lý AI; tab nhiều nhóm có **cột danh mục** bên trái; mẫu hiện dạng **thẻ có ảnh** (bộ lọc xem trước bằng khung hình hiện tại), footage dạng lưới.
+- **Trình phát** có đồng hồ giờ:phút:giây:khung, đổi tỉ lệ ngay dưới khung.
+- **Thuộc tính theo tab**: đoạn video có Video · Hoạt ảnh · Tốc độ & âm · Điều chỉnh; khi không chọn gì: Khung hình · Xuất · Dự án.
+- **Thanh công cụ icon**: hoàn tác, làm lại, tách, xoá trái/phải (Q/W), xoá, nhân đôi, đóng băng, lật, xoay 90°, cắt khung, keyframe nhanh, tách âm thanh, mốc, trượt, ripple, hít, zoom.
+- **Đầu track**: tắt tiếng, ẩn, khoá từng track (áp cả khi xuất). **Dải khung hình** trên đoạn video. **Menu chuột phải** trên đoạn (tách tại đây, xoá trái/phải, sao chép, dán, nhân đôi, đóng băng, tách âm thanh, lật, keyframe, xoá) và trên track.
+
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 
 Cài theo [`cloudflare/CAI-DAT.md`](../cloudflare/CAI-DAT.md) (khoảng 10 phút, không cần thẻ). Có máy chủ này tool thêm:

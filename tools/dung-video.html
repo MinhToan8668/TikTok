@@ -272,6 +272,146 @@
   .toast.show{opacity:1}
   .quota{font-size:12.5px;color:var(--muted)}
   @media (max-width:520px){.etop{gap:6px;padding:8px}.etop .ten{max-width:110px;font-size:13px}.etop .tt{display:none}.nhap textarea,.cau .t[contenteditable]{font-size:16px}.fsrc .fh{grid-template-columns:56px 1fr}.fsrc .acts{grid-column:1/-1;flex-direction:row;flex-wrap:wrap}}
+  /* ═══════ GIAO DIỆN KIỂU CAPCUT DESKTOP (bố cục học từ OpenCut: toàn màn hình, khung kéo đổi cỡ, thanh icon, thuộc tính theo tab) ═══════ */
+  .ed{--eb:#0b0b0d;--ep:#18181b;--ep2:#232327;--el:#2b2b31;--et:#e7e7eb;--em:#8d8d96;--ea:#22d3df;--eo:#fff;--ev:#8b7cf6;--etxt:#f0a94a;--emg:#3fd18a;
+      background:var(--eb);border-radius:12px;grid-template-rows:auto minmax(0,1fr) 5px var(--hTl,300px);padding:0 4px 4px;font-size:13px}
+  .ed.full{position:fixed;inset:0;z-index:50;height:100vh!important;min-height:0!important;border-radius:0;max-width:none}
+  body.edFull{overflow:hidden}body.edFull .tl-fab{display:none}
+  .toast{z-index:80}
+  .ed .etop{background:transparent;border:0;padding:4px 6px;min-height:42px;gap:8px}
+  .etop .logo{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--et);white-space:nowrap}.etop .logo i{display:grid;place-items:center;width:24px;height:24px;border-radius:7px;background:var(--ea);color:#062226}.etop .logo svg{width:15px;height:15px}
+  .etop .gian{flex:1}
+  .etop .ten{flex:0 1 280px;text-align:center}
+  .ed .btn.ic{padding:5px;width:30px;height:30px;justify-content:center}.ed .btn.ic svg{width:17px;height:17px}
+  .ed .btn.nutXuat{background:var(--ea);color:#062226;border-color:var(--ea);padding:6px 16px;border-radius:8px;font-weight:800}.ed .btn.nutXuat i{display:inline-grid}.ed .btn.nutXuat svg{width:15px;height:15px}
+  .ed .btn.xanh{background:var(--ea);color:#062226;border-color:var(--ea)}
+  .ed input[type=range],.ed input[type=checkbox]{accent-color:var(--ea)}
+  .ed .cau.dang,.ed .tag.ai,.ed .etool .ic[aria-pressed="true"],.ed .drop.hot{background:#0b3337;color:var(--ea)}
+  .ed .cau input[type=checkbox]{accent-color:var(--ea)}
+  .ed .m.ai{border-left-color:var(--ea)}
+  /* thân: 3 khung tách rời + tay kéo đổi cỡ */
+  .ed .ebody{grid-template-columns:var(--wTrai,360px) 5px minmax(0,1fr) 5px var(--wPhai,320px);gap:0}
+  .ed .ecol{border-radius:8px;border:0!important;background:var(--ep)}
+  .ed .ecol.giua{background:var(--ep);padding:0;justify-content:flex-start}
+  .ed .etl{border:0;border-radius:8px;min-height:0;overflow:hidden}
+  .keo{position:relative;z-index:5;background:transparent;transition:background .15s}
+  .keo:hover,.keo.dang{background:var(--ea)}
+  .keo.ngang{cursor:col-resize;border-radius:3px;margin:40px 1px}
+  .keo.doc{cursor:row-resize;border-radius:3px;margin:1px 40px}
+  @media (max-width:1180px){.ed .ebody{grid-template-columns:var(--wTrai,330px) 5px minmax(0,1fr)}.keo.k2{display:none}}
+  @media (max-width:980px){.ed{grid-template-rows:auto auto auto auto}.ed .ebody{grid-template-columns:1fr;gap:4px}.keo{display:none}.ed.full{position:static;height:auto!important}}
+  /* tab trái: thanh icon kiểu CapCut */
+  .ed .ecol.trai .etabs{display:flex;gap:0;padding:4px 4px 0;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--el)}
+  .ed .ecol.trai .etabs button{flex:1 1 0;min-width:34px;font-size:10px;line-height:1.15;font-weight:600;padding:5px 1px 5px;gap:3px;color:var(--em);white-space:normal;text-align:center;justify-content:flex-start;border-bottom:2px solid transparent;border-radius:6px 6px 0 0}
+  .ed .ecol.trai .etabs button svg{width:20px;height:20px}
+  .ed .ecol.trai .etabs button:hover{color:var(--et);background:var(--ep2)}
+  .ed .ecol.trai .etabs button[aria-selected="true"]{color:var(--ea);border-bottom-color:var(--ea)}
+  .ed .etabs .n{position:absolute;top:1px;right:3px;font-size:9.5px;line-height:14px;padding:0 4px;background:var(--ep2)}
+  /* cột danh mục bên trái mỗi tab (như CapCut) */
+  .ed .epane.on.coBen{display:grid;grid-template-columns:92px minmax(0,1fr);padding:0;gap:0;overflow:hidden}
+  .epane .ben{display:flex;flex-direction:column;gap:2px;padding:8px 6px;border-right:1px solid var(--el);overflow-y:auto;scrollbar-width:none}
+  .epane .ben button{border:0;background:transparent;color:var(--em);text-align:left;font-size:12px;padding:7px 8px;border-radius:6px;line-height:1.3}
+  .epane .ben button:hover{color:var(--et)}
+  .epane .ben button.on{background:var(--ep2);color:var(--et);font-weight:700}
+  .epane .noi{overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:10px;min-height:0;scrollbar-width:thin;scrollbar-color:var(--el) transparent}
+  .ed .epane h3.pt{font-size:12px;text-transform:none;letter-spacing:0;color:var(--et);font-weight:700;margin:6px 0 2px}
+  .epane label.hang{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12.5px;color:#c9c9cf}.epane label.hang input[type=range]{flex:1;max-width:160px}.epane label.hang output{font-size:11px;color:var(--em);min-width:34px;text-align:right}
+  /* lưới thẻ (mẫu chữ, phụ đề, bộ lọc, hiệu ứng, chuyển cảnh, âm thanh) */
+  .ed .mauLuoi{display:grid;grid-template-columns:repeat(auto-fill,minmax(86px,1fr))!important;gap:8px}
+  .ed .mauLuoi button{display:flex;flex-direction:column;align-items:stretch;padding:0;overflow:hidden;border-radius:8px;background:transparent;border:1px solid transparent;min-height:0;text-align:left;font-weight:600}
+  .ed .mauLuoi button .the{aspect-ratio:1/1;display:grid;place-items:center;background:#0f0f12;border-radius:7px;overflow:hidden;position:relative;font-size:24px;padding:4px;text-align:center;line-height:1.1}
+  .ed .mauLuoi button .the img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .ed .mauLuoi button .the .mau{font-size:15px;max-width:100%;overflow:hidden;white-space:nowrap}
+  .ed .mauLuoi button .ten{font-size:11px;padding:4px 2px 2px;color:#cfcfd5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ed .mauLuoi button .ten small{display:block;color:var(--em);font-size:10px;font-weight:400}
+  .ed .mauLuoi button:hover .the{box-shadow:inset 0 0 0 1.5px var(--ea)}
+  .ed .mauLuoi button:hover .the::after{content:'+';position:absolute;right:4px;bottom:4px;width:18px;height:18px;border-radius:50%;background:var(--ea);color:#062226;font:800 14px/18px system-ui;text-align:center}
+  .ed .mauLuoi button[aria-pressed="true"] .the{box-shadow:inset 0 0 0 2px var(--ea)}
+  .ed .mauLuoi .pdm{font-size:12px;font-weight:800;color:#fff;padding:3px 4px;border-radius:4px}.ed .mauLuoi .pdm b{padding:1px 3px;border-radius:3px}
+  .ed .emojiLuoi{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:6px}
+  .ed .emojiLuoi button{aspect-ratio:1/1;font-size:26px;border:1px solid transparent;background:#0f0f12;border-radius:8px;padding:0}
+  .ed .emojiLuoi button:hover{border-color:var(--ea)}
+  .ed .drop.nho{padding:16px 10px;display:block}
+  .ed .gx{grid-template-columns:repeat(auto-fill,minmax(86px,1fr));gap:8px}
+  .ed .gx button{background:#0f0f12;border:1px solid transparent;border-radius:8px;aspect-ratio:1/0.85;justify-content:center;font-weight:600;color:#cfcfd5}
+  .ed .gx button:hover{border-color:var(--ea)}
+  .ed .gx button i{font-size:22px}
+  /* footage dạng lưới */
+  #srcs{display:flex;flex-direction:column;gap:8px}
+  #srcs.luoi{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px;align-items:start}
+  #srcs.luoi:not(.dangTim) .fsrc:not(.mo){background:transparent;border-color:transparent}
+  #srcs.luoi:not(.dangTim) .fsrc:not(.mo) .fh{display:flex;flex-direction:column;align-items:stretch;padding:0;gap:4px}
+  #srcs.luoi:not(.dangTim) .fsrc:not(.mo) .th{width:100%;height:auto;aspect-ratio:16/10;border-radius:8px}
+  #srcs.luoi:not(.dangTim) .fsrc:not(.mo) .th:hover{box-shadow:0 0 0 1.5px var(--ea)}
+  #srcs.luoi:not(.dangTim) .fsrc:not(.mo) b{font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #srcs.luoi:not(.dangTim) .fsrc:not(.mo) small{font-size:10.5px}
+  #srcs.luoi:not(.dangTim) .fsrc:not(.mo) .acts{flex-direction:row;flex-wrap:wrap}
+  #srcs.luoi:not(.dangTim) .fsrc:not(.mo) .canhs,#srcs.luoi:not(.dangTim) .fsrc:not(.mo) .tags,#srcs.luoi:not(.dangTim) .fsrc:not(.mo) .kk{display:none}
+  #srcs.luoi .fsrc.mo,#srcs.luoi.dangTim .fsrc{grid-column:1/-1}
+  .fsrc .moRong{cursor:pointer}
+  /* trình phát */
+  .phead{width:100%;display:flex;align-items:center;justify-content:space-between;padding:8px 12px;font-size:12.5px;color:var(--et);font-weight:600;border-bottom:1px solid var(--el)}
+  .phead span:last-child{color:var(--em);font-weight:400;font-size:11.5px}
+  .khungVung{flex:1;min-height:0;width:100%;display:flex;align-items:center;justify-content:center;padding:10px;overflow:hidden}
+  .ed .khungVung .khung{height:100%;min-height:0;max-height:100%;border-radius:4px;box-shadow:none}
+  @media (max-width:980px){.ed .khungVung .khung{height:auto;width:min(100%,300px)}}
+  .ed .ctl{width:100%;margin:0;padding:6px 12px 7px;border-top:1px solid var(--el);display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;position:relative}
+  .ed .ctl #seek{position:absolute;left:0;right:0;top:-7px;width:100%;height:12px;margin:0;opacity:.0;cursor:pointer}
+  .ed .ctl #seek:hover{opacity:.9}
+  .ed .ctl .tg{font-size:12px;font-variant-numeric:tabular-nums;color:var(--em)}.ed .ctl .tg b{color:var(--ea);font-weight:600}
+  .ed .ctl .play{width:34px;height:34px;background:transparent;color:#fff;font-size:18px;border-radius:50%}.ed .ctl .play:hover{background:var(--ep2)}
+  .ed .ctl .ctlPhai{display:flex;justify-content:flex-end;gap:4px;align-items:center}
+  .ed .ctl select{font-size:12px;padding:3px 6px;border-radius:6px}
+  /* thuộc tính: tab kiểu CapCut */
+  .ed .ecol.phai>.etabs button:first-child{font-size:13px;font-weight:700;color:var(--et);border-bottom-color:transparent}
+  .ptabs{display:flex;gap:2px;border-bottom:1px solid var(--el);margin:-2px -10px 8px;padding:0 8px;overflow-x:auto;scrollbar-width:none;position:sticky;top:-10px;background:var(--ep);z-index:3}
+  .ptabs button{border:0;background:transparent;color:var(--em);font-size:12.5px;font-weight:600;padding:9px 8px 8px;border-bottom:2px solid transparent;white-space:nowrap}
+  .ptabs button:hover{color:var(--et)}
+  .ptabs button.on{color:var(--et);border-bottom-color:var(--ea)}
+  .ed .prop .nhom2.an,.ed .prop .tinh.an{display:none}
+  .ed .prop .nhom2{border-top:0;margin-top:2px}
+  .ed .prop .tinh>h3{display:none}
+  .ed.coChon #prop>:not(#propChon){display:none}
+  .ed .prop input[type=checkbox]{appearance:none;-webkit-appearance:none;width:30px;height:17px;border-radius:999px;background:#3a3a41;position:relative;cursor:pointer;transition:.15s;flex:none;margin:0}
+  .ed .prop input[type=checkbox]::after{content:'';position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:#fff;transition:.15s}
+  .ed .prop input[type=checkbox]:checked{background:var(--ea)}
+  .ed .prop input[type=checkbox]:checked::after{left:15px}
+  /* thanh công cụ dòng thời gian: icon */
+  .ed .etool{justify-content:space-between;padding:4px 8px;gap:8px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+  .etool .cum{display:flex;align-items:center;gap:1px;flex:none}
+  .etool .ic{width:30px;height:28px;border:0;background:transparent;color:#c8c8cf;border-radius:6px;display:grid;place-items:center;padding:0;font-size:14px}
+  .etool .ic svg{width:18px;height:18px}
+  .etool .ic:hover{background:var(--ep2);color:#fff}
+  .etool .ic:disabled{opacity:.35}
+  .etool .tg{margin:0 6px;font-size:12px}
+  .etool #zoomTl{width:90px}
+  /* đầu track: tắt tiếng, ẩn, khoá (như OpenCut / CapCut) */
+  .ed .etl-in{padding-left:100px}
+  .ed .track .lb{left:-100px;width:96px;flex-direction:column;align-items:stretch;justify-content:center;gap:1px;padding:0 6px;background:var(--ep)}
+  .lb .ln{display:flex;align-items:center;gap:5px;white-space:nowrap;overflow:hidden}
+  .lb .tro{display:flex;gap:1px}
+  .lb .trn{width:21px;height:17px;border:0;background:transparent;color:#7d7d86;border-radius:4px;padding:0;display:grid;place-items:center}
+  .lb .trn svg{width:13px;height:13px}
+  .lb .trn:hover{background:var(--ep2);color:var(--et)}
+  .lb .trn.bat{color:#ff7a7a}
+  .track.an .item{opacity:.3}
+  .track.khoa .item{cursor:not-allowed;background-image:repeating-linear-gradient(45deg,transparent 0 6px,rgba(255,255,255,.07) 6px 12px)}
+  .ed .track.v1{height:62px}
+  .ed .item.v{background-color:#173a3d}
+  .ed .item.chon{border-color:#fff;box-shadow:0 0 0 1px #fff}
+  .item canvas.phim{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;opacity:.92}
+  .item.v b,.item.v small,.item.b b,.item.b small{position:relative;z-index:1;text-shadow:0 1px 2px #000,0 0 4px #000}
+  .ed .ph{background:#fff;width:1.5px}.ed .ph::before{content:'';position:absolute;top:0;left:-5px;width:11px;height:12px;background:#fff;clip-path:polygon(0 0,100% 0,100% 60%,50% 100%,0 60%)}
+  /* menu chuột phải */
+  .cmenu{position:fixed;z-index:90;min-width:190px;background:#1f1f23;border:1px solid #33333a;border-radius:9px;padding:4px;box-shadow:0 14px 40px rgba(0,0,0,.55);font-size:12.5px;color:#e7e7eb}
+  .cmenu button{display:flex;align-items:center;gap:9px;width:100%;border:0;background:transparent;color:inherit;padding:6px 9px;border-radius:6px;text-align:left;font:inherit;cursor:pointer}
+  .cmenu button:hover{background:#2b2b31}
+  .cmenu button svg{width:15px;height:15px;color:#a8a8b0;flex:none}
+  .cmenu button kbd{margin-left:auto;color:#7d7d86;font:11px ui-monospace,monospace}
+  .cmenu button.do{color:#ff8a8a}
+  .cmenu hr{border:0;border-top:1px solid #33333a;margin:4px 2px}
+  .ed .etl-scroll{max-height:none;flex:1;min-height:0}
+  .ed{--hTl:clamp(200px,36vh,360px)}
 </style>
 </head>
 <body>
@@ -299,47 +439,56 @@
 
   <div class="ed" id="ed">
     <div class="etop">
+      <div class="logo"><i data-ic="scissor"></i><b>Viral Studio</b></div>
+      <span class="gian"></span>
       <input class="ten" id="tenDuAn" value="Video mới" aria-label="Tên dự án">
+      <span class="gian"></span>
       <span class="tt" id="ttKetNoi"><i></i><span>Sẵn sàng</span></span>
-      <button class="btn ghost nho" id="btnHoanTac" type="button" title="Hoàn tác (Ctrl+Z)">↶ Hoàn tác</button><button class="btn ghost nho" id="btnLamLai" type="button" title="Làm lại (Ctrl+Shift+Z)">↷</button>
-      <button class="btn ghost nho" id="btnThuocTinh" type="button" title="Thuộc tính">⚙️</button>
-      <button class="btn trang" id="btnXuat" type="button">Xuất</button>
+      <button class="btn ghost nho ic" id="btnToanApp" type="button" title="Toàn màn hình làm việc" data-ic="full"></button>
+      <button class="btn ghost nho ic" id="btnThuocTinh" type="button" title="Thuộc tính" data-ic="gear"></button>
+      <button class="btn nutXuat" id="btnXuat" type="button"><i data-ic="export"></i>Xuất</button>
     </div>
 
     <div class="ebody">
       <div class="ecol trai">
         <div class="etabs" role="tablist">
-          <button type="button" role="tab" aria-selected="true" data-tab="footage"><i>🎞</i>Media<span class="n" id="nSrc">0</span></button>
-          <button type="button" role="tab" aria-selected="false" data-tab="am"><i>🎵</i>Âm thanh</button>
-          <button type="button" role="tab" aria-selected="false" data-tab="chu"><i>🔤</i>Chữ</button>
-          <button type="button" role="tab" aria-selected="false" data-tab="loi"><i>💬</i>Phụ đề</button>
-          <button type="button" role="tab" aria-selected="false" data-tab="dohoa"><i>✨</i>Đồ hoạ</button>
-          <button type="button" role="tab" aria-selected="false" data-tab="hieu"><i>🎨</i>Hiệu ứng</button>
-          <button type="button" role="tab" aria-selected="false" data-tab="ai"><i>🤖</i>Trợ lý</button>
+          <button type="button" role="tab" aria-selected="true" data-tab="footage" data-ic="media">Media<span class="n" id="nSrc">0</span></button>
+          <button type="button" role="tab" aria-selected="false" data-tab="am" data-ic="audio">Âm thanh</button>
+          <button type="button" role="tab" aria-selected="false" data-tab="chu" data-ic="text">Văn bản</button>
+          <button type="button" role="tab" aria-selected="false" data-tab="sticker" data-ic="sticker">Nhãn dán</button>
+          <button type="button" role="tab" aria-selected="false" data-tab="hieu" data-ic="effect">Hiệu ứng</button>
+          <button type="button" role="tab" aria-selected="false" data-tab="chuyen" data-ic="trans">Chuyển cảnh</button>
+          <button type="button" role="tab" aria-selected="false" data-tab="loc" data-ic="filter">Bộ lọc</button>
+          <button type="button" role="tab" aria-selected="false" data-tab="loi" data-ic="caption">Phụ đề</button>
+          <button type="button" role="tab" aria-selected="false" data-tab="dohoa" data-ic="shape">Đồ hoạ</button>
+          <button type="button" role="tab" aria-selected="false" data-tab="ai" data-ic="ai">Trợ lý AI</button>
         </div>
 
         <div class="epane" data-pane="am">
-          <h3 class="pt">Nhạc nền, lồng tiếng, âm thanh</h3>
-          <div id="tiengHop" hidden><h3>Lồng tiếng AI (A2)</h3>
+          <div id="am3Hop"></div>
+          <div id="tiengHop" hidden><h3 class="pt">Lồng tiếng AI</h3>
           <label class="full"><textarea id="tiengText" rows="3" placeholder="Lời cần đọc. Để trống = đọc câu ngay tại đầu phát, hoặc hook."></textarea></label>
           <label><span>Giọng</span><select id="tiengGiong"><option value="nu_am">Nữ ấm</option><option value="nu_tre">Nữ trẻ</option><option value="nu_diu">Nữ dịu</option><option value="nu_sang">Nữ sáng</option><option value="nam_tram">Nam trầm</option><option value="nam_tre">Nam trẻ</option><option value="nam_am">Nam ấm</option><option value="nam_manh">Nam mạnh</option></select></label>
           <label><span>Cách đọc</span><input type="text" id="tiengCach" placeholder="vui, nhanh vừa · trầm, chậm rãi"></label>
           <div class="row"><button class="btn xanh nho" id="btnTieng" type="button">🎙 Tạo và đặt tại đầu phát</button></div>
           <div class="quota" id="tiengTt">Mỗi lần tạo tốn 1 lượt Dựng video (Pro, học viên không giới hạn). Khi lồng tiếng phát, tiếng gốc và nhạc tự hạ.</div></div>
-          <h3>Nhạc nền (A1)</h3>
+          <h3 class="pt">Nhạc nền</h3>
           <label class="full"><input type="file" id="nhacIn" accept="audio/*" style="font-size:11px"></label>
           <label><span>Khi có tiếng nói</span><input type="range" id="duckNoi" min="0" max="50" value="12"></label>
           <label><span>Khi không lời</span><input type="range" id="duckBroll" min="10" max="100" value="60"></label>
           <label><span>Cắt theo beat</span><input type="checkbox" id="snapBeat" checked></label>
           <div class="quota" id="nhacTt">Chưa có nhạc. Thêm file để máy đo beat.</div>
-          <div id="am3Hop"></div>
         </div>
 
         <div class="epane" data-pane="chu">
           <div class="row"><button class="btn xanh nho" id="btnThemChu" type="button">＋ Thêm chữ</button><span class="quota" style="margin:0">tại đầu phát · kéo trên khung để đặt chỗ</span></div>
           <h3 class="pt">Mẫu chữ</h3><div class="mauLuoi" id="mauChu"></div>
-          <h3 class="pt">Sticker</h3><div class="row" id="emojiNhanh"></div>
-          <label class="full"><span>Tải sticker của bạn (PNG, GIF, WebP)</span><input type="file" id="stickerIn" accept="image/png,image/gif,image/webp,image/*" multiple style="font-size:11px"></label>
+        </div>
+
+        <div class="epane" data-pane="sticker">
+          <h3 class="pt">Emoji</h3><div class="emojiLuoi" id="emojiNhanh"></div>
+          <h3 class="pt">Tải lên</h3>
+          <label class="drop nho" style="cursor:pointer"><b>＋ Sticker của bạn</b>PNG, GIF, WebP nền trong suốt · đặt lên V3, vừa khung<input type="file" id="stickerIn" accept="image/png,image/gif,image/webp,image/*" multiple hidden></label>
         </div>
 
         <div class="epane" data-pane="dohoa">
@@ -348,12 +497,6 @@
         </div>
 
         <div class="epane" data-pane="hieu">
-          <h3 class="pt">Chuyển cảnh</h3>
-          <div class="row"><button class="btn nho" id="btnChuyenAll" type="button">Áp chuyển cảnh đang chọn ở thanh công cụ cho mọi điểm cắt</button></div>
-          <h3 class="pt">Bộ lọc</h3>
-          <label><span>Áp cho mọi đoạn</span><input type="checkbox" id="locTatCa"></label>
-          <label><span>Cường độ</span><input type="range" id="locMucChung" min="0" max="1" step="0.01" value="1"></label>
-          <div class="mauLuoi" id="locLuoi"></div>
           <h3 class="pt">Hiệu ứng video</h3>
           <div class="mauLuoi" id="huLuoi"></div>
           <h3 class="pt">Nền khung (khi hình không phủ kín)</h3>
@@ -363,11 +506,28 @@
           <div class="quota">Dùng khi thu nhỏ hình (Phóng to &lt; 100%) hoặc video ngang đặt trong khung dọc.</div>
         </div>
 
+        <div class="epane" data-pane="chuyen">
+          <h3 class="pt">Chuyển cảnh</h3>
+          <div class="quota">Chọn một đoạn V1 rồi bấm: chuyển cảnh sang đoạn sau. Không chọn đoạn: đặt ở điểm cắt gần đầu phát.</div>
+          <div class="mauLuoi" id="chuyenLuoi"></div>
+          <h3 class="pt">Cài đặt</h3>
+          <label class="hang"><span>Thời lượng</span><input type="range" id="chuyenDai" min="0.2" max="1.2" step="0.1" value="0.5"><output id="chuyenDaiO">0,5s</output></label>
+          <label class="hang"><span>Mặc định</span><select id="chuyenMacDinh" title="Chuyển cảnh mặc định giữa các đoạn"><option value="cat">Cắt thẳng</option><option value="fade">Mờ dần</option><option value="zoom">Zoom</option><option value="slide">Trượt</option><option value="wipe">Quét</option><option value="whip">Whip</option><option value="flash">Chớp</option><option value="glitch">Glitch</option><option value="circle">Vòng tròn</option><option value="blur">Nhoè</option></select></label>
+          <div class="row"><button class="btn nho" id="btnChuyenAll" type="button">Áp cho mọi điểm cắt</button></div>
+        </div>
+
+        <div class="epane" data-pane="loc">
+          <h3 class="pt">Bộ lọc</h3>
+          <label class="hang"><span>Áp cho mọi đoạn</span><input type="checkbox" id="locTatCa"></label>
+          <label class="hang"><span>Cường độ</span><input type="range" id="locMucChung" min="0" max="1" step="0.01" value="1"></label>
+          <div class="mauLuoi" id="locLuoi"></div>
+        </div>
+
         <div class="epane on" data-pane="footage">
           <div class="drop" id="drop" tabindex="0" role="button"><b>＋ Thêm footage</b>Video quay thô, ảnh, nhiều đoạn cũng được. AI sẽ chép lời từng từ, nhận diện cảnh và khoảnh khắc đáng giữ.<input type="file" id="fileIn" accept="video/*,image/*" multiple hidden></div>
-          <div class="tim"><input id="tim" type="search" placeholder="Tìm trong footage: câu nói, cảnh, tag…"></div>
+          <div class="tim"><input id="tim" type="search" placeholder="Tìm trong footage: câu nói, cảnh, tag…"><button class="btn nho ghost ic" id="btnLuoiSrc" type="button" title="Đổi lưới / danh sách" data-ic="grid"></button></div>
           <div class="kho" id="kho" hidden><div class="hang"><input id="khoQ" type="search" placeholder="Kho B-roll miễn phí: cận tay gõ phím, phố đêm…"><select id="khoHuong" title="Hướng video"><option value="doc">Dọc</option><option value="ngang">Ngang</option></select><button class="btn nho xanh" id="khoTim" type="button">Tìm</button></div><div class="kq" id="khoKq"></div><div class="quota" id="khoTt">Video stock miễn phí dùng thương mại, không tốn lượt AI. Bấm một video để thêm vào footage.</div></div>
-          <div id="srcs" style="display:flex;flex-direction:column;gap:8px"></div>
+          <div id="srcs" class="luoi"></div>
           <div class="quota" id="srcStatus"></div>
         </div>
 
@@ -411,12 +571,13 @@
       </div>
 
       <div class="ecol giua">
-        <div class="khung"><canvas id="cv" width="540" height="960"></canvas><div id="tayCam"></div><div class="trong" id="trong">Thêm footage ở bên trái.<br>Kéo cảnh vào dòng thời gian, hoặc để Trợ lý dựng.</div></div>
+        <div class="phead"><span>Trình phát</span><span id="pheadTt"></span></div>
+        <div class="khungVung"><div class="khung"><canvas id="cv" width="540" height="960"></canvas><div id="tayCam"></div><div class="trong" id="trong">Thêm footage ở bên trái.<br>Kéo cảnh vào dòng thời gian, hoặc để Trợ lý dựng.</div></div></div>
         <div class="ctl">
-          <button class="play" id="btnPlay" type="button" aria-label="Phát">▶</button>
           <input type="range" id="seek" min="0" max="1000" value="0" aria-label="Vị trí">
-          <span class="tg" id="tg">0:00 / 0:00</span>
-          <button class="btn nho" id="btnToanManHinh" type="button" title="Xem to">⤢</button>
+          <span class="tg" id="tg">00:00:00:00 / 00:00:00:00</span>
+          <button class="play" id="btnPlay" type="button" aria-label="Phát">▶</button>
+          <div class="ctlPhai"><select id="tiLe2" title="Tỉ lệ khung"></select><button class="btn nho ghost ic" id="btnToanManHinh" type="button" title="Xem toàn màn hình" data-ic="full"></button></div>
         </div>
         <div class="xuat" id="phimHop"><div class="box" style="max-width:460px;text-align:left"><b style="font-size:15px">⌨ Phím tắt</b>
           <table class="phim"><tr><td>Space</td><td>Phát / dừng</td></tr><tr><td>S · Ctrl/⌘ + B</td><td>Tách tại đầu phát</td></tr><tr><td>Q / W</td><td>Xoá phần trước / sau đầu phát trong đoạn</td></tr><tr><td>Ctrl/⌘ + C / V</td><td>Sao chép / dán tại đầu phát</td></tr><tr><td>Ctrl/⌘ + Shift + Z · Ctrl + Y</td><td>Làm lại</td></tr><tr><td>N</td><td>Bật/tắt hít (snap)</td></tr><tr><td>Ctrl/⌘ + cuộn</td><td>Zoom dòng thời gian</td></tr><tr><td>Delete</td><td>Xoá mục đang chọn</td></tr><tr><td>Ctrl/⌘ + D</td><td>Nhân đôi</td></tr><tr><td>Ctrl/⌘ + Z</td><td>Hoàn tác</td></tr><tr><td>← →</td><td>Lùi / tới 1 khung hình</td></tr><tr><td>Shift + ← →</td><td>Lùi / tới 1 giây</td></tr><tr><td>J / L</td><td>Về điểm cắt trước / sau</td></tr><tr><td>Home / End</td><td>Đầu / cuối video</td></tr><tr><td>M</td><td>Đặt mốc</td></tr><tr><td>F</td><td>Đóng băng khung</td></tr><tr><td>+ / −</td><td>Phóng to / thu nhỏ dòng thời gian</td></tr><tr><td>?</td><td>Bảng này</td></tr></table>
@@ -457,21 +618,37 @@
 
     <div class="etl">
       <div class="etool">
-        <button class="btn nho" data-act="xoa" type="button">Xoá</button>
-        <button class="btn nho" data-act="tach" type="button">Tách</button>
-        <button class="btn nho" data-act="nhan" type="button">Nhân đôi</button>
-        <button class="btn nho" id="btnDongBang" type="button" title="Đóng băng khung tại đầu phát 1,5 giây (Freeze frame)">❄ Đóng băng</button>
-        <button class="btn nho" id="btnMoc" type="button" title="Đặt mốc tại đầu phát (phím M)">◆ Mốc</button>
-        <span class="sep"></span>
-        <button class="btn nho" id="btnSlip" type="button" aria-pressed="false" title="Trượt: kéo đoạn V1 để đổi khúc lấy trong source, giữ nguyên độ dài">↔ Trượt</button>
-        <button class="btn nho" id="btnRipple" type="button" aria-pressed="true" title="Ripple: xoá hay cắt V1 thì chữ, đồ hoạ, b-roll phía sau dồn theo">⇤ Ripple</button>
-        <button class="btn nho" id="btnSnap" type="button" aria-pressed="true" title="Hít vào beat và mép câu">🧲 Hít</button>
-        <select id="chuyenMacDinh" title="Chuyển cảnh mặc định giữa các đoạn"><option value="cat">Cắt thẳng</option><option value="fade">Mờ dần</option><option value="zoom">Zoom</option><option value="slide">Trượt</option><option value="wipe">Quét</option><option value="whip">Whip</option><option value="flash">Chớp</option><option value="glitch">Glitch</option><option value="circle">Vòng tròn</option><option value="blur">Nhoè</option></select>
-        <button class="btn nho" id="btnPlay2" type="button">▶</button>
-        <span class="sep"></span>
-        <span style="color:var(--em)">Zoom</span><input type="range" id="zoomTl" min="6" max="80" value="18">
-        <button class="btn nho" id="btnPhim" type="button" title="Phím tắt (?)">⌨</button>
-        <span class="tg" id="tg2">0:00 <small>/ 0:00</small></span>
+        <div class="cum">
+          <button class="ic" id="btnHoanTac" type="button" title="Hoàn tác (Ctrl+Z)" data-ic="undo"></button>
+          <button class="ic" id="btnLamLai" type="button" title="Làm lại (Ctrl+Shift+Z)" data-ic="redo"></button>
+          <span class="sep"></span>
+          <button class="ic" data-act="tach" type="button" title="Tách tại đầu phát (Ctrl+B)" data-ic="split"></button>
+          <button class="ic" id="btnQ" type="button" title="Xoá phần bên trái đầu phát (Q)" data-ic="delL"></button>
+          <button class="ic" id="btnW" type="button" title="Xoá phần bên phải đầu phát (W)" data-ic="delR"></button>
+          <button class="ic" data-act="xoa" type="button" title="Xoá (Delete)" data-ic="trash"></button>
+          <span class="sep"></span>
+          <button class="ic" data-act="nhan" type="button" title="Nhân đôi (Ctrl+D)" data-ic="copy"></button>
+          <button class="ic" id="btnDongBang" type="button" title="Đóng băng khung 1,5 giây (F)" data-ic="freeze"></button>
+          <button class="ic" id="btnLat" type="button" title="Lật ngang" data-ic="mirror"></button>
+          <button class="ic" id="btnXoay90" type="button" title="Xoay 90°" data-ic="rotate"></button>
+          <button class="ic" id="btnCrop" type="button" title="Cắt khung (crop)" data-ic="crop"></button>
+          <button class="ic" id="btnKfNhanh" type="button" title="Thêm keyframe tại đầu phát" data-ic="kf"></button>
+          <button class="ic" id="btnTachAmTl" type="button" title="Tách âm thanh xuống A3" data-ic="wave"></button>
+          <button class="ic" id="btnMoc" type="button" title="Đặt mốc (M)" data-ic="mark"></button>
+        </div>
+        <div class="cum">
+          <button class="ic" id="btnSlip" type="button" aria-pressed="false" title="Trượt: kéo đoạn V1 để đổi khúc lấy trong source, giữ nguyên độ dài" data-ic="slip"></button>
+          <button class="ic" id="btnRipple" type="button" aria-pressed="true" title="Ripple: xoá hay cắt V1 thì chữ, đồ hoạ, b-roll, âm thanh phía sau dồn theo" data-ic="link"></button>
+          <button class="ic" id="btnSnap" type="button" aria-pressed="true" title="Hít vào beat và mép câu" data-ic="magnet"></button>
+          <span class="sep"></span>
+          <button class="ic" id="btnPlay2" type="button" title="Phát / dừng (Space)">▶</button>
+          <span class="tg" id="tg2">0:00 <small>/ 0:00</small></span>
+          <span class="sep"></span>
+          <button class="ic" id="btnZoomRa" type="button" title="Thu nhỏ dòng thời gian" data-ic="zoomOut"></button>
+          <input type="range" id="zoomTl" min="6" max="80" value="18" aria-label="Zoom dòng thời gian">
+          <button class="ic" id="btnZoomVao" type="button" title="Phóng to dòng thời gian" data-ic="zoomIn"></button>
+          <button class="ic" id="btnPhim" type="button" title="Phím tắt (?)" data-ic="kbd"></button>
+        </div>
       </div>
       <div class="etl-scroll" id="tlScroll">
         <div class="etl-in" id="tlIn">
@@ -500,6 +677,7 @@ const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAl
 const el = (t, c, txt) => { const e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; };
 const ls = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} }, del(k){ try { localStorage.removeItem(k); } catch {} } };
 const API = 'https://script.google.com/macros/s/AKfycbyxe1nWupAl6VheDZHaU3Ojm-d6c8F_khhUMtkehNCLh5OnGW6f2uF0PKPYZ4eYUqyGjQ/exec';
+const LB = 100;   // bề rộng đầu track
 let toastT; function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 3200); }
 const ERR = { can_dangky: 'Tạo tài khoản miễn phí để dùng AI.', het_luot_thu: 'Bạn đã dùng hết lượt miễn phí.', het_luot: 'Hết lượt AI hôm nay, mai quay lại nhé.', het_luot_chat: 'Hôm nay bạn đã hết lượt nhờ trợ lý dựng, mai quay lại nhé.', het_phien: 'Phiên đăng nhập hết hạn, đăng nhập lại giúp mình.', video_qua_dai: 'Footage dài quá 12 phút. Cắt bớt trước khi đưa vào.', khong_co_video: 'Chưa có footage nào được hiểu.', can_gemini: 'Máy chủ đang chạy Claude, phần nghe video cần GEMINI_API_KEY. Báo mentor.', ban_qua: 'AI của Google đang quá tải, thử lại sau 1–2 phút.', het_gio: 'AI xử lý quá lâu, thử lại hoặc chia footage ngắn hơn.', tu_choi: 'AI không xử lý được footage này.', chua_cai_key: 'Máy chủ chưa cài khoá AI. Báo mentor.', sai_key: 'Khoá AI trên máy chủ không hợp lệ. Báo mentor.', unknown_action: 'Máy chủ chưa có DungVideo.gs. Mentor dán DungVideo.gs, HookAI.gs, Studio.gs rồi Deploy, chọn New version.', thieu_text: 'Gõ yêu cầu dựng trước đã.' };
 const fmt = s => { s = Math.max(0, s || 0); const m = Math.floor(s / 60), g = Math.floor(s % 60); return m + ':' + (g < 10 ? '0' : '') + g; };
@@ -599,7 +777,7 @@ function khopTim(s, q) { if (!q) return true; q = q.toLowerCase(); return (s.ten
 
 function veSrcs() {
   const box = $('#srcs'); box.innerHTML = ''; $('#nSrc').textContent = P.srcs.length;
-  const q = $('#tim').value.trim();
+  const q = $('#tim').value.trim(); $('#srcs').classList.toggle('dangTim', !!q);
   P.srcs.forEach((s, i) => {
     if (!khopTim(s, q)) return;
     const d = el('div', 'fsrc'); d.dataset.id = s.id;
@@ -610,6 +788,8 @@ function veSrcs() {
     if (s.tt === 'xong') { const vap = s.cau.filter(c => c.loai === 'vap' || c.loai === 'lap' || c.loai === 'lac').length; tx.appendChild(el('small', null, '✓ ' + s.tu.length + ' từ · ' + s.cau.length + ' câu' + (vap ? ' · ' + vap + ' vấp/lặp/lạc' : '') + ' · ' + s.canh.length + ' cảnh' + (s.matTt ? ' · ' + s.matTt : ''))); }
     if (s.tt === 'dang') tx.appendChild(el('small', null, s.buoc || 'Đang hiểu…'));
     if (s.tt === 'loi') tx.appendChild(el('small', null, '⚠ ' + s.loi));
+    tx.classList.add('moRong'); tx.title = 'Bấm để xem / ẩn chi tiết AI'; tx.onclick = () => { s.mo = !(s.mo != null ? s.mo : s.tt === 'xong'); veSrcs(); };
+    if (s.mo != null ? s.mo : s.tt === 'xong') d.classList.add('mo');
     fh.appendChild(tx);
     const acts = el('div', 'acts');
     if (s.loai === 'video' && (s.tt === 'san_sang' || (s.tt === 'loi' && s.giay))) { const b = el('button', 'btn xanh', s.tt === 'loi' ? 'Thử lại' : '✨ Hiểu footage'); b.type = 'button'; b.onclick = () => hieu(s); acts.appendChild(b); }
@@ -864,11 +1044,11 @@ function veTl() {
     if (s && s.thumb) d.style.setProperty('--thumb', 'url(' + s.thumb + ')');
     const cau = s ? s.cau.filter(x => x.kt > c.bd + 0.1 && x.bd < c.kt - 0.1) : [];
     d.appendChild(el('b', null, (s && s.dongBang ? '❄ ' : 'S' + (si + 1) + ' · ') + fmt1(dai) + 's' + (tocC(c) !== 1 ? ' · ' + tocC(c) + '×' : '') + (c.kf ? ' ◇' : '') + (c.loc && c.loc !== 'khong' ? ' 🎨' : ''))); d.appendChild(el('small', null, cau.length ? cau[0].text : (s && s.loai === 'anh' ? 'ảnh' : c.ly_do || '')));
-    d.appendChild(el('span', 'h l')); d.appendChild(el('span', 'h r')); veSongItem(d, s, c.bd, c.kt, dai * px); mocKf(c).forEach(t => { const k = el('i', 'kfd'); k.style.left = t * px - 3 + 'px'; d.appendChild(k); }); if (c.anVao && c.anVao.id !== 'khong') { const a = el('i', 'anv'); a.style.width = (c.anVao.d || 0.5) * px + 'px'; d.appendChild(a); } if (c.anRa && c.anRa.id !== 'khong') { const a = el('i', 'anr'); a.style.width = (c.anRa.d || 0.5) * px + 'px'; d.appendChild(a); }
+    d.appendChild(el('span', 'h l')); d.appendChild(el('span', 'h r')); vePhimItem(d, s, c.bd, c.kt, dai * px); veSongItem(d, s, c.bd, c.kt, dai * px); mocKf(c).forEach(t => { const k = el('i', 'kfd'); k.style.left = t * px - 3 + 'px'; d.appendChild(k); }); if (c.anVao && c.anVao.id !== 'khong') { const a = el('i', 'anv'); a.style.width = (c.anVao.d || 0.5) * px + 'px'; d.appendChild(a); } if (c.anRa && c.anRa.id !== 'khong') { const a = el('i', 'anr'); a.style.width = (c.anRa.d || 0.5) * px + 'px'; d.appendChild(a); }
     if (c.chuyen && c.chuyen !== 'cat' && i < P.clips.length - 1) d.appendChild(el('span', 'cc', '⇢ ' + CHUYEN_TEN[c.chuyen]));
     keoItem(d, 'v', i, acc, dai); tr.v1.appendChild(d); acc += dai;
   });
-  P.broll.forEach((b, i) => { const s = srcCua(b.src); if (!s) return; const d = el('div', 'item b ' + b.kieu + (P.chon && P.chon.k === 'b' && P.chon.i === i ? ' chon' : '')); d.style.left = b.t_bd * px + 'px'; d.style.width = Math.max(6, (b.kt - b.bd) / tocC(b) * px - 2) + 'px'; mocKf(b).forEach(t => { const k = el('i', 'kfd'); k.style.left = t * px - 3 + 'px'; d.appendChild(k); }); d.appendChild(el('b', null, (b.kieu === 'pip' ? '▣ ' : '▮ ') + 'S' + (P.srcs.indexOf(s) + 1) + ' · ' + fmt1(b.kt - b.bd) + 's')); d.appendChild(el('small', null, (s.canh.find(c => c.bd <= b.bd + 0.2 && c.kt >= b.kt - 0.2) || {}).mo_ta || s.ten)); d.appendChild(el('span', 'h l')); d.appendChild(el('span', 'h r')); d.dataset.i = i; keoItem(d, 'b', i, b.t_bd, (b.kt - b.bd) / tocC(b)); (b.lop === 3 ? tr.v3 : tr.v2).appendChild(d); });
+  P.broll.forEach((b, i) => { const s = srcCua(b.src); if (!s) return; const d = el('div', 'item b ' + b.kieu + (P.chon && P.chon.k === 'b' && P.chon.i === i ? ' chon' : '')); d.style.left = b.t_bd * px + 'px'; d.style.width = Math.max(6, (b.kt - b.bd) / tocC(b) * px - 2) + 'px'; vePhimItem(d, s, b.bd, b.kt, (b.kt - b.bd) / tocC(b) * px); mocKf(b).forEach(t => { const k = el('i', 'kfd'); k.style.left = t * px - 3 + 'px'; d.appendChild(k); }); d.appendChild(el('b', null, (b.kieu === 'pip' ? '▣ ' : '▮ ') + 'S' + (P.srcs.indexOf(s) + 1) + ' · ' + fmt1(b.kt - b.bd) + 's')); d.appendChild(el('small', null, (s.canh.find(c => c.bd <= b.bd + 0.2 && c.kt >= b.kt - 0.2) || {}).mo_ta || s.ten)); d.appendChild(el('span', 'h l')); d.appendChild(el('span', 'h r')); d.dataset.i = i; keoItem(d, 'b', i, b.t_bd, (b.kt - b.bd) / tocC(b)); (b.lop === 3 ? tr.v3 : tr.v2).appendChild(d); });
   P.tieng.forEach((t, i) => { const d = el('div', 'item t' + (P.chon && P.chon.k === 't' && P.chon.i === i ? ' chon' : '')); d.style.left = t.t_bd * px + 'px'; d.style.width = Math.max(6, t.giay * px - 2) + 'px'; d.appendChild(el('b', null, '🎙 ' + fmt1(t.giay) + 's · ' + (TIENG_GIONG[t.giong] || t.giong))); d.appendChild(el('small', null, t.text)); keoItem(d, 't', i, t.t_bd, t.giay); tr.a2.appendChild(d); });
   veAm3Tl(tr, px);
   P.gfx.forEach((g, i) => { const d = el('div', 'item g' + (P.chon && P.chon.k === 'g' && P.chon.i === i ? ' chon' : '')); d.style.left = g.bd * px + 'px'; d.style.width = Math.max(6, (g.kt - g.bd) * px - 2) + 'px'; d.appendChild(el('b', null, (GX[g.kieu] || {}).ic + ' ' + (GX[g.kieu] || {}).ten)); d.appendChild(el('small', null, g.text || g.phu || '')); d.appendChild(el('span', 'h l')); d.appendChild(el('span', 'h r')); keoItem(d, 'g', i, g.bd, g.kt - g.bd); tr.o1.appendChild(d); });
@@ -877,12 +1057,12 @@ function veTl() {
   if (P.nhac) { const d = el('div', 'item a'); d.style.left = '0'; d.style.width = Math.max(6, Math.max(tongGiay(), 1) * px - 2) + 'px'; d.appendChild(el('span', 'song')); d.appendChild(el('b', null, '🎵 ' + P.nhac.ten)); d.appendChild(el('small', null, P.beat.length + ' beat · ' + $('#duckNoi').value + '% khi nói · ' + $('#duckBroll').value + '% khi không lời')); veDuck(d, px); tr.a1.appendChild(d); }
   $('#tlTrong').style.display = P.clips.length ? 'none' : ''; $('#trong').hidden = !!P.clips.length;
   $('#seek').max = Math.max(1, Math.round(tongGiay() * 100));
-  const g = tongGiay(); $('#tg').textContent = fmt(P.t) + ' / ' + fmt(g); $('#tg2').innerHTML = fmtF(P.t) + ' <small>/ ' + fmt(g) + (g > 90 ? ' · dài, nên rút' : '') + '</small>';
+  const g = tongGiay(); datTg(g); $('#tg2').innerHTML = fmtF(P.t) + ' <small>/ ' + fmt(g) + (g > 90 ? ' · dài, nên rút' : '') + '</small>';
   vePh(); veProp(); dongBoTick();
 }
 function veDuck(d, px) { let acc = 0; P.clips.forEach(c => { const s = srcCua(c.src); if (s) s.cau.forEach(x => { const bd = Math.max(x.bd, c.bd), kt = Math.min(x.kt, c.kt); if (kt > bd) { const i = el('i', 'duck'); i.style.left = (acc + (bd - c.bd) / tocC(c)) * px + 'px'; i.style.width = (kt - bd) / tocC(c) * px + 'px'; d.appendChild(i); } }); acc += daiC(c); }); }
 function dongBoTick() { $$('.cau').forEach(d => { const s = srcCua(d.dataset.src), c = s && s.cau[+d.dataset.i]; if (!c) return; const trong = cauTrongTl(s.id, c); const cb = d.querySelector('input'); if (cb) cb.checked = trong; d.classList.toggle('tat', !trong); }); $$('.nhom[data-src]').forEach(n => { const s = srcCua(n.dataset.src); if (s) n.querySelector('.dem').textContent = s.cau.filter(c => cauTrongTl(s.id, c)).length + '/' + s.cau.length; }); }
-function vePh() { $('#ph').style.left = (64 + P.t * PX()) + 'px'; const sc = $('#tlScroll'), x = P.t * PX(); if (P.dang && (x < sc.scrollLeft || x > sc.scrollLeft + sc.clientWidth - 120)) sc.scrollLeft = Math.max(0, x - 80); }
+function vePh() { $('#ph').style.left = (LB + P.t * PX()) + 'px'; const sc = $('#tlScroll'), x = P.t * PX(); if (P.dang && (x < sc.scrollLeft || x > sc.scrollLeft + sc.clientWidth - 120)) sc.scrollLeft = Math.max(0, x - 80); }
 $('#zoomTl').addEventListener('input', () => { P.pxs = +$('#zoomTl').value; veTl(); });
 $('#btnSnap').onclick = () => { P.snap = !P.snap; $('#btnSnap').setAttribute('aria-pressed', String(P.snap)); };
 $('#nenKieu').addEventListener('change', () => { const k = $('#nenKieu').value; $('#nenMauHang').hidden = k !== 'mau'; if (k !== 'giu') segNap(); else $('#nenTt').hidden = true; segNho = { khoa: '', cv: null }; if (!P.dang) veKhung(); });
@@ -916,8 +1096,10 @@ function hitBeat() { if (!P.beat.length) return; let acc = 0; P.clips.forEach((c
 function layoutV1() { let acc = 0; const items = $$('.track.v1 .item'); P.clips.forEach((c, j) => { const it = items[j]; if (!it) return; it.style.left = acc * PX() + 'px'; it.style.width = Math.max(6, daiC(c) * PX() - 2) + 'px'; acc += daiC(c); }); }
 function chonHien() { setTimeout(veTay, 0); $$('.track .item').forEach(x => x.classList.remove('chon')); if (P.chon) { const it = $$({ v: '.track.v1 .item', g: '.track.o1 .item', b: '.item.b' }[P.chon.k]).find(x => P.chon.k !== 'b' || +x.dataset.i === P.chon.i); const it2 = P.chon.k === 'b' ? $$('.item.b').find(x => +x.dataset.i === P.chon.i) : $$({ v: '.track.v1 .item:not(.vungCat):not(.ngo)', g: '.track.o1 .item', a: '.track.a3 .item', t: '.track.a2 .item' }[P.chon.k] || '.none')[P.chon.i]; if (it2) it2.classList.add('chon'); } }
 function keoItem(d, k, i, bd, dai) {
+  d.dataset.k = k; d.dataset.i = i;
   d.addEventListener('pointerdown', e => {
     if (e.button !== 0) return; e.stopPropagation();
+    const trk = d.closest('.track'); if (trk && trKhoa(trk.dataset.track)) { P.chon = { k, i }; chonHien(); veProp(); toast('Track đang khoá 🔒 · bấm ổ khoá ở đầu track để mở'); return; }
     const mep = e.target.classList.contains('h') && d.offsetWidth >= 30 ? (e.target.classList.contains('l') ? 'l' : 'r') : '';   // mục quá hẹp: chỉ dời, không cắt mép
     P.chon = { k, i }; chonHien(); veProp(); moPhaiNeuCan();
     try { d.setPointerCapture(e.pointerId); } catch {}
@@ -949,9 +1131,9 @@ function keoItem(d, k, i, bd, dai) {
   });
 }
 /* bấm vào ruler / track trống = đặt playhead; thả footage vào V1 */
-$('#tlIn').addEventListener('pointerdown', e => { if (e.target.closest('.item') || e.target.closest('.lb')) return; const r = $('#tlIn').getBoundingClientRect(); const t = Math.max(0, Math.min(tongGiay(), (e.clientX - r.left - 64) / PX())); if (P.dang) dung(); P.t = t; P.chon = null; veTl(); veKhung(); });
+$('#tlIn').addEventListener('pointerdown', e => { if (e.target.closest('.item') || e.target.closest('.lb')) return; const r = $('#tlIn').getBoundingClientRect(); const t = Math.max(0, Math.min(tongGiay(), (e.clientX - r.left - LB) / PX())); if (P.dang) dung(); P.t = t; P.chon = null; veTl(); veKhung(); });
 $('#tlIn').addEventListener('dragover', e => { e.preventDefault(); });
-$('#tlIn').addEventListener('drop', e => { e.preventDefault(); try { const o = JSON.parse(e.dataTransfer.getData('text/plain')); if (!o.src) return; const r = $('#tlIn').getBoundingClientRect(), t = (e.clientX - r.left - 64) / PX();
+$('#tlIn').addEventListener('drop', e => { e.preventDefault(); try { const o = JSON.parse(e.dataTransfer.getData('text/plain')); if (!o.src) return; const r = $('#tlIn').getBoundingClientRect(), t = (e.clientX - r.left - LB) / PX();
   if (e.target.closest('.track.v2') || e.target.closest('.track.v3')) { luuHoanTac(); P.broll.push({ id: uid(), src: o.src, bd: o.bd, kt: Math.min(o.kt, o.bd + 4), t_bd: Math.max(0, hit(t)), kieu: 'full', lop: e.target.closest('.track.v3') ? 3 : 2 }); veTl(); toast('Đã đặt b-roll trên V2 (che toàn khung). Chọn để đổi sang khung nhỏ.'); return; } let acc = 0, vt = P.clips.length; for (let j = 0; j < P.clips.length; j++) { const len = P.clips[j].kt - P.clips[j].bd; if (t < acc + len / 2) { vt = j; break; } acc += len; } luuHoanTac(); P.clips.splice(vt, 0, { src: o.src, bd: o.bd, kt: o.kt, ly_do: 'kéo vào' }); veTl(); } catch {} });
 function viTri(t) { let acc = 0; for (let i = 0; i < P.clips.length; i++) { const c = P.clips[i], d = daiC(c); if (t < acc + d || i === P.clips.length - 1) return { clip: i, tSrc: Math.min(c.kt, c.bd + Math.max(0, t - acc) * tocC(c)), bdTl: acc }; acc += d; } return { clip: -1, tSrc: 0, bdTl: 0 }; }
 function xemTai(sid, tSrc) { let acc = 0; for (const c of P.clips) { if (c.src === sid && tSrc >= c.bd && tSrc <= c.kt) { P.t = acc + (tSrc - c.bd) / tocC(c); veKhung(); vePh(); return; } acc += daiC(c); } toast('Câu này đang bị cắt, tick lại để đưa vào'); }
@@ -1154,11 +1336,13 @@ function veNguonThuong(ctx, W, H, s, im, tSrc, z, anh, khongNen) {
 function veNen(ctx, W, H, t, nguon) {
   const { clip, tSrc, bdTl } = viTri(t); if (clip < 0) { ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H); return null; }
   const c = P.clips[clip], s = srcCua(c.src); if (!s || !s.el) { ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H); return null; }
+  if (trAn('v1')) { ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H); } else {
   veNenKhung(ctx, W, H, c, s, nguon === 'phu' && s.loai === 'video' ? elPhu(s, 'el2') : s.el);
   let z = 1; if ($('#zoomOn').checked) for (const zt of P.zoom) { const d = t - zt; if (d >= 0 && d < 3) { z = 1 + 0.06 * Math.min(1, d / 0.4) * (1 - Math.max(0, (d - 2.4) / 0.6)); break; } }
   apDoan(ctx, W, H, c, t - bdTl, g => { let [s2, im2] = catNguon(c, s, nguon === 'phu' && s.loai === 'video' ? elPhu(s, 'el2') : s.el, 0); [s2, im2] = chinhMau(c, s2, im2, t); veNguon(g, W, H, s2, im2, tSrc, z); });
+  }
   // V2 b-roll đè lên
-  [...P.broll].sort((a, b2) => (a.lop || 2) - (b2.lop || 2)).forEach(b => { const dai = (b.kt - b.bd) / tocC(b); if (t < b.t_bd || t >= b.t_bd + dai) return; const sb = srcCua(b.src); if (!sb || !sb.el) return; let im = sb.loai === 'video' ? elPhu(sb, 'elB') : sb.el; if (b.chroma) im = chromaKey(im, sb, b) || im; let sbx = sb; [sbx, im] = catNguon(b, sb, im, 1); [sbx, im] = chinhMau(b, sbx, im, t); const a = Math.min(1, (t - b.t_bd) / 0.25, (b.t_bd + dai - t) / 0.25);   // độ mờ b.mo đã tính trong apDoan
+  [...P.broll].sort((a, b2) => (a.lop || 2) - (b2.lop || 2)).forEach(b => { if (trAn(b.lop === 3 ? 'v3' : 'v2')) return; const dai = (b.kt - b.bd) / tocC(b); if (t < b.t_bd || t >= b.t_bd + dai) return; const sb = srcCua(b.src); if (!sb || !sb.el) return; let im = sb.loai === 'video' ? elPhu(sb, 'elB') : sb.el; if (b.chroma) im = chromaKey(im, sb, b) || im; let sbx = sb; [sbx, im] = catNguon(b, sb, im, 1); [sbx, im] = chinhMau(b, sbx, im, t); const a = Math.min(1, (t - b.t_bd) / 0.25, (b.t_bd + dai - t) / 0.25);   // độ mờ b.mo đã tính trong apDoan
     apDoan(ctx, W, H, b, t - b.t_bd, ctx => { ctx.save(); ctx.globalAlpha *= Math.max(0, a); const sb = sbx;
     if (b.kieu === 'pip') { const pw = W * 0.72, ph = pw * 9 / 16, px0 = W / 2 - pw / 2, py0 = H * 0.13; ctx.beginPath(); ctx.roundRect(px0, py0, pw, ph, W * 0.03); ctx.fillStyle = '#000'; ctx.fill(); ctx.clip(); const iw = sb.w || 1, ih = sb.h || 1, sc = Math.max(pw / iw, ph / ih); ctx.drawImage(im, px0 + pw / 2 - iw * sc / 2, py0 + ph / 2 - ih * sc / 2, iw * sc, ih * sc); ctx.restore(); ctx.save(); ctx.strokeStyle = mauNhan(); ctx.lineWidth = W * 0.008; ctx.beginPath(); ctx.roundRect(px0, py0, pw, ph, W * 0.03); ctx.stroke(); }
     else if (b.vua === 'contain') { const iw = sb.w || 1, ih = sb.h || 1, k = Math.min(W / iw, H / ih); ctx.drawImage(im, W / 2 - iw * k / 2, H / 2 - ih * k / 2, iw * k, ih * k); }
@@ -1176,9 +1360,9 @@ function veFrame(ctx, W, H, t, snap) {
   if (ch && snap && snap.width === W) { const g = gltVe(ch.kieu, snap, nenCv, ch.p, W, H); if (g) { ctx.drawImage(g, 0, 0); daVe = true; } else { ctx.drawImage(snap, 0, 0); ctx.globalAlpha = ch.p; ctx.drawImage(nenCv, 0, 0); ctx.globalAlpha = 1; daVe = true; } }
   if (!daVe) ctx.drawImage(nenCv, 0, 0);
   if (!r) return null;
-  P.gfx.forEach(g => { if (t >= g.bd && t < g.kt) veDoHoa(ctx, W, H, g, t); });
-  if ($('#phuDe').checked) vePhuDe(ctx, W, H, t);
-  const hook = $('#hook').value.trim(); if (hook && t < 3.2) veHook(ctx, hook, W, H, t);
+  if (!trAn('o1')) P.gfx.forEach(g => { if (t >= g.bd && t < g.kt) veDoHoa(ctx, W, H, g, t); });
+  if ($('#phuDe').checked && !trAn('o2')) vePhuDe(ctx, W, H, t);
+  const hook = $('#hook').value.trim(); if (hook && t < 3.2 && !trAn('o2')) veHook(ctx, hook, W, H, t);
   return r;
 }
 /* khung cuối của đoạn trước (cho xem thử tĩnh trong cửa sổ chuyển cảnh): vẽ bằng phần tử phụ để không phá đoạn đang xem */
@@ -1195,7 +1379,7 @@ async function veKhung() {
   for (const b of P.broll) { const dai = b.kt - b.bd; if (P.t >= b.t_bd && P.t < b.t_bd + dai) { const sb = srcCua(b.src); if (sb && sb.loai === 'video' && !P.dang) await seekTo(elPhu(sb, 'elB'), b.bd + (P.t - b.t_bd)); } }
   let snap = null; const ch = chuyenTai(P.t); if (ch && !P.dang) { await gltNap(); snap = await laySnapTruoc(cv.width, cv.height, ch.truoc); }
   veFrame(cx, cv.width, cv.height, P.t, snap); veTay();
-  $('#seek').value = Math.round(P.t * 100); $('#tg').textContent = fmt(P.t) + ' / ' + fmt(tongGiay()); $('#tg2').innerHTML = fmtF(P.t) + ' <small>/ ' + fmt(tongGiay()) + '</small>'; vePh();
+  $('#seek').value = Math.round(P.t * 100); datTg(tongGiay()); $('#tg2').innerHTML = fmtF(P.t) + ' <small>/ ' + fmt(tongGiay()) + '</small>'; vePh();
 }
 $('#seek').addEventListener('input', () => { if (P.dang) dung(); P.t = +$('#seek').value / 100; veKhung(); });
 $('#btnToanManHinh').onclick = () => { const k = $('.khung'); if (document.fullscreenElement) document.exitFullscreen(); else if (k.requestFullscreen) k.requestFullscreen(); };
@@ -1244,12 +1428,12 @@ async function phat(xuat) {
     const c = P.clips[cur], s = srcCua(c.src);
     if (v && !v.paused && !v.ended) P.t = bdTl + (v.currentTime - c.bd) / tocC(c); else P.t = tlLuc + (performance.now() - batDau) / 1000;
     // A2 lồng tiếng: phát đúng chỗ, tiếng gốc video hạ còn 25% khi có lồng tiếng
-    let coLong = false; P.tieng.forEach(t => { const trong = P.t >= t.t_bd && P.t < t.t_bd + t.giay; if (trong) coLong = true; if (!t.el) return; if (trong && t.el.paused) { try { t.el.currentTime = Math.max(0, P.t - t.t_bd); t.el.play(); } catch {} } else if (!trong && !t.el.paused) t.el.pause(); });
-    if (s && nutAm[s.id]) nutAm[s.id].gain.setTargetAtTime(giaTriKf(c, 'am', P.t - bdTl) * fadeHeSo(c, P.t - bdTl) * (coLong ? 0.25 : 1), ac.currentTime, 0.05);   // âm lượng + fade của đoạn, hạ khi có lồng tiếng
-    if (nhacGain) { const coTieng = coLong || (s && s.cau.some(x => tSrc >= x.bd && tSrc <= x.kt)); let m = coTieng ? mucNoi() : mucBroll(); if (tong - P.t < 1.5) m *= Math.max(0, (tong - P.t) / 1.5); nhacGain.gain.setTargetAtTime(m, ac.currentTime, 0.2); }
+    let coLong = false; P.tieng.forEach(t => { if (t.el) t.el.muted = trTat('a2'); const trong = P.t >= t.t_bd && P.t < t.t_bd + t.giay; if (trong) coLong = true; if (!t.el) return; if (trong && t.el.paused) { try { t.el.currentTime = Math.max(0, P.t - t.t_bd); t.el.play(); } catch {} } else if (!trong && !t.el.paused) t.el.pause(); });
+    if (s && nutAm[s.id]) nutAm[s.id].gain.setTargetAtTime(giaTriKf(c, 'am', P.t - bdTl) * fadeHeSo(c, P.t - bdTl) * (coLong ? 0.25 : 1) * (trTat('v1') ? 0 : 1), ac.currentTime, 0.05);   // âm lượng + fade của đoạn, hạ khi có lồng tiếng
+    if (nhacGain) { const coTieng = coLong || (s && s.cau.some(x => tSrc >= x.bd && tSrc <= x.kt)); let m = coTieng ? mucNoi() : mucBroll(); if (tong - P.t < 1.5) m *= Math.max(0, (tong - P.t) / 1.5); nhacGain.gain.setTargetAtTime(trTat('a1') ? 0 : m, ac.currentTime, 0.2); }
     if (P.t >= bdTl + daiC(c) - 0.02) { if (cur >= P.clips.length - 1) { P.t = tong; xong(); return; } P.t = bdTl + daiC(c) + 0.001; }
     veFrame(ctx, W, H, Math.min(P.t, tong), snap);
-    if (!xuat) { $('#seek').value = Math.round(P.t * 100); $('#tg').textContent = fmt(P.t) + ' / ' + fmt(tong); $('#tg2').innerHTML = fmtF(P.t) + ' <small>/ ' + fmt(tong) + '</small>'; vePh(); }
+    if (!xuat) { $('#seek').value = Math.round(P.t * 100); datTg(tong); $('#tg2').innerHTML = fmtF(P.t) + ' <small>/ ' + fmt(tong) + '</small>'; vePh(); }
     else { $('#xuatBar').style.width = Math.min(100, P.t / tong * 100) + '%'; $('#xuatTt').textContent = 'Đang dựng ' + fmt(P.t) + ' / ' + fmt(tong) + ' · đừng chuyển tab'; }
     requestAnimationFrame(buoc);
   };
@@ -1434,7 +1618,7 @@ function veLatCat(box, m) {
   const c = m.cat || { l: 0, t: 0, r: 0, b: 0 }; [['l', 'Cắt trái'], ['r', 'Cắt phải'], ['t', 'Cắt trên'], ['b', 'Cắt dưới']].forEach(([p, t]) => oTruot(n, t, 0, 0.45, 0.01, c[p] || 0, pct, v => { m.cat = { ...(m.cat || { l: 0, t: 0, r: 0, b: 0 }), [p]: v }; }));
 }
 /* ── Ctrl + cuộn trên dòng thời gian để zoom (giữ đầu phát đứng yên) ── */
-$('#tlScroll').addEventListener('wheel', e => { if (!e.ctrlKey && !e.metaKey) return; e.preventDefault(); const sc = $('#tlScroll'), r = sc.getBoundingClientRect(), tChuot = (e.clientX - r.left + sc.scrollLeft - 64) / PX(); const z = Math.max(6, Math.min(80, P.pxs * (e.deltaY < 0 ? 1.15 : 1 / 1.15))); P.pxs = Math.round(z); $('#zoomTl').value = P.pxs; veTl(); sc.scrollLeft = Math.max(0, tChuot * PX() + 64 - (e.clientX - r.left)); }, { passive: false });
+$('#tlScroll').addEventListener('wheel', e => { if (!e.ctrlKey && !e.metaKey) return; e.preventDefault(); const sc = $('#tlScroll'), r = sc.getBoundingClientRect(), tChuot = (e.clientX - r.left + sc.scrollLeft - LB) / PX(); const z = Math.max(6, Math.min(80, P.pxs * (e.deltaY < 0 ? 1.15 : 1 / 1.15))); P.pxs = Math.round(z); $('#zoomTl').value = P.pxs; veTl(); sc.scrollLeft = Math.max(0, tChuot * PX() + 64 - (e.clientX - r.left)); }, { passive: false });
 $('#btnLamLai').onclick = lamLai;
 
 function am3Nhe() { return (P.am3 || []).map(a => ({ ...a, el: undefined, gain: undefined })); }
@@ -1649,7 +1833,7 @@ function am3Lich(a, t0, now, raXuat) {
   if (fo) { const bdFo = Math.max(vao, dai - fo); g.gain.setValueAtTime(vol * Math.min(1, (dai - bdFo) / fo), st + (bdFo - vao)); g.gain.linearRampToValueAtTime(0, st + con); }
   src.start(st, Math.min(k.buf.duration - 0.001, a.bd + vao), con); return src;
 }
-function am3BatDau() { am3Dung(); if (!ac) return; const t0 = P.t, now = ac.currentTime + 0.02; (P.am3 || []).forEach(a => { const s = am3Lich(a, t0, now, true); if (s) am3Nguon.push(s); }); }
+function am3BatDau() { am3Dung(); if (!ac || trTat('a3')) return; const t0 = P.t, now = ac.currentTime + 0.02; (P.am3 || []).forEach(a => { const s = am3Lich(a, t0, now, true); if (s) am3Nguon.push(s); }); }
 function am3Dung() { am3Nguon.forEach(s => { try { s.stop(); } catch { } }); am3Nguon = []; }
 async function am3Nghe(a) { moAm(); try { await ac.resume(); } catch { } try { await am3NapKho(a.kho); } catch { toast('Chưa nạp được âm thanh này'); return; } const s = am3Lich({ ...a, t_bd: 0 }, 0, ac.currentTime + 0.02, false); if (s) am3Nguon.push(s); }
 /* âm lượng trung bình (bỏ khoảng im) theo năng lượng 50 khung/giây → dB */
@@ -1736,7 +1920,7 @@ async function tachAmClip(i) {
   $('#am3Tt').textContent = 'Đã tách âm thanh xuống A3 và tắt tiếng đoạn gốc' + (tocC(c) !== 1 ? ' (âm tách giữ tốc độ gốc)' : '') + '. Kéo lệch để làm J-cut / L-cut.'; return a;
 }
 function khoiTaoC() {
-  $('#am3Hop').innerHTML = '<h3>Âm thanh A3 · hiệu ứng, ghi âm, tách tiếng</h3><div class="mauLuoi" id="sfxLuoi"></div><div class="row"><label class="btn nho" style="cursor:pointer">📂 Thêm file âm thanh<input type="file" id="am3In" accept="audio/*" multiple hidden></label><button class="btn nho" id="btnThuAm" type="button">🎙 Ghi âm</button></div><div class="row"><button class="btn nho" id="btnTachAm" type="button" title="Chọn một đoạn trên V1 trước">⤓ Tách âm thanh đoạn đang chọn</button><button class="btn nho" id="btnChuanAm" type="button" title="Đưa các đoạn về cùng độ to (khoảng -19 dB, gần chuẩn -14 LUFS khi đăng)">📏 Chuẩn hoá âm lượng</button></div><div class="quota" id="am3Tt">Hiệu ứng âm thanh đặt tại đầu phát. Ghi âm: dòng thời gian phát để bạn nói theo hình.</div>';
+  $('#am3Hop').innerHTML = '<h3 class="pt">Hiệu ứng âm thanh</h3><div class="mauLuoi" id="sfxLuoi"></div><h3 class="pt">Ghi âm & tách tiếng</h3><div class="row"><label class="btn nho" style="cursor:pointer">📂 Thêm file âm thanh<input type="file" id="am3In" accept="audio/*" multiple hidden></label><button class="btn nho" id="btnThuAm" type="button">🎙 Ghi âm</button></div><div class="row"><button class="btn nho" id="btnTachAm" type="button" title="Chọn một đoạn trên V1 trước">⤓ Tách âm thanh đoạn đang chọn</button><button class="btn nho" id="btnChuanAm" type="button" title="Đưa các đoạn về cùng độ to (khoảng -19 dB, gần chuẩn -14 LUFS khi đăng)">📏 Chuẩn hoá âm lượng</button></div><div class="quota" id="am3Tt">Hiệu ứng âm thanh đặt tại đầu phát. Ghi âm: dòng thời gian phát để bạn nói theo hình.</div>';
   Object.entries(SFX).forEach(([k, [ten]]) => { const b = el('button'); b.type = 'button'; b.dataset.k = k; b.textContent = ten; b.onclick = () => themAm3('sfx:' + k, ten.replace(/^\S+\s/, ''), 'sfx'); $('#sfxLuoi').appendChild(b); });
   $('#am3In').onchange = async e => { for (const f of [...e.target.files]) { const kho = 'f:' + uid(); try { await am3NapBlob(kho, f); await themAm3(kho, f.name.replace(/\.[^.]+$/, ''), 'file'); } catch { toast('Không đọc được ' + f.name); } } e.target.value = ''; };
   $('#btnTachAm').onclick = () => tachAmClip(P.chon && P.chon.k === 'v' ? P.chon.i : -1);
@@ -1793,19 +1977,19 @@ async function tronAmThanh(tong, sr) {
   sr = sr || 48000; const oc = new OfflineAudioContext(2, Math.max(1, Math.ceil(tong * sr)), sr), ra = oc.destination;
   const mucNoi = (+$('#duckNoi').value || 12) / 100, mucBroll = (+$('#duckBroll').value || 60) / 100;
   const coLongTai = x => P.tieng.some(t => x >= t.t_bd && x < t.t_bd + t.giay);
-  for (const t of P.tieng) { if (t.t_bd >= tong) continue; try { const buf = t.b64 ? await giaiMaAm(new Blob([Uint8Array.from(atob(t.b64), c => c.charCodeAt(0))])) : await bufTuUrl(t.url); const s = oc.createBufferSource(); s.buffer = buf; s.connect(ra); s.start(t.t_bd, 0, Math.min(buf.duration, tong - t.t_bd)); } catch { } }
+  for (const t of P.tieng) { if (t.t_bd >= tong || trTat('a2')) continue; try { const buf = t.b64 ? await giaiMaAm(new Blob([Uint8Array.from(atob(t.b64), c => c.charCodeAt(0))])) : await bufTuUrl(t.url); const s = oc.createBufferSource(); s.buffer = buf; s.connect(ra); s.start(t.t_bd, 0, Math.min(buf.duration, tong - t.t_bd)); } catch { } }
   let acc = 0;
   for (const c of P.clips) {
-    const dai = daiC(c), s = srcCua(c.src), bd0 = acc; acc += dai; if (!s || s.loai !== 'video') continue;
+    const dai = daiC(c), s = srcCua(c.src), bd0 = acc; acc += dai; if (!s || s.loai !== 'video' || trTat('v1')) continue;
     let buf; try { buf = (await am3NapKho('src:' + s.id)).buf; } catch { continue; } if (c.bd >= buf.duration) continue;
     const k = tocC(c), src = oc.createBufferSource(), g = oc.createGain(); src.buffer = k === 1 ? buf : gianDoan(oc, buf, c.bd, Math.min(c.kt, buf.duration), k); src.connect(g); g.connect(ra);   // tua nhanh/chậm: giữ cao độ giọng như lúc xem trước
     let cu = -1; for (let o = 0; o <= dai + 1e-6; o += 0.02) { const v = Math.max(0, giaTriKf(c, 'am', o) * fadeHeSo(c, o) * (coLongTai(bd0 + o) ? 0.25 : 1)); if (cu < 0) g.gain.setValueAtTime(v, bd0); else if (Math.abs(v - cu) > 0.001) g.gain.linearRampToValueAtTime(v, bd0 + o); cu = v; }
     if (k === 1) src.start(bd0, c.bd, Math.max(0.01, Math.min(c.kt, buf.duration) - c.bd)); else src.start(bd0, 0, Math.min(dai, src.buffer.duration));
   }
-  if (P.nhac) { try { const buf = await bufTuUrl(P.nhac.url), s = oc.createBufferSource(), g = oc.createGain(); s.buffer = buf; s.loop = true; s.connect(g); g.connect(ra);
+  if (P.nhac && !trTat('a1')) { try { const buf = await bufTuUrl(P.nhac.url), s = oc.createBufferSource(), g = oc.createGain(); s.buffer = buf; s.loop = true; s.connect(g); g.connect(ra);
     let cu = -1; for (let x = 0; x <= tong; x += 0.05) { const { clip, tSrc } = viTri(x), c = P.clips[clip], sc = c && srcCua(c.src), coTieng = coLongTai(x) || (sc && sc.cau.some(q => tSrc >= q.bd && tSrc <= q.kt)); let m = coTieng ? mucNoi : mucBroll; if (tong - x < 1.5) m *= Math.max(0, (tong - x) / 1.5); if (cu < 0) g.gain.setValueAtTime(m, 0); else if (Math.abs(m - cu) > 0.001) g.gain.setTargetAtTime(m, x, tong - x < 1.5 ? 0.02 : 0.2); cu = m; }
     s.start(0); s.stop(tong); } catch { } }
-  await am3NapThieu(); (P.am3 || []).forEach(a => am3Lich(a, 0, 0, { ctx: oc }));
+  await am3NapThieu(); if (!trTat('a3')) (P.am3 || []).forEach(a => am3Lich(a, 0, 0, { ctx: oc }));
   return await oc.startRendering();
 }
 /* vẽ một khung tại t cho bản xuất: tua footage chính, b-roll và khung trước chuyển cảnh đúng giây rồi dùng chung veFrame */
@@ -1852,6 +2036,212 @@ async function batDauXuat() {
   }
   if (!window.MediaRecorder || !cv.captureStream) { toast('Trình duyệt này chưa xuất được video, dùng Chrome hoặc Safari mới.'); $('#xuatHop').classList.remove('mo'); return; }
   $('#xuatTieuDe').textContent = 'Đang dựng video…'; P.t = 0; await phat(true);
+}
+
+/* ═════════ GIAO DIỆN KIỂU CAPCUT (bố cục, icon, thao tác học từ OpenCut) ═════════ */
+const IC = {
+  scissor: '<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.1 15.9M14.5 14.5 20 20M8.1 8.1 12 12"/>',
+  media: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m10 9 5 3-5 3z"/>',
+  audio: '<path d="M9 18V6l10-2v12"/><circle cx="6" cy="18" r="3"/><circle cx="16" cy="16" r="3"/>',
+  text: '<path d="M5 6V4h14v2M12 4v16M9 20h6"/>',
+  sticker: '<path d="M21 12a9 9 0 1 1-9-9h9z"/><path d="M9 10h.01M15 10h.01M8.5 14.5c2 2 5 2 7 0"/>',
+  effect: '<path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>',
+  trans: '<rect x="3" y="6" width="7" height="12" rx="1"/><rect x="14" y="6" width="7" height="12" rx="1"/><path d="M10 12h4"/>',
+  filter: '<circle cx="9" cy="9" r="5"/><circle cx="15" cy="9" r="5"/><circle cx="12" cy="15" r="5"/>',
+  caption: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 15h4M13 15h4M7 11h10"/>',
+  shape: '<rect x="3" y="3" width="8" height="8" rx="1"/><circle cx="17" cy="7" r="4"/><path d="m12 21 4.5-8 4.5 8z"/>',
+  ai: '<rect x="5" y="7" width="14" height="12" rx="3"/><path d="M12 3v4M9 12h.01M15 12h.01M9.5 15.5h5M2 12v3M22 12v3"/>',
+  undo: '<path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>',
+  redo: '<path d="m15 14 5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/>',
+  split: '<path d="M12 3v18"/><path d="M8 7 4 12l4 5M16 7l4 5-4 5"/>',
+  delL: '<path d="M15 3v18"/><rect x="3" y="7" width="8" height="10" rx="1.5"/><path d="m5.5 10 3 4m0-4-3 4"/>',
+  delR: '<path d="M9 3v18"/><rect x="13" y="7" width="8" height="10" rx="1.5"/><path d="m15.5 10 3 4m0-4-3 4"/>',
+  trash: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
+  copy: '<rect x="8" y="8" width="13" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/>',
+  freeze: '<path d="M12 2v20M3.3 7l17.4 10M20.7 7 3.3 17"/><path d="m9 4 3 2 3-2M9 20l3-2 3 2"/>',
+  mirror: '<path d="M12 3v18"/><path d="M8 7 3 17h5zM16 7l5 10h-5z"/>',
+  rotate: '<path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/>',
+  crop: '<path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/>',
+  kf: '<path d="m12 3 9 9-9 9-9-9z"/>',
+  wave: '<path d="M3 10v4M7 7v10M11 4v16M15 8v8M19 11v2"/>',
+  mark: '<path d="M6 3h12v15l-6-4-6 4z"/>',
+  slip: '<path d="M3 12h18M7 8l-4 4 4 4M17 8l4 4-4 4"/>',
+  link: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+  magnet: '<path d="M6 3v8a6 6 0 0 0 12 0V3"/><path d="M6 7h4M14 7h4"/>',
+  zoomOut: '<circle cx="11" cy="11" r="7"/><path d="m20 20-4-4M8 11h6"/>',
+  zoomIn: '<circle cx="11" cy="11" r="7"/><path d="m20 20-4-4M8 11h6M11 8v6"/>',
+  kbd: '<rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/>',
+  full: '<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
+  gear: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.9 4.9 7 7M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1 7 17M17 7l2.1-2.1"/>',
+  export: '<path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 15v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/>',
+  eye: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  eyeOff: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><path d="M3 3l18 18"/>',
+  lock: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+  unlock: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.5-2"/>',
+  vol: '<path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/>',
+  mute: '<path d="M11 5 6 9H3v6h3l5 4z"/><path d="m22 9-6 6m0-6 6 6"/>',
+  grid: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+  paste: '<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>'
+};
+function ic(k) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (IC[k] || '') + '</svg>'; }
+/* đồng hồ kiểu CapCut: giờ:phút:giây:khung */
+function tc(t) { t = Math.max(0, t || 0); const p = n => String(n).padStart(2, '0'); return p(Math.floor(t / 3600)) + ':' + p(Math.floor(t / 60) % 60) + ':' + p(Math.floor(t) % 60) + ':' + p(Math.floor((t % 1) * 30)); }
+function datTg(tong) { const g = $('#tg'); if (g) g.innerHTML = '<b>' + tc(P.t) + '</b> / ' + tc(tong); const t2 = $('#tiLe2'); if (t2 && t2.value !== $('#tiLe').value) t2.value = $('#tiLe').value; }
+/* track: ẩn / tắt tiếng / khoá */
+function trO(k) { return (P.tr && P.tr[k]) || {}; }
+function trAn(k) { return !!trO(k).an; }
+function trTat(k) { return !!trO(k).tat; }
+function trKhoa(k) { return !!trO(k).khoa; }
+const TR_NUT = { o2: ['an', 'khoa'], o1: ['an', 'khoa'], v3: ['an', 'khoa'], v2: ['an', 'khoa'], v1: ['tat', 'an', 'khoa'], a2: ['tat', 'khoa'], a3: ['tat', 'khoa'], a1: ['tat', 'khoa'] };
+function veTrNut() { $$('.track').forEach(tr => { const k = tr.dataset.track, o = trO(k); tr.classList.toggle('an', !!o.an); tr.classList.toggle('tat', !!o.tat); tr.classList.toggle('khoa', !!o.khoa); tr.querySelectorAll('.trn').forEach(b => { const n = b.dataset.n, bat = !!o[n]; b.innerHTML = ic(n === 'an' ? (bat ? 'eyeOff' : 'eye') : n === 'tat' ? (bat ? 'mute' : 'vol') : (bat ? 'lock' : 'unlock')); b.classList.toggle('bat', bat); b.title = { an: bat ? 'Hiện track' : 'Ẩn track', tat: bat ? 'Bật tiếng track' : 'Tắt tiếng track', khoa: bat ? 'Mở khoá track' : 'Khoá track (không kéo, sửa được)' }[n]; b.setAttribute('aria-pressed', String(bat)); }); }); }
+function doiTr(k, n) { P.tr = P.tr || {}; const o = P.tr[k] = P.tr[k] || {}; o[n] = !o[n]; veTrNut(); if (n === 'tat' && P.dang && k === 'a3') am3BatDau(); if (n === 'tat' && P.dang && k === 'a2') P.tieng.forEach(t => { if (t.el) t.el.muted = trTat('a2'); }); if (!P.dang) veKhung(); }
+/* dải khung hình (filmstrip) trên đoạn, như CapCut */
+async function taoPhim(s) {
+  if (!s || s.phim || s.dangPhim || !s.el || !s.w || !s.h) return; s.dangPhim = true;
+  await null;   // không vẽ lại dòng thời gian khi đang ở giữa veTl
+  try {
+    const fh = 54, fw = Math.max(24, Math.min(110, Math.round(fh * s.w / s.h)));
+    if (s.loai !== 'video') { const c = document.createElement('canvas'); c.width = fw; c.height = fh; c.getContext('2d').drawImage(s.el, 0, 0, fw, fh); s.phim = { cv: c, n: 1, buoc: 1e9, fw, fh }; }
+    else { const n = Math.max(2, Math.min(60, Math.ceil(s.giay || 2))), buoc = (s.giay || 2) / n, v = elPhu(s, 'elP'), c = document.createElement('canvas'); c.width = fw * n; c.height = fh; const g = c.getContext('2d');
+      for (let i = 0; i < n; i++) { await seekTo(v, Math.min((s.giay || 2) - 0.05, (i + 0.5) * buoc)); try { g.drawImage(v, i * fw, 0, fw, fh); } catch { } }
+      s.phim = { cv: c, n, buoc, fw, fh }; }
+    setTimeout(() => { if (!P.dang) veTl(); }, 0);
+  } catch { } s.dangPhim = false;
+}
+function vePhimItem(d, s, bd, kt, wPx) {
+  if (!s) return; if (!s.phim) { taoPhim(s); return; }
+  const h = 54, w = Math.min(4000, Math.max(1, Math.round(wPx))), c = el('canvas', 'phim'); c.width = w; c.height = h; const g = c.getContext('2d'), p = s.phim, tw = Math.max(8, Math.round(h * p.fw / p.fh));
+  for (let x = 0; x < w; x += tw) { const t = bd + (kt - bd) * Math.min(1, (x + tw / 2) / w), k = Math.max(0, Math.min(p.n - 1, Math.floor(t / p.buoc))); g.drawImage(p.cv, k * p.fw, 0, p.fw, p.fh, x, 0, tw, h); }
+  d.insertBefore(c, d.firstChild);
+}
+/* thẻ trong lưới (ảnh/biểu tượng ở trên, tên ở dưới) */
+function theHoa(b, noi, ten, phu) { b.innerHTML = ''; const t = el('div', 'the'); if (typeof noi === 'string') t.innerHTML = noi; else if (noi) t.appendChild(noi); b.appendChild(t); const n = el('div', 'ten', ten); if (phu) n.appendChild(el('small', null, phu)); b.appendChild(n); b.title = ten; }
+const HU_IC = { khong: '⦸', rung: '📳', nhip: '💓', chop: '⚡', ro_sang: '🌅', phim_cu: '🎞', nhoe_zoom: '🌀' };
+const CH_IC = { cat: '✂', fade: '◐', slide: '➡', zoom: '🔍', wipe: '▧', whip: '💨', flash: '⚡', glitch: '▦', circle: '◯', blur: '≋' };
+function anhKhungNho() { try { if (!P.clips.length) return ''; const c = document.createElement('canvas'); c.width = 96; c.height = 96; const sc = Math.max(96 / cv.width, 96 / cv.height); c.getContext('2d').drawImage(cv, 48 - cv.width * sc / 2, 48 - cv.height * sc / 2, cv.width * sc, cv.height * sc); return c.toDataURL('image/jpeg', 0.75); } catch { return ''; } }
+function capNhatAnhLoc() { const u = anhKhungNho(); $$('#locLuoi .the img').forEach(im => { if (u) im.src = u; im.hidden = !u; }); }
+function datChuyen(k) {
+  if (P.clips.length < 2) { toast('Cần ít nhất 2 đoạn trên V1'); return; }
+  let i = P.chon && P.chon.k === 'v' ? P.chon.i : -1;
+  if (i < 0 || i >= P.clips.length - 1) { let acc = 0, gan = 1e9; P.clips.forEach((c, j) => { acc += daiC(c); if (j < P.clips.length - 1 && Math.abs(acc - P.t) < gan) { gan = Math.abs(acc - P.t); i = j; } }); }
+  luuHoanTac(); P.clips[i].chuyen = k; P.clips[i].chuyen_dai = +$('#chuyenDai').value; if (k !== 'cat') gltNap(); veTl(); veKhung();
+  $$('#chuyenLuoi button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.k === k))); toast('Chuyển cảnh “' + CHUYEN_TEN[k] + '” sau đoạn ' + (i + 1));
+}
+/* cột danh mục bên trái mỗi tab: bấm để cuộn tới nhóm */
+function taoBen(pane) {
+  const hs = [...pane.querySelectorAll('h3.pt')]; if (hs.length < 2 || pane.querySelector('.ben')) return;
+  const ben = el('nav', 'ben'), noi = el('div', 'noi'); while (pane.firstChild) noi.appendChild(pane.firstChild); pane.appendChild(ben); pane.appendChild(noi); pane.classList.add('coBen');
+  const ve = () => { ben.innerHTML = ''; hs.forEach(h => { if (!h.offsetParent && pane.classList.contains('on')) return; const b = el('button', null, h.textContent); b.type = 'button'; b.onclick = () => { noi.scrollTo({ top: h.offsetTop - noi.offsetTop - 6, behavior: 'smooth' }); }; b._h = h; ben.appendChild(b); }); soi(); };
+  const soi = () => { const bs = [...ben.children]; let cur = bs[0]; bs.forEach(b => { if (b._h.offsetTop - noi.offsetTop - 30 <= noi.scrollTop) cur = b; }); bs.forEach(b => b.classList.toggle('on', b === cur)); };
+  noi.addEventListener('scroll', soi, { passive: true }); pane._veBen = ve; ve();
+}
+/* thuộc tính theo tab (Video · Hoạt ảnh · Tốc độ & âm · Điều chỉnh…) */
+const TAB_NHOM = { 'Khung hình': 'Video', 'Keyframe ◇': 'Video', 'Lật & cắt khung': 'Video', 'Khung hình (overlay)': 'Video', 'Lớp & khớp khung': 'Video', 'Ghép nền (chroma key) & độ mờ': 'Video', 'Hoạt ảnh vào / ra': 'Hoạt ảnh', 'Hoạt ảnh chữ': 'Hoạt ảnh', 'Tốc độ & âm thanh': 'Tốc độ & âm', 'Màu': 'Điều chỉnh', 'Kiểu chữ': 'Văn bản', 'Sticker': 'Nhãn dán', 'Bám theo lời nói': 'Đồ hoạ', 'Đồ hoạ AI': 'Đồ hoạ' };
+function tenNhom(n) { const b = n.querySelector(':scope > b'), t = b ? b.textContent.trim() : 'Khác'; return TAB_NHOM[t] || t; }
+function moTabProp(t) { P.propTab = t; tabHoaProp(); }
+function tabHoaProp() {
+  const box = $('#propChon'); box.querySelectorAll(':scope > .ptabs').forEach(x => x.remove());
+  const co = !!(P.chon && box.children.length); $('#ed').classList.toggle('coChon', co);
+  const tde = $('#phaiTieuDe'); if (tde) tde.textContent = co ? ({ v: 'Video', b: 'Overlay', g: 'Văn bản & đồ hoạ', a: 'Âm thanh', t: 'Lồng tiếng' }[P.chon.k] || 'Thuộc tính') : 'Dự án';
+  const ds = [...box.children].filter(x => x.classList.contains('nhom2')); if (ds.length < 2) { ds.forEach(n => n.classList.remove('an')); return; }
+  const tabs = [...new Set(ds.map(tenNhom))]; if (tabs.length < 2) { ds.forEach(n => n.classList.remove('an')); return; }
+  const cur = tabs.includes(P.propTab) ? P.propTab : tabs[0], bar = el('div', 'ptabs');
+  tabs.forEach(t => { const b = el('button', t === cur ? 'on' : null, t); b.type = 'button'; b.onclick = () => moTabProp(t); bar.appendChild(b); });
+  ds.forEach(n => n.classList.toggle('an', tenNhom(n) !== cur)); box.insertBefore(bar, ds[0]);
+}
+function moTabTinh(t) { $$('#prop > .tinh').forEach(s => s.classList.toggle('an', s.dataset.ten !== t)); $$('#tinhTabs button').forEach(b => b.classList.toggle('on', b.textContent === t)); try { localStorage.setItem('dv_tinh', t); } catch { } }
+function tabHoaTinh() {
+  const prop = $('#prop'), kids = [...prop.children].filter(x => x.id !== 'propChon'), secs = []; let cur = null;
+  const TEN = { 'Hook & khung': 'Khung hình', 'Xuất': 'Xuất', 'Dự án': 'Dự án' };
+  kids.forEach(x => { if (x.tagName === 'H3') { cur = el('div', 'tinh'); cur.dataset.ten = TEN[x.textContent.trim()] || x.textContent.trim(); secs.push(cur); prop.appendChild(cur); } if (cur) cur.appendChild(x); });
+  if (!secs.length) return; const bar = el('div', 'ptabs'); bar.id = 'tinhTabs'; prop.insertBefore(bar, secs[0]);
+  secs.forEach(s => { const b = el('button', null, s.dataset.ten); b.type = 'button'; b.onclick = () => moTabTinh(s.dataset.ten); bar.appendChild(b); });
+  let dau = 'Khung hình'; try { dau = localStorage.getItem('dv_tinh') || dau; } catch { } moTabTinh(secs.some(s => s.dataset.ten === dau) ? dau : secs[0].dataset.ten);
+}
+/* khung kéo đổi cỡ (trái · giữa · phải · dòng thời gian), nhớ trên máy */
+function kichCo() { try { return JSON.parse(localStorage.getItem('dv_kc') || '{}'); } catch { return {}; } }
+function apKichCo(o) { const ed = $('#ed'); if (o.trai) ed.style.setProperty('--wTrai', o.trai + 'px'); if (o.phai) ed.style.setProperty('--wPhai', o.phai + 'px'); if (o.tl) ed.style.setProperty('--hTl', o.tl + 'px'); }
+function taoTayKeo(elm, loai) {
+  elm.addEventListener('pointerdown', e => {
+    e.preventDefault(); elm.classList.add('dang'); try { elm.setPointerCapture(e.pointerId); } catch { }
+    const ed = $('#ed'), r = ed.getBoundingClientRect(), o = kichCo(), x0 = e.clientX, y0 = e.clientY, trai0 = $('.ecol.trai').offsetWidth, phai0 = $('.ecol.phai').offsetWidth, tl0 = $('.etl').offsetHeight;
+    const mv = ev => { if (loai === 'trai') o.trai = Math.round(Math.max(240, Math.min(r.width * 0.5, trai0 + ev.clientX - x0))); else if (loai === 'phai') o.phai = Math.round(Math.max(240, Math.min(r.width * 0.4, phai0 - (ev.clientX - x0)))); else o.tl = Math.round(Math.max(150, Math.min(r.height - 260, tl0 - (ev.clientY - y0)))); apKichCo(o); };
+    const up = () => { elm.classList.remove('dang'); elm.removeEventListener('pointermove', mv); elm.removeEventListener('pointerup', up); try { localStorage.setItem('dv_kc', JSON.stringify(o)); } catch { } if (!P.dang) veKhung(); };
+    elm.addEventListener('pointermove', mv); elm.addEventListener('pointerup', up);
+  });
+  elm.addEventListener('dblclick', () => { const o = kichCo(); delete o[loai === 'tl' ? 'tl' : loai]; try { localStorage.setItem('dv_kc', JSON.stringify(o)); } catch { } const ed = $('#ed'); ed.style.removeProperty({ trai: '--wTrai', phai: '--wPhai', tl: '--hTl' }[loai]); });
+}
+function datToanApp(bat) { const ed = $('#ed'); ed.classList.toggle('full', bat); document.body.classList.toggle('edFull', bat); try { localStorage.setItem('dv_full', bat ? '1' : '0'); } catch { } const b = $('#btnToanApp'); if (b) b.title = bat ? 'Thoát toàn màn hình làm việc' : 'Toàn màn hình làm việc (ẩn thanh trang web)'; if (!P.dang) setTimeout(veKhung, 50); }
+/* menu chuột phải trên dòng thời gian */
+function dongMenu() { $$('.cmenu').forEach(m => m.remove()); }
+function moMenu(x, y, ds) {
+  dongMenu(); const m = el('div', 'cmenu'); ds.forEach(o => { if (o === '-') { m.appendChild(el('hr')); return; } const b = el('button', o.do ? 'do' : null); b.type = 'button'; b.innerHTML = ic(o.ic) + '<span>' + o.t + '</span>' + (o.k ? '<kbd>' + o.k + '</kbd>' : ''); b.onclick = () => { dongMenu(); o.f(); }; m.appendChild(b); });
+  document.body.appendChild(m); const r = m.getBoundingClientRect(); m.style.left = Math.min(x, innerWidth - r.width - 6) + 'px'; m.style.top = Math.min(y, innerHeight - r.height - 6) + 'px';
+}
+function tChuot(e) { const r = $('#tlIn').getBoundingClientRect(); return Math.max(0, Math.min(tongGiay(), (e.clientX - r.left - LB) / PX())); }
+function khoiTaoUI() {
+  $$('[data-ic]').forEach(b => b.insertAdjacentHTML('afterbegin', ic(b.dataset.ic)));
+  // khung kéo đổi cỡ
+  const eb = $('.ebody'), k1 = el('div', 'keo ngang k1'), k2 = el('div', 'keo ngang k2'), k3 = el('div', 'keo doc');
+  eb.insertBefore(k1, $('.ecol.giua')); eb.insertBefore(k2, $('.ecol.phai')); $('#ed').insertBefore(k3, $('.etl'));
+  k1.title = k2.title = k3.title = 'Kéo để đổi cỡ · bấm đúp để đặt lại'; taoTayKeo(k1, 'trai'); taoTayKeo(k2, 'phai'); taoTayKeo(k3, 'tl'); apKichCo(kichCo());
+  // toàn màn hình làm việc (mặc định trên máy tính)
+  let full = innerWidth >= 1180; try { const v = localStorage.getItem('dv_full'); if (v != null) full = v === '1'; } catch { } if (innerWidth < 980) full = false;
+  datToanApp(full); $('#btnToanApp').onclick = () => datToanApp(!$('#ed').classList.contains('full'));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') dongMenu(); });
+  // tiêu đề cột phải + tab thuộc tính
+  const tp = $('.ecol.phai > .etabs button'); if (tp) tp.id = 'phaiTieuDe'; tabHoaTinh(); tabHoaProp();
+  // đầu track
+  $$('.track').forEach(tr => { const k = tr.dataset.track, lb = tr.querySelector('.lb'); lb.innerHTML = '<div class="ln">' + lb.innerHTML + '</div>'; const tro = el('div', 'tro'); (TR_NUT[k] || []).forEach(n => { const b = el('button', 'trn'); b.type = 'button'; b.dataset.n = n; b.onclick = e => { e.stopPropagation(); doiTr(k, n); }; tro.appendChild(b); }); lb.appendChild(tro); });
+  veTrNut();
+  // thẻ lưới
+  $$('#mauChu button').forEach((b, i) => { const st = MAU_CHU[i] && MAU_CHU[i][1]; if (!st) return; const s = el('span', 'mau', String(st.text).split('|')[0].slice(0, 12)); s.style.fontFamily = st.font ? FONT_CSS[st.font] : ''; s.style.fontWeight = st.dam || 900; s.style.color = st.nen === 'hop_mau' ? '#062226' : st.mau === 'nhan' ? 'var(--ea)' : (st.mau || '#fff'); if (st.nen === 'hop' || st.nen === 'hop_mau') { s.style.background = st.nen === 'hop_mau' ? 'var(--ea)' : (st.nen_mau || '#0a0c0e'); s.style.padding = '2px 6px'; s.style.borderRadius = '4px'; } if (st.nen === 'vien') s.style.webkitTextStroke = '1px #000'; if (st.phat_sang) s.style.textShadow = '0 0 8px ' + st.phat_sang; if (st.nghieng) s.style.fontStyle = 'italic'; b.removeAttribute('style'); theHoa(b, s, MAU_CHU[i][0]); });
+  $$('#mauPd button').forEach((b, i) => { const p = MAU_PD[i] && MAU_PD[i][1]; if (!p) return; const s = el('span', 'pdm'); s.style.fontFamily = FONT_CSS[p.font] || ''; const w = el('b', null, 'chào'); s.append('Xin ', w); if (p.pdKieu === 'highlight' || p.pdKieu === 'pill') { w.style.background = p.mau; w.style.color = '#111'; if (p.pdKieu === 'pill') w.style.borderRadius = '999px'; } else if (p.pdKieu === 'toi') { s.style.background = 'rgba(0,0,0,.85)'; w.style.color = p.mau; } else if (p.pdKieu === 'vien') { s.style.webkitTextStroke = '1px #000'; w.style.color = p.mau; } else w.style.color = p.mau; if (p.pdKieu === 'pop') w.style.fontSize = '1.25em'; theHoa(b, s, MAU_PD[i][0]); });
+  $$('#locLuoi button').forEach(b => { const k = b.dataset.k, f = (LOC[k] || [])[1] || ''; b.style.filter = ''; theHoa(b, '<span style="font-size:20px;opacity:.6">🎨</span><img alt="" hidden style="filter:' + f + '">', (LOC[k] || [k])[0]); });
+  $$('#huLuoi button').forEach(b => theHoa(b, '<span>' + (HU_IC[b.dataset.k] || '✨') + '</span>', HIEU_UNG[b.dataset.k] || b.dataset.k));
+  $$('#sfxLuoi button').forEach(b => { const k = b.dataset.k, [ten, dai] = SFX[k] || [b.textContent, 0], m = ten.match(/^(\S+)\s+(.*)$/); theHoa(b, '<span>' + (m ? m[1] : '🔊') + '</span>', m ? m[2] : ten, fmt1(dai) + 's'); });
+  Object.keys(CHUYEN_TEN).forEach(k => { const b = el('button'); b.type = 'button'; b.dataset.k = k; theHoa(b, '<span>' + (CH_IC[k] || '⇢') + '</span>', CHUYEN_TEN[k]); b.onclick = () => datChuyen(k); $('#chuyenLuoi').appendChild(b); });
+  $('#chuyenDai').addEventListener('input', () => { const v = +$('#chuyenDai').value; $('#chuyenDaiO').textContent = fmt1(v) + 's'; const c = P.chon && P.chon.k === 'v' ? P.clips[P.chon.i] : null; (c ? [c] : P.clips).forEach(x => { if (x.chuyen && x.chuyen !== 'cat') x.chuyen_dai = v; }); if (!P.dang) veKhung(); });
+  // cột danh mục mỗi tab
+  $$('.ecol.trai [data-pane]').forEach(taoBen);
+  // footage: lưới / danh sách
+  $('#btnLuoiSrc').onclick = () => { $('#srcs').classList.toggle('luoi'); };
+  // thanh công cụ mới
+  $('#btnQ').onclick = () => catDauPhat(true); $('#btnW').onclick = () => catDauPhat(false);
+  const mucBienHinh = () => { let m = mucChon(); if (!m || !['v', 'b'].includes(P.chon.k)) { const { clip } = viTri(P.t); if (clip < 0) { toast('Chưa có đoạn nào'); return null; } P.chon = { k: 'v', i: clip }; m = P.clips[clip]; } return m; };
+  $('#btnLat').onclick = () => { const m = mucBienHinh(); if (!m) return; luuHoanTac(); m.latX = !m.latX; veTl(); veProp(); veKhung(); };
+  $('#btnXoay90').onclick = () => { const m = mucBienHinh(); if (!m) return; luuHoanTac(); let v = (m.xoay || 0) + 90; if (v > 180) v -= 360; m.xoay = v; veTl(); veProp(); veKhung(); };
+  $('#btnCrop').onclick = () => { const m = mucBienHinh(); if (!m) return; P.propTab = 'Video'; chonHien(); veProp(); moPhaiNeuCan(); const n = [...$$('#propChon .nhom2')].find(x => /cắt khung/i.test(x.textContent)); if (n) n.scrollIntoView({ block: 'center', behavior: 'smooth' }); };
+  $('#btnKfNhanh').onclick = () => { let m = mucChon(), k = P.chon && P.chon.k; if (!m || !['v', 'b', 'g'].includes(k)) { m = mucBienHinh(); k = 'v'; } if (!m) return; const st = batDauMuc(k, m), off = P.t - st; if (off < 0 || off > daiMuc(k, m)) { toast('Đưa đầu phát vào trong mục đang chọn'); return; } luuHoanTac(); ['sc', 'x', 'y', 'xoay', 'mo'].forEach(p => datKf(m, p, off, giaTriKf(m, p, off))); veTl(); veProp(); toast('Đã thêm keyframe ◇ tại ' + fmt1(P.t) + 's (phóng, vị trí, xoay, độ mờ)'); };
+  $('#btnTachAmTl').onclick = () => { const i = P.chon && P.chon.k === 'v' ? P.chon.i : viTri(P.t).clip; if (i < 0) { toast('Chưa có đoạn nào'); return; } tachAmClip(i); };
+  const zoom = f => { P.pxs = Math.round(Math.max(6, Math.min(80, P.pxs * f))); $('#zoomTl').value = P.pxs; veTl(); };
+  $('#btnZoomRa').onclick = () => zoom(1 / 1.25); $('#btnZoomVao').onclick = () => zoom(1.25);
+  // tỉ lệ nhanh ở trình phát
+  const t2 = $('#tiLe2'); [...$('#tiLe').options].forEach(o => { const n = el('option', null, o.value); n.value = o.value; t2.appendChild(n); }); t2.value = $('#tiLe').value; t2.onchange = () => { $('#tiLe').value = t2.value; $('#tiLe').dispatchEvent(new Event('change')); };
+  // menu chuột phải
+  $('#tlIn').addEventListener('contextmenu', e => {
+    const it = e.target.closest('.item[data-k]'), tr = e.target.closest('.track'); e.preventDefault();
+    if (it) { const k = it.dataset.k, i = +it.dataset.i; P.chon = { k, i }; chonHien(); veProp(); const tm = tChuot(e);
+      moMenu(e.clientX, e.clientY, [
+        { ic: 'split', t: 'Tách tại đây', k: 'Ctrl+B', f: () => { P.t = tm; lenh('tach'); } },
+        { ic: 'delL', t: 'Xoá phần bên trái', k: 'Q', f: () => { P.t = tm; P.chon = { k, i }; catDauPhat(true); } },
+        { ic: 'delR', t: 'Xoá phần bên phải', k: 'W', f: () => { P.t = tm; P.chon = { k, i }; catDauPhat(false); } }, '-',
+        { ic: 'copy', t: 'Sao chép', k: 'Ctrl+C', f: () => saoChep() }, { ic: 'paste', t: 'Dán tại đầu phát', k: 'Ctrl+V', f: () => dan() }, { ic: 'copy', t: 'Nhân đôi', k: 'Ctrl+D', f: () => lenh('nhan') },
+        ...(k === 'v' ? ['-', { ic: 'freeze', t: 'Đóng băng khung tại đây', k: 'F', f: () => { P.t = tm; $('#btnDongBang').click(); } }, { ic: 'wave', t: 'Tách âm thanh', f: () => tachAmClip(i) }, { ic: 'mirror', t: 'Lật ngang', f: () => $('#btnLat').click() }, { ic: 'kf', t: 'Thêm keyframe tại đây', f: () => { P.t = tm; $('#btnKfNhanh').click(); } }] : []),
+        ...(k === 'b' ? ['-', { ic: 'mirror', t: 'Lật ngang', f: () => $('#btnLat').click() }, { ic: 'kf', t: 'Thêm keyframe tại đây', f: () => { P.t = tm; $('#btnKfNhanh').click(); } }] : []),
+        '-', { ic: 'trash', t: 'Xoá', k: 'Delete', do: true, f: () => lenh('xoa') }]); return; }
+    if (tr) { const k = tr.dataset.track, n = TR_NUT[k] || []; moMenu(e.clientX, e.clientY, [
+        ...(n.includes('tat') ? [{ ic: trTat(k) ? 'vol' : 'mute', t: trTat(k) ? 'Bật tiếng track' : 'Tắt tiếng track', f: () => doiTr(k, 'tat') }] : []),
+        ...(n.includes('an') ? [{ ic: trAn(k) ? 'eye' : 'eyeOff', t: trAn(k) ? 'Hiện track' : 'Ẩn track', f: () => doiTr(k, 'an') }] : []),
+        { ic: trKhoa(k) ? 'unlock' : 'lock', t: trKhoa(k) ? 'Mở khoá track' : 'Khoá track', f: () => doiTr(k, 'khoa') }, '-',
+        { ic: 'paste', t: 'Dán tại đầu phát', k: 'Ctrl+V', f: () => dan() }, { ic: 'mark', t: 'Đặt mốc tại đây', k: 'M', f: () => themMoc(tChuot(e)) }]); }
+  });
+  document.addEventListener('pointerdown', e => { if (!e.target.closest('.cmenu')) dongMenu(); });
+  // làm mới ảnh bộ lọc khi mở tab, vẽ lại danh mục
+  const doiTabCu = doiTab; doiTab = function (t) { doiTabCu(t); const p = $('[data-pane="' + t + '"]'); if (p && p._veBen) p._veBen(); if (t === 'loc') capNhatAnhLoc(); };
+  $$('.etabs [data-tab]').forEach(b => b.onclick = () => doiTab(b.dataset.tab));
+  const veCu = veProp; veProp = function () { veCu(); tabHoaProp(); };
+  veTl(); veProp();
 }
 
 /* ═════════ MOTION GRAPHICS (10/2026): 11 mẫu mới · bám theo lời nói · đồ hoạ AI dạng cảnh JSON có keyframe ═════════
@@ -2402,7 +2792,7 @@ async function taoTieng() {
   finally { nut.disabled = false; nut.textContent = cu; }
 }
 $('#btnTieng').onclick = taoTieng;
-khoiTaoB(); khoiTaoC();
+khoiTaoB(); khoiTaoC(); khoiTaoUI();
 </script>
 <script src="tro-ly.js?v=202610011200"></script>
 </body>
