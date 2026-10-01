@@ -5,3 +5,5 @@ name = "flat-wave-6907"   # trùng tên Worker trên Cloudflare để bản buil
 main = "worker.js"
 compatibility_date = "2025-09-01"
 workers_dev = true
+# giữ các biến Text đặt trên trang Cloudflare (APPS_SCRIPT_URL, LLM_PROVIDER…) khi build từ GitHub, không xoá
+keep_vars = true
