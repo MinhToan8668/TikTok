@@ -661,16 +661,16 @@ function agentTomTatGoi(a) { const o = { ...a }; delete o.text; const t = Object
 async function agentChay(yc) {
   const st = $('#aiStatus'), btn = $('#btnAI'); btn.disabled = true; AG.dang = true;
   P.lichSu.push({ vai: 'nd', text: yc }); veDs(); $('#yc').value = '';
-  const ls = AG.ls; ls.push({ vai: 'nd', text: yc }); const t0 = Date.now(); let buoc = 0, soLenh = 0, hop = null;
+  const ls = AG.ls; ls.push({ vai: 'nd', text: yc }); const t0 = Date.now(); let buoc = 0, soLenh = 0, hop = null, ve = '';
   const ghiBuoc = (chu, cls) => { if (!hop) { hop = el('div', 'm ai buoc agent'); hop.dataset.moi = '1'; $('#ds').appendChild(hop); } const d = el('div', 'bc' + (cls ? ' ' + cls : '')); if (typeof chu === 'string') d.textContent = chu; else d.appendChild(chu); hop.appendChild(d); $('#ds').scrollTop = 1e9; return d; };
   const cho = ghiBuoc('Đang nghĩ…', 'dang');
   try {
     for (; buoc < 16; buoc++) {
       cho.textContent = buoc ? 'Đang nghĩ bước tiếp… (' + Math.round((Date.now() - t0) / 1000) + 's)' : 'Đang đọc dự án và yêu cầu… (' + Math.round((Date.now() - t0) / 1000) + 's)';
-      const r = await fetch(MC.url + '/agent', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ token: TK.token(), buoc, lich_su: ls.slice(-30), du_an: agentTomTat(), ho_so: TK.hoSo() }) });
+      const r = await fetch(MC.url + '/agent', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ token: TK.token(), buoc, ve, lich_su: ls.slice(-30), du_an: agentTomTat(), ho_so: TK.hoSo() }) });
       let j = {}; try { j = await r.json(); } catch { }
       if (!j.ok) { const ma = j.error || ('http_' + r.status); if (ma === 'het_luot_thu') TK.moHet('chat'); const chu = ma === 'het_luot_thu' ? 'Hết lượt chat miễn phí.' : ma === 'het_phien' ? 'Phiên hết hạn, đăng nhập lại.' : 'Trợ lý chưa trả lời (' + ma + (j.chi_tiet ? ': ' + j.chi_tiet : '') + ').'; P.lichSu.push({ vai: 'ai', text: '⚠️ ' + chu }); st.textContent = chu; break; }
-      if (j.luot_con != null) st.textContent = 'Còn ' + j.luot_con + ' lượt chat.';
+      if (j.ve) ve = j.ve; if (j.luot_con != null) st.textContent = 'Còn ' + j.luot_con + ' lượt chat.';
       if (j.goi && j.goi.length) {
         ls.push({ vai: 'ai', text: j.text || '', ky_text: j.ky_text, goi: j.goi }); const kq = [];
         for (const g of j.goi) {

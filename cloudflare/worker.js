@@ -22,7 +22,7 @@
      ANTHROPIC_API_KEY, OPENAI_API_KEY   (Secret) key khi chọn claude / openai
    ═══════════════════════════════════════════════════════════════════════════ */
 
-const PHIEN_BAN = '2026.10.04';
+const PHIEN_BAN = '2026.10.05';
 /* link /exec của Apps Script đang dùng trong tool (công khai sẵn trong tools/*.html). Biến APPS_SCRIPT_URL trên Cloudflare, nếu có, sẽ được ưu tiên. */
 const APPS_SCRIPT_MD = 'https://script.google.com/macros/s/AKfycbyxe1nWupAl6VheDZHaU3Ojm-d6c8F_khhUMtkehNCLh5OnGW6f2uF0PKPYZ4eYUqyGjQ/exec';
 const asUrl = env => String(env.APPS_SCRIPT_URL || env.APPS_SCRIPT || APPS_SCRIPT_MD).trim();
@@ -227,6 +227,12 @@ Quy tắc:
 - Sau khi đặt đồ hoạ hoặc đổi khung/nền, gọi xem_khung ở thời điểm liên quan để tự kiểm rồi sửa nếu chữ chồng mặt hay lệch. Tối đa ~12 lệnh một lượt.
 - Không gọi xuat_video, long_tieng, hieu_footage nếu người dùng không yêu cầu hoặc chưa cần. Không bịa lời thoại.
 - Kết thúc bằng 1–3 câu tóm tắt đã làm gì và gợi ý bước tiếp (không liệt kê lại từng lệnh).`;
+/* vé cho một lượt agent: HMAC(token người dùng + hạn 10 phút) ký bằng khoá bí mật của máy chủ.
+   Bước đầu đã kiểm đăng nhập và trừ lượt qua Apps Script, các bước sau chỉ cần vé, không gọi Apps Script lại. */
+async function khoaVe(env) { const bi = String(env.VE_SECRET || dsKey(env)[0] || env.ANTHROPIC_API_KEY || env.OPENAI_API_KEY || ''); return crypto.subtle.importKey('raw', new TextEncoder().encode('viral-studio-ve|' + bi), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']); }
+async function kyVe(env, noiDung) { const sig = await crypto.subtle.sign('HMAC', await khoaVe(env), new TextEncoder().encode(noiDung)); return btoa(String.fromCharCode(...new Uint8Array(sig))).replace(/[+/=]/g, c => ({ '+': '-', '/': '_', '=': '' }[c])); }
+async function taoVe(env, token) { const han = Date.now() + 600000; return han + '.' + await kyVe(env, han + '|' + String(token || '')); }
+async function veHopLe(env, ve, token) { const [han, ky] = String(ve).split('.'); if (!han || !ky || +han < Date.now()) return false; return (await kyVe(env, han + '|' + String(token || ''))) === ky; }
 function llmNcc(env) { const p = String(env.LLM_PROVIDER || 'gemini').toLowerCase(); return /claude|anthropic/.test(p) ? 'claude' : /openai|gpt/.test(p) ? 'openai' : 'gemini'; }
 function llmCoKey(env) { const n = llmNcc(env); return n === 'claude' ? !!env.ANTHROPIC_API_KEY : n === 'openai' ? !!env.OPENAI_API_KEY : dsKey(env).length > 0; }
 function llmModel(env) { return env.LLM_MODEL || { gemini: 'gemini-3.5-flash', claude: 'claude-sonnet-4-5', openai: 'gpt-4.1' }[llmNcc(env)]; }
@@ -235,18 +241,20 @@ async function agent(req, env, cors) {
   const ls = Array.isArray(b.lich_su) ? b.lich_su : []; if (!ls.length) return json({ ok: false, error: 'thieu_lich_su' }, cors, 400);
   if (!llmCoKey(env)) return json({ ok: false, error: 'chua_co_key_' + llmNcc(env) }, cors, 503);
   if (!asUrl(env)) return json({ ok: false, error: 'chua_noi_apps_script' }, cors, 503);
-  let luotCon = null;
-  if (!(+b.buoc)) {   // bước đầu của một lượt: trừ 1 lượt chat (Free), Pro/học viên trả ok
+  let luotCon = null, ve = String(b.ve || '');
+  if (+b.buoc) { if (!(await veHopLe(env, ve, b.token))) return json({ ok: false, error: 'het_phien' }, cors, 402); }   // bước sau phải có vé từ bước đầu
+  else {   // bước đầu của một lượt: trừ 1 lượt chat (Free), Pro/học viên trả ok
     let kiem = {}; try { const r = await fetch(asUrl(env), { method: 'POST', headers: { 'content-type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'st_use', token: String(b.token || ''), tool: 'chat' }), redirect: 'follow' }); kiem = await r.json(); } catch { return json({ ok: false, error: 'khong_noi_duoc_apps_script' }, cors, 502); }
     if (!kiem.ok) return json({ ok: false, error: kiem.error || 'het_phien' }, cors, 402);
     luotCon = kiem.luot_con == null ? null : kiem.luot_con;
+    ve = await taoVe(env, b.token);
   }
   const hs = b.ho_so && typeof b.ho_so === 'object' ? Object.entries(b.ho_so).filter(([k, v]) => v).map(([k, v]) => k + ': ' + String(v).slice(0, 200)).join('; ') : '';
   const heThong = AGENT_HE_THONG + (hs ? '\nHồ sơ kênh người dùng: ' + hs : '');
   const duAn = 'Trạng thái dự án hiện tại:\n' + JSON.stringify(b.du_an || {}).slice(0, 60000);
   try {
     const kq = await ({ gemini: goiGeminiAgent, claude: goiClaudeAgent, openai: goiOpenAIAgent })[llmNcc(env)](env, heThong, ls, duAn);
-    return json({ ok: true, text: kq.text || '', ky_text: kq.ky_text, goi: kq.goi || [], luot_con: luotCon, ncc: llmNcc(env), model: llmModel(env) }, cors);
+    return json({ ok: true, text: kq.text || '', ky_text: kq.ky_text, goi: kq.goi || [], luot_con: luotCon, ve, ncc: llmNcc(env), model: llmModel(env) }, cors);
   } catch (e) { return json({ ok: false, error: 'llm_loi', chi_tiet: String(e && e.message || e).slice(0, 300), luot_con: luotCon }, cors, 502); }
 }
 /* ── Gemini: functionDeclarations, functionCall / functionResponse ── */
