@@ -22,7 +22,10 @@
      ANTHROPIC_API_KEY, OPENAI_API_KEY   (Secret) key khi chọn claude / openai
    ═══════════════════════════════════════════════════════════════════════════ */
 
-const PHIEN_BAN = '2026.10.03';
+const PHIEN_BAN = '2026.10.04';
+/* link /exec của Apps Script đang dùng trong tool (công khai sẵn trong tools/*.html). Biến APPS_SCRIPT_URL trên Cloudflare, nếu có, sẽ được ưu tiên. */
+const APPS_SCRIPT_MD = 'https://script.google.com/macros/s/AKfycbyxe1nWupAl6VheDZHaU3Ojm-d6c8F_khhUMtkehNCLh5OnGW6f2uF0PKPYZ4eYUqyGjQ/exec';
+const asUrl = env => String(env.APPS_SCRIPT_URL || env.APPS_SCRIPT || APPS_SCRIPT_MD).trim();
 const ORIGIN_MD = 'https://minhtoan8668.github.io,http://localhost:8765,http://127.0.0.1:8765';
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0 Safari/537.36';
 const TTS_MODELS = ['gemini-3.8-flash-lite-tts', 'gemini-3.8-flash-tts', 'gemini-2.5-flash-preview-tts'];
@@ -37,7 +40,7 @@ export default {
     const cors = corsCho(req, env);
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: { ...cors, 'access-control-max-age': '86400' } });
     try {
-      if (path === '/') return json({ ok: true, ten: 'Viral Studio · máy chủ Cloudflare', phien_ban: PHIEN_BAN, dich_vu: { broll: coKho(env), tts: !!dsKey(env).length, tai: true, kiem_luot: !!env.APPS_SCRIPT_URL, agent: !!llmCoKey(env), agent_ncc: llmNcc(env) } }, cors);
+      if (path === '/') return json({ ok: true, ten: 'Viral Studio · máy chủ Cloudflare', phien_ban: PHIEN_BAN, dich_vu: { broll: coKho(env), tts: !!dsKey(env).length, tai: true, kiem_luot: !!asUrl(env), agent: !!llmCoKey(env), agent_ncc: llmNcc(env) } }, cors);
       if (path === '/broll' && req.method === 'GET') return json(await timBroll(url, env, ctx), cors);
       if (path === '/media' && req.method === 'GET') return media(req, url, cors);
       if (path === '/tai' && req.method === 'GET') return taiHo(req, url, cors);
@@ -152,10 +155,10 @@ async function tts(req, env, cors) {
   let b = {}; try { b = await req.json(); } catch { }
   const text = String(b.text || '').trim().slice(0, 1200); if (!text) return json({ ok: false, error: 'thieu_text' }, cors, 400);
   if (!dsKey(env).length) return json({ ok: false, error: 'chua_co_key' }, cors, 503);
-  if (!env.APPS_SCRIPT_URL) return json({ ok: false, error: 'chua_noi_apps_script' }, cors, 503);
+  if (!asUrl(env)) return json({ ok: false, error: 'chua_noi_apps_script' }, cors, 503);
   // Apps Script: học viên/Pro trả ok, tài khoản Free trừ 1 lượt Dựng video, hết lượt trả het_luot_thu
   let kiem = {};
-  try { const r = await fetch(env.APPS_SCRIPT_URL, { method: 'POST', headers: { 'content-type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'st_use', token: String(b.token || ''), tool: 'dung' }), redirect: 'follow' }); kiem = await r.json(); }
+  try { const r = await fetch(asUrl(env), { method: 'POST', headers: { 'content-type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'st_use', token: String(b.token || ''), tool: 'dung' }), redirect: 'follow' }); kiem = await r.json(); }
   catch (e) { return json({ ok: false, error: 'khong_noi_duoc_apps_script' }, cors, 502); }
   if (!kiem.ok) return json({ ok: false, error: kiem.error || 'het_phien' }, cors, 402);
   const giong = TTS_GIONG[b.giong] || (Object.values(TTS_GIONG).includes(b.giong) ? b.giong : 'Kore');
@@ -231,10 +234,10 @@ async function agent(req, env, cors) {
   let b = {}; try { b = await req.json(); } catch { }
   const ls = Array.isArray(b.lich_su) ? b.lich_su : []; if (!ls.length) return json({ ok: false, error: 'thieu_lich_su' }, cors, 400);
   if (!llmCoKey(env)) return json({ ok: false, error: 'chua_co_key_' + llmNcc(env) }, cors, 503);
-  if (!env.APPS_SCRIPT_URL) return json({ ok: false, error: 'chua_noi_apps_script' }, cors, 503);
+  if (!asUrl(env)) return json({ ok: false, error: 'chua_noi_apps_script' }, cors, 503);
   let luotCon = null;
   if (!(+b.buoc)) {   // bước đầu của một lượt: trừ 1 lượt chat (Free), Pro/học viên trả ok
-    let kiem = {}; try { const r = await fetch(env.APPS_SCRIPT_URL, { method: 'POST', headers: { 'content-type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'st_use', token: String(b.token || ''), tool: 'chat' }), redirect: 'follow' }); kiem = await r.json(); } catch { return json({ ok: false, error: 'khong_noi_duoc_apps_script' }, cors, 502); }
+    let kiem = {}; try { const r = await fetch(asUrl(env), { method: 'POST', headers: { 'content-type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'st_use', token: String(b.token || ''), tool: 'chat' }), redirect: 'follow' }); kiem = await r.json(); } catch { return json({ ok: false, error: 'khong_noi_duoc_apps_script' }, cors, 502); }
     if (!kiem.ok) return json({ ok: false, error: kiem.error || 'het_phien' }, cors, 402);
     luotCon = kiem.luot_con == null ? null : kiem.luot_con;
   }

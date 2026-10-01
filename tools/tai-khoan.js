@@ -505,9 +505,11 @@
   }
   /* máy chủ phụ Cloudflare (bot /maychu). Trả '' nếu mentor chưa cài: tool tự ẩn kho B-roll, lồng tiếng, tải hộ lớn.
      Dò một lần bằng GET / để biết máy chủ có key gì (dich_vu), nhớ trong phiên. */
+  var MAY_CHU_MD = 'https://flat-wave-6907.minhtoantowork.workers.dev';   // máy chủ Cloudflare của khoá; đổi bằng bot /maychu
   var mayChuNho = null;
   async function mayChu() {
-    var c = await napCfg(), u = (c && c.may_chu) ? String(c.may_chu).replace(/\/+$/, '') : '';
+    var c = await napCfg(), u = String((c && c.may_chu) || MAY_CHU_MD).replace(/\/+$/, '');   // bot /maychu ghi đè; /maychu xoa trả 'tat' để tắt hẳn
+    if (u === 'tat') u = '';
     if (!u) return { url: '', dich_vu: {} };
     if (mayChuNho && mayChuNho.url === u) return mayChuNho;
     var dv = {}; try { var ctl = new AbortController(); setTimeout(function () { ctl.abort(); }, 6000); var r = await fetch(u + '/', { signal: ctl.signal }); var j = await r.json(); if (j.ok) dv = j.dich_vu || {}; } catch (e) { }

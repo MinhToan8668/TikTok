@@ -860,7 +860,7 @@ function studioLenh(cmd, arg, chatId){
   }
   if (cmd === 'maychu'){
     if (!arg) return hoi('☁️ Gửi link máy chủ Cloudflare Worker (dạng `https://ten.tai-khoan.workers.dev`), xem hướng dẫn cài trong `cloudflare/CAI-DAT.md`. Gửi `xoa` để tắt.' + (stMayChu() ? '\n\nHiện: `' + stMayChu() + '`' : ''));
-    if (/^(xoa|xóa|0)$/i.test(arg.trim())){ P.deleteProperty('CF_URL'); return tgSend(chatId, '✅ Đã tắt máy chủ phụ. Tool vẫn chạy bằng Apps Script.'); }
+    if (/^(xoa|xóa|0|tat|tắt)$/i.test(arg.trim())){ P.setProperty('CF_URL', 'tat'); return tgSend(chatId, '✅ Đã tắt máy chủ phụ. Tool vẫn chạy bằng Apps Script. Bật lại: /maychu <link>.'); }
     var cf = String(arg).trim().replace(/\/+$/, '');
     if (!/^https:\/\/[a-z0-9.-]+\.[a-z]{2,}(\/[^\s]*)?$/i.test(cf)) return tgSend(chatId, '⚠️ Link phải bắt đầu bằng https:// (ví dụ `https://viral-studio.abc.workers.dev`).');
     var tt = ''; try{ var rr = UrlFetchApp.fetch(cf + '/', {muteHttpExceptions:true, followRedirects:true}); var jj = JSON.parse(rr.getContentText()); if (jj.ok){ var dv = jj.dich_vu || {}; tt = '\n\nMáy chủ trả lời ✅ phiên bản ' + jj.phien_ban + '\n• Kho B-roll: ' + (dv.broll ? '✅' : '❌ thiếu PIXABAY_KEY') + '\n• Lồng tiếng AI: ' + (dv.tts ? '✅' : '❌ thiếu GEMINI_API_KEYS') + '\n• Kiểm lượt: ' + (dv.kiem_luot ? '✅' : '❌ thiếu APPS_SCRIPT_URL') + '\n• Trợ lý agent: ' + (dv.agent ? '✅ ' + (dv.agent_ncc || '') : '❌ thiếu key AI'); } else tt = '\n\n⚠️ Link mở được nhưng không phải máy chủ Viral Studio.'; }catch(e){ tt = '\n\n⚠️ Chưa gọi được máy chủ (' + String(e).slice(0, 80) + '). Vẫn lưu, kiểm lại sau.'; }
