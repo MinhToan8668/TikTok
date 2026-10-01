@@ -252,22 +252,8 @@ nav .burger{border-color:rgba(28,38,0,.35)}
 .hero .lead{margin-bottom:26px;max-width:56ch}
 .hero .lead strong{color:#1c2600;font-weight:700}
 .hero-actions{display:flex;flex-wrap:wrap;gap:13px;align-items:center;margin-bottom:22px}
-/* hàng hai thẻ miễn phí dưới hero: soi kênh (kem) và Viral Studio (mực) */
-.hero-free2{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:clamp(18px,2.6vw,30px);margin-top:clamp(14px,2.4vw,28px);align-items:stretch}
-.hero-free2 .hero-vs{width:auto;transform:rotate(-.6deg)}
-.hero-soi{position:relative;background:var(--paper-lt);color:#1c2600;border:2px solid #1c2600;border-radius:var(--r-sm);
-  padding:20px 22px 20px;transform:rotate(.6deg);box-shadow:0 8px 0 #1c2600,0 24px 50px -20px rgba(28,38,0,.45)}
-.hero-soi::before{content:'';position:absolute;top:-13px;left:26px;transform:rotate(-4deg);
-  width:78px;height:24px;background:rgba(153,223,0,.6);border:1px solid rgba(28,38,0,.2);border-radius:2px}
-.hero-soi-lbl{font-family:var(--disp);font-weight:800;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#1c2600}
-.hero-soi h3{font-family:var(--disp);font-size:clamp(18px,1.9vw,22px);font-weight:800;line-height:1.15;letter-spacing:-.02em;color:#1c2600;margin:0 0 6px}
-.hero-soi h3 em{font-style:normal;color:var(--lime-deep)}
-.hero-soi p{font-size:13px;line-height:1.55;color:var(--ink-soft);margin:0 0 14px}
-.hero-soi-nhap{display:flex;gap:8px}
-.hero-soi-nhap .inp{flex:1;min-width:0;border:2px solid #1c2600;background:#fff;border-radius:999px;padding:11px 16px;font:inherit;font-size:14px;color:var(--ink)}
-.hero-soi-nhap .inp:focus{outline:none;box-shadow:0 0 0 3px rgba(153,223,0,.55)}
-.hero-soi-nhap .btn{flex:none;white-space:nowrap;box-shadow:0 4px 0 rgba(28,38,0,.35)}
-@media(max-width:1000px){.hero-free2{grid-template-columns:1fr;max-width:420px;margin-left:auto;margin-right:auto}}
+.hero-free{display:flex;flex-wrap:wrap;gap:12px}   /* hai nút miễn phí luôn đi thành cặp */
+.hero-free .btn{text-decoration:none}
 /* popup soi kênh: nền tối mờ, form kéo từ mục soi kênh vào */
 .soi-pop{position:fixed;inset:0;z-index:400;display:none;align-items:center;justify-content:center;padding:16px}
 .soi-pop.on{display:flex}
@@ -340,16 +326,48 @@ nav .burger{border-color:rgba(28,38,0,.35)}
 .hero-vs-note{margin-top:11px;font-family:var(--hand);font-style:italic;font-size:12.5px;color:var(--lime);line-height:1.5;text-align:center}
 @media(prefers-reduced-motion:reduce){.hero-vs-free,.hero-vs-tools span i{animation:none}}
 @media(max-width:1000px){.hero-side{justify-items:center}.hero-vs{max-width:420px;transform:rotate(-.8deg)}}
+/* ── máy tính: nén hero để tiêu đề, nút, phiếu ghi danh và thẻ Viral Studio lọt một màn hình (đặt sau mọi rule hero để thắng) ── */
+@media(min-width:1001px){
+  .hero{padding:18px 0 40px}
+  .hero-in{grid-template-columns:minmax(0,1fr) minmax(300px,360px);gap:clamp(24px,3vw,40px)}
+  .hero-brand{margin-bottom:12px;gap:14px}
+  .hero-mark{--lg:60px;border-radius:26%;box-shadow:0 6px 0 rgba(28,38,0,.28),0 14px 26px -10px rgba(28,38,0,.4)}
+  .hero-pill{font-size:10px;padding:4px 10px}
+  .hero-brand-t b{font-size:19px}
+  .hero-note{display:none}
+  .hero h1{font-size:clamp(30px,3.4vw,44px);margin-bottom:12px}
+  .hero .lead{font-size:14.5px;line-height:1.6;margin-bottom:16px;max-width:52ch}
+  .an-dt{display:none}
+  .hero-actions{gap:10px;margin-bottom:12px}
+  .hero-actions .btn-lg{padding:12px 18px;font-size:14px}
+  .hero-actions .btn-line{display:none}            /* "xem lớp kèm edit" có mục riêng ngay dưới */
+  .hero-chip{font-size:12px;padding:6px 12px}
+  /* cột phải */
+  .hero-side{gap:14px}
+  .tag{padding:14px 16px 12px}
+  .tag-head{margin-bottom:8px}
+  .tag-num{font-size:30px}
+  .tag-lbl{display:none}
+  .tag .prog{margin:8px 0 10px}
+  .tag-rows{gap:7px;padding-top:10px}
+  .tag-foot{margin-top:9px;font-size:11.5px;line-height:1.45}
+  .hero-vs{padding:12px 14px 12px}
+  .hero-vs-top{margin-bottom:6px}
+  .hero-vs h3{font-size:16px;margin-bottom:8px}
+  .hero-vs p{display:none}
+  .hero-vs-tools{grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:10px}
+  .hero-vs-tools span{padding:7px 4px;font-size:10.5px;justify-content:center;text-align:center;line-height:1.15;gap:4px}
+  .hero-vs-tools span i{display:none}
+  .hero-vs-tools span b{margin:0;font-size:8px;padding:1px 4px}
+  .hero-vs .btn-vs{padding:10px 14px;font-size:13.5px}
+  .hero-vs-note{margin-top:7px;font-size:11px}
+}
 /* ── điện thoại: hero gọn lại còn ~3 màn cuộn, thẻ Viral Studio lên ngay dưới nút Đăng ký ── */
 @media(max-width:640px){
   .hero{padding:18px 0 36px}
   .hero-in{gap:16px;grid-template-columns:minmax(0,1fr)}
-  .hero-in>*,.hero-left>*,.hero-side>*,.hero-free2>*{min-width:0;max-width:100%}
-  .hero-left,.hero-side,.hero-free2{display:contents}   /* để xếp lại thứ tự từng khối trong cùng một lưới */
-  .hero-soi{order:5;transform:none;margin-top:6px;padding:18px 18px 16px}
-  .hero-soi::before{display:none}
-  .hero-soi-nhap{flex-direction:column}
-  .hero-soi-nhap .btn{width:100%;justify-content:center}
+  .hero-in>*,.hero-left>*,.hero-side>*{min-width:0;max-width:100%}
+  .hero-left,.hero-side{display:contents}        /* để xếp lại thứ tự từng khối trong cùng một lưới */
   .hero-brand{order:1;margin-bottom:0;gap:12px}
   .hero-mark{--lg:58px;border-radius:26%;padding:calc(var(--lg) * .16);box-shadow:0 5px 0 rgba(28,38,0,.28),0 12px 22px -8px rgba(28,38,0,.4);animation:none}
   .hero-pill{font-size:9.5px;padding:4px 9px;letter-spacing:.06em}
@@ -362,14 +380,14 @@ nav .burger{border-color:rgba(28,38,0,.35)}
   .hero-free{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .hero-free .btn{width:100%;justify-content:center;padding:11px 8px;font-size:13.5px;white-space:normal;line-height:1.2;text-align:center}
   .hero-actions .btn-line{display:none}          /* "Xem lớp kèm edit" đã có ở mục dưới */
-  .hero-vs{order:6;max-width:none;width:100%;transform:none;margin-top:6px;padding:18px 18px 16px}
+  .hero-vs{order:5;max-width:none;width:100%;transform:none;margin-top:6px;padding:18px 18px 16px}
   .hero-vs::before{display:none}
   .hero-vs h3{font-size:19px}
   .hero-vs p{font-size:12.5px;margin-bottom:12px}
-  .hero-chips{order:7;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 calc(-1*var(--pad));padding:2px var(--pad) 6px}
+  .hero-chips{order:6;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 calc(-1*var(--pad));padding:2px var(--pad) 6px}
   .hero-chips::-webkit-scrollbar{display:none}
   .hero-chip{flex:none;font-size:12px;padding:7px 12px}
-  .tag{order:8;width:100%;max-width:none;transform:none;padding:18px 18px 16px}
+  .tag{order:7;width:100%;max-width:none;transform:none;padding:18px 18px 16px}
   .tag::before{display:none}
   .tag-num{font-size:36px}
   .tag-lbl{display:none}
@@ -1521,6 +1539,10 @@ body.hv-mode{padding-bottom:0}
       <p class="lead rv">Lớp học xây kênh TikTok <strong>30 ngày</strong> do đội ngũ sáng lập kênh Tự Mình Xây Kênh trực tiếp đứng lớp. Mỗi tuần một buổi live <strong>chốt hướng đi cho kênh của bạn</strong>, xuyên suốt khóa mentor mở máy <strong>dựng video chung với bạn</strong> — tới khi bạn tự tin bấm nút đăng.<span class="an-dt"> Mọi thứ dạy bằng số liệu thật: watch time, retention, hook rate. Không dạy mẹo may rủi.</span></p>
       <div class="hero-actions rv">
         <button class="btn btn-ink btn-lg" data-open data-cta>Đăng ký học <span class="arw">→</span></button>
+        <div class="hero-free">
+          <button class="btn btn-lime btn-lg" data-go="soikenh">🔍 Soi kênh miễn phí</button>
+          <a class="btn btn-lime btn-lg" href="tools/soi-video.html" target="_blank" rel="noopener">✨ Viral Studio miễn phí</a>
+        </div>
         <button class="btn btn-line btn-lg" data-go="editkem">Xem lớp kèm edit ra sao ↓</button>
       </div>
       <div class="hero-chips rv">
@@ -1548,18 +1570,7 @@ body.hv-mode{padding-bottom:0}
         </div>
         <div class="tag-foot">↳ giữ chỗ chưa mất phí · tụi mình gọi tư vấn trước, hợp rồi mới đóng</div>
       </aside>
-    </div>
-    <!-- hàng hai thẻ miễn phí: soi kênh (mở popup) và Viral Studio -->
-    <div class="hero-free2">
-      <aside class="hero-soi rv" aria-label="Soi kênh miễn phí">
-        <div class="hero-vs-top"><span class="hero-soi-lbl">🔍 Soi kênh</span><span class="hero-vs-free">Free · 48 giờ</span></div>
-        <h3>Kênh bạn đang kẹt ở đâu? <em>Dán link, tụi mình soi.</em></h3>
-        <p>Trả lời qua Zalo trong 48 giờ: video rớt ở giây mấy, nên sửa chỗ nào trước. Gửi xong nhận luôn link group cộng đồng.</p>
-        <form class="hero-soi-nhap" id="heroSoiNhap" novalidate>
-          <input class="inp" id="heroSoiLink" inputmode="url" placeholder="Dán link video hoặc @kênh của bạn" aria-label="Link video hoặc kênh">
-          <button class="btn btn-ink btn-md" type="submit">Soi ngay →</button>
-        </form>
-      </aside>
+      <!-- thẻ Viral Studio: mời dùng thử ngay cạnh phiếu ghi danh -->
       <aside class="hero-vs rv" aria-label="Viral Studio, bốn công cụ AI dùng thử miễn phí">
         <div class="hero-vs-top"><span class="hero-vs-lbl">✦ Viral Studio</span><span class="hero-vs-free">Free · thử ngay</span></div>
         <h3>4 tool AI làm video viral, <em>không cần tài khoản</em></h3>
@@ -2763,8 +2774,6 @@ var CFG=null, faqBuilt=false;
     window.moSoi = mo;
     pop.querySelectorAll('[data-soi-dong]').forEach(function(b){ b.addEventListener('click', dong); });
     document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && pop.classList.contains('on')) dong(); });
-    var hn = document.getElementById('heroSoiNhap');
-    if (hn) hn.addEventListener('submit', function(e){ e.preventDefault(); mo((document.getElementById('heroSoiLink').value || '').trim()); });
   })();
 
   /* Giá gói Pro, lượt thử, gói học viên: lấy từ máy chủ, bot đổi (/giapro /ngaypro /luotthu… /ngayhv /giahv) là landing đổi theo. */
