@@ -384,7 +384,7 @@ Thuộc tính → **Nền người nói**: Giữ nguyên · Xoá nền → nhoè
 - **Thuộc tính từng đoạn V1** (chọn đoạn → cột Thuộc tính): phóng to, vị trí ngang/dọc, xoay, độ mờ; **chuyển động keyframe** đầu → cuối đoạn (Zoom vào chậm, Zoom ra, Lia trái → phải, Lia xuống, hoặc tự chỉnh giá trị cuối); **tốc độ** 0,25× → 3× (dòng thời gian, phụ đề, beat tự tính lại, giữ cao độ giọng); **âm lượng** 0–200%, hiện dần vào / mờ dần ra; **màu**: 8 bộ lọc (Ấm, Lạnh, Sáng trong, Điện ảnh, Rực rỡ, Cổ điển, Trắng đen) + độ sáng, tương phản, bão hoà, nút áp cho mọi đoạn.
 - **Chữ tự do** và **Sticker** trong thư viện đồ hoạ: kéo thẳng trên khung xem trước, chọn màu, nền (viền, bóng, hộp), 8 hiệu ứng (bật, hiện dần, trượt, nổi lên, gõ chữ, nảy, lắc). Font Be Vietnam Pro giữ dấu chồng (Ẩ, Ễ, Ộ, Ở).
 - **Xoá phông xanh (chroma key)** và độ mờ cho b-roll V2.
-- **✂ Cắt khoảng lặng** (tab Lời thoại): bỏ khoảng im dài hơn 0,3–1,2 giây và tiếng ờ/ừm/à theo lời đã chép từng từ; đồ hoạ phía sau tự dồn; Ctrl+Z để hoàn tác.
+- **✂ Cắt khoảng lặng** (tab Phụ đề): bỏ khoảng im dài hơn 0,3–1,2 giây và tiếng ừ/ờ/ừm theo lời đã chép từng từ (bản CapCut bên dưới có thêm xem trước); đồ hoạ phía sau tự dồn; Ctrl+Z để hoàn tác.
 - **❄ Đóng băng khung** (phím F), **◆ Mốc** trên thước (phím M, chuột phải để xoá).
 - **Tỉ lệ khung** 9:16, 1:1, 4:5, 16:9; xuất 720p, 1080p, 1440p, **4K** theo cạnh ngắn.
 - **Phong cách** một chạm (Podcast bùng nổ, Vlog nhẹ nhàng, Tin nhanh, Điện ảnh, Năng động, Tối giản) và **lưu phong cách của bạn** dùng lại mọi dự án.
@@ -400,6 +400,23 @@ Chưa làm (cần máy chủ GPU hoặc dịch vụ trả phí): voice clone, t�
 - **Bám theo lời nói**: chọn Danh sách, Checklist, Biểu đồ cột, Trước/Sau hay So sánh → bật "Hiện từng mục đúng lúc nói tới": mỗi mục hiện đúng giây người nói nhắc tới (dựa vào lời đã chép từng từ, tự tính lại khi cắt ghép, đổi tốc độ). Nút **⌖ Đặt đúng lúc nói** dời bất kỳ đồ hoạ nào tới lúc chữ của nó được nói.
 - **✨ Đồ hoạ AI (mô tả)**: gõ mô tả tiếng Việt ("biểu đồ đường doanh thu tăng từ 2 lên 9 triệu", "3 ô Hook, Giữ chân, Kêu gọi bay vào lần lượt") → AI thiết kế một cảnh gồm các lớp hộp/tròn/chữ/đường/vòng/số có keyframe và ease, canh theo lời nói trong khoảng đó. Máy chủ tự kiểm lỗi (thiếu chữ, thiếu số, thiếu hướng) và bắt AI sửa một lần; trình dựng vẽ 3 khung thử để chắc có hình. Có **Tạo lại** và **Áp sửa** bằng lời ("chậm hơn, đổi màu đỏ"). AI chỉ trả dữ liệu cảnh, không chạy code, nên an toàn. Mỗi lần tạo tốn 1 lượt chat (Free), chạy qua máy chủ Cloudflare `/do_hoa` (model đổi bằng biến `LLM_DO_HOA`, mặc định gemini-3.5-flash-lite, 2–7 giây).
 - **Trợ lý agent** dùng được tất cả: `tim_loi` (giây của một cụm từ), `them_do_hoa` với `bam_loi`, `dat_theo_loi`, kieu `ai` + `canh` (agent tự thiết kế cảnh) hoặc `mo_ta`; quy tắc: ưu tiên mẫu, chỉ tự thiết kế khi không có mẫu hợp, rồi xem khung để tự kiểm. Trợ lý dựng bản nháp (Apps Script) cũng biết 11 mẫu mới.
+
+### Bản CapCut (10/2026): thao tác, chữ, âm thanh, xuất
+
+Làm theo tài liệu tính năng CapCut, ngay trong trình dựng hiện có (không viết lại, không cần máy chủ GPU):
+
+- **Cắt nhanh**: Q bỏ phần trước đầu phát, W bỏ phần sau (ripple), Ctrl+B tách, Ctrl+C / Ctrl+V sao chép, dán tại đầu phát. **Hoàn tác / Làm lại** (Ctrl+Z, Ctrl+Shift+Z hoặc Ctrl+Y, nút ↷), mỗi lượt của trợ lý gộp thành 1 bước.
+- **Keyframe từng thuộc tính** (phóng, vị trí ngang/dọc, xoay, độ mờ, âm lượng): bấm ◇ cạnh thanh trượt để đặt mốc tại đầu phát, chấm vàng hiện trên đoạn, chọn kiểu chuyển (mềm, đều, vào, ra, nảy). **Tay cầm trên khung xem trước**: kéo để dời, góc để phóng, núm trên để xoay. **Hoạt ảnh vào/ra** cho đoạn và b-roll (12 kiểu), **lật** ngang/dọc, **cắt khung** (crop).
+- **Dạng sóng âm** trên đoạn V1, **Ctrl + lăn chuột** để zoom dòng thời gian, timeline cuộn dọc khi nhiều track.
+- **7 tab trái** như CapCut: Media · Âm thanh · Chữ · Phụ đề · Đồ hoạ · Hiệu ứng · Trợ lý.
+- **Chữ**: font, đậm, nghiêng, gạch chân, căn lề, viền (màu, độ dày), hộp nền (màu, bo góc), phát sáng, giãn chữ, khoảng dòng; hiệu ứng vào / ra / lặp. **10 mẫu chữ** một chạm (Tiêu đề vàng, Neon, Gõ chữ máy, Số liệu nổi bật, Kêu gọi follow…), emoji nhanh, **sticker PNG/GIF** tải lên thành overlay V3 (vừa khung).
+- **Phụ đề**: 6 mẫu một chạm (Trắng viền đen, Vàng karaoke, Hộp nền đen, Viên thuốc, Bật từng từ, Nổi lên nhẹ), **nhập file .srt** thay phụ đề tự sinh.
+- **Overlay V3** nằm trên b-roll V2 (chọn Lớp trong Thuộc tính), Khớp khung: phủ kín hoặc vừa khung.
+- **Hiệu ứng**: chỉnh màu nâng cao chạy GPU (phơi sáng, nhiệt độ, tint, vùng sáng, vùng tối, vignette, hạt phim), **cường độ bộ lọc**, 6 hiệu ứng clip (rung máy quay, nhịp theo beat, chớp sáng, vệt sáng, phim cũ, phóng nhoè), **áp chuyển cảnh cho mọi điểm cắt**, **nền khung** (đen, màu, mờ chính video, ảnh) khi hình không phủ kín.
+- **Âm thanh (track A3)**: 8 hiệu ứng âm thanh tổng hợp ngay trên máy (Whoosh, Pop, Ding, Click, Boom, Riser, Tíc tắc, Chụp ảnh), thêm file, **ghi âm micro** (dòng thời gian phát để nói theo hình), **tách âm thanh** đoạn V1 xuống A3 để làm J-cut / L-cut. Âm lượng theo **dB**, vào/tắt dần, **chuẩn hoá âm lượng** các đoạn về cùng độ to (khoảng -19 dB). A3 lưu trong dự án.
+- **✂ Cắt khoảng lặng có xem trước**: bấm → vùng đỏ trên V1 là phần sẽ cắt, bấm **Áp dụng** hoặc **Huỷ**. Footage chưa chép lời vẫn cắt được (đo theo âm lượng). Chỉ tự bỏ ừ, ờ, ừm; "thì, là, kiểu, à" sau chỗ ngập ngừng chỉ được đánh dấu vạch vàng để bạn nghe lại, vì đó có thể là lời thật.
+- **Xuất chính xác từng khung** (WebCodecs + mediabunny): vẽ từng khung bằng đúng bộ vẽ của khung xem trước nên bản xuất giống hệt (đã kiểm ở giây 5/15/25), không rớt khung, nhanh hơn thời gian thực với 720p, chạy nền được. Cài đặt (Thuộc tính → Xuất): **MP4 H.264**, MP4 AV1, WebM VP9, **chỉ âm thanh WAV**; 24/25/30/60 khung/giây; chất lượng Vừa/Cao/Rất cao. Máy không mã hoá được codec đã chọn thì tool tự dùng codec khác và báo rõ; trình duyệt cũ không có WebCodecs thì tự ghi thời gian thực như trước (hoặc chọn "Ghi thời gian thực").
+- **Trợ lý agent: 45 lệnh**, thêm `keyframe`, `sua_broll` (lớp V3, vừa khung, màu, hoạt ảnh), `ap_tat_ca` (lọc/hiệu ứng/chuyển cảnh cho mọi đoạn), `cat_dau_phat` (Q/W), `nhan_doi`, `mau_chu`, `phu_de_mau`, `nhap_srt`, `nen_khung`, `them_am_thanh`, `sua_am_thanh`, `tach_am_thanh`, `chuan_hoa_am`; `sua_doan` nhận màu nâng cao, hiệu ứng, lật, hoạt ảnh; `sua_do_hoa` nhận đủ kiểu chữ; `xuat_video` nhận fps, định dạng, chất lượng.
 
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 
