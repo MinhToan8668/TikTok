@@ -365,31 +365,41 @@ nav .burger{border-color:rgba(28,38,0,.35)}
 /* ── màn rộng (≥1500px): nới hero ra, cột phải rộng hơn, thẻ Viral Studio vuông vức 2×2 có icon ── */
 @media(min-width:1500px){
   .hero{padding:26px 0 48px}
-  .hero-in{max-width:1400px;grid-template-columns:minmax(0,1fr) 440px;gap:60px}
+  .hero-in{max-width:1300px;grid-template-columns:minmax(0,1fr) 480px;gap:44px}
   .hero-mark{--lg:84px}
   .hero-brand-t b{font-size:23px}
   .hero-pill{font-size:11px;padding:5px 12px}
   .hero h1{font-size:54px;margin-bottom:16px}
-  .hero .lead{font-size:16px;line-height:1.65;max-width:58ch;margin-bottom:20px}
+  .hero .lead{font-size:16px;line-height:1.65;max-width:100%;margin-bottom:20px}
   .an-dt{display:inline}
   .hero-actions .btn-lg{padding:14px 22px;font-size:15px}
   .hero-chip{font-size:12.5px;padding:7px 14px}
   .hero-side{gap:20px}
   .tag{padding:20px 22px 18px}
   .tag-head{margin-bottom:12px}
-  .tag-num{font-size:40px}
-  .tag-rows{gap:9px;padding-top:13px}
+  .tag-num{font-size:42px}
+  .tag-rows{gap:10px;padding-top:13px}
+  .tag-row{font-size:13.5px}
   .tag-foot{font-size:12.5px;margin-top:12px}
   .hero-vs{padding:20px 22px 18px}
   .hero-vs-top{margin-bottom:10px}
-  .hero-vs h3{font-size:21px;margin-bottom:6px}
-  .hero-vs p{display:block;font-size:13.5px;margin-bottom:14px}
+  .hero-vs h3{font-size:23px;margin-bottom:6px}
+  .hero-vs p{display:block;font-size:14px;margin-bottom:14px}
   .hero-vs-tools{grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
-  .hero-vs-tools span{padding:10px 12px;font-size:13px;justify-content:flex-start;text-align:left;gap:7px;line-height:1.25}
+  .hero-vs-tools span{padding:11px 13px;font-size:13.5px;justify-content:flex-start;text-align:left;gap:7px;line-height:1.25}
   .hero-vs-tools span i{display:inline-block}
   .hero-vs-tools span b{margin-left:auto;font-size:9.5px;padding:2px 6px}
   .hero-vs .btn-vs{padding:13px 16px;font-size:15px}
   .hero-vs-note{font-size:12.5px;margin-top:11px}
+}
+/* ── màn rất rộng (≥1700px, nhiều chỗ dọc): chữ bên trái to hẳn để hai cột sát nhau ── */
+@media(min-width:1700px){
+  .hero-mark{--lg:92px}
+  .hero-brand-t b{font-size:25px}
+  .hero h1{font-size:62px;margin-bottom:18px}
+  .hero .lead{font-size:17.5px;margin-bottom:22px}
+  .hero-actions .btn-lg{padding:15px 24px;font-size:16px}
+  .hero-chip{font-size:13.5px;padding:8px 15px}
 }
 /* ── điện thoại: hero gọn lại còn ~3 màn cuộn, thẻ Viral Studio lên ngay dưới nút Đăng ký ── */
 @media(max-width:640px){
