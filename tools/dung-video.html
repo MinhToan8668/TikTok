@@ -440,6 +440,10 @@
           <label><span>Font chữ</span><select id="font"><option value="be_vietnam">Be Vietnam Pro</option><option value="montserrat">Montserrat</option><option value="bricolage">Bricolage</option><option value="lexend">Lexend</option><option value="oswald">Oswald (hẹp)</option><option value="anton">Anton (đập)</option><option value="playfair">Playfair (thanh lịch)</option></select></label>
           <label><span>Zoom nhấn</span><input type="checkbox" id="zoomOn" checked></label>
           <h3>Xuất</h3>
+          <label><span>Định dạng</span><select id="xuatDD"><option value="mp4_avc" selected>MP4 · H.264 (đăng TikTok)</option><option value="mp4_av1">MP4 · AV1 (nhẹ hơn, máy mới)</option><option value="webm_vp9">WebM · VP9</option><option value="wav">Chỉ âm thanh · WAV</option></select></label>
+          <label><span>Khung/giây</span><select id="xuatFps"><option value="24">24</option><option value="25">25</option><option value="30" selected>30</option><option value="60">60 (mượt, nặng)</option></select></label>
+          <label><span>Chất lượng</span><select id="xuatCL"><option value="vua">Vừa (file nhẹ)</option><option value="cao" selected>Cao</option><option value="rat_cao">Rất cao</option></select></label>
+          <label><span>Cách xuất</span><select id="xuatCach" title="Chính xác từng khung: nhanh, không rớt khung, chạy nền được. Ghi thời gian thực: cho máy/trình duyệt cũ."><option value="nhanh" selected>Chính xác từng khung</option><option value="ghi">Ghi thời gian thực (máy cũ)</option></select></label>
           <label><span>Độ phân giải</span><select id="doPhanGiai"><option value="1080">1080p</option><option value="720">720p (nhẹ)</option><option value="1440">1440p (máy mạnh)</option><option value="2160">4K (máy rất mạnh)</option></select></label>
           <h3>Dự án</h3>
           <div class="row"><button class="btn nho" id="btnLuuDA" type="button">💾 Lưu dự án</button><button class="btn nho" id="btnMoDA" type="button">📂 Mở dự án</button><input type="file" id="moDAIn" accept="application/json" hidden></div>
@@ -1254,21 +1258,15 @@ async function phat(xuat) {
 }
 function dung() { if (P.dungHam) P.dungHam(); }
 $('#btnPlay').onclick = $('#btnPlay2').onclick = () => { if (P.dang) dung(); else phat(false); };
-$('#btnXuat').onclick = async () => {
-  if (!P.clips.length) { toast('Chưa có đoạn nào để xuất'); return; } if (P.dang) dung();
-  if (!window.MediaRecorder || !cv.captureStream) { toast('Trình duyệt này chưa xuất được video, dùng Chrome hoặc Safari mới.'); return; }
-  $('#xuatHop').classList.add('mo'); $('#xuatXong').style.display = 'none'; $('#xuatHuy').style.display = ''; $('#xuatBar').style.width = '0'; $('#xuatTieuDe').textContent = 'Đang dựng video…';
-  try { if ('wakeLock' in navigator) P.wl = await navigator.wakeLock.request('screen'); } catch {}
-  P.t = 0; P.huyXuat = false; await phat(true);
-};
+$('#btnXuat').onclick = () => batDauXuat();
 $('#xuatHuy').onclick = () => { P.huyXuat = true; dung(); $('#xuatHop').classList.remove('mo'); };
 $('#xuatDong').onclick = () => $('#xuatHop').classList.remove('mo');
-function luuFile(blob) {
+function luuFile(blob, ghiChu) {
   try { if (P.wl) P.wl.release(); } catch {}
   if (P.huyXuat) return;
-  const mp4 = /mp4/.test(blob.type), ten = ($('#tenDuAn').value.trim() || 'video').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').replace(/[^A-Za-z0-9]+/g, '-').toLowerCase().replace(/^-|-$/g, '').slice(0, 40) + '-' + new Date().toISOString().slice(5, 16).replace(/[-:T]/g, '') + (mp4 ? '.mp4' : '.webm');
-  const u = URL.createObjectURL(blob); const a = $('#xuatTai'); a.href = u; a.download = ten;
-  $('#xuatTieuDe').textContent = '✓ Xong · ' + ten + ' (' + (blob.size / 1048576).toFixed(1).replace('.', ',') + ' MB)'; $('#xuatBar').style.width = '100%'; $('#xuatTt').textContent = mp4 ? 'Bấm Tải video rồi đăng, hoặc đưa sang Chấm video để AI chấm bản này.' : 'Máy này xuất WebM (không có bộ mã H.264). TikTok web vẫn nhận; cần MP4 thì mở lại bằng Chrome trên máy tính hoặc Safari.';
+  const mp4 = /mp4/.test(blob.type), ten = ($('#tenDuAn').value.trim() || 'video').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').replace(/[^A-Za-z0-9]+/g, '-').toLowerCase().replace(/^-|-$/g, '').slice(0, 40) + '-' + new Date().toISOString().slice(5, 16).replace(/[-:T]/g, '') + (/wav/.test(blob.type) ? '.wav' : mp4 ? '.mp4' : '.webm');
+  const u = URL.createObjectURL(blob); const a = $('#xuatTai'); a.href = u; a.download = ten; a.textContent = /wav/.test(blob.type) ? '⬇️ Tải âm thanh' : '⬇️ Tải video';
+  $('#xuatTieuDe').textContent = '✓ Xong · ' + ten + ' (' + (blob.size / 1048576).toFixed(1).replace('.', ',') + ' MB)'; $('#xuatBar').style.width = '100%'; $('#xuatTt').textContent = ghiChu ? ghiChu : mp4 ? 'Bấm Tải video rồi đăng, hoặc đưa sang Chấm video để AI chấm bản này.' : 'Máy này xuất WebM (không có bộ mã H.264). TikTok web vẫn nhận; cần MP4 thì mở lại bằng Chrome trên máy tính hoặc Safari.';
   $('#xuatXong').style.display = ''; $('#xuatHuy').style.display = 'none';
   a.click(); toast('Đã lưu ' + ten); P.t = 0; veKhung();
 }
@@ -1645,7 +1643,7 @@ function am3MoiItem(kho, ten, loai, dai) { return { id: uid(), kho, ten, loai, t
 function am3Lich(a, t0, now, raXuat) {
   const k = AM3_KHO[a.kho]; if (!k || !k.buf) return null; const dai = a.kt - a.bd, cuoi = a.t_bd + dai; if (cuoi <= t0 + 0.01 || dai <= 0) return null;
   const tre = Math.max(0, a.t_bd - t0), vao = Math.max(0, t0 - a.t_bd), con = dai - vao, st = now + tre, vol = a.am == null ? 1 : a.am;
-  const src = ac.createBufferSource(); src.buffer = k.buf; const g = ac.createGain(); src.connect(g); g.connect(ac.destination); if (raXuat && dest) g.connect(dest);
+  const C = (raXuat && raXuat.ctx) || ac, src = C.createBufferSource(); src.buffer = k.buf; const g = C.createGain(); src.connect(g); if (raXuat && raXuat.ctx) g.connect(C.destination); else { g.connect(ac.destination); if (raXuat && dest) g.connect(dest); }
   const fi = Math.min(a.fi || 0, dai / 2), fo = Math.min(a.fo || 0, dai / 2);
   if (fi && vao < fi) { g.gain.setValueAtTime(vol * vao / fi, st); g.gain.linearRampToValueAtTime(vol, st + (fi - vao)); } else g.gain.setValueAtTime(vol, st);
   if (fo) { const bdFo = Math.max(vao, dai - fo); g.gain.setValueAtTime(vol * Math.min(1, (dai - bdFo) / fo), st + (bdFo - vao)); g.gain.linearRampToValueAtTime(0, st + con); }
@@ -1755,6 +1753,88 @@ function khoiTaoC() {
     rec.start(250); const b = $('#btnThuAm'); b.textContent = '⏹ Dừng ghi'; b.classList.add('dangGhi'); if (P.clips.length && !P.dang) phat(false);
   };
   $('#btnLang').onclick = xemTruocCatLang;
+}
+
+/* ═════════ XUẤT CHÍNH XÁC TỪNG KHUNG: WebCodecs + mediabunny ═════════
+   Vẽ đúng bằng veFrame của xem trước ở từng mốc n/fps (tua đúng khung, không phụ thuộc máy nhanh/chậm),
+   âm thanh trộn sẵn trong OfflineAudioContext. Máy không có WebCodecs thì quay về ghi thời gian thực (MediaRecorder). */
+const MB_URL = 'https://cdn.jsdelivr.net/npm/mediabunny@1.61.0/+esm';
+let MB = null;
+async function napMB() { if (!MB) MB = await import(MB_URL); return MB; }
+function coWebCodecs() { return typeof VideoEncoder === 'function' && typeof AudioEncoder === 'function'; }
+const DD_XUAT = { mp4_avc: ['mp4', 'avc'], mp4_av1: ['mp4', 'av1'], webm_vp9: ['webm', 'vp9'] };
+const TEN_CODEC = { avc: 'H.264', hevc: 'H.265', vp9: 'VP9', vp8: 'VP8', av1: 'AV1', aac: 'AAC', opus: 'Opus', mp3: 'MP3' };
+function wavTuBuf(ab) {
+  const nc = ab.numberOfChannels, sr = ab.sampleRate, n = ab.length, buf = new ArrayBuffer(44 + n * nc * 2), v = new DataView(buf), ws = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+  ws(0, 'RIFF'); v.setUint32(4, 36 + n * nc * 2, true); ws(8, 'WAVE'); ws(12, 'fmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, nc, true); v.setUint32(24, sr, true); v.setUint32(28, sr * nc * 2, true); v.setUint16(32, nc * 2, true); v.setUint16(34, 16, true); ws(36, 'data'); v.setUint32(40, n * nc * 2, true);
+  const ch = [...Array(nc)].map((_, i) => ab.getChannelData(i)); let o = 44; for (let i = 0; i < n; i++) for (let c = 0; c < nc; c++) { const x = Math.max(-1, Math.min(1, ch[c][i])); v.setInt16(o, x < 0 ? x * 32768 : x * 32767, true); o += 2; }
+  return new Blob([buf], { type: 'audio/wav' });
+}
+async function bufTuUrl(url) { return await giaiMaAm(new Blob([await (await fetch(url)).arrayBuffer()])); }
+/* trộn toàn bộ âm thanh dòng thời gian (V1 + A1 nhạc có duck + A2 lồng tiếng + A3) giống hệt lúc phát */
+async function tronAmThanh(tong, sr) {
+  sr = sr || 48000; const oc = new OfflineAudioContext(2, Math.max(1, Math.ceil(tong * sr)), sr), ra = oc.destination;
+  const mucNoi = (+$('#duckNoi').value || 12) / 100, mucBroll = (+$('#duckBroll').value || 60) / 100;
+  const coLongTai = x => P.tieng.some(t => x >= t.t_bd && x < t.t_bd + t.giay);
+  for (const t of P.tieng) { if (t.t_bd >= tong) continue; try { const buf = t.b64 ? await giaiMaAm(new Blob([Uint8Array.from(atob(t.b64), c => c.charCodeAt(0))])) : await bufTuUrl(t.url); const s = oc.createBufferSource(); s.buffer = buf; s.connect(ra); s.start(t.t_bd, 0, Math.min(buf.duration, tong - t.t_bd)); } catch { } }
+  let acc = 0;
+  for (const c of P.clips) {
+    const dai = daiC(c), s = srcCua(c.src), bd0 = acc; acc += dai; if (!s || s.loai !== 'video') continue;
+    let buf; try { buf = (await am3NapKho('src:' + s.id)).buf; } catch { continue; } if (c.bd >= buf.duration) continue;
+    const src = oc.createBufferSource(), g = oc.createGain(); src.buffer = buf; src.playbackRate.value = tocC(c); src.connect(g); g.connect(ra);
+    let cu = -1; for (let o = 0; o <= dai + 1e-6; o += 0.02) { const v = Math.max(0, giaTriKf(c, 'am', o) * fadeHeSo(c, o) * (coLongTai(bd0 + o) ? 0.25 : 1)); if (cu < 0) g.gain.setValueAtTime(v, bd0); else if (Math.abs(v - cu) > 0.001) g.gain.linearRampToValueAtTime(v, bd0 + o); cu = v; }
+    src.start(bd0, c.bd, Math.max(0.01, Math.min(c.kt, buf.duration) - c.bd));
+  }
+  if (P.nhac) { try { const buf = await bufTuUrl(P.nhac.url), s = oc.createBufferSource(), g = oc.createGain(); s.buffer = buf; s.loop = true; s.connect(g); g.connect(ra);
+    let cu = -1; for (let x = 0; x <= tong; x += 0.05) { const { clip, tSrc } = viTri(x), c = P.clips[clip], sc = c && srcCua(c.src), coTieng = coLongTai(x) || (sc && sc.cau.some(q => tSrc >= q.bd && tSrc <= q.kt)); let m = coTieng ? mucNoi : mucBroll; if (tong - x < 1.5) m *= Math.max(0, (tong - x) / 1.5); if (cu < 0) g.gain.setValueAtTime(m, 0); else if (Math.abs(m - cu) > 0.001) g.gain.setTargetAtTime(m, x, tong - x < 1.5 ? 0.02 : 0.2); cu = m; }
+    s.start(0); s.stop(tong); } catch { } }
+  await am3NapThieu(); (P.am3 || []).forEach(a => am3Lich(a, 0, 0, { ctx: oc }));
+  return await oc.startRendering();
+}
+/* vẽ một khung tại t cho bản xuất: tua footage chính, b-roll và khung trước chuyển cảnh đúng giây rồi dùng chung veFrame */
+async function veKhungXuat(ctx, W, H, t) {
+  const { clip, tSrc } = viTri(t);
+  if (clip >= 0) { const s = srcCua(P.clips[clip].src); if (s && s.el && s.loai === 'video') await seekTo(s.el, tSrc); }
+  for (const b of P.broll) { const k = tocC(b), dai = (b.kt - b.bd) / k; if (t >= b.t_bd && t < b.t_bd + dai) { const sb = srcCua(b.src); if (sb && sb.loai === 'video') await seekTo(elPhu(sb, 'elB'), b.bd + (t - b.t_bd) * k); } }
+  const ch = chuyenTai(t), snap = ch ? await laySnapTruoc(W, H, ch.truoc) : null;
+  veFrame(ctx, W, H, t, snap);
+}
+function caiXuat() { return { fps: +$('#xuatFps').value || 30, cl: $('#xuatCL').value || 'cao', dd: $('#xuatDD').value || 'mp4_avc', cach: $('#xuatCach').value || 'nhanh', res: +$('#doPhanGiai').value || 1080 }; }
+async function chuanBiVe() { try { await document.fonts.load('900 40px ' + (FONT_CSS[$('#font').value] || FONT_CSS.be_vietnam)); } catch { } if (segBat() && !segModel && !segLoi) { try { await segNap(); } catch { } } if (P.clips.some(c => c.chuyen && c.chuyen !== 'cat')) await gltNap(); }
+async function xuatWebCodecs(o) {
+  const M = await napMB(), tong = tongGiay(), fps = o.fps, N = Math.max(1, Math.round(tong * fps)), { W, H } = kichThuoc(o.res), [loai, muon] = DD_XUAT[o.dd] || DD_XUAT.mp4_avc;
+  const fmt = loai === 'webm' ? new M.WebMOutputFormat() : new M.Mp4OutputFormat({ fastStart: 'in-memory' });
+  const hoTro = fmt.getSupportedVideoCodecs(), thu = [muon, ...['avc', 'vp9', 'av1', 'vp8'].filter(c => c !== muon)].filter(c => hoTro.includes(c));
+  const vc = await M.getFirstEncodableVideoCodec(thu, { width: W, height: H }); if (!vc) throw new Error('máy không mã hoá được video ' + W + '×' + H);
+  const acd = await M.getFirstEncodableAudioCodec(['aac', 'opus'].filter(c => fmt.getSupportedAudioCodecs().includes(c)), { numberOfChannels: 2, sampleRate: 48000 });
+  const canvas = Object.assign(document.createElement('canvas'), { width: W, height: H }), ctx = canvas.getContext('2d');
+  const out = new M.Output({ format: fmt, target: new M.BufferTarget() }), cl = { vua: M.QUALITY_MEDIUM, cao: M.QUALITY_HIGH, rat_cao: M.QUALITY_VERY_HIGH }[o.cl] || M.QUALITY_HIGH;
+  const vs = new M.CanvasSource(canvas, { codec: vc, bitrate: cl, keyFrameInterval: 2 }); out.addVideoTrack(vs, { frameRate: fps });
+  let as = null; if (acd) { as = new M.AudioBufferSource({ codec: acd, bitrate: o.cl === 'vua' ? 128000 : 192000 }); out.addAudioTrack(as); }
+  await out.start();
+  if (as) { $('#xuatTt').textContent = 'Đang trộn âm thanh…'; const mix = await tronAmThanh(tong); if (P.huyXuat) { await out.cancel(); return null; } await as.add(mix); as.close(); }
+  await chuanBiVe(); const t0 = performance.now();
+  for (let n = 0; n < N; n++) {
+    if (P.huyXuat) { await out.cancel(); return null; }
+    const t = n / fps; await veKhungXuat(ctx, W, H, Math.min(t, tong - 0.001)); await vs.add(t, 1 / fps);
+    if (n % 3 === 0 || n === N - 1) { $('#xuatBar').style.width = ((n + 1) / N * 100).toFixed(1) + '%'; const tg = (performance.now() - t0) / 1000, con = tg / (n + 1) * (N - n - 1); $('#xuatTt').textContent = 'Khung ' + (n + 1) + '/' + N + ' · ' + fps + ' khung/giây · ' + TEN_CODEC[vc] + (acd ? ' + ' + TEN_CODEC[acd] : '') + ' · còn ~' + Math.ceil(con) + 's'; }
+  }
+  vs.close(); $('#xuatTt').textContent = 'Đang đóng gói file…'; await out.finalize();
+  return { blob: new Blob([out.target.buffer], { type: loai === 'webm' ? 'video/webm' : 'video/mp4' }), vc, acd, muon };
+}
+async function batDauXuat() {
+  if (!P.clips.length) { toast('Chưa có đoạn nào để xuất'); return; } if (P.dang) dung();
+  const o = caiXuat();
+  $('#xuatHop').classList.add('mo'); $('#xuatXong').style.display = 'none'; $('#xuatHuy').style.display = ''; $('#xuatBar').style.width = '0'; P.huyXuat = false;
+  try { if ('wakeLock' in navigator) P.wl = await navigator.wakeLock.request('screen'); } catch { }
+  if (o.dd === 'wav') { $('#xuatTieuDe').textContent = 'Đang xuất âm thanh…'; $('#xuatTt').textContent = 'Đang trộn lồng tiếng, nhạc, hiệu ứng…'; try { const mix = await tronAmThanh(tongGiay()); if (P.huyXuat) return; luuFile(wavTuBuf(mix), 'File WAV 48 kHz, đủ lồng tiếng, nhạc (đã hạ khi nói) và hiệu ứng. Dùng để làm podcast hoặc chỉnh tiếp ở phần mềm khác.'); } catch (e) { toast('Xuất âm thanh lỗi: ' + (e.message || e)); $('#xuatHop').classList.remove('mo'); } return; }
+  if (o.cach === 'nhanh' && coWebCodecs()) {
+    $('#xuatTieuDe').textContent = 'Đang dựng video (chính xác từng khung)…'; $('#xuatTt').textContent = 'Đang nạp bộ mã hoá…';
+    try { const r = await xuatWebCodecs(o); if (!r) return; const doi = r.vc !== r.muon; luuFile(r.blob, (doi ? 'Máy này không mã hoá được ' + TEN_CODEC[r.muon] + ' nên đã dùng ' + TEN_CODEC[r.vc] + '. ' : '') + (r.blob.type === 'video/mp4' ? 'Bấm Tải video rồi đăng, hoặc đưa sang Chấm video để AI chấm bản này.' : 'File WebM, TikTok web vẫn nhận.')); return; }
+    catch (e) { console.warn('WebCodecs', e); if (P.huyXuat) return; toast('Bộ mã hoá nhanh lỗi (' + (e.message || e) + '), chuyển sang ghi thời gian thực'); }
+  }
+  if (!window.MediaRecorder || !cv.captureStream) { toast('Trình duyệt này chưa xuất được video, dùng Chrome hoặc Safari mới.'); $('#xuatHop').classList.remove('mo'); return; }
+  $('#xuatTieuDe').textContent = 'Đang dựng video…'; P.t = 0; await phat(true);
 }
 
 /* ═════════ MOTION GRAPHICS (10/2026): 11 mẫu mới · bám theo lời nói · đồ hoạ AI dạng cảnh JSON có keyframe ═════════
