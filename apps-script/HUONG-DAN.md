@@ -394,6 +394,13 @@ Thuộc tính → **Nền người nói**: Giữ nguyên · Xoá nền → nhoè
 
 Chưa làm (cần máy chủ GPU hoặc dịch vụ trả phí): voice clone, tách giọng khỏi nhạc, upscale, theo dõi chuyển động đối tượng bất kỳ, kho nhạc bản quyền.
 
+### Motion graphics (10/2026)
+
+- **24 đồ hoạ trong thư viện**, thêm 11 mẫu: Biểu đồ cột (`Nhãn:số|Nhãn:số`, cột mọc lên kèm số đếm), Biểu đồ tròn %, Trước / Sau, So sánh VS, Checklist (tick từng mục), Trả lời bình luận (khung bình luận kiểu TikTok), Nút Follow (bấm → Đã follow), Đếm ngược, Ghim địa điểm (ghim rơi + sóng), Thanh tìm kiếm (gõ chữ), Thông báo (trượt từ trên xuống). Đều là hàm của thời gian nên tua tới đâu cũng đúng hình, xem trước và xuất giống nhau.
+- **Bám theo lời nói**: chọn Danh sách, Checklist, Biểu đồ cột, Trước/Sau hay So sánh → bật "Hiện từng mục đúng lúc nói tới": mỗi mục hiện đúng giây người nói nhắc tới (dựa vào lời đã chép từng từ, tự tính lại khi cắt ghép, đổi tốc độ). Nút **⌖ Đặt đúng lúc nói** dời bất kỳ đồ hoạ nào tới lúc chữ của nó được nói.
+- **✨ Đồ hoạ AI (mô tả)**: gõ mô tả tiếng Việt ("biểu đồ đường doanh thu tăng từ 2 lên 9 triệu", "3 ô Hook, Giữ chân, Kêu gọi bay vào lần lượt") → AI thiết kế một cảnh gồm các lớp hộp/tròn/chữ/đường/vòng/số có keyframe và ease, canh theo lời nói trong khoảng đó. Máy chủ tự kiểm lỗi (thiếu chữ, thiếu số, thiếu hướng) và bắt AI sửa một lần; trình dựng vẽ 3 khung thử để chắc có hình. Có **Tạo lại** và **Áp sửa** bằng lời ("chậm hơn, đổi màu đỏ"). AI chỉ trả dữ liệu cảnh, không chạy code, nên an toàn. Mỗi lần tạo tốn 1 lượt chat (Free), chạy qua máy chủ Cloudflare `/do_hoa` (model đổi bằng biến `LLM_DO_HOA`, mặc định gemini-3.5-flash-lite, 2–7 giây).
+- **Trợ lý agent** dùng được tất cả: `tim_loi` (giây của một cụm từ), `them_do_hoa` với `bam_loi`, `dat_theo_loi`, kieu `ai` + `canh` (agent tự thiết kế cảnh) hoặc `mo_ta`; quy tắc: ưu tiên mẫu, chỉ tự thiết kế khi không có mẫu hợp, rồi xem khung để tự kiểm. Trợ lý dựng bản nháp (Apps Script) cũng biết 11 mẫu mới.
+
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 
 Cài theo [`cloudflare/CAI-DAT.md`](../cloudflare/CAI-DAT.md) (khoảng 10 phút, không cần thẻ). Có máy chủ này tool thêm:

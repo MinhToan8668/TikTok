@@ -7,6 +7,8 @@
      GET  /media?u=    → phát lại file Pixabay/Pexels có CORS + Range (xem trước, xuất video)
      GET  /tai?u=&ten= → tải hộ file video/ảnh/nhạc từ CDN các nền tảng, không giới hạn 35MB, có tên file
      POST /tts         → lồng tiếng AI tiếng Việt (Gemini TTS), trả WAV; trừ lượt qua Apps Script
+     POST /do_hoa      → AI tạo motion graphic mới theo mô tả: trả cảnh JSON (lớp hộp/tròn/chữ/đường/vòng/số + keyframe),
+                         trình dựng tự vẽ, không chạy code lạ; trừ 1 lượt chat
      POST /agent       → Trợ lý dựng kiểu agent: nhận yêu cầu + trạng thái dự án, hỏi LLM có tool-calling
                          (bộ lệnh học theo Vyra MCP), trả về lệnh để tab chạy lên dòng thời gian; lặp tới khi xong.
                          Đổi nhà cung cấp AI bằng biến LLM_PROVIDER = gemini | claude | openai (+ key tương ứng).
@@ -22,7 +24,7 @@
      ANTHROPIC_API_KEY, OPENAI_API_KEY   (Secret) key khi chọn claude / openai
    ═══════════════════════════════════════════════════════════════════════════ */
 
-const PHIEN_BAN = '2026.10.06';
+const PHIEN_BAN = '2026.10.07';
 /* link /exec của Apps Script đang dùng trong tool (công khai sẵn trong tools/*.html). Biến APPS_SCRIPT_URL trên Cloudflare, nếu có, sẽ được ưu tiên. */
 const APPS_SCRIPT_MD = 'https://script.google.com/macros/s/AKfycbyxe1nWupAl6VheDZHaU3Ojm-d6c8F_khhUMtkehNCLh5OnGW6f2uF0PKPYZ4eYUqyGjQ/exec';
 const asUrl = env => String(env.APPS_SCRIPT_URL || env.APPS_SCRIPT || APPS_SCRIPT_MD).trim();
@@ -44,6 +46,7 @@ export default {
       if (path === '/broll' && req.method === 'GET') return json(await timBroll(url, env, ctx), cors);
       if (path === '/media' && req.method === 'GET') return media(req, url, cors);
       if (path === '/tai' && req.method === 'GET') return taiHo(req, url, cors);
+      if (path === '/do_hoa' && req.method === 'POST') { if (!cors['access-control-allow-origin']) return json({ ok: false, error: 'origin' }, cors, 403); return doHoaAI(req, env, cors); }
       if (path === '/agent' && req.method === 'POST') { if (!cors['access-control-allow-origin']) return json({ ok: false, error: 'origin' }, cors, 403); return agent(req, env, cors); }
       if (path === '/tts' && req.method === 'POST') { if (!cors['access-control-allow-origin']) return json({ ok: false, error: 'origin' }, cors, 403); return tts(req, env, cors); }
       return json({ ok: false, error: 'khong_co' }, cors, 404);
@@ -204,8 +207,8 @@ const AGENT_TOOLS = [
   ['hit_beat', 'Kéo mép các đoạn về beat nhạc gần nhất (cần có nhạc nền).', {}],
   ['dat_broll', 'Đặt b-roll lên V2: src_id, bd→kt trong source, t_bd giây bắt đầu trên dòng thời gian, kieu = full | pip.', { src_id: { type: 'string' }, bd: { type: 'number' }, kt: { type: 'number' }, t_bd: { type: 'number' }, kieu: { type: 'string' } }, ['src_id', 'bd', 'kt', 't_bd']],
   ['xoa_broll', 'Xoá b-roll theo id.', { id: { type: 'string' } }, ['id']],
-  ['them_do_hoa', 'Thêm đồ hoạ O1: kieu = tieu_de|lower_third|danh_sach|tien_do|trich_dan|dem_so|khung_nhan|mui_ten|vong_xoay|nhan_goc|chu (chữ tự do)|sticker (emoji); bd, kt giây trên dòng thời gian; text, phu. Riêng chu/sticker: x, y (0–1 theo khung), co (cỡ 0.03–0.2, sticker tới 0.4), mau (#hex), nen vien|bong|hop|hop_mau|khong, hu (hiệu ứng) pop|mo|truot|len|go|nay|lac|khong. Xuống dòng bằng |.', { kieu: { type: 'string' }, bd: { type: 'number' }, kt: { type: 'number' }, text: { type: 'string' }, phu: { type: 'string' }, x: { type: 'number' }, y: { type: 'number' }, co: { type: 'number' }, mau: { type: 'string' }, nen: { type: 'string' }, hu: { type: 'string' } }, ['kieu', 'bd', 'kt']],
-  ['sua_do_hoa', 'Sửa đồ hoạ theo id: bd, kt, text, phu; với chu/sticker thêm x, y, co, mau, nen, hu.', { id: { type: 'string' }, bd: { type: 'number' }, kt: { type: 'number' }, text: { type: 'string' }, phu: { type: 'string' }, x: { type: 'number' }, y: { type: 'number' }, co: { type: 'number' }, mau: { type: 'string' }, nen: { type: 'string' }, hu: { type: 'string' } }, ['id']],
+  ['them_do_hoa', 'Thêm đồ hoạ O1: kieu = tieu_de|lower_third|danh_sach|tien_do|trich_dan|dem_so|khung_nhan|mui_ten|vong_xoay|nhan_goc|chu (chữ tự do)|sticker (emoji); bd, kt giây trên dòng thời gian; text, phu. Mẫu mới: bieu_do_cot (text "Nhãn:số|Nhãn:số", phu đơn vị), bieu_do_tron (text "72%", phu chú thích), truoc_sau / so_sanh (text "A|B"), checklist (text "a|b|c"), binh_luan (text bình luận, phu tên), dang_ky (text @kênh), dem_nguoc (text số giây), ghim_ban_do (text địa điểm, x, y), tim_kiem (text từ khoá), thong_bao (text tiêu đề, phu nội dung). Riêng chu/sticker: x, y (0–1 theo khung), co (cỡ 0.03–0.2, sticker tới 0.4), mau (#hex), nen vien|bong|hop|hop_mau|khong, hu (hiệu ứng) pop|mo|truot|len|go|nay|lac|khong. Xuống dòng bằng |. bam_loi=true: các mục (danh_sach, checklist, bieu_do_cot, truoc_sau, so_sanh) hiện đúng lúc người nói nhắc tới. dat_theo_loi=true: tự dời đồ hoạ tới lúc chữ của nó được nói. kieu ai = đồ hoạ tự thiết kế khi không có mẫu hợp: truyền canh = {lop:[{loai hop|tron|chu|duong|vong|so, mau "#hex" hoặc "nhan" (màu nhấn) hoặc "khong", vien, day (độ dày theo cạnh ngắn 0.004–0.03), bo_goc 0–1, chu, co (cỡ chữ 0.03–0.2), dam 600|800|900, can center|left|right, so_tu, so_den, dinh_dang "{}%", kf:[{t giây từ lúc đồ hoạ bắt đầu, x, y (tâm 0–1), w, h (0–1 theo khung; tron/vong: w là đường kính; duong: w,h là vector), s (scale), xoay (độ), mo (0–1), tien_do (0–1: vẽ dần đường/vòng, gõ chữ, đếm số), ease vao|ra|mem|nay|deu}]}]} (lớp sau vẽ đè lớp trước, tối đa 40 lớp).', { kieu: { type: 'string' }, bam_loi: { type: 'boolean' }, dat_theo_loi: { type: 'boolean' }, canh: { type: 'object' }, mo_ta: { type: 'string' }, bd: { type: 'number' }, kt: { type: 'number' }, text: { type: 'string' }, phu: { type: 'string' }, x: { type: 'number' }, y: { type: 'number' }, co: { type: 'number' }, mau: { type: 'string' }, nen: { type: 'string' }, hu: { type: 'string' } }, ['kieu', 'bd', 'kt']],
+  ['sua_do_hoa', 'Sửa đồ hoạ theo id: bd, kt, text, phu; với chu/sticker thêm x, y, co, mau, nen, hu; bam_loi, dat_theo_loi; với kieu ai truyền canh mới (đủ lớp).', { id: { type: 'string' }, bam_loi: { type: 'boolean' }, dat_theo_loi: { type: 'boolean' }, canh: { type: 'object' }, bd: { type: 'number' }, kt: { type: 'number' }, text: { type: 'string' }, phu: { type: 'string' }, x: { type: 'number' }, y: { type: 'number' }, co: { type: 'number' }, mau: { type: 'string' }, nen: { type: 'string' }, hu: { type: 'string' } }, ['id']],
   ['xoa_do_hoa', 'Xoá đồ hoạ theo id.', { id: { type: 'string' } }, ['id']],
   ['cai_dat', 'Đổi cài đặt chung. hook: chữ 3 giây đầu. phu_de: {bat, kieu highlight|pill|vien|emoji|toi|pop|rise, cum 2–6, nhan_manh "từ, từ", mau xanh|vang|cam|lam|hong, vi_tri 0.62|0.78|0.86}. khung: cat|bam_mat|mo. nen: {kieu giu|mo|mau|toi, mau #hex}. font: be_vietnam|montserrat|bricolage|lexend|oswald|anton|playfair. zoom_nhan. chuyen_mac_dinh. ten_du_an. ti_le: 9:16|1:1|4:5|16:9. phong_cach: tên trong danh sách phong_cach của dự án (hormozi, vlog, tin_tuc, dien_anh, nang_dong, toi_gian…).', { ti_le: { type: 'string' }, phong_cach: { type: 'string' }, hook: { type: 'string' }, phu_de: { type: 'object' }, khung: { type: 'string' }, nen: { type: 'object' }, font: { type: 'string' }, zoom_nhan: { type: 'boolean' }, chuyen_mac_dinh: { type: 'string' }, ten_du_an: { type: 'string' } }],
   ['hieu_footage', 'Cho AI hiểu một footage chưa hiểu (chép lời từng từ, cảnh, khoảnh khắc). Tốn 1 lượt Dựng video của người dùng, chờ 10–60s.', { src_id: { type: 'string' } }, ['src_id']],
@@ -218,6 +221,7 @@ const AGENT_TOOLS = [
   ['xuat_video', 'Dựng và lưu video xuống máy người dùng. Chỉ gọi khi người dùng yêu cầu xuất. do_phan_giai = 720|1080|1440.', { do_phan_giai: { type: 'integer' } }],
   ['luu_du_an', 'Trả JSON dự án.', {}],
   ['hoan_tac', 'Hoàn tác thao tác gần nhất.', {}],
+  ['tim_loi', 'Tìm một cụm từ trong lời đang dùng trên V1, trả các giây trên dòng thời gian (để đặt đồ hoạ đúng lúc nói).', { q: { type: 'string' } }, ['q']],
   ['cat_khoang_lang', 'Cắt khoảng im giữa các câu dài hơn nguong giây (mặc định 0.5) và tiếng ờ/ừm/à (bo_dem, mặc định true) trên V1, dựa vào lời đã chép từng từ; đồ hoạ phía sau tự dồn theo.', { nguong: { type: 'number' }, bo_dem: { type: 'boolean' } }],
   ['dong_bang', 'Đóng băng khung hình (freeze frame) tại giây tl trên dòng thời gian, giữ trong giay giây (mặc định 1.5).', { tl: { type: 'number' }, giay: { type: 'number' } }],
   ['them_moc', 'Đặt mốc (marker) tại giây t trên dòng thời gian, kèm tên.', { t: { type: 'number' }, ten: { type: 'string' } }],
@@ -231,6 +235,7 @@ Quy tắc:
 - Video ngắn: 3 giây đầu phải mạnh, mỗi ý 3–5 giây, bỏ vấp/lặp/lạc, phụ đề bật, đồ hoạ vừa đủ (tiêu đề 2s đầu, nhãn góc cho bước, thanh tiến độ).
 - Sau khi đặt đồ hoạ hoặc đổi khung/nền, gọi xem_khung ở thời điểm liên quan để tự kiểm rồi sửa nếu chữ chồng mặt hay lệch. Tối đa ~12 lệnh một lượt.
 - Không gọi xuat_video, long_tieng, hieu_footage nếu người dùng không yêu cầu hoặc chưa cần. Không bịa lời thoại.
+- Motion graphics: ưu tiên mẫu có sẵn (điền props), đặt đúng lúc nói bằng tim_loi hoặc dat_theo_loi/bam_loi. Chỉ dùng kieu ai (tự thiết kế cảnh có keyframe) khi không mẫu nào hợp; sau đó xem_khung ở 2–3 thời điểm để tự kiểm.
 - Mỗi lệnh chỉ gọi MỘT lần: kết quả lệnh và trạng thái dự án đính kèm đã phản ánh thay đổi, không gọi lại lệnh đã thành công. Gọi được nhiều lệnh cùng lúc khi chúng độc lập.
 - Cắt dead air: dùng cat_khoang_lang. Chữ tự do/emoji: them_do_hoa kieu chu/sticker. Tốc độ, zoom chậm, màu, âm lượng: sua_doan. Khung vuông/ngang, phong cách: cai_dat. Nhiều short từ video dài: tao_shorts (tốn lượt, chỉ khi được yêu cầu).
 - Kết thúc bằng 1–3 câu tóm tắt đã làm gì và gợi ý bước tiếp (không liệt kê lại từng lệnh).`;
@@ -308,3 +313,62 @@ async function goiOpenAIAgent(env, heThong, ls, duAn) {
   const j = await r.json(); const m = (((j.choices || [])[0] || {}).message) || {};
   return { text: (m.content || '').trim(), goi: (m.tool_calls || []).map(t => { let a = {}; try { a = JSON.parse(t.function.arguments || '{}'); } catch { } return { id: t.id, ten: t.function.name, args: a }; }) };
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Đồ hoạ AI: mô tả tiếng Việt → cảnh JSON có keyframe (giống Vyra sinh motion graphics, nhưng là dữ liệu
+   thay vì code, nên trình dựng vẽ an toàn và tua tới giây nào cũng đúng hình).
+   ═══════════════════════════════════════════════════════════════════════════ */
+const CANH_SCHEMA = { type: 'object', properties: { lop: { type: 'array', items: { type: 'object', properties: {
+  loai: { type: 'string', enum: ['hop', 'tron', 'chu', 'duong', 'vong', 'so'] }, mau: { type: 'string' }, vien: { type: 'string' }, day: { type: 'number' }, bo_goc: { type: 'number' },
+  chu: { type: 'string' }, co: { type: 'number' }, dam: { type: 'number' }, can: { type: 'string' }, so_tu: { type: 'number' }, so_den: { type: 'number' }, dinh_dang: { type: 'string' },
+  kf: { type: 'array', items: { type: 'object', properties: { t: { type: 'number' }, x: { type: 'number' }, y: { type: 'number' }, w: { type: 'number' }, h: { type: 'number' }, s: { type: 'number' }, xoay: { type: 'number' }, mo: { type: 'number' }, tien_do: { type: 'number' }, ease: { type: 'string', enum: ['vao', 'ra', 'mem', 'nay', 'deu'] } }, required: ['t'] } } },
+  required: ['loai', 'kf'] } } }, required: ['lop'] };
+async function doHoaAI(req, env, cors) {
+  let b = {}; try { b = await req.json(); } catch { }
+  const moTa = String(b.mo_ta || '').trim().slice(0, 800); if (!moTa) return json({ ok: false, error: 'thieu_text' }, cors, 400);
+  if (!dsKey(env).length) return json({ ok: false, error: 'chua_co_key' }, cors, 503);
+  let kiem = {}; try { const r = await fetch(asUrl(env), { method: 'POST', headers: { 'content-type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'st_use', token: String(b.token || ''), tool: 'chat' }), redirect: 'follow' }); kiem = await r.json(); } catch { return json({ ok: false, error: 'khong_noi_duoc_apps_script' }, cors, 502); }
+  if (!kiem.ok) return json({ ok: false, error: kiem.error || 'het_phien' }, cors, 402);
+  const dai = Math.max(0.8, Math.min(20, +b.dai || 3)), tiLe = /^(9:16|1:1|4:5|16:9)$/.test(b.ti_le) ? b.ti_le : '9:16', mau = /^#[0-9a-f]{3,8}$/i.test(b.mau_nhan || '') ? b.mau_nhan : '#99DF00';
+  const loi = Array.isArray(b.loi) ? b.loi.slice(0, 80).map(w => String(w.w || '').slice(0, 30) + '@' + (+w.t || 0).toFixed(2)).join(' ') : '';
+  const prompt = [
+    'Bạn là motion designer cho video TikTok tiếng Việt. Thiết kế MỘT motion graphic theo mô tả, dưới dạng cảnh gồm các lớp có keyframe.',
+    'Trả về DUY NHẤT một JSON dạng {"lop":[{"loai":...,"kf":[...]}]}, các trường như ví dụ cuối. Mọi số là tỉ lệ 0–1 (KHÔNG dùng pixel), tối đa 2 chữ số thập phân.',
+    'Khung ' + tiLe + '. Toạ độ x,y là TÂM của lớp, 0–1 theo chiều ngang/dọc khung. w,h là kích thước 0–1 theo chiều ngang/dọc khung (tron/vong: w là đường kính theo chiều ngang; duong: (w,h) là vector từ điểm đầu). co = cỡ chữ theo cạnh ngắn (0.04–0.12 là vừa đọc trên điện thoại). day = độ dày nét theo cạnh ngắn.',
+    'Thời lượng ' + dai + ' giây, t tính từ 0 tới ' + dai + '. Mỗi lớp có kf sắp theo t; thuộc tính không ghi ở keyframe thì giữ giá trị gần nhất. ease của keyframe là kiểu chuyển động đi TỚI keyframe đó: vao (nhanh rồi chậm, hợp xuất hiện), nay (vọt quá rồi về, hợp bật), mem, ra, deu.',
+    'tien_do 0→1 dùng để: vẽ dần đường (duong), vẽ dần vòng (vong), gõ chữ (chu), đếm số (so: so_tu→so_den, dinh_dang có {} chỗ đặt số, ví dụ "{} triệu").',
+    'mau dùng mã #hex, "nhan" là màu nhấn của kênh (' + mau + '), "khong" là không tô (chỉ viền). Chữ tiếng Việt CÓ DẤU, ngắn, đậm (dam 800–900), nên có lớp nền tối (#0b0d10, mo 0.75) hoặc viền đen để đọc rõ trên video.',
+    'Nguyên tắc đẹp: vào trong 0.3–0.5s bằng ease vao/nay, giữ yên phần giữa, ra trong 0.3s cuối (mo về 0). Các phần xuất hiện lệch nhau 0.15–0.4s. Không che vùng giữa mặt người nói (y 0.3–0.6, x 0.3–0.7) trừ khi mô tả yêu cầu. Tối đa 25 lớp.',
+    loi ? 'Lời người nói trong khoảng này (từ@giây tính từ đầu đồ hoạ), dùng để canh các phần xuất hiện đúng lúc được nhắc: ' + loi : '',
+    b.cu ? 'Bản trước (sửa theo yêu cầu, giữ phần không nhắc tới): ' + JSON.stringify(b.cu).slice(0, 6000) : '',
+    'BẮT BUỘC: keyframe ĐẦU TIÊN của mỗi lớp ghi đủ x, y, w, h (hình học đầy đủ). Lớp chu phải có "chu" (nội dung). Lớp so phải có so_tu, so_den, dinh_dang. Lớp duong phải có w,h khác 0 (hướng vẽ). Không bỏ trống.',
+    'VÍ DỤ (2 giây, nhãn bật lên rồi số đếm): {"lop":[{"loai":"hop","mau":"#0b0d10","bo_goc":0.4,"kf":[{"t":0,"x":0.5,"y":0.78,"w":0.7,"h":0.12,"mo":0,"s":0.8},{"t":0.35,"mo":0.8,"s":1,"ease":"nay"},{"t":1.7,"mo":0.8},{"t":2,"mo":0}]},{"loai":"so","mau":"nhan","co":0.08,"dam":900,"so_tu":0,"so_den":120,"dinh_dang":"{} học viên","kf":[{"t":0.2,"x":0.5,"y":0.78,"w":0.6,"h":0.1,"mo":0,"tien_do":0},{"t":0.4,"mo":1},{"t":1.4,"tien_do":1,"ease":"mem"},{"t":1.7,"mo":1},{"t":2,"mo":0}]}]}',
+    'MÔ TẢ: ' + moTa
+  ].filter(Boolean).join('\n');
+  const body = { contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.3, maxOutputTokens: 7000, responseMimeType: 'application/json' } };   // không ép responseSchema: thử thật cho thấy khuôn cứng làm model bỏ trường hoặc kẹt số
+  let j, model = env.LLM_DO_HOA || 'gemini-3.5-flash-lite';   // flash-lite: 2–7 giây, đủ tốt với ví dụ + tự kiểm; đổi bằng biến LLM_DO_HOA
+  try { j = await goiGemini(env, model, body); } catch (e) { if (!/429|503|RESOURCE_EXHAUSTED/i.test(String(e.message))) return json({ ok: false, error: 'llm_loi', chi_tiet: String(e.message).slice(0, 200) }, cors, 502); model = 'gemini-3.5-flash-lite'; try { j = await goiGemini(env, model, body); } catch (e2) { return json({ ok: false, error: 'llm_loi', chi_tiet: String(e2.message).slice(0, 200) }, cors, 502); } }
+  const docCanh = j2 => { const txt = ((((j2.candidates || [])[0] || {}).content || {}).parts || []).map(p => p.text || '').join(''); try { return JSON.parse(txt); } catch { return null; } };
+  let canh = docCanh(j), loiCanh = kiemCanh(canh);
+  if (loiCanh.length) {   // tự kiểm: thiếu trường thì bắt AI sửa một lần
+    const body2 = { ...body, contents: [{ role: 'user', parts: [{ text: prompt }] }, { role: 'model', parts: [{ text: JSON.stringify(canh || {}) }] }, { role: 'user', parts: [{ text: 'Cảnh trên có lỗi, sửa và trả lại TOÀN BỘ cảnh: ' + loiCanh.join('; ') }] }] };
+    try { const j2 = await goiGemini(env, model, body2); const c2 = docCanh(j2); if (c2 && kiemCanh(c2).length < loiCanh.length) { canh = c2; loiCanh = kiemCanh(c2); } } catch { }
+  }
+  if (canh && Array.isArray(canh.lop)) canh.lop = canh.lop.filter(l => !loiLop(l));   // bỏ lớp còn hỏng thay vì vẽ sai
+  if (!canh || !Array.isArray(canh.lop) || !canh.lop.length) return json({ ok: false, error: 'llm_loi', chi_tiet: 'cảnh trống' }, cors, 502);
+  return json({ ok: true, canh, model, luot_con: kiem.luot_con == null ? null : kiem.luot_con }, cors);
+}
+
+function loiLop(l) {
+  if (!l || !Array.isArray(l.kf) || !l.kf.length) return 'thiếu kf';
+  const f0 = l.kf[0] || {};
+  if (l.loai === 'chu' && !String(l.chu || '').trim()) return 'lớp chu thiếu "chu"';
+  if (l.loai === 'so' && (l.so_den == null || !isFinite(+l.so_den))) return 'lớp so thiếu so_den';
+  if (l.loai === 'duong' && !l.kf.some(f => (+f.w || 0) !== 0 || (+f.h || 0) !== 0)) return 'lớp duong thiếu w,h (hướng)';
+  if ((l.loai === 'hop') && !l.kf.some(f => f.w != null) ) return 'lớp hop thiếu w';
+  if ((l.loai === 'hop') && !l.kf.some(f => f.h != null)) return 'lớp hop thiếu h';
+  if (['tron', 'vong'].includes(l.loai) && !l.kf.some(f => (+f.w || 0) > 0)) return 'lớp ' + l.loai + ' thiếu w (đường kính)';
+  if (f0.x == null || f0.y == null) return 'keyframe đầu thiếu x,y';
+  return '';
+}
+function kiemCanh(c) { if (!c || !Array.isArray(c.lop) || !c.lop.length) return ['cảnh trống']; return c.lop.map((l, i) => { const e = loiLop(l); return e ? 'lớp ' + (i + 1) + ': ' + e : ''; }).filter(Boolean).slice(0, 12); }
