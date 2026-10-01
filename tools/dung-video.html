@@ -1770,6 +1770,23 @@ function wavTuBuf(ab) {
   const ch = [...Array(nc)].map((_, i) => ab.getChannelData(i)); let o = 44; for (let i = 0; i < n; i++) for (let c = 0; c < nc; c++) { const x = Math.max(-1, Math.min(1, ch[c][i])); v.setInt16(o, x < 0 ? x * 32768 : x * 32767, true); o += 2; }
   return new Blob([buf], { type: 'audio/wav' });
 }
+/* co giãn thời gian giữ nguyên cao độ (WSOLA) cho đoạn tua nhanh/chậm khi trộn âm xuất file */
+function keoGian(ch, k, ref) {
+  const N = 1024, Hs = 512, Ha = Hs * k, tol = 256, outLen = Math.floor(ch.length / k), out = new Float32Array(outLen + N), norm = new Float32Array(outLen + N), w = new Float32Array(N), viTriDung = ref ? null : [];
+  for (let j = 0; j < N; j++) w[j] = 0.5 - 0.5 * Math.cos(2 * Math.PI * j / N);
+  let truoc = 0;
+  for (let m = 0, so = 0; so < outLen; m++, so += Hs) {
+    let pa = ref ? ref[m] : Math.round(m * Ha);
+    if (pa == null || pa + N > ch.length) break;
+    if (!ref && m > 0) { const tn = truoc + Hs; let tot = 0, bv = -Infinity; for (let d = -tol; d <= tol; d += 8) { const c = pa + d; if (c < 0 || c + N > ch.length || tn + N > ch.length) continue; let sum = 0; for (let j = 0; j < N; j += 4) sum += ch[tn + j] * ch[c + j]; if (sum > bv) { bv = sum; tot = d; } } pa += tot; }
+    if (viTriDung) viTriDung.push(pa);
+    for (let j = 0; j < N; j++) { out[so + j] += ch[pa + j] * w[j]; norm[so + j] += w[j]; }
+    truoc = pa;
+  }
+  for (let i = 0; i < outLen; i++) out[i] = norm[i] > 1e-3 ? out[i] / norm[i] : 0;
+  return { du_lieu: out.subarray(0, outLen), vi_tri: viTriDung };
+}
+function gianDoan(oc, buf, bd, kt, k) { const sr = buf.sampleRate, a = Math.max(0, Math.floor(bd * sr)), b = Math.min(buf.length, Math.floor(kt * sr)), nc = buf.numberOfChannels; const c0 = keoGian(buf.getChannelData(0).subarray(a, b), k), ra = oc.createBuffer(nc, Math.max(1, c0.du_lieu.length), sr); ra.copyToChannel(c0.du_lieu, 0); for (let c = 1; c < nc; c++) ra.copyToChannel(keoGian(buf.getChannelData(c).subarray(a, b), k, c0.vi_tri).du_lieu, c); return ra; }
 async function bufTuUrl(url) { return await giaiMaAm(new Blob([await (await fetch(url)).arrayBuffer()])); }
 /* trộn toàn bộ âm thanh dòng thời gian (V1 + A1 nhạc có duck + A2 lồng tiếng + A3) giống hệt lúc phát */
 async function tronAmThanh(tong, sr) {
@@ -1781,9 +1798,9 @@ async function tronAmThanh(tong, sr) {
   for (const c of P.clips) {
     const dai = daiC(c), s = srcCua(c.src), bd0 = acc; acc += dai; if (!s || s.loai !== 'video') continue;
     let buf; try { buf = (await am3NapKho('src:' + s.id)).buf; } catch { continue; } if (c.bd >= buf.duration) continue;
-    const src = oc.createBufferSource(), g = oc.createGain(); src.buffer = buf; src.playbackRate.value = tocC(c); src.connect(g); g.connect(ra);
+    const k = tocC(c), src = oc.createBufferSource(), g = oc.createGain(); src.buffer = k === 1 ? buf : gianDoan(oc, buf, c.bd, Math.min(c.kt, buf.duration), k); src.connect(g); g.connect(ra);   // tua nhanh/chậm: giữ cao độ giọng như lúc xem trước
     let cu = -1; for (let o = 0; o <= dai + 1e-6; o += 0.02) { const v = Math.max(0, giaTriKf(c, 'am', o) * fadeHeSo(c, o) * (coLongTai(bd0 + o) ? 0.25 : 1)); if (cu < 0) g.gain.setValueAtTime(v, bd0); else if (Math.abs(v - cu) > 0.001) g.gain.linearRampToValueAtTime(v, bd0 + o); cu = v; }
-    src.start(bd0, c.bd, Math.max(0.01, Math.min(c.kt, buf.duration) - c.bd));
+    if (k === 1) src.start(bd0, c.bd, Math.max(0.01, Math.min(c.kt, buf.duration) - c.bd)); else src.start(bd0, 0, Math.min(dai, src.buffer.duration));
   }
   if (P.nhac) { try { const buf = await bufTuUrl(P.nhac.url), s = oc.createBufferSource(), g = oc.createGain(); s.buffer = buf; s.loop = true; s.connect(g); g.connect(ra);
     let cu = -1; for (let x = 0; x <= tong; x += 0.05) { const { clip, tSrc } = viTri(x), c = P.clips[clip], sc = c && srcCua(c.src), coTieng = coLongTai(x) || (sc && sc.cau.some(q => tSrc >= q.bd && tSrc <= q.kt)); let m = coTieng ? mucNoi : mucBroll; if (tong - x < 1.5) m *= Math.max(0, (tong - x) / 1.5); if (cu < 0) g.gain.setValueAtTime(m, 0); else if (Math.abs(m - cu) > 0.001) g.gain.setTargetAtTime(m, x, tong - x < 1.5 ? 0.02 : 0.2); cu = m; }
