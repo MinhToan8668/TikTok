@@ -609,7 +609,7 @@
           <div class="ctlPhai"><select id="tiLe2" title="Tỉ lệ khung"></select><button class="btn nho ghost ic" id="btnToanManHinh" type="button" title="Xem toàn màn hình" data-ic="full"></button></div>
         </div>
         <div class="xuat" id="phimHop"><div class="box" style="max-width:460px;text-align:left"><b style="font-size:15px">⌨ Phím tắt</b>
-          <table class="phim"><tr><td>Space</td><td>Phát / dừng</td></tr><tr><td>S · Ctrl/⌘ + B</td><td>Tách tại đầu phát</td></tr><tr><td>Q / W</td><td>Xoá phần trước / sau đầu phát trong đoạn</td></tr><tr><td>Ctrl/⌘ + C / V</td><td>Sao chép / dán tại đầu phát</td></tr><tr><td>Ctrl/⌘ + Shift + Z · Ctrl + Y</td><td>Làm lại</td></tr><tr><td>N</td><td>Bật/tắt hít (snap)</td></tr><tr><td>Ctrl/⌘ + cuộn</td><td>Zoom dòng thời gian</td></tr><tr><td>Delete</td><td>Xoá mục đang chọn</td></tr><tr><td>Ctrl/⌘ + D</td><td>Nhân đôi</td></tr><tr><td>Ctrl/⌘ + Z</td><td>Hoàn tác</td></tr><tr><td>← →</td><td>Lùi / tới 1 khung hình</td></tr><tr><td>Shift + ← →</td><td>Lùi / tới 1 giây</td></tr><tr><td>J / L</td><td>Về điểm cắt trước / sau</td></tr><tr><td>Home / End</td><td>Đầu / cuối video</td></tr><tr><td>M</td><td>Đặt mốc</td></tr><tr><td>F</td><td>Đóng băng khung</td></tr><tr><td>+ / −</td><td>Phóng to / thu nhỏ dòng thời gian</td></tr><tr><td>?</td><td>Bảng này</td></tr></table>
+          <table class="phim"><tr><td>Space</td><td>Phát / dừng</td></tr><tr><td>S · Ctrl/⌘ + B</td><td>Tách tại đầu phát</td></tr><tr><td>K</td><td>Thêm keyframe tại đầu phát</td></tr><tr><td>Alt + J / Alt + L</td><td>Keyframe trước / sau</td></tr><tr><td>Ctrl/⌘ + Shift + K</td><td>Xoá keyframe tại đầu phát</td></tr><tr><td>Kéo ◆ trên dòng thời gian</td><td>Đổi thời điểm keyframe</td></tr><tr><td>Ctrl/⌘ + = / −, Shift + Z</td><td>Phóng to / thu nhỏ / vừa khung dòng thời gian</td></tr><tr><td>Q / W</td><td>Xoá phần trước / sau đầu phát trong đoạn</td></tr><tr><td>Ctrl/⌘ + C / V</td><td>Sao chép / dán tại đầu phát</td></tr><tr><td>Ctrl/⌘ + Shift + Z · Ctrl + Y</td><td>Làm lại</td></tr><tr><td>N</td><td>Bật/tắt hít (snap)</td></tr><tr><td>Ctrl/⌘ + cuộn</td><td>Zoom dòng thời gian</td></tr><tr><td>Delete</td><td>Xoá mục đang chọn</td></tr><tr><td>Ctrl/⌘ + D</td><td>Nhân đôi</td></tr><tr><td>Ctrl/⌘ + Z</td><td>Hoàn tác</td></tr><tr><td>← →</td><td>Lùi / tới 1 khung hình</td></tr><tr><td>Shift + ← →</td><td>Lùi / tới 1 giây</td></tr><tr><td>J / L</td><td>Về điểm cắt trước / sau</td></tr><tr><td>Home / End</td><td>Đầu / cuối video</td></tr><tr><td>M</td><td>Đặt mốc</td></tr><tr><td>F</td><td>Đóng băng khung</td></tr><tr><td>+ / −</td><td>Phóng to / thu nhỏ dòng thời gian</td></tr><tr><td>?</td><td>Bảng này</td></tr></table>
           <div class="row" style="margin-top:10px"><button class="btn ghost" type="button" id="phimDong">Đóng</button></div></div></div>
         <div class="xuat" id="xuatHop"><div class="box"><b id="xuatTieuDe">Đang dựng video…</b><div class="bar"><i id="xuatBar"></i></div><div class="quota" id="xuatTt" style="color:#98a09a">Đừng chuyển tab trong lúc dựng.</div><div id="xuatXong" style="margin-top:12px;display:none"><a class="btn xanh" id="xuatTai" href="#" download>⬇️ Tải video</a> <a class="btn" href="cham-video.html">Chấm video này →</a> <button class="btn ghost" type="button" id="xuatDong">Đóng</button></div><button class="btn ghost" type="button" id="xuatHuy" style="margin-top:10px">Huỷ</button></div></div>
       </div>
@@ -740,6 +740,12 @@ document.addEventListener('keydown', e => {
   if ((e.ctrlKey || e.metaKey) && (e.key === ']' || e.key === '[') && P.chon && (P.chon.k === 'b' || P.chon.k === 'g')) { e.preventDefault(); doiLop(P.chon.k, P.chon.i, e.key === ']' ? 1 : -1); return; }
   const a = document.activeElement, dangGo = /INPUT|TEXTAREA|SELECT/.test(a.tagName) || a.isContentEditable; if (dangGo) return;
   const ctrl = e.ctrlKey || e.metaKey, k = e.key;
+  // phím keyframe / zoom như CapCut: K thêm, Alt+J / Alt+L keyframe trước / sau, Ctrl+Shift+K xoá keyframe tại đầu phát, Ctrl+= / Ctrl+- zoom, Shift+Z vừa khung
+  if (!ctrl && e.altKey && (e.code === 'KeyJ' || e.code === 'KeyL')) { e.preventDefault(); nhayKf(e.code === 'KeyL' ? 1 : -1); return; }
+  if (!ctrl && !e.altKey && !e.shiftKey && (k === 'k' || k === 'K')) { e.preventDefault(); $('#btnKfNhanh').click(); return; }
+  if (ctrl && e.shiftKey && e.code === 'KeyK') { e.preventDefault(); xoaKfDauPhat(); return; }
+  if (ctrl && (k === '=' || k === '+' || k === '-' || k === '_')) { e.preventDefault(); $('#' + (k === '-' || k === '_' ? 'btnZoomRa' : 'btnZoomVao')).click(); return; }
+  if (!ctrl && e.shiftKey && (k === 'Z' || k === 'z')) { e.preventDefault(); zoomVua(); return; }
   if (ctrl && !e.shiftKey && (k === 'z' || k === 'Z')) { e.preventDefault(); hoanTac(); return; }
   if (ctrl && (k === 'd' || k === 'D')) { e.preventDefault(); if (P.chon) lenh('nhan'); return; }
   if (ctrl && ((e.shiftKey && (k === 'z' || k === 'Z')) || k === 'y' || k === 'Y')) { e.preventDefault(); lamLai(); return; }
@@ -2302,6 +2308,21 @@ function hangLop() {
   if (moi) veTrNut();
 }
 /* chỗ thả khi kéo item / thả footage */
+/* keyframe: nhảy / xoá / kéo đổi thời điểm (như CapCut) */
+function mucKf() { let k = P.chon && P.chon.k, m = mucChon(); if (!m || !['v', 'b', 'g'].includes(k)) { const { clip } = viTri(P.t); if (clip < 0) return null; k = 'v'; m = P.clips[clip]; } return { k, m }; }
+function nhayKf(huong) { const o = mucKf(); if (!o) return; const st = batDauMuc(o.k, o.m), off = P.t - st, moc = mocKf(o.m), t = huong > 0 ? moc.find(x => x > off + 0.02) : [...moc].reverse().find(x => x < off - 0.02); if (t == null) { toast(huong > 0 ? 'Không còn keyframe phía sau' : 'Không còn keyframe phía trước'); return; } P.t = st + t; vePh(); datTg(tongGiay()); veKhung(); veProp(); }
+function xoaKfDauPhat() { const o = mucKf(); if (!o || !o.m.kfs) { toast('Không có keyframe tại đầu phát'); return; } const off = P.t - batDauMuc(o.k, o.m); let n = 0; luuHoanTac(); Object.keys(o.m.kfs).forEach(p => { if (kfTai(o.m, p, off) >= 0) { xoaKf(o.m, p, off); n++; } }); if (!n) { P.hoanTac.pop(); toast('Không có keyframe tại đầu phát'); return; } veTl(); veProp(); veKhung(); toast('Đã xoá ' + n + ' keyframe'); }
+function zoomVua() { const sc = $('#tlScroll'), tong = Math.max(1, tongGiay()); P.pxs = Math.round(Math.max(6, Math.min(80, (sc.clientWidth - LB - 40) / tong))); $('#zoomTl').value = P.pxs; sc.scrollLeft = 0; veTl(); }
+function keoKf(e, kd) {
+  const it = kd.closest('.item'), k = it.dataset.k, i = +it.dataset.i, m = { v: P.clips, b: P.broll, g: P.gfx }[k][i]; if (!m) return;
+  if (P.dang) dung(); P.chon = { k, i }; const t0 = +kd.dataset.t, x0 = e.clientX, px = PX(), dai = daiMuc(k, m); let daKeo = false, tMoi = t0;
+  try { kd.setPointerCapture(e.pointerId); } catch { }
+  const mv = ev => { const dx = ev.clientX - x0; if (!daKeo && Math.abs(dx) < 3) return; if (!daKeo) { daKeo = true; luuHoanTac(); } tMoi = Math.max(0, Math.min(dai, t0 + dx / px)); kd.style.left = tMoi * px - 4 + 'px'; hienTip(ev, '◆ ' + fmt1(tMoi) + 's'); };
+  const up = () => { kd.removeEventListener('pointermove', mv); kd.removeEventListener('pointerup', up); kd.removeEventListener('pointercancel', up); hienTip(null);
+    if (daKeo) { Object.keys(m.kfs || {}).forEach(p => { (m.kfs[p] || []).forEach(f => { if (Math.abs(f.t - t0) < 1 / 30) f.t = +tMoi.toFixed(3); }); m.kfs[p].sort((a, b) => a.t - b.t); }); toast('Dời keyframe tới ' + fmt1(tMoi) + 's của đoạn'); }
+    P.t = batDauMuc(k, m) + (daKeo ? tMoi : t0); chonHien(); veTl(); vePh(); datTg(tongGiay()); veKhung(); veProp(); moPhaiNeuCan(); };
+  kd.addEventListener('pointermove', mv); kd.addEventListener('pointerup', up); kd.addEventListener('pointercancel', up);
+}
 function dichTha(y, k, m, kh) {
   const loai = k === 'v' ? 'video' : loaiMuc(k, m), ds = dsPhu().filter(o => o.m !== m), tatCa = [...new Set(ds.map(o => o.m.lop).filter(l => l != null))].sort((a, b) => a - b), max = tatCa.length ? tatCa[tatCa.length - 1] : 0, tren = $('#tlTren');
   kh = kh || khoangMuc(k, m);
@@ -2345,7 +2366,7 @@ function khoiTaoLop() {
   const donKeo = () => { if (P.dangKeo) { P.dangKeo = false; if (P.veTlCho) { P.veTlCho = false; veTl(); } } hienTip(null); const sl = $('#snapLine'); if (sl) sl.style.display = 'none'; };   // luôn dọn ô độ dài / vạch hít khi thả chuột
   document.addEventListener('pointerup', donKeo); document.addEventListener('pointercancel', donKeo);
   const tin = $('#tlIn'), sc = $('#tlScroll');
-  tin.addEventListener('pointerdown', e => { const kd = e.target.closest('.kfd'); if (!kd || e.button !== 0) return; e.stopPropagation(); e.preventDefault(); const it = kd.closest('.item'), k = it.dataset.k, i = +it.dataset.i, m = { v: P.clips, b: P.broll, g: P.gfx }[k][i]; if (!m) return; if (P.dang) dung(); P.chon = { k, i }; P.t = batDauMuc(k, m) + (+kd.dataset.t); chonHien(); vePh(); datTg(tongGiay()); veKhung(); veProp(); moPhaiNeuCan(); }, true);
+  tin.addEventListener('pointerdown', e => { const kd = e.target.closest('.kfd'); if (!kd || e.button !== 0) return; e.stopPropagation(); e.preventDefault(); keoKf(e, kd); }, true);
   tin.addEventListener('pointerdown', e => {
     if (e.button !== 0 || e.target.closest('.item') || e.target.closest('.lb') || e.target.closest('.moc')) return;
     try { tin.setPointerCapture(e.pointerId); } catch { } document.body.classList.add('dangTua');
