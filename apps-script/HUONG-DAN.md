@@ -428,6 +428,8 @@ Học theo giao diện CapCut và bố cục mã nguồn mở OpenCut (bản cla
 - **Trình phát** có đồng hồ giờ:phút:giây:khung, đổi tỉ lệ ngay dưới khung.
 - **Thuộc tính theo tab**: đoạn video có Video · Hoạt ảnh · Tốc độ & âm · Điều chỉnh; khi không chọn gì: Khung hình · Xuất · Dự án.
 - **Thanh công cụ icon**: hoàn tác, làm lại, tách, xoá trái/phải (Q/W), xoá, nhân đôi, đóng băng, lật, xoay 90°, cắt khung, keyframe nhanh, tách âm thanh, mốc, trượt, ripple, hít, zoom.
+- **Kéo để tua**: giữ chuột trên thước thời gian hoặc chỗ trống của dòng thời gian rồi kéo, khung xem trước chạy theo (tự cuộn khi chạm mép).
+- **Xếp lớp như CapCut**: mỗi lớp phủ là một hàng, lớp trên phủ lên lớp dưới (cả khi xuất). Kéo b-roll, sticker, chữ, đồ hoạ lên/xuống giữa các hàng; kéo lên vùng "＋" trên cùng để tạo lớp mới; kéo đoạn V1 lên hàng lớp phủ để thành video chồng (picture-in-picture), kéo lớp phủ xuống V1 để thành đoạn chính. Thuộc tính có "Lớp n/N · Lên trên · Xuống dưới", chuột phải có Đưa lên/xuống lớp, phím Ctrl+] / Ctrl+[. Hàng trống tự bỏ.
 - **Đầu track**: tắt tiếng, ẩn, khoá từng track (áp cả khi xuất). **Dải khung hình** trên đoạn video. **Menu chuột phải** trên đoạn (tách tại đây, xoá trái/phải, sao chép, dán, nhân đôi, đóng băng, tách âm thanh, lật, keyframe, xoá) và trên track.
 
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
