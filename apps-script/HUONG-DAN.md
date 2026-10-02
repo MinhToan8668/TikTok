@@ -483,6 +483,12 @@ Học theo giao diện CapCut và bố cục mã nguồn mở OpenCut (bản cla
 
 **Không làm được trên trình duyệt (cần mô hình AI lớn hoặc dịch vụ trả phí):** tạo video/ảnh bằng AI, tách giọng khỏi nhạc chất lượng cao, nhái giọng, khớp khẩu hình, tăng độ phân giải bằng AI; phần thương mại/đội nhóm/đám mây (P3).
 
+### Phụ đề và kéo thả như CapCut (10/2026)
+
+- **Phụ đề là đoạn chữ trên track**: bấm để chọn (hoặc bấm phụ đề ngay trên khung xem trước), bấm đúp để sửa chữ, Delete để xoá, tách tại đầu phát, nút câu trước/sau. Sửa chữ là sửa luôn lời thoại, câu vừa sửa giữ nguyên một khối.
+- **Kéo dời / kéo mép** một câu: phụ đề tự tách thành đoạn chữ riêng (giữ nhịp từng từ); đè lên câu bên cạnh thì câu đó tự ngắn lại.
+- **Kéo video vào dòng thời gian giữ đủ độ dài** (trước đây lớp phủ chỉ lấy 4 giây). Thả vào track chính thì chèn cả video tại chỗ gần nhất; thả phía trên thì thành lớp phủ, chồng giờ thì tự mở line mới. Thả file từ máy thẳng vào dòng thời gian cũng được.
+
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 
 Cài theo [`cloudflare/CAI-DAT.md`](../cloudflare/CAI-DAT.md) (khoảng 10 phút, không cần thẻ). Có máy chủ này tool thêm:
