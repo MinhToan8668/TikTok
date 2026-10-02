@@ -505,6 +505,14 @@ Theo bộ phím Custom1 và menu của CapCut:
 - **Hộp Xuất** (nút Xuất / Ctrl+M): tên, định dạng, độ phân giải, khung/giây, chất lượng, khoảng xuất, tóm tắt + ước tính dung lượng, xuất ảnh tĩnh. **Cài đặt** (⚙ thanh trên): thời lượng ảnh, đóng băng, chuyển cảnh mặc định; tự lưu; dọn footage không dùng.
 - **Mở dự án CapCut** (Dự án của tôi → 🎬, hoặc 📂 Mở dự án rồi chọn `draft_info.json` / `draft_content.json` trong thư mục dự án CapCut): đọc track chính (kể cả khoảng trống), lớp phủ, chữ (font cỡ, màu, viền, nền, bóng, căn, dọc), sticker (giữ chỗ), phụ đề (kèm nhịp từng từ), tốc độ, âm lượng, đảo ngược, biến đổi và keyframe vị trí / cỡ / xoay / độ mờ, tỉ lệ khung, mốc. Sau đó thêm lại các file footage (máy khớp theo tên). Không mang sang: hiệu ứng, chuyển cảnh, bộ lọc độc quyền của CapCut, âm thanh (thêm lại ở tab Âm thanh).
 
+### Theo ảnh màn hình CapCut (10/2026)
+
+- **Nhoè chuyển động (Motion blur)** cho đoạn video / lớp phủ: bật, Độ nhoè, Trộn với khung gốc, Hướng (cả hai / tới / lùi), 4 hoặc 6 mẫu. Khi phát: nhoè xấp xỉ bằng vệt khung trước; khi dừng và khi xuất: lấy nhiều mẫu quanh thời điểm (chậm hơn).
+- **Hoạt ảnh** thành lưới ô xem trước động với 3 tab Vào / Ra / Kết hợp (8 cặp vào-ra sẵn), thanh thời lượng, nút **Áp cho tất cả**. Áp cho tất cả cũng có ở Tốc độ, Mặt nạ, Nhoè chuyển động.
+- **Thanh trên**: nút Menu ▾ (dự án mới, dự án của tôi, mở, lưu, nhập, xuất, cài đặt, phím tắt, toàn màn hình), nút Phím tắt, dòng "Tự lưu hh:mm:ss".
+- **Ảnh bìa**: nút Bìa ở đầu track chính đặt khung tại đầu phát làm ảnh bìa dự án (hiện trong Dự án của tôi).
+- **Hiệu ứng âm thanh** thành danh sách hàng như CapCut: nghe thử ▶, yêu thích ☆ (lưu trên máy), + thêm, lọc Yêu thích.
+
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 
 Cài theo [`cloudflare/CAI-DAT.md`](../cloudflare/CAI-DAT.md) (khoảng 10 phút, không cần thẻ). Có máy chủ này tool thêm:
