@@ -457,6 +457,19 @@ Học theo giao diện CapCut và bố cục mã nguồn mở OpenCut (bản cla
 - **Xuất thêm**: GIF (10/12/15 khung/giây, rộng 240/360/480), ảnh tĩnh PNG tại đầu phát, ước tính dung lượng trước khi xuất.
 - **Media**: lọc Tất cả / Video / Ảnh; rê chuột ngang trên ảnh thu nhỏ để xem lướt video.
 
+### Đặc tả CapCut 9.1 · Đợt 2 (10/2026)
+
+- **Đảo ngược đoạn** (tab Tốc độ & âm hoặc chuột phải): đoạn V1 phát lùi; bản xuất đảo cả hình và tiếng. Tách, cắt mép, Q/W vẫn đúng chiều.
+- **Tốc độ 0,1–100×**: thanh kéo + nút nhanh 0,1×, 0,5×, 1×, 2×, 5×, 10×, 100×. **Giữ cao độ giọng** (bật mặc định); tắt thì giọng cao/trầm theo tốc độ. Trên 16× hoặc đảo ngược, xem trước tua từng khung (có thể giật), bản xuất vẫn mượt.
+- **Thay đoạn** (chuột phải đoạn V1/lớp phủ): thay bằng file mới hoặc footage khác, giữ vị trí, độ dài, hiệu ứng, màu.
+- **Dán thuộc tính** (Ctrl+Alt+V): Ctrl+C một mục rồi chọn mục khác (một hoặc nhiều) → nhận khung hình, màu, LUT, mặt nạ, hoà trộn, keyframe, kiểu chữ; giữ nguyên nguồn và khúc cắt.
+- **Tách mọi track** (Shift+S): tách cùng lúc V1, lớp phủ, chữ, âm thanh tại đầu phát (bỏ qua track đang khoá).
+- **Lớp trên cùng / dưới cùng** (Ctrl+Shift+] / [ hoặc chuột phải). **Alt + kéo** chữ/lớp phủ/âm thanh để nhân bản.
+- **Keyframe**: Chép ◆, Dán ◆ (sang đoạn khác hoặc chỗ khác), Đảo ngược (chuyển động chạy ngược).
+- **Mốc**: chuột phải mốc → đổi tên, ghi chú (hiện khi rê chuột), 6 màu, xoá.
+- **Track**: bấm đúp đầu track (chỗ trống) hoặc chuột phải → đổi tên; **Solo** chỉ hiện (track hình) hoặc chỉ nghe (track tiếng) track đó.
+- **Chữ**: chuyển màu (gradient, chọn màu thứ hai và hướng), uốn cong (∩ / ∪), chữ dọc.
+
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 
 Cài theo [`cloudflare/CAI-DAT.md`](../cloudflare/CAI-DAT.md) (khoảng 10 phút, không cần thẻ). Có máy chủ này tool thêm:
