@@ -57,7 +57,7 @@ var DEFAULT_CONFIG = {
   slots:{max:15,base:0,fixed:''},   // fixed = '' → tự đếm; là số → đặt tay
   pricing:{earlyBird:2000000,regular:3000000},
   schedule:{days:'Tối Thứ 5',time:'20:00–22:00',platform:'MS Teams',weeks:4,sessions:4},
-  zalo:{groupUrl:''},
+  zalo:{groupUrl:'https://zalo.me/g/ozi0jkjbtzvqga8vpwfe'},
   stats:{cohortsDone:2,students:'30+'},
   contact:{tiktok:'Tự Mình Xây Kênh',tiktokUrl:'https://www.tiktok.com/'},
   announcement:{show:false,text:''}
