@@ -1532,10 +1532,10 @@ body.hv-mode{padding-bottom:0}
     <div class="nav-links">
       <a class="nav-link hot" href="tools/soi-video.html" style="text-decoration:none">Viral Studio <i>free</i></a>
       <button class="nav-link hot" data-go="soikenh">Soi kênh <i>free</i></button>
+      <button class="nav-link hot" data-cd>Cộng đồng <i>free</i></button>
       <button class="nav-link" data-go="editkem">Edit kèm</button>
       <button class="nav-link" data-go="ketqua">Học viên cũ</button>
       <button class="nav-link" data-go="lotrinh">Lộ trình</button>
-      <button class="nav-link hot" data-go="congdong" data-zalo>Cộng đồng <i>free</i></button>
     </div>
     <div class="nav-cta">
       <div class="nav-slots"><span class="dot"></span>còn <b data-bind="computed.remaining">—</b> chỗ</div>
@@ -1557,7 +1557,7 @@ body.hv-mode{padding-bottom:0}
       <a href="#tuan">Một tuần trong lớp</a>
       <a href="#lotrinh">Lộ trình 30 ngày</a>
       <a href="#mentors">Người dạy</a>
-      <a href="#congdong" data-zalo>Group cộng đồng · free</a>
+      <a href="#congdong" data-cd>Group cộng đồng · free</a>
       <a href="#hocphi">Học phí</a>
       <a href="#faq">Hỏi đáp</a>
     </div>
@@ -1590,7 +1590,7 @@ body.hv-mode{padding-bottom:0}
         <div class="hero-free">
           <button class="btn btn-lime btn-lg" data-go="soikenh">🔍 Soi kênh miễn phí</button>
           <a class="btn btn-lime btn-lg" href="tools/soi-video.html" target="_blank" rel="noopener">✨ Viral Studio miễn phí</a>
-          <button class="btn btn-lg btn-cd" data-go="congdong" data-zalo>💬 Tham gia cộng đồng <i>free</i></button>
+          <button class="btn btn-lg btn-cd" data-cd>💬 Tham gia cộng đồng <i>free</i></button>
         </div>
         <button class="btn btn-line btn-lg" data-go="editkem">Xem lớp kèm edit ra sao ↓</button>
       </div>
@@ -1648,6 +1648,44 @@ body.hv-mode{padding-bottom:0}
       <p>Trả lời qua Zalo trong <b>48 giờ</b>. Không có video thì dán link kênh, hoặc viết vài dòng bạn đang kẹt ở đâu.</p>
     </div>
     <div id="soiPopThan"></div>
+  </div>
+</div>
+
+<!-- popup tham gia cộng đồng: điền sơ bộ, xong là có link group Zalo -->
+<div class="soi-pop" id="cdPop" role="dialog" aria-modal="true" aria-labelledby="cdPopTieu">
+  <div class="soi-pop-nen" data-cd-dong></div>
+  <div class="soi-pop-hop">
+    <button class="soi-pop-x" type="button" data-cd-dong aria-label="Đóng">✕</button>
+    <div class="soi-pop-head">
+      <span class="kicker">miễn phí · không cần vào lớp</span>
+      <h3 id="cdPopTieu">Tham gia cộng đồng Tự Mình Xây Kênh</h3>
+      <p>Group Zalo có bài chia sẻ mỗi ngày, hỏi định hướng được trả lời trong ngày, và lượt soi kênh cho mọi người. Điền vài dòng để tụi mình biết bạn là ai, rồi nhận link vào group.</p>
+    </div>
+    <form class="soi-form" id="cdForm" novalidate>
+      <div class="fi2">
+        <div class="fg"><label class="fl" for="cd-name">Tên gọi *</label>
+          <input class="inp" id="cd-name" name="name" autocomplete="name" placeholder="Tên hoặc @tengoi">
+          <span class="err">Cho mình biết tên bạn</span></div>
+        <div class="fg"><label class="fl" for="cd-phone">Zalo / SĐT *</label>
+          <input class="inp" id="cd-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="09xx xxx xxx">
+          <span class="err">Số chưa hợp lệ</span></div>
+      </div>
+      <div class="fg"><label class="fl" for="cd-kenh">Link kênh TikTok <span style="font-weight:400;text-transform:none;letter-spacing:0">(có thì dán, chưa có cũng được)</span></label>
+        <input class="inp" id="cd-kenh" name="video" inputmode="url" placeholder="https://www.tiktok.com/@tenkenh"></div>
+      <div class="fg"><label class="fl" for="cd-note">Bạn đang làm kênh về gì, kẹt ở đâu?</label>
+        <textarea class="inp" id="cd-note" name="note" rows="2" placeholder="VD: kênh nấu ăn, đăng 20 video mà chưa cái nào qua 1.000 view"></textarea></div>
+      <div class="hp" aria-hidden="true"><label>Để trống ô này<input type="text" id="cd-website" name="website" tabindex="-1" autocomplete="off"></label></div>
+      <div class="form-msg" id="cdMsg"></div>
+      <button class="btn btn-cd btn-lg" id="cdBtn" type="submit" style="width:100%;justify-content:center"><span class="spin"></span><span class="lbl">💬 Nhận link vào group →</span></button>
+      <p class="privacy">Chỉ dùng để mời bạn vào group · Không chia sẻ cho bên thứ ba</p>
+    </form>
+    <div class="soi-done" id="cdDone" hidden>
+      <div class="done-ic">👋</div>
+      <h3>Chào mừng bạn!</h3>
+      <p id="cdDoneP">Bấm nút dưới để vào group Zalo. Tụi mình cũng sẽ ping bạn qua Zalo trong ngày.</p>
+      <a class="btn btn-cd btn-lg" id="cdDoneZalo" href="#" target="_blank" rel="noopener" style="display:none">💬 Vào group Zalo ngay →</a>
+      <button class="btn btn-line btn-md" type="button" data-cd-dong style="margin-top:14px">Xem tiếp trang</button>
+    </div>
   </div>
 </div>
 
@@ -2162,7 +2200,7 @@ body.hv-mode{padding-bottom:0}
   </div>
   <div class="cd-chot rv">
     <span class="hand">vào group không mất gì. Vào lớp hay không, tính sau.</span>
-    <div class="cd-nut"><a class="btn btn-cd btn-md" id="cdZaloBtn" href="#" target="_blank" rel="noopener" hidden>💬 Vào group Zalo ngay →</a>
+    <div class="cd-nut"><button class="btn btn-cd btn-md" type="button" data-cd>💬 Tham gia cộng đồng <i>free</i></button>
     <button class="btn btn-ink btn-md" data-open data-cta>Đăng ký &amp; nhận link group <span class="arw">→</span></button></div>
   </div>
 </div></section>
@@ -2804,19 +2842,49 @@ var CFG=null, faqBuilt=false;
     if (location.hash) { var dich = document.getElementById(location.hash.slice(1)); if (dich) moGap(dich); }
   })();
 
-  /* Nút/tab cộng đồng: bot đặt link group qua /zalo thì mở thẳng Zalo ở tab mới; chưa có link thì cuộn tới mục cộng đồng. */
+  /* Popup tham gia cộng đồng: điền tên + Zalo (+ link kênh, đang kẹt gì), gửi qua action 'soi' với source 'congdong'
+     để chung bảng và chung thông báo bot; xong hiện link group Zalo (bot /zalo). Mở từ tab menu, nút hero, nút cuối mục. */
   (function(){
-    function ap(){
-      var z = (typeof CFG !== 'undefined' && CFG && CFG.zalo && CFG.zalo.groupUrl) || '';
-      var nb = document.getElementById('cdZaloBtn'); if (nb){ nb.hidden = !z; if (z) nb.href = z; }
-      document.querySelectorAll('[data-zalo]').forEach(function(b){ b.dataset.zaloUrl = z; });
-    }
+    var pop = document.getElementById('cdPop'), form = document.getElementById('cdForm'), done = document.getElementById('cdDone');
+    if (!pop || !form) return;
+    function zalo(){ return (typeof CFG !== 'undefined' && CFG && CFG.zalo && CFG.zalo.groupUrl) || ''; }
+    function mo(){ pop.classList.add('on'); document.body.classList.add('lock'); setTimeout(function(){ var f = document.getElementById('cd-name'); if (f && form.style.display !== 'none') f.focus(); }, 60); }
+    function dong(){ pop.classList.remove('on'); document.body.classList.remove('lock'); }
+    window.moCd = mo;
     document.addEventListener('click', function(e){
-      var b = e.target.closest ? e.target.closest('[data-zalo]') : null; if (!b) return;
-      var z = b.dataset.zaloUrl; if (!z) return;                      // chưa có link: để data-go / href cuộn như thường
-      e.preventDefault(); e.stopPropagation(); window.open(z, '_blank', 'noopener');
-    }, true);
-    ap(); window.capNhatZalo = ap;
+      var b = e.target.closest ? e.target.closest('[data-cd]') : null; if (!b) return;
+      e.preventDefault(); if (typeof closeDrawer === 'function') closeDrawer(); mo();
+    });
+    pop.querySelectorAll('[data-cd-dong]').forEach(function(b){ b.addEventListener('click', dong); });
+    document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && pop.classList.contains('on')) dong(); });
+    function msg(t){ var m = document.getElementById('cdMsg'); m.textContent = t; m.className = 'form-msg' + (t ? ' on bad' : ''); }
+    function xong(){
+      form.style.display = 'none'; done.hidden = false; done.classList.add('rv', 'in');
+      var z = zalo(), a = document.getElementById('cdDoneZalo');
+      if (z){ a.href = z; a.style.display = 'inline-flex'; }
+      else document.getElementById('cdDoneP').textContent = 'Tụi mình sẽ gửi link group qua Zalo cho bạn trong ngày.';
+    }
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      var bad = null;
+      [['#cd-name', function(v){ return !!v; }], ['#cd-phone', function(v){ var d = v.replace(/\D/g, ''); return d.length >= 9 && d.length <= 12; }]].forEach(function(c){
+        var el = document.querySelector(c[0]), ok = c[1](el.value.trim());
+        el.classList.toggle('bad', !ok); var er = el.parentNode.querySelector('.err'); if (er) er.style.display = ok ? '' : 'block';
+        if (!ok && !bad) bad = el;
+      });
+      if (bad){ bad.focus(); msg('Bạn xem lại giúp mình ô tô đỏ nhé.'); return; }
+      msg('');
+      if (document.getElementById('cd-website').value.trim()){ xong(); return; }
+      var kenh = document.getElementById('cd-kenh').value.trim();
+      var data = { action:'soi', source:'congdong', name: document.getElementById('cd-name').value.trim(), phone: document.getElementById('cd-phone').value.trim(),
+        video: kenh || 'Chưa có kênh · xin vào group cộng đồng', pain_tag:'Tham gia cộng đồng', note: document.getElementById('cd-note').value.trim(), consent:'Mặc định', website:'' };
+      var btn = document.getElementById('cdBtn'); btn.classList.add('busy');
+      if (!API || API.indexOf('PASTE_') === 0){ btn.classList.remove('busy'); xong(); return; }
+      fetch(API, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body: JSON.stringify(data) })
+        .then(function(r){ return r.json(); })
+        .then(function(res){ btn.classList.remove('busy'); if (res && res.ok) xong(); else msg(typeof errText === 'function' ? errText(res && res.error) : 'Có lỗi, thử lại giúp mình.'); })
+        .catch(function(){ btn.classList.remove('busy'); msg('Không gửi được, bạn kiểm tra mạng rồi thử lại nhé.'); });
+    });
   })();
 
   /* Popup soi kênh: kéo form #soiForm (và màn #soiDone) từ mục soi kênh vào hộp nổi, đóng thì trả về chỗ cũ
@@ -2987,7 +3055,6 @@ function loadConfig(){
       var cfg=merge(FALLBACK,d.config);
       try{ localStorage.setItem(CACHE_KEY,JSON.stringify(d.config)); }catch(e){}
       render(cfg);
-      if(window.capNhatZalo) capNhatZalo();
     })
     .catch(function(){ /* offline → giữ bản cache/fallback */ });
 }
