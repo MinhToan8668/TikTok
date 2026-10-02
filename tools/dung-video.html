@@ -278,6 +278,10 @@
   .ed .khungVung.cuon{overflow:auto;display:block}.ed .khungVung .khung.zoomTay{max-height:none;max-width:none;min-height:0;aspect-ratio:auto;margin:auto}
   #srcs .fh{position:relative}canvas.xemThe{position:absolute;display:none;pointer-events:none;object-fit:cover;border-radius:7px}
   #btnLap[aria-pressed="true"]{color:var(--ea)}
+  #xuatCaiHop .box,#caiHop .box,#ttHop .box{text-align:left;display:flex;flex-direction:column;gap:8px}
+  #xuatCaiHop .box label,#caiHop .box label{display:grid;grid-template-columns:1fr minmax(0,180px);gap:10px;align-items:center;font-size:13px;margin:0}#xuatCaiHop .box label.full{grid-template-columns:1fr}
+  #xuatCaiHop .box select,#xuatCaiHop .box input[type=text],#caiHop .box input[type=number],#caiHop .box select{width:100%;min-width:0;box-sizing:border-box;background:var(--ep2);color:#fff;border:1px solid var(--el);border-radius:8px;padding:6px 8px;font:inherit;font-size:13px}
+  #xuatCaiHop .box input[type=checkbox],#caiHop .box input[type=checkbox]{justify-self:end;width:18px;height:18px}#xcVideo,#xcGif{display:contents}
   .pdDs{flex:none;min-height:60px;max-height:260px;overflow:auto;border:1px solid var(--el);border-radius:8px;margin:6px 0}.pdHang{display:grid;grid-template-columns:44px 1fr 24px;gap:6px;align-items:center;padding:4px 6px;border-bottom:1px solid var(--el);font-size:12.5px}.pdHang.chon{background:rgba(34,211,223,.12)}.pdHang .g{color:var(--ea);cursor:pointer;font-size:11px}.pdHang .t{outline:none;min-height:18px;word-break:break-word}.pdHang .t:focus{background:rgba(255,255,255,.06);border-radius:4px}.pdHang .btn{padding:0 5px;font-size:11px}
   input.soTruot{width:58px;font-size:11px;padding:1px 4px;background:var(--ep2);color:#fff;border:1px solid var(--ea);border-radius:4px}#propChon output{cursor:text}#propChon label>span:first-child{cursor:default}
   #btnCheChon[aria-pressed="true"],#btnCheCat[aria-pressed="true"]{color:var(--ea);background:rgba(34,211,223,.12)}
@@ -3858,7 +3862,7 @@ function xoaTrack(key) { const ds = moiMuc().filter(o => (o.k === 'b' || o.k ===
 function phimCapCut(e) {
   const a = document.activeElement; if (/INPUT|TEXTAREA|SELECT/.test(a.tagName) || a.isContentEditable) return; if ($('.xuat.mo') && e.key !== 'Escape') return;
   const ctrl = e.ctrlKey || e.metaKey, c = e.code, sh = e.shiftKey, alt = e.altKey, xong = f => { e.preventDefault(); e.stopImmediatePropagation(); f(); };
-  if (e.key === 'Escape') { if ($('.xuat.mo')) return xong(() => $$('.xuat.mo').forEach(x => x.classList.remove('mo'))); if (P.cheDo === 'cat') return xong(() => datCheDo('chon')); return; }
+  if (e.key === 'Escape') { if ($('.cmenu')) { dongMenu(); return; } if ($('.xuat.mo')) return xong(() => $$('.xuat.mo').forEach(x => x.classList.remove('mo'))); if (P.cheDo === 'cat') return xong(() => datCheDo('chon')); return; }
   if (ctrl && !alt && (c === 'KeyK' || c === 'KeyB')) return xong(() => { if (!sh) return tachChon(); const m = mucChon(); if (m && m.kfs && Object.keys(m.kfs).some(p => kfTai(m, p, offMuc(P.chon.k, m)) >= 0)) xoaKfDauPhat(); else tachTatCa(); });   // Ctrl+Shift+K: đang đứng trên ◆ của mục đang chọn thì xoá ◆, không thì tách mọi track
   if (ctrl && !sh && !alt && c === 'KeyL') return xong(() => { $('#btnLienKet').click(); toast(P.lienKet !== false ? 'Bật liên kết' : 'Tắt liên kết'); });
   if (ctrl && !sh && !alt && c === 'KeyR') return xong(() => { const m = mucChon(); if (!m || !'vb'.includes(P.chon.k)) { toast('Chọn đoạn video trước'); return; } moTabProp('Tốc độ & âm'); moPhaiNeuCan(); });
