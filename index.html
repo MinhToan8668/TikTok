@@ -326,6 +326,14 @@ nav .burger{border-color:rgba(28,38,0,.35)}
 .hero-vs-note{margin-top:11px;font-family:var(--hand);font-style:italic;font-size:12.5px;color:var(--lime);line-height:1.5;text-align:center}
 @media(prefers-reduced-motion:reduce){.hero-vs-free,.hero-vs-tools span i{animation:none}}
 @media(max-width:1000px){.hero-side{justify-items:center}.hero-vs{max-width:420px;transform:rotate(-.8deg)}}
+/* nút cộng đồng: Zalo xanh dương nhạt trên lime, nhãn free đỏ nhảy như menu */
+.btn-cd{background:#0a84ff;color:#fff;box-shadow:0 5px 0 rgba(0,40,90,.45);text-decoration:none;position:relative}
+.btn-cd:hover{box-shadow:0 8px 0 rgba(0,40,90,.45)}
+.btn-cd i{font-style:normal;font-family:var(--disp);font-weight:800;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
+  background:#ff4d1f;color:#fff;border-radius:999px;padding:3px 7px;margin-left:8px;display:inline-block;transform:rotate(-5deg);animation:freeNhay 1.6s ease-in-out infinite}
+.cd-nut{display:flex;gap:10px;flex-wrap:wrap}
+@media(prefers-reduced-motion:reduce){.btn-cd i{animation:none}}
+@media(max-width:560px){.cd-nut,.cd-nut .btn{width:100%}}
 /* ── máy tính: nén hero để tiêu đề, nút, phiếu ghi danh và thẻ Viral Studio lọt một màn hình (đặt sau mọi rule hero để thắng) ── */
 @media(min-width:1001px){
   .hero{padding:18px 0 40px}
@@ -418,6 +426,7 @@ nav .burger{border-color:rgba(28,38,0,.35)}
   .hero-actions [data-cta]{width:100%;justify-content:center}
   .hero-free{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .hero-free .btn{width:100%;justify-content:center;padding:11px 8px;font-size:13.5px;white-space:normal;line-height:1.2;text-align:center}
+  .hero-free .btn-cd{grid-column:1/-1;white-space:nowrap}   /* nút cộng đồng chiếm trọn hàng dưới */
   .hero-actions .btn-line{display:none}          /* "Xem lớp kèm edit" đã có ở mục dưới */
   .hero-vs{order:5;max-width:none;width:100%;transform:none;margin-top:6px;padding:18px 18px 16px}
   .hero-vs::before{display:none}
@@ -1434,7 +1443,7 @@ body.hv-mode{padding-bottom:0}
 /* ═══════════ RESPONSIVE ═══════════ */
 @media(max-width:1440px){.nav-slots{display:none}.nav-link{padding:9px 8px;font-size:13px}}
 @media(max-width:1240px){.brand span{display:none}}
-@media(max-width:1180px){.nav-link{padding:9px 6px;font-size:12.5px}.nav-cta{gap:8px}.nav-cta .btn-sm{padding-left:13px;padding-right:13px}}
+@media(max-width:1180px){.nav-link{padding:9px 5px;font-size:12px}.nav-link.hot i{font-size:8.5px;padding:2px 5px;margin-left:3px}.nav-cta{gap:6px}.nav-cta .btn-sm{padding-left:11px;padding-right:11px;font-size:12.5px}.brand span{display:none}}
 @media(max-width:1000px){.nav-links{display:none}.burger{display:flex}}
 @media(max-width:1000px){
   .hero-in{grid-template-columns:1fr;gap:34px}
@@ -1526,7 +1535,7 @@ body.hv-mode{padding-bottom:0}
       <button class="nav-link" data-go="editkem">Edit kèm</button>
       <button class="nav-link" data-go="ketqua">Học viên cũ</button>
       <button class="nav-link" data-go="lotrinh">Lộ trình</button>
-      <button class="nav-link" data-go="congdong">Cộng đồng</button>
+      <button class="nav-link hot" data-go="congdong" data-zalo>Cộng đồng <i>free</i></button>
     </div>
     <div class="nav-cta">
       <div class="nav-slots"><span class="dot"></span>còn <b data-bind="computed.remaining">—</b> chỗ</div>
@@ -1548,7 +1557,7 @@ body.hv-mode{padding-bottom:0}
       <a href="#tuan">Một tuần trong lớp</a>
       <a href="#lotrinh">Lộ trình 30 ngày</a>
       <a href="#mentors">Người dạy</a>
-      <a href="#congdong">Group cộng đồng</a>
+      <a href="#congdong" data-zalo>Group cộng đồng · free</a>
       <a href="#hocphi">Học phí</a>
       <a href="#faq">Hỏi đáp</a>
     </div>
@@ -1581,6 +1590,7 @@ body.hv-mode{padding-bottom:0}
         <div class="hero-free">
           <button class="btn btn-lime btn-lg" data-go="soikenh">🔍 Soi kênh miễn phí</button>
           <a class="btn btn-lime btn-lg" href="tools/soi-video.html" target="_blank" rel="noopener">✨ Viral Studio miễn phí</a>
+          <button class="btn btn-lg btn-cd" data-go="congdong" data-zalo>💬 Tham gia cộng đồng <i>free</i></button>
         </div>
         <button class="btn btn-line btn-lg" data-go="editkem">Xem lớp kèm edit ra sao ↓</button>
       </div>
@@ -2152,7 +2162,8 @@ body.hv-mode{padding-bottom:0}
   </div>
   <div class="cd-chot rv">
     <span class="hand">vào group không mất gì. Vào lớp hay không, tính sau.</span>
-    <button class="btn btn-ink btn-md" data-open data-cta>Đăng ký &amp; nhận link group <span class="arw">→</span></button>
+    <div class="cd-nut"><a class="btn btn-cd btn-md" id="cdZaloBtn" href="#" target="_blank" rel="noopener" hidden>💬 Vào group Zalo ngay →</a>
+    <button class="btn btn-ink btn-md" data-open data-cta>Đăng ký &amp; nhận link group <span class="arw">→</span></button></div>
   </div>
 </div></section>
 <section class="cta" id="dangky">
@@ -2793,6 +2804,21 @@ var CFG=null, faqBuilt=false;
     if (location.hash) { var dich = document.getElementById(location.hash.slice(1)); if (dich) moGap(dich); }
   })();
 
+  /* Nút/tab cộng đồng: bot đặt link group qua /zalo thì mở thẳng Zalo ở tab mới; chưa có link thì cuộn tới mục cộng đồng. */
+  (function(){
+    function ap(){
+      var z = (typeof CFG !== 'undefined' && CFG && CFG.zalo && CFG.zalo.groupUrl) || '';
+      var nb = document.getElementById('cdZaloBtn'); if (nb){ nb.hidden = !z; if (z) nb.href = z; }
+      document.querySelectorAll('[data-zalo]').forEach(function(b){ b.dataset.zaloUrl = z; });
+    }
+    document.addEventListener('click', function(e){
+      var b = e.target.closest ? e.target.closest('[data-zalo]') : null; if (!b) return;
+      var z = b.dataset.zaloUrl; if (!z) return;                      // chưa có link: để data-go / href cuộn như thường
+      e.preventDefault(); e.stopPropagation(); window.open(z, '_blank', 'noopener');
+    }, true);
+    ap(); window.capNhatZalo = ap;
+  })();
+
   /* Popup soi kênh: kéo form #soiForm (và màn #soiDone) từ mục soi kênh vào hộp nổi, đóng thì trả về chỗ cũ
      để mọi xử lý gửi form giữ nguyên. Mở từ thẻ hero (kèm link vừa dán) hoặc từ nút data-go="soikenh". */
   (function(){
@@ -2961,6 +2987,7 @@ function loadConfig(){
       var cfg=merge(FALLBACK,d.config);
       try{ localStorage.setItem(CACHE_KEY,JSON.stringify(d.config)); }catch(e){}
       render(cfg);
+      if(window.capNhatZalo) capNhatZalo();
     })
     .catch(function(){ /* offline → giữ bản cache/fallback */ });
 }
