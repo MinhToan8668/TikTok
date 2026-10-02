@@ -528,6 +528,12 @@ Trước đây trên điện thoại (nhất là iPhone chuyển app giữa ch�
 - Việc AI chạy nền: từ giây 40 trang hỏi song song máy chủ theo `job_id` mỗi 8 giây; bên nào có kết quả trước thì lấy, kết nối treo bị huỷ.
 - Quá 9,5 phút: báo rõ "Máy chủ chưa trả kết quả… mở lại trang sau vài phút", việc vẫn nằm trong danh sách chờ để lần mở trang sau tự nhận kết quả (máy chủ giữ 6 giờ). Không cần dán lại Apps Script.
 
+### Chuẩn bị buổi demo (10/2026)
+
+- **Trang kiểm tra hệ thống**: `tools/kiem-tra.html` (https://minhtoan8668.github.io/TikTok/tools/kiem-tra.html). Mở trên đúng máy sẽ demo, bấm Chạy kiểm tra: trang web đã là bản mới chưa, Apps Script có trả lời, Cloudflare + key Gemini còn chạy (gọi thử một câu), máy có WebCodecs / OPFS / WebGL, mạng tới CDN. Cloudflare có thêm đường `/suc-khoe` cho việc này.
+- **HookAI.gs đổi**: tải video TikTok và chờ Gemini xử lý file giới hạn 170 giây (trước đây có thể ngốn hết 6 phút rồi bị Apps Script giết, mất lượt). Cần dán lại `HookAI.gs` vào Apps Script rồi Deploy → New version (bản dán sẵn key mentor giữ riêng, không đưa lên GitHub).
+- Danh sách việc nên làm trước giờ demo nằm ngay trong trang kiểm tra.
+
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 
 Cài theo [`cloudflare/CAI-DAT.md`](../cloudflare/CAI-DAT.md) (khoảng 10 phút, không cần thẻ). Có máy chủ này tool thêm:

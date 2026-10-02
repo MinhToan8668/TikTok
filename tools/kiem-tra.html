@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kiểm tra hệ thống · Viral Studio</title>
+<meta name="robots" content="noindex">
+<style>
+  :root{color-scheme:dark;--nen:#0b0b0d;--o:#18181b;--vien:#2b2b31;--chu:#e7e7eb;--mo:#8d8d96;--xanh:#22d3df;--ok:#3fd18a;--loi:#ff4d6d;--cho:#ffb020}
+  *{box-sizing:border-box}body{margin:0;font:15px/1.5 "Be Vietnam Pro",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--nen);color:var(--chu);padding:20px 16px 60px}
+  main{max-width:720px;margin:0 auto}h1{font-size:22px;margin:0 0 4px}p.mo{color:var(--mo);margin:0 0 18px}
+  .the{background:var(--o);border:1px solid var(--vien);border-radius:14px;padding:14px 16px;margin-bottom:10px;display:grid;grid-template-columns:28px 1fr auto;gap:10px;align-items:start}
+  .the i{display:block;width:14px;height:14px;border-radius:50%;background:var(--cho);margin-top:5px;box-shadow:0 0 0 4px rgba(255,176,32,.15)}
+  .the.ok i{background:var(--ok);box-shadow:0 0 0 4px rgba(63,209,138,.15)}.the.loi i{background:var(--loi);box-shadow:0 0 0 4px rgba(255,77,109,.15)}
+  .the b{display:block;font-size:14.5px}.the small{display:block;color:var(--mo);font-size:12.5px;white-space:pre-wrap;word-break:break-word}.the .ms{font-size:12px;color:var(--mo);white-space:nowrap}
+  .btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--vien);background:var(--o);color:var(--chu);border-radius:999px;padding:9px 16px;font:inherit;font-weight:700;cursor:pointer}.btn.xanh{background:var(--xanh);border-color:var(--xanh);color:#000}
+  .hang{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 20px;align-items:center}#tomTat{font-weight:800}
+  h2{font-size:15px;margin:22px 0 8px;color:var(--mo);text-transform:uppercase;letter-spacing:.04em}
+  ul{margin:0;padding-left:18px;color:var(--mo)}li{margin:3px 0}a{color:var(--xanh)}
+</style>
+</head>
+<body>
+<main>
+  <h1>Kiểm tra hệ thống trước buổi demo</h1>
+  <p class="mo">Bấm một nút là biết máy chủ, AI và máy đang dùng có sẵn sàng không. Chạy trên đúng máy và đúng trình duyệt sẽ dùng để demo.</p>
+  <div class="hang"><button class="btn xanh" id="btnChay" type="button">▶ Chạy kiểm tra</button><span id="tomTat"></span></div>
+  <div id="ds"></div>
+  <h2>Trước giờ demo</h2>
+  <ul>
+    <li>Dùng Chrome hoặc Edge trên máy tính; tắt bớt tab nặng. Mở trước từng tool một lần để trình duyệt tải xong.</li>
+    <li>Đăng nhập sẵn tài khoản demo, kiểm tra còn lượt AI (ô lượt ở góc tool).</li>
+    <li>Chuẩn bị sẵn: 1 link TikTok ngắn (dưới 60 giây) + lời thoại đã dán sẵn làm phương án dự phòng; 1 video quay thô dưới 2 phút cho Dựng video.</li>
+    <li>Khi hướng dẫn nhiều học viên bấm cùng lúc: cho bấm lệch nhau vài giây, AI của Google giới hạn số yêu cầu mỗi phút.</li>
+    <li>Nếu một tool báo lỗi đỏ: đọc dòng "Mã lỗi", bấm lại một lần; vẫn lỗi thì chuyển sang tool khác, kết quả AI chạy nền sẽ tự hiện khi quay lại.</li>
+  </ul>
+</main>
+<script>
+const MC_URL = 'https://flat-wave-6907.minhtoantowork.workers.dev';
+const API = 'https://script.google.com/macros/s/AKfycbyxe1nWupAl6VheDZHaU3Ojm-d6c8F_khhUMtkehNCLh5OnGW6f2uF0PKPYZ4eYUqyGjQ/exec';
+const $ = s => document.querySelector(s);
+const ds = [], box = $('#ds');
+function the(id, ten) { const d = document.createElement('div'); d.className = 'the'; d.innerHTML = '<i></i><div><b>' + ten + '</b><small>Đang kiểm tra…</small></div><span class="ms"></span>'; box.appendChild(d); return { d, dat(ok, chu, ms) { d.className = 'the ' + (ok === null ? '' : ok ? 'ok' : 'loi'); d.querySelector('small').textContent = chu; d.querySelector('.ms').textContent = ms != null ? Math.round(ms) + ' ms' : ''; ds.push(ok); } }; }
+async function fetchJson(url, opt, han) { const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), han || 30000); try { const r = await fetch(url, Object.assign({ signal: ctl.signal }, opt || {})); const txt = await r.text(); try { return JSON.parse(txt); } catch { throw new Error('HTTP ' + r.status + ' · không phải JSON: ' + txt.slice(0, 80)); } } finally { clearTimeout(t); } }
+async function chay() {
+  $('#btnChay').disabled = true; box.innerHTML = ''; ds.length = 0; $('#tomTat').textContent = '';
+  // 1. trang web
+  { const k = the('trang', 'Trang web (GitHub Pages)'); const t = performance.now(); try { const r = await fetch('dung-video.html', { cache: 'no-store' }); const txt = await r.text(); const m = txt.match(/Đặc tả CapCut 9\.1|khoiTaoMobi/); k.dat(r.ok && !!m, r.ok ? 'Tải được tools/dung-video.html (' + Math.round(txt.length / 1024) + ' KB)' + (m ? ' · bản mới nhất' : ' · ⚠ bản cũ, GitHub Pages chưa cập nhật, đợi 2–3 phút rồi tải lại') : 'HTTP ' + r.status, performance.now() - t); } catch (e) { k.dat(false, 'Không tải được: ' + e.message, performance.now() - t); } }
+  // 2. Apps Script
+  { const k = the('as', 'Máy chủ Apps Script (tài khoản, lượt, AI)'); const t = performance.now(); try { const j = await fetchJson(API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'st_cfg' }) }, 45000); k.dat(!!j.ok, j.ok ? 'Trả lời bình thường · lượt thử: ' + Object.entries(j.luot || {}).map(([a, b]) => a + ' ' + b).join(', ') : 'Trả lời lỗi: ' + (j.error || '?'), performance.now() - t); } catch (e) { k.dat(false, 'Không trả lời sau ' + Math.round((performance.now() - t) / 1000) + ' giây: ' + e.message + '\nNếu kéo dài: mở Apps Script → Deploy → Manage deployments xem bản đang chạy.', performance.now() - t); } }
+  // 3. Cloudflare + Gemini
+  { const k = the('mc', 'Máy chủ Cloudflare + AI của Google (Gemini)'); const t = performance.now(); try { const j = await fetchJson(MC_URL + '/suc-khoe', null, 45000); const g = j.gemini || {}, a = j.apps_script || {}; k.dat(!!j.ok, 'Cloudflare bản ' + j.phien_ban + ' · Gemini ' + (g.ok ? 'trả lời “' + (g.tra_loi || '').trim() + '” sau ' + g.ms + ' ms (' + g.so_key + ' key)' : 'LỖI: ' + (g.loi || '?') + (g.so_key ? '' : ' · chưa có key')) + ' · Cloudflare gọi Apps Script ' + (a.ok ? 'OK ' + a.ms + ' ms' : 'LỖI ' + (a.loi || '')) + (j.broll ? ' · kho B-roll bật' : ''), performance.now() - t); } catch (e) { k.dat(false, 'Không gọi được: ' + e.message + (/404|khong_co/.test(e.message) ? '\nCloudflare chưa cập nhật bản mới (tự cập nhật từ GitHub trong vài phút).' : ''), performance.now() - t); } }
+  // 4. máy đang dùng
+  { const k = the('may', 'Máy và trình duyệt này'); const ok = [], can = []; (window.VideoEncoder ? ok : can).push('WebCodecs (xuất video nhanh)'); (navigator.storage && navigator.storage.getDirectory ? ok : can).push('OPFS (tự lưu footage)'); (window.indexedDB ? ok : can).push('IndexedDB (tự lưu dự án)'); (window.MediaRecorder ? ok : can).push('MediaRecorder'); const gl = document.createElement('canvas').getContext('webgl'); (gl ? ok : can).push('WebGL (chỉnh màu)'); const mem = navigator.deviceMemory ? navigator.deviceMemory + ' GB RAM' : ''; const ua = /iPhone|iPad/.test(navigator.userAgent) ? 'iPhone/iPad' : /Android/.test(navigator.userAgent) ? 'Android' : 'máy tính'; k.dat(can.length === 0, ua + (mem ? ' · ' + mem : '') + ' · ' + innerWidth + '×' + innerHeight + '\nCó: ' + ok.join(', ') + (can.length ? '\nThiếu: ' + can.join(', ') + ' → dùng Chrome/Edge mới trên máy tính' : ''), null); }
+  // 5. mạng tới CDN
+  { const k = the('cdn', 'Thư viện ngoài (mediabunny, MediaPipe)'); const t = performance.now(); try { const r = await Promise.all([fetch('https://cdn.jsdelivr.net/npm/mediabunny/package.json', { cache: 'no-store' }), fetch('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/package.json', { cache: 'no-store' })]); k.dat(r.every(x => x.ok), r.every(x => x.ok) ? 'Tải được từ jsdelivr' : 'Một thư viện không tải được (mạng chặn CDN?)', performance.now() - t); } catch (e) { k.dat(false, 'Không tới được jsdelivr: ' + e.message, performance.now() - t); } }
+  const xau = ds.filter(x => x === false).length; $('#tomTat').textContent = xau ? '⚠ ' + xau + ' mục lỗi, xem bên dưới' : '✓ Mọi thứ sẵn sàng'; $('#tomTat').style.color = xau ? 'var(--loi)' : 'var(--ok)'; $('#btnChay').disabled = false;
+}
+$('#btnChay').onclick = chay; chay();
+</script>
+</body>
+</html>

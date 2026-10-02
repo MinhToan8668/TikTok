@@ -24,7 +24,7 @@
      ANTHROPIC_API_KEY, OPENAI_API_KEY   (Secret) key khi chọn claude / openai
    ═══════════════════════════════════════════════════════════════════════════ */
 
-const PHIEN_BAN = '2026.10.13';
+const PHIEN_BAN = '2026.10.14';
 /* link /exec của Apps Script đang dùng trong tool (công khai sẵn trong tools/*.html). Biến APPS_SCRIPT_URL trên Cloudflare, nếu có, sẽ được ưu tiên. */
 const APPS_SCRIPT_MD = 'https://script.google.com/macros/s/AKfycbyxe1nWupAl6VheDZHaU3Ojm-d6c8F_khhUMtkehNCLh5OnGW6f2uF0PKPYZ4eYUqyGjQ/exec';
 const asUrl = env => String(env.APPS_SCRIPT_URL || env.APPS_SCRIPT || APPS_SCRIPT_MD).trim();
@@ -42,6 +42,7 @@ export default {
     const cors = corsCho(req, env);
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: { ...cors, 'access-control-max-age': '86400' } });
     try {
+      if (path === '/suc-khoe') return sucKhoe(env, cors);
       if (path === '/') return json({ ok: true, ten: 'Viral Studio · máy chủ Cloudflare', phien_ban: PHIEN_BAN, dich_vu: { broll: coKho(env), tts: !!dsKey(env).length, tai: true, kiem_luot: !!asUrl(env), agent: !!llmCoKey(env), agent_ncc: llmNcc(env) } }, cors);
       if (path === '/broll' && req.method === 'GET') return json(await timBroll(url, env, ctx), cors);
       if (path === '/media' && req.method === 'GET') return media(req, url, cors);
@@ -338,6 +339,13 @@ const CANH_SCHEMA = { type: 'object', properties: { lop: { type: 'array', items:
   chu: { type: 'string' }, co: { type: 'number' }, dam: { type: 'number' }, can: { type: 'string' }, so_tu: { type: 'number' }, so_den: { type: 'number' }, dinh_dang: { type: 'string' },
   kf: { type: 'array', items: { type: 'object', properties: { t: { type: 'number' }, x: { type: 'number' }, y: { type: 'number' }, w: { type: 'number' }, h: { type: 'number' }, s: { type: 'number' }, xoay: { type: 'number' }, mo: { type: 'number' }, tien_do: { type: 'number' }, ease: { type: 'string', enum: ['vao', 'ra', 'mem', 'nay', 'deu'] } }, required: ['t'] } } },
   required: ['loai', 'kf'] } } }, required: ['lop'] };
+/* ── kiểm tra sức khoẻ trước buổi demo: Apps Script trả lời không, key Gemini còn chạy không (một câu hỏi rất ngắn) ── */
+async function sucKhoe(env, cors) {
+  const kq = { ok: true, phien_ban: PHIEN_BAN, luc: new Date().toISOString(), apps_script: { ok: false }, gemini: { ok: false, so_key: dsKey(env).length }, broll: coKho(env) };
+  const t1 = Date.now(); try { const r = await fetch(asUrl(env), { method: 'POST', headers: { 'content-type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'st_cfg' }), redirect: 'follow' }); const j = await r.json(); kq.apps_script = { ok: !!j.ok, ms: Date.now() - t1, luot: j.luot || null }; } catch (e) { kq.apps_script = { ok: false, ms: Date.now() - t1, loi: String(e.message || e).slice(0, 120) }; }
+  const t2 = Date.now(); try { const j = await goiGemini(env, 'gemini-3.5-flash-lite', { contents: [{ parts: [{ text: 'Trả lời đúng một chữ: OK' }] }], generationConfig: { maxOutputTokens: 5 } }); const txt = ((((j.candidates || [])[0] || {}).content || {}).parts || []).map(p => p.text || '').join(''); kq.gemini = { ok: !!txt, ms: Date.now() - t2, so_key: dsKey(env).length, tra_loi: txt.slice(0, 20) }; } catch (e) { kq.gemini = { ok: false, ms: Date.now() - t2, so_key: dsKey(env).length, loi: String(e.message || e).slice(0, 160) }; }
+  kq.ok = kq.apps_script.ok && kq.gemini.ok; return json(kq, cors, 200);
+}
 /* ── dịch phụ đề song ngữ (trình dựng video): một lượt dịch tối đa 60 câu ── */
 const NN_DICH = { en: 'tiếng Anh', zh: 'tiếng Trung giản thể', ko: 'tiếng Hàn', ja: 'tiếng Nhật', th: 'tiếng Thái', id: 'tiếng Indonesia', fr: 'tiếng Pháp', es: 'tiếng Tây Ban Nha' };
 async function dichPhuDe(req, env, cors) {

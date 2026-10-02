@@ -741,7 +741,7 @@ function soiTikwm(url){
   return null;
 }
 /* Tải mp4 về: thử link trực tiếp của CDN, rồi link do tikwm trung chuyển theo id video. */
-function soiTaiMp4(tw){
+function soiTaiMp4(tw, han){
   var ds = [];
   if (tw.play) ds.push({ten:'cdn play', url:tw.play});
   if (tw.id) ds.push({ten:'tikwm play/id', url:'https://www.tikwm.com/video/media/play/' + tw.id + '.mp4'});
@@ -749,6 +749,7 @@ function soiTaiMp4(tw){
   if (tw.id) ds.push({ten:'tikwm hdplay/id', url:'https://www.tikwm.com/video/media/hdplay/' + tw.id + '.mp4'});
   if (tw.wmplay) ds.push({ten:'cdn wmplay', url:tw.wmplay});
   for (var i = 0; i < ds.length; i++){
+    if (han && Date.now() > han){ soiGhi('het gio tai video, bo qua ' + (ds.length - i) + ' duong con lai'); break; }   // không để tải video ngốn hết 6 phút của Apps Script
     try{
       var r = UrlFetchApp.fetch(ds[i].url, {muteHttpExceptions:true, followRedirects:true, headers:{'Referer':'https://www.tiktok.com/', 'Accept':'video/mp4,video/*;q=0.9,*/*;q=0.8'}});
       var ma = r.getResponseCode(), ct = String(r.getHeaders()['Content-Type'] || r.getHeaders()['content-type'] || '');
@@ -800,7 +801,7 @@ function soiLink(b){
 }
 
 /* Đưa video lên Files API của Gemini (dùng cho video trên 14MB). Trả về file_uri khi Gemini xử lý xong. */
-function geminiUploadFile(key, bytes, mime){
+function geminiUploadFile(key, bytes, mime, han){
   // Mọi lỗi mạng hay JSON hỏng đều trả {ok:false} để hàm gọi hoàn lượt, không ném ra doPost.
   try{
     var r = UrlFetchApp.fetch('https://generativelanguage.googleapis.com/upload/v1beta/files', {
@@ -812,6 +813,7 @@ function geminiUploadFile(key, bytes, mime){
     for (var i = 0; i < 40; i++){
       if (f.state === 'ACTIVE') return {ok:true, uri:f.uri, mime:f.mimeType || mime};
       if (f.state === 'FAILED') return {ok:false, loi:'files state FAILED'};
+      if (han && Date.now() > han) return {ok:false, loi:'files cho qua lau (het gio tai video)'};
       Utilities.sleep(2000);
       var g = UrlFetchApp.fetch('https://generativelanguage.googleapis.com/v1beta/' + f.name, {muteHttpExceptions:true, headers:{'x-goog-api-key': key}});
       if (g.getResponseCode() === 200){ try{ f = JSON.parse(g.getContentText()) || f; }catch(e){} }
@@ -821,7 +823,7 @@ function geminiUploadFile(key, bytes, mime){
 }
 
 /* Lấy phần video để gửi Gemini: từ file học viên tải lên, từ TikTok (qua tikwm) hoặc YouTube (Gemini đọc thẳng link). */
-function soiLayVideo(b, key){
+function soiLayVideo(b, key, han){
   var nen = String(b.nen || soiNen(String(b.link || '')));
   var bytes = null, mime = 'video/mp4', tw = null;
   if (b.file_uri){   // video lớn đã được đẩy lên Gemini qua up_start / up_chunk / up_done
@@ -837,14 +839,14 @@ function soiLayVideo(b, key){
     tw = soiTikwm(String(b.link).trim());
     if (!tw || !(tw.play || tw.id)) return {ok:false, error:'khong_tai_duoc_video', loi:'khong lay duoc link mp4 · ' + SOI_NHAT_KY.join(' | ')};
     if (tw.size && tw.size > SOI_VIDEO_TOI_DA) return {ok:false, error:'video_qua_lon', loi:'size ' + tw.size};
-    var mp4 = soiTaiMp4(tw);
+    var mp4 = soiTaiMp4(tw, han);
     if (!mp4) return {ok:false, error:'khong_tai_duoc_video', loi:'khong tai duoc mp4 · ' + SOI_NHAT_KY.join(' | ')};
     bytes = mp4.bytes; mime = mp4.mime;
   } else return {ok:false, error:'khong_co_video'};
   if (!bytes || bytes.length < 1000) return {ok:false, error:'video_hong', loi:'rong'};
   if (bytes.length > SOI_VIDEO_TOI_DA) return {ok:false, error:'video_qua_lon', loi:'size ' + bytes.length};
   if (bytes.length <= SOI_INLINE_TOI_DA) return {ok:true, part:{inline_data:{mime_type:mime, data:Utilities.base64Encode(bytes)}}, nguon: b.video_b64 ? 'upload' : 'tiktok', tw:tw, kich_thuoc:bytes.length};
-  var up = geminiUploadFile(key, bytes, mime);
+  var up = geminiUploadFile(key, bytes, mime, han);
   if (!up.ok) return {ok:false, error:'khong_tai_duoc_video', loi:'gemini files: ' + up.loi};
   return {ok:true, part:{file_data:{mime_type:up.mime, file_uri:up.uri}}, nguon: b.video_b64 ? 'upload' : 'tiktok', tw:tw, kich_thuoc:bytes.length};
 }
@@ -882,7 +884,7 @@ function hookSoi(b, ai, provider, key){
   try{
   var media = null, canhBao = '', video = null;
   if (muonVideo){
-    video = soiLayVideo(b, gkey);
+    video = soiLayVideo(b, gkey, T0 + 170000);   // tải + đưa video lên Gemini tối đa 170 giây, phần còn lại dành cho AI
     if (video.ok) media = [video.part];
     else if (kbDemChu(loiThoai) >= 8) canhBao = 'Không tải được video (' + (video.loi || video.error) + '), AI mổ trên lời thoại bạn dán.';
     else { hoan(); return jsonOut({ok:false, error: video.error || 'khong_tai_duoc_video', chi_tiet: String(video.loi || '').slice(0, me.vaitro === 'mentor' ? 600 : 220)}); }
@@ -1116,7 +1118,7 @@ function hookChamVideo(b, ai, provider, key){
   try{
   var media = null, canhBao = '', video = null;
   if (muonVideo){
-    video = soiLayVideo(b, gkey);
+    video = soiLayVideo(b, gkey, T0 + 170000);   // tải + đưa video lên Gemini tối đa 170 giây, phần còn lại dành cho AI
     if (video.ok) media = [video.part];
     else if (kbDemChu(loiThoai) >= 8) canhBao = 'Không tải được video (' + (video.loi || video.error) + '), AI chấm trên lời thoại và mô tả bạn gửi.';
     else { hoan(); return jsonOut({ok:false, error: video.error || 'khong_tai_duoc_video', chi_tiet: String(video.loi || '').slice(0, me.vaitro === 'mentor' ? 600 : 220)}); }
