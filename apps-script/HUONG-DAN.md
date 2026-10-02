@@ -489,6 +489,22 @@ Học theo giao diện CapCut và bố cục mã nguồn mở OpenCut (bản cla
 - **Kéo dời / kéo mép** một câu: phụ đề tự tách thành đoạn chữ riêng (giữ nhịp từng từ); đè lên câu bên cạnh thì câu đó tự ngắn lại.
 - **Kéo video vào dòng thời gian giữ đủ độ dài** (trước đây lớp phủ chỉ lấy 4 giây). Thả vào track chính thì chèn cả video tại chỗ gần nhất; thả phía trên thì thành lớp phủ, chồng giờ thì tự mở line mới. Thả file từ máy thẳng vào dòng thời gian cũng được.
 
+### Thao tác chuẩn CapCut Desktop 9.1 (10/2026)
+
+Theo bộ phím Custom1 và menu của CapCut:
+
+- **Chế độ Chọn (V) / Cắt (C)**: ở chế độ Cắt, bấm lên đoạn là tách đúng chỗ bấm (có vạch dọc theo chuột). Esc về Chọn.
+- **Tách**: Ctrl+K / Ctrl+B tách mục đang chọn tại đầu phát (không chọn gì thì tách track chính); Ctrl+Shift+K / Shift+S tách mọi track (đang đứng trên ◆ của mục chọn thì xoá ◆).
+- **Phím khác**: S hít, Shift+Backspace nam châm track chính, Ctrl+L liên kết, A / Shift+A chọn mọi mục trước / sau đầu phát, Shift+X vùng In–Out theo đoạn, Shift+E ẩn/hiện đoạn, Ctrl+R mở bảng tốc độ, Ctrl+. / Ctrl+, tăng giảm 1 dB, M / Alt+M mốc (màu khác) / Shift+M mốc sau / Alt+Shift+M mốc trước, Ctrl+J đánh dấu beat, Shift+Alt+K keyframe cơ bản, Alt+K bảng keyframe, Ctrl+Alt+C / V sao chép / dán thuộc tính có chọn nhóm (biến đổi, màu, bộ lọc, tốc độ, hoạt ảnh, mặt nạ, âm lượng, hoà trộn, keyframe, kiểu chữ), Ctrl+M xuất, Ctrl+N dự án mới, Ctrl+F / ` toàn màn hình, Alt+G / Alt+Shift+G gộp / bỏ gộp, Shift+← → 10 khung, giữ Ctrl khi kéo để tạm tắt hít, Alt+cuộn để cuộn ngang. Bấm ? để xem bảng đầy đủ.
+- **Menu chuột phải đoạn**: thêm Sao chép / Dán thuộc tính…, Ẩn đoạn, Tắt tiếng, Tốc độ…, Đổi tên, Nhãn màu (6 màu, vạch trên đoạn), Thêm mốc, Vùng In–Out theo đoạn, Xoá và dồn (ripple delete). **Chuột phải ◆**: Tuyến tính, Chậm đầu, Chậm cuối, Mượt hai đầu, Giữ (Hold), chép / dán / xoá ◆. **Chuột phải track**: chiều cao thấp / vừa / cao, xoá mọi mốc, xoá track.
+- **Thanh trượt**: bấm vào số để gõ giá trị, bấm đúp nhãn để đặt lại.
+- **Trình phát**: tỉ lệ 9:16, 1:1, 4:5, 16:9, 4:3, 3:4, 21:9, 2.35:1, 1.85:1; phóng 25–200%; bấm đúp chữ hoặc phụ đề trên khung để sửa ngay.
+- **Video / lớp phủ**: bo góc, viền (màu, độ đậm), bóng đổ (màu, nhoè, khoảng cách, góc). **Chữ**: bóng chi tiết (màu, độ đậm, nhoè, khoảng cách, góc).
+- **Âm thanh đoạn**: bộ lọc giọng (điện thoại, radio, trầm, sáng, vang, echo, thì thầm), cân bằng trái / phải, âm lượng tới +10 dB; áp cả khi xem và xuất.
+- **Phụ đề**: tab Phụ đề có danh sách câu: bấm giờ để tới, gõ để sửa, Enter tách tại con trỏ, Backspace ở đầu câu để gộp, tìm & thay hết.
+- **Hộp Xuất** (nút Xuất / Ctrl+M): tên, định dạng, độ phân giải, khung/giây, chất lượng, khoảng xuất, tóm tắt + ước tính dung lượng, xuất ảnh tĩnh. **Cài đặt** (⚙ thanh trên): thời lượng ảnh, đóng băng, chuyển cảnh mặc định; tự lưu; dọn footage không dùng.
+- **Mở dự án CapCut** (Dự án của tôi → 🎬, hoặc 📂 Mở dự án rồi chọn `draft_info.json` / `draft_content.json` trong thư mục dự án CapCut): đọc track chính (kể cả khoảng trống), lớp phủ, chữ (font cỡ, màu, viền, nền, bóng, căn, dọc), sticker (giữ chỗ), phụ đề (kèm nhịp từng từ), tốc độ, âm lượng, đảo ngược, biến đổi và keyframe vị trí / cỡ / xoay / độ mờ, tỉ lệ khung, mốc. Sau đó thêm lại các file footage (máy khớp theo tên). Không mang sang: hiệu ứng, chuyển cảnh, bộ lọc độc quyền của CapCut, âm thanh (thêm lại ở tab Âm thanh).
+
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 
 Cài theo [`cloudflare/CAI-DAT.md`](../cloudflare/CAI-DAT.md) (khoảng 10 phút, không cần thẻ). Có máy chủ này tool thêm:
