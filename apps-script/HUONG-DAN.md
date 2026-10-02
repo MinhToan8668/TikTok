@@ -513,6 +513,14 @@ Theo bộ phím Custom1 và menu của CapCut:
 - **Ảnh bìa**: nút Bìa ở đầu track chính đặt khung tại đầu phát làm ảnh bìa dự án (hiện trong Dự án của tôi).
 - **Hiệu ứng âm thanh** thành danh sách hàng như CapCut: nghe thử ▶, yêu thích ☆ (lưu trên máy), + thêm, lọc Yêu thích.
 
+### Bố cục điện thoại kiểu CapCut mobile (10/2026)
+
+Màn hình ≤ 760px tự chuyển sang bố cục dọc, trình dựng chiếm trọn màn hình (không cuộn trang):
+- **Trên**: thanh gọn (Menu, tên dự án, Cài đặt, Dự án, Xuất). **Giữa trên**: trình phát (~42% màn hình) + đồng hồ, nút phát, tỉ lệ. **Giữa dưới**: dòng thời gian (ngón tay cuộn, hai ngón kéo giãn để phóng to / thu nhỏ, chạm thước để tua).
+- **Dưới cùng**: thanh công cụ cuộn ngang (Media, Âm thanh, Văn bản, Nhãn dán, Hiệu ứng, Chuyển cảnh, Bộ lọc, Phụ đề, Đồ hoạ, Trợ lý AI). Bấm một mục → bảng trượt lên (bấm lại hoặc ✓ để đóng).
+- **Chạm một đoạn** → thanh thao tác nhanh ngay trên thanh công cụ: Tách, Tốc độ, Âm lượng, Hoạt ảnh, Nhân đôi, Thuộc tính, Xoá, Bỏ chọn. Bấm Thuộc tính / Tốc độ / Hoạt ảnh → bảng thuộc tính trượt lên (✕ để đóng).
+- Xoay ngang hoặc màn rộng hơn 760px → về bố cục máy tính.
+
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 
 Cài theo [`cloudflare/CAI-DAT.md`](../cloudflare/CAI-DAT.md) (khoảng 10 phút, không cần thẻ). Có máy chủ này tool thêm:

@@ -278,6 +278,25 @@
   .ed .khungVung.cuon{overflow:auto;display:block}.ed .khungVung .khung.zoomTay{max-height:none;max-width:none;min-height:0;aspect-ratio:auto;margin:auto}
   #srcs .fh{position:relative}canvas.xemThe{position:absolute;display:none;pointer-events:none;object-fit:cover;border-radius:7px}
   #btnLap[aria-pressed="true"]{color:var(--ea)}
+  /* ── điện thoại: bố cục dọc kiểu CapCut mobile ── */
+  .sheetDau,#mobTao{display:none}
+  @media (max-width:760px){
+    .ed.mobi.full{position:fixed!important;inset:0;height:100dvh!important;min-height:0!important;display:flex;flex-direction:column;border-radius:0;max-width:none;overflow:hidden}
+    .ed.mobi .etop{padding:6px 8px;gap:6px;flex:none}.ed.mobi .etop .logo b,.ed.mobi #btnPhimTat,.ed.mobi #btnToanApp,.ed.mobi #btnThuocTinh,.ed.mobi #ttKetNoi,.ed.mobi #luuTt,.ed.mobi #btnDuAn span{display:none}.ed.mobi .etop .ten{min-width:0;width:auto;flex:1 1 60px;max-width:none;font-size:13px}.ed.mobi .etop .gian{display:none}.ed.mobi .etop .btn{padding:6px 8px;font-size:12px}
+    .ed.mobi .ebody{display:flex!important;flex-direction:column;flex:none;gap:0;height:auto;min-height:0}.ed.mobi .keo{display:none}
+    .ed.mobi .ecol.giua{order:0;flex:none;height:42dvh;min-height:220px;padding:0}.ed.mobi .phead{display:none}.ed.mobi .khungVung{padding:6px}.ed.mobi .khungVung .khung{height:100%!important;width:auto!important;max-width:100%;aspect-ratio:var(--tl,9/16)}
+    .ed.mobi .ctl{padding:4px 8px;grid-template-columns:auto 1fr auto;gap:6px}.ed.mobi .ctl #seek{display:none}.ed.mobi .ctl .tg{font-size:11px}.ed.mobi .ctlPhai select{max-width:72px;font-size:11px}.ed.mobi #lopPhuChon,.ed.mobi #zoomKhung,.ed.mobi #btnScope{display:none}
+    .ed.mobi .etl{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;border-radius:0;margin:0;padding-bottom:var(--hBar,60px)}.ed.mobi .etool{padding:3px 6px}.ed.mobi .etl-scroll{max-height:none;flex:1;touch-action:pan-x pan-y}.ed.mobi .track{height:44px}.ed.mobi .track.v1{height:58px}
+    .ed.mobi .ecol.trai{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:45;display:flex;flex-direction:column-reverse;max-height:76dvh;background:var(--ep);border:0;border-top:1px solid var(--el);box-shadow:0 -8px 30px rgba(0,0,0,.5)}
+    .ed.mobi .ecol.trai .etabs{display:flex;order:0;border:0;padding:4px 4px calc(4px + env(safe-area-inset-bottom));gap:2px;overflow-x:auto;background:var(--ep)}.ed.mobi .ecol.trai .etabs button{flex:0 0 auto;min-width:58px;font-size:10.5px;padding:4px 4px;border-radius:8px;border-bottom:0}.ed.mobi .ecol.trai .etabs button[aria-selected="true"]{color:var(--ea);background:transparent}
+    .ed.mobi .ecol.trai .epane,.ed.mobi .ecol.trai .epane.on{display:none}.ed.mobi.sheet .ecol.trai .epane.on{display:flex;flex-direction:column;max-height:calc(76dvh - 100px);overflow:auto;border-top:1px solid var(--el)}.ed.mobi.sheet .ecol.trai .epane.coBen{flex-direction:row}
+    .ed.mobi.sheet .sheetDau{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;font-weight:700;font-size:13px;background:var(--ep)}.ed.mobi .sheetDau .btn{min-width:38px}
+    .ed.mobi .ecol.phai{display:none}.ed.mobi.co-phai .ecol.phai{display:flex;position:fixed;left:0;right:0;bottom:var(--hBar,58px);top:auto;height:56dvh;width:auto;z-index:44;border-radius:14px 14px 0 0;border:1px solid var(--el);box-shadow:0 -8px 30px rgba(0,0,0,.5)}
+    .ed.mobi.coChonM:not(.co-phai) #mobTao{display:flex;position:fixed;left:0;right:0;bottom:var(--hBar,58px);z-index:43;gap:2px;overflow-x:auto;padding:4px 6px;background:var(--ep2);border-top:1px solid var(--el);scrollbar-width:none}
+    #mobTao button{flex:0 0 auto;min-width:60px;display:flex;flex-direction:column;align-items:center;gap:2px;background:transparent;border:0;color:var(--et);font-size:10.5px;padding:4px 6px;border-radius:8px}#mobTao button i{font-style:normal;font-size:18px;line-height:1}#mobTao button:active{background:rgba(255,255,255,.08)}
+    .ed.mobi .cmenu{left:8px!important;right:8px!important;max-width:none;bottom:70px;top:auto!important;max-height:60dvh;overflow:auto}
+    .ed.mobi .xuat .box{max-height:88dvh;overflow:auto}
+  }
   .anLuoi{grid-template-columns:repeat(auto-fill,minmax(72px,1fr))}.anTab .btn[aria-pressed="true"]{background:var(--ea);color:#000}
   .anXem{width:100%;height:44px;background:#15161a;border-radius:5px;overflow:hidden;display:grid;place-items:center}.anXem i{display:block;width:26px;height:26px;border-radius:4px;background:linear-gradient(135deg,#22d3df,#9b5bff);animation:1.6s ease-in-out infinite}
   .anXem i.nguoc{animation-direction:reverse}
@@ -1336,7 +1355,7 @@ function veProp() {
   if (P.chon.k === 'g' && P.gfx[P.chon.i]) { veThuocTinhGfx3(box, P.gfx[P.chon.i]); veThuocTinhBlend(box, P.gfx[P.chon.i]); }
   const x = el('button', 'btn nho', '🗑 Xoá'); x.type = 'button'; x.onclick = () => lenh('xoa'); box.appendChild(x);
 }
-function moPhaiNeuCan() { if (matchMedia('(max-width:1180px)').matches) $('#ed').classList.add('co-phai'); }
+function moPhaiNeuCan() { if (typeof laMobi === 'function' && laMobi()) return; if (matchMedia('(max-width:1180px)').matches) $('#ed').classList.add('co-phai'); }   // điện thoại: chọn đoạn hiện thanh thao tác nhanh trước, bấm Thuộc tính mới mở bảng
 $('#btnThuocTinh').onclick = () => $('#ed').classList.toggle('co-phai');
 $('#btnDongPhai').onclick = () => $('#ed').classList.remove('co-phai');
 Object.keys(GX).forEach(k => { const b = el('button'); b.type = 'button'; b.innerHTML = '<i>' + GX[k].ic + '</i>' + GX[k].ten; b.onclick = () => { if (k === 'ai') { moHopAI(); return; } luuHoanTac(); const dai = GX[k].dai || tongGiay(), bd = k === 'tien_do' ? 0 : P.t; const mau = { tieu_de: 'CHỮ ĐẬP', lower_third: 'Tên bạn', danh_sach: 'Mục 1|Mục 2|Mục 3', trich_dan: 'Câu đắt nhất trong video', dem_so: '80%', nhan_goc: 'Bước 1', chu: 'Chữ của bạn', sticker: '🔥', bieu_do_cot: 'Tháng 1:2|Tháng 2:5|Tháng 3:9', bieu_do_duong: 'T1:2|T2:5|T3:4|T4:9', bieu_do_vung: 'T1:3|T2:4|T3:7|T4:12', bieu_do_tron: '72%', truoc_sau: 'Làm thủ công|Dùng AI', so_sanh: 'CapCut|Vyra', checklist: 'Quay dọc|Ánh sáng tốt|Hook 3 giây', binh_luan: 'Làm sao để lên xu hướng vậy anh?', dang_ky: '@tuminhxaykenh', dem_nguoc: '3', ghim_ban_do: 'Đà Lạt', tim_kiem: 'cách lên xu hướng TikTok', thong_bao: 'Bạn có 1 đơn hàng mới' }; P.gfx.push({ id: uid(), ...(GX_MD[k] || {}), kieu: k, bd, kt: Math.min(Math.max(tongGiay(), bd + 1), bd + dai || tongGiay()), text: mau[k] || '', phu: k === 'lower_third' ? 'Tự Mình Xây Kênh' : '' }); P.chon = { k: 'g', i: P.gfx.length - 1 }; veTl(); veKhung(); }; $('#gx').appendChild(b); });
@@ -2679,7 +2698,7 @@ function khoiTaoBang() {
   tin.addEventListener('pointerleave', () => { if (!P.xemTruc || P.dang) return; phX.style.display = 'none'; xemCho = null; setTimeout(() => { if (!xemBan) veKhung(); }, 60); });
   // kéo khung chọn ở chỗ trống của track
   tin.addEventListener('pointerdown', e => {
-    if (e.button !== 0 || e.target.closest('.item') || e.target.closest('.lb') || e.target.closest('.moc') || e.clientY <= $('#ruler').getBoundingClientRect().bottom) return;
+    if (e.button !== 0 || e.pointerType === 'touch' || e.target.closest('.item') || e.target.closest('.lb') || e.target.closest('.moc') || e.clientY <= $('#ruler').getBoundingClientRect().bottom) return;
     const r0 = tin.getBoundingClientRect(), x0 = e.clientX - r0.left, y0 = e.clientY - r0.top; let k = null; const them = e.ctrlKey || e.metaKey || e.shiftKey, cu = them ? dsNhieu() : [];
     try { tin.setPointerCapture(e.pointerId); } catch { }
     const mv = ev => { const r = tin.getBoundingClientRect(), x = ev.clientX - r.left, y = ev.clientY - r.top; if (!k) { if (Math.hypot(x - x0, y - y0) < 5) return; k = el('div'); k.id = 'khungChon'; tin.appendChild(k); }
@@ -4131,7 +4150,30 @@ function khoiTaoN() {
   let mbXemBan = false; const veKhungGoc = veKhung; veKhung = async function () { const r = await veKhungGoc.apply(this, arguments); if (!P.dang && !mbXemBan && mbTai(P.t)) { mbXemBan = true; const t0 = P.t; try { await veKhungMb(cx, cv.width, cv.height, t0, veKhungXuatGoc); } catch { } mbXemBan = false; if (P.t === t0 && !P.dang) veTay(); } return r; };
 }
 
-khoiTaoB(); khoiTaoC(); khoiTaoUI(); khoiTaoLop(); khoiTaoBang(); khoiTaoDot1(); khoiTaoDot2(); khoiTaoDot3(); khoiTaoM1(); khoiTaoM2(); khoiTaoM3(); khoiTaoN(); veTl();
+/* ═════════ BỐ CỤC ĐIỆN THOẠI KIỂU CAPCUT MOBILE: trình phát trên, dòng thời gian giữa, thanh công cụ dưới, bảng trượt lên ═════════ */
+const laMobi = () => matchMedia('(max-width:760px)').matches;
+function doHBar() { const e = $('.ecol.trai .etabs'); if (e) $('#ed').style.setProperty('--hBar', e.offsetHeight + 'px'); }
+function datMobi() { const ed = $('#ed'), m = laMobi(); ed.classList.toggle('mobi', m); setTimeout(doHBar, 0); if (m) { ed.classList.add('full'); document.body.classList.add('edFull'); if (ed.classList.contains('co-phai')) ed.classList.remove('sheet'); } else { ed.classList.remove('sheet', 'coChonM'); } if (!P.dang) setTimeout(veKhung, 60); }
+function moSheet(bat) { const ed = $('#ed'); if (!laMobi()) return; ed.classList.toggle('sheet', bat); if (bat) { ed.classList.remove('co-phai'); const t = $('.etabs [data-tab][aria-selected="true"]'); $('#sheetTen').textContent = t ? t.textContent.replace(/\d+$/, '').trim() : ''; } }
+function veTaoMobi() { const ed = $('#ed'); if (laMobi()) doHBar(); ed.classList.toggle('coChonM', laMobi() && !!P.chon && !ed.classList.contains('sheet')); if (laMobi() && !P.chon && dsNhieu().length < 2) ed.classList.remove('co-phai'); }
+function khoiTaoMobi() {
+  const trai = $('.ecol.trai'); const dau = el('div', 'sheetDau'); dau.innerHTML = '<span id="sheetTen"></span>'; const x = el('button', 'btn nho xanh'); x.type = 'button'; x.id = 'sheetDong'; x.textContent = '✓'; x.title = 'Xong'; x.onclick = () => moSheet(false); dau.appendChild(x); trai.appendChild(dau);
+  const tao = el('div'); tao.id = 'mobTao'; const nut = (ic, t, f) => { const b = el('button'); b.type = 'button'; b.innerHTML = '<i>' + ic + '</i><span>' + t + '</span>'; b.onclick = f; tao.appendChild(b); };
+  nut('✂', 'Tách', () => lenh('tach')); nut('⏱', 'Tốc độ', () => { P.propTab = 'Tốc độ & âm'; moSheet(false); $('#ed').classList.add('co-phai'); veProp(); moTabProp('Tốc độ & âm'); }); nut('🔊', 'Âm lượng', () => { moSheet(false); $('#ed').classList.add('co-phai'); veProp(); moTabProp('Tốc độ & âm'); });
+  nut('✨', 'Hoạt ảnh', () => { moSheet(false); $('#ed').classList.add('co-phai'); veProp(); moTabProp('Hoạt ảnh'); }); nut('⧉', 'Nhân đôi', () => lenh('nhan')); nut('⚙', 'Thuộc tính', () => { moSheet(false); $('#ed').classList.add('co-phai'); veProp(); }); nut('🗑', 'Xoá', () => lenh('xoa')); nut('✕', 'Bỏ chọn', () => { P.chon = null; P.nhieu = []; chonHien(); veProp(); $('#ed').classList.remove('co-phai'); });
+  $('#ed').appendChild(tao);
+  const chonHienCu = chonHien; chonHien = function () { chonHienCu.apply(this, arguments); veTaoMobi(); };
+  const doiTabCu = doiTab; doiTab = function (t) { const cung = laMobi() && $('#ed').classList.contains('sheet') && $('[data-pane="' + t + '"]').classList.contains('on'); doiTabCu(t); if (laMobi()) moSheet(!cung); };
+  $('#btnDongPhai').addEventListener('click', () => veTaoMobi());
+  // dòng thời gian: ngón tay cuộn, hai ngón phóng to / thu nhỏ
+  const sc = $('#tlScroll'); let pinch = null;
+  sc.addEventListener('touchstart', e => { if (e.touches.length === 2) { pinch = { d: Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY), px: P.pxs }; } }, { passive: true });
+  sc.addEventListener('touchmove', e => { if (!pinch || e.touches.length !== 2) return; e.preventDefault(); const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY), px = Math.round(Math.max(6, Math.min(80, pinch.px * d / pinch.d))); if (px !== P.pxs) { P.pxs = px; $('#zoomTl').value = px; veTl(); } }, { passive: false });
+  sc.addEventListener('touchend', () => { pinch = null; }, { passive: true });
+  datMobi(); addEventListener('resize', datMobi);
+}
+
+khoiTaoB(); khoiTaoC(); khoiTaoUI(); khoiTaoLop(); khoiTaoBang(); khoiTaoDot1(); khoiTaoDot2(); khoiTaoDot3(); khoiTaoM1(); khoiTaoM2(); khoiTaoM3(); khoiTaoN(); khoiTaoMobi(); veTl();
 </script>
 <script src="tro-ly.js?v=202610011200"></script>
 </body>
