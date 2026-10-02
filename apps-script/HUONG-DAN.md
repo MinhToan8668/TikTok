@@ -470,6 +470,19 @@ Học theo giao diện CapCut và bố cục mã nguồn mở OpenCut (bản cla
 - **Track**: bấm đúp đầu track (chỗ trống) hoặc chuột phải → đổi tên; **Solo** chỉ hiện (track hình) hoặc chỉ nghe (track tiếng) track đó.
 - **Chữ**: chuyển màu (gradient, chọn màu thứ hai và hướng), uốn cong (∩ / ∪), chữ dọc.
 
+### Đặc tả CapCut 9.1 · Đợt 3 (10/2026): chạy ngay trên máy
+
+- **Tách theo cảnh** (chuột phải đoạn V1): máy dò chỗ đổi cảnh (so màu và điểm ảnh từng khung nhỏ) rồi tách đoạn.
+- **Bám vật thể** (đồ hoạ chữ/sticker/hình → tab Đồ hoạ → Bám vật thể): đặt điểm bám lên vật thể, bấm 🎯; máy dò 10 điểm/giây trên khung đã dựng, chữ đi theo và giữ khoảng cách.
+- **Hình vẽ** (Đồ hoạ → ⬛ Hình vẽ): chữ nhật bo góc, tròn, tam giác, ngôi sao, trái tim, lục giác, mũi tên, đường thẳng; màu tô / chỉ viền, độ dày viền, xoay, độ mờ, hiện ra mờ dần / phóng / vẽ dần.
+- **Biểu đồ đường, biểu đồ vùng** + **nhập CSV** (2 cột nhãn, số; dấu phẩy, chấm phẩy hoặc tab; dòng tiêu đề tự bỏ). Đổi qua lại cột / đường / vùng.
+- **Giảm tiếng ồn** (đoạn V1 → Tốc độ & âm): trừ phổ theo hồ sơ ồn tự đo ở chỗ im lặng; nút 🎧 Nghe thử 6 giây; áp khi xuất video và WAV.
+- **Phụ đề song ngữ** (tab Phụ đề): chọn ngôn ngữ (Anh, Trung, Hàn, Nhật, Thái, Indonesia, Pháp, Tây Ban Nha) → 🌐 Dịch phụ đề (qua máy chủ Cloudflare, tốn 1 lượt AI mỗi 60 câu) → dòng dịch hiện dưới phụ đề, có trong file .srt.
+- **Scopes** (nút 📊 dưới trình phát): biểu đồ màu RGB, dạng sóng độ sáng, vectorscope có vạch màu da.
+- **Bánh xe màu** (vùng tối / trung tính / vùng sáng, kéo để đẩy màu, thanh dưới để sáng/tối, bấm đúp để đặt lại), **Đường cong** (Tổng, R, G, B; bấm thêm điểm, kéo, bấm đúp xoá), **HSL** 8 dải màu (sắc độ, bão hoà, độ sáng từng dải). Tất cả chạy WebGL, áp cả khi xuất.
+
+**Không làm được trên trình duyệt (cần mô hình AI lớn hoặc dịch vụ trả phí):** tạo video/ảnh bằng AI, tách giọng khỏi nhạc chất lượng cao, nhái giọng, khớp khẩu hình, tăng độ phân giải bằng AI; phần thương mại/đội nhóm/đám mây (P3).
+
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 
 Cài theo [`cloudflare/CAI-DAT.md`](../cloudflare/CAI-DAT.md) (khoảng 10 phút, không cần thẻ). Có máy chủ này tool thêm:
