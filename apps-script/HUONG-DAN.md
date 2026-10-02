@@ -443,6 +443,20 @@ Học theo giao diện CapCut và bố cục mã nguồn mở OpenCut (bản cla
 - **Kéo mép để cắt** đoạn V1, b-roll, chữ, đồ hoạ, âm thanh: rê chuột vào mép thấy tay cắt trắng, kéo vào/ra, có ô hiện độ dài; mép hít vào đầu phát, mép các mục khác, beat và câu nói. Cắt V1 thì phía sau tự dồn.
 - **Đầu track**: tắt tiếng, ẩn, khoá từng track (áp cả khi xuất). **Dải khung hình** trên đoạn video. **Menu chuột phải** trên đoạn (tách tại đây, xoá trái/phải, sao chép, dán, nhân đôi, đóng băng, tách âm thanh, lật, keyframe, xoá) và trên track.
 
+### Đặc tả CapCut 9.1 · Đợt 1 (10/2026)
+
+- **Tự lưu + Dự án của tôi** (nút Dự án trên thanh trên): trình dựng tự lưu vào trình duyệt vài giây một lần (có chữ "✓ Đã lưu"), cả footage (lưu trong bộ nhớ riêng OPFS của trình duyệt, không cần thêm lại file). Danh sách dự án có ảnh bìa, độ dài, dung lượng; tìm, sắp xếp theo ngày/tên/dung lượng; mở, đổi tên, nhân bản, xoá. Dự án xoá nằm **thùng rác 30 ngày**, khôi phục được.
+- **Gói dự án .zip** (trong Dự án của tôi): gói dự án + footage thành một file để chuyển máy; máy kia bấm Nhập gói.
+- **Mặt nạ** (tab Mặt nạ của đoạn V1/b-roll): Đường thẳng, Gương, Tròn, Chữ nhật (bo góc), Trái tim, Ngôi sao; chỉnh vị trí, cỡ, xoay, mềm viền, đảo ngược. Mặt nạ đi theo khung hình của đoạn.
+- **Hoà trộn** (b-roll, chữ, đồ hoạ): 16 chế độ như CapCut (Multiply, Screen, Overlay, Soft light…).
+- **LUT .cube** (tab Bộ lọc → Nhập LUT): tối đa 20 MB, lưu trong trình duyệt, áp cho đoạn đang chọn hoặc mọi đoạn, có cường độ. Chuột phải để xoá LUT.
+- **Điều chỉnh màu thêm**: Trắng, Đen, Sắc độ, Độ rực, Phai màu, Độ nét, Độ trong (chạy WebGL, áp cả khi xuất).
+- **Trình phát**: lưới 3×3, vùng an toàn TikTok (thanh trên, cột nút, tên/mô tả), phóng khung 50/100/200%, nút ⟲ phát lặp.
+- **In/Out**: I đặt điểm vào, O đặt điểm ra (vùng xanh trên thước), Alt+X bỏ. Phát lặp sẽ lặp trong vùng này; Xuất chọn Khoảng xuất = Vùng In–Out.
+- **J/K/L**: L phát (bấm tiếp để 2×, 4×, 8×), J tua lùi, K dừng (khi không tua thì K vẫn là thêm keyframe). Nhảy điểm cắt chuyển sang ↑ / ↓.
+- **Xuất thêm**: GIF (10/12/15 khung/giây, rộng 240/360/480), ảnh tĩnh PNG tại đầu phát, ước tính dung lượng trước khi xuất.
+- **Media**: lọc Tất cả / Video / Ảnh; rê chuột ngang trên ảnh thu nhỏ để xem lướt video.
+
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 
 Cài theo [`cloudflare/CAI-DAT.md`](../cloudflare/CAI-DAT.md) (khoảng 10 phút, không cần thẻ). Có máy chủ này tool thêm:
