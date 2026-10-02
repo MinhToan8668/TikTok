@@ -521,6 +521,13 @@ Màn hình ≤ 760px tự chuyển sang bố cục dọc, trình dựng chiếm 
 - **Chạm một đoạn** → thanh thao tác nhanh ngay trên thanh công cụ: Tách, Tốc độ, Âm lượng, Hoạt ảnh, Nhân đôi, Thuộc tính, Xoá, Bỏ chọn. Bấm Thuộc tính / Tốc độ / Hoạt ảnh → bảng thuộc tính trượt lên (✕ để đóng).
 - Xoay ngang hoặc màn rộng hơn 760px → về bố cục máy tính.
 
+### Vòng xoay AI không treo nữa (10/2026)
+
+Trước đây trên điện thoại (nhất là iPhone chuyển app giữa chừng) kết nối tới Apps Script có thể treo vô hạn: vòng xoay "AI đang tải video… 486 giây" quay mãi dù máy chủ đã xong hoặc đã dừng. Sửa trong `tools/tai-khoan.js`:
+- Mọi cuộc gọi API đều có hạn chờ (100 giây; việc AI chạy nền 9,5 phút).
+- Việc AI chạy nền: từ giây 40 trang hỏi song song máy chủ theo `job_id` mỗi 8 giây; bên nào có kết quả trước thì lấy, kết nối treo bị huỷ.
+- Quá 9,5 phút: báo rõ "Máy chủ chưa trả kết quả… mở lại trang sau vài phút", việc vẫn nằm trong danh sách chờ để lần mở trang sau tự nhận kết quả (máy chủ giữ 6 giờ). Không cần dán lại Apps Script.
+
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 
 Cài theo [`cloudflare/CAI-DAT.md`](../cloudflare/CAI-DAT.md) (khoảng 10 phút, không cần thẻ). Có máy chủ này tool thêm:

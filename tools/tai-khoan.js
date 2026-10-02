@@ -40,12 +40,24 @@
        mayChu — máy chủ có trả lời nhưng không phải JSON (Apps Script văng lỗi, chưa deploy, hết quota)
        còn lại — lỗi dựng giao diện SAU KHI máy chủ đã trả lời xong */
   function loiMang(e) { return !!(e && e.mang); }
+  function loiQuaLau(e) { return !!(e && e.quaLau); }
   function loiMayChu(e) { return !!(e && e.mayChu); }
-  async function goi(body) {
-    var r;
+  /* gọi Apps Script. Mọi cuộc gọi đều có hạn chờ (mặc định 100 giây; việc AI chạy nền đặt dài hơn) để
+     điện thoại treo kết nối (iOS chuyển app, mất sóng) không làm vòng xoay quay mãi. */
+  var GOI_CHO = 100000;
+  async function goi(body, opt) {
+    opt = opt || {}; var r, ctl = new AbortController(), han = opt.timeout || GOI_CHO, hetGio = false;
+    var tm = setTimeout(function () { hetGio = true; ctl.abort(); }, han);
+    if (opt.signal) opt.signal.addEventListener('abort', function () { ctl.abort(); });
     try {
-      r = await fetch(TK.api, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) });
-    } catch (e) { var em = new Error('fetch ngã: ' + (e && e.message || e)); em.mang = true; throw em; }
+      r = await fetch(TK.api, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body), signal: ctl.signal });
+    } catch (e) {
+      clearTimeout(tm);
+      if (opt.signal && opt.signal.aborted) { var eb = new Error('đã huỷ'); eb.huy = true; throw eb; }
+      if (hetGio) { var et = new Error('máy chủ không trả lời sau ' + Math.round(han / 1000) + ' giây'); et.quaLau = true; throw et; }
+      var em = new Error('fetch ngã: ' + (e && e.message || e)); em.mang = true; throw em;
+    }
+    clearTimeout(tm);
     var t = await r.text();
     try { return JSON.parse(t); }
     catch (e) {
@@ -688,16 +700,30 @@
     var v = { id: 'j' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10), tool: info.tool || TK.tool, nhan: info.nhan || 'AI', t0: Date.now(), trang: (location.pathname.split('/').pop() || ''), them: info.them || null };
     luuViec(dsViec().concat([v])); dangCho[v.id] = 1; xinThongBao();
     var b2 = {}; for (var k in body) b2[k] = body[k]; b2.job_id = v.id;
-    try {
-      var r = await goi(b2);
-      boViec(v.id); delete dangCho[v.id]; baoXong(v, r); return r;
-    } catch (e) {
-      // mạng đứt hoặc trình duyệt treo kết nối khi chuyển app: máy chủ vẫn đang chạy, hỏi lại theo job_id
-      var r2 = await choViec(v);
-      boViec(v.id); delete dangCho[v.id];
-      if (r2) { baoXong(v, r2); return r2; }
-      throw e;
-    }
+    /* Gửi và chờ, nhưng không tin vào một kết nối duy nhất: từ giây 40 cứ 8 giây hỏi máy chủ theo job_id
+       song song; bên nào có kết quả trước thì lấy. Quá 9,5 phút thì dừng chờ, giữ việc trong danh sách
+       để lần mở trang sau tự nhận nốt (máy chủ giữ kết quả 6 giờ). */
+    var HAN_NEN = 9.5 * 60000, ctl = new AbortController(), xong = false;
+    var cho1 = goi(b2, { timeout: HAN_NEN, signal: ctl.signal }).then(function (r) { return { r: r }; }, function (e) { return { e: e }; });
+    var cho2 = (async function () {
+      await ngu(40000);
+      while (!xong) {
+        var r = await hoiViec(v);
+        if (r && r.error !== 'dang_chay' && r.error !== 'khong_thay') return { r: r, hoi: true };
+        if (Date.now() - v.t0 > HAN_NEN) { var eq = new Error('máy chủ chưa trả kết quả sau 9 phút'); eq.quaLau = true; return { e: eq }; }
+        await ngu(8000);
+      }
+      return new Promise(function () { });
+    })();
+    var kq = await Promise.race([cho1, cho2]); xong = true;
+    if (kq.hoi) ctl.abort();
+    if (kq.r) { boViec(v.id); delete dangCho[v.id]; baoXong(v, kq.r); return kq.r; }
+    if (kq.e && kq.e.quaLau) { delete dangCho[v.id]; throw kq.e; }   // giữ việc lại, tiepViec sẽ hỏi tiếp khi mở trang
+    // mạng đứt hoặc trình duyệt treo kết nối khi chuyển app: máy chủ vẫn đang chạy, hỏi lại theo job_id
+    var r2 = await choViec(v);
+    boViec(v.id); delete dangCho[v.id];
+    if (r2) { baoXong(v, r2); return r2; }
+    throw kq.e;
   }
   /* trang tool đăng ký cách hiện kết quả cho loại việc của mình */
   function nhanViec(tool, fn) {
@@ -987,7 +1013,7 @@
     khoiDong: khoiDong, nap: nap, mo: mo, dong: dong, canCo: canCo, moHet: moHet, mayChu: mayChu,
     goiNen: goiNen, nhanViec: nhanViec, viecDangCho: function () { return dsViec(); },
     luotTai: luotTai, canTai: canTai, dungTai: dungTai, veNhanFree: veNhanFree,
-    goi: goi, loiMang: loiMang, loiMayChu: loiMayChu,   // tool dùng chung một cách gọi API và một cách phân loại lỗi
+    goi: goi, loiMang: loiMang, loiMayChu: loiMayChu, loiQuaLau: loiQuaLau,   // tool dùng chung một cách gọi API và một cách phân loại lỗi
     moHocVien: function () { tab = 'signup'; kieu = 'hv'; mo('signup'); },
     token: token, dev: dev, hoSo: hoSo, luuHoSoTam: luuHoSoTam,
     laPro: laPro, laMentor: laMentor, luotCon: luotCon, oMoiHoSo: oMoiHoSo, ganO: ganO, ghiTruong: ghiTruong, taiVideo: taiVideo, zalo: zalo, giaPro: nhanGia,
