@@ -431,8 +431,9 @@ function handleSoi(d){
     soiSheet().appendRow([id, time, name, "'"+phone, video, String(d.pain_tag||''),
       String(d.note||''), consent||'Không', String(d.source||'web'), 'moi']);
 
+    var laCd = String(d.source||'') === 'congdong';   // form "Tham gia cộng đồng" trên landing: chung bảng, khác tiêu đề
     var tin = [
-      '👀 *Soi kênh mới — gửi video*','',
+      laCd ? '👋 *Xin vào group cộng đồng*' : '👀 *Soi kênh mới — gửi video*','',
       '👤 *'+name+'*   ·   mã `'+id+'`',
       '📱 `'+phone+'`',
       '🎬 '+video,
@@ -440,7 +441,7 @@ function handleSoi(d){
       d.note ? '💭 Muốn soi: _"'+d.note+'"_' : '',
       consent ? '✅ *Cho phép đưa lên kênh làm ca sửa*' : '🔒 Không cho phép đưa lên kênh — chỉ trả lời riêng',
       '',
-      '🕐 '+time+' · trả lời qua Zalo trong 48h'
+      '🕐 '+time+(laCd ? ' · gửi link group cho bạn này qua Zalo' : ' · trả lời qua Zalo trong 48h')
     ].filter(function(x){return x!==''}).join('\n');
     tgBroadcast(tin);
     return jsonOut({ok:true, id:id});
