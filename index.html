@@ -2320,6 +2320,10 @@ body.hv-mode{padding-bottom:0}
             <div class="fg"><label class="fl" for="ky-email">Email</label>
               <input class="inp" id="ky-email" type="email" autocomplete="email" placeholder="ban@gmail.com">
               <span class="err">Email chưa đúng</span></div>
+            <div class="fg"><label class="fl" for="ky-sdt">Số điện thoại (Zalo)</label>
+              <input class="inp" id="ky-sdt" type="tel" inputmode="tel" autocomplete="tel" placeholder="09xx xxx xxx">
+              <span class="err">Số chưa hợp lệ</span>
+              <span class="hint">Để tụi mình mời vào group, xác nhận Pro và báo lịch kèm.</span></div>
             <div class="fg"><label class="fl" for="ky-pass">Mật khẩu</label>
               <input class="inp" id="ky-pass" type="password" autocomplete="new-password" placeholder="ít nhất 6 ký tự">
               <span class="err">Mật khẩu cần ít nhất 6 ký tự</span>
@@ -4176,17 +4180,19 @@ function hvDangKy(){
   if (btn.classList.contains('busy')) return;
   var ten   = ($('#ky-ten').value||'').trim();
   var email = ($('#ky-email').value||'').trim();
+  var sdt   = ($('#ky-sdt').value||'').trim();
   var pass  = $('#ky-pass').value||'';
 
   if (!hvSoat([
     ['#ky-ten',   ten.replace(/\s+/g,' ').split(' ').length >= 2],
     ['#ky-email', /^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(email)],
+    ['#ky-sdt',   (function(d){ return d.length >= 9 && d.length <= 12; })(sdt.replace(/\D/g,''))],
     ['#ky-pass',  pass.length >= 6]
   ])) return;
 
   btn.classList.add('busy');
   $('#hvKyMsg').className = 'hv-msg';
-  hvGoi('hv_signup', {ten:ten, email:email, pass:pass}).then(function(r){
+  hvGoi('hv_signup', {ten:ten, email:email, sdt:sdt, pass:pass}).then(function(r){
     btn.classList.remove('busy');
     if (r && r.ok){
       $('#hvPanelKy').innerHTML =
@@ -4201,7 +4207,9 @@ function hvDangKy(){
         email_sai:'Email chưa đúng định dạng.',
         mk_ngan:'Mật khẩu cần ít nhất 6 ký tự.',
         ten_ngan:'Ghi đầy đủ họ và tên giúp mình (VD: Nguyễn Văn An).',
-        thieu:'Điền đủ ba ô giúp mình.'
+        thieu_sdt:'Cho mình xin số điện thoại (Zalo) nữa nhé.',
+        sdt_sai:'Số điện thoại chưa đúng, kiểm tra lại giúp mình.',
+        thieu:'Điền đủ bốn ô giúp mình.'
       }[r && r.error] || 'Không gửi được, thử lại giúp mình.');
     }
   }).catch(function(){

@@ -234,6 +234,18 @@
     if (!khoa) return;
     khoa = false; document.documentElement.classList.remove('tk-khoa'); dong();
   }
+  /* Đã đăng nhập nhưng tài khoản chưa có SĐT (tạo trước lúc bắt buộc): khoá trang, bắt bổ sung một lần. */
+  var khoaSdt = false;
+  function canSdt() { return !!(TK.me && !TK.me.sdt && !(TK.me.mentor)) && !demoNhung(); }
+  function khoaTrangSdt() {
+    if (khoaSdt || !canSdt()) return;
+    khoaSdt = true; document.documentElement.classList.add('tk-khoa');
+    mo('sdt');
+  }
+  function moKhoaSdt() {
+    if (!khoaSdt) return;
+    khoaSdt = false; document.documentElement.classList.remove('tk-khoa'); dong();
+  }
 
   // nạp CSS một lần, dùng cho cả bảng tài khoản lẫn ô hồ sơ gắn sẵn trong trang tool
   var daCss = false;
@@ -255,6 +267,7 @@
   }
   function mo(trang, loiNhan) { dung(); ve(trang || (TK.me ? 'home' : 'signup'), loiNhan); hop.classList.add('mo'); }
   function dong() { if (khoa && !TK.me) return;   // chưa đăng nhập thì bảng không đóng được
+    if (khoaSdt && canSdt()) return;              // chưa bổ sung SĐT cũng vậy
     if (hop) { hop.classList.remove('mo'); var f = hop.querySelector('.tk-khung iframe'); if (f) f.src = 'about:blank'; } }
 
   function el(t, c, txt) { var e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; }
@@ -267,8 +280,37 @@
     if (trang === 'pro') return vePro();
     if (trang === 'het') return veHet(loiNhan);
     if (trang === 'hv') return veDsHv();
+    if (trang === 'sdt') return veSdt(loiNhan);
     if (TK.me) return veHome(loiNhan);
     return veDangKy(loiNhan);
+  }
+
+  /* ── bổ sung số điện thoại cho tài khoản tạo trước lúc bắt buộc SĐT ── */
+  function veSdt(loiNhan) {
+    oTrang.appendChild(el('h3', null, 'Thêm số điện thoại'));
+    oTrang.appendChild(el('p', 'tk-phu', loiNhan || ('Tài khoản ' + ((TK.me && TK.me.email) || 'của bạn') + ' được tạo lúc tụi mình chưa hỏi số điện thoại. '
+      + 'Giờ cần số Zalo để gửi kết quả soi kênh, mời vào group cộng đồng, xác nhận Pro và báo lịch kèm. Thêm một lần là xong, không hỏi lại.')));
+    var f = document.createElement('form'); f.noValidate = true;
+    var l = el('label', null, 'Số điện thoại (Zalo)'), i = document.createElement('input');
+    i.name = 'sdt'; i.type = 'tel'; i.inputMode = 'tel'; i.autocomplete = 'tel'; i.required = true; i.placeholder = '09xx xxx xxx';
+    l.appendChild(i); f.appendChild(l);
+    var gui = nut('Lưu số và dùng tiếp', true); gui.className += ' rong'; gui.type = 'submit'; f.appendChild(gui);
+    var tt = el('p', 'tk-tt'); f.appendChild(tt);
+    f.onsubmit = async function (e) {
+      e.preventDefault();
+      var d = i.value.replace(/\D/g, '');
+      if (d.length < 9 || d.length > 12) { tt.className = 'tk-tt loi'; tt.textContent = 'Số chưa đúng, kiểm tra lại giúp mình (9–12 chữ số).'; return; }
+      gui.disabled = true; tt.className = 'tk-tt'; tt.textContent = 'Đang lưu…';
+      try {
+        var r = await goi({ action: 'st_sdt', token: token(), sdt: i.value.trim() });
+        if (!r.ok) { gui.disabled = false; tt.className = 'tk-tt loi'; tt.textContent = r.error === 'unknown_action' ? 'Máy chủ chưa cập nhật, mentor cần dán Studio.gs mới.' : (r.error === 'het_phien' ? 'Phiên hết hạn, đăng nhập lại giúp mình.' : 'Chưa lưu được, thử lại nhé.'); return; }
+        if (TK.me) TK.me.sdt = r.sdt || i.value.trim();
+        tt.className = 'tk-tt ok'; tt.textContent = 'Đã lưu. Cảm ơn bạn!';
+        setTimeout(function () { moKhoaSdt(); }, 500);
+      } catch (e2) { gui.disabled = false; tt.className = 'tk-tt loi'; tt.textContent = loiMang(e2) ? 'Mất mạng, kiểm tra kết nối rồi thử lại.' : 'Máy chủ đang lỗi, thử lại sau một lát.'; }
+    };
+    oTrang.appendChild(f);
+    setTimeout(function () { i.focus(); }, 50);
   }
 
   /* ── đăng ký / đăng nhập ── */
@@ -790,7 +832,7 @@
     bao(); return TK.me;
   }
   var ngheDs = [];   // phần khác (tro-ly.js) đăng ký nghe khi tài khoản đổi, không đè onDoi của tool
-  function bao() { if (TK.me) moKhoa(); else if (!token()) khoaTrang();
+  function bao() { if (TK.me) { moKhoa(); if (canSdt()) khoaTrangSdt(); else moKhoaSdt(); } else if (!token()) khoaTrang();
     if (typeof TK.onDoi === 'function') { try { TK.onDoi(TK.me); } catch (e) { } } ngheDs.forEach(function (f) { try { f(TK.me); } catch (e) { } }); }
 
   /* ── cổng chặn trước khi gọi AI ── */
