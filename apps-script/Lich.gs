@@ -23,7 +23,7 @@ var SHEET_HV   = 'HocVien';
 var LICH_HEADERS = ['id','mentor_ma','mentor_ten','ngay','batdau','ketthuc','trangthai',
                     'hv_ma','hv_ten','hv_email','nhac_luc','da_nhac','tao'];
 var HV_HEADERS   = ['ma','email','ten','ten_goi','salt','hash','vaitro','trangthai',
-                    'token','token_han','tao','dangnhap_cuoi'];
+                    'token','token_han','tao','dangnhap_cuoi','sdt'];   // sdt thêm sau: bang() tự nối cột, không mất tài khoản cũ
 
 /* Ba ca mặc định — sửa ở đây là đổi cho cả web lẫn bot */
 var CA = [
@@ -44,6 +44,18 @@ var MK_TOI_THIEU  = 6;      // độ dài mật khẩu tối thiểu khi tự đ
 function bang(ten, headers){
   var wb = ss();
   var sh = wb.getSheetByName(ten);
+  // Bảng cũ thiếu cột ở cuối (vừa thêm header mới): nối cột ngay trên bảng đang chạy thay vì đổi tên bảng,
+  // không thì mọi tài khoản/lịch đang có biến mất khỏi app.
+  if (sh && sh.getLastRow() >= 1 && sh.getLastColumn() < headers.length){
+    var n = sh.getLastColumn();
+    var cu = sh.getRange(1, 1, 1, n).getValues()[0].map(function(x){ return String(x) });
+    var khop = true; for (var i = 0; i < n; i++) if (cu[i] !== headers[i]) khop = false;
+    if (khop){
+      var them = headers.slice(n);
+      sh.getRange(1, n + 1, 1, them.length).setValues([them]);
+      sh.getRange(1, n + 1, sh.getMaxRows(), them.length).setNumberFormat('@');
+    }
+  }
   if (sh && sh.getLastRow() >= 1 && sh.getLastColumn() !== headers.length){
     sh.setName(ten+'_cu_'+Utilities.formatDate(new Date(),'GMT+7','ddMMyy_HHmm'));
     sh = null;
@@ -351,8 +363,11 @@ function apiDangKy(b){
   var email = chuanEmail(b.email);
   var pass  = String(b.pass||'');
   var ten   = chuanTen(b.ten);
+  var sdt   = String(b.sdt||'').replace(/[^\d+]/g,'');
 
   if (!email || !pass || !ten)   return jsonOut({ok:false, error:'thieu'});
+  if (!sdt)                      return jsonOut({ok:false, error:'thieu_sdt'});   // cần số Zalo để liên hệ, xác nhận Pro, mời group
+  if (!(sdt.replace(/\D/g,'').length >= 9 && sdt.replace(/\D/g,'').length <= 12)) return jsonOut({ok:false, error:'sdt_sai'});
   if (!emailHopLe(email))        return jsonOut({ok:false, error:'email_sai'});
   if (pass.length < MK_TOI_THIEU)return jsonOut({ok:false, error:'mk_ngan'});
   if (ten.split(' ').length < 2) return jsonOut({ok:false, error:'ten_ngan'});
@@ -371,7 +386,7 @@ function apiDangKy(b){
 
     bang(SHEET_HV, HV_HEADERS).appendRow([
       ma, email, ten, goi, salt, bamMK(pass, salt),
-      'cho', 'active', '', '', nowVN(), ''
+      'cho', 'active', '', '', nowVN(), '', sdt
     ]);
   } finally { lock.releaseLock(); }
 
@@ -380,6 +395,7 @@ function apiDangKy(b){
     '🙋 *Có người vừa đăng ký tài khoản*','',
     '👤 *'+ten+'*   _(gọi là '+goi+')_',
     '📧 `'+email+'`',
+    '📱 `'+sdt+'`',
     '🕐 '+nowVN(),'',
     'Chọn vai trò để mở khoá tài khoản này:'
   ].join('\n'), [[

@@ -187,6 +187,7 @@ function studioApi(b){
     if (act === 'st_signup') return stDangKy(b);
     if (act === 'st_login')  return stDangNhap(b);
     if (act === 'st_me')     return stToi(b);
+    if (act === 'st_sdt')    return stLuuSdt(b);          // tài khoản cũ chưa có số điện thoại: bổ sung một lần
     if (act === 'st_use')    return stDungLuot(b);
     if (act === 'st_buy')    return stMua(b);
     if (act === 'st_paid')   return stDaChuyen(b);
@@ -285,7 +286,7 @@ function stToi(b){
     return jsonOut({ok:true, ho_so:hs});
   }
   var hv = aiDay(b.token);
-  if (hv) return jsonOut({ok:true, ho_so:{loai:'hv', ten:hv.ten_goi||hv.ten, email:hv.email, pro:true, vaitro:hv.vaitro,
+  if (hv) return jsonOut({ok:true, ho_so:{loai:'hv', ten:hv.ten_goi||hv.ten, email:hv.email, sdt:hv.sdt||'', pro:true, vaitro:hv.vaitro,
     mentor: hv.vaitro === 'mentor' || hv.vaitro === 'admin',
     ho_so: hsHienDung(hv.email, '', null), ho_so_nguon: hsNguon(hv.email, '', null)}});
   return jsonOut({ok:false, error:'het_phien'});
@@ -400,6 +401,17 @@ function stBaoHoSo(ten, email, sdt, hs, nguon){
 }
 
 /* ── hồ sơ kênh: học viên tự sửa; mentor sửa hộ bằng cách gửi thêm 'ma' ── */
+/* Bổ sung số điện thoại cho tài khoản tạo trước lúc bắt buộc SĐT (cả người dùng Studio lẫn học viên khu lớp). */
+function stLuuSdt(b){
+  var sdt = String(b.sdt||'').replace(/[^\d+]/g,'');
+  if (!sdtHopLe(sdt)) return jsonOut({ok:false, error:'sdt_sai'});
+  var nd = ndTuToken(b.token);
+  if (nd){ ndGhi(ST_SHEET, ST_HEADERS, nd, {sdt: sdt}); return jsonOut({ok:true, sdt: sdt}); }
+  var hv = aiDay(b.token);
+  if (hv){ ghiDong(SHEET_HV, HV_HEADERS, hv, {sdt: sdt}); return jsonOut({ok:true, sdt: sdt}); }
+  return jsonOut({ok:false, error:'het_phien'});
+}
+
 function stLuuHoSo(b){
   var nd = ndTuToken(b.token), hv = nd ? null : aiDay(b.token);
   if (!nd && !hv) return jsonOut({ok:false, error:'het_phien'});
