@@ -288,8 +288,7 @@
   /* ── bổ sung số điện thoại cho tài khoản tạo trước lúc bắt buộc SĐT ── */
   function veSdt(loiNhan) {
     oTrang.appendChild(el('h3', null, 'Thêm số điện thoại'));
-    oTrang.appendChild(el('p', 'tk-phu', loiNhan || ('Tài khoản ' + ((TK.me && TK.me.email) || 'của bạn') + ' được tạo lúc tụi mình chưa hỏi số điện thoại. '
-      + 'Giờ cần số Zalo để gửi kết quả soi kênh, mời vào group cộng đồng, xác nhận Pro và báo lịch kèm. Thêm một lần là xong, không hỏi lại.')));
+    oTrang.appendChild(el('p', 'tk-phu', loiNhan || 'Bạn vui lòng thêm số điện thoại Zalo để mình add vào group cộng đồng free và hỗ trợ nhiều hơn nhé.'));
     var f = document.createElement('form'); f.noValidate = true;
     var l = el('label', null, 'Số điện thoại (Zalo)'), i = document.createElement('input');
     i.name = 'sdt'; i.type = 'tel'; i.inputMode = 'tel'; i.autocomplete = 'tel'; i.required = true; i.placeholder = '09xx xxx xxx';
