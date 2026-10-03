@@ -978,7 +978,7 @@
     napCfg().then(bao);
     setTimeout(tiepViec, 300);   // có giá và hạn mức từ máy chủ: vẽ lại nút Pro, nhãn FREE, dòng lượt của tool
     veNhanFree();
-    nap().then(function (me) { if (me) moKhoa(); else khoaTrang(); });
+    nap().then(function (me) { if (me) moKhoa(); else if (!token()) khoaTrang(); });   // có token mà máy chủ chưa trả lời (mất mạng, mạng chặn script.google.com) thì không khoá, bao() sẽ khoá khi chắc chắn hết phiên
     if (!token()) khoaTrang();   // không có token thì khoá ngay, khỏi chờ máy chủ
     return TK;
   }
