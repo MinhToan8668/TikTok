@@ -236,7 +236,9 @@
   }
   /* Đã đăng nhập nhưng tài khoản chưa có SĐT (tạo trước lúc bắt buộc): khoá trang, bắt bổ sung một lần. */
   var khoaSdt = false;
-  function canSdt() { return !!(TK.me && !TK.me.sdt && !(TK.me.mentor)) && !demoNhung(); }
+  function canSdt() { if (TK.me && !TK.me.sdt && ls.get('vs_sdt_cho')) { TK.me.sdt = ls.get('vs_sdt_cho'); guiLaiSdt(); } return !!(TK.me && !TK.me.sdt && !(TK.me.mentor)) && !demoNhung(); }
+  var dangGuiSdt = false;
+  function guiLaiSdt() { var so = ls.get('vs_sdt_cho'); if (!so || dangGuiSdt) return; dangGuiSdt = true; goi({ action: 'st_sdt', token: token(), sdt: so }).then(function (r) { if (r && r.ok) ls.del('vs_sdt_cho'); }).catch(function () { }).then(function () { dangGuiSdt = false; }); }
   function khoaTrangSdt() {
     if (khoaSdt || !canSdt()) return;
     khoaSdt = true; document.documentElement.classList.add('tk-khoa');
@@ -302,7 +304,13 @@
       gui.disabled = true; tt.className = 'tk-tt'; tt.textContent = 'Đang lưu…';
       try {
         var r = await goi({ action: 'st_sdt', token: token(), sdt: i.value.trim() });
-        if (!r.ok) { gui.disabled = false; tt.className = 'tk-tt loi'; tt.textContent = r.error === 'unknown_action' ? 'Máy chủ chưa cập nhật, mentor cần dán Studio.gs mới.' : (r.error === 'het_phien' ? 'Phiên hết hạn, đăng nhập lại giúp mình.' : 'Chưa lưu được, thử lại nhé.'); return; }
+        if (!r.ok) {
+          if (r.error === 'unknown_action') {   // máy chủ chưa có st_sdt: không được chặn người đã đăng nhập; mở khoá, giữ số để gửi lại sau
+            ls.set('vs_sdt_cho', i.value.trim()); if (TK.me) TK.me.sdt = i.value.trim();
+            tt.className = 'tk-tt ok'; tt.textContent = 'Máy chủ chưa nhận số (mentor cần dán Studio.gs mới), mình cho bạn dùng tiếp, số sẽ gửi lại sau.';
+            setTimeout(function () { moKhoaSdt(); }, 900); return;
+          }
+          gui.disabled = false; tt.className = 'tk-tt loi'; tt.textContent = r.error === 'het_phien' ? 'Phiên hết hạn, đăng nhập lại giúp mình.' : 'Chưa lưu được, thử lại nhé.'; return; }
         if (TK.me) TK.me.sdt = r.sdt || i.value.trim();
         tt.className = 'tk-tt ok'; tt.textContent = 'Đã lưu. Cảm ơn bạn!';
         setTimeout(function () { moKhoaSdt(); }, 500);
