@@ -91,6 +91,11 @@
   /* ── giao diện: một bảng duy nhất cho đăng ký, đăng nhập, hồ sơ kênh ── */
   var CSS = [
     '.tk-nen{position:fixed;inset:0;background:rgba(20,18,8,.62);display:none;place-items:center;padding:16px;z-index:60;overflow:auto}',
+    // chưa đăng nhập: khoá cả trang tool sau lớp mờ, chỉ còn bảng tài khoản bấm được
+    'html.tk-khoa body>*:not(.tk-nen){filter:blur(6px);pointer-events:none;user-select:none}',
+    'html.tk-khoa{overflow:hidden}',
+    'html.tk-khoa .tk-dong{display:none}',
+    '.tk-khoa-ghi{font-size:12.5px;color:var(--muted,#666);margin:-4px 0 12px;line-height:1.5}',
     '.tk-nen.mo{display:grid}',
     '.tk-hop{background:var(--surface,#fff);color:var(--text,#222);border-radius:18px;padding:20px;max-width:440px;width:100%;box-shadow:0 18px 50px rgba(0,0,0,.28);max-height:92vh;overflow:auto}',
     '.tk-hop h3{margin:0 0 4px;font-family:var(--font-display,inherit);font-size:19px}',
@@ -216,6 +221,19 @@
 
 
   var hop = null, oTrang = null, tab = 'signup', kieu = 'khach', dsHv = null;
+  /* Mọi tool Viral Studio phải đăng nhập mới dùng. Ngoại lệ duy nhất: bản demo nhúng trong khung xem thử của landing
+     (#demo và đang nằm trong iframe) — mở thẳng link #demo ở tab riêng vẫn bị khoá. */
+  var khoa = false;
+  function demoNhung() { return /demo/.test(location.hash) && window.self !== window.top; }
+  function khoaTrang() {
+    if (khoa || token() || demoNhung()) return;
+    khoa = true; document.documentElement.classList.add('tk-khoa');
+    mo('signup', 'Viral Studio dành cho người có tài khoản. Tạo tài khoản miễn phí mất 30 giây, có ngay lượt dùng thử; học viên khoá đăng nhập là có Pro.');
+  }
+  function moKhoa() {
+    if (!khoa) return;
+    khoa = false; document.documentElement.classList.remove('tk-khoa'); dong();
+  }
 
   // nạp CSS một lần, dùng cho cả bảng tài khoản lẫn ô hồ sơ gắn sẵn trong trang tool
   var daCss = false;
@@ -227,13 +245,17 @@
     hop.innerHTML = '<div class="tk-hop" id="tkHop"></div>';
     hop.addEventListener('click', function (e) { if (e.target === hop) dong(); });
     // form đăng ký học viên (landing ?embed=dangky) báo đóng khi người dùng bấm X hoặc xong việc
-    window.addEventListener('message', function (e) { if (e.data && e.data.tmxk === 'close' && kieu === 'hv') dong(); });
+    window.addEventListener('message', function (e) {
+      if (!(e.data && e.data.tmxk === 'close' && kieu === 'hv')) return;
+      if (khoa && !TK.me) { kieu = 'khach'; ve('signup'); } else dong();   // đang khoá: quay về bảng tạo tài khoản thay vì đóng
+    });
     document.body.appendChild(hop);
     oTrang = hop.querySelector('#tkHop');
     return hop;
   }
   function mo(trang, loiNhan) { dung(); ve(trang || (TK.me ? 'home' : 'signup'), loiNhan); hop.classList.add('mo'); }
-  function dong() { if (hop) { hop.classList.remove('mo'); var f = hop.querySelector('.tk-khung iframe'); if (f) f.src = 'about:blank'; } }
+  function dong() { if (khoa && !TK.me) return;   // chưa đăng nhập thì bảng không đóng được
+    if (hop) { hop.classList.remove('mo'); var f = hop.querySelector('.tk-khung iframe'); if (f) f.src = 'about:blank'; } }
 
   function el(t, c, txt) { var e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; }
   function nut(nhan, chinh) { var b = el('button', 'tk-nut' + (chinh ? ' chinh' : ''), nhan); b.type = 'button'; return b; }
@@ -768,7 +790,8 @@
     bao(); return TK.me;
   }
   var ngheDs = [];   // phần khác (tro-ly.js) đăng ký nghe khi tài khoản đổi, không đè onDoi của tool
-  function bao() { if (typeof TK.onDoi === 'function') { try { TK.onDoi(TK.me); } catch (e) { } } ngheDs.forEach(function (f) { try { f(TK.me); } catch (e) { } }); }
+  function bao() { if (TK.me) moKhoa(); else if (!token()) khoaTrang();
+    if (typeof TK.onDoi === 'function') { try { TK.onDoi(TK.me); } catch (e) { } } ngheDs.forEach(function (f) { try { f(TK.me); } catch (e) { } }); }
 
   /* ── cổng chặn trước khi gọi AI ── */
   async function canCo(tool) {
@@ -914,7 +937,8 @@
     napCfg().then(bao);
     setTimeout(tiepViec, 300);   // có giá và hạn mức từ máy chủ: vẽ lại nút Pro, nhãn FREE, dòng lượt của tool
     veNhanFree();
-    nap();
+    nap().then(function (me) { if (me) moKhoa(); else khoaTrang(); });
+    if (!token()) khoaTrang();   // không có token thì khoá ngay, khỏi chờ máy chủ
     return TK;
   }
 
