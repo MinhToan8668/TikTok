@@ -547,6 +547,23 @@ Thư mục `capcut-clone-spec/` (đặc tả + 161 ảnh chụp CapCut Web) đư
 - **Xuất**: bấm Xuất mở bảng 365px thả ngay dưới nút (bấm ra ngoài thì đóng), đủ Tên, Định dạng, Độ phân giải, Khung/giây, Chất lượng, Khoảng xuất.
 - Kiểm thử: `t121.mjs` (bố cục, phím, bảng Xuất); các bộ t89–t120 vẫn xanh. Ảnh so sánh chụp ở 1431×949 như đặc tả.
 
+### Kho tài nguyên: bộ lọc, mẫu chữ, font, hiệu ứng, chuyển cảnh, âm thanh, sticker (10/2026)
+
+Mọi tài nguyên tách khỏi code, nằm trong `tools/kho/kho.js` (một file JS gán `window.KHO`, nạp trước script chính). Thêm mục mới = thêm một dòng vào danh sách tương ứng, không đụng trình dựng. Không dùng tài nguyên của CapCut (tài sản riêng của họ); tất cả tự viết hoặc nguồn mở.
+
+- **Bộ lọc (62)**: mỗi bộ lọc là bộ tham số (nhiệt độ, tint, bão hoà, tương phản, gamma, nâng đen, tông vùng tối/sáng, đen trắng, hai tông…); máy dựng LUT 17³ ngay khi áp (`taoLutKho`), lưu dưới id `kho:<id>` trong `P.luts`, dự án mở lại tự dựng lại. Nhóm: Điện ảnh, Phim nhựa, Ấm, Lạnh, Màu rực, Đen trắng, Hoài cổ, Hai tông, Chỉnh nhanh. Thẻ xem trước lấy khung hình hiện tại qua chính bộ lọc đó.
+- **Mẫu chữ (63 mới, 73 tổng)** theo nhóm Xu hướng, Tiêu đề, Lời nói, Review · bán hàng, Hoài cổ, Tối giản, Vui nhộn, Kêu gọi, Giáo dục · tin; có ô tìm. Dùng đúng các trường của chữ tự do nên Trợ lý AI (`mau_chu`) gọi được theo tên.
+- **Font (21 thêm)** từ Google Fonts, đều có tiếng Việt: Bebas Neue, Pacifico, Lobster, Dancing Script, Bangers, Comfortaa, Nunito, Roboto Slab, Space Grotesk, Archivo Black, Quicksand, Patrick Hand, Inter, Kanit, Exo 2, Josefin Sans, Merriweather, Saira Condensed, Baloo 2, Chakra Petch, Big Shoulders Display. Nút **＋ Font** trong tab Văn bản nhập `.ttf/.otf/.woff2` của riêng mình (lưu IndexedDB, dùng cho mọi dự án).
+- **Hiệu ứng video (43 mới, 50 tổng)**: shader WebGL chạy sau bước chỉnh màu (`apHuKho`), có thanh **Cường độ hiệu ứng** trong thuộc tính. Nhóm: Hỏng hóc · retro (Glitch, VHS, TV cũ, Pixel, Phim xước…), Biến dạng (Gương, Kính vạn hoa, Xoáy, Sóng, Mắt cá, Chia 4 màn…), Ánh sáng (Bừng sáng, Rò sáng, Tia sáng, Bokeh…), Nghệ thuật (Hai tông, Âm bản, Phác hoạ, Ảnh nhiệt, Chấm bi, Viền neon…), Thời tiết · hạt (Tuyết, Mưa, Bụi sáng, Sương mù, Lửa). Thẻ xem trước render thật qua shader.
+- **Chuyển cảnh (20 thêm, 30 tổng)** viết theo chuẩn gl-transitions (`vs_*`), trộn vào kho CDN và vẫn chạy khi CDN không tải được.
+- **Âm thanh (49 mới)**: công thức tổng hợp tại máy (`tongHopKho`: lớp dao động + nhiễu lọc, lặp, ngẫu nhiên), nhóm Chuyển động, Va chạm · trống, Giao diện · thông báo, Kịch tính, Vui nhộn, Môi trường; có tìm và nhóm **Của tôi** cho file nhập.
+- **Sticker động**: ô tìm Giphy/Tenor trong tab Nhãn dán; GIF/WebP động giải mã bằng `ImageDecoder` (Chrome/Edge) và chạy theo thời gian trên V3. Sticker PNG/GIF tự tải lên cũng động.
+- **Âm thanh trực tuyến**: ô tìm Freesound trong tab Âm thanh (nghe thử, bấm + để chèn; giấy phép hiện trên từng dòng).
+- **Nhập gói .zip** (cuối tab Bộ lọc): gom `.cube`, font, `.mp3/.wav`, `.png/.gif/.webp` vào một zip để chia sẻ cho học viên; máy tự phân loại.
+- **Cloudflare** thêm `GET /nhan-dan?q=` (Giphy hoặc Tenor) và `GET /am-thanh?q=` (Freesound), cache 1 giờ; cần thêm Secret `GIPHY_KEY` (hoặc `TENOR_KEY`) và `FREESOUND_KEY` trong Settings → Variables and Secrets. Chưa có key thì ô tìm báo rõ, phần còn lại của kho vẫn chạy ngoại tuyến. `/tai` cho phép thêm host giphy, tenor, freesound.
+- **Trợ lý AI**: `loc`, `hieu_ung`, `chuyen` trong `sua_doan`/`ap_tat_ca` nhận tên trong kho (ví dụ loc "Phim Hàn", hieu_ung "VHS", chuyen "Trái tim").
+- Kiểm thử: `t122.mjs` (27 bước: dựng LUT, tìm/nhóm, hiệu ứng + cường độ, chuyển cảnh WebGL, mẫu chữ, nhập font, âm thanh tổng hợp, GIF động, gói .zip, AI theo tên).
+
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 
 Cài theo [`cloudflare/CAI-DAT.md`](../cloudflare/CAI-DAT.md) (khoảng 10 phút, không cần thẻ). Có máy chủ này tool thêm:
