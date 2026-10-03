@@ -517,6 +517,99 @@
   .mauCong button svg{width:100%;height:26px}
   .mauCong button.on{border-color:var(--ea);color:var(--ea)}
   .suaCong{width:100%;max-width:260px;background:#0f0f12;border:1px solid var(--el);border-radius:8px;touch-action:none}
+  /* ===== Bố cục CapCut Web (capcut-clone-spec/SPEC.md) — máy tính ===== */
+  .ed.ccw{--eb:#0E0E11;--ep:#17171A;--ep2:#27282C;--el:#2A2B30;--et:#FAFBFF;--em:#9A9BA3;--ea:#59C5DD;--etxt:#D97D3E;--emg:#4CA987;--ev:#6C54DE;--ccTl:#121214;--ccCv:#1C1D21;--ccPop:#373739;padding:0;border-radius:0;background:var(--eb);grid-template-rows:56px minmax(0,1fr) 5px var(--hTl,229px)}
+  .ed.ccw .ecol,.ed.ccw .etl{border-radius:0}
+  .ed.ccw .keo.ngang{margin:0;background:var(--el)}.ed.ccw .keo.doc{margin:0;background:var(--el)}.ed.ccw .keo:hover,.ed.ccw .keo.dang{background:var(--ea)}
+  /* thanh trên 56px kính mờ */
+  .ed.ccw .etop{height:56px;min-height:56px;padding:0 12px 0 0;gap:6px;background:rgba(18,18,20,.8);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--el)}
+  .ed.ccw .etop>*{order:20}
+  .ed.ccw .etop .logo{order:0;width:71px;justify-content:center;gap:0;flex:none;height:56px;border-right:1px solid var(--el)}.ed.ccw .etop .logo b{display:none}.ed.ccw .etop .logo i{width:28px;height:28px;border-radius:8px}
+  .ed.ccw #luuTt{order:1;margin-left:14px;color:var(--em);font-size:0}.ed.ccw #luuTt::before{content:'☁';font-size:17px;line-height:1}.ed.ccw #luuTt:not(:empty)::before{color:var(--emg)}
+  .ed.ccw #tenDuAn{order:2;flex:0 1 auto;width:auto;max-width:220px;text-align:left;font-size:14px;font-weight:600;padding:4px 4px 4px 6px}
+  .ed.ccw #tenMenu{order:3;border:0;background:transparent;color:var(--em);width:22px;height:28px;border-radius:6px;padding:0;font-size:11px}.ed.ccw #tenMenu:hover{background:var(--ep2);color:var(--et)}
+  .ed.ccw .etop .gian:first-of-type{order:4}
+  .ed.ccw .ccMid{order:5;display:flex;align-items:center;gap:2px}
+  .ed.ccw .etop .gian:last-of-type{order:6}
+  .ed.ccw #ttKetNoi{display:none}
+  .ed.ccw #quota{order:10}.ed.ccw #btnDuAn{order:11}.ed.ccw #btnCaiDat{order:12}.ed.ccw #btnPhimTat{order:13}.ed.ccw #btnToanApp{order:14}.ed.ccw #btnThuocTinh{order:15}.ed.ccw #btnXuat{order:16;margin-left:6px}.ed.ccw #btnMenu{order:17}
+  .ed.ccw #btnPhimTat span,.ed.ccw #btnPhimTat{font-size:0}.ed.ccw #btnPhimTat svg{width:17px;height:17px}.ed.ccw #btnPhimTat{width:30px;padding:5px;justify-content:center}
+  .ed.ccw .etop .btn.ghost{border-color:transparent;color:#c9c9cf}.ed.ccw .etop .btn.ghost:hover{background:var(--ep2);color:var(--et)}
+  .ed.ccw .ccIc{width:32px;height:32px;border:0;background:transparent;color:#c9c9cf;border-radius:8px;display:grid;place-items:center;padding:0;font-size:15px}
+  .ed.ccw .ccIc svg{width:18px;height:18px}.ed.ccw .ccIc:hover{background:var(--ep2);color:var(--et)}.ed.ccw .ccIc[aria-pressed="true"]{background:var(--ccPop);color:var(--et)}.ed.ccw .ccIc:disabled{opacity:.35}
+  .ed.ccw .ccMid #zoomKhung{border:0;background:transparent;color:var(--et);font-size:13px;font-weight:600;padding:4px 6px;margin:0 2px;border-radius:8px;cursor:pointer}.ed.ccw .ccMid #zoomKhung:hover{background:var(--ep2)}
+  .ed.ccw .ccMid .sep{width:1px;height:18px;background:var(--el);margin:0 6px}
+  .ed.ccw .btn.nutXuat{background:linear-gradient(60deg,#4A7EE3,#1BC9E3,#1AC9C0);color:#fff;border:0;height:32px;min-width:90px;padding:0 14px;border-radius:8px;font-size:13px;font-weight:600;gap:6px}.ed.ccw .btn.nutXuat:hover{filter:brightness(1.08)}
+  .ed.ccw #btnMenu{font-size:18px;width:32px;padding:0;justify-content:center;letter-spacing:1px;line-height:1}
+  /* cột trái: rail 71px + bảng thư viện 327px, thu gọn Ctrl+/ */
+  .ed.ccw .ebody{grid-template-columns:var(--wTrai,398px) 5px minmax(0,1fr) 5px var(--wPhai,321px)}
+  .ed.ccw .ecol.trai{display:grid;grid-template-columns:71px minmax(0,1fr);grid-template-rows:minmax(0,1fr);background:var(--ep);position:relative;overflow:visible}
+  .ed.ccw .ecol.trai .etabs{grid-column:1;grid-row:1;display:flex;flex-direction:column;align-items:stretch;gap:2px;padding:6px 4px;border:0;border-right:1px solid var(--el);background:var(--eb);overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
+  .ed.ccw .ecol.trai .etabs button{flex:none;min-width:0;width:100%;height:52px;border:0;border-radius:8px;padding:4px 2px;font-size:10.5px;font-weight:500;line-height:1.1;gap:3px;justify-content:center;color:var(--em);position:relative;white-space:normal}
+  .ed.ccw .ecol.trai .etabs button svg{width:20px;height:20px}
+  .ed.ccw .ecol.trai .etabs button:hover{background:var(--ep2);color:var(--et)}
+  .ed.ccw .ecol.trai .etabs button[aria-selected="true"]{background:var(--ep2);color:var(--et);border:0}
+  .ed.ccw .ecol.trai .etabs button[data-tab="footage"]{order:1}.ed.ccw .ecol.trai .etabs button[data-tab="am"]{order:2}.ed.ccw .ecol.trai .etabs button[data-tab="chu"]{order:3}.ed.ccw .ecol.trai .etabs button[data-tab="loi"]{order:4}.ed.ccw .ecol.trai .etabs button[data-tab="hieu"]{order:5}.ed.ccw .ecol.trai .etabs button[data-tab="chuyen"]{order:6}.ed.ccw .ecol.trai .etabs button[data-tab="loc"]{order:7}.ed.ccw .ecol.trai .etabs button[data-tab="sticker"]{order:8}.ed.ccw .ecol.trai .etabs button[data-tab="dohoa"]{order:9}.ed.ccw .ecol.trai .etabs button[data-tab="ai"]{order:10}
+  .ed.ccw .ecol.trai .etabs .ccKbd{order:99;margin-top:auto;height:40px;color:var(--em)}
+  .ed.ccw .ecol.trai .etabs .n{top:3px;right:6px}
+  .ed.ccw .ecol.trai .epane,.ed.ccw .ecol.trai .epane.on{grid-column:2;grid-row:1}
+  .ed.ccw .ecol.trai .sheetDau{display:none}
+  .ed.ccw #ccThu{position:absolute;right:-13px;top:50%;width:13px;height:48px;margin-top:-24px;border:0;border-radius:0 8px 8px 0;background:var(--ep2);color:var(--em);padding:0;font-size:11px;z-index:9;display:grid;place-items:center}
+  .ed.ccw #ccThu:hover{color:var(--et);background:var(--ccPop)}
+  .ed.ccw.thuGon .ebody{grid-template-columns:71px 0 minmax(0,1fr) 5px var(--wPhai,321px)}
+  .ed.ccw.thuGon .ecol.trai{grid-template-columns:71px}.ed.ccw.thuGon .ecol.trai .epane{display:none!important}.ed.ccw.thuGon .keo.k1{visibility:hidden;pointer-events:none}.ed.ccw.thuGon #ccThu{right:-13px}
+  /* vùng canvas */
+  .ed.ccw .ecol.giua{background:var(--ccCv)}
+  .ed.ccw .phead{display:none}
+  .ed.ccw .khungVung{padding:24px 60px}
+  .ed.ccw .ctl{display:none}
+  .ed.ccw .khungVung .khung{border-radius:0}
+  .ed.ccw #ccRatio{position:absolute;left:12px;top:12px;width:52px;height:52px;border:0;border-radius:8px;background:rgba(18,18,20,.8);color:#c9c9cf;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:10.5px;padding:0;z-index:6}.ed.ccw #ccRatio #tiLe2{display:block;width:50px;border:0;background:transparent;color:#c9c9cf;font-size:10.5px;text-align:center;padding:0;appearance:none;-webkit-appearance:none;cursor:pointer;text-align-last:center}.ed.ccw #ccRatio:hover,.ed.ccw #ccRatio:hover #tiLe2{color:var(--et)}
+  .ed.ccw #ccRatio svg{width:18px;height:18px}.ed.ccw #ccRatio:hover{color:var(--et);background:var(--ccPop)}
+  .ed.ccw .ctlPhai.ccNoi{position:absolute;right:12px;top:12px;z-index:6;display:flex;gap:2px;align-items:center;background:rgba(18,18,20,.8);border-radius:8px;padding:3px}
+  .ed.ccw .ctlPhai.ccNoi select{background:transparent;border:0;color:#c9c9cf;font-size:12px;max-width:96px}.ed.ccw .ctlPhai.ccNoi #zoomKhung,.ed.ccw .ctlPhai.ccNoi #tiLe2{display:none}.ed.ccw .ctlPhai.ccNoi .btn{border-color:transparent;color:#c9c9cf}
+  .ed.ccw #ccTayLop{position:absolute;inset:0;z-index:7;cursor:grab;display:none}.ed.ccw.tay #ccTayLop{display:block}.ed.ccw.tay.dangTay #ccTayLop{cursor:grabbing}
+  /* bảng thuộc tính phải: rail 56 + bảng 265, ẩn khi không chọn gì */
+  .ed.ccw .ecol.phai{position:relative;padding-left:56px;background:var(--ep)}
+  .ed.ccw .ecol.phai>.etabs{display:none}
+  .ed.ccw:not(.coChon):not(.co-phai) .ecol.phai,.ed.ccw:not(.coChon):not(.co-phai) .keo.k2{display:none}
+  .ed.ccw:not(.coChon):not(.co-phai) .ebody{grid-template-columns:var(--wTrai,398px) 5px minmax(0,1fr) 0 0}
+  .ed.ccw.thuGon:not(.coChon):not(.co-phai) .ebody{grid-template-columns:71px 0 minmax(0,1fr) 0 0}
+  .ed.ccw .ecol.phai .ptabs{position:absolute;left:0;top:0;bottom:0;width:56px;margin:0;padding:8px 4px;flex-direction:column;gap:4px;border:0;border-right:1px solid var(--el);background:var(--eb);overflow-y:auto;overflow-x:hidden;z-index:4}
+  .ed.ccw .ecol.phai .ptabs button{border:0;border-radius:8px;padding:8px 2px;font-size:9.5px;font-weight:500;line-height:1.15;white-space:normal;text-align:center;word-break:break-word;color:var(--em)}
+  .ed.ccw .ecol.phai .ptabs button:hover{background:var(--ep2);color:var(--et)}.ed.ccw .ecol.phai .ptabs button.on{background:var(--ep2);color:var(--et)}
+  .ed.ccw .ecol.phai .epane{padding:12px 12px 20px}
+  /* dòng thời gian */
+  .ed.ccw .etl{background:var(--ccTl)}
+  .ed.ccw .etool{display:grid;grid-template-columns:1fr auto 1fr;height:48px;padding:0 12px;border-bottom:1px solid var(--el);overflow:visible}
+  .ed.ccw .etool .cum:last-child{justify-content:flex-end}
+  .ed.ccw .etool .ic{width:32px;height:32px;border-radius:8px}
+  .ed.ccw .etool .ic[aria-pressed="true"]{background:var(--ea);color:#0E0E11}
+  .ed.ccw .etool #btnPlay2,.ed.ccw .etool #tg2{display:none}
+  .ed.ccw .etool .ccGiua{display:flex;align-items:center;gap:8px;justify-content:center}
+  .ed.ccw .etool .ccGiua .play{width:34px;height:34px;border:0;background:transparent;color:#fff;font-size:16px;border-radius:50%}.ed.ccw .etool .ccGiua .play:hover{background:var(--ep2)}
+  .ed.ccw .etool .ccGiua .tg{margin:0;font-size:13px;font-weight:600;color:var(--em)}.ed.ccw .etool .ccGiua .tg b{color:var(--et);font-weight:600}
+  .ed.ccw .etool #zoomTl{width:90px;accent-color:#c9c9cf}
+  .ed.ccw .etl-scroll{background:var(--ccTl)}
+  .ed.ccw .ruler{background:var(--ccTl);font-size:11px;height:24px;border-bottom:0}.ed.ccw .ruler i{border-left-color:#3a3b42;line-height:24px;padding-left:4px}.ed.ccw .ruler i.nho{top:18px;height:5px}
+  .ed.ccw .etl-in{padding-left:110px}.ed.ccw .track .lb{left:-110px;width:106px;background:var(--ccTl);border-left:0;justify-content:flex-start;padding-left:10px;gap:8px}
+  .ed.ccw .track{border-bottom:0}
+  .ed.ccw .track:not(.rong)::after{content:'';position:absolute;left:0;right:0;top:4px;bottom:4px;background:var(--ep2);border-radius:6px;opacity:.45;pointer-events:none;z-index:0}
+  .ed.ccw .track .item,.ed.ccw .track .lb{z-index:1}
+  .ed.ccw .item{border-radius:6px;border-width:2px}
+  .ed.ccw .item.chon,.ed.ccw .item.nhieu{border-color:var(--ea);box-shadow:none}
+  .ed.ccw .item.chon .h{background:var(--ea)}.ed.ccw .item.chon .h::after{background:#0E0E11;box-shadow:2px 0 0 #0E0E11}
+  .ed.ccw .item.c,.ed.ccw .item.pdIt{background:var(--etxt);color:#fff}
+  .ed.ccw .item.a,.ed.ccw .item.a3{background:#2f6b57;color:#e4fff4}.ed.ccw .item.a .song{background:repeating-linear-gradient(90deg,transparent 0 3px,#4CA987 3px 4px)}
+  .ed.ccw .item.t{background:#CC5D88;color:#fff}.ed.ccw .item.g{background:var(--etxt);color:#fff}.ed.ccw .item.g.hinh,.ed.ccw .item.g.bieuDo{background:#6C54DE}.ed.ccw .item.b{background:#2b4a52;color:#e4f6ff}
+  .ed.ccw .ph{background:#fff}.ed.ccw .ph::before{border-top-color:#fff}
+  .ed.ccw .etl-trong{background:var(--ccTl)}
+  .ed.ccw #seek{display:none}.ed.ccw.anTl{grid-template-rows:56px minmax(0,1fr) 5px 70px}.ed.ccw.anTl .etl-scroll,.ed.ccw.anTl .etl-trong{display:none}.ed.ccw.anTl #seek{display:block;width:calc(100% - 24px);margin:4px 12px;height:14px;accent-color:var(--ea);cursor:pointer}.ed.ccw.anTl .etool .cum:last-child .ic:not(#btnAnTl):not(#btnToanManHinh),.ed.ccw.anTl #zoomTl{opacity:.35;pointer-events:none}
+  /* khung chọn trên canvas: viền cyan 1px, núm tròn trắng, núm xoay dưới đáy */
+  .ed.ccw #tayCam .tay{border:1px solid var(--ea);box-shadow:none}.ed.ccw #tayCam .goc{width:10px;height:10px;border-radius:50%;border:1.5px solid #8a8a92;background:#fff}.ed.ccw #tayCam .xoay{background:#fff;border:1px solid #8a8a92;width:20px;height:20px;margin-left:-10px;top:auto;bottom:12px}
+  /* bảng Xuất thả xuống dưới nút Xuất */
+  .ed.ccw #xuatCaiHop{background:transparent;place-items:start end;padding:6px 12px 0 0;pointer-events:none}.ed.ccw #xuatCaiHop .box{pointer-events:auto;width:365px;max-width:365px;border-radius:12px;background:#2F3035;border-color:#3a3b40;box-shadow:0 16px 48px rgba(0,0,0,.5);padding:16px;max-height:calc(100vh - 80px);overflow:auto}
+  .ed.ccw .cmenu,.ed.ccw ~ .cmenu{background:var(--ccPop)}
 </style>
 </head>
 <body>
@@ -701,7 +794,7 @@
           <div class="ctlPhai"><button class="btn nho ghost" id="btnLap" type="button" aria-pressed="false" title="Phát lặp (trong vùng In–Out nếu có)">⟲</button><button class="btn nho ghost" id="btnScope" type="button" aria-pressed="false" title="Scopes: biểu đồ màu, dạng sóng, vectorscope">📊</button><select id="lopPhuChon" title="Lớp phủ trình phát"><option value="khong">Không lưới</option><option value="luoi">Lưới 3×3</option><option value="an_toan">Vùng an toàn TikTok</option><option value="ca_hai">Lưới + vùng an toàn</option></select><select id="zoomKhung" title="Phóng khung xem"><option value="vua">Vừa</option><option value="0.25">25%</option><option value="0.5">50%</option><option value="0.75">75%</option><option value="1">100%</option><option value="2">200%</option></select><select id="tiLe2" title="Tỉ lệ khung"></select><button class="btn nho ghost ic" id="btnToanManHinh" type="button" title="Xem toàn màn hình" data-ic="full"></button></div>
         </div>
         <div class="xuat" id="phimHop"><div class="box" style="max-width:460px;text-align:left"><b style="font-size:15px">⌨ Phím tắt</b>
-          <table class="phim"><tr><td>Space</td><td>Phát / dừng</td></tr><tr><td>S · Ctrl/⌘ + B</td><td>Tách tại đầu phát</td></tr><tr><td>Ctrl/⌘ + bấm, Shift + bấm, kéo chỗ trống</td><td>Chọn nhiều mục</td></tr><tr><td>Ctrl/⌘ + A / X</td><td>Chọn tất cả / cắt</td></tr><tr><td>Ctrl/⌘ + G, Ctrl/⌘ + Shift + G</td><td>Gộp nhóm / bỏ gộp</td></tr><tr><td>Ctrl/⌘ + S / I / E</td><td>Lưu dự án / nhập file / xuất</td></tr><tr><td>K</td><td>Thêm keyframe tại đầu phát</td></tr><tr><td>Alt + J / Alt + L</td><td>Keyframe trước / sau</td></tr><tr><td>Ctrl/⌘ + Shift + K</td><td>Xoá keyframe tại đầu phát</td></tr><tr><td>Kéo ◆ trên dòng thời gian</td><td>Đổi thời điểm keyframe</td></tr><tr><td>Ctrl/⌘ + = / −, Shift + Z</td><td>Phóng to / thu nhỏ / vừa khung dòng thời gian</td></tr><tr><td>Q / W</td><td>Xoá phần trước / sau đầu phát trong đoạn</td></tr><tr><td>Ctrl/⌘ + C / V</td><td>Sao chép / dán tại đầu phát</td></tr><tr><td>Ctrl/⌘ + Shift + Z · Ctrl + Y</td><td>Làm lại</td></tr><tr><td>N</td><td>Bật/tắt hít (snap)</td></tr><tr><td>Ctrl/⌘ + cuộn</td><td>Zoom dòng thời gian</td></tr><tr><td>Delete</td><td>Xoá mục đang chọn</td></tr><tr><td>Ctrl/⌘ + D</td><td>Nhân đôi</td></tr><tr><td>Ctrl/⌘ + Z</td><td>Hoàn tác</td></tr><tr><td>← →</td><td>Lùi / tới 1 khung hình</td></tr><tr><td>Shift + ← →</td><td>Lùi / tới 10 khung hình</td></tr><tr><td>↑ / ↓</td><td>Về điểm cắt trước / sau</td></tr><tr><td>V / C</td><td>Chế độ Chọn / Cắt (bấm lên đoạn để tách)</td></tr><tr><td>Ctrl/⌘ + K · Ctrl/⌘ + B</td><td>Tách mục đang chọn (không chọn: track chính)</td></tr><tr><td>Ctrl/⌘ + Shift + K · Shift + S</td><td>Tách mọi track tại đầu phát (đang đứng trên ◆ của mục chọn: xoá ◆)</td></tr><tr><td>S · Shift + Backspace · Ctrl/⌘ + L</td><td>Hít · nam châm track chính · liên kết</td></tr><tr><td>A / Shift + A</td><td>Chọn mọi mục trước / sau đầu phát</td></tr><tr><td>Shift + X · Shift + E</td><td>Vùng In–Out theo đoạn · ẩn/hiện đoạn</td></tr><tr><td>Ctrl/⌘ + R · Ctrl/⌘ + . / ,</td><td>Bảng tốc độ · tăng / giảm âm lượng 1 dB</td></tr><tr><td>Alt + M · Shift + M · Alt + Shift + M</td><td>Mốc màu khác · mốc sau · mốc trước</td></tr><tr><td>Ctrl/⌘ + J</td><td>Đánh dấu beat tại đầu phát</td></tr><tr><td>Shift + Alt + K · Alt + K</td><td>Keyframe cơ bản · mở bảng keyframe</td></tr><tr><td>Ctrl/⌘ + Alt + C / V</td><td>Sao chép / dán thuộc tính (chọn nhóm)</td></tr><tr><td>Ctrl/⌘ + M · Ctrl/⌘ + N · Ctrl/⌘ + F</td><td>Xuất · dự án mới · toàn màn hình</td></tr><tr><td>Alt + G · Alt + Shift + G</td><td>Gộp / bỏ gộp</td></tr><tr><td>Giữ Ctrl khi kéo · Alt + cuộn</td><td>Tạm tắt hít · cuộn ngang dòng thời gian</td></tr><tr><td>Ctrl/⌘ + Alt + V</td><td>Dán thuộc tính (từ mục đã sao chép)</td></tr><tr><td>Ctrl/⌘ + Shift + ] / [</td><td>Lớp phủ lên trên cùng / xuống dưới cùng</td></tr><tr><td>Alt + kéo</td><td>Nhân bản mục (chữ, lớp phủ, âm thanh)</td></tr><tr><td>J / K / L</td><td>Tua lùi / dừng / tua tới (bấm L nhiều lần để nhanh 2×, 4×, 8×)</td></tr><tr><td>I / O · Alt + X</td><td>Đặt điểm In / Out · bỏ vùng In–Out</td></tr><tr><td>Home / End</td><td>Đầu / cuối video</td></tr><tr><td>M</td><td>Đặt mốc</td></tr><tr><td>F</td><td>Đóng băng khung</td></tr><tr><td>+ / −</td><td>Phóng to / thu nhỏ dòng thời gian</td></tr><tr><td>?</td><td>Bảng này</td></tr></table>
+          <table class="phim"><tr><td>Space</td><td>Phát / dừng</td></tr><tr><td>V · H</td><td>Chọn · Bàn tay (kéo cuộn khung khi phóng to)</td></tr><tr><td>⇧F · ⇧0 · ⇧1 · ⇧2</td><td>Khung vừa · 100% · 50% · 200%</td></tr><tr><td>Ctrl/⌘ + /</td><td>Thu gọn / mở bảng thư viện</td></tr><tr><td>Ctrl/⌘ + Shift + .</td><td>Ẩn / hiện dòng thời gian</td></tr><tr><td>S · Ctrl/⌘ + B</td><td>Tách tại đầu phát</td></tr><tr><td>Ctrl/⌘ + bấm, Shift + bấm, kéo chỗ trống</td><td>Chọn nhiều mục</td></tr><tr><td>Ctrl/⌘ + A / X</td><td>Chọn tất cả / cắt</td></tr><tr><td>Ctrl/⌘ + G, Ctrl/⌘ + Shift + G</td><td>Gộp nhóm / bỏ gộp</td></tr><tr><td>Ctrl/⌘ + S / I / E</td><td>Lưu dự án / nhập file / xuất</td></tr><tr><td>K</td><td>Thêm keyframe tại đầu phát</td></tr><tr><td>Alt + J / Alt + L</td><td>Keyframe trước / sau</td></tr><tr><td>Ctrl/⌘ + Shift + K</td><td>Xoá keyframe tại đầu phát</td></tr><tr><td>Kéo ◆ trên dòng thời gian</td><td>Đổi thời điểm keyframe</td></tr><tr><td>Ctrl/⌘ + = / −, Shift + Z</td><td>Phóng to / thu nhỏ / vừa khung dòng thời gian</td></tr><tr><td>Q / W</td><td>Xoá phần trước / sau đầu phát trong đoạn</td></tr><tr><td>Ctrl/⌘ + C / V</td><td>Sao chép / dán tại đầu phát</td></tr><tr><td>Ctrl/⌘ + Shift + Z · Ctrl + Y</td><td>Làm lại</td></tr><tr><td>N</td><td>Bật/tắt hít (snap)</td></tr><tr><td>Ctrl/⌘ + cuộn</td><td>Zoom dòng thời gian</td></tr><tr><td>Delete</td><td>Xoá mục đang chọn</td></tr><tr><td>Ctrl/⌘ + D</td><td>Nhân đôi</td></tr><tr><td>Ctrl/⌘ + Z</td><td>Hoàn tác</td></tr><tr><td>← →</td><td>Lùi / tới 1 khung hình</td></tr><tr><td>Shift + ← →</td><td>Lùi / tới 10 khung hình</td></tr><tr><td>↑ / ↓</td><td>Về điểm cắt trước / sau</td></tr><tr><td>V / C</td><td>Chế độ Chọn / Cắt (bấm lên đoạn để tách)</td></tr><tr><td>Ctrl/⌘ + K · Ctrl/⌘ + B</td><td>Tách mục đang chọn (không chọn: track chính)</td></tr><tr><td>Ctrl/⌘ + Shift + K · Shift + S</td><td>Tách mọi track tại đầu phát (đang đứng trên ◆ của mục chọn: xoá ◆)</td></tr><tr><td>S · Shift + Backspace · Ctrl/⌘ + L</td><td>Hít · nam châm track chính · liên kết</td></tr><tr><td>A / Shift + A</td><td>Chọn mọi mục trước / sau đầu phát</td></tr><tr><td>Shift + X · Shift + E</td><td>Vùng In–Out theo đoạn · ẩn/hiện đoạn</td></tr><tr><td>Ctrl/⌘ + R · Ctrl/⌘ + . / ,</td><td>Bảng tốc độ · tăng / giảm âm lượng 1 dB</td></tr><tr><td>Alt + M · Shift + M · Alt + Shift + M</td><td>Mốc màu khác · mốc sau · mốc trước</td></tr><tr><td>Ctrl/⌘ + J</td><td>Đánh dấu beat tại đầu phát</td></tr><tr><td>Shift + Alt + K · Alt + K</td><td>Keyframe cơ bản · mở bảng keyframe</td></tr><tr><td>Ctrl/⌘ + Alt + C / V</td><td>Sao chép / dán thuộc tính (chọn nhóm)</td></tr><tr><td>Ctrl/⌘ + M · Ctrl/⌘ + N · Ctrl/⌘ + F</td><td>Xuất · dự án mới · toàn màn hình</td></tr><tr><td>Alt + G · Alt + Shift + G</td><td>Gộp / bỏ gộp</td></tr><tr><td>Giữ Ctrl khi kéo · Alt + cuộn</td><td>Tạm tắt hít · cuộn ngang dòng thời gian</td></tr><tr><td>Ctrl/⌘ + Alt + V</td><td>Dán thuộc tính (từ mục đã sao chép)</td></tr><tr><td>Ctrl/⌘ + Shift + ] / [</td><td>Lớp phủ lên trên cùng / xuống dưới cùng</td></tr><tr><td>Alt + kéo</td><td>Nhân bản mục (chữ, lớp phủ, âm thanh)</td></tr><tr><td>J / K / L</td><td>Tua lùi / dừng / tua tới (bấm L nhiều lần để nhanh 2×, 4×, 8×)</td></tr><tr><td>I / O · Alt + X</td><td>Đặt điểm In / Out · bỏ vùng In–Out</td></tr><tr><td>Home / End</td><td>Đầu / cuối video</td></tr><tr><td>M</td><td>Đặt mốc</td></tr><tr><td>F</td><td>Đóng băng khung</td></tr><tr><td>+ / −</td><td>Phóng to / thu nhỏ dòng thời gian</td></tr><tr><td>?</td><td>Bảng này</td></tr></table>
           <div class="row" style="margin-top:10px"><button class="btn ghost" type="button" id="phimDong">Đóng</button></div></div></div>
         <div class="xuat" id="qlHop" data-tab="ds"><div class="box qlBox"><div class="row" style="justify-content:space-between;align-items:center"><b style="font-size:15px">📁 Dự án của tôi</b><button class="btn nho ghost" id="qlDong" type="button">✕</button></div>
           <div class="row qlThanh"><button class="btn nho qlTab on" data-tab="ds" type="button">Dự án</button><button class="btn nho qlTab" data-tab="rac" type="button">🗑 Thùng rác</button><input id="qlTim" type="search" placeholder="Tìm dự án…"><select id="qlXep" title="Sắp xếp"><option value="ngay">Mới sửa</option><option value="ten">Tên A–Z</option><option value="dl">Dung lượng</option></select></div>
@@ -830,7 +923,7 @@ const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAl
 const el = (t, c, txt) => { const e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; };
 const ls = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} }, del(k){ try { localStorage.removeItem(k); } catch {} } };
 const API = 'https://script.google.com/macros/s/AKfycbyxe1nWupAl6VheDZHaU3Ojm-d6c8F_khhUMtkehNCLh5OnGW6f2uF0PKPYZ4eYUqyGjQ/exec';
-const LB = 70;   // bề rộng đầu track
+let LB = 70;   // bề rộng đầu track (110 ở bố cục CapCut Web)
 let toastT; function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 3200); }
 const ERR = { can_dangky: 'Tạo tài khoản miễn phí để dùng AI.', het_luot_thu: 'Bạn đã dùng hết lượt miễn phí.', het_luot: 'Hết lượt AI hôm nay, mai quay lại nhé.', het_luot_chat: 'Hôm nay bạn đã hết lượt nhờ trợ lý dựng, mai quay lại nhé.', het_phien: 'Phiên đăng nhập hết hạn, đăng nhập lại giúp mình.', video_qua_dai: 'Footage dài quá 12 phút. Cắt bớt trước khi đưa vào.', khong_co_video: 'Chưa có footage nào được hiểu.', can_gemini: 'Máy chủ đang chạy Claude, phần nghe video cần GEMINI_API_KEY. Báo mentor.', ban_qua: 'AI của Google đang quá tải, thử lại sau 1–2 phút.', het_gio: 'AI xử lý quá lâu, thử lại hoặc chia footage ngắn hơn.', tu_choi: 'AI không xử lý được footage này.', chua_cai_key: 'Máy chủ chưa cài khoá AI. Báo mentor.', sai_key: 'Khoá AI trên máy chủ không hợp lệ. Báo mentor.', unknown_action: 'Máy chủ chưa có DungVideo.gs. Mentor dán DungVideo.gs, HookAI.gs, Studio.gs rồi Deploy, chọn New version.', thieu_text: 'Gõ yêu cầu dựng trước đã.' };
 const fmt = s => { s = Math.max(0, s || 0); const m = Math.floor(s / 60), g = Math.floor(s % 60); return m + ':' + (g < 10 ? '0' : '') + g; };
@@ -4174,7 +4267,72 @@ function khoiTaoMobi() {
   datMobi(); addEventListener('resize', datMobi);
 }
 
-khoiTaoB(); khoiTaoC(); khoiTaoUI(); khoiTaoLop(); khoiTaoBang(); khoiTaoDot1(); khoiTaoDot2(); khoiTaoDot3(); khoiTaoM1(); khoiTaoM2(); khoiTaoM3(); khoiTaoN(); khoiTaoMobi(); veTl();
+/* ===== Bố cục CapCut Web (capcut-clone-spec/SPEC.md): rail 71 + thư viện 327, thanh trên 56 kính mờ, nút Tỉ lệ, bảng thuộc tính nổi, timeline toolbar giữa, Hand (H), zoom khung, ẩn timeline ===== */
+const CC_TC = t => { t = Math.max(0, t || 0); const p = n => String(n).padStart(2, '0'); const h = Math.floor(t / 3600); return (h ? p(h) + ':' : '') + p(Math.floor(t / 60) % 60) + ':' + p(Math.floor(t) % 60) + ':' + p(Math.floor((t % 1) * 30)); };
+function ccwBat() { return $('#ed').classList.contains('ccw'); }
+function ccDatTay(bat) { const ed = $('#ed'); P.ccTay = !!bat; ed.classList.toggle('tay', P.ccTay); const h = $('#btnTayCT'), c = $('#btnChonCT'); if (h) h.setAttribute('aria-pressed', String(P.ccTay)); if (c) c.setAttribute('aria-pressed', String(!P.ccTay)); if (P.ccTay && P.cheDo === 'cat') { P.ccDangTay = true; datCheDo('chon', true); P.ccDangTay = false; } }
+function ccNhanZoom() { const z = $('#zoomKhung'); if (!z) return 'Vừa'; return z.value === 'vua' ? 'Vừa' : Math.round(+z.value * 100) + '%'; }
+function ccDatZoom(v) { const z = $('#zoomKhung'); if (!z) return; z.value = String(v); z.dispatchEvent(new Event('change')); }
+function ccThuGon(bat) { const ed = $('#ed'); ed.classList.toggle('thuGon', bat == null ? !ed.classList.contains('thuGon') : !!bat); const t = $('#ccThu'); if (t) { t.textContent = ed.classList.contains('thuGon') ? '›' : '‹'; t.title = ed.classList.contains('thuGon') ? 'Mở bảng thư viện (Ctrl+/)' : 'Thu gọn bảng thư viện (Ctrl+/)'; } try { localStorage.setItem('dv_thuGon', ed.classList.contains('thuGon') ? '1' : '0'); } catch { } if (!P.dang) setTimeout(veKhung, 60); }
+function ccAnTl(bat) { const ed = $('#ed'); ed.classList.toggle('anTl', bat == null ? !ed.classList.contains('anTl') : !!bat); const b = $('#btnAnTl'); if (b) b.setAttribute('aria-pressed', String(ed.classList.contains('anTl'))); if (!P.dang) setTimeout(veKhung, 60); }
+function ccMenuTen(e) { const r = e.currentTarget.getBoundingClientRect(); moMenu(r.left, r.bottom + 6, [{ ic: 'text', t: 'Đổi tên', f: () => { const i = $('#tenDuAn'); i.focus(); i.select(); } }, { ic: 'copy', t: 'Nhân bản dự án', f: () => { $('#btnDuAn').click(); toast('Bấm ⧉ cạnh dự án để nhân bản'); } }, { ic: 'media', t: 'Dự án của tôi', k: 'Ctrl+O', f: () => $('#btnDuAn').click() }]); }
+function khoiTaoCCW() {
+  if (typeof laMobi === 'function' && laMobi()) return;
+  const ed = $('#ed'); ed.classList.add('ccw'); P.ccwInit = true; LB = 110;
+  IC.hand = '<path d="M18 11V6a2 2 0 0 0-4 0v5M14 10V4a2 2 0 0 0-4 0v6M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/>';
+  IC.ratio = '<path d="M4 9V6a2 2 0 0 1 2-2h3M15 4h3a2 2 0 0 1 2 2v3M20 15v3a2 2 0 0 1-2 2h-3M9 20H6a2 2 0 0 1-2-2v-3"/><rect x="8" y="8" width="8" height="8" rx="1"/>';
+  IC.dots = '<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>';
+  IC.tlOff = '<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8"/>';
+  // thanh trên: nhóm giữa Select / Hand / zoom / hoàn tác / làm lại
+  const top = $('.etop'), mid = el('div', 'ccMid'); mid.innerHTML = '<button class="ccIc" id="btnChonCT" type="button" title="Chọn (V)" aria-pressed="true">' + ic('cursor') + '</button><button class="ccIc" id="btnTayCT" type="button" title="Bàn tay: kéo để dời khung xem (H)" aria-pressed="false">' + ic('hand') + '</button><span class="sep"></span>';
+  const zk = $('#zoomKhung'); zk.title = 'Phóng khung xem · ⇧F vừa, ⇧0 100%, ⇧1 50%, ⇧2 200%'; const bHt = $('#btnHoanTac'), bLl = $('#btnLamLai'); mid.insertBefore(zk, mid.lastChild); bHt.className = 'ccIc'; bLl.className = 'ccIc'; mid.appendChild(bHt); mid.appendChild(bLl);
+  const gian = top.querySelector('.gian'); top.insertBefore(mid, gian.nextSibling);
+  const tm = el('button', null, '▾'); tm.type = 'button'; tm.id = 'tenMenu'; tm.title = 'Đổi tên, nhân bản, dự án của tôi'; top.insertBefore(tm, $('#tenDuAn').nextSibling); tm.onclick = ccMenuTen;
+  $('#btnChonCT').onclick = () => { ccDatTay(false); datCheDo('chon', true); }; $('#btnTayCT').onclick = () => ccDatTay(!P.ccTay);
+  const bm = $('#btnMenu'); bm.innerHTML = ic('dots'); bm.title = 'Menu';
+  const lt = $('#luuTt'); if (lt && !lt.textContent) lt.title = 'Tự lưu vào trình duyệt mỗi vài giây';
+  // rail trái: nút phím tắt dưới cùng + tay thu gọn
+  const tabs = $('.ecol.trai .etabs'); const kb = el('button', 'ccKbd'); kb.type = 'button'; kb.title = 'Phím tắt (?)'; kb.innerHTML = ic('kbd'); kb.onclick = () => $('#btnPhimTat').click(); tabs.appendChild(kb);
+  const thu = el('button', null, '‹'); thu.type = 'button'; thu.id = 'ccThu'; thu.onclick = () => ccThuGon(); $('.ecol.trai').appendChild(thu);
+  let thuLuu = '0'; try { thuLuu = localStorage.getItem('dv_thuGon') || '0'; } catch { } ccThuGon(thuLuu === '1');
+  // vùng canvas: nút Tỉ lệ góc trái, cụm điều khiển trình phát nổi góc phải, lớp bàn tay
+  const vung = $('.khungVung'); const rb = el('div'); rb.id = 'ccRatio'; rb.title = 'Tỉ lệ khung'; rb.innerHTML = ic('ratio'); const t2 = $('#tiLe2'); if (t2) rb.appendChild(t2); vung.appendChild(rb);
+  const cp = $('.ctl .ctlPhai'); if (cp) { cp.classList.add('ccNoi'); vung.appendChild(cp); }
+  const tl = el('div'); tl.id = 'ccTayLop'; vung.appendChild(tl);
+  tl.onpointerdown = e => { if (e.button !== 0) return; const sx = e.clientX, sy = e.clientY, l0 = vung.scrollLeft, t0 = vung.scrollTop; tl.setPointerCapture(e.pointerId); ed.classList.add('dangTay'); tl.onpointermove = ev => { vung.scrollLeft = l0 - (ev.clientX - sx); vung.scrollTop = t0 - (ev.clientY - sy); }; tl.onpointerup = tl.onpointercancel = () => { tl.onpointermove = null; ed.classList.remove('dangTay'); }; };
+  // thanh công cụ timeline: ▶ + đồng hồ ở giữa; toàn màn hình + ẩn timeline bên phải
+  const tool = $('.etool'), cums = tool.querySelectorAll(':scope > .cum'); const giua = el('div', 'cum ccGiua'); giua.appendChild($('#btnPlay')); giua.appendChild($('#tg')); tool.insertBefore(giua, cums[1]);
+  const phai = cums[1]; const tm2 = $('#btnToanManHinh'); const anTl = el('button', 'ic'); anTl.type = 'button'; anTl.id = 'btnAnTl'; anTl.title = 'Ẩn / hiện dòng thời gian (Ctrl+Shift+.)'; anTl.setAttribute('aria-pressed', 'false'); anTl.innerHTML = ic('tlOff'); anTl.onclick = () => ccAnTl();
+  if (tm2) { tm2.className = 'ic'; tm2.innerHTML = ic('full'); phai.appendChild(tm2); } phai.appendChild(anTl);
+  // đồng hồ MM:SS:FF | tổng, thước mm:ss
+  const datTgCu = datTg; datTg = function (tong) { datTgCu.apply(this, arguments); const g = $('#tg'); if (g && ccwBat()) g.innerHTML = '<b>' + CC_TC(P.t) + '</b> <span style="opacity:.5">|</span> ' + CC_TC(tong); };
+  const rulerCu = ruler; ruler = function () { rulerCu.apply(this, arguments); if (!ccwBat()) return; $$('#ruler > i:not(.nho)').forEach(i => { if (/^\d:\d\d$/.test(i.textContent)) i.textContent = '0' + i.textContent; }); };
+  datTg(tongGiay()); ruler();
+  // V (chọn) hay C (cắt) ở bất kỳ đâu → tắt bàn tay
+  const datCheDoCu = datCheDo; datCheDo = function (m) { datCheDoCu.apply(this, arguments); if (P.ccTay && !P.ccDangTay) ccDatTay(false); };
+  // zoom khung đổi từ chỗ khác → cập nhật nhãn
+  // #seek thành thanh tiến độ khi ẩn timeline (như CapCut)
+  const sk = $('#seek'); if (sk) $('.etl').insertBefore(sk, $('#tlScroll'));
+  // phím: H bàn tay, V chọn, Ctrl+/ thu gọn thư viện, Ctrl+Shift+. ẩn timeline, ⇧F vừa khung, ⇧0 100%, ⇧1 50%, ⇧2 200%
+  addEventListener('keydown', e => {
+    const a = document.activeElement; if (/INPUT|TEXTAREA|SELECT/.test(a.tagName) || a.isContentEditable) return; if ($('.xuat.mo')) return;
+    const ctrl = e.ctrlKey || e.metaKey, sh = e.shiftKey, alt = e.altKey, c = e.code; const xong = f => { e.preventDefault(); e.stopImmediatePropagation(); f(); };
+    if (!ctrl && !alt && !sh && c === 'KeyH') return xong(() => ccDatTay(true));
+    if (!ctrl && !alt && !sh && c === 'KeyV') { ccDatTay(false); return; }
+    if (ctrl && !sh && !alt && c === 'Slash') return xong(() => ccThuGon());
+    if (ctrl && sh && !alt && c === 'Period') return xong(() => ccAnTl());
+    if (sh && !ctrl && !alt && c === 'KeyF') return xong(() => ccDatZoom('vua'));
+    if (sh && !ctrl && !alt && c === 'Digit0') return xong(() => ccDatZoom('1'));
+    if (sh && !ctrl && !alt && c === 'Digit1') return xong(() => ccDatZoom('0.5'));
+    if (sh && !ctrl && !alt && c === 'Digit2') return xong(() => ccDatZoom('2'));
+  }, true);
+  // bảng Xuất thả xuống: bấm ra ngoài thì đóng
+  document.addEventListener('pointerdown', e => { const h = $('#xuatCaiHop'); if (!h || !h.classList.contains('mo')) return; if (e.target.closest('#xuatCaiHop .box') || e.target.closest('#btnXuat')) return; h.classList.remove('mo'); }, true);
+  // bỏ chọn khi bấm vào nền vùng canvas (như CapCut: bảng thuộc tính tự ẩn)
+  vung.addEventListener('pointerdown', e => { if (e.target !== vung) return; if (P.chon || (P.nhieu && P.nhieu.length)) { P.chon = null; P.nhieu = []; chonHien(); veProp(); } });
+}
+
+khoiTaoB(); khoiTaoC(); khoiTaoUI(); khoiTaoLop(); khoiTaoBang(); khoiTaoDot1(); khoiTaoDot2(); khoiTaoDot3(); khoiTaoM1(); khoiTaoM2(); khoiTaoM3(); khoiTaoN(); khoiTaoMobi(); khoiTaoCCW(); veTl();
 </script>
 <script src="tro-ly.js?v=202610011200"></script>
 </body>

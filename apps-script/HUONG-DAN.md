@@ -534,6 +534,19 @@ Trước đây trên điện thoại (nhất là iPhone chuyển app giữa ch�
 - **HookAI.gs đổi**: tải video TikTok và chờ Gemini xử lý file giới hạn 170 giây (trước đây có thể ngốn hết 6 phút rồi bị Apps Script giết, mất lượt). Cần dán lại `HookAI.gs` vào Apps Script rồi Deploy → New version (bản dán sẵn key mentor giữ riêng, không đưa lên GitHub).
 - Danh sách việc nên làm trước giờ demo nằm ngay trong trang kiểm tra.
 
+### Bố cục CapCut Web trên máy tính (10/2026, theo `capcut-clone-spec/SPEC.md`)
+
+Thư mục `capcut-clone-spec/` (đặc tả + 161 ảnh chụp CapCut Web) được áp thẳng lên `tools/dung-video.html` (không viết lại bằng React như prompt gợi ý: bản hiện có đã đủ tính năng, AI, tự lưu và bộ kiểm thử; đổi stack ngay trước buổi demo là rủi ro không cần thiết). Bố cục mới chỉ bật trên màn hình rộng hơn 760px; điện thoại vẫn dùng bố cục dọc.
+
+- **Màu & cỡ theo đặc tả**: nền `#0E0E11`, bảng `#17171A`, vùng canvas `#1C1D21`, timeline `#121214`, điểm nhấn cyan `#59C5DD`, clip chữ cam `#D97D3E`, âm thanh xanh `#4CA987`, nhãn dán hồng `#CC5D88`; thanh trên 56px kính mờ, rail trái 71px, thư viện 327px, bảng thuộc tính 265px + rail tab dọc 56px, toolbar timeline 48px, đầu track 110px.
+- **Thanh trên**: ☁ trạng thái tự lưu · tên dự án ▾ (Đổi tên, Nhân bản, Dự án của tôi) · Chọn (V) / Bàn tay (H) / zoom khung ▾ / Hoàn tác / Làm lại ở giữa · Dự án, Cài đặt, ⌨, toàn màn hình, ⚙ bảng dự án, **Xuất** gradient, ⋯ menu bên phải.
+- **Rail trái**: 10 tab dọc có nhãn (Media, Âm thanh, Văn bản, Phụ đề, Hiệu ứng, Chuyển cảnh, Bộ lọc, Nhãn dán, Đồ hoạ, Trợ lý AI) + ⌨ dưới cùng; tay ‹ ở mép hoặc **Ctrl+/** thu gọn thư viện (nhớ qua `localStorage dv_thuGon`).
+- **Vùng canvas**: nút **Tỉ lệ** 52×52 góc trên trái (ô chọn tỉ lệ), cụm ⟲ lặp · 📊 scopes · lưới/vùng an toàn nổi góc phải; bấm nền để bỏ chọn; khung chọn viền cyan 1px, núm tròn trắng. **Bàn tay (H)**: kéo để cuộn khung khi phóng to; ⇧F vừa khung, ⇧0 100%, ⇧1 50%, ⇧2 200%.
+- **Bảng thuộc tính phải**: ẩn khi không chọn gì (như CapCut); chọn clip thì hiện với rail tab dọc. Cài đặt dự án (Hook, khung, tỉ lệ, phong cách, font, xuất, dự án) mở bằng nút ⚙ trên thanh trên.
+- **Timeline**: ▶ + đồng hồ `MM:SS:FF | tổng` ở giữa toolbar, thước `00:02`, đầu phát trắng, viền chọn cyan; nút ⌧ hoặc **Ctrl+Shift+.** ẩn/hiện track (còn thanh tiến độ như CapCut). Ctrl+. vẫn là tiến 1 khung theo bảng phím CapCut desktop.
+- **Xuất**: bấm Xuất mở bảng 365px thả ngay dưới nút (bấm ra ngoài thì đóng), đủ Tên, Định dạng, Độ phân giải, Khung/giây, Chất lượng, Khoảng xuất.
+- Kiểm thử: `t121.mjs` (bố cục, phím, bảng Xuất); các bộ t89–t120 vẫn xanh. Ảnh so sánh chụp ở 1431×949 như đặc tả.
+
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 
 Cài theo [`cloudflare/CAI-DAT.md`](../cloudflare/CAI-DAT.md) (khoảng 10 phút, không cần thẻ). Có máy chủ này tool thêm:
