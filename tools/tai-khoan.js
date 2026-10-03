@@ -375,7 +375,7 @@
           : await goi({ action: 'st_login', email: d.email, pass: d.pass });
         if (!r.ok) {
           tt.className = 'tk-tt loi';
-          tt.textContent = { trung_email: 'Email này đã có tài khoản, chuyển sang tab Đăng nhập nhé.', sai_mk: 'Email hoặc mật khẩu chưa đúng.', thieu: 'Còn thiếu thông tin.', email_sai: 'Email chưa đúng định dạng.', sdt_sai: 'Số điện thoại chưa đúng.' }[r.error] || 'Chưa xong, thử lại giúp mình.';
+          tt.textContent = { trung_email: 'Email này đã có tài khoản, chuyển sang tab Đăng nhập nhé.', sai_mk: 'Email hoặc mật khẩu chưa đúng.', sai: 'Email hoặc mật khẩu chưa đúng. Sai 5 lần liên tiếp sẽ bị khoá tạm 10 phút.', khoa_tam: 'Nhập sai mật khẩu nhiều lần nên tài khoản bị khoá tạm 10 phút. Đợi rồi thử lại, kiểm tra Caps Lock và email.', cho_duyet: 'Tài khoản học viên đang chờ duyệt, nhắn mentor giúp mình.', thieu: 'Còn thiếu thông tin.', thieu_sdt: 'Cần số điện thoại (Zalo) để tạo tài khoản.', email_sai: 'Email chưa đúng định dạng.', sdt_sai: 'Số điện thoại chưa đúng.', het_phien: 'Phiên đã hết, đăng nhập lại giúp mình.' }[r.error] || ('Máy chủ từ chối (mã ' + (r.error || '?') + '). Chụp màn hình gửi mentor giúp mình.');
           return;
         }
         ls.set(ND_KEY, JSON.stringify({ token: r.token }));
