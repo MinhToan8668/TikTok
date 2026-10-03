@@ -639,6 +639,98 @@
   #lopPhu .tkAva{width:2.6em!important;height:2.6em;border-radius:50%;background:rgba(255,255,255,.35);border:.12em solid #fff;position:relative}#lopPhu .tkAva i{position:absolute;left:50%;bottom:-.55em;transform:translateX(-50%);width:1.1em;height:1.1em;border-radius:50%;background:#fe2c55;font:800 .9em/1.1em sans-serif;text-align:center;font-style:normal}
   #lopPhu .tkDia{width:2.4em!important;height:2.4em;border-radius:50%;background:radial-gradient(circle,#333 0 28%,#111 29% 100%);border:.35em solid #222;box-sizing:border-box}
   #lopPhu .tkDuoi{position:absolute;left:3.5%;right:20%;bottom:5%;display:flex;flex-direction:column;gap:.35em;font-size:.78em;line-height:1.25}#lopPhu .tkDuoi b{font-size:1.15em;font-weight:800}#lopPhu .tkDuoi span{opacity:.92}
+  /* ═══ Giao diện kính mờ (liquid glass) hai tông theo bảng màu Tự Mình Xây Kênh · chỉ bố cục máy tính ═══ */
+  .ed.ccw{--ea:#99DF00;--eaChu:#B9F23A;--eaInk:#101400;--ea2:#22d3df;--eb:#0B0C08;--ep:rgba(22,24,15,.72);--ep2:rgba(255,255,255,.06);--el:rgba(255,255,255,.09);--vien:rgba(255,255,255,.10);--sang:rgba(255,255,255,.07);--et:#F3F0E4;--em:#B0B296;--ccTl:rgba(14,16,9,.74);--ccCv:rgba(10,11,7,.55);--ccPop:rgba(30,33,20,.92);--kinh:blur(20px) saturate(1.35);--bong:0 12px 36px rgba(0,0,0,.35);
+    background:radial-gradient(1200px 600px at 12% -10%,rgba(153,223,0,.16),transparent 60%),radial-gradient(900px 500px at 100% 110%,rgba(34,211,223,.10),transparent 60%),#0B0C08;padding:0 8px 8px;gap:0}
+  :root[data-theme="light"] .ed.ccw{--eaChu:#4F7A00;--eaInk:#101400;--eb:#EEF3DD;--ep:rgba(253,251,243,.72);--ep2:rgba(28,38,0,.06);--el:rgba(28,38,0,.10);--vien:rgba(255,255,255,.65);--sang:rgba(255,255,255,.9);--et:#1C2600;--em:#5B6436;--ccTl:rgba(255,255,255,.55);--ccCv:rgba(28,38,0,.05);--ccPop:rgba(253,251,243,.95);--bong:0 12px 36px rgba(38,33,15,.14);
+    background:radial-gradient(1200px 600px at 12% -10%,rgba(153,223,0,.35),transparent 60%),radial-gradient(900px 500px at 100% 110%,rgba(34,211,223,.18),transparent 60%),linear-gradient(#F4F7E6,#EAF0D8)}
+  @media (prefers-color-scheme: light){:root:not([data-theme="dark"]) .ed.ccw{--eaChu:#4F7A00;--eaInk:#101400;--eb:#EEF3DD;--ep:rgba(253,251,243,.72);--ep2:rgba(28,38,0,.06);--el:rgba(28,38,0,.10);--vien:rgba(255,255,255,.65);--sang:rgba(255,255,255,.9);--et:#1C2600;--em:#5B6436;--ccTl:rgba(255,255,255,.55);--ccCv:rgba(28,38,0,.05);--ccPop:rgba(253,251,243,.95);--bong:0 12px 36px rgba(38,33,15,.14);
+    background:radial-gradient(1200px 600px at 12% -10%,rgba(153,223,0,.35),transparent 60%),radial-gradient(900px 500px at 100% 110%,rgba(34,211,223,.18),transparent 60%),linear-gradient(#F4F7E6,#EAF0D8)}}
+  /* tấm kính: thanh trên, 3 cột, dòng thời gian */
+  .ed.ccw .etop,.ed.ccw .ecol,.ed.ccw .etl{background:var(--ep);backdrop-filter:var(--kinh);-webkit-backdrop-filter:var(--kinh);border:1px solid var(--vien)!important;box-shadow:inset 0 1px 0 var(--sang),var(--bong)}
+  .ed.ccw .etop{border-radius:14px;margin:8px 0 6px;height:52px;min-height:52px;grid-template-rows:auto}
+  .ed.ccw{grid-template-rows:66px minmax(0,1fr) 6px var(--hTl,229px)}
+  .ed.ccw.anTl{grid-template-rows:66px minmax(0,1fr) 6px 70px}
+  .ed.ccw .etop .logo{height:50px;border-right:1px solid var(--el);border-radius:14px 0 0 14px}
+  .ed.ccw .ecol,.ed.ccw .etl{border-radius:16px;overflow:hidden}
+  .ed.ccw .ecol.trai{overflow:visible;position:relative;z-index:3}
+  .ed.ccw .ecol.trai .etabs{border-radius:16px 0 0 16px;background:transparent;border-right:1px solid var(--el)}
+  .ed.ccw .ecol.giua{background:var(--ccCv)}
+  .ed.ccw .keo.ngang,.ed.ccw .keo.doc{background:transparent}.ed.ccw .keo:hover,.ed.ccw .keo.dang{background:var(--ea)}
+  .ed.ccw .ebody{grid-template-columns:var(--wTrai,398px) 6px minmax(0,1fr) 6px var(--wPhai,321px)}
+  .ed.ccw:not(.coChon):not(.co-phai) .ebody{grid-template-columns:var(--wTrai,398px) 6px minmax(0,1fr) 0 0}
+  .ed.ccw.thuGon .ebody{grid-template-columns:71px 0 minmax(0,1fr) 6px var(--wPhai,321px)}.ed.ccw.thuGon:not(.coChon):not(.co-phai) .ebody{grid-template-columns:71px 0 minmax(0,1fr) 0 0}
+  .ed.ccw.bocDoc{grid-template-columns:minmax(0,1fr) 6px var(--wXem,460px)}.ed.ccw.bocDoc>.ecol.giua{grid-column:3;border-left:1px solid var(--vien)!important}
+  .ed.ccw.bocDoc .ebody{grid-template-columns:var(--wTrai,398px) 6px minmax(0,1fr)}.ed.ccw.bocDoc.thuGon .ebody{grid-template-columns:71px 0 minmax(0,1fr)}
+  .ed.ccw #ccThu{border-radius:0 10px 10px 0;background:var(--ccPop);border:1px solid var(--vien);border-left:0}
+  /* chữ, nút, ô nhập */
+  .ed.ccw,.ed.ccw button,.ed.ccw input,.ed.ccw select,.ed.ccw textarea{color:var(--et)}
+  .ed.ccw .btn{border-radius:10px;border-color:var(--el);background:var(--ep2)}
+  .ed.ccw .btn.xanh,.ed.ccw .btn.nho.xanh{background:var(--ea);color:var(--eaInk);border-color:transparent;box-shadow:0 2px 10px rgba(153,223,0,.25)}
+  .ed.ccw .etop .btn.ghost{color:var(--em)}.ed.ccw .etop .btn.ghost:hover{color:var(--et);background:var(--ep2)}
+  .ed.ccw .ccIc{color:var(--em)}.ed.ccw .ccIc:hover{color:var(--et)}.ed.ccw .ccIc[aria-pressed="true"]{background:var(--ea);color:var(--eaInk)}
+  .ed.ccw .btn.nutXuat{background:linear-gradient(120deg,#99DF00,#5fd9a6 55%,#22d3df);color:#0B0C08;box-shadow:0 4px 16px rgba(153,223,0,.35)}
+  .ed.ccw input,.ed.ccw select,.ed.ccw textarea{background:var(--ep2);border:1px solid var(--el);border-radius:10px}
+  .ed.ccw input:focus,.ed.ccw select:focus,.ed.ccw textarea:focus{outline:0;border-color:var(--ea);box-shadow:0 0 0 3px rgba(153,223,0,.18)}
+  .ed.ccw ::placeholder{color:var(--em);opacity:.7}
+  .ed.ccw input[type=range],.ed.ccw input[type=checkbox]{accent-color:var(--ea)}
+  .ed.ccw .khoChip .btn{border-radius:999px}.ed.ccw .khoChip .btn.xanh{background:var(--ea);color:var(--eaInk)}
+  .ed.ccw .quota{color:var(--em)}
+  /* rail trái + bảng thuộc tính */
+  .ed.ccw .ecol.trai .etabs button{color:var(--em);border-radius:12px}.ed.ccw .ecol.trai .etabs button:hover{background:var(--ep2);color:var(--et)}
+  .ed.ccw .ecol.trai .etabs button[aria-selected="true"]{background:rgba(153,223,0,.16);color:var(--eaChu);box-shadow:inset 0 0 0 1px rgba(153,223,0,.35)}
+  .ed.ccw .etabs .n{background:var(--ea);color:var(--eaInk)}
+  .ed.ccw .ecol.phai .ptabs{background:transparent;border-right:1px solid var(--el)}
+  .ed.ccw .ecol.phai .ptabs button{color:var(--em);border-radius:10px}.ed.ccw .ecol.phai .ptabs button.on{background:rgba(153,223,0,.16);color:var(--eaChu)}
+  .ed.ccw .prop .nhom2>b,.ed.ccw .epane h3.pt{color:var(--et)}
+  .ed.ccw .prop input[type=checkbox]{background:var(--ep2)}.ed.ccw .prop input[type=checkbox]:checked{background:var(--ea)}
+  .ed.ccw .epane .ben{border-right:1px solid var(--el)}.ed.ccw .epane .ben button{color:var(--em);border-radius:10px}.ed.ccw .epane .ben button.on{background:var(--ep2);color:var(--et)}
+  .ed.ccw .mauLuoi button .the,.ed.ccw .emojiLuoi button,.ed.ccw .gx button{background:var(--ep2);border-radius:12px}
+  .ed.ccw .mauLuoi button .ten{color:var(--et)}.ed.ccw .mauLuoi button:hover .the{box-shadow:inset 0 0 0 1.5px var(--ea)}.ed.ccw .mauLuoi button:hover .the::after{background:var(--ea);color:var(--eaInk)}
+  .ed.ccw .drop{border-color:var(--el);background:var(--ep2);border-radius:14px}
+  .ed.ccw .fsrc{background:transparent}
+  .ed.ccw .sfxHang{background:var(--ep2);border-radius:12px;border:1px solid transparent}.ed.ccw .sfxHang:hover{border-color:var(--el)}
+  /* vùng canvas */
+  .ed.ccw #ccRatio,.ed.ccw .ctlPhai.ccNoi{background:var(--ccPop);backdrop-filter:var(--kinh);-webkit-backdrop-filter:var(--kinh);border:1px solid var(--vien);border-radius:12px;color:var(--em)}
+  .ed.ccw .ctlPhai.ccNoi select,.ed.ccw .ctlPhai.ccNoi .btn{color:var(--et);background:transparent;border:0}
+  .ed.ccw .khungVung .khung{border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+  /* dòng thời gian */
+  .ed.ccw .etool{border-bottom:1px solid var(--el)}
+  .ed.ccw .etool .ic{color:var(--em);border-radius:10px}.ed.ccw .etool .ic:hover{background:var(--ep2);color:var(--et)}
+  .ed.ccw .etool .ic[aria-pressed="true"]{background:var(--ea);color:var(--eaInk)}
+  .ed.ccw .etool .ccGiua .tg{color:var(--em)}.ed.ccw .prop label>span:first-child,.ed.ccw .epane label>span:first-child{color:var(--et)}.ed.ccw .etool .ccGiua .tg b{color:var(--et)}.ed.ccw .etool .ccGiua .play{color:var(--et)}
+  .ed.ccw .etool #zoomTl{accent-color:var(--ea)}
+  .ed.ccw .etl-scroll,.ed.ccw .ruler,.ed.ccw .track .lb,.ed.ccw .etl-trong{background:transparent}
+  .ed.ccw .ruler{color:var(--em)}.ed.ccw .ruler i{border-left-color:var(--el)}
+  .ed.ccw .track:not(.rong)::after{background:var(--ep2);opacity:1;border-radius:8px}
+  .ed.ccw .ph{background:var(--et)}.ed.ccw .ph::before{border-top-color:var(--et)}.phDau{background:var(--et)}
+  .ed.ccw .item{border-radius:8px}
+  .ed.ccw .item.chon,.ed.ccw .item.nhieu,.ed.ccw .item.pdIt.nhieu{border-color:var(--ea);box-shadow:0 0 0 1px var(--ea)}
+  .ed.ccw .item.chon .h{background:var(--ea)}
+  .ed.ccw #tayCam .tay{border-color:var(--ea)}
+  .ed.ccw #khungChon{border-color:var(--ea);background:rgba(153,223,0,.12)}
+  .ed.ccw .lb .trn{color:var(--em)}.ed.ccw .lb .trn:hover{background:var(--ep2);color:var(--et)}
+  /* hộp thoại: nổi trên toàn màn hình, không bị cột khung xem cắt */
+  .ed.ccw .xuat{position:fixed;inset:0;z-index:70;background:rgba(8,9,5,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+  .ed.ccw .xuat .box{background:var(--ccPop);backdrop-filter:var(--kinh);-webkit-backdrop-filter:var(--kinh);border:1px solid var(--vien);border-radius:20px;box-shadow:inset 0 1px 0 var(--sang),0 24px 70px rgba(0,0,0,.45);color:var(--et);max-height:calc(100vh - 40px);overflow:auto}
+  .ed.ccw #xuatCaiHop{background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;place-items:start end;padding:66px 20px 0 0}
+  .ed.ccw #xuatCaiHop .box{width:365px;max-width:365px;border-radius:16px;padding:16px;max-height:calc(100vh - 86px);overflow:auto}
+  .ed.ccw.bocDoc #xuatCaiHop{padding-right:20px}
+  .ed.ccw .xuat .box .btn.ghost{color:var(--em)}
+  .ed.ccw .cmenu,.cmenu.ccwMenu{background:var(--ccPop,#1f1f23);backdrop-filter:blur(20px) saturate(1.35);-webkit-backdrop-filter:blur(20px) saturate(1.35);border:1px solid var(--vien,#33333a);border-radius:14px;color:var(--et,#e7e7eb)}
+  .cmenu.ccwMenu button:hover{background:var(--ep2,#2b2b31)}.cmenu.ccwMenu button kbd{color:var(--em,#7d7d86)}
+  .ed.ccw .toast,.toast.ccwToast{background:var(--ccPop);color:var(--et);border:1px solid var(--vien);backdrop-filter:blur(16px);border-radius:999px}
+  .ed.ccw .tt i{background:var(--ea)}
+  .ed.ccw .kfHD{background:rgba(153,223,0,.10);border-color:rgba(153,223,0,.25);color:var(--et)}
+  .ed.ccw .prop label .kfn.co{color:var(--eaInk);border-color:var(--ea);background:var(--ea)}
+  :root[data-theme="light"] .ed.ccw .item.v{color:#fff}
+  :root[data-theme="light"] .ed.ccw .xuat{background:rgba(28,38,0,.25)}
+  @media (prefers-color-scheme: light){:root:not([data-theme="dark"]) .ed.ccw .xuat{background:rgba(28,38,0,.25)}}
+  .cmenu.ccwMenu,body:has(.ed.ccw) .toast{--ccPop:rgba(30,33,20,.92);--vien:rgba(255,255,255,.10);--et:#F3F0E4;--em:#B0B296;--ep2:rgba(255,255,255,.06)}
+  :root[data-theme="light"] .cmenu.ccwMenu,:root[data-theme="light"] body:has(.ed.ccw) .toast{--ccPop:rgba(253,251,243,.96);--vien:rgba(255,255,255,.7);--et:#1C2600;--em:#5B6436;--ep2:rgba(28,38,0,.06)}
+  @media (prefers-color-scheme: light){:root:not([data-theme="dark"]) .cmenu.ccwMenu,:root:not([data-theme="dark"]) body:has(.ed.ccw) .toast{--ccPop:rgba(253,251,243,.96);--vien:rgba(255,255,255,.7);--et:#1C2600;--em:#5B6436;--ep2:rgba(28,38,0,.06)}}
+  body:has(.ed.ccw) .toast{background:var(--ccPop);color:var(--et);border:1px solid var(--vien);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:999px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+  .cmenu.ccwMenu button{color:var(--et)}.cmenu.ccwMenu button svg{color:var(--em)}.cmenu.ccwMenu hr{border-top-color:var(--vien)}
 </style>
 </head>
 <body>
@@ -2506,7 +2598,7 @@ function datToanApp(bat) { const ed = $('#ed'); ed.classList.toggle('full', bat)
 /* menu chuột phải trên dòng thời gian */
 function dongMenu() { $$('.cmenu').forEach(m => m.remove()); }
 function moMenu(x, y, ds) {
-  dongMenu(); const m = el('div', 'cmenu'); ds.forEach(o => { if (o === '-') { m.appendChild(el('hr')); return; } const b = el('button', o.do ? 'do' : null); b.type = 'button'; b.innerHTML = ic(o.ic) + '<span>' + o.t + '</span>' + (o.k ? '<kbd>' + o.k + '</kbd>' : ''); b.onclick = () => { dongMenu(); o.f(); }; m.appendChild(b); });
+  dongMenu(); const m = el('div', 'cmenu' + ($('#ed') && $('#ed').classList.contains('ccw') ? ' ccwMenu' : '')); ds.forEach(o => { if (o === '-') { m.appendChild(el('hr')); return; } const b = el('button', o.do ? 'do' : null); b.type = 'button'; b.innerHTML = ic(o.ic) + '<span>' + o.t + '</span>' + (o.k ? '<kbd>' + o.k + '</kbd>' : ''); b.onclick = () => { dongMenu(); o.f(); }; m.appendChild(b); });
   document.body.appendChild(m); const r = m.getBoundingClientRect(); m.style.left = Math.min(x, innerWidth - r.width - 6) + 'px'; m.style.top = Math.min(y, innerHeight - r.height - 6) + 'px';
 }
 function tChuot(e) { const r = $('#tlIn').getBoundingClientRect(); return Math.max(0, Math.min(tongGiay(), (e.clientX - r.left - LB) / PX())); }
@@ -4358,6 +4450,10 @@ function khoiTaoCCW() {
     if (sh && !ctrl && !alt && c === 'Digit1') return xong(() => ccDatZoom('0.5'));
     if (sh && !ctrl && !alt && c === 'Digit2') return xong(() => ccDatZoom('2'));
   }, true);
+  // hộp thoại dời ra ngoài cột khung xem (cột có backdrop-filter + overflow hidden sẽ cắt mất nút); nằm cố định toàn màn hình
+  $$('.ecol.giua > .xuat').forEach(x => ed.appendChild(x));
+  // bấm vào nền mờ ngoài hộp thoại thì đóng (trừ lúc đang xuất dở)
+  document.addEventListener('pointerdown', e => { const h = e.target.closest('.xuat.mo'); if (!h || e.target !== h) return; if (h.id === 'xuatHop' && $('#xuatXong') && $('#xuatXong').style.display === 'none') return; h.classList.remove('mo'); }, true);
   // bảng Xuất thả xuống: bấm ra ngoài thì đóng
   document.addEventListener('pointerdown', e => { const h = $('#xuatCaiHop'); if (!h || !h.classList.contains('mo')) return; if (e.target.closest('#xuatCaiHop .box') || e.target.closest('#btnXuat')) return; h.classList.remove('mo'); }, true);
   // bỏ chọn khi bấm vào nền vùng canvas (như CapCut: bảng thuộc tính tự ẩn)

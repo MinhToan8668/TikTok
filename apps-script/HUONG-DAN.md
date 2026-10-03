@@ -572,6 +572,11 @@ Mọi tài nguyên tách khỏi code, nằm trong `tools/kho/kho.js` (một file
 - **Lớp phủ Giao diện TikTok** (ô lớp phủ trên khung xem, tự bật khi vào bố cục dọc): vẽ thanh "Đang Follow · Dành cho bạn", cột nút tim/bình luận/lưu/chia sẻ, tên kênh + mô tả + nhạc ở đáy, tỉ lệ theo bề rộng khung, để canh chữ và đồ hoạ không bị giao diện TikTok che. Có cả "TikTok + lưới".
 - Kiểm thử: `t123.mjs` (21 bước).
 
+### Hộp thoại không bị cắt + giao diện kính mờ hai tông (10/2026)
+
+- **Lỗi bấm Xuất không ra file / không đóng được hộp thoại**: các hộp thoại (Xuất, Cài đặt, Dự án, Phím tắt, Dán thuộc tính, tiến độ xuất) nằm trong cột khung xem; cột này cắt tràn nên trên màn hình thấp (laptop 1280×720, cửa sổ nhỏ) phần nút Xuất/Huỷ/Đóng rơi ra ngoài, không bấm được. Nay hộp thoại được dời ra ngoài cột và cố định toàn màn hình (`position:fixed`), nội dung dài thì cuộn trong hộp; Esc vẫn đóng. Kiểm thử `t124.mjs` chạy ở 1280×720: Xuất ra file thật, mọi hộp đóng được.
+- **Giao diện kính mờ (liquid glass) theo bảng màu Tự Mình Xây Kênh**: thanh trên, ba cột và dòng thời gian là các tấm kính bo góc 16px (`backdrop-filter`), nền có vệt sáng lime và cyan; màu nhấn lime `#99DF00` (nút Xuất gradient lime → cyan, viền chọn, tab đang mở), chữ mực `#1C2600` ở tông sáng và `#F3F0E4` ở tông tối. Đổi tông bằng nút ◐ trên đầu trang (theo `data-theme` của trang, mặc định theo hệ điều hành). Chỉ áp cho bố cục máy tính; điện thoại giữ nguyên.
+
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 
 Cài theo [`cloudflare/CAI-DAT.md`](../cloudflare/CAI-DAT.md) (khoảng 10 phút, không cần thẻ). Có máy chủ này tool thêm:
