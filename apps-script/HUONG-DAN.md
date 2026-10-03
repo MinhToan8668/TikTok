@@ -564,6 +564,14 @@ Mọi tài nguyên tách khỏi code, nằm trong `tools/kho/kho.js` (một file
 - **Trợ lý AI**: `loc`, `hieu_ung`, `chuyen` trong `sua_doan`/`ap_tat_ca` nhận tên trong kho (ví dụ loc "Phim Hàn", hieu_ung "VHS", chuyen "Trái tim").
 - Kiểm thử: `t122.mjs` (27 bước: dựng LUT, tìm/nhóm, hiệu ứng + cường độ, chuyển cảnh WebGL, mẫu chữ, nhập font, âm thanh tổng hợp, GIF động, gói .zip, AI theo tên).
 
+### Quét chọn phụ đề, kiểu riêng từng câu, bố cục video dọc (10/2026)
+
+- **Quét chọn nhiều** (kéo ở chỗ trống trên dòng thời gian) nay bắt luôn các câu phụ đề trên O2 cùng với đồ hoạ, b-roll, âm thanh. Trước đây chip phụ đề không có `data-k` nên bị bỏ qua; ngoài ra trình duyệt phát `pointercancel` giữa chừng khi bắt đầu kéo trên track có chữ, nay chặn bằng `preventDefault` và nghe `pointerup` ở `window`. Chọn xong: Delete xoá hết một lần (một bước hoàn tác), bảng thuộc tính báo số câu đang chọn. Hoàn tác/làm lại giờ nhớ cả trạng thái phụ đề (từ bị ẩn, đoạn chữ riêng, kiểu riêng, nhóm từ).
+- **Áp cho tất cả phụ đề** (như ô *Apply to all main captions* của CapCut): trong bảng thuộc tính của một câu phụ đề có ô bật/tắt. Bật (mặc định): nhóm "Kiểu phụ đề (cho tất cả câu)" như cũ. Tắt: hiện nhóm **Kiểu riêng cho câu này** gồm Kiểu chữ, Font, Cỡ chữ, Độ đậm, Màu chữ, Màu nhấn, IN HOA, Vị trí dọc; chỉnh áp cho câu đang chọn (hoặc mọi câu đang quét chọn). Kiểu riêng lưu trên từ đầu của câu (`w.kieu`), đi theo dự án và CapCut import/export; chip phụ đề có dấu ✎. Nút "Bỏ kiểu riêng", "Bỏ hết kiểu riêng", "Lấy làm kiểu chung".
+- **Bố cục video dọc** (nút 📱 trên thanh trên, nhớ trong `localStorage dv_bocDoc`): khung xem đứng bên phải cao hết màn như điện thoại; thư viện, thuộc tính và dòng thời gian nằm bên trái (giống CapCut desktop khi dựng video dọc). Chưa chọn gì thì thư viện giãn hết chiều ngang.
+- **Lớp phủ Giao diện TikTok** (ô lớp phủ trên khung xem, tự bật khi vào bố cục dọc): vẽ thanh "Đang Follow · Dành cho bạn", cột nút tim/bình luận/lưu/chia sẻ, tên kênh + mô tả + nhạc ở đáy, tỉ lệ theo bề rộng khung, để canh chữ và đồ hoạ không bị giao diện TikTok che. Có cả "TikTok + lưới".
+- Kiểm thử: `t123.mjs` (21 bước).
+
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 
 Cài theo [`cloudflare/CAI-DAT.md`](../cloudflare/CAI-DAT.md) (khoảng 10 phút, không cần thẻ). Có máy chủ này tool thêm:
