@@ -1,642 +1,303 @@
 # Bài đăng Facebook + Threads · Viral Studio
 
-Viết theo **Cẩm nang viết post Facebook viral** và **Cẩm nang viết Threads viral** (10/2026),
-qua 2 skill `fb-viral-post` và `threads-viral-writer`. Ảnh trong `xuat/`, khổ 4:5.
-Mỗi tool đăng 2 ảnh: ảnh chính, rồi ảnh "cách dùng". Tiêu đề trên ảnh chính trùng với hook
-của bài, người lướt thấy ảnh và dòng đầu là cùng một ý.
+Mỗi bài có: bản Facebook, bản Threads, bình luận đầu tiên (dán link), đoạn chia sẻ vào group
+học viên. Ảnh trong `xuat/`, tool nào đăng kèm 2 ảnh (ảnh chính trước, ảnh cách dùng sau).
 
-## Những gì đã áp từ cẩm nang
-
-| Cẩm nang nói | Trong bộ bài này |
-|---|---|
-| Dòng đầu < 20 chữ, có con số hoặc chi tiết cụ thể | Hook nào cũng có số: "6 khâu", "3 thứ", "50–200K", "4 lỗi", "11 khung", "3.600 view" |
-| Bài phải đáng lưu hoặc gửi bạn bè | Mỗi bài cho đi một mẹo dùng được ngay, lấy từ kiến thức của khoá, kể cả khi không mở tool |
-| Viết 5 hook thuộc ≥3 loại rồi mới chọn | Có ở từng bài, ★ là hook được chọn |
-| Giọng cá nhân thắng giọng thương hiệu | Facebook xưng "tụi mình – bạn", Threads xưng "tụi t – mn", không "chúng tôi xin giới thiệu" |
-| Kết bằng câu hỏi trả lời được trong 5 giây | Cuối bài là câu hỏi về chuyện của người đọc, không kêu like, share, tag hay gõ từ khoá |
-| Link ở bình luận đầu | Ảnh ghi "👇 Link dùng thử ở bình luận đầu tiên", nội dung bình luận soạn sẵn |
-| Đoạn ≤ 3 dòng, emoji ≤ 3 (FB) / ≤ 2 (Threads), hashtag 0–2 | Đã giữ. Threads gắn đúng 1 topic tag |
-| Threads mỗi post ≤ 500 ký tự, chọn 1 trong 12 công thức | Dài nhất 348 ký tự, mỗi bài một công thức khác nhau |
-| Không bịa số liệu | Số trong bài đều từ tool hoặc tài liệu khoá (`.claude/skills/hook-text/reference/kien-thuc-hook.md`) |
-
-## Lịch đăng
-
-Đăng 11h30–13h hoặc 20h–22h30, sau đó kiểm lại bằng Meta Business Suite → Thông tin chi tiết.
-Mỗi bài ở lại trả lời bình luận trong **60 phút đầu**, mỗi câu trả lời có nội dung và kết bằng
-một câu hỏi ngược lại. Threads: dành thêm 15 phút trả lời có nội dung vào post cùng chủ đề của
-người khác.
-
-| Ngày | Ảnh | Link (dán vào bình luận đầu) |
-|---|---|---|
-| 0 | `00-tong-quan.png` | https://minhtoan8668.github.io/TikTok/ |
-| 1 | `01-tai-video.png`, `01b-tai-video-cach-dung.png` | https://minhtoan8668.github.io/TikTok/tools/tai-ve.html |
-| 2 | `02-soi-video.png`, `02b-soi-video-cach-dung.png` | https://minhtoan8668.github.io/TikTok/tools/soi-video.html |
-| 3 | `03-hook-viral.png`, `03b-hook-viral-cach-dung.png` | https://minhtoan8668.github.io/TikTok/tools/hook-text.html |
-| 4 | `04-kich-ban.png`, `04b-kich-ban-cach-dung.png` | https://minhtoan8668.github.io/TikTok/tools/kich-ban.html |
-| 5 | `05-dung-video.png`, `05b-dung-video-cach-dung.png` | https://minhtoan8668.github.io/TikTok/tools/dung-video.html |
-| 6 | `06-cham-video.png`, `06b-cham-video-cach-dung.png` | https://minhtoan8668.github.io/TikTok/tools/cham-video.html |
-
-Sau 24 giờ ghi số cảm xúc, bình luận, chia sẻ, tiếp cận của từng bài. Bài nào gấp 3 lần trung
-bình thì viết phần 2 hoặc làm thành video.
+Vài điều giữ khi sửa chữ:
+- Viết như đang nhắn tin. Câu dài ngắn lộn xộn cũng được, có "kiểu", "nha", "=)))" cũng được.
+- Đừng biến bài thành danh sách có tiêu đề in đậm, đừng câu kiểu "Không phải X, mà là Y".
+- Link để ở bình luận đầu, ghim lại. Không kêu like, share, tag, hay gõ một chữ để nhận link.
+- Đăng xong ở lại trả lời bình luận tầm 1 tiếng, trả lời đúng chuyện người ta kể.
+- Facebook xưng "tụi mình", gọi "bạn". Threads xưng "tụi t", gọi "mn", mỗi bài dưới 500 ký tự, gắn 1 chủ đề `TikTok`.
 
 ---
 
-## 0 · Tổng quan: 6 khâu, 6 tool
+## 0 · Tổng quan
 
-### Facebook
+Ảnh: `00-tong-quan.png`
 
-Mục tiêu: lưu + bình luận · Công thức: Tổng hợp tài nguyên (mục lục)
-
-5 hook đã cân nhắc:
-1. ★ (Con số) Làm 1 video TikTok có 6 khâu. Mỗi khâu, tụi mình làm sẵn 1 tool.
-2. (Tổng hợp) Tất tần tật bộ tool tụi mình dùng để làm 1 video, từ lúc tìm ý tới lúc đăng.
-3. (Phá hiểu lầm) Ai cũng nghĩ video viral nhờ may. Thực ra nó qua đủ 3 cửa: dừng lại, xem hết, lặp lại được.
-4. (Kể chuyện) Dạy làm content mà khâu nào cũng phải ngồi làm tay. Thế là tụi mình code luôn.
-5. (Cảnh quen thuộc) Nhìn quanh vẫn thấy nhiều bạn quay xong đăng luôn, rồi ngồi đoán vì sao không ai xem.
-
-Chọn 1 vì có số, và mục lục theo thứ tự làm là thứ người ta lưu lại.
-
---- PHIÊN BẢN A (khuyên dùng) ---
+**Facebook**
 
 ```
-Làm 1 video TikTok có 6 khâu.
-Mỗi khâu, tụi mình làm sẵn 1 tool. Xếp đúng thứ tự làm, bạn lưu lại dùng dần nha.
+Làm 1 video TikTok có 6 khâu, mà khâu nào hồi trước tụi mình cũng ngồi làm tay hết.
 
-1. Tải video mẫu
-Dán link là có video HD không logo, nhạc nền, ảnh bìa gốc.
+Tải video người ta về coi, ngồi soi xem sao nó nổ, viết kịch bản rồi đếm từng giây, sửa câu hook cả buổi, dựng, xong còn phải coi lại xem hỏng chỗ nào.
 
-2. Soi video viral
-AI mổ vì sao video người ta nổ: vì sao dừng lại, vì sao xem hết, cái gì lặp lại được.
+Dạy học viên làm y vậy hoài thì tụi mình nghĩ thôi code luôn cho lẹ =)))
 
-3. Chấm hook
-Đưa câu hook với khung đầu video, AI chấm trên 100 và viết lại 5 bản.
+Giờ khâu nào cũng có 1 tool, gom chung lại gọi là Viral Studio. Mở trình duyệt trên điện thoại là xài, khỏi cài app, có bản thử free.
 
-4. Viết kịch bản
-Viết theo 11 khung của khoá, AI chỉ đúng giây nào người xem sẽ lướt.
+Ảnh là 6 tool xếp đúng thứ tự làm 1 video, bạn lưu lại mai mốt mở ra dùng nha.
 
-5. Dựng video
-Cắt ghép, chèn chữ, phụ đề, xuất MP4 ngay trên trình duyệt. Khỏi mua app edit.
-
-6. Chấm video trước khi đăng
-AI xem trọn video, chỉ đúng giây nào đang hỏng và sửa sao với footage đang có.
-
-Tụi mình gọi bộ này là Viral Studio. Mở trình duyệt trên điện thoại là dùng, không cài app, có bản dùng thử miễn phí.
-
-Bạn đang kẹt ở khâu mấy?
+Bạn đang hay kẹt ở khâu nào nhất?
 ```
 
---- PHIÊN BẢN B (ngắn, kể chuyện) ---
+**Threads**
 
 ```
-Dạy làm content mà khâu nào cũng phải ngồi làm tay.
-Soi video người ta, chấm hook, canh kịch bản từng giây, rồi còn dựng.
+Làm 1 video tiktok có 6 khâu, khâu nào tụi t cũng từng ngồi làm tay muốn xỉu =)))
 
-Thế là tụi mình code luôn thành 6 tool =))))
+Nên tụi t code luôn 6 cái tool: tải video ko logo, soi sao video người ta nổ, chấm hook, chấm kịch bản, dựng video, chấm video trước khi đăng
 
-Tải video, soi video viral, chấm hook, viết kịch bản, dựng video, chấm video trước khi đăng. Mở trình duyệt là dùng, có bản thử miễn phí.
-
-Làm video, khâu nào làm bạn mất thời gian nhất?
+Mở đt là xài, ko cài app, có bản free. Mn đang kẹt khâu nào
 ```
 
-Bình luận đầu tiên: `Link dùng thử Viral Studio nè: https://minhtoan8668.github.io/TikTok/ · Bạn kẹt khâu nào cứ nói, tụi mình chỉ đúng tool cho khâu đó.`
-Ảnh: `00-tong-quan.png`.
+Bình luận đầu: `Link Viral Studio nè https://minhtoan8668.github.io/TikTok/ kẹt khâu nào cứ nói, tụi mình chỉ tool cho khâu đó`
 
-### Threads
-
-Mục tiêu: share · Công thức: #4 Kết quả + tài nguyên
-
-5 hook:
-1. ★ Làm 1 video TikTok có 6 khâu, tụi t code cho mỗi khâu 1 tool, xài free:
-2. Tụi t dạy làm content xong gom cả quy trình thành 6 cái tool luôn =))))
-3. 6 tool làm TikTok mà tụi t ước có từ hồi mới làm
-4. Có vẻ ngược đời, nhưng sự thật là: video viral ít khi nhờ may
-5. Topic: làm video mn kẹt nhất khâu nào? T trước: khâu viết hook
-→ Chọn 1: có số, danh sách đánh số là dạng được lưu và repost nhiều.
+Group học viên:
 
 ```
-Làm 1 video TikTok có 6 khâu, tụi t code cho mỗi khâu 1 tool, xài free:
-
-1. Tải video mẫu ko logo
-2. Soi vì sao video người ta nổ
-3. Chấm hook trên 100
-4. Viết kịch bản, biết trước giây nào bị lướt
-5. Dựng video, khỏi mua app edit
-6. Chấm video trước khi đăng
-
-Mở điện thoại là xài, ko cài app. Mn đang kẹt khâu mấy?
+Cả lớp ơi Viral Studio giờ đủ 6 tool rồi nha. Đăng nhập tài khoản học viên là tự có Pro. Tuần này mỗi ngày tụi mình gửi hướng dẫn 1 tool, mọi người làm theo với video của mình luôn nha.
+https://minhtoan8668.github.io/TikTok/
 ```
-
-Topic tag: `TikTok` · Ảnh: `00-tong-quan.png`
-Bình luận mồi: `Link nè: https://minhtoan8668.github.io/TikTok/ · Kẹt khâu nào nói t nghe, t chỉ đúng tool cho khâu đó.`
-
-### Chia sẻ vào group học viên
-
-> Cả lớp ơi, Viral Studio giờ đủ 6 tool rồi nha. Đăng nhập bằng tài khoản học viên là tool tự nhận Pro. Tuần này mỗi ngày tụi mình gửi hướng dẫn một tool, làm theo luôn với video của bạn.
-> https://minhtoan8668.github.io/TikTok/
 
 ---
 
 ## 1 · Tải video
 
-### Facebook
+Ảnh: `01-tai-video.png`, `01b-tai-video-cach-dung.png`
 
-Mục tiêu: lưu + share · Công thức: Danh sách
-
-5 hook đã cân nhắc:
-1. ★ (Con số) Từ 1 link TikTok, bạn lấy được 3 thứ chứ không chỉ cái video.
-2. (Cảnh quen thuộc) Nhìn quanh vẫn thấy nhiều bạn tải video về học bằng web đầy quảng cáo, tải xong còn dính logo.
-3. (Tự trào) Muốn tải 1 video về học mà phải tắt 5 cái quảng cáo.
-4. (Câu hỏi) Tải video về để học thì nên xem cái gì trước: hook, nhạc hay ảnh bìa?
-5. (Mẹo) Dán nguyên đoạn chữ "Chia sẻ" từ app vào là đủ, khỏi lọc link.
-
---- PHIÊN BẢN A (khuyên dùng) ---
+**Facebook**
 
 ```
-Từ 1 link TikTok, bạn lấy được 3 thứ chứ không chỉ cái video.
+Ai làm content chắc cũng từng vầy. Thấy video hay muốn tải về coi kỹ, google ra cả chục trang, trang nào cũng quảng cáo nhảy tùm lum, tải xong còn dính logo che mất chữ 🥲
 
-Tụi mình hay tải video người ta về để soi cách làm, nên làm luôn cái tool tải trong Viral Studio. Dán link vào là có:
+Nên trong Viral Studio tụi mình làm luôn cái tool tải. Copy link bên app, dán vô, bấm Lấy file là xong. Ra video HD không logo, có cả nhạc nền với ảnh bìa gốc. Lười lọc link thì dán nguyên đoạn chữ app copy ra cũng được, tool tự tìm.
 
-1. Video HD không logo
-Xem lại từng khung hình cho rõ, chữ hook không bị logo che.
-
-2. Nhạc nền
-Nghe kỹ họ chọn nhạc gì, nhạc có hợp nội dung không.
-
-3. Ảnh bìa gốc
-Để ý chữ trên bìa: to cỡ nào, nằm ở đâu, mấy dòng.
-
-Chạy được với TikTok, Douyin, YouTube, Instagram, Facebook, X, Pinterest. Mẹo: dán nguyên đoạn chữ "Chia sẻ" copy từ app cũng được, tool tự lọc ra link.
+TikTok, Douyin, YouTube, Instagram, Facebook, X, Pinterest đều tải được hết.
 
 Tải về để học thôi nha, đừng đăng lại video của người ta.
 
-Bạn hay tải video về để học cái gì nhất: hook, cách quay hay cách dựng?
+Bạn hay tải video về để học cái gì nhất?
 ```
 
---- PHIÊN BẢN B (ngắn, tự trào) ---
+**Threads**
 
 ```
-Muốn tải 1 video về học mà phải tắt 5 cái quảng cáo, tải xong còn dính logo 🥲
+ủa có ai giống t ko, muốn tải 1 cái video tiktok về coi mà phải tắt 5 cái quảng cáo, tải xong còn dính logo =)))
 
-Nên tụi mình làm luôn cái tool tải: dán link là có video HD không logo, nhạc nền, ảnh bìa gốc. Free, không cài app.
+tụi t bực quá làm luôn cái tool, dán link vô là có video ko logo, nhạc nền, ảnh bìa gốc. dán nguyên đoạn chữ copy từ app cũng đc
 
-Bạn đang tải video bằng cách nào?
+free nha, link t để dưới reply
 ```
 
-Bình luận đầu tiên: `Link tool tải video nè: https://minhtoan8668.github.io/TikTok/tools/tai-ve.html · Tải xong bấm "Soi video này" là AI mổ luôn vì sao video đó viral.`
-Ảnh: `01-tai-video.png`, `01b-tai-video-cach-dung.png`.
+Bình luận đầu: `Link tool tải nè https://minhtoan8668.github.io/TikTok/tools/tai-ve.html tải xong bấm "Soi video này" là AI mổ luôn sao video đó viral`
 
-### Threads
-
-Mục tiêu: reply + share · Công thức: #1 Topic "Hãy kể" + "T trước:"
-
-5 hook:
-1. ★ Topic: mẹo nhỏ làm TikTok mà ước gì biết sớm hơn. T trước:
-2. Từ 1 link TikTok lấy được 3 thứ, ko chỉ cái video
-3. Tải video tiktok mà toàn gặp web đầy quảng cáo =)))
-4. TUYỆT ĐỐI ĐỪNG soi video có logo che mất chữ hook
-5. Hãy kể web tải video ruột của mn
-→ Chọn 1: ai làm content cũng có mẹo để kể, "T trước:" làm mẫu và phá băng.
+Group học viên:
 
 ```
-Topic: mẹo nhỏ làm TikTok mà mn ước gì biết sớm hơn.
-
-T trước: muốn học 1 video thì tải bản HD ko logo về xem từng khung, kèm nhạc nền với ảnh bìa gốc. Dán nguyên đoạn chữ "Chia sẻ" copy từ app vô tool tụi t làm là ra hết, ko cần lọc link =)))
-
-Tới mn đó
+Cần video mẫu làm bài tập soi thì tải ở đây cho lẹ nha, không dính logo, học viên tải thoải mái.
+https://minhtoan8668.github.io/TikTok/tools/tai-ve.html
 ```
-
-Topic tag: `TikTok` · Ảnh: `01-tai-video.png`
-Bình luận mồi: `Link tool tải nè: https://minhtoan8668.github.io/TikTok/tools/tai-ve.html · Tải về để học thôi nha, đừng đăng lại video người ta.`
-
-### Chia sẻ vào group học viên
-
-> Cần video mẫu cho bài tập soi thì tải ở đây cho nhanh, không dính logo. Học viên tải không giới hạn.
-> https://minhtoan8668.github.io/TikTok/tools/tai-ve.html
 
 ---
 
 ## 2 · Soi video viral
 
-### Facebook
+Ảnh: `02-soi-video.png`, `02b-soi-video-cach-dung.png`
 
-Mục tiêu: share + bình luận · Công thức: Phá hiểu lầm
-
-5 hook đã cân nhắc:
-1. ★ (Phá hiểu lầm) Ai cũng nghĩ muốn học làm video thì phải soi video triệu view. Thực ra không cần.
-2. (Cảnh quen thuộc) Xem video người ta nổ view rồi tự hỏi: ủa sao nổ vậy trời?
-3. (Con số) Video nào viral cũng qua đủ 3 cửa. Video của bạn đang kẹt ở cửa nào?
-4. (Tò mò) Video 50K view cùng ngách dạy bạn nhiều hơn video triệu view.
-5. (Cảnh báo) Đừng copy video viral trước khi hiểu nó thắng ở cửa nào.
-
---- PHIÊN BẢN A (khuyên dùng) ---
+**Facebook**
 
 ```
-Ai cũng nghĩ muốn học làm video thì phải soi video triệu view.
-Thực ra không cần.
+Nhiều bạn mới làm hay đi soi mấy video triệu view để học. Mà video triệu view nhiều khi dính trend, dính người nổi tiếng, mình làm theo y chang cũng không ra.
 
-Video triệu view hay dính trend, dính người nổi tiếng, khó lặp lại.
-Video 50–200K cùng ngách thì cùng tệp người xem với bạn. Cái khuôn của nó, bạn mượn được.
+Tụi mình hay khuyên học viên soi video cùng ngách tầm 50 tới 200K view thôi. Cùng kiểu người xem với mình, cái sườn của nó mình mượn được.
 
-Khi soi, đừng hỏi "video này hay không". Hỏi 3 câu:
-🛑 Vì sao người ta dừng lại ở giây đầu?
-👀 Vì sao người ta xem hết?
-🔁 Cái gì lặp lại được sang kênh mình?
+Lúc soi thì để ý coi sao người ta dừng lại ở giây đầu, sao người ta coi tới hết, rồi cái gì mình làm lại được cho kênh mình.
 
-Tool Soi video viral trong Viral Studio làm đúng 3 câu đó. Dán link vào, AI tự tải video, nghe lời thoại theo từng giây, đọc số liệu và bình luận, rồi chấm từng cửa.
+Tool Soi video viral làm giùm mấy chuyện đó. Dán link vô, AI tự nghe lời thoại từng giây, đọc cả bình luận, xong gợi ý luôn hook với lời thoại mẫu cho kênh của bạn.
 
-Xong còn áp khuôn sang kênh bạn: hook mẫu, lời thoại mẫu từng phần. Không phải để copy, mà để hiểu cái sườn rồi kể chuyện của mình.
-
-Gần đây video nào làm bạn tò mò "sao nó nổ vậy"?
+Gần đây có video nào làm bạn thắc mắc sao nó nổ không?
 ```
 
---- PHIÊN BẢN B (ngắn) ---
+**Threads**
 
 ```
-Video nào viral cũng qua đủ 3 cửa:
-người ta dừng lại, người ta xem hết, và cái khuôn lặp lại được.
+nói thật muốn học làm video thì đừng soi video triệu view, mấy cái đó hay dính trend khó làm lại lắm
 
-Tụi mình làm cái tool dán link vào là AI chấm đủ 3 cửa, rồi áp khuôn đó sang kênh bạn.
+soi video cùng ngách tầm 50-200k view thôi, cùng tệp người xem, sườn của nó mình mượn đc
 
-Video của bạn hay kẹt ở cửa nào?
+tụi t có làm cái tool dán link vô là AI mổ ra sao người ta dừng lại, sao coi hết, cái gì làm lại đc. mn hay soi kênh nào
 ```
 
-Bình luận đầu tiên: `Link tool soi video nè: https://minhtoan8668.github.io/TikTok/tools/soi-video.html · Mẹo: chọn video cùng ngách, 50–200K view là đủ học.`
-Ảnh: `02-soi-video.png`, `02b-soi-video-cach-dung.png`.
+Bình luận đầu: `Link tool soi video nè https://minhtoan8668.github.io/TikTok/tools/soi-video.html thử với cái video gần nhất làm bạn tò mò á`
 
-### Threads
-
-Mục tiêu: like + repost · Công thức: #6 Hot take "Sự thật là"
-
-5 hook:
-1. ★ Có vẻ ngược đời, nhưng sự thật là: muốn học làm video thì đừng soi video triệu view.
-2. bạn sẽ không biết video mình thiếu gì cho tới khi soi video cùng ngách
-3. Video viral nào cũng qua 3 cửa, video mn kẹt ở cửa nào?
-4. Topic: kênh TikTok nào mn hay soi để học? T trước:
-5. Xem video người ta nổ view rồi tự hỏi sao nó nổ vậy trời 🤔
-→ Chọn 1: nhận định ngược đời, người làm content dễ repost để "nói hộ".
+Group học viên:
 
 ```
-Có vẻ ngược đời, nhưng sự thật là: muốn học làm video thì đừng soi video triệu view.
-
-Video triệu view hay dính trend, khó lặp lại. Soi video 50–200K cùng ngách, cùng tệp người xem với mình, khuôn của nó mượn được.
-
-Tụi t làm cái tool dán link vô là AI mổ ra 3 cửa: vì sao dừng lại, vì sao xem hết, cái gì lặp lại được.
-
-Mn hay soi kênh nào để học?
+Trước khi quay video mới mọi người chọn 1 video viral cùng ngách soi thử nha. Phần "Cửa 3 · Lặp lại được" là khuôn để mượn, bấm Chép khuôn rồi qua tool Kịch bản viết tiếp.
+https://minhtoan8668.github.io/TikTok/tools/soi-video.html
 ```
-
-Topic tag: `TikTok` · Ảnh: `02-soi-video.png`
-Bình luận mồi: `Link tool soi nè: https://minhtoan8668.github.io/TikTok/tools/soi-video.html · Thử với video gần nhất làm mn tò mò nha.`
-
-### Chia sẻ vào group học viên
-
-> Trước khi quay video mới, chọn 1 video viral cùng ngách soi thử nha. Mục "Cửa 3 · Lặp lại được" là khuôn để mượn, bấm Chép khuôn rồi qua tool Kịch bản viết tiếp.
-> https://minhtoan8668.github.io/TikTok/tools/soi-video.html
 
 ---
 
 ## 3 · Hook viral
 
-### Facebook
+Ảnh: `03-hook-viral.png`, `03b-hook-viral-cach-dung.png`
 
-Mục tiêu: lưu + bình luận · Công thức: Danh sách
-
-5 hook đã cân nhắc:
-1. ★ (Danh sách) 4 lỗi hook khiến video bị lướt trước giây thứ 3.
-2. (Con số) "Chào mọi người, mình là Lan": mất 4 giây. Người xem rời ở giây thứ 3.
-3. (Con số) Người lướt mất khoảng 1 giây để quyết định dừng hay lướt.
-4. (Phá hiểu lầm) Ai cũng nghĩ hook là câu nói. Thực ra người ta nhìn trước khi nghe.
-5. (Đối xứng) "Mình có vài tips muốn chia sẻ": lướt. "Mình bỏ 3 triệu mua cái này và hối hận": xem.
-
---- PHIÊN BẢN A (khuyên dùng) ---
+**Facebook**
 
 ```
-4 lỗi hook khiến video bị lướt trước giây thứ 3.
-Người lướt chỉ mất khoảng 1 giây để quyết định dừng hay đi.
+Khám bài cho học viên hoài, tụi mình gặp lại mấy lỗi hook y chang nhau.
 
-1. Mở bằng giới thiệu bản thân
-"Chào mọi người, mình là Lan" mất 4 giây, người xem rời ở giây thứ 3.
-Sửa: vào thẳng vấn đề. "Mình bỏ 3 triệu mua cái này và hối hận."
+Hay gặp nhất là mở video bằng "Chào mọi người, mình là…". Câu đó tốn mất 4 giây, trong khi người ta lướt đi từ giây thứ 3 rồi. Vô thẳng chuyện luôn đi, kiểu "Mình bỏ 3 triệu mua cái này và hối hận" là người ta dừng liền.
 
-2. Chữ hook nhỏ
-Chữ phải đọc được trên điện thoại: chiếm khoảng 1/3 màn hình phía trên, không quá 2 dòng.
+Rồi chữ hook để nhỏ xíu dưới góc. Chữ phải to, nằm khoảng 1/3 màn hình phía trên, đừng quá 2 dòng.
 
-3. Nói chung chung, không có số
-"Rất nhiều khách quay lại" yếu hơn hẳn "70% khách là khách quen quay lại từ 3 lần trở lên".
+Có con số mà để tuốt cuối câu cũng phí. Đưa số lên đầu cho mắt bắt được ngay.
 
-4. Không nói rõ video cho ai
-"Kiến thức tài chính" là cho không ai cả.
-"Cách người lương 10 triệu chia tiền trong tháng" là có người dừng lại.
+Với lại nói chung chung quá. "Kiến thức tài chính" thì không ai thấy là của mình, đổi thành "cách người lương 10 triệu chia tiền trong tháng" là có người dừng lại.
 
-Tụi mình làm cái tool Hook viral để bắt mấy lỗi này: đưa câu hook với khung đầu video vào, AI chấm trên 100 rồi viết lại 5 bản. Chọn xong thì đặt chữ lên video luôn, xuất PNG kéo vào CapCut.
+Tụi mình làm cái tool Hook viral để bắt mấy lỗi này, đưa câu hook vô là AI chấm trên 100 rồi viết lại 5 bản cho chọn.
 
-Bạn mắc mấy cái? Hoặc để câu hook gần nhất của bạn dưới bình luận, tụi mình góp ý thử.
+Câu hook gần nhất của bạn là gì, để dưới bình luận tụi mình coi thử cho.
 ```
 
---- PHIÊN BẢN B (ngắn, đối xứng) ---
-
-```
-"Mình có vài tips muốn chia sẻ" → người xem lướt.
-"Mình bỏ 3 triệu mua cái này và hối hận" → người xem dừng.
-
-Khác nhau ở chỗ câu sau vào thẳng vấn đề, có con số, có cảm xúc.
-
-Tụi mình làm cái tool chấm hook trên 100 và viết lại 5 bản cho bạn chọn. Câu hook gần nhất của bạn là gì?
-```
-
-Bình luận đầu tiên: `Link tool chấm hook nè: https://minhtoan8668.github.io/TikTok/tools/hook-text.html · Dán câu hook dưới đây, tụi mình góp ý từng câu.`
-Ảnh: `03-hook-viral.png`, `03b-hook-viral-cach-dung.png`.
-
-### Threads
-
-Mục tiêu: reply · Công thức: #1 Topic "Hãy kể" + "T trước:"
-
-5 hook:
-1. ★ Topic: câu hook nào làm mn dừng lướt gần nhất?
-2. "Chào mọi người, mình là Lan" mất 4 giây, người xem rời ở giây thứ 3 =)))
-3. ĐỪNG BAO GIỜ MỞ VIDEO BẰNG "CHÀO MỌI NGƯỜI"
-4. Hook của mn được mấy điểm trên 100?
-5. Người lướt mất 1 giây để quyết định dừng hay đi
-→ Chọn 1: ai lướt TikTok cũng có câu để kể, reply nhiều thì post lan.
+**Threads**
 
 ```
 Topic: câu hook nào làm mn dừng lướt gần nhất?
 
-T trước: "Mình bỏ 3 triệu mua cái này và hối hận". Vào thẳng vấn đề, có số, có cảm xúc. Ko "chào mọi người, mình là…" mất 4 giây đầu.
+t trước: "mình bỏ 3 triệu mua cái này và hối hận". vô thẳng chuyện luôn, ko "chào mọi người mình là…" mất 4 giây đầu
 
-Ai muốn chấm hook của mình trên 100 thì tụi t có tool, link t để dưới reply.
+ai muốn chấm hook của mình trên 100 thì tụi t có tool, link dưới reply nha
 ```
 
-Topic tag: `TikTok` · Ảnh: `03-hook-viral.png`
-Bình luận mồi: `Link nè: https://minhtoan8668.github.io/TikTok/tools/hook-text.html · Dán hook của mn ở đây, tụi t góp ý.`
+Bình luận đầu: `Link tool chấm hook nè https://minhtoan8668.github.io/TikTok/tools/hook-text.html dán câu hook của bạn ở dưới, tụi mình góp ý`
 
-### Chia sẻ vào group học viên
+Group học viên:
 
-> Hook dưới 60 điểm thì đừng vội đăng nha. Chạy qua tool, lấy bản viết lại nào giống giọng mình nhất rồi gửi vào group để mentor xem.
-> https://minhtoan8668.github.io/TikTok/tools/hook-text.html
+```
+Hook dưới 60 điểm thì khoan đăng nha. Chạy qua tool, lấy bản viết lại nào nghe giống giọng mình nhất rồi gửi vô group cho mentor coi.
+https://minhtoan8668.github.io/TikTok/tools/hook-text.html
+```
 
 ---
 
 ## 4 · Kịch bản viral
 
-### Facebook
+Ảnh: `04-kich-ban.png`, `04b-kich-ban-cach-dung.png`
 
-Mục tiêu: lưu · Công thức: Tổng hợp tài nguyên (danh sách khung)
-
-5 hook đã cân nhắc:
-1. ★ (Con số) 11 khung kịch bản tụi mình dạy trong lớp. Chuyện nào khung nấy.
-2. (Cảnh quen thuộc) Viết kịch bản xong đọc thấy ổn, đăng lên người ta lướt ở giây thứ 3.
-3. (Phá hiểu lầm) Ai cũng nghĩ kịch bản hay là viết hay. Thực ra là chọn đúng khung cho đúng chuyện.
-4. (Cảnh báo) Đừng viết "mình xúc động lắm" trong kịch bản.
-5. (Đối lập) Kể chuyện gia đình và chia sẻ kinh nghiệm, mỗi loại cần một khung khác nhau.
-
---- PHIÊN BẢN A (khuyên dùng) ---
+**Facebook**
 
 ```
-11 khung kịch bản tụi mình dạy trong lớp.
-Chuyện nào khung nấy. Đây là 7 khung hay dùng nhất, lưu lại tra dần nha.
+Viết kịch bản đọc lại thấy ổn áp, đăng lên thì người ta lướt mất ở giây thứ 3. Nghe quen không 😅
 
-1. Một khoảnh khắc (5W-1H)
-Chuyện gia đình, đời thường. Kể MỘT khoảnh khắc thật, tả từng hành động nhỏ.
+Nhiều khi viết không dở đâu, chọn sai khung thôi. Chuyện gia đình mà viết như chia sẻ kinh nghiệm thì nghe khô, còn bán hàng mà kể lể như vlog thì người ta lướt.
 
-2. Kể chuyện 4 nhịp
-Chuyện đi học, đi làm. Vấn đề → tình huống → hậu quả → quan điểm.
+Trong lớp tụi mình dạy 11 khung kịch bản, chuyện nào khung nấy. Chuyện gia đình thì kể đúng một khoảnh khắc thật, tả từng hành động nhỏ. Chuyện đi học đi làm thì đi từ vấn đề, tới tình huống, hậu quả, rồi mới tới suy nghĩ của mình. Bán combo hay khoá học thì đưa con số cho người ta tự chia, đừng nói "rẻ".
 
-3. Chia sẻ kinh nghiệm
-Xây thương hiệu cá nhân, bán dịch vụ. Câu khẳng định chắc nịch, xung đột, giải pháp.
+Có một cái áp được cho khung nào cũng được: đừng viết "mình xúc động lắm". Viết cơ thể mình đang làm gì, kiểu "miệng nhai cơm mà mắt cay xè". Người xem tự thấy.
 
-4. Daily vlog cảm xúc
-Một ngày của quán, của mẹ bỉm, của người đi làm. Quay cường độ cảm xúc, không quay hành động.
+Tool Kịch bản viral có đủ 11 khung, viết tới đâu nó đổi ra số giây tới đó, chấm xong chỉ luôn giây nào người xem sẽ lướt.
 
-5. Thử thách
-"24h không…". Vào thẳng hành động, khó dần, không có đoạn chùng.
-
-6. Danh sách hữu ích
-"3 cách…", "5 lỗi…". Hook có số, mỗi ý một ví dụ thật.
-
-7. Bán hàng HỜI 3 tầng
-Combo, khoá học. Đưa con số để khách tự chia, đừng nói "rẻ".
-
-4 khung còn lại nằm trong tool Kịch bản viral. Viết theo khung, tool đổi số chữ ra số giây theo tốc độ nói của bạn. Bấm Chấm là AI chỉ đúng giây nào người xem sẽ lướt.
-
-Chuyện bạn định kể tuần này hợp khung mấy?
+Tuần này bạn định kể chuyện gì? Kể sơ đi, tụi mình gợi ý khung cho.
 ```
 
---- PHIÊN BẢN B (ngắn, cảnh báo) ---
+**Threads**
 
 ```
-Đừng viết "mình xúc động lắm" trong kịch bản.
+ĐỪNG VIẾT "MÌNH XÚC ĐỘNG LẮM" TRONG KỊCH BẢN NỮA MN ƠI
 
-Viết cơ thể mình đang làm gì: "miệng nhai cơm mà mắt cay xè".
-Người xem tự thấy, không cần bạn kể.
+viết cơ thể mình đang làm gì đi, kiểu "miệng nhai cơm mà mắt cay xè". người xem tự thấy, ko cần mình kể
 
-Tool Kịch bản viral của tụi mình bắt từng câu kiểu này, còn chỉ đúng giây nào người xem sẽ lướt. Câu nào trong kịch bản gần nhất của bạn đang "kể" thay vì "tả"?
+tụi t làm cái tool chấm kịch bản bắt mấy câu này hoài =))) còn chỉ luôn giây nào người ta lướt. link dưới reply
 ```
 
-Bình luận đầu tiên: `Link tool chấm kịch bản nè: https://minhtoan8668.github.io/TikTok/tools/kich-ban.html · Chưa biết chuyện mình hợp khung nào thì kể sơ dưới đây, tụi mình gợi ý.`
-Ảnh: `04-kich-ban.png`, `04b-kich-ban-cach-dung.png`.
+Bình luận đầu: `Link tool kịch bản nè https://minhtoan8668.github.io/TikTok/tools/kich-ban.html chưa biết chuyện mình hợp khung nào thì kể sơ ở dưới nha`
 
-### Threads
-
-Mục tiêu: share · Công thức: #11 Cảnh báo viết HOA
-
-5 hook:
-1. ★ ĐỪNG BAO GIỜ VIẾT "MÌNH XÚC ĐỘNG LẮM" TRONG KỊCH BẢN.
-2. 11 khung kịch bản, chuyện nào khung nấy
-3. Viết kịch bản đọc thấy ổn áp, đăng lên người ta lướt ở giây thứ 3 =)))
-4. Giải thích dễ hiểu cho người mới làm content: TẢ khác KỂ chỗ nào
-5. Topic: câu kịch bản sến nhất mn từng viết. T trước:
-→ Chọn 1: cảnh báo viết HOA kéo lưu và gửi bạn mạnh, lại là mẹo dùng được ngay.
+Group học viên:
 
 ```
-ĐỪNG BAO GIỜ VIẾT "MÌNH XÚC ĐỘNG LẮM" TRONG KỊCH BẢN.
-
-Viết cơ thể mình đang làm gì: "miệng nhai cơm mà mắt cay xè". Người xem tự thấy, ko cần mình kể.
-
-Tụi t code cả cái tool chấm kịch bản theo 11 khung của lớp, AI bắt từng câu kiểu này, còn chỉ đúng giây nào người xem sẽ lướt. Link t để dưới reply.
+Kịch bản tuần này mọi người viết thẳng trong tool luôn nha, chấm xong chụp phần "Người xem sẽ lướt ở đâu" gửi vô group, tụi mình góp ý tiếp.
+https://minhtoan8668.github.io/TikTok/tools/kich-ban.html
 ```
-
-Topic tag: `TikTok` · Ảnh: `04-kich-ban.png`
-Bình luận mồi: `Link nè: https://minhtoan8668.github.io/TikTok/tools/kich-ban.html · Mn thử dán 1 câu "kể" trong kịch bản của mình xuống đây, tụi t sửa thành "tả" cho xem.`
-
-### Chia sẻ vào group học viên
-
-> Kịch bản tuần này mọi người viết thẳng trong tool nha, chấm xong chụp phần "Người xem sẽ lướt ở đâu" gửi vào group, tụi mình góp ý tiếp.
-> https://minhtoan8668.github.io/TikTok/tools/kich-ban.html
 
 ---
 
-## 5 · Dựng video (mới)
+## 5 · Dựng video
 
-### Facebook
+Ảnh: `05-dung-video.png`, `05b-dung-video-cach-dung.png`
 
-Mục tiêu: share + bình luận · Công thức: Kể chuyện
-
-5 hook đã cân nhắc:
-1. ★ (Kể chuyện) Học viên ngại mua CapCut Pro. Thế là tụi mình code luôn một cái app edit cho xài free.
-2. (Tự trào) Dạy làm content mà học viên kẹt ở khâu… trả tiền app edit =))))
-3. (Con số) 0đ. Cắt ghép, chèn chữ, phụ đề, xuất MP4.
-4. (Đối lập) Mua gói Pro app edit, hay dựng free ngay trên trình duyệt?
-5. (Câu hỏi + ẩn dụ) Có cần mua app edit trả phí mới dựng được video đẹp không?
-
---- PHIÊN BẢN A (khuyên dùng) ---
+**Facebook**
 
 ```
-Học viên ngại mua CapCut Pro.
-Thế là tụi mình code luôn một cái app edit video cho học viên xài free =))))
+Kiểu như là tụi mình dạy làm content, mà tới khúc dựng thì học viên ngại mua CapCut Pro. Thế là tụi mình quyết định code ra hẳn cái app edit video cho học viên xài free luôn =))))
 
-Lớp tụi mình dạy làm content. Tới khâu dựng, nhiều bạn khựng lại vì phải trả phí app.
+Cắt ghép nhiều track, chèn chữ có mẫu sẵn, phụ đề karaoke, hiệu ứng, nhạc theo beat, xong bấm xuất là ra file MP4. Mở trình duyệt là dựng, không cài app, không mua gói gì hết.
 
-Nên trong Viral Studio giờ có thêm trình dựng video, mở trình duyệt là dùng:
-✂️ Cắt ghép nhiều track
-🔤 Mẫu chữ có sẵn, phụ đề karaoke
-📤 Hiệu ứng, nhạc theo beat, xuất MP4 về máy
+Lười dựng thì gõ cho con Trợ lý AI trong đó kiểu "bỏ mấy chỗ vấp, giữ 30 giây hay nhất, thêm phụ đề", nó dựng giùm. Phần AI này thì có lượt thử free.
 
-Lười dựng thì gõ cho Trợ lý AI: "bỏ vấp, giữ 30 giây hay nhất, thêm phụ đề". AI dựng giúp, phần này có lượt thử miễn phí.
+Thua gì CapCut không trời. Giờ tụi mình mở cho mọi người xài thử luôn, dựng trên máy tính là sướng nhất.
 
-Thua gì CapCut không trời. Giờ tụi mình mở cho mọi người dùng thử luôn, mở trên máy tính dựng sướng nhất.
-
-Bạn đang dựng video bằng app gì?
+Bạn đang dựng video bằng app gì vậy?
 ```
 
---- PHIÊN BẢN B (ngắn) ---
+**Threads**
 
 ```
-0đ.
-Cắt ghép, chèn chữ, phụ đề karaoke, xuất MP4.
+Kiểu như là tụi t dạy làm content mà học viên ngại mua capcut pro, thế là tụi t quyết định code ra hẳn cái app edit video cho học viên xài free lun. Thua gì capcut ko trời =))))
 
-Học viên ngại mua app edit trả phí, nên tụi mình code luôn một cái chạy trên trình duyệt. Giờ mở cho mọi người dùng thử.
-
-Mỗi tháng bạn đang trả bao nhiêu cho app edit?
+giờ mở cho mọi người xài thử luôn, cắt ghép, chữ, phụ đề, hiệu ứng, xuất mp4, ko cài app gì hết
 ```
 
-Bình luận đầu tiên: `Link tool dựng video nè: https://minhtoan8668.github.io/TikTok/tools/dung-video.html · Mở trên máy tính dựng sướng nhất, điện thoại hợp sửa nhanh.`
-Ảnh: `05-dung-video.png`, `05b-dung-video-cach-dung.png`.
+Bình luận đầu: `Link app dựng nè https://minhtoan8668.github.io/TikTok/tools/dung-video.html mở trên máy tính dựng sướng hơn nha`
 
-### Threads
-
-Mục tiêu: like + reply · Công thức: #7 One-liner twist (giữ nguyên lời của bạn)
-
-5 hook:
-1. ★ Kiểu như là tụi t dạy làm content mà học viên ngại mua capcut pro…
-2. 0đ. Cắt ghép, chữ, phụ đề, xuất MP4
-3. POV: học viên kêu app edit mắc quá =)))
-4. Hãy kể app edit ruột của mn, t trước:
-5. Có vẻ ngược đời, nhưng sự thật là: dựng video ko cần app trả phí
-→ Chọn 1: câu chuyện thật, có cú chốt "thua gì capcut ko trời" tự nhiên.
+Group học viên:
 
 ```
-Kiểu như là tụi t dạy làm content mà học viên ngại mua capcut pro, thế là tụi t quyết định code ra hẳn cái app edit video cho học viên xài free lun.
-Thua gì capcut ko trời =))))
-
-Giờ mở cho mọi người xài thử luôn: cắt ghép, chữ, phụ đề, hiệu ứng, xuất MP4, ko cài app.
+App dựng mới ra nè, mọi người dựng thử footage tuần này rồi báo tụi mình chỗ nào chưa tiện nha. Dùng máy tính dễ thao tác hơn điện thoại.
+https://minhtoan8668.github.io/TikTok/tools/dung-video.html
 ```
-
-Topic tag: `TikTok` · Ảnh: `05-dung-video.png`
-Bình luận mồi: `Link nè: https://minhtoan8668.github.io/TikTok/tools/dung-video.html · Mn đang dựng bằng app gì, có trả phí ko?`
-
-### Chia sẻ vào group học viên
-
-> Tool dựng mới ra nè, mọi người thử với footage tuần này rồi báo tụi mình chỗ nào chưa tiện nha. Dùng trên máy tính dễ thao tác hơn điện thoại.
-> https://minhtoan8668.github.io/TikTok/tools/dung-video.html
 
 ---
 
-## 6 · Chấm video của bạn (mới)
+## 6 · Chấm video
 
-### Facebook
+Ảnh: `06-cham-video.png`, `06b-cham-video-cach-dung.png`
 
-Mục tiêu: lưu + bình luận · Công thức: Danh sách
-
-5 hook đã cân nhắc:
-1. ★ (Con số) Bản lọt QR code: 3.600 view. Bản không lọt: 84.500 view.
-2. (Danh sách) 5 lỗi nhỏ làm video bị lướt mà tự xem lại khó thấy.
-3. (Cảnh quen thuộc) Đăng xong cứ ngồi refresh mà view đứng im một chỗ.
-4. (Phá hiểu lầm) Ai cũng nghĩ view thấp là do thuật toán. Thực ra hay hỏng ở vài giây cụ thể.
-5. (Cảnh báo) Đừng đăng video khi chưa xem lại 1 giây đầu ở chế độ tắt tiếng.
-
---- PHIÊN BẢN A (khuyên dùng) ---
+**Facebook**
 
 ```
-Bản lọt QR code: 3.600 view.
-Bản không lọt: 84.500 view.
+Trong tài liệu lớp tụi mình có một case: bản video lọt cái QR code vô khung được 3.600 view, bản không lọt được 84.500 view.
 
-Lỗi nhỏ vậy thôi mà tự xem lại thường không thấy. Đây là 5 lỗi nhỏ hay làm video bị lướt:
+Lỗi nhỏ xíu vậy đó, mà tự coi lại video của mình thì hay bỏ qua lắm.
 
-1. Mở bằng lời chào
-"Chào mọi người, hôm nay mình…" là mất mấy giây vàng đầu tiên.
+Mấy lỗi kiểu này còn nhiều. Mở đầu bằng lời chào, chữ màn hình nhỏ nằm góc dưới, quay một cảnh tổng quan dài mà không có gì mới, nhạc to lấn giọng.
 
-2. Chữ màn hình nhỏ, nằm góc dưới
-Chữ hook nên chiếm khoảng 1/3 màn hình phía trên, không quá 2 dòng.
+Có cách tự kiểm nhanh nè. Tắt tiếng coi 1 giây đầu rồi hỏi mình thấy gì. Bật tiếng coi lại rồi hỏi mình nghe gì.
 
-3. Quay tổng quan một phát
-Người xem thấy hết trong 2 giây là lướt. Quay từng món, từng chi tiết.
+Còn muốn có người chỉ đúng giây nào đang hỏng thì xài tool Chấm video của tụi mình. Đưa link hoặc file lên, AI coi hết video rồi nói luôn sửa sao với footage đang có.
 
-4. Nhạc lấn giọng
-Người lướt quyết định bằng cả mắt lẫn tai. Giọng chìm là mất một cửa.
-
-5. Lọt QR code, logo nền tảng khác vào khung
-Chính là cái lỗi ở dòng đầu bài.
-
-Mẹo tự kiểm: tắt tiếng xem 1 giây đầu, hỏi "nhìn thấy gì?". Bật tiếng xem lại, hỏi "nghe thấy gì?".
-
-Lười tự kiểm thì tool Chấm video của tụi mình làm giúp: AI xem trọn video, chỉ đúng giây nào đang hỏng, cái gì sửa được ngay với footage đang có.
-
-Bạn mắc mấy cái?
+Video gần nhất của bạn, bạn đoán nó hỏng ở đâu?
 ```
 
---- PHIÊN BẢN B (ngắn) ---
+**Threads**
 
 ```
-Đăng xong cứ ngồi refresh mà view đứng im một chỗ 😵‍💫
+bạn sẽ ko biết video mình hỏng ở đâu cho tới khi có người chỉ đúng giây 🥲
 
-Đừng đoán. Tắt tiếng xem lại 1 giây đầu, hỏi "nhìn thấy gì?". Bật tiếng xem lại, hỏi "nghe thấy gì?". Phần lớn lỗi nằm ở đó.
+case trong lớp tụi t: bản lọt QR code 3.600 view, bản ko lọt 84.500 view. lỗi bé tí mà tự coi lại ko thấy
 
-Muốn có người chỉ đúng giây thì tool Chấm video của tụi mình làm việc này. Video gần nhất của bạn, bạn đoán nó hỏng ở đâu?
+nên tụi t làm cái tool cho AI coi hết video rồi chỉ đúng giây hỏng, sửa sao với footage đang có. mn tự coi lại video mình có hay thấy lỗi ko
 ```
 
-Bình luận đầu tiên: `Link tool chấm video nè: https://minhtoan8668.github.io/TikTok/tools/cham-video.html · Video đã đăng hay bản dựng chưa đăng đều chấm được.`
-Ảnh: `06-cham-video.png`, `06b-cham-video-cach-dung.png`.
+Bình luận đầu: `Link tool chấm video nè https://minhtoan8668.github.io/TikTok/tools/cham-video.html video đăng rồi hay bản dựng chưa đăng đều chấm được`
 
-### Threads
-
-Mục tiêu: like + repost · Công thức: #6 Hot take "bạn sẽ không biết… cho tới khi…"
-
-5 hook:
-1. ★ bạn sẽ không biết video mình hỏng ở đâu cho tới khi có người chỉ đúng giây 🥲
-2. Bản lọt QR code 3.600 view, bản ko lọt 84.500 view
-3. Đăng xong ngồi refresh mà view đứng im =)))
-4. TUYỆT ĐỐI KHÔNG ĐỂ LỌT QR CODE VÀO VIDEO
-5. Hãy kể lỗi ngớ ngẩn nhất làm video mn flop. T trước:
-→ Chọn 1: nói hộ nỗi khổ chung của người làm video, có số liệu thật đỡ ngay dòng 2.
+Group học viên:
 
 ```
-bạn sẽ không biết video mình hỏng ở đâu cho tới khi có người chỉ đúng giây 🥲
-
-Vd: bản lọt QR code 3.600 view, bản ko lọt 84.500 view. Lỗi nhỏ xíu mà tự xem lại ko thấy.
-
-Tụi t làm cái tool cho AI xem trọn video, chỉ đúng giây nào đang hỏng, sửa sao với footage đang có.
-
-Mn tự xem lại video mình có hay thấy lỗi ko?
+Trước khi đăng mọi người chấm thử bản dựng ở đây nha. Lỗi nào "nặng" thì sửa trước, đăng xong gửi link vô group cả lớp cùng coi.
+https://minhtoan8668.github.io/TikTok/tools/cham-video.html
 ```
-
-Topic tag: `TikTok` · Ảnh: `06-cham-video.png`
-Bình luận mồi: `Link nè: https://minhtoan8668.github.io/TikTok/tools/cham-video.html · Mẹo tự kiểm: tắt tiếng xem 1 giây đầu, hỏi "nhìn thấy gì?".`
-
-### Chia sẻ vào group học viên
-
-> Trước khi đăng, chấm thử bản dựng ở đây nha. Lỗi nào "nặng" thì sửa trước, xong đăng lên rồi gửi link vào group cho cả lớp cùng xem.
-> https://minhtoan8668.github.io/TikTok/tools/cham-video.html
 
 ---
 
-## Trả lời bình luận (60 phút đầu)
+## Trả lời bình luận
 
-Đọc kỹ người ta kể gì, trả lời đúng chuyện đó, kết bằng một câu hỏi ngược lại. Mỗi người một câu.
+Đọc người ta kể gì rồi trả lời đúng chuyện đó, mỗi người một kiểu, đừng dán y chang. Vài ví dụ:
 
-- Người kể khâu đang kẹt: "Kẹt khâu hook thì thử món Chấm hook nha, đưa câu hook vào là thấy nó yếu ở đâu liền. Câu hook gần nhất của bạn là gì?"
-- Người dán câu hook: góp ý thật một câu (đưa con số lên đầu, nói rõ cho ai, cắt bớt chữ thừa), rồi hỏi "bạn định đặt chữ này ở đâu trên video?"
-- Người hỏi "link đâu": "Link ở bình luận đầu tiên nha bạn, mở trình duyệt là dùng liền. Bạn định thử tool nào trước?"
-- Người hỏi có mất tiền không: "Có bản dùng thử miễn phí, không cần cài app. Tạo tài khoản 30 giây là có thêm lượt AI."
-
-Không làm: "Like nếu đồng ý", "Tag 3 người bạn", "Share để nhận…", "Bình luận [từ khoá] để nhận link", dán một câu y chang cho hàng chục người.
+- `Kẹt khâu hook hả, thử cái tool chấm hook coi, đưa câu vô là thấy nó yếu chỗ nào liền á. Câu hook gần nhất của bạn là gì?`
+- Người dán câu hook: góp ý thật 1 câu (đưa số lên đầu, nói rõ cho ai, cắt bớt chữ), rồi hỏi `bạn tính để chữ này ở đâu trên video?`
+- `Link ở bình luận ghim trên cùng á bạn, mở trình duyệt là xài liền`
+- `Có bản thử free nha, khỏi cài app, tạo tài khoản 30 giây là có thêm lượt AI`
