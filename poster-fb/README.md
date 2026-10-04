@@ -8,6 +8,7 @@ Bộ poster quảng bá 6 tool Viral Studio cho page Tự Mình Xây Kênh, ản
 | `bai-dang.md` | Caption từng bài, đoạn chia sẻ vào group, lịch đăng 7 ngày, link từng tool |
 | `poster.html` | Bố cục tất cả poster. Mở bằng trình duyệt để xem, sửa chữ ở đây |
 | `anh/` | Ảnh chụp giao diện tool (khổ điện thoại 390px ×3, dựng video khổ máy tính) |
+| `logo/` | Logo đổi màu theo nền: `lockup-nen-lime.svg` (viên gạch play màu kem), `lockup-nen-toi.svg` (gạch sáng, viên play lime). Nền kem dùng logo gốc trong `assets/brand/` |
 | `mau/` | Dữ liệu mẫu để chụp: ảnh bìa và 3 cảnh webm cho Tải video, Dựng video |
 | `chup.js` | Chụp lại `anh/` từ tool trong repo |
 | `xuat.js` | Xuất `poster.html` ra `xuat/` |
