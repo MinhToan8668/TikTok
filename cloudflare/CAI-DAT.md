@@ -53,7 +53,7 @@ Trong trang Worker vừa tạo → **Settings** → **Variables and Secrets** �
 
 | Variable name | Type | Value |
 |---|---|---|
-| `GEMINI_API_KEYS` | Secret | key Gemini đang dùng ở Apps Script. Nhiều key thì cách nhau dấu phẩy, máy chủ tự xoay khi key này hết hạn mức |
+| `GEMINI_API_KEYS` | Secret | key Gemini, nhiều key cách nhau dấu phẩy. Nên dùng cùng bộ key đã thêm ở Apps Script (bot `/keygemini`), mỗi key ở một project Google Cloud riêng. Máy chủ bắt đầu ở key ngẫu nhiên, key nào hết hạn mức thì nghỉ đúng số giây Google báo và chuyển key khác |
 | `PIXABAY_KEY` | Secret | key miễn phí: đăng ký tài khoản tại <https://pixabay.com/accounts/register/>, xác nhận email, đăng nhập rồi mở <https://pixabay.com/api/docs/>. Kéo xuống mục **Parameters**, dòng `key` hiện sẵn key của anh (dạng `12345678-abc...`), chép ra. 100 lượt/phút, máy chủ tự nhớ kết quả 24 giờ nên dư dùng |
 | `PEXELS_KEY` | Secret | tuỳ chọn. Pexels đang tạm ngưng cấp key mới; ai có sẵn thì thêm để gộp thêm kết quả |
 | `APPS_SCRIPT_URL` | Text | link `/exec` của Apps Script (chính là link đang dán trong tool). Máy chủ dùng để kiểm đăng nhập và trừ lượt khi lồng tiếng |
@@ -110,9 +110,8 @@ Sau đó tải lại trang Dựng video: tab **Footage** có ô **Kho B-roll mi�
 | Trang Pexels báo "New API key issuance is currently paused" | Bình thường, dùng Pixabay thay thế, không cần Pexels |
 | Lồng tiếng báo `origin` | Web đang chạy ở tên miền lạ. Thêm biến `ORIGINS` |
 | Lồng tiếng báo `khong_noi_duoc_apps_script` | `APPS_SCRIPT_URL` sai hoặc Apps Script chưa Deploy "Anyone" |
-| Lồng tiếng báo `tts_loi 429` | Key Gemini hết hạn mức phút. Thêm key thứ hai vào `GEMINI_API_KEYS` |
+| Học viên thấy "AI đang quá tải" | Mọi key Gemini của Worker đang hết hạn mức hoặc Google quá tải. Bot gửi admin lý do thật (tối đa 1 tin mỗi 30 phút). Thêm key ở project khác vào `GEMINI_API_KEYS` của Worker |
 | Trợ lý dựng báo `chua_co_key_claude` / `chua_co_key_openai` | Đã đặt `LLM_PROVIDER` nhưng chưa thêm key tương ứng |
-| Trợ lý dựng báo `llm_loi 429` | Model hết hạn mức ngày; đổi `LLM_MODEL` hoặc thêm key |
 | Muốn xem log | Trang Worker → **Logs** → **Begin log stream**, rồi thao tác trên tool |
 
 ## Cập nhật code máy chủ

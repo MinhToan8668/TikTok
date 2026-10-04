@@ -579,7 +579,7 @@ function handleTelegram(update){
   // Lệnh của khu lịch mentor (Lich.gs) — tách riêng cho gọn
   if (quanTri && lichCoLenh(cmd)) return lichLenh(cmd, arg, chatId, msg);
   // Lệnh bán Pro của Viral Studio (Studio.gs): /studio /stk /giapro /luotthu ...
-  if (quanTri && studioCoLenh(cmd)) return studioLenh(cmd, arg, chatId);
+  if (quanTri && studioCoLenh(cmd)) return studioLenh(cmd, arg, chatId, msg);
 
   var cfg = getConfig();
 
@@ -1087,27 +1087,9 @@ var HOI_RONG_TOI  = 2;    // im lặng mấy lượt liền thì nhường lư�
  * (kèm xả hàng chờ — nguồn spam), bỏ qua tin tồn cũ, rồi đặt lịch hỏi
  * Telegram mỗi phút. Chạy lại nhiều lần vẫn an toàn.
  */
-function setup(){
-  var out = [];
-
-  if (!cfgProp('BOT_TOKEN') || !cfgProp('ADMIN_CHAT_IDS'))
-    throw new Error('Chưa điền BOT_TOKEN / ADMIN_CHAT_IDS trong SETUP ở đầu file.');
-
-  sheet();
-  out.push('✔ Sheet "'+SHEET_NAME+'" sẵn sàng: '+ss().getUrl());
-
-  try{ out.push('✔ '+lichSetup()); }
-  catch(err){ out.push('✘ Không dựng được khu lịch mentor: '+err); }
-
-  var me = tgApi('getMe', {});
-  if (!me || !me.ok){
-    out.push('✘ Token không hợp lệ — kiểm tra lại với @BotFather rồi chạy lại setup');
-    Logger.log(out.join('\n'));
-    return;
-  }
-  out.push('✔ Bot: @'+me.result.username);
-
-  var cmds = tgApi('setMyCommands',{commands:[
+/* Menu lệnh hiện khi gõ "/" trong Telegram. Thêm lệnh mới thì chạy hàm capNhatMenuBot một lần
+   (không cần chạy lại setup). */
+var MENU_BOT = [
     {command:'trangthai',  description:'📋 Tình trạng lớp hiện tại'},
     {command:'danhsach',   description:'👥 Danh sách đăng ký'},
     {command:'giasom',     description:'💰 Giá ưu đãi — /giasom 2000000'},
@@ -1128,6 +1110,7 @@ function setup(){
     {command:'tuchoi',     description:'❌ Từ chối — /tuchoi AB12'},
     {command:'nen',        description:'🖼 Vẽ nền Teams — /nen Minh Toàn'},
     {command:'studio',     description:'🎬 Viral Studio: STK, giá Pro, lượt AI'},
+    {command:'keygemini',  description:'🔑 Key Gemini: xem · them AIza... · xoa 2'},
     {command:'dsck',       description:'🧾 Viral Studio: giao dịch chờ mở Pro'},
     {command:'lichtuan',   description:'📆 Lịch kèm 1:1 cả tuần + ai đã đặt'},
     {command:'dstk',       description:'👥 Tài khoản: chờ duyệt · mentor · học viên'},
@@ -1141,7 +1124,33 @@ function setup(){
     {command:'huy',        description:'👌 Hủy câu hỏi đang chờ'},
     {command:'sheet',      description:'📄 Link Google Sheet'},
     {command:'menu',       description:'⚙️ Danh sách đầy đủ lệnh'}
-  ]});
+];
+function capNhatMenuBot(){
+  var r = tgApi('setMyCommands', {commands: MENU_BOT});
+  Logger.log(r && r.ok ? '✔ Đã cập nhật menu lệnh bot (' + MENU_BOT.length + ' lệnh). Mở lại chat bot để thấy.' : '✘ Không cập nhật được menu: ' + JSON.stringify(r));
+}
+
+function setup(){
+  var out = [];
+
+  if (!cfgProp('BOT_TOKEN') || !cfgProp('ADMIN_CHAT_IDS'))
+    throw new Error('Chưa điền BOT_TOKEN / ADMIN_CHAT_IDS trong SETUP ở đầu file.');
+
+  sheet();
+  out.push('✔ Sheet "'+SHEET_NAME+'" sẵn sàng: '+ss().getUrl());
+
+  try{ out.push('✔ '+lichSetup()); }
+  catch(err){ out.push('✘ Không dựng được khu lịch mentor: '+err); }
+
+  var me = tgApi('getMe', {});
+  if (!me || !me.ok){
+    out.push('✘ Token không hợp lệ — kiểm tra lại với @BotFather rồi chạy lại setup');
+    Logger.log(out.join('\n'));
+    return;
+  }
+  out.push('✔ Bot: @'+me.result.username);
+
+  var cmds = tgApi('setMyCommands',{commands: MENU_BOT});
   out.push(cmds && cmds.ok
     ? '✔ Đã nạp menu lệnh — nút Menu xanh hiện cạnh ô chat'
     : '• Không nạp được menu lệnh (gõ tay vẫn chạy bình thường)');
