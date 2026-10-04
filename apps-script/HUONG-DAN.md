@@ -586,6 +586,8 @@ Mọi tài nguyên tách khỏi code, nằm trong `tools/kho/kho.js` (một file
 - **Thanh dưới khung xem (bố cục dọc)**: đồng hồ `hiện tại | tổng` theo MM:SS:FF, nút vừa khung và toàn màn hình, như thanh player của CapCut desktop.
 - **Cột tự canh**: khi chưa tự kéo cỡ, bảng thuộc tính rộng 321–400px (28% bề rộng) để nhãn như "Vị trí ngang" không xuống dòng; cột khung xem rộng vừa tỉ lệ video; phần dư dồn cho thư viện.
 - **Nhãn clip chữ trên dòng thời gian**: hiện thẳng nội dung chữ (một dòng) thay vì "📝 Chữ" + nội dung bị cắt.
+- **Bảng thuộc tính bị đẩy ra ngoài màn hình khi thêm chữ**: nếu trước đó đã kéo cột thư viện rất rộng (nhớ trong `dv_kc`), lúc chọn một đồ hoạ bảng thuộc tính hiện ra làm tổng ba cột rộng hơn cửa sổ, bảng và thanh trượt nằm ngoài tầm nhìn nên tưởng là lỗi. Nay cỡ cột đã kéo luôn được kẹp lại để cột khung xem còn ≥360px và bảng thuộc tính nằm trong màn hình; tay kéo cũng không cho kéo quá mức đó. Bấm đúp tay kéo để về cỡ mặc định.
+- **Dựng chữ / sticker / nhạc khi chưa có footage**: trước đây tổng thời lượng = tổng các đoạn V1 nên không có footage thì khung xem chỉ hiện chữ hướng dẫn, chữ vừa thêm không thấy và không phát được. Nay tổng thời lượng lấy theo điểm kết thúc xa nhất của chữ / b-roll / âm thanh khi V1 trống; khung xem vẽ các lớp trên nền đen, bấm phát và xuất đều chạy, giống CapCut.
 
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 
