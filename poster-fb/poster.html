@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Poster Facebook · Viral Studio · Tự Mình Xây Kênh</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&display=swap" rel="stylesheet">
+<!-- Mỗi <section class="poster"> là một ảnh 1080×1350 (khổ dọc 4:5 của Facebook).
+     xuat.js chụp từng section ra poster-fb/xuat/<id>.png. Mở file này bằng trình duyệt để xem trước. -->
+<style>
+  :root{
+    --paper:#F9E8DD; --ink:#26210F; --lime:#99DF00; --moss:#1B220D;
+    --surface:#FDFBF3; --muted:#57612F; --line:#C9DE93; --red:#FF5A36;
+    --font-ui:'Be Vietnam Pro', system-ui, sans-serif;
+    --font-display:'Bricolage Grotesque', 'Be Vietnam Pro', system-ui, sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#777;font-family:var(--font-ui);color:var(--ink);display:flex;flex-direction:column;align-items:center;gap:40px;padding:40px 0}
+
+  .poster{width:1080px;height:1350px;position:relative;overflow:hidden;background:var(--lime);flex:none}
+  /* lưới mờ như nền Viral Studio */
+  .poster::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.35;
+    background-image:linear-gradient(rgba(38,33,15,.10) 2px,transparent 2px),linear-gradient(90deg,rgba(38,33,15,.10) 2px,transparent 2px);background-size:90px 90px}
+  .poster.toi{background:var(--ink);color:var(--paper)}
+  .poster.toi::before{background-image:linear-gradient(rgba(153,223,0,.08) 2px,transparent 2px),linear-gradient(90deg,rgba(153,223,0,.08) 2px,transparent 2px)}
+  .poster.giay{background:var(--paper)}
+  .poster.giay::before{opacity:.5}
+
+  /* ── đầu trang: logo + số thứ tự ── */
+  .dau{position:absolute;left:60px;right:60px;top:52px;display:flex;align-items:center;justify-content:space-between}
+  .dau img{height:46px}
+  .so{font:800 22px/1 var(--font-display);letter-spacing:.04em;text-transform:uppercase;background:var(--ink);color:var(--lime);padding:13px 20px;border-radius:999px}
+  .toi .so{background:var(--lime);color:var(--ink)}
+
+  /* ── tiêu đề ── */
+  .tieude{position:absolute;left:60px;right:60px;top:138px}
+  .nhan{display:inline-flex;align-items:center;gap:10px;font:800 26px/1 var(--font-ui);background:var(--surface);border:3px solid var(--ink);border-radius:14px;padding:11px 18px;box-shadow:5px 5px 0 var(--ink)}
+  .nhan i{font-style:normal;font:900 17px/1 var(--font-ui);background:var(--red);color:#fff;padding:6px 10px;border-radius:999px;letter-spacing:.06em}
+  h1{font:800 70px/1.04 var(--font-display);letter-spacing:-.02em;margin-top:26px}
+  h1 mark{background:none;color:inherit;position:relative;white-space:nowrap}
+  .poster:not(.toi) h1 mark{background:var(--ink);color:var(--lime);padding:0 14px;border-radius:12px;box-decoration-break:clone;-webkit-box-decoration-break:clone;white-space:normal}
+  .toi h1 mark{color:var(--lime)}
+  .tieude p{font:500 27px/1.42 var(--font-ui);margin-top:20px;max-width:940px;color:var(--moss)}
+  .toi .tieude p{color:#d9d6c4}
+
+  /* ── điện thoại ── */
+  .dt{position:absolute;width:var(--w,370px);background:#0d0e0a;border-radius:calc(var(--w,370px) * .12);padding:calc(var(--w,370px) * .03);box-shadow:0 30px 60px rgba(27,34,13,.35),0 0 0 3px #3a3a32 inset}
+  .dt .man{border-radius:calc(var(--w,370px) * .095);overflow:hidden;position:relative;background:var(--sb,#99DF00);padding-top:calc(var(--w,370px) * .085)}
+  .dt .man::after{content:"9:41";position:absolute;top:calc(var(--w,370px) * .03);left:calc(var(--w,370px) * .1);font:700 calc(var(--w,370px) * .038)/1 var(--font-ui);color:var(--ink)}
+  .dt .man img{width:100%;display:block}
+  .dt .man::before{content:"";position:absolute;top:10px;left:50%;transform:translateX(-50%);width:28%;height:calc(var(--w,370px) * .07);background:#0d0e0a;border-radius:999px;z-index:2}
+
+  /* ── máy tính (dựng video) ── */
+  .lap{position:absolute;left:60px;right:60px}
+  .lap .vien{background:#0d0e0a;border-radius:26px 26px 0 0;padding:16px 16px 18px;box-shadow:0 30px 60px rgba(27,34,13,.35)}
+  .lap .vien img{width:100%;display:block;border-radius:8px}
+  .lap .de{height:22px;background:linear-gradient(#c9c9bd,#8e8e83);border-radius:0 0 30px 30px;margin:0 -30px}
+
+  /* ── các bước bên phải ── */
+  .buoc{position:absolute;list-style:none;display:flex;flex-direction:column;gap:20px}
+  .buoc li{display:flex;gap:18px;align-items:flex-start;background:var(--surface);border:3px solid var(--ink);border-radius:20px;padding:20px 22px;box-shadow:6px 6px 0 var(--ink)}
+  .buoc b{flex:none;width:52px;height:52px;border-radius:50%;background:var(--ink);color:var(--lime);display:grid;place-items:center;font:800 28px/1 var(--font-display)}
+  .buoc strong{display:block;font:800 27px/1.2 var(--font-ui)}
+  .buoc span{display:block;font:500 21px/1.42 var(--font-ui);color:var(--muted);margin-top:6px}
+  .buoc.ngang{flex-direction:row}
+  .buoc.ngang li{flex:1;flex-direction:column;gap:12px}
+
+  /* ── mảnh cắt phóng to ── */
+  /* --x, --y: góc trên trái vùng cần cắt (px css trên ảnh rộng 390); --k: độ phóng; --cw, --ch: kích thước vùng cắt */
+  /* dải tên mảnh cao 40px nằm trên cùng, ảnh cắt bắt đầu ngay dưới dải */
+  .zoom{position:absolute;width:calc(var(--cw) * var(--k) * 1px);height:calc(var(--ch) * var(--k) * 1px + 40px);border:3px solid var(--ink);border-radius:20px;overflow:hidden;
+    background:var(--surface) var(--src) no-repeat;background-size:calc(390px * var(--k)) auto;background-position:calc(var(--x) * var(--k) * -1px) calc(var(--y) * var(--k) * -1px + 40px);
+    box-shadow:8px 8px 0 var(--ink);transform:rotate(var(--r,-2deg))}
+  .zoom em{position:absolute;top:0;left:0;right:0;height:40px;display:flex;align-items:center;gap:8px;padding:0 16px;font:800 18px/1 var(--font-ui);font-style:normal;background:var(--ink);color:var(--lime);letter-spacing:.02em}
+  .zoom em::before{content:"🔍"}
+  .mui{position:absolute;font:800 24px/1.2 var(--font-display);color:var(--ink);transform:rotate(var(--r,-4deg))}
+
+  /* ── chân trang ── */
+  .chan{position:absolute;left:0;right:0;bottom:0;height:104px;background:var(--ink);color:var(--paper);display:flex;align-items:center;justify-content:space-between;padding:0 60px;gap:20px}
+  .chan .link{font:600 23px/1.3 var(--font-ui)}
+  .chan .link b{display:block;font:800 30px/1.15 var(--font-display);color:var(--lime);letter-spacing:-.01em}
+  .chan .hv{font:800 22px/1.25 var(--font-ui);background:var(--lime);color:var(--ink);padding:14px 20px;border-radius:16px;text-align:center}
+  .toi .chan{background:var(--lime);color:var(--ink)}
+  .toi .chan .link b{color:var(--ink)}
+  .toi .chan .hv{background:var(--ink);color:var(--lime)}
+  .ghichu{position:absolute;right:60px;top:112px;font:500 15px/1 var(--font-ui);color:var(--muted);opacity:.85}
+  .toi .ghichu{color:#b7b89a}
+
+  /* ── poster tổng quan ── */
+  .luoi6{position:absolute;left:60px;right:60px;top:492px;display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+  .o{background:var(--paper);color:var(--ink);border-radius:22px;overflow:hidden;position:relative;border:3px solid var(--lime)}
+  .o .anh{height:212px;background:var(--surface) no-repeat top center/100% auto;border-bottom:3px solid var(--ink)}
+  .o .chu{padding:16px 18px 18px}
+  .o h3{font:800 25px/1.15 var(--font-ui);display:flex;align-items:center;gap:8px}
+  .o p{font:500 18px/1.38 var(--font-ui);color:var(--muted);margin-top:7px}
+  .o i{position:absolute;top:12px;right:12px;font:900 15px/1 var(--font-ui);font-style:normal;background:var(--red);color:#fff;padding:7px 10px;border-radius:999px;letter-spacing:.06em}
+  .o i.free{background:var(--lime);color:var(--ink);border:2px solid var(--ink)}
+
+  /* ── trang cách dùng: 3 điện thoại một hàng ── */
+  .ba{position:absolute;left:60px;right:60px;top:368px;display:grid;grid-template-columns:repeat(3,1fr);gap:30px}
+  .ba .cot{position:relative}
+  .ba .dt{position:relative;--w:300px}
+  .ba .soto{position:absolute;top:-24px;left:-14px;z-index:3;width:66px;height:66px;border-radius:50%;background:var(--lime);border:4px solid var(--ink);display:grid;place-items:center;font:800 34px/1 var(--font-display);box-shadow:4px 4px 0 var(--ink)}
+  .ba h4{font:800 26px/1.2 var(--font-ui);margin-top:24px}
+  .ba p{font:500 20px/1.4 var(--font-ui);color:var(--muted);margin-top:6px}
+  .tieude.nho h1{font-size:60px}
+  .toi .buoc li{color:var(--ink)}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ 00 · TỔNG QUAN ═══════════ -->
+<section class="poster toi" id="00-tong-quan">
+  <div class="dau"><img src="../assets/brand/tmxk-lockup-trang.svg" alt="Tự Mình Xây Kênh"><span class="so">Viral Studio</span></div>
+  <div class="tieude">
+    <span class="nhan" style="color:var(--ink)">✦ Bộ tool AI của khoá</span>
+    <h1>6 tool AI làm video viral,<br><mark>ngay trên điện thoại.</mark></h1>
+    <p>AI train từ hàng trăm video viral đã mổ bằng số liệu thật, làm đúng quy trình trong lớp Tự Mình Xây Kênh.</p>
+  </div>
+  <div class="luoi6">
+    <div class="o"><i class="free">FREE</i><div class="anh" style="background-image:url(anh/tai-2.jpg);background-position:center 18%"></div><div class="chu"><h3>⬇️ Tải video</h3><p>Dán link, lấy video không logo, ảnh gốc, nhạc nền.</p></div></div>
+    <div class="o"><div class="anh" style="background-image:url(anh/soi-3.jpg)"></div><div class="chu"><h3>🔎 Soi video viral</h3><p>Mổ vì sao video người ta nổ, áp khuôn sang kênh bạn.</p></div></div>
+    <div class="o"><div class="anh" style="background-image:url(anh/hook-3.jpg);background-position:center 9%"></div><div class="chu"><h3>⚡ Hook viral</h3><p>Chấm hook trên 100, viết lại 5 bản, đặt chữ lên video.</p></div></div>
+    <div class="o"><div class="anh" style="background-image:url(anh/kb-3.jpg)"></div><div class="chu"><h3>📝 Kịch bản viral</h3><p>Viết theo 11 khung, biết trước giây nào người xem lướt.</p></div></div>
+    <div class="o"><i>MỚI</i><div class="anh" style="background-image:url(anh/dung-3.jpg);background-size:190% auto;background-position:62% 22%"></div><div class="chu"><h3>🎞️ Dựng video</h3><p>Thả footage, nhờ Trợ lý AI dựng, xuất MP4 trên máy.</p></div></div>
+    <div class="o"><i>MỚI</i><div class="anh" style="background-image:url(anh/cv-2.jpg)"></div><div class="chu"><h3>🎯 Chấm video</h3><p>AI xem trọn video bạn làm, chỉ đúng giây đang hỏng.</p></div></div>
+  </div>
+  <div class="ghichu">Ảnh chụp giao diện thật · dữ liệu minh hoạ</div>
+  <div class="chan"><div class="link">Mở Viral Studio tại<b>minhtoan8668.github.io/TikTok</b></div><div class="hv">Học viên khoá<br>dùng Pro miễn phí</div></div>
+</section>
+
+<!-- ═══════════ 01 · TẢI VIDEO ═══════════ -->
+<section class="poster" id="01-tai-video">
+  <div class="dau"><img src="../assets/brand/tmxk-lockup.svg" alt="Tự Mình Xây Kênh"><span class="so">Viral Studio · 01/06</span></div>
+  <div class="tieude">
+    <span class="nhan">⬇️ Tải video <i>FREE</i></span>
+    <h1>Dán link là tải.<br><mark>Không logo.</mark></h1>
+    <p>TikTok, Douyin, X, YouTube, Instagram, Facebook, Pinterest… lấy video, ảnh gốc và nhạc nền về máy. Không tốn lượt AI.</p>
+  </div>
+  <div class="dt" style="--w:380px;left:60px;top:500px"><div class="man"><img src="anh/tai-2.jpg" alt=""></div></div>
+  <ol class="buoc" style="left:478px;right:60px;top:520px">
+    <li><b>1</b><div><strong>Copy link video</strong><span>Trong app bấm Chia sẻ → Sao chép liên kết. Dán cả đoạn chữ cũng được.</span></div></li>
+    <li><b>2</b><div><strong>Bấm Lấy file</strong><span>Hiện đủ: video HD không logo, nhạc nền, ảnh bìa.</span></div></li>
+    <li><b>3</b><div><strong>Tải về, hoặc soi luôn</strong><span>Bấm “Soi video này” để AI mổ vì sao video đó viral.</span></div></li>
+  </ol>
+  <div class="zoom" style="--src:url(anh/tai-3.jpg);--x:30;--y:465;--cw:330;--ch:125;--k:1.5;right:66px;bottom:136px"><em>Không logo</em></div>
+  <div class="ghichu">Ảnh chụp giao diện thật · dữ liệu minh hoạ</div>
+  <div class="chan"><div class="link">Tools → Tải video<b>minhtoan8668.github.io/TikTok</b></div><div class="hv">Học viên khoá:<br>tải không giới hạn</div></div>
+</section>
+
+<section class="poster giay" id="01b-tai-video-cach-dung">
+  <div class="dau"><img src="../assets/brand/tmxk-lockup.svg" alt="Tự Mình Xây Kênh"><span class="so">Cách dùng · Tải video</span></div>
+  <div class="tieude nho"><h1>3 bước,<br><mark>chưa tới 30 giây.</mark></h1></div>
+  <div class="ba">
+    <div class="cot"><span class="soto">1</span><div class="dt"><div class="man"><img src="anh/tai-1.jpg" alt=""></div></div><h4>Dán link vào ô</h4><p>Bấm nút Dán, tool tự lọc ra link.</p></div>
+    <div class="cot"><span class="soto">2</span><div class="dt"><div class="man"><img src="anh/tai-2.jpg" alt=""></div></div><h4>Bấm Lấy file</h4><p>Thấy ngay tiêu đề, view, tim, bình luận.</p></div>
+    <div class="cot"><span class="soto">3</span><div class="dt"><div class="man"><img src="anh/tai-3.jpg" alt=""></div></div><h4>Chọn file, Tải về</h4><p>Video HD không logo, nhạc nền, ảnh bìa.</p></div>
+  </div>
+  <div class="ghichu" style="top:auto;bottom:116px">Chỉ tải nội dung bạn có quyền dùng · tải về để học, không đăng lại nguyên bản</div>
+  <div class="chan"><div class="link">Tools → Tải video<b>minhtoan8668.github.io/TikTok</b></div><div class="hv">Học viên khoá:<br>tải không giới hạn</div></div>
+</section>
+
+<!-- ═══════════ 02 · SOI VIDEO VIRAL ═══════════ -->
+<section class="poster" id="02-soi-video">
+  <div class="dau"><img src="../assets/brand/tmxk-lockup.svg" alt="Tự Mình Xây Kênh"><span class="so">Viral Studio · 02/06</span></div>
+  <div class="tieude">
+    <span class="nhan">🔎 Soi video viral</span>
+    <h1>Video người ta nổ view?<br><mark>AI chỉ ra vì sao.</mark></h1>
+    <p>Dán link video đang chạy tốt cùng ngách. AI tự tải, nghe và bóc lời thoại theo giây, đọc số và bình luận, rồi áp khuôn sang kênh bạn.</p>
+  </div>
+  <div class="dt" style="--w:380px;left:60px;top:500px"><div class="man"><img src="anh/soi-3.jpg" alt=""></div></div>
+  <ol class="buoc" style="left:478px;right:60px;top:520px">
+    <li><b>1</b><div><strong>Dán link video mẫu</strong><span>Cùng ngách, 50–200K view là đủ học. Không cần triệu view.</span></div></li>
+    <li><b>2</b><div><strong>Ghi kênh của bạn</strong><span>Chủ đề, người xem, sản phẩm để AI áp khuôn đúng kênh.</span></div></li>
+    <li><b>3</b><div><strong>Bấm Soi video</strong><span>Mổ 3 cửa: vì sao dừng lại, vì sao xem hết, công thức lặp lại được.</span></div></li>
+  </ol>
+  <div class="zoom" style="--src:url(anh/soi-cua3.jpg);--x:0;--y:90;--cw:390;--ch:140;--k:1.28;right:66px;bottom:136px"><em>Khuôn để mượn</em></div>
+  <div class="ghichu">Ảnh chụp giao diện thật · dữ liệu minh hoạ</div>
+  <div class="chan"><div class="link">Tools → Soi video viral<b>minhtoan8668.github.io/TikTok</b></div><div class="hv">Học viên khoá<br>dùng Pro miễn phí</div></div>
+</section>
+
+<section class="poster giay" id="02b-soi-video-cach-dung">
+  <div class="dau"><img src="../assets/brand/tmxk-lockup.svg" alt="Tự Mình Xây Kênh"><span class="so">Cách dùng · Soi video</span></div>
+  <div class="tieude nho"><h1>Một link,<br><mark>ra cả khuôn kịch bản.</mark></h1></div>
+  <div class="ba">
+    <div class="cot"><span class="soto">1</span><div class="dt"><div class="man"><img src="anh/soi-1.jpg" alt=""></div></div><h4>Dán link, bấm Lấy video</h4><p>Hoặc tải file video từ máy lên.</p></div>
+    <div class="cot"><span class="soto">2</span><div class="dt"><div class="man"><img src="anh/soi-2.jpg" alt=""></div></div><h4>Đọc phần tóm tắt</h4><p>Ngách, dạng video, tệp người xem, lời thoại theo giây.</p></div>
+    <div class="cot"><span class="soto">3</span><div class="dt"><div class="man"><img src="anh/soi-3.jpg" alt=""></div></div><h4>Mượn khuôn 3 cửa</h4><p>Kèm hook và lời thoại mẫu cho kênh bạn.</p></div>
+  </div>
+  <div class="chan"><div class="link">Tools → Soi video viral<b>minhtoan8668.github.io/TikTok</b></div><div class="hv">Học viên khoá<br>dùng Pro miễn phí</div></div>
+</section>
+
+<!-- ═══════════ 03 · HOOK VIRAL ═══════════ -->
+<section class="poster" id="03-hook-viral">
+  <div class="dau"><img src="../assets/brand/tmxk-lockup.svg" alt="Tự Mình Xây Kênh"><span class="so">Viral Studio · 03/06</span></div>
+  <div class="tieude">
+    <span class="nhan">⚡ Hook viral</span>
+    <h1>3 giây đầu quyết định.<br><mark>Hook của bạn mấy điểm?</mark></h1>
+    <p>Dán câu hook và frame video. AI chấm trên 100, viết lại 5 bản, tự xếp chữ né mặt. 14 bố cục, 19 font Việt.</p>
+  </div>
+  <div class="dt" style="--w:380px;left:60px;top:500px"><div class="man"><img src="anh/hook-3.jpg" alt=""></div></div>
+  <ol class="buoc" style="left:478px;right:60px;top:520px">
+    <li><b>1</b><div><strong>Đưa frame và câu hook</strong><span>Chụp khung đầu video, gõ câu hook bạn định dùng.</span></div></li>
+    <li><b>2</b><div><strong>Bấm Phân tích</strong><span>Chấm 4 tiêu chí: tò mò, dễ hiểu, độ dài, từ khoá. Viết lại 5 bản.</span></div></li>
+    <li><b>3</b><div><strong>Xuất PNG chữ</strong><span>Chọn bố cục, font. Tải PNG nền trong suốt, kéo vào CapCut.</span></div></li>
+  </ol>
+  <div class="zoom" style="--src:url(anh/hook-2.jpg);--x:20;--y:665;--cw:355;--ch:148;--k:1.4;right:66px;bottom:136px"><em>Kéo vào CapCut</em></div>
+  <div class="ghichu">Ảnh chụp giao diện thật · dữ liệu minh hoạ</div>
+  <div class="chan"><div class="link">Tools → Hook viral<b>minhtoan8668.github.io/TikTok</b></div><div class="hv">Học viên khoá<br>dùng Pro miễn phí</div></div>
+</section>
+
+<section class="poster giay" id="03b-hook-viral-cach-dung">
+  <div class="dau"><img src="../assets/brand/tmxk-lockup.svg" alt="Tự Mình Xây Kênh"><span class="so">Cách dùng · Hook viral</span></div>
+  <div class="tieude nho"><h1>Chấm, sửa,<br><mark>đặt chữ lên video.</mark></h1></div>
+  <div class="ba">
+    <div class="cot"><span class="soto">1</span><div class="dt"><div class="man"><img src="anh/hook-1.jpg" alt=""></div></div><h4>Tải frame, gõ hook</h4><p>Xem ngay chữ nằm trên khung TikTok, Reels, Shorts.</p></div>
+    <div class="cot"><span class="soto">2</span><div class="dt"><div class="man"><img src="anh/hook-3.jpg" alt=""></div></div><h4>Bấm Phân tích</h4><p>Điểm hook gốc và 5 bản viết lại. Bấm Dùng để thay.</p></div>
+    <div class="cot"><span class="soto">3</span><div class="dt"><div class="man"><img src="anh/hook-2.jpg" alt=""></div></div><h4>Chỉnh chữ, xuất PNG</h4><p>Kéo chữ, đổi bố cục, nhấn màu từ khoá.</p></div>
+  </div>
+  <div class="chan"><div class="link">Tools → Hook viral<b>minhtoan8668.github.io/TikTok</b></div><div class="hv">Học viên khoá<br>dùng Pro miễn phí</div></div>
+</section>
+
+<!-- ═══════════ 04 · KỊCH BẢN VIRAL ═══════════ -->
+<section class="poster" id="04-kich-ban">
+  <div class="dau"><img src="../assets/brand/tmxk-lockup.svg" alt="Tự Mình Xây Kênh"><span class="so">Viral Studio · 04/06</span></div>
+  <div class="tieude">
+    <span class="nhan">📝 Kịch bản viral</span>
+    <h1>Biết trước giây nào<br><mark>người xem sẽ lướt.</mark></h1>
+    <p>Viết theo 11 khung kịch bản của khoá. AI chấm 5 tiêu chí, bắt câu nghe như văn máy, viết lại trọn bài 60–105 giây theo tốc độ nói của bạn.</p>
+  </div>
+  <div class="dt" style="--w:380px;left:60px;top:500px"><div class="man"><img src="anh/kb-3.jpg" alt=""></div></div>
+  <ol class="buoc" style="left:478px;right:60px;top:520px">
+    <li><b>1</b><div><strong>Chọn khung</strong><span>Một khoảnh khắc, Kể chuyện 4 nhịp, Chia sẻ kinh nghiệm…</span></div></li>
+    <li><b>2</b><div><strong>Viết từng phần</strong><span>Tool đếm chữ, đổi ra giây, báo phần nào đang thiếu hay thừa.</span></div></li>
+    <li><b>3</b><div><strong>Bấm Chấm</strong><span>Điểm 5 tiêu chí, chỗ người xem lướt, 3 chỗ cần sửa.</span></div></li>
+  </ol>
+  <div class="zoom" style="--src:url(anh/kb-2.jpg);--x:15;--y:460;--cw:362;--ch:140;--k:1.38;right:66px;bottom:136px"><em>Canh từng giây</em></div>
+  <div class="ghichu">Ảnh chụp giao diện thật · dữ liệu minh hoạ</div>
+  <div class="chan"><div class="link">Tools → Kịch bản viral<b>minhtoan8668.github.io/TikTok</b></div><div class="hv">Học viên khoá<br>dùng Pro miễn phí</div></div>
+</section>
+
+<section class="poster giay" id="04b-kich-ban-cach-dung">
+  <div class="dau"><img src="../assets/brand/tmxk-lockup.svg" alt="Tự Mình Xây Kênh"><span class="so">Cách dùng · Kịch bản</span></div>
+  <div class="tieude nho"><h1>Viết theo khung,<br><mark>AI khám từng câu.</mark></h1></div>
+  <div class="ba">
+    <div class="cot"><span class="soto">1</span><div class="dt"><div class="man"><img src="anh/kb-1.jpg" alt=""></div></div><h4>Chọn khung kịch bản</h4><p>Mỗi khung ghi rõ hợp với chuyện gì.</p></div>
+    <div class="cot"><span class="soto">2</span><div class="dt"><div class="man"><img src="anh/kb-2.jpg" alt=""></div></div><h4>Viết theo gợi ý</h4><p>Số giây từng phần hiện ngay bên cạnh.</p></div>
+    <div class="cot"><span class="soto">3</span><div class="dt"><div class="man"><img src="anh/kb-3.jpg" alt=""></div></div><h4>Bấm Chấm</h4><p>Sửa theo góp ý hoặc để AI viết lại cả bài.</p></div>
+  </div>
+  <div class="chan"><div class="link">Tools → Kịch bản viral<b>minhtoan8668.github.io/TikTok</b></div><div class="hv">Học viên khoá<br>dùng Pro miễn phí</div></div>
+</section>
+
+<!-- ═══════════ 05 · DỰNG VIDEO ═══════════ -->
+<section class="poster toi" id="05-dung-video">
+  <div class="dau"><img src="../assets/brand/tmxk-lockup-trang.svg" alt="Tự Mình Xây Kênh"><span class="so">Viral Studio · 05/06</span></div>
+  <div class="tieude">
+    <span class="nhan" style="color:var(--ink)">🎞️ Dựng video <i>MỚI</i></span>
+    <h1>Thả footage vào.<br><mark>Nói AI muốn dựng sao.</mark></h1>
+    <p>Trình dựng ngay trên trình duyệt: nhiều track, phụ đề karaoke, mẫu chữ, hiệu ứng, nhạc theo beat. Xuất MP4 ngay trên máy.</p>
+  </div>
+  <div class="lap" style="top:456px"><div class="vien"><img src="anh/dung-3.jpg" alt=""></div><div class="de"></div></div>
+  <ol class="buoc ngang" style="left:60px;right:60px;top:1118px">
+    <li style="padding:16px 18px"><div style="display:flex;gap:12px;align-items:center"><b style="width:44px;height:44px;font-size:24px">1</b><strong style="font-size:23px">Thêm footage</strong></div></li>
+    <li style="padding:16px 18px"><div style="display:flex;gap:12px;align-items:center"><b style="width:44px;height:44px;font-size:24px">2</b><strong style="font-size:23px">Nhờ Trợ lý AI</strong></div></li>
+    <li style="padding:16px 18px"><div style="display:flex;gap:12px;align-items:center"><b style="width:44px;height:44px;font-size:24px">3</b><strong style="font-size:23px">Thêm chữ, xuất</strong></div></li>
+  </ol>
+  <div class="chan"><div class="link">Tools → Dựng video<b>minhtoan8668.github.io/TikTok</b></div><div class="hv">Học viên khoá<br>dùng Pro miễn phí</div></div>
+</section>
+
+<section class="poster giay" id="05b-dung-video-cach-dung">
+  <div class="dau"><img src="../assets/brand/tmxk-lockup.svg" alt="Tự Mình Xây Kênh"><span class="so">Cách dùng · Dựng video</span></div>
+  <div class="tieude nho"><h1>Dựng như CapCut,<br><mark>có AI ngồi cạnh.</mark></h1></div>
+  <div class="lap" style="top:340px;left:100px;right:100px"><div class="vien" style="padding:10px 10px 12px;border-radius:18px 18px 0 0"><img src="anh/dung-1.jpg" alt=""></div><div class="de" style="height:14px;margin:0 -20px"></div></div>
+  <ol class="buoc" style="left:60px;right:60px;top:950px;gap:16px">
+    <li style="padding:16px 20px"><b>1</b><div><strong>Thêm footage, thả lên dòng thời gian</strong><span>Bấm Media → chọn video, ảnh trong máy → bấm + để thêm vào cuối V1.</span></div></li>
+    <li style="padding:16px 20px"><b>2</b><div><strong>Mở Trợ lý AI, gõ yêu cầu</strong><span>“Bỏ vấp, giữ 30 giây hay nhất, thêm phụ đề kiểu TikTok, nhấn con số.”</span></div></li>
+  </ol>
+  <div class="ghichu" style="top:auto;bottom:116px">Mẹo: mở trên máy tính để dựng thoải mái nhất</div>
+  <div class="chan"><div class="link">Bước 3: Văn bản → chọn mẫu chữ → Xuất MP4<b>minhtoan8668.github.io/TikTok</b></div><div class="hv">Học viên khoá<br>dùng Pro miễn phí</div></div>
+</section>
+
+<!-- ═══════════ 06 · CHẤM VIDEO ═══════════ -->
+<section class="poster" id="06-cham-video">
+  <div class="dau"><img src="../assets/brand/tmxk-lockup.svg" alt="Tự Mình Xây Kênh"><span class="so">Viral Studio · 06/06</span></div>
+  <div class="tieude">
+    <span class="nhan">🎯 Chấm video của bạn <i>MỚI</i></span>
+    <h1>Đăng xong view đứng im?<br><mark>Cho AI xem thử.</mark></h1>
+    <p>AI xem trọn video bạn làm, chấm 7 thang khả năng viral, chỉ đúng giây nào đang hỏng và cách sửa ngay trên bản dựng đang có.</p>
+  </div>
+  <div class="dt" style="--w:380px;left:60px;top:500px"><div class="man"><img src="anh/cv-2.jpg" alt=""></div></div>
+  <ol class="buoc" style="left:478px;right:60px;top:520px">
+    <li><b>1</b><div><strong>Dán link hoặc tải video</strong><span>Video đã đăng hay bản dựng chưa đăng đều được.</span></div></li>
+    <li><b>2</b><div><strong>Bấm Chấm video</strong><span>Điểm trên 100, 7 thang, chỗ cần lưu ý theo từng giây.</span></div></li>
+    <li><b>3</b><div><strong>Sửa ngay, làm tiếp</strong><span>Việc sửa trên bản dựng này, việc làm khác lần sau, 3 kịch bản tiếp theo.</span></div></li>
+  </ol>
+  <div class="zoom" style="--src:url(anh/cv-3.jpg);--x:15;--y:122;--cw:362;--ch:128;--k:1.32;right:66px;bottom:136px"><em>Lỗi theo từng giây</em></div>
+  <div class="ghichu">Ảnh chụp giao diện thật · dữ liệu minh hoạ</div>
+  <div class="chan"><div class="link">Tools → Chấm video của bạn<b>minhtoan8668.github.io/TikTok</b></div><div class="hv">Học viên khoá<br>dùng Pro miễn phí</div></div>
+</section>
+
+<section class="poster giay" id="06b-cham-video-cach-dung">
+  <div class="dau"><img src="../assets/brand/tmxk-lockup.svg" alt="Tự Mình Xây Kênh"><span class="so">Cách dùng · Chấm video</span></div>
+  <div class="tieude nho"><h1>Biết hỏng ở đâu,<br><mark>sửa đúng chỗ đó.</mark></h1></div>
+  <div class="ba">
+    <div class="cot"><span class="soto">1</span><div class="dt"><div class="man"><img src="anh/cv-1.jpg" alt=""></div></div><h4>Đưa video lên</h4><p>Dán link TikTok, YouTube Shorts hoặc tải file.</p></div>
+    <div class="cot"><span class="soto">2</span><div class="dt"><div class="man"><img src="anh/cv-3.jpg" alt=""></div></div><h4>Xem lỗi theo giây</h4><p>Nặng, vừa, nhẹ, kèm cách sửa cho từng chỗ.</p></div>
+    <div class="cot"><span class="soto">3</span><div class="dt"><div class="man"><img src="anh/cv-4.jpg" alt=""></div></div><h4>Lấy 3 kịch bản tiếp</h4><p>Bám đúng kênh bạn, AI viết trọn được luôn.</p></div>
+  </div>
+  <div class="chan"><div class="link">Tools → Chấm video của bạn<b>minhtoan8668.github.io/TikTok</b></div><div class="hv">Học viên khoá<br>dùng Pro miễn phí</div></div>
+</section>
+
+</body>
+</html>
