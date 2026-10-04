@@ -1039,10 +1039,10 @@
     });
     if (!kq) return null;
     bao(92, 'Đã tải xong, Google đang xử lý video…');
-    var d = await goiLai({ action: 'hook_ai', mode: 'up_xong', token: token(), dev: dev(), file: kq.name }, 1);
+    var d = await goiLai({ action: 'hook_ai', mode: 'up_xong', token: token(), dev: dev(), file: kq.name, kh: s0.kh || '' }, 1);
     if (!d.ok) { var e2 = new Error(d.error || 'up_xong'); e2.ma = d.error; e2.chi_tiet = d.chi_tiet; throw e2; }
     bao(100, 'AI đã nhận video');
-    return { file_uri: d.file_uri, mime: d.mime || mime, size: d.size || file.size, cach: 'thang' };
+    return { file_uri: d.file_uri, mime: d.mime || mime, size: d.size || file.size, kh: d.kh || s0.kh || '', cach: 'thang' };   // kh: mã key đã đưa video lên, gửi lại khi soi/chấm
   }
   async function taiVideo(file, onTienDo) {
     var bao = function (p, c) { if (typeof onTienDo === 'function') { try { onTienDo(p, c); } catch (e) { } } };
@@ -1067,10 +1067,24 @@
     var d = await goiLai({ action: 'hook_ai', mode: 'up_done', token: token(), dev: dev(), id: s0.id, n: n, mime: file.type || 'video/mp4', ten: file.name }, 1);
     if (!d.ok) { var e2 = new Error(d.error || 'up_done'); e2.ma = d.error; e2.chi_tiet = d.chi_tiet; throw e2; }
     bao(100, 'AI đã nhận video');
-    return { file_uri: d.file_uri, mime: d.mime || file.type || 'video/mp4', size: d.size || file.size };
+    return { file_uri: d.file_uri, mime: d.mime || file.type || 'video/mp4', size: d.size || file.size, kh: d.kh || '' };
+  }
+
+  /* ── AI quá tải: máy chủ trả ban_qua kèm cho (số giây nên chờ). Học viên chỉ thấy "quá tải" và thời gian thử lại;
+     lý do thật (hết hạn mức key…) chỉ gửi bot cho admin và hiện cho tài khoản mentor. ── */
+  function thoiGianCho(giay) {
+    giay = Math.max(30, Number(giay) || 60);
+    if (giay < 90) return '1 phút';
+    if (giay < 3600) return Math.ceil(giay / 60) + ' phút';
+    return Math.round(giay / 3600) + ' giờ';
+  }
+  function cauQuaTai(r, them) {
+    return 'AI đang quá tải vì nhiều người dùng cùng lúc. Bạn thử lại sau khoảng ' + thoiGianCho(r && r.cho) + (them || '') + '.' +
+      (r && r.chi_tiet && laMentor() ? ' ' + r.chi_tiet : '');   // máy chủ chỉ gửi chi tiết cho mentor
   }
 
   global.TK = {
+    thoiGianCho: thoiGianCho, cauQuaTai: cauQuaTai,
     khoiDong: khoiDong, nap: nap, mo: mo, dong: dong, canCo: canCo, moHet: moHet, mayChu: mayChu,
     goiNen: goiNen, nhanViec: nhanViec, viecDangCho: function () { return dsViec(); },
     luotTai: luotTai, canTai: canTai, dungTai: dungTai, veNhanFree: veNhanFree,

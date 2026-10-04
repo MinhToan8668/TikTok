@@ -27,7 +27,7 @@
      ANTHROPIC_API_KEY, OPENAI_API_KEY   (Secret) key khi chọn claude / openai
    ═══════════════════════════════════════════════════════════════════════════ */
 
-const PHIEN_BAN = '2026.10.15';
+const PHIEN_BAN = '2026.10.16';
 /* link /exec của Apps Script đang dùng trong tool (công khai sẵn trong tools/*.html). Biến APPS_SCRIPT_URL trên Cloudflare, nếu có, sẽ được ưu tiên. */
 const APPS_SCRIPT_MD = 'https://script.google.com/macros/s/AKfycbyxe1nWupAl6VheDZHaU3Ojm-d6c8F_khhUMtkehNCLh5OnGW6f2uF0PKPYZ4eYUqyGjQ/exec';
 const asUrl = env => String(env.APPS_SCRIPT_URL || env.APPS_SCRIPT || APPS_SCRIPT_MD).trim();
@@ -41,6 +41,7 @@ const HOST_MEDIA = /(^|\.)(pexels\.com|pixabay\.com)$/i;
 
 export default {
   async fetch(req, env, ctx) {
+    CTX = ctx;
     const url = new URL(req.url), path = url.pathname.replace(/\/+$/, '') || '/';
     const cors = corsCho(req, env);
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: { ...cors, 'access-control-max-age': '86400' } });
@@ -69,21 +70,65 @@ function corsCho(req, env) {
   if (!o || ds.includes('*') || ds.some(d => d === o || d.replace(/\/+$/, '') === o.replace(/\/+$/, ''))) h['access-control-allow-origin'] = o || '*';
   return h;
 }
-function json(o, cors, status) { return new Response(JSON.stringify(o), { status: status || 200, headers: { ...cors, 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' } }); }
+/* Lỗi hết hạn mức / quá tải của Gemini: trang chỉ nhận ban_qua + số giây nên chờ, không thấy chi tiết thô */
+const RE_HAN_MUC = /qua_tai:|quota|exceeded your|RESOURCE_EXHAUSTED|\b429\b|overloaded|UNAVAILABLE/i;
+function json(o, cors, status) {
+  if (o && o.ok === false && typeof o.chi_tiet === 'string' && RE_HAN_MUC.test(o.chi_tiet)) {
+    const m = o.chi_tiet.match(/qua_tai:(\w+):(\d+)/);
+    console.warn('qua tai:', o.error, o.chi_tiet.slice(0, 300));   // xem ở Worker → Logs
+    o = { ...o, error: 'ban_qua', cho: m ? +m[2] : 60 }; delete o.chi_tiet;
+  }
+  return new Response(JSON.stringify(o), { status: status || 200, headers: { ...cors, 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' } }); }
 function hostHopLe(u, re) { try { const x = new URL(u); return /^https?:$/.test(x.protocol) && re.test(x.hostname) ? x : null; } catch { return null; } }
 function tenAscii(s, macDinh) { return (String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80)) || macDinh; }
 
-/* ── Gemini: xoay key khi 429/403 ── */
+/* ── Gemini: xoay key, bắt đầu ở key ngẫu nhiên để chia đều; key bị 429 thì nghỉ riêng model đó đúng số giây
+   Google báo (nhớ trong bộ nhớ của Worker). Mọi key đều 429/503 thì ném lỗi có dấu "qua_tai:<lý do>:<giây chờ>",
+   json() đổi thành ban_qua cho trang (học viên không thấy chữ hạn mức), và báo Apps Script → bot cho admin. ── */
+const NGHI = new Map();   // key|model → hết nghỉ lúc (ms)
+let CTX = null;
+function doc429(t) {
+  let ngay = /PerDay|per day/i.test(t), cho = 0;
+  try { const e = (JSON.parse(t) || {}).error || {}; (e.details || []).forEach(d => { if (/RetryInfo/.test(d['@type'] || '')) cho = parseFloat(String(d.retryDelay || '0')) || 0; if (/QuotaFailure/.test(d['@type'] || '')) (d.violations || []).forEach(v => { if (/PerDay/i.test(v.quotaId || '')) ngay = true; }); }); } catch { }
+  return { ngay, cho };
+}
+function giayToiReset() {   // hạn mức ngày đặt lại lúc 0 giờ giờ Thái Bình Dương
+  const p = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Los_Angeles', hour12: false, hour: 'numeric', minute: 'numeric', second: 'numeric' }).formatToParts(new Date());
+  const g = k => +((p.find(x => x.type === k) || {}).value || 0);
+  return Math.max(60, 86400 - ((g('hour') % 24) * 3600 + g('minute') * 60 + g('second')));
+}
 async function goiGemini(env, model, body) {
   const keys = dsKey(env); if (!keys.length) throw new Error('chua_co_key');
-  let loi = '';
-  for (let i = 0; i < keys.length; i++) {
-    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${keys[i]}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+  let loi = '', soPhut = 0, soNgay = 0, google = 0, cho = 0;
+  const ghiCho = g => { if (g > 0 && (!cho || g < cho)) cho = g; };
+  const bd = Math.floor(Math.random() * keys.length);
+  for (let q = 0; q < keys.length; q++) {
+    const k = keys[(bd + q) % keys.length], nk = k.slice(-8) + '|' + model, het = NGHI.get(nk) || 0;
+    if (het > Date.now()) { ghiCho(Math.ceil((het - Date.now()) / 1000)); soPhut++; continue; }
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, { method: 'POST', headers: { 'content-type': 'application/json', 'x-goog-api-key': k }, body: JSON.stringify(body) });
     if (r.ok) return r.json();
-    loi = `${r.status} ${(await r.text()).slice(0, 200)}`;
-    if (r.status !== 429 && r.status !== 403 && r.status < 500) break;
+    const t = await r.text();
+    loi = `${r.status} ${t.slice(0, 200)}`;
+    if (r.status === 429) { const d = doc429(t), g = d.ngay ? giayToiReset() : Math.max(20, Math.ceil(d.cho)); NGHI.set(nk, Date.now() + g * 1000); ghiCho(g); d.ngay ? soNgay++ : soPhut++; continue; }
+    if (r.status >= 500) { google++; ghiCho(60); continue; }
+    if (r.status === 403) continue;
+    break;
+  }
+  if (soPhut || soNgay || google) {
+    const lyDo = (soPhut || soNgay) ? (soNgay && !soPhut ? 'han_muc_ngay' : 'han_muc_phut') : 'google_qua_tai';
+    cho = Math.max(30, cho || 60);
+    baoQuaTai(env, { ly_do: lyDo, cho, so_key: keys.length, key_ngay: soNgay, key_phut: soPhut, models: model });
+    throw new Error(`qua_tai:${lyDo}:${cho}| ${lyDo === 'google_qua_tai' ? 503 : 429} ${loi}`);   // giữ mã 429/503 để chỗ gọi còn lùi về model nhẹ
   }
   throw new Error(loi || 'gemini');
+}
+/* báo Apps Script (gửi bot cho admin, Apps Script tự chặn mỗi loại 1 tin / 30 phút); Worker chặn thêm 10 phút */
+const DA_BAO = new Map();
+function baoQuaTai(env, o) {
+  const url = asUrl(env); if (!url || (DA_BAO.get(o.ly_do) || 0) > Date.now()) return;
+  DA_BAO.set(o.ly_do, Date.now() + 600000);
+  const p = fetch(url, { method: 'POST', headers: { 'content-type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'hook_ai', mode: 'cf_qua_tai', ...o }), redirect: 'follow' }).catch(() => { });
+  if (CTX) try { CTX.waitUntil(p); } catch { }
 }
 
 /* ── kho B-roll (Pexels): tìm tiếng Việt trước, ít kết quả thì nhờ Gemini dịch từ khoá ── */
