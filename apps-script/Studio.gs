@@ -815,7 +815,7 @@ function studioLenh(cmd, arg, chatId, msg){
       '⬇️ /luottai `10` — lượt tải video miễn phí cho khách (học viên, Pro không giới hạn)',
       '🎞 /luotdung `2` — số source AI nhận diện miễn phí ở tool Dựng video cho tài khoản Free',
       '💬 /luotchat `15` — tin chat với Trợ lý AI cho tài khoản Free · /chatngay `60` — mỗi ngày cho Pro, học viên',
-      '🔑 /keygemini — xem key Gemini đang rảnh hay hết hạn mức · `/keygemini them AIza...` thêm key · `/keygemini xoa 2`',
+      '🔑 /keygemini — xem key Gemini đang rảnh hay hết hạn mức, bot hỏi lại để bạn gửi key mới hoặc `xoa 2`',
       '☁️ /maychu `https://…workers.dev` — máy chủ phụ Cloudflare (kho B-roll, lồng tiếng AI, tải hộ file lớn) · hiện: ' + (stMayChu() ? '`' + stMayChu() + '`' : '_chưa cài_'),
       '🧠 /baihoc — bộ nhớ AI · /day `nội dung` — dạy AI · /duyetbh /tatbh /xoabh `id`',
       '💬 /tuvan — học viên đang hỏi trợ lý gì · /tonghop — AI tự rút bài học từ các lượt tư vấn mới',
