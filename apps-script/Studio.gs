@@ -759,7 +759,7 @@ function stNapHoSoMau(){
 
 /* ═══════ LỆNH BOT TELEGRAM (chỉ chat quản trị) ═══════
    Code.gs gọi:  if (quanTri && studioCoLenh(cmd)) return studioLenh(cmd, arg, chatId);  */
-var LENH_STUDIO = ['studio','stk','giapro','ngaypro','ngayhv','giahv','uudaihv','maychu','luotthu','luotkb','luotsoi','luotcham','luottai','luotchat','luotdung','luotai','baihoc','duyetbh','tatbh','xoabh','day','chatngay','tuvan','tonghop','mopro','tatpro','dsck','timnd','ckkhoa','tienkhoa','hoso','lichsu','dshv','naphoso'];
+var LENH_STUDIO = ['studio','keygemini','stk','giapro','ngaypro','ngayhv','giahv','uudaihv','maychu','luotthu','luotkb','luotsoi','luotcham','luottai','luotchat','luotdung','luotai','baihoc','duyetbh','tatbh','xoabh','day','chatngay','tuvan','tonghop','mopro','tatpro','dsck','timnd','ckkhoa','tienkhoa','hoso','lichsu','dshv','naphoso'];
 function studioCoLenh(cmd){ return LENH_STUDIO.indexOf(cmd) > -1; }
 
 var ST_MA_NH = {vietcombank:'VCB', vcb:'VCB', mb:'MB', mbbank:'MB', quandoi:'MB', techcombank:'TCB', tcb:'TCB',
@@ -784,7 +784,7 @@ function stDatGoi(sua){
 function stTien(n){ return Number(n).toLocaleString('vi-VN') + 'đ'; }
 function stHan(d){ return d ? Utilities.formatDate(new Date(d), 'GMT+7', 'dd/MM/yyyy') : ''; }
 
-function studioLenh(cmd, arg, chatId){
+function studioLenh(cmd, arg, chatId, msg){
   var P = props();
   var hoi = function(cau){ datCho(chatId, cmd); return tgSend(chatId, cau + '\n\n_Đổi ý thì /huy._'); };
   if (typeof tlLenh === 'function' && typeof TL_LENH !== 'undefined' && TL_LENH.indexOf(cmd) > -1) return tlLenh(cmd, arg, chatId, hoi);   // bộ nhớ AI (TroLy.gs)
@@ -815,6 +815,7 @@ function studioLenh(cmd, arg, chatId){
       '⬇️ /luottai `10` — lượt tải video miễn phí cho khách (học viên, Pro không giới hạn)',
       '🎞 /luotdung `2` — số source AI nhận diện miễn phí ở tool Dựng video cho tài khoản Free',
       '💬 /luotchat `15` — tin chat với Trợ lý AI cho tài khoản Free · /chatngay `60` — mỗi ngày cho Pro, học viên',
+      '🔑 /keygemini — xem key Gemini đang rảnh hay hết hạn mức · `/keygemini them AIza...` thêm key · `/keygemini xoa 2`',
       '☁️ /maychu `https://…workers.dev` — máy chủ phụ Cloudflare (kho B-roll, lồng tiếng AI, tải hộ file lớn) · hiện: ' + (stMayChu() ? '`' + stMayChu() + '`' : '_chưa cài_'),
       '🧠 /baihoc — bộ nhớ AI · /day `nội dung` — dạy AI · /duyetbh /tatbh /xoabh `id`',
       '💬 /tuvan — học viên đang hỏi trợ lý gì · /tonghop — AI tự rút bài học từ các lượt tư vấn mới',
@@ -870,6 +871,7 @@ function studioLenh(cmd, arg, chatId){
     var h2 = stHV(); h2.gia = th; P.setProperty('ST_HV', JSON.stringify(h2));
     return tgSend(chatId, '✅ Gói học viên khoá: *' + (h2.gia ? stTien(h2.gia) : 'miễn phí') + '* · ' + (h2.ngay ? h2.ngay + ' ngày' : 'suốt đời') + '. Landing cập nhật ngay lần mở sau.');
   }
+  if (cmd === 'keygemini' && typeof hookLenhKey === 'function') return hookLenhKey(arg, chatId, msg, hoi);   // thêm / xoá / xem key Gemini (HookAI.gs)
   if (cmd === 'maychu'){
     if (!arg) return hoi('☁️ Gửi link máy chủ Cloudflare Worker (dạng `https://ten.tai-khoan.workers.dev`), xem hướng dẫn cài trong `cloudflare/CAI-DAT.md`. Gửi `xoa` để tắt.' + (stMayChu() ? '\n\nHiện: `' + stMayChu() + '`' : ''));
     if (/^(xoa|xóa|0|tat|tắt)$/i.test(arg.trim())){ P.setProperty('CF_URL', 'tat'); return tgSend(chatId, '✅ Đã tắt máy chủ phụ. Tool vẫn chạy bằng Apps Script. Bật lại: /maychu <link>.'); }

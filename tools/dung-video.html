@@ -1072,7 +1072,7 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div id="vids" hidden></div>
 
-<script src="tai-khoan.js?v=202610032000"></script>
+<script src="tai-khoan.js?v=202610041200"></script>
 <script>document.addEventListener("DOMContentLoaded",function(){if(typeof TK==="undefined"){var k=document.createElement("div");k.style.cssText="position:fixed;left:12px;right:12px;bottom:12px;z-index:9999;background:#ff4d6d;color:#fff;padding:12px 14px;border-radius:12px;font:14px system-ui;display:flex;gap:10px;align-items:center;justify-content:space-between";k.innerHTML="Trang tải thiếu một phần (mạng chập chờn) nên nút AI chưa chạy được. <button onclick=\"location.reload()\" style=\"background:#fff;color:#000;border:0;border-radius:8px;padding:6px 12px;font-weight:700\">Tải lại trang</button>";document.body.appendChild(k);}});</script>
 <script src="kho/kho.js?v=20261003"></script>
 <script>
@@ -1082,7 +1082,7 @@ const ls = { get(k){ try { return localStorage.getItem(k); } catch { return null
 const API = 'https://script.google.com/macros/s/AKfycbyxe1nWupAl6VheDZHaU3Ojm-d6c8F_khhUMtkehNCLh5OnGW6f2uF0PKPYZ4eYUqyGjQ/exec';
 let LB = 70;   // bề rộng đầu track (110 ở bố cục CapCut Web)
 let toastT; function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 3200); }
-const ERR = { can_dangky: 'Tạo tài khoản miễn phí để dùng AI.', het_luot_thu: 'Bạn đã dùng hết lượt miễn phí.', het_luot: 'Hết lượt AI hôm nay, mai quay lại nhé.', het_luot_chat: 'Hôm nay bạn đã hết lượt nhờ trợ lý dựng, mai quay lại nhé.', het_phien: 'Phiên đăng nhập hết hạn, đăng nhập lại giúp mình.', video_qua_dai: 'Footage dài quá 12 phút. Cắt bớt trước khi đưa vào.', khong_co_video: 'Chưa có footage nào được hiểu.', can_gemini: 'Máy chủ đang chạy Claude, phần nghe video cần GEMINI_API_KEY. Báo mentor.', ban_qua: 'AI của Google đang quá tải, thử lại sau 1–2 phút.', het_gio: 'AI xử lý quá lâu, thử lại hoặc chia footage ngắn hơn.', tu_choi: 'AI không xử lý được footage này.', chua_cai_key: 'Máy chủ chưa cài khoá AI. Báo mentor.', sai_key: 'Khoá AI trên máy chủ không hợp lệ. Báo mentor.', unknown_action: 'Máy chủ chưa có DungVideo.gs. Mentor dán DungVideo.gs, HookAI.gs, Studio.gs rồi Deploy, chọn New version.', thieu_text: 'Gõ yêu cầu dựng trước đã.' };
+const ERR = { can_dangky: 'Tạo tài khoản miễn phí để dùng AI.', het_luot_thu: 'Bạn đã dùng hết lượt miễn phí.', het_luot: 'Hết lượt AI hôm nay, mai quay lại nhé.', het_luot_chat: 'Hôm nay bạn đã hết lượt nhờ trợ lý dựng, mai quay lại nhé.', het_phien: 'Phiên đăng nhập hết hạn, đăng nhập lại giúp mình.', video_qua_dai: 'Footage dài quá 12 phút. Cắt bớt trước khi đưa vào.', khong_co_video: 'Chưa có footage nào được hiểu.', can_gemini: 'Máy chủ đang chạy Claude, phần nghe video cần GEMINI_API_KEY. Báo mentor.', ban_qua: 'AI đang quá tải vì nhiều người dùng cùng lúc, thử lại sau 1–2 phút.', het_gio: 'AI xử lý quá lâu, thử lại hoặc chia footage ngắn hơn.', tu_choi: 'AI không xử lý được footage này.', chua_cai_key: 'Máy chủ chưa cài khoá AI. Báo mentor.', sai_key: 'Khoá AI trên máy chủ không hợp lệ. Báo mentor.', unknown_action: 'Máy chủ chưa có DungVideo.gs. Mentor dán DungVideo.gs, HookAI.gs, Studio.gs rồi Deploy, chọn New version.', thieu_text: 'Gõ yêu cầu dựng trước đã.' };
 const fmt = s => { s = Math.max(0, s || 0); const m = Math.floor(s / 60), g = Math.floor(s % 60); return m + ':' + (g < 10 ? '0' : '') + g; };
 const fmtF = s => { s = Math.max(0, s || 0); const m = Math.floor(s / 60), g = Math.floor(s % 60), f = Math.floor((s % 1) * 30); return m + ':' + (g < 10 ? '0' : '') + g + '.' + (f < 10 ? '0' : '') + f; };
 const fmt1 = s => (Math.round((s || 0) * 10) / 10).toFixed(1).replace('.', ',');
@@ -1373,7 +1373,7 @@ async function agentChay(yc) {
       cho.textContent = buoc ? 'Đang nghĩ bước tiếp… (' + Math.round((Date.now() - t0) / 1000) + 's)' : 'Đang đọc dự án và yêu cầu… (' + Math.round((Date.now() - t0) / 1000) + 's)';
       const r = await fetch(MC.url + '/agent', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ token: TK.token(), buoc, ve, lich_su: ls.slice(-30), du_an: agentTomTat(), ho_so: TK.hoSo() }) });
       let j = {}; try { j = await r.json(); } catch { }
-      if (!j.ok) { const ma = j.error || ('http_' + r.status); if (ma === 'het_luot_thu') TK.moHet('chat'); const chu = ma === 'het_luot_thu' ? 'Hết lượt chat miễn phí.' : ma === 'het_phien' ? 'Phiên hết hạn, đăng nhập lại.' : 'Trợ lý chưa trả lời (' + ma + (j.chi_tiet ? ': ' + j.chi_tiet : '') + ').'; P.lichSu.push({ vai: 'ai', text: '⚠️ ' + chu }); st.textContent = chu; break; }
+      if (!j.ok) { const ma = j.error || ('http_' + r.status); if (ma === 'het_luot_thu') TK.moHet('chat'); const chu = ma === 'het_luot_thu' ? 'Hết lượt chat miễn phí.' : ma === 'het_phien' ? 'Phiên hết hạn, đăng nhập lại.' : ma === 'ban_qua' ? TK.cauQuaTai(j) : 'Trợ lý chưa trả lời (' + ma + (j.chi_tiet ? ': ' + j.chi_tiet : '') + ').'; P.lichSu.push({ vai: 'ai', text: '⚠️ ' + chu }); st.textContent = chu; break; }
       if (j.ve) ve = j.ve; if (j.luot_con != null) st.textContent = 'Còn ' + j.luot_con + ' lượt chat.';
       if (j.goi && j.goi.length) {
         ls.push({ vai: 'ai', text: j.text || '', ky_text: j.ky_text, goi: j.goi }); const kq = [];
@@ -3118,7 +3118,7 @@ async function taoDoHoaAI(moTa, bd, dai, g0) {
   const tu = tuTrenTl().filter(w => w.bd >= bd - 0.5 && w.bd <= bd + dai + 0.5).map(w => ({ w: w.w, t: +(w.bd - bd).toFixed(2) }));
   const r = await fetch(MC.url + '/do_hoa', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ token: TK.token(), mo_ta: String(moTa).slice(0, 600), dai: +dai.toFixed(2), ti_le: $('#tiLe').value, mau_nhan: mauNhan(), loi: tu.slice(0, 80), cu: g0 && g0.canh ? g0.canh : undefined }) });
   let j = {}; try { j = await r.json(); } catch { }
-  if (!j.ok) { if (j.error === 'het_luot_thu') TK.moHet('chat'); throw new Error(j.error === 'het_luot_thu' ? 'Hết lượt chat miễn phí' : 'AI chưa tạo được (' + (j.error || r.status) + (j.chi_tiet ? ': ' + j.chi_tiet : '') + ')'); }
+  if (!j.ok) { if (j.error === 'het_luot_thu') TK.moHet('chat'); throw new Error(j.error === 'het_luot_thu' ? 'Hết lượt chat miễn phí' : j.error === 'ban_qua' ? TK.cauQuaTai(j) : 'AI chưa tạo được (' + (j.error || r.status) + (j.chi_tiet ? ': ' + j.chi_tiet : '') + ')'); }
   const canh = chuanCanh(j.canh); if (!canh.lop.length) throw new Error('AI trả về cảnh trống');
   return { canh, kiem: kiemCanh(canh, dai), luot_con: j.luot_con };
 }
@@ -3517,7 +3517,7 @@ async function taoTieng() {
   const nut = $('#btnTieng'), cu = nut.textContent; nut.disabled = true; nut.textContent = 'Đang tạo giọng…'; $('#tiengTt').textContent = 'AI đang đọc ' + text.length + ' ký tự…';
   try {
     const r = await fetch(MC.url + '/tts', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ token: TK.token(), text: text.slice(0, 1200), giong: $('#tiengGiong').value, cach: $('#tiengCach').value.trim() }) });
-    if (!r.ok) { let j = {}; try { j = await r.json(); } catch { } const ma = j.error || ('http_' + r.status); if (ma === 'het_luot_thu') { TK.moHet('dung'); $('#tiengTt').textContent = 'Hết lượt Dựng video miễn phí.'; } else if (ma === 'het_phien') { $('#tiengTt').textContent = 'Phiên hết hạn, đăng nhập lại.'; TK.canCo && TK.canCo(); } else $('#tiengTt').textContent = 'Chưa tạo được giọng (' + ma + '), thử lại.'; return; }
+    if (!r.ok) { let j = {}; try { j = await r.json(); } catch { } const ma = j.error || ('http_' + r.status); if (ma === 'het_luot_thu') { TK.moHet('dung'); $('#tiengTt').textContent = 'Hết lượt Dựng video miễn phí.'; } else if (ma === 'het_phien') { $('#tiengTt').textContent = 'Phiên hết hạn, đăng nhập lại.'; TK.canCo && TK.canCo(); } else $('#tiengTt').textContent = ma === 'ban_qua' ? TK.cauQuaTai(j) : 'Chưa tạo được giọng (' + ma + '), thử lại.'; return; }
     const buf = await r.arrayBuffer(); const blob = new Blob([buf], { type: 'audio/wav' });
     let giay = +r.headers.get('x-giay') || 0; if (!giay) { try { const ab = await giaiMaAm(blob); giay = ab.duration; } catch { giay = Math.max(1, text.length / 14); } }
     let b64 = ''; { const u8 = new Uint8Array(buf); let bin = ''; for (let i = 0; i < u8.length; i += 0x8000) bin += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); b64 = btoa(bin); }

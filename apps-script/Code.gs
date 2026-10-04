@@ -579,7 +579,7 @@ function handleTelegram(update){
   // Lệnh của khu lịch mentor (Lich.gs) — tách riêng cho gọn
   if (quanTri && lichCoLenh(cmd)) return lichLenh(cmd, arg, chatId, msg);
   // Lệnh bán Pro của Viral Studio (Studio.gs): /studio /stk /giapro /luotthu ...
-  if (quanTri && studioCoLenh(cmd)) return studioLenh(cmd, arg, chatId);
+  if (quanTri && studioCoLenh(cmd)) return studioLenh(cmd, arg, chatId, msg);
 
   var cfg = getConfig();
 

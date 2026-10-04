@@ -321,7 +321,7 @@
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="tai-khoan.js?v=202610032000"></script>
+<script src="tai-khoan.js?v=202610041200"></script>
 <script>document.addEventListener("DOMContentLoaded",function(){if(typeof TK==="undefined"){var k=document.createElement("div");k.style.cssText="position:fixed;left:12px;right:12px;bottom:12px;z-index:9999;background:#ff4d6d;color:#fff;padding:12px 14px;border-radius:12px;font:14px system-ui;display:flex;gap:10px;align-items:center;justify-content:space-between";k.innerHTML="Trang tải thiếu một phần (mạng chập chờn) nên nút AI chưa chạy được. <button onclick=\"location.reload()\" style=\"background:#fff;color:#000;border:0;border-radius:8px;padding:6px 12px;font-weight:700\">Tải lại trang</button>";document.body.appendChild(k);}});</script>
 <script>
 const $ = s => document.querySelector(s);
@@ -460,16 +460,19 @@ function dienTuHoSo() {
 }
 
 /* ---------- chấm ---------- */
-const ERR = { can_dangky: 'Tạo tài khoản miễn phí để dùng AI, mất 30 giây.', het_han_hv: 'Gói Pro dành cho học viên của bạn đã hết hạn. Nâng cấp Pro để dùng tiếp, hoặc nhắn mentor.', khong_co_quyen: 'Tài khoản này không có quyền.', khong_tai_duoc_video: 'Không tải được video từ link này. Tải file video lên rồi chấm lại.', video_qua_lon: 'Video quá lớn. Video từ link tối đa 45MB; tải file lên được tới 1GB. Hoặc xuất lại 720p.', video_qua_dai: 'Video dài quá 10 phút, AI không xem kịp. Cắt đoạn cần chấm rồi gửi lại.', het_gio: 'Video quá nặng nên máy chủ không xem xong trong 5 phút. Lượt đã được hoàn, xuất lại 720p hoặc cắt ngắn rồi thử lại.', loi_ai: 'AI trả lời lỗi giữa chừng, lượt đã được hoàn. Bấm Chấm lại.', internal: 'Máy chủ gặp lỗi bất ngờ. Thử lại sau ít phút, nếu vẫn vậy báo mentor.', het_phien_tai: 'Phiên tải bị mất giữa chừng, bấm lại để tải từ đầu.', thieu_khuc: 'Tải lên bị thiếu một khúc, bấm Chấm lại để gửi lại.', video_hong: 'File video không đọc được, thử xuất lại dạng MP4.', khong_co_video: 'Chưa có video. Tải file lên hoặc dán link video đã đăng.', can_gemini: 'Máy chủ đang chạy Claude, phần xem video cần thêm GEMINI_API_KEY. Báo mentor.', het_luot_thu: 'Bạn đã dùng hết lượt chấm video miễn phí. Nâng cấp Pro hoặc đăng ký học viên để dùng tiếp.', het_luot: 'Hết lượt AI hôm nay, mai quay lại nhé.', het_phien: 'Phiên đăng nhập hết hạn. Đăng nhập lại giúp mình.', chua_cai_key: 'Máy chủ chưa cài khóa AI. Báo mentor.', sai_key: 'Khóa AI trên máy chủ không hợp lệ. Báo mentor.', ban_qua: 'AI của Google đang quá tải, đã tự thử lại 3 lần mà chưa được. Đợi 1–2 phút rồi bấm lại, video không phải tải lại.', tu_choi: 'AI không xử lý được nội dung này.', loi_mang: 'Máy chủ không gọi được AI, thử lại.', unknown_action: 'Máy chủ chưa cập nhật.', may_chu_cu: 'Máy chủ đang chạy HookAI.gs bản cũ nên chưa nhận được video tải lên. Mentor dán HookAI.gs mới vào Apps Script rồi Deploy, chọn New version.' };
+const ERR = { can_dangky: 'Tạo tài khoản miễn phí để dùng AI, mất 30 giây.', het_han_hv: 'Gói Pro dành cho học viên của bạn đã hết hạn. Nâng cấp Pro để dùng tiếp, hoặc nhắn mentor.', khong_co_quyen: 'Tài khoản này không có quyền.', khong_tai_duoc_video: 'Không tải được video từ link này. Tải file video lên rồi chấm lại.', video_qua_lon: 'Video quá lớn. Video từ link tối đa 45MB; tải file lên được tới 1GB. Hoặc xuất lại 720p.', video_qua_dai: 'Video dài quá 10 phút, AI không xem kịp. Cắt đoạn cần chấm rồi gửi lại.', het_gio: 'Video quá nặng nên máy chủ không xem xong trong 5 phút. Lượt đã được hoàn, xuất lại 720p hoặc cắt ngắn rồi thử lại.', loi_ai: 'AI trả lời lỗi giữa chừng, lượt đã được hoàn. Bấm Chấm lại.', internal: 'Máy chủ gặp lỗi bất ngờ. Thử lại sau ít phút, nếu vẫn vậy báo mentor.', het_phien_tai: 'Phiên tải bị mất giữa chừng, bấm lại để tải từ đầu.', thieu_khuc: 'Tải lên bị thiếu một khúc, bấm Chấm lại để gửi lại.', video_hong: 'File video không đọc được, thử xuất lại dạng MP4.', khong_co_video: 'Chưa có video. Tải file lên hoặc dán link video đã đăng.', can_gemini: 'Máy chủ đang chạy Claude, phần xem video cần thêm GEMINI_API_KEY. Báo mentor.', het_luot_thu: 'Bạn đã dùng hết lượt chấm video miễn phí. Nâng cấp Pro hoặc đăng ký học viên để dùng tiếp.', het_luot: 'Hết lượt AI hôm nay, mai quay lại nhé.', het_phien: 'Phiên đăng nhập hết hạn. Đăng nhập lại giúp mình.', chua_cai_key: 'Máy chủ chưa cài khóa AI. Báo mentor.', sai_key: 'Khóa AI trên máy chủ không hợp lệ. Báo mentor.', ban_qua: 'AI đang quá tải vì nhiều người dùng cùng lúc. Đợi 1–2 phút rồi bấm lại, video không phải tải lại.', tu_choi: 'AI không xử lý được nội dung này.', loi_mang: 'Máy chủ không gọi được AI, thử lại.', unknown_action: 'Máy chủ chưa cập nhật.', may_chu_cu: 'Máy chủ đang chạy HookAI.gs bản cũ nên chưa nhận được video tải lên. Mentor dán HookAI.gs mới vào Apps Script rồi Deploy, chọn New version.' };
 let busy = false;
-/* AI bận (Google trả 503/429): tự đếm ngược 20 giây rồi gọi lại, tối đa 2 lần. Video đã tải
-   được dùng lại qua file_uri, và máy chủ đã hoàn lượt khi lỗi nên gọi lại không tốn thêm. */
+/* AI quá tải: máy chủ trả ban_qua kèm số giây nên chờ (cho). Chờ ngắn thì tự đếm ngược rồi gọi lại, tối đa 2 lần;
+   chờ lâu (hơn 90 giây) thì dừng, báo thời gian thử lại. Video đã tải được dùng lại qua file_uri, và máy chủ
+   đã hoàn lượt khi lỗi nên gọi lại không tốn thêm. Học viên không bao giờ thấy chữ "hạn mức". */
 async function goiCoThuLai(body) {
   const st = $('#chamStatus');
   for (let lan = 0; ; lan++) {
     const r = await TK.goiNen(body, { tool: 'cham', nhan: 'Chấm video' });   // chạy nền: rời trang vẫn nhận được kết quả
     if (r.ok || r.error !== 'ban_qua' || lan >= 2) return r;
-    for (let g = 20; g > 0; g--) { st.className = 'status'; st.innerHTML = `<span class="spinner"></span>AI của Google đang quá tải, tự thử lại sau ${g} giây (lần ${lan + 2}/3)…`; await new Promise(z => setTimeout(z, 1000)); }
+    const cho = Math.max(15, Math.round(Number(r.cho) || 20));
+    if (cho > 90) return r;
+    for (let g = cho; g > 0; g--) { st.className = 'status'; st.innerHTML = `<span class="spinner"></span>AI đang quá tải vì nhiều người dùng cùng lúc, tự thử lại sau ${g} giây (lần ${lan + 2}/3)…`; await new Promise(z => setTimeout(z, 1000)); }
   }
 }
 
@@ -490,17 +493,17 @@ async function cham() {
     if (!DEMO && ng === 'file' && state.file.lon) {
       clearInterval(tick);
       if (!state.file.file_uri) {
-        try { state.file.file_uri = (await TK.taiVideo(state.file.file, (p, c) => { st.className = 'status'; st.innerHTML = `<span class="spinner"></span>${c} ${p}%`; })).file_uri; }
+        try { const up = await TK.taiVideo(state.file.file, (p, c) => { st.className = 'status'; st.innerHTML = `<span class="spinner"></span>${c} ${p}%`; }); state.file.file_uri = up.file_uri; state.file.file_kh = up.kh || ''; }
         catch (e) { st.className = 'status err'; st.textContent = (ERR[e.ma] || 'Không tải được video lên (' + (e.message || e) + ').') + (e.chi_tiet ? ' ' + e.chi_tiet : '') + ' Thử lại, hoặc xuất video nhẹ hơn.'; return; }
       }
-      lon = { file_uri: state.file.file_uri, file_mime: state.file.mime, file_size: state.file.size };
+      lon = { file_uri: state.file.file_uri, file_kh: state.file.file_kh || '', file_mime: state.file.mime, file_size: state.file.size };
       tickLai();
     }
     if (DEMO) { await new Promise(z => setTimeout(z, 1200)); r = { ok: true, data: demoData(so), con: null, han: null }; }
     else r = await goiCoThuLai({ action: 'hook_ai', mode: 'cham', token: TK.token(), dev: TK.dev(), ho_so: TK.hoSo(), link: ng === 'link' ? $('#link').value.trim() : '', nen: state.nen, video_b64: ng === 'file' && !lon ? state.file.b64 : undefined, video_mime: ng === 'file' && !lon ? state.file.mime : undefined, ...(lon || {}), loi_thoai: $('#loiThoai').value.trim(), y_dinh: $('#yDinh').value.trim(), da_dang: state.daDang === 'roi', gio_dang: state.daDang === 'roi' ? (state.gioDangThat || Number($('#gioDang').value) || 0) : 0, muc_tieu: state.mucTieu, so_lieu: state.daDang === 'roi' ? so : { giay: so.giay }, chu_de: $('#chuDe').value.trim(), doi_tuong: $('#doiTuong').value.trim(), san_pham: $('#sanPham').value.trim() });
     clearInterval(tick);
     if (!r.ok) {
-      st.className = 'status err'; st.textContent = (ERR[r.error] || 'Có lỗi khi gọi AI, thử lại sau.') + (r.chi_tiet ? ' Mã lỗi: ' + r.chi_tiet : '');
+      st.className = 'status err'; st.textContent = r.error === 'ban_qua' ? TK.cauQuaTai(r, ', video không phải tải lại') : (ERR[r.error] || 'Có lỗi khi gọi AI, thử lại sau.') + (r.chi_tiet ? ' Mã lỗi: ' + r.chi_tiet : '');
       if (r.error === 'het_luot_thu') openUpsell('Hết lượt chấm video miễn phí', ERR.het_luot_thu);
       if (r.error === 'unknown_action') st.textContent = 'Máy chủ đang chạy HookAI.gs bản cũ nên chưa có Chấm video. Mentor dán HookAI.gs mới vào Apps Script rồi Deploy, chọn New version.';
       return;

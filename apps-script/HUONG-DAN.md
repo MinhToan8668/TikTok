@@ -368,10 +368,16 @@ Mỗi lượt hỏi đáp với trợ lý (của học viên, khách và cả me
 3. Chat chỉ nạp phần kiến thức của tool đang mở, nên đầu vào ngắn hơn và trả lời nhanh hơn.
 4. Nhiều Gemini key xoay vòng (xem dưới). Key nào bị 429 thì chuyển ngay sang key khác, không ngồi chờ.
 
-**Thêm key:** Script properties → thêm `GEMINI_API_KEYS`, dán các key cách nhau dấu phẩy. `GEMINI_API_KEY` vẫn là key chính.
+**Thêm key (cách nhanh):** nhắn bot `/keygemini them AIza...` (nhiều key cách nhau dấu cách). Bot gọi thử từng key, key tốt thì lưu vào `GEMINI_API_KEYS`, rồi xoá tin chứa key khỏi chat. `/keygemini` xem key nào đang rảnh, key nào hết hạn mức phút hoặc ngày. `/keygemini xoa 2` xoá key phụ số 2. Cách tay vẫn được: Script properties → `GEMINI_API_KEYS`, các key cách nhau dấu phẩy. `GEMINI_API_KEY` vẫn là key chính.
 ⚠️ Hạn mức Gemini tính theo **project**, không tính theo key. Các key phải tạo ở **các project Google Cloud khác nhau** (AI Studio → Create API key → Create in new project) thì mới cộng dồn được. Nhiều key cùng một project không nhanh hơn chút nào.
-Cách hiệu quả nhất là **bật billing (Tier 1)** cho project của key chính. Hạn mức mỗi phút tăng lên hàng chục lần, trả tiền theo lượng dùng (bản flash rất rẻ). Làm vậy là hết cảnh 429 và phải chờ.
-Video đã tải lên Files API chỉ key của đúng project đó đọc được, nên lượt có video lớn luôn dùng key chính.
+☁️ Máy chủ Cloudflare dùng danh sách key **riêng** (`GEMINI_API_KEYS` trong Worker → Settings → Variables and Secrets) cho lồng tiếng, dịch phụ đề, trợ lý dựng. Thêm key mới thì thêm ở cả hai nơi. Hai nơi dùng chung key thì cũng dùng chung hạn mức của project đó.
+Cách hiệu quả nhất vẫn là **bật billing (Tier 1)** cho project của key chính: hạn mức mỗi phút tăng hàng chục lần và được Google ưu tiên khi đông.
+
+**Máy chủ xử lý hết hạn mức thế nào (bản 10/2026):**
+- Key bị 429 thì nghỉ **riêng model đó**, đúng số giây Google báo. Hết hạn mức ngày thì nghỉ tới lúc Google đặt lại (0 giờ giờ Thái Bình Dương, tức 14–15 giờ chiều VN). Model khác của key đó vẫn dùng tiếp. Lượt sau bỏ qua key đang nghỉ, không gọi thử mất thời gian.
+- Video lớn đưa lên Files API bằng key đang rảnh, không dồn hết vào key chính. Trang giữ mã key (`kh`, chỉ là mã băm, không phải key) và gửi lại khi soi, chấm để máy chủ phân tích bằng đúng key đó.
+- **Học viên không bao giờ thấy chữ "hạn mức".** Mọi kiểu hết hạn mức hay Google quá tải đều hiện "AI đang quá tải vì nhiều người dùng cùng lúc, thử lại sau khoảng X". Chờ dưới 90 giây thì trang Soi video, Chấm video tự đếm ngược và gọi lại tối đa 2 lần. Lượt luôn được hoàn.
+- **Lý do thật** chỉ hiện cho tài khoản mentor (dòng `[mentor] …` sau câu báo lỗi) và gửi bot cho admin: hết hạn mức phút, hết hạn mức ngày (mấy key), hay Google 503. Mỗi loại tối đa 1 tin mỗi 30 phút. Máy chủ Cloudflare cũng báo về bot qua Apps Script (`mode: cf_qua_tai`).
 
 ### Xoá nền người nói (chạy trên máy, không tốn lượt)
 
