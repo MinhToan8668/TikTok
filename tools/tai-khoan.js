@@ -340,7 +340,7 @@
     if (tab === 'signup') {
       var qua = el('div', 'tk-qua');
       qua.innerHTML = '🎁 Miễn phí, dùng được ngay: <b>10 lượt AI phân tích hook</b>, <b>3 lượt chấm kịch bản</b>, <b>1 lượt soi video viral</b>, <b>1 lượt chấm video của bạn</b>.' +
-        '<br>Điền hồ sơ kênh một lần là cả bốn tool tự bám đúng ngách và tệp của bạn.';
+        '<br>Điền hồ sơ kênh một lần là cả sáu tool tự bám đúng ngách và tệp của bạn.';
       oTrang.appendChild(qua);
     }
 
