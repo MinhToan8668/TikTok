@@ -602,6 +602,12 @@ Mọi tài nguyên tách khỏi code, nằm trong `tools/kho/kho.js` (một file
 - **Mọi mục thuộc tính** (chữ, video, overlay, âm thanh): tiêu đề mục có mũi tên **gập / mở** (nhớ theo tên mục trong `dv_gap`), nút **↺** đặt lại các thanh trượt trong mục, và với mục có keyframe: **‹ ◇ ›** (keyframe trước / thêm keyframe cho cả mục tại đầu phát / keyframe sau). Mỗi thanh trượt có ô số kiểu CapCut với nút ▴▾ tăng giảm từng bước; bấm vào số để gõ. Mục "Khung hình" của video hiện tên là "Biến đổi".
 - Chọn một chữ là bảng mở thẳng tab **Văn bản**; bấm đúp chữ trên khung xem đưa con trỏ vào ô chữ. Kiểm thử: `t126.mjs` (bảng màu + bảng thuộc tính), `t125.mjs`.
 
+### Ô media gọn, khung xem ôm sát cột, toàn màn hình đúng tỉ lệ (10/2026)
+
+- **Ô footage** nhỏ như CapCut (≥108px, 3 ô trên cột 400px): tên một dòng cắt bớt, dòng phụ 10px, nút "＋ V1" ẩn (đã có nút ＋ khi rê và bấm đúp), "Dò mặt" chỉ còn icon 🙂 (giữ tooltip).
+- **Khung xem** ở bố cục dọc: đệm 12–14px, bề rộng cột tính sát theo khung hình (`canhGiua`), hết khoảng trống hai bên.
+- **Lỗi toàn màn hình bị kéo giãn ngang**: nút ⛶ đưa `.khung` vào fullscreen, trình duyệt ép khung thành đúng cỡ màn hình nên canvas 9:16 bị kéo thành 16:9. Nay `:fullscreen` dùng `object-fit: contain`: video dọc có viền đen hai bên, video ngang viền trên dưới, đúng tỉ lệ đang chọn; tay cầm và lớp phủ ẩn khi đang toàn màn hình. Esc để thoát.
+
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 
 Cài theo [`cloudflare/CAI-DAT.md`](../cloudflare/CAI-DAT.md) (khoảng 10 phút, không cần thẻ). Có máy chủ này tool thêm:

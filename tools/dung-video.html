@@ -628,7 +628,7 @@
   .ed.ccw.bocDoc:not(.coChon):not(.co-phai) .ebody{grid-template-columns:minmax(0,1fr)}.ed.ccw.bocDoc:not(.coChon):not(.co-phai) .ebody .keo.k1{display:none}
   .ed.ccw.bocDoc.thuGon .ebody{grid-template-columns:71px 0 minmax(0,1fr)}.ed.ccw.bocDoc.thuGon:not(.coChon):not(.co-phai) .ebody{grid-template-columns:71px}
   .ed.ccw.bocDoc .ecol.phai{padding-left:56px}
-  .ed.ccw.bocDoc>.ecol.giua .khungVung{padding:18px 24px}
+  .ed.ccw.bocDoc>.ecol.giua .khungVung{padding:12px 14px}
   .ed.ccw.bocDoc>.ecol.giua .xuat:not(#xuatCaiHop){position:fixed}
   .ed.ccw #btnBoCucDoc{order:14}.ed.ccw #btnBoCucDoc[aria-pressed="true"]{background:var(--ccPop);color:var(--et)}
   /* lớp phủ giao diện TikTok */
@@ -746,9 +746,11 @@
   .ed.ccw #btnSangToi{order:15}
   /* bảng Media kiểu CapCut */
   .ed.ccw .epane[data-pane="footage"]:has(#srcs .fsrc) .drop{padding:9px 12px;display:flex;align-items:center;gap:10px;text-align:left;font-size:12px;border-radius:12px}.ed.ccw .epane[data-pane="footage"]:has(#srcs .fsrc) .drop b{font-size:12.5px;white-space:nowrap}
-  .ed.ccw #srcs.luoi{grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:10px}
+  .ed.ccw #srcs.luoi{grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:8px}
+  .ed.ccw #srcs.luoi:not(.dangTim) .fsrc:not(.mo) .fh>div.moRong{min-width:0}.ed.ccw #srcs.luoi:not(.dangTim) .fsrc:not(.mo) b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px}.ed.ccw #srcs.luoi:not(.dangTim) .fsrc:not(.mo) small{font-size:10px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ed.ccw #srcs.luoi:not(.dangTim) .fsrc:not(.mo) .acts{flex-wrap:wrap;gap:3px}.ed.ccw #srcs.luoi:not(.dangTim) .fsrc:not(.mo) .acts .btn{padding:2px 6px;font-size:10.5px;border-radius:6px;min-height:0;line-height:1.4}.ed.ccw #srcs.luoi:not(.dangTim) .fsrc:not(.mo) .acts .btn.anCC2{display:none}
   .ed.ccw #srcs.luoi:not(.dangTim) .fsrc:not(.mo) .fh{gap:5px}
-  .ed.ccw .fsrc .thWrap{position:relative;border-radius:10px;overflow:hidden;background:#000;aspect-ratio:16/10}
+  .ed.ccw .fsrc .thWrap{position:relative;border-radius:8px;overflow:hidden;background:#000;aspect-ratio:16/10}
   .ed.ccw #srcs.luoi:not(.dangTim) .fsrc:not(.mo) .thWrap .th{width:100%;height:100%;object-fit:cover;border-radius:0;aspect-ratio:auto}
   .ed.ccw .fsrc.mo .thWrap{width:56px;height:74px;aspect-ratio:auto}.ed.ccw .fsrc.mo .thWrap .th{width:100%;height:100%}
   .ed.ccw .fsrc .hhTg,.ed.ccw .fsrc .hhDung,.ed.ccw .fsrc .hhAi{position:absolute;font:600 10px/1 "Be Vietnam Pro",system-ui,sans-serif;padding:3px 5px;border-radius:5px;pointer-events:none}
@@ -801,6 +803,11 @@
   .bangMau .nhan{padding:0 8px;height:26px;display:grid;place-items:center;border:1px solid var(--el);border-radius:6px;background:var(--ep2);color:var(--em)}.bangMau .hex{flex:1;min-width:0;height:26px;border:1px solid var(--el);border-radius:6px;background:var(--ep2);color:var(--et);padding:0 8px;font:inherit;text-transform:uppercase}
   .bangMau .them{width:20px;height:20px;border-radius:50%;border:1px dashed var(--em);background:transparent;color:var(--et);cursor:pointer;font-size:13px;line-height:1;padding:0}
   .bangMau .luoi{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin-top:6px}.bangMau .luoi .o{aspect-ratio:1;border-radius:50%;border:1px solid rgba(127,127,127,.25);cursor:pointer;padding:0}.bangMau .luoi .o.on{box-shadow:0 0 0 2px var(--ccPop,#1e1e22),0 0 0 3.5px var(--ea)}.bangMau .luoi .quota{grid-column:1/-1;font-size:11px;color:var(--em)}
+  /* toàn màn hình khung xem: giữ đúng tỉ lệ video, viền đen hai bên (không kéo giãn) */
+  .khung:fullscreen{display:flex;align-items:center;justify-content:center;background:#000;border-radius:0;aspect-ratio:auto}
+  .khung:fullscreen canvas{position:static;width:100%;height:100%;object-fit:contain;display:block}
+  .khung:fullscreen #tayCam,.khung:fullscreen #trong{display:none}
+  .khung:fullscreen #lopPhu{display:none}
 </style>
 </head>
 <body>
@@ -4825,7 +4832,7 @@ function canhGiua() {
   if ($('.keo.dang')) return;   // đang kéo tay đổi cỡ thì không tự canh
   const vung = $('.khungVung'); if (!vung) return; const [a, b] = (typeof TI_LE === 'object' && TI_LE[$('#tiLe').value]) || [9, 16];
   const h = Math.max(200, vung.clientHeight - 28), can = Math.round(h * a / b) + 40;
-  if (ed.classList.contains('bocDoc')) { ed.style.setProperty('--wXem', Math.max(360, Math.min(Math.round(innerWidth * 0.55), can + 8)) + 'px'); return; }
+  if (ed.classList.contains('bocDoc')) { ed.style.setProperty('--wXem', Math.max(360, Math.min(Math.round(innerWidth * 0.55), can - 10)) + 'px'); return; }   // khung vừa khít cột, không chừa mép thừa
   // chưa tự kéo cỡ cột trái → thư viện lấy hết phần dư, cột giữa chỉ rộng vừa khung hình
   const kc = typeof kichCo === 'function' ? kichCo() : {}; const eb = $('.ebody'); if (!eb) return; const coPhai = ed.classList.contains('coChon') || ed.classList.contains('co-phai');
   if (kc.trai || ed.classList.contains('thuGon')) {
@@ -4863,6 +4870,7 @@ function veHuyHieuSrc() {
     if (s.giay) w.appendChild(el('span', 'hhTg', s.loai === 'anh' ? 'Ảnh' : fmt(s.giay)));
     if (dung.has(s.id)) w.appendChild(el('span', 'hhDung', 'Đã dùng'));
     if (s.tt === 'xong') w.appendChild(el('span', 'hhAi', '✦ AI')); else if (s.tt === 'dang') w.appendChild(el('span', 'hhAi dang', '…'));
+    fh.querySelectorAll('.acts .btn').forEach(bt => { const t = bt.textContent.trim(); if (t === '＋ V1') bt.classList.add('anCC2'); else if (t === '🙂 Dò mặt') { bt.textContent = '🙂'; bt.title = 'Dò mặt để crop dọc bám theo (chạy trên máy, không tốn lượt)'; } });   // ô kiểu CapCut: ＋ đã có khi rê, Dò mặt chỉ còn icon
     const them = el('button', 'hhThem'); them.type = 'button'; them.title = 'Thêm vào dòng thời gian tại cuối V1'; them.textContent = '+'; them.onclick = e => { e.stopPropagation(); luuHoanTac(); P.clips.push({ src: s.id, bd: 0, kt: s.giay || 3, ly_do: 'thêm tay' }); veTl(); veSrcs(); toast('Đã thêm ' + s.ten + ' vào V1'); }; w.appendChild(them);
     w.ondblclick = () => { luuHoanTac(); P.clips.push({ src: s.id, bd: 0, kt: s.giay || 3, ly_do: 'thêm tay' }); veTl(); veSrcs(); };
   });
