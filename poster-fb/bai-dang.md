@@ -2,24 +2,46 @@
 
 Ảnh nằm trong `xuat/`, khổ 2160×2700 (dọc 4:5, hiện đầy màn hình điện thoại trên cả Facebook
 lẫn Threads). Mỗi tool đăng **2 ảnh cùng một bài**: ảnh chính trước, ảnh "cách dùng" sau.
+Chân ảnh ghi "👇 Link dùng thử ở bình luận đầu tiên".
 
-**Giọng văn:** nói chuyện như nhắn tin với bạn bè, kể vì sao tụi mình làm ra tool.
-Facebook xưng "tụi mình", gọi "bạn". Threads xưng "tụi t", viết tắt thoải mái, mỗi bài dưới
-500 ký tự (giới hạn của Threads).
+**Giọng văn:** nói chuyện như nhắn tin với bạn bè. Facebook xưng "tụi mình", gọi "bạn".
+Threads xưng "tụi t", viết tắt thoải mái, mỗi bài dưới 500 ký tự (giới hạn của Threads).
 
-**Khều bình luận:** poster ghi "💬 Bình luận “Viral Studio” để nhận link". Không để link trong
-bài, ai bình luận thì gửi link qua tin nhắn (Facebook) hoặc trả lời ngay dưới bình luận
-(Threads). Mẫu trả lời ở cuối file. Muốn đẩy thêm thì chèn câu mốc:
-"Đủ 100 bình luận tụi mình thả link công khai luôn nha".
+## Để bài được đẩy hiển thị, không dính vi phạm
 
-> Lưu ý: Facebook có chính sách giảm hiển thị bài "câu bình luận" (kêu bình luận một từ cụ thể).
-> Để đỡ bị, phần đầu bài phải là nội dung thật, câu kêu bình luận để ở cuối, và nên trả lời
-> từng bình luận bằng câu có nội dung chứ không chỉ "check inbox". Theo dõi lượt tiếp cận vài
-> bài đầu, thấy tụt thì chuyển sang để link ở bình luận đầu tiên.
+Meta (Facebook, Instagram, Threads) hạ hiển thị bài **câu tương tác** (engagement bait), xem ở
+Meta Transparency Center → Content distribution guidelines → Engagement bait. Năm kiểu bị bắt:
 
-**Lịch gợi ý:** ngày 0 bài tổng quan, sau đó mỗi ngày một tool.
+| Kiểu | Ví dụ cần tránh |
+|---|---|
+| Câu bình luận | "Bình luận *Viral Studio* để nhận link", "cmt 1 tụi mình gửi" |
+| Câu cảm xúc | "Thả tim nếu bạn cũng vậy" |
+| Câu chia sẻ | "Chia sẻ bài này để nhận…" |
+| Câu tag | "Tag đứa bạn đang làm TikTok" |
+| Câu bình chọn | "Bình luận A nếu thích tool này, B nếu thích tool kia" |
 
-| Ngày | Ảnh | Link gửi khi có người bình luận |
+Cách làm trong bộ bài này:
+
+1. **Bài nào cũng có giá trị kể cả khi không bấm link.** Mỗi bài có một mẹo thật lấy từ chính
+   tool (hook đưa con số lên đầu, kịch bản đừng viết "mình xúc động"…). Người đọc dừng lâu hơn,
+   lưu bài, tự bình luận.
+2. **Kết bằng câu hỏi mở**, hỏi chuyện của người đọc ("câu hook gần nhất bạn dùng là gì?").
+   Hỏi thật để nói chuyện thì không phải câu tương tác. Không bảo họ gõ một chữ cụ thể.
+3. **Không để link trong thân bài.** Đăng xong vào bình luận đầu tiên dán link rồi **ghim**
+   bình luận đó (Facebook: bấm ⋯ → Ghim). Threads: trả lời ngay dưới bài của chính mình bằng
+   link, hoặc gắn link vào hồ sơ.
+4. **Trả lời từng bình luận bằng câu có nội dung**, mỗi câu một khác. Dán y chang một câu cho
+   hàng chục người dễ bị coi là spam. Ai hỏi link thì chỉ xuống bình luận ghim hoặc gửi tin nhắn.
+5. **Hashtag ít thôi**: Facebook 1–2 cái, Threads chỉ gắn được 1 chủ đề, chọn `TikTok`.
+6. **Chia sẻ vào group:** mỗi group viết lời dẫn khác nhau, chia sẻ cách nhau vài tiếng,
+   đừng thả cùng lúc vào nhiều group (dễ bị chặn vì spam).
+7. **Viết đúng sự thật.** Không hứa "không giới hạn" khi sau này có hạn mức, không ghi số lượt
+   cụ thể (lượt chỉnh được qua bot), không nói AI "đảm bảo viral".
+
+**Lịch gợi ý:** ngày 0 bài tổng quan, sau đó mỗi ngày một tool, đăng giờ học viên hay lướt
+(trưa 11–13h hoặc tối 20–22h, xem Meta Business Suite → Thông tin chi tiết để chọn giờ của page).
+
+| Ngày | Ảnh | Link dán vào bình luận ghim |
 |---|---|---|
 | 0 | `00-tong-quan.png` | https://minhtoan8668.github.io/TikTok/ |
 | 1 | `01-tai-video.png`, `01b-tai-video-cach-dung.png` | https://minhtoan8668.github.io/TikTok/tools/tai-ve.html |
@@ -35,7 +57,7 @@ bài, ai bình luận thì gửi link qua tin nhắn (Facebook) hoặc trả l�
 
 **Facebook**
 
-> Tụi mình dạy làm content TikTok, mà mấy cái dạy trong lớp toàn là việc phải ngồi làm tay: soi video người ta, chấm hook, canh kịch bản từng giây…
+> Tụi mình dạy làm content TikTok, mà mấy việc dạy trong lớp toàn phải ngồi làm tay: soi video người ta, chấm hook, canh kịch bản từng giây…
 >
 > Thế là tụi mình gom hết lại, code thành hẳn một bộ tool luôn =)))) Tên là Viral Studio, có 6 món:
 >
@@ -46,16 +68,20 @@ bài, ai bình luận thì gửi link qua tin nhắn (Facebook) hoặc trả l�
 > 🎞️ Dựng video: khỏi mua app edit, dựng free
 > 🎯 Chấm video: AI xem video bạn làm, chỉ đúng giây đang hỏng
 >
-> Mở trình duyệt trên điện thoại là xài, không cần cài app, dùng thử miễn phí. 7 ngày tới tụi mình giới thiệu từng món một, lưu bài lại nha.
+> Mở trình duyệt trên điện thoại là xài, không cần cài app, dùng thử miễn phí. 7 ngày tới tụi mình kể từng món một.
 >
-> Muốn thử liền thì bình luận "Viral Studio", tụi mình gửi link cho bạn 👇
+> Còn bạn, làm video đang kẹt nhất ở khâu nào? Kể tụi mình nghe, tụi mình chỉ đúng món cho khâu đó.
+>
+> #TuMinhXayKenh
+
+**Bình luận ghim:** Link dùng thử Viral Studio nè 👉 https://minhtoan8668.github.io/TikTok/
 
 **Threads**
 
 > Tụi t dạy làm content TikTok, xong gom hết mấy việc dạy trong lớp code thành 6 cái tool luôn =))))
 > Tải video ko logo, soi vì sao video người ta nổ, chấm hook, chấm kịch bản, dựng video free, chấm video mình làm.
-> Mở điện thoại là xài, ko cần cài app, dùng thử free.
-> Ai muốn thử cmt "Viral Studio" tụi t gửi link nha
+> Mở điện thoại là xài, ko cần cài app, xài thử free. Link t để dưới reply nha.
+> Mấy bạn làm video hay kẹt nhất khâu nào?
 
 **Chia sẻ vào group học viên**
 
@@ -75,17 +101,23 @@ bài, ai bình luận thì gửi link qua tin nhắn (Facebook) hoặc trả l�
 > Cách dùng (xem ảnh 2):
 > 1. Trong app bấm Chia sẻ → Sao chép liên kết
 > 2. Dán vào tool, bấm Lấy file
-> 3. Chọn file cần, bấm Tải về. Muốn biết vì sao video đó viral thì bấm luôn "Soi video này"
+> 3. Chọn file cần, bấm Tải về
 >
-> Free, không cần cài app. Nhớ là tải về để học thôi nha, đừng đăng lại video của người ta.
+> Mẹo: lười lọc link thì dán nguyên cả đoạn chữ app copy ra cũng được, tool tự tìm link. Tải xong bấm "Soi video này" là AI mổ luôn vì sao video đó viral.
 >
-> Bình luận "Viral Studio" tụi mình gửi link liền 👇
+> Nhớ là tải về để học thôi nha, đừng đăng lại video của người ta.
+>
+> Bạn hay tải video của kênh nào về học? Kể tụi mình nghe với.
+>
+> #TuMinhXayKenh
+
+**Bình luận ghim:** Link tool tải video nè, free, không cần cài app 👉 https://minhtoan8668.github.io/TikTok/tools/tai-ve.html
 
 **Threads**
 
 > Tải video TikTok mà toàn gặp web đầy quảng cáo, tải xong còn dính logo =)))
-> Tụi t làm luôn cái tool tải: dán link là có video HD ko logo, nhạc nền, ảnh bìa. TikTok, Douyin, YouTube, IG, FB đều đc.
-> Free, ko cần cài app. Cmt "Viral Studio" tụi t gửi link
+> Tụi t làm luôn cái tool tải: dán link là có video HD ko logo, nhạc nền, ảnh bìa. TikTok, Douyin, YouTube, IG, FB đều đc. Dán nguyên đoạn chữ copy từ app cũng đc, tool tự lọc link.
+> Free, ko cần app. Link t để dưới reply.
 
 **Chia sẻ vào group học viên**
 
@@ -98,7 +130,7 @@ bài, ai bình luận thì gửi link qua tin nhắn (Facebook) hoặc trả l�
 
 **Facebook**
 
-> Có bao giờ bạn xem một video người ta triệu view rồi tự hỏi: ủa sao cái này nổ vậy trời? 🤔
+> Có bao giờ bạn xem một video người ta nổ view rồi tự hỏi: ủa sao cái này nổ vậy trời? 🤔
 >
 > Tool Soi video viral trả lời đúng câu đó. Dán link video vào, AI tự tải, nghe lời thoại theo từng giây, đọc số liệu và bình luận, rồi mổ theo 3 cửa:
 >
@@ -108,15 +140,19 @@ bài, ai bình luận thì gửi link qua tin nhắn (Facebook) hoặc trả l�
 >
 > Xong còn áp cái khuôn đó sang kênh của bạn: hook mẫu, lời thoại mẫu từng phần. Không phải để copy, mà để hiểu cái sườn rồi kể chuyện của mình.
 >
-> Mẹo nhỏ: chọn video cùng ngách, 50–200K view là đủ học rồi, không cần video triệu view.
+> Mẹo: muốn học thì chọn video cùng ngách, 50–200K view là đủ, không cần video triệu view.
 >
-> Muốn soi thử thì bình luận "Viral Studio" nha, tụi mình gửi link 👇
+> Gần đây có video nào làm bạn tò mò sao nó nổ không? Kể tụi mình nghe thử.
+>
+> #TuMinhXayKenh
+
+**Bình luận ghim:** Link tool soi video nè 👉 https://minhtoan8668.github.io/TikTok/tools/soi-video.html
 
 **Threads**
 
-> Xem video người ta triệu view rồi tự hỏi sao nó nổ vậy trời 🤔
+> Xem video người ta nổ view rồi tự hỏi sao nó nổ vậy trời 🤔
 > Tụi t làm cái tool dán link vô là AI nghe lời thoại từng giây, đọc bình luận, mổ ra vì sao người ta dừng lại, vì sao xem hết, rồi áp cái khuôn đó qua kênh của mình.
-> Free nha. Cmt "Viral Studio" tụi t gửi link
+> Mẹo: soi video cùng ngách 50–200K view là đủ học. Link t để dưới reply.
 
 **Chia sẻ vào group học viên**
 
@@ -135,13 +171,19 @@ bài, ai bình luận thì gửi link qua tin nhắn (Facebook) hoặc trả l�
 >
 > Chọn xong thì đặt chữ lên video luôn: 14 bố cục, 19 font Việt, chữ tự né mặt, xuất PNG nền trong suốt kéo thẳng vào CapCut.
 >
-> Hook của bạn được mấy điểm? Bình luận "Viral Studio", tụi mình gửi link chấm thử 👇
+> Mẹo AI hay nhắc khi chấm: có con số thì đưa lên đầu câu. "3 giây đầu quyết định 90% lượt xem" giữ mắt hơn "Lượt xem phụ thuộc rất nhiều vào 3 giây đầu".
+>
+> Câu hook gần nhất bạn dùng là gì? Để dưới bình luận, tụi mình góp ý thử.
+>
+> #TuMinhXayKenh
+
+**Bình luận ghim:** Link tool chấm hook nè 👉 https://minhtoan8668.github.io/TikTok/tools/hook-text.html
 
 **Threads**
 
 > Hook của bạn được mấy điểm trên 100? 👀
 > Tụi t làm cái tool chấm hook: đưa ảnh khung đầu video + câu hook, AI chấm điểm rồi viết lại 5 bản. Xong đặt chữ lên video luôn, 19 font Việt, xuất PNG kéo vô CapCut.
-> Cmt "Viral Studio" tụi t gửi link chấm thử nha
+> Mẹo: có con số thì đưa lên đầu câu. Link t để dưới reply.
 
 **Chia sẻ vào group học viên**
 
@@ -163,13 +205,19 @@ bài, ai bình luận thì gửi link qua tin nhắn (Facebook) hoặc trả l�
 >
 > Muốn nhanh thì để AI viết lại trọn bài 60–105 giây, giọng người thật chứ không phải giọng robot.
 >
-> Bình luận "Viral Studio" để nhận link nha 👇
+> Mẹo: đừng viết "mình xúc động lắm". Viết cơ thể mình đang làm gì: "miệng nhai cơm mà mắt cay xè". Người xem tự thấy, không cần bạn kể.
+>
+> Video của bạn hay bị lướt ở đoạn nào nhất: mở đầu, giữa hay gần cuối?
+>
+> #TuMinhXayKenh
+
+**Bình luận ghim:** Link tool chấm kịch bản nè 👉 https://minhtoan8668.github.io/TikTok/tools/kich-ban.html
 
 **Threads**
 
 > Viết kịch bản đọc thấy ổn áp, đăng lên người ta lướt ở giây thứ 3 =)))
 > Tụi t làm cái tool chấm kịch bản: viết theo 11 khung của lớp, AI chỉ đúng giây nào người xem sẽ lướt, câu nào nghe như văn máy, còn viết lại trọn bài cho mình luôn.
-> Cmt "Viral Studio" tụi t gửi link
+> Mẹo: đừng viết "mình xúc động", viết cơ thể mình làm gì. Link t để dưới reply.
 
 **Chia sẻ vào group học viên**
 
@@ -192,13 +240,19 @@ bài, ai bình luận thì gửi link qua tin nhắn (Facebook) hoặc trả l�
 >
 > Giờ tụi mình mở cho mọi người xài thử luôn. Không cài app, không mua gói, mở trình duyệt là dựng. Lười thì gõ cho Trợ lý AI "bỏ vấp, giữ 30 giây hay nhất, thêm phụ đề", AI dựng giúp (phần AI có lượt thử miễn phí).
 >
-> Mở trên máy tính dựng sướng nhất nha. Muốn xài thử thì bình luận "Viral Studio", tụi mình gửi link liền 👇
+> Mẹo: mở trên máy tính dựng sướng nhất, điện thoại thì hợp sửa nhanh.
+>
+> Bạn đang dựng video bằng app gì, có đang trả phí hàng tháng không?
+>
+> #TuMinhXayKenh
+
+**Bình luận ghim:** Link tool dựng video nè, xài free trên trình duyệt 👉 https://minhtoan8668.github.io/TikTok/tools/dung-video.html
 
 **Threads**
 
 > Kiểu như là tụi t dạy làm content mà học viên ngại mua capcut pro, thế là tụi t quyết định code ra hẳn cái app edit video cho học viên xài free lun. Thua gì capcut ko trời =))))
 > Giờ mở cho mọi người xài thử luôn: cắt ghép, chữ, phụ đề, hiệu ứng, xuất MP4, ko cài app.
-> Cmt "Viral Studio" tụi t gửi link
+> Link t để dưới reply nha.
 
 **Chia sẻ vào group học viên**
 
@@ -220,13 +274,19 @@ bài, ai bình luận thì gửi link qua tin nhắn (Facebook) hoặc trả l�
 > 🛠️ Cái gì sửa được ngay trên bản dựng này, cái gì để lần quay sau làm khác
 > 💡 Gợi ý 3 kịch bản tiếp theo bám đúng kênh bạn
 >
-> Bình luận "Viral Studio" tụi mình gửi link chấm thử nha 👇
+> Mẹo: câu kết "nhớ follow mình nha" thường làm điểm phần kết tụt. Thay bằng một câu khiến người xem muốn trả lời.
+>
+> Video gần nhất bạn đăng, bạn thấy nó hỏng ở đâu? Kể tụi mình nghe thử.
+>
+> #TuMinhXayKenh
+
+**Bình luận ghim:** Link tool chấm video nè 👉 https://minhtoan8668.github.io/TikTok/tools/cham-video.html
 
 **Threads**
 
 > Đăng xong ngồi refresh mà view đứng im =)))
 > Tụi t làm cái tool cho AI xem trọn video mình làm, chấm 7 thang, chỉ đúng giây nào đang hỏng, sửa sao với footage đang có, rồi gợi ý 3 kịch bản tiếp theo.
-> Cmt "Viral Studio" tụi t gửi link chấm thử
+> Link t để dưới reply nha.
 
 **Chia sẻ vào group học viên**
 
@@ -235,22 +295,13 @@ bài, ai bình luận thì gửi link qua tin nhắn (Facebook) hoặc trả l�
 
 ---
 
-## Mẫu trả lời bình luận
+## Trả lời bình luận
 
-Đổi link theo bảng ở đầu file. Trả lời mỗi người một câu hơi khác nhau, đừng dán y chang
-hàng loạt (dễ bị coi là spam).
+Đọc bình luận rồi trả lời đúng chuyện người ta kể, cuối câu mới chỉ link. Mỗi câu một khác.
 
-**Facebook** (trả lời dưới bình luận, link gửi qua tin nhắn)
+- Người kể khâu đang kẹt: "Kẹt khâu hook thì thử món Hook viral nha, đưa câu hook vào là thấy nó yếu ở đâu liền. Link ở bình luận ghim đó bạn."
+- Người dán câu hook: góp ý thật một câu (đưa con số lên đầu, cắt bớt chữ thừa…), rồi "chạy thử qua tool xem được mấy điểm nha".
+- Người hỏi "link đâu": "Link ở bình luận ghim trên cùng nha bạn, mở bằng trình duyệt là dùng được liền."
+- Người hỏi có mất tiền không: "Dùng thử miễn phí nha, không cần cài app. Tạo tài khoản 30 giây là có thêm lượt AI."
 
-> Tụi mình gửi link vào tin nhắn rồi nha, bạn xem cả mục tin nhắn chờ giúp tụi mình 💚
-> Thử xong thấy chỗ nào chưa hay cứ nói tụi mình nha.
-
-Tin nhắn kèm link:
-
-> Link Viral Studio nè bạn: (link)
-> Mở bằng trình duyệt là dùng, không cần cài app. Thử ngay được luôn, tạo tài khoản 30 giây là có thêm lượt AI miễn phí.
-
-**Threads** (trả lời thẳng dưới bình luận)
-
-> Link nè: (link)
-> Mở trình duyệt là xài, ko cần app nha. Xài thử thấy sao nói tụi t nghe với 🫶
+**Threads:** trả lời ngay dưới bình luận, dán link cũng được: "Link nè: (link). Xài thử thấy sao nói tụi t nghe với 🫶"
