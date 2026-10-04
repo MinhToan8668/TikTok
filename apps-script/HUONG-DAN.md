@@ -608,6 +608,13 @@ Mọi tài nguyên tách khỏi code, nằm trong `tools/kho/kho.js` (một file
 - **Khung xem** ở bố cục dọc: đệm 12–14px, bề rộng cột tính sát theo khung hình (`canhGiua`), hết khoảng trống hai bên.
 - **Lỗi toàn màn hình bị kéo giãn ngang**: nút ⛶ đưa `.khung` vào fullscreen, trình duyệt ép khung thành đúng cỡ màn hình nên canvas 9:16 bị kéo thành 16:9. Nay `:fullscreen` dùng `object-fit: contain`: video dọc có viền đen hai bên, video ngang viền trên dưới, đúng tỉ lệ đang chọn; tay cầm và lớp phủ ẩn khi đang toàn màn hình. **Thanh điều khiển** kiểu CapCut ở đáy: ▶/⏸, giờ hiện tại / tổng, thanh tua, nút thoát; tự ẩn sau 2,6 s khi đang phát và không rê chuột (rê lại là hiện); bấm vào hình để phát / dừng; Esc để thoát. Kiểm thử `t127.mjs`.
 
+### Keyframe cho chữ, sticker, đồ hoạ như CapCut (10/2026)
+
+- Trước đây keyframe chỉ vẽ thật cho đoạn video và overlay; chữ có nút ◇ trên thanh công cụ nhưng khung không đổi. Nay mục **Biến đổi** của chữ dùng các hàng có keyframe: **Tỉ lệ** (`sc`, nhân với cỡ chữ), **Vị trí X / Y**, **Xoay**; **Độ mờ** trong Hoà trộn. Bấm ◇ cạnh hàng để đặt keyframe tại đầu phát (thành ◆); đã có keyframe thì chỉ cần dời đầu phát rồi kéo thanh (hoặc kéo chữ trên khung xem) là tự thêm keyframe mới, như CapCut. ◇ ở tiêu đề mục đặt cho cả 4 thuộc tính; ‹ › nhảy tới keyframe trước / sau.
+- Mục **Keyframe** của chữ (dưới Biến đổi): ◀ ◇ / ◇ ▶, Xoá hết, Chép ◆ / Dán ◆ / Đảo ngược, các mẫu Zoom vào chậm / Zoom ra / Lia trái → phải / Đập vào, chọn đường cong (mượt, tuyến tính, giữ…).
+- Trên dòng thời gian, clip chữ hiện chấm ◆ tại mỗi keyframe: kéo để dời, chuột phải để đổi đường cong, chép, dán, xoá. Nút ◇ trên thanh công cụ (phím K) và menu chuột phải "Thêm keyframe tại đây" dùng chung.
+- Nội suy áp khi xem trước, khi xuất và trên điện thoại (bọc `veDoHoa`, trả lại giá trị gốc sau khi vẽ nên dự án lưu không bị méo). Dự án nhập từ CapCut có keyframe chữ (`KFTypePositionX/Y`, `Scale`, `Rotation`, `Alpha`) nay chạy đúng. Kiểm thử `t128.mjs`.
+
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 
 Cài theo [`cloudflare/CAI-DAT.md`](../cloudflare/CAI-DAT.md) (khoảng 10 phút, không cần thẻ). Có máy chủ này tool thêm:
