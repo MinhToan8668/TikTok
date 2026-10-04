@@ -815,6 +815,20 @@
   .fsBar button{width:36px;height:36px;border:0;border-radius:9px;background:transparent;color:#fff;display:grid;place-items:center;cursor:pointer;padding:0}.fsBar button:hover{background:rgba(255,255,255,.12)}.fsBar button svg{width:18px;height:18px}
   .fsBar .tg{white-space:nowrap;color:#cfd2c9;font-variant-numeric:tabular-nums}.fsBar .tg b{color:#fff}
   .fsBar input[type=range]{flex:1;accent-color:#99DF00;height:4px;cursor:pointer;margin:0}
+  /* đầu phát bắt dính */
+  #ph.bat{filter:drop-shadow(0 0 3px var(--ea,#99DF00))}
+  /* tab Văn bản kiểu CapCut */
+  .ed.ccw .epane.on[data-pane="chu"]{display:grid;grid-template-columns:118px minmax(0,1fr);gap:12px;align-content:start}
+  .ed.ccw .epane[data-pane="chu"] .snav{display:flex;flex-direction:column;gap:6px;position:sticky;top:0;align-self:start}
+  .ed.ccw .epane[data-pane="chu"] .snav button{text-align:left;border:0;border-radius:9px;background:var(--ep2);color:var(--et);padding:9px 10px;font:600 12.5px/1.25 "Be Vietnam Pro",system-ui,sans-serif;cursor:pointer}
+  .ed.ccw .epane[data-pane="chu"] .snav button:hover{background:var(--el)}
+  .ed.ccw .epane[data-pane="chu"] .snav button.on{color:var(--eaChu);background:var(--ep)}
+  .ed.ccw .epane[data-pane="chu"] .snoi{min-width:0}.ed.ccw .epane[data-pane="chu"] .snoi > section > h3.pt:first-child{margin-top:2px}
+  .ed.ccw .epane[data-pane="chu"] select{width:100%;box-sizing:border-box}
+  .ed.ccw .theChuMacDinh{width:140px;height:116px;border-radius:12px;border:1px solid var(--el);background:var(--ep2);color:var(--et);font:700 14px "Be Vietnam Pro",system-ui,sans-serif;cursor:pointer;display:grid;place-items:center;margin:4px 0 10px}.ed.ccw .theChuMacDinh:hover{border-color:var(--ea)}
+  .ed.ccw .fontToi{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;margin-top:8px}.ed.ccw .fontToi .fontThe{height:48px;border-radius:10px;border:1px solid var(--el);background:var(--ep2);color:var(--et);font-size:15px;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 8px}
+  .ed.ccw .snoiDay{display:flex;align-items:center;gap:10px;margin-top:16px;padding-top:12px;border-top:1px solid var(--el)}.ed.ccw .snoiDay .gian{flex:1}.ed.ccw .snoiDay .pdXoa{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--em)}
+  .ed.ccw .mauDong .mau.dong{font-size:22px;font-weight:800;color:var(--et)}
 </style>
 </head>
 <body>
@@ -1123,7 +1137,7 @@
 
 <script src="tai-khoan.js?v=202610041200"></script>
 <script>document.addEventListener("DOMContentLoaded",function(){if(typeof TK==="undefined"){var k=document.createElement("div");k.style.cssText="position:fixed;left:12px;right:12px;bottom:12px;z-index:9999;background:#ff4d6d;color:#fff;padding:12px 14px;border-radius:12px;font:14px system-ui;display:flex;gap:10px;align-items:center;justify-content:space-between";k.innerHTML="Trang tải thiếu một phần (mạng chập chờn) nên nút AI chưa chạy được. <button onclick=\"location.reload()\" style=\"background:#fff;color:#000;border:0;border-radius:8px;padding:6px 12px;font-weight:700\">Tải lại trang</button>";document.body.appendChild(k);}});</script>
-<script src="kho/kho.js?v=20261003"></script>
+<script src="kho/kho.js?v=20261004"></script>
 <script>
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 const el = (t, c, txt) => { const e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; };
@@ -2853,8 +2867,8 @@ function khoiTaoLop() {
     if (e.button !== 0 || e.target.closest('.item') || e.target.closest('.lb') || e.target.closest('.moc') || e.clientY > $('#ruler').getBoundingClientRect().bottom) return;   // chỉ kéo tua trên thước (theo toạ độ: thước có thể vừa vẽ lại)
     try { tin.setPointerCapture(e.pointerId); } catch { } document.body.classList.add('dangTua');
     let cuon = 0; const tick = () => { if (!cuon) return; sc.scrollLeft += cuon; requestAnimationFrame(tick); };
-    const mv = ev => { P.t = tChuot(ev); vePh(); datTg(tongGiay()); const r = sc.getBoundingClientRect(), cu = cuon; cuon = ev.clientX > r.right - 30 ? 12 : ev.clientX < r.left + LB + 20 && sc.scrollLeft > 0 ? -12 : 0; if (cuon && !cu) requestAnimationFrame(tick); veTua(); };
-    const up = () => { cuon = 0; document.body.classList.remove('dangTua'); if (P.chon) veProp(); tin.removeEventListener('pointermove', mv); tin.removeEventListener('pointerup', up); tin.removeEventListener('pointercancel', up); veTua(); };
+    const mv = ev => { P.t = batDauPhat(tChuot(ev), ev.altKey); vePh(); datTg(tongGiay()); const r = sc.getBoundingClientRect(), cu = cuon; cuon = ev.clientX > r.right - 30 ? 12 : ev.clientX < r.left + LB + 20 && sc.scrollLeft > 0 ? -12 : 0; if (cuon && !cu) requestAnimationFrame(tick); veTua(); };
+    const up = () => { cuon = 0; document.body.classList.remove('dangTua'); const ph0 = $('#ph'); if (ph0) ph0.classList.remove('bat'); if (P.chon) veProp(); tin.removeEventListener('pointermove', mv); tin.removeEventListener('pointerup', up); tin.removeEventListener('pointercancel', up); veTua(); };
     tin.addEventListener('pointermove', mv); tin.addEventListener('pointerup', up); tin.addEventListener('pointercancel', up);
   });
 }
@@ -4714,7 +4728,7 @@ function veTimAm() {
 function khoiTaoKho() {
   if (!KHO_OK) { console.warn('Chưa tải được tools/kho/kho.js'); return; }
   // Google Fonts cho font mới
-  const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'https://fonts.googleapis.com/css2?' + Object.values(KHO.font).map(([, q]) => 'family=' + q).join('&') + '&display=swap'; document.head.appendChild(l);
+  { const qs = Object.values(KHO.font).map(([, q]) => 'family=' + q); for (let i = 0; i < qs.length; i += 10) { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'https://fonts.googleapis.com/css2?' + qs.slice(i, i + 10).join('&') + '&display=swap'; document.head.appendChild(l); } }   // từng cụm 10 họ: một họ sai tham số không kéo cả danh sách sập
   const sel = $('#font'); if (sel) Object.entries(KHO.font).forEach(([id, [ten]]) => { if (![...sel.options].some(o => o.value === id)) { const op = el('option', null, ten); op.value = id; sel.appendChild(op); } });
   // bộ lọc
   const locPane = $('[data-pane="loc"]'); if (locPane) { const h3 = [...locPane.querySelectorAll('h3.pt')].find(x => /^Bộ lọc/.test(x.textContent)); if (h3) h3.textContent = 'Bộ lọc nhanh'; const khu = el('div'); khu.id = 'khoLocKhu'; khu.innerHTML = '<h3 class="pt">Bộ lọc</h3><div class="quota" style="margin:0 0 4px">' + KHO.boLoc.length + ' màu, máy dựng LUT tại chỗ, không tải gì thêm. Bấm thẻ để áp cho đoạn đang chọn (hoặc mọi đoạn).</div><div class="row khoHang"><input type="search" id="khoLocTim" placeholder="Tìm bộ lọc: teal, phim, đen trắng…"></div><div class="row khoChip" id="khoLocChip"></div><div class="mauLuoi" id="khoLocLuoi"></div>'; (h3 ? h3.parentNode : locPane).insertBefore(khu, h3 || null); khoiTaoKhoChipLoc('tat'); $('#khoLocTim').oninput = () => veKhoLoc();
@@ -5047,7 +5061,49 @@ function khoiTaoKfGfx() {
   };
 }
 
-khoiTaoB(); khoiTaoC(); khoiTaoUI(); khoiTaoLop(); khoiTaoBang(); khoiTaoDot1(); khoiTaoDot2(); khoiTaoDot3(); khoiTaoM1(); khoiTaoM2(); khoiTaoM3(); khoiTaoN(); khoiTaoMobi(); khoiTaoCCW(); khoiTaoKho(); khoiTaoDoc(); khoiTaoGon(); khoiTaoMediaCC(); khoiTaoCC2(); khoiTaoFsBar(); khoiTaoKfGfx(); veTl();
+/* ═════════ đầu phát bắt dính khi tua trên thước: mép đoạn, mép chữ / overlay / âm thanh, câu nói, beat, mốc, keyframe (giữ Alt để tắt) ═════════ */
+function mocBatTua() { const tCu = P.t; P.t = -1; let ds; try { ds = mocHit(); } finally { P.t = tCu; } (P.moc || []).forEach(m => ds.push(m.t)); const kf = (k, m) => { const st = batDauMuc(k, m); Object.values(m.kfs || {}).forEach(l => l.forEach(f => ds.push(st + f.t))); }; P.clips.forEach(c => kf('v', c)); P.broll.forEach(b => kf('b', b)); P.gfx.forEach(g => kf('g', g)); return ds; }
+function batDauPhat(t, tat) { const ph = $('#ph'); if (tat || P.namCham === false) { if (ph) ph.classList.remove('bat'); return t; } const ng = 7 / PX(); let best = null; for (const m of mocBatTua()) { const d = Math.abs(m - t); if (d < ng && (best == null || d < Math.abs(best - t))) best = m; } if (ph) ph.classList.toggle('bat', best != null); return best == null ? t : Math.max(0, Math.min(tongGiay(), best)); }
+
+/* ═════════ Tab Văn bản kiểu CapCut: Thêm chữ · Của tôi · Hiệu ứng chữ · Mẫu chữ động · Phụ đề tự động · Phụ đề từ file (nhập / xuất) ═════════ */
+const CHU_MUC = [['them', 'Thêm chữ'], ['toi', 'Của tôi'], ['hieu', 'Hiệu ứng chữ'], ['mau', 'Mẫu chữ động'], ['tudong', 'Phụ đề tự động'], ['tep', 'Phụ đề từ file']];
+function moChuMuc(id) { const pane = $('[data-pane="chu"]'); if (!pane || !pane.querySelector('.snav')) return; P.chuMuc = id; pane.querySelectorAll('.snav button').forEach(b => b.classList.toggle('on', b.dataset.muc === id)); pane.querySelectorAll('.snoi > section').forEach(sx => { sx.hidden = sx.dataset.muc !== id; }); if (id === 'toi') veFontToi(); try { localStorage.setItem('dv_chuMuc', id); } catch { } }
+function veFontToi() { const box = $('#fontToiDs'); if (!box) return; box.innerHTML = ''; const ds = Object.entries(FONT_CSS).filter(([id]) => id.startsWith('f_')); if (!ds.length) { box.appendChild(el('div', 'quota', 'Chưa có font riêng. Bấm "＋ Font" để thêm .ttf / .otf / .woff2 (lưu trong trình duyệt, dùng cho mọi dự án).')); return; } ds.forEach(([id, css]) => { const b = el('button', 'fontThe'); b.type = 'button'; b.style.fontFamily = css; b.textContent = css.replace(/"/g, ''); b.title = 'Thêm chữ dùng font này'; b.onclick = () => { $('#btnThemChu').click(); const g = P.gfx[P.gfx.length - 1]; if (g) { g.font = id; veKhung(); veProp(); } }; box.appendChild(b); }); }
+function khoiTaoVanBanCC() {
+  const pane = $('[data-pane="chu"]'); if (!pane || !$('#ed').classList.contains('ccw') || pane.querySelector('.snav')) return;
+  const cu = [...pane.children]; const nav = el('div', 'snav'), noi = el('div', 'snoi'), sec = {};
+  CHU_MUC.forEach(([id, ten]) => { const b = el('button', null, ten); b.type = 'button'; b.dataset.muc = id; b.onclick = () => moChuMuc(id); nav.appendChild(b); const sx = el('section'); sx.dataset.muc = id; sx.hidden = true; noi.appendChild(sx); sec[id] = sx; });
+  pane.appendChild(nav); pane.appendChild(noi);   // gắn vào trang trước để $('#…') bên dưới tìm thấy
+  // Thêm chữ
+  const hangThem = cu.find(x => x.querySelector && x.querySelector('#btnThemChu')); const o = el('button', 'theChuMacDinh'); o.type = 'button'; o.innerHTML = '<span>Chữ mặc định</span>'; o.title = 'Thêm chữ tại đầu phát'; o.onclick = () => $('#btnThemChu').click(); sec.them.appendChild(o); if (hangThem) sec.them.appendChild(hangThem); sec.them.appendChild(el('div', 'quota', 'Bấm đúp chữ trên khung xem để sửa · kéo để đặt chỗ · Enter xuống dòng trong ô chữ.'));
+  // Của tôi: font riêng
+  const fontIn = $('#khoFontIn'); const lf = fontIn ? fontIn.closest('label') : null; sec.toi.appendChild(el('h3', 'pt', 'Font của bạn')); const hf = el('div', 'row'); if (lf) hf.appendChild(lf); sec.toi.appendChild(hf); const fd = el('div', 'fontToi'); fd.id = 'fontToiDs'; sec.toi.appendChild(fd);
+  if (fontIn) { const cu2 = fontIn.onchange; fontIn.onchange = async e => { if (cu2) await cu2.call(fontIn, e); veFontToi(); }; }
+  // Hiệu ứng chữ: tìm, nhóm, lưới mẫu chữ (mọi thứ còn lại của bảng cũ)
+  cu.forEach(x => { if (x !== hangThem && x.parentNode === pane) sec.hieu.appendChild(x); });
+  // Mẫu chữ động
+  sec.mau.appendChild(el('h3', 'pt', 'Chữ có hoạt ảnh sẵn')); const lm = el('div', 'mauLuoi mauDong');
+  [['Bật ra', { hu: 'pop' }], ['Gõ chữ', { hu: 'go' }], ['Trượt vào', { hu: 'truot' }], ['Nổi lên', { hu: 'len' }], ['Phóng to vào', { hu: 'phong' }], ['Xoay vào', { hu: 'xoay' }], ['Nhoè vào', { hu: 'nhoe' }], ['Hiện dần', { hu: 'mo' }], ['Nảy liên tục', { hu: 'nay' }], ['Lắc', { hu: 'lac' }], ['Nhịp to nhỏ', { hu: 'pop', lap: 'nhip' }], ['Nhấp nháy', { hu: 'mo', lap: 'nhap_nhay' }], ['Thu nhỏ khi ra', { hu: 'pop', ra: 'thu' }], ['Rơi xuống khi ra', { hu: 'len', ra: 'roi' }]].forEach(([ten, st]) => { const b = el('button'); b.type = 'button'; theHoa(b, '<span class="mau dong">Aa</span>', ten); b.onclick = () => { $('#btnThemChu').click(); const g = P.gfx[P.gfx.length - 1]; if (g) { Object.assign(g, st); veKhung(); veProp(); } }; lm.appendChild(b); });
+  sec.mau.appendChild(lm); sec.mau.appendChild(el('div', 'quota', 'Chỉnh thêm ở tab Hoạt ảnh của bảng thuộc tính. Đồ hoạ động nhiều lớp nằm ở mục Đồ hoạ bên trái.'));
+  // Phụ đề tự động (như CapCut Auto captions)
+  const NN = [['vi', 'Tiếng Việt'], ['en', 'English'], ['zh', '中文'], ['ko', '한국어'], ['ja', '日本語'], ['th', 'ไทย'], ['id', 'Bahasa Indonesia'], ['auto', 'Tự nhận']];
+  const td = sec.tudong; td.innerHTML = '<h3 class="pt">Ngôn ngữ nói</h3><select id="pdNgonNguNoi"></select><h3 class="pt">Phụ đề song ngữ</h3><select id="pdSongNguChon"><option value="">Không</option></select><div class="quota">AI nghe từng từ trong footage rồi tạo phụ đề karaoke; chọn ngôn ngữ dịch để có dòng thứ hai dưới phụ đề.</div><div class="quota" id="pdTuDongTt"></div><div class="snoiDay"><label class="pdXoa"><input type="checkbox" id="pdXoaCu"> Xoá phụ đề hiện có</label><span class="gian"></span><button class="btn xanh" id="btnTaoPd" type="button">Tạo phụ đề</button></div>';
+  const sNN = $('#pdNgonNguNoi'); NN.forEach(([v, t]) => { const op = el('option', null, t); op.value = v; sNN.appendChild(op); }); sNN.value = P.pdNgonNguNoi || 'vi'; sNN.onchange = () => { P.pdNgonNguNoi = sNN.value; };
+  const sSN = $('#pdSongNguChon'), goc = $('#pdNgonNgu'); if (goc) [...goc.options].forEach(op => { const o2 = el('option', null, op.textContent); o2.value = op.value; sSN.appendChild(o2); });
+  $('#btnTaoPd').onclick = async () => { const bt = $('#btnTaoPd'), tt = $('#pdTuDongTt'); const vids = P.srcs.filter(z => z.loai === 'video'); if (!vids.length) { toast('Thêm footage trước đã'); return; } if ($('#pdXoaCu').checked && P.pdNgoai) { luuHoanTac(); P.pdNgoai = null; if ($('#btnBoSrt')) $('#btnBoSrt').hidden = true; } const chua = vids.filter(z => z.tt === 'san_sang' || (z.tt === 'loi' && z.giay)); bt.disabled = true; try { for (const z of chua) { tt.textContent = 'Đang nghe ' + z.ten + '…'; await hieu(z); } } finally { bt.disabled = false; } const pd = $('#phuDe'); if (pd && !pd.checked) { pd.checked = true; pd.dispatchEvent(new Event('change')); } if (sSN.value && goc) { goc.value = sSN.value; const bd = $('#btnDichPd'); if (bd) bd.click(); } const n = cumTu().length; tt.textContent = n ? 'Đã có ' + n + ' cụm phụ đề · chỉnh kiểu, sửa câu ở mục Phụ đề bên trái.' : 'Chưa nhận được lời nói: kiểm tra footage có tiếng, hoặc bấm Hiểu footage ở Media.'; veTl(); veKhung(); };
+  // Phụ đề từ file: nhập + xuất
+  const tp = sec.tep; tp.innerHTML = '<h3 class="pt">Nhập</h3><div class="row"><label class="btn nho" style="cursor:pointer">📥 Nhập .srt / .vtt<input type="file" id="srtIn2" accept=".srt,.vtt,text/plain" hidden></label><span class="quota" style="margin:0">Thay phụ đề tự sinh bằng file của bạn.</span></div><h3 class="pt">Xuất phụ đề</h3><div class="row"><button class="btn nho" id="btnXuatSrt2" type="button">.srt</button><button class="btn nho" id="btnXuatVtt" type="button">.vtt</button><button class="btn nho" id="btnXuatTxt" type="button">.txt lời thoại</button><button class="btn nho ghost" id="btnChepPd" type="button">Chép lời thoại</button></div><div class="quota">Mang sang CapCut, Premiere, YouTube hoặc dán vào mô tả video. Đang bật song ngữ thì .srt / .vtt kèm dòng dịch.</div>';
+  $('#srtIn2').onchange = e => { const g0 = $('#srtIn'); if (!g0) return; const dt = new DataTransfer(); [...e.target.files].forEach(f => dt.items.add(f)); g0.files = dt.files; g0.dispatchEvent(new Event('change')); e.target.value = ''; };
+  const canLoi = () => { if (!cumTu().length) { toast('Chưa có phụ đề: bấm Tạo phụ đề hoặc Hiểu footage trước'); return false; } return true; };
+  const loiThoai = () => cumTu().map(c => c.tu.map(t => t.w).join(' ')).join('\n');
+  $('#btnXuatSrt2').onclick = () => $('#btnSrt').click();
+  $('#btnXuatVtt').onclick = () => { if (!canLoi()) return; luuText(tenAscii('phu-de') + '.vtt', 'WEBVTT\n\n' + taoSrt().replace(/(\d\d:\d\d:\d\d),(\d\d\d)/g, '$1.$2'), 'text/vtt;charset=utf-8'); toast('Đã xuất .vtt'); };
+  $('#btnXuatTxt').onclick = () => { if (!canLoi()) return; luuText(tenAscii('loi-thoai') + '.txt', loiThoai()); toast('Đã xuất .txt'); };
+  $('#btnChepPd').onclick = async () => { if (!canLoi()) return; try { await navigator.clipboard.writeText(loiThoai()); toast('Đã chép lời thoại'); } catch { toast('Trình duyệt chặn chép, dùng nút .txt'); } };
+  let luu = 'them'; try { luu = localStorage.getItem('dv_chuMuc') || 'them'; } catch { } moChuMuc(CHU_MUC.some(([id]) => id === luu) ? luu : 'them');
+}
+
+khoiTaoB(); khoiTaoC(); khoiTaoUI(); khoiTaoLop(); khoiTaoBang(); khoiTaoDot1(); khoiTaoDot2(); khoiTaoDot3(); khoiTaoM1(); khoiTaoM2(); khoiTaoM3(); khoiTaoN(); khoiTaoMobi(); khoiTaoCCW(); khoiTaoKho(); khoiTaoDoc(); khoiTaoGon(); khoiTaoMediaCC(); khoiTaoCC2(); khoiTaoFsBar(); khoiTaoKfGfx(); khoiTaoVanBanCC(); veTl();
 </script>
 <script src="tro-ly.js?v=202610011200"></script>
 </body>

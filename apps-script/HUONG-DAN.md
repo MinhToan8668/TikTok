@@ -615,6 +615,12 @@ Mọi tài nguyên tách khỏi code, nằm trong `tools/kho/kho.js` (một file
 - Trên dòng thời gian, clip chữ hiện chấm ◆ tại mỗi keyframe: kéo để dời, chuột phải để đổi đường cong, chép, dán, xoá. Nút ◇ trên thanh công cụ (phím K) và menu chuột phải "Thêm keyframe tại đây" dùng chung.
 - Nội suy áp khi xem trước, khi xuất và trên điện thoại (bọc `veDoHoa`, trả lại giá trị gốc sau khi vẽ nên dự án lưu không bị méo). Dự án nhập từ CapCut có keyframe chữ (`KFTypePositionX/Y`, `Scale`, `Rotation`, `Alpha`) nay chạy đúng. Kiểm thử `t128.mjs`.
 
+### Đầu phát bắt dính, tab Văn bản kiểu CapCut, thêm font (10/2026)
+
+- **Đầu phát bắt dính khi tua trên thước**: trong 7px quanh mép đoạn V1, mép chữ / overlay / âm thanh, ranh câu nói, beat, mốc đánh dấu và keyframe thì đầu phát hít vào đúng mốc đó (vạch đầu phát sáng lime). Giữ **Alt** khi kéo để tua tự do; tắt nam châm (⇧Backspace) cũng tắt bắt dính.
+- **Tab Văn bản** bố cục như CapCut, cột mục bên trái: **Thêm chữ** (ô "Chữ mặc định"), **Của tôi** (font .ttf/.otf/.woff2 của bạn, bấm font để thêm chữ dùng font đó), **Hiệu ứng chữ** (toàn bộ mẫu chữ trong kho: tìm, chip nhóm), **Mẫu chữ động** (14 kiểu hoạt ảnh sẵn: bật ra, gõ chữ, trượt, nổi, nhoè, nảy, nhịp, nhấp nháy…), **Phụ đề tự động** (ngôn ngữ nói, song ngữ, "Xoá phụ đề hiện có", nút **Tạo phụ đề** = Hiểu footage cho mọi video chưa hiểu rồi bật phụ đề + dịch nếu chọn), **Phụ đề từ file** (nhập .srt/.vtt; xuất **.srt**, **.vtt**, **.txt lời thoại**, chép lời thoại vào bộ nhớ tạm). Mục đang mở nhớ trong `dv_chuMuc`.
+- **Font**: thêm 58 font Google có đủ dấu tiếng Việt, gồm **TikTok Sans**, Roboto, Open Sans, Lora, Source Sans 3, Noto Sans/Serif, Mulish, Manrope, Sora, Public Sans, Cabin, Barlow Condensed, Nunito Sans, Raleway, Work Sans, IBM Plex Sans, Fira Sans, Montserrat Alternates, EB Garamond, Cormorant Garamond, Signika, Asap, Overpass, Encode Sans, nhóm Thái có Việt (Prompt, Mitr, K2D, Sarabun, Bai Jamjuree, Athiti, Niramit, Krub, Maitree, Pridi, Taviraj, Trirong, Fahkwang, Kodchasan, Thasadith, Mali, Itim, Pattaya, Charm, Chonburi, Sriracha), display (Alfa Slab One, Bungee, Lilita One, Grandstander, Arima, Dela Gothic One, Rowdies, Oi, Bungee Shade, Yeseva One, Philosopher, Play). Be Vietnam Pro vẫn là font mặc định. Font tải theo từng cụm 10 họ nên một họ lỗi không làm hỏng cả danh sách. Kiểm thử `t129.mjs`.
+
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 
 Cài theo [`cloudflare/CAI-DAT.md`](../cloudflare/CAI-DAT.md) (khoảng 10 phút, không cần thẻ). Có máy chủ này tool thêm:

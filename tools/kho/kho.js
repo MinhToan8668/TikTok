@@ -94,6 +94,19 @@ KHO.font = {
   space: ['Space Grotesk', 'Space+Grotesk:wght@700'], archivo: ['Archivo Black', 'Archivo+Black'], quicksand: ['Quicksand', 'Quicksand:wght@700'], patrick: ['Patrick Hand', 'Patrick+Hand'],
   inter: ['Inter', 'Inter:wght@700;900'], kanit: ['Kanit', 'Kanit:ital,wght@0,800;1,800'], exo: ['Exo 2', 'Exo+2:wght@800'], josefin: ['Josefin Sans', 'Josefin+Sans:wght@700'],
   merriweather: ['Merriweather', 'Merriweather:wght@900'], saira: ['Saira Condensed', 'Saira+Condensed:wght@800'], baloo: ['Baloo 2', 'Baloo+2:wght@800'], chakra: ['Chakra Petch', 'Chakra+Petch:wght@700'], big_shoulders: ['Big Shoulders Display', 'Big+Shoulders+Display:wght@900'],
+  /* 10/2026 · thêm font có đủ dấu tiếng Việt (Google Fonts, subset vietnamese) */
+  tiktok: ['TikTok Sans', 'TikTok+Sans:wght@400..900'], roboto: ['Roboto', 'Roboto:wght@400;700;900'], open_sans: ['Open Sans', 'Open+Sans:wght@400;700;800'], lora: ['Lora', 'Lora:wght@400;700'], source_sans: ['Source Sans 3', 'Source+Sans+3:wght@400;700;900'],
+  noto_sans: ['Noto Sans', 'Noto+Sans:wght@400;700;900'], noto_serif: ['Noto Serif', 'Noto+Serif:wght@400;700'], mulish: ['Mulish', 'Mulish:wght@400;700;900'], manrope: ['Manrope', 'Manrope:wght@400;700;800'], sora: ['Sora', 'Sora:wght@400;700;800'],
+  public_sans: ['Public Sans', 'Public+Sans:wght@400;700;900'], cabin: ['Cabin', 'Cabin:wght@400;700'], barlow_cond: ['Barlow Condensed', 'Barlow+Condensed:wght@400;700;900'], nunito_sans: ['Nunito Sans', 'Nunito+Sans:wght@400;700;900'], raleway: ['Raleway', 'Raleway:wght@400;700;900'],
+  work_sans: ['Work Sans', 'Work+Sans:wght@400;700;900'], ibm_plex: ['IBM Plex Sans', 'IBM+Plex+Sans:wght@400;700'], fira_sans: ['Fira Sans', 'Fira+Sans:wght@400;700;900'], montserrat_alt: ['Montserrat Alternates', 'Montserrat+Alternates:wght@400;700;900'], eb_garamond: ['EB Garamond', 'EB+Garamond:wght@400;700'],
+  cormorant: ['Cormorant Garamond', 'Cormorant+Garamond:wght@400;700'], signika: ['Signika', 'Signika:wght@400;700'], asap: ['Asap', 'Asap:wght@400;700'], overpass: ['Overpass', 'Overpass:wght@400;700;900'], encode_sans: ['Encode Sans', 'Encode+Sans:wght@400;700;900'],
+  prompt: ['Prompt', 'Prompt:wght@400;700;900'], mitr: ['Mitr', 'Mitr:wght@400;700'], k2d: ['K2D', 'K2D:wght@400;700;800'], sarabun: ['Sarabun', 'Sarabun:wght@400;700;800'], bai: ['Bai Jamjuree', 'Bai+Jamjuree:wght@400;700'],
+  athiti: ['Athiti', 'Athiti:wght@400;700'], niramit: ['Niramit', 'Niramit:wght@400;700'], krub: ['Krub', 'Krub:wght@400;700'], maitree: ['Maitree', 'Maitree:wght@400;700'], pridi: ['Pridi', 'Pridi:wght@400;700'],
+  taviraj: ['Taviraj', 'Taviraj:wght@400;700;900'], trirong: ['Trirong', 'Trirong:wght@400;700;900'], fahkwang: ['Fahkwang', 'Fahkwang:wght@400;700'], kodchasan: ['Kodchasan', 'Kodchasan:wght@400;700'], thasadith: ['Thasadith', 'Thasadith:wght@400;700'],
+  mali: ['Mali', 'Mali:wght@400;700'], itim: ['Itim', 'Itim'], pattaya: ['Pattaya', 'Pattaya'], charm: ['Charm', 'Charm:wght@400;700'], chonburi: ['Chonburi', 'Chonburi'],
+  sriracha: ['Sriracha', 'Sriracha'], alfa: ['Alfa Slab One', 'Alfa+Slab+One'], bungee: ['Bungee', 'Bungee'], lilita: ['Lilita One', 'Lilita+One'], grandstander: ['Grandstander', 'Grandstander:wght@400;700;900'],
+  arima: ['Arima', 'Arima:wght@400;700'], dela: ['Dela Gothic One', 'Dela+Gothic+One'], rowdies: ['Rowdies', 'Rowdies:wght@400;700'], oi: ['Oi', 'Oi'], bungee_shade: ['Bungee Shade', 'Bungee+Shade'],
+  yeseva: ['Yeseva One', 'Yeseva+One'], philosopher: ['Philosopher', 'Philosopher:wght@400;700'], play: ['Play', 'Play:wght@400;700'],
 };
 
 /* ── MẪU CHỮ: [tên, kiểu, nhóm]. Kiểu dùng đúng các trường của chữ tự do: text, co, mau, nen (khong|vien|hop|hop_mau|bong), nen_mau, nen_bo, vien_day, phat_sang, hu (pop|len|truot|nhoe|go|phong|mo|nay|lac|xoay|ve), lap (nhap_nhay|nhip|nay|lac), font, dam, nghieng, can, x, y, dongCao ── */
