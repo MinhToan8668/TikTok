@@ -606,7 +606,7 @@ Mọi tài nguyên tách khỏi code, nằm trong `tools/kho/kho.js` (một file
 
 - **Ô footage** nhỏ như CapCut (≥108px, 3 ô trên cột 400px): tên một dòng cắt bớt, dòng phụ 10px, nút "＋ V1" ẩn (đã có nút ＋ khi rê và bấm đúp), "Dò mặt" chỉ còn icon 🙂 (giữ tooltip).
 - **Khung xem** ở bố cục dọc: đệm 12–14px, bề rộng cột tính sát theo khung hình (`canhGiua`), hết khoảng trống hai bên.
-- **Lỗi toàn màn hình bị kéo giãn ngang**: nút ⛶ đưa `.khung` vào fullscreen, trình duyệt ép khung thành đúng cỡ màn hình nên canvas 9:16 bị kéo thành 16:9. Nay `:fullscreen` dùng `object-fit: contain`: video dọc có viền đen hai bên, video ngang viền trên dưới, đúng tỉ lệ đang chọn; tay cầm và lớp phủ ẩn khi đang toàn màn hình. Esc để thoát.
+- **Lỗi toàn màn hình bị kéo giãn ngang**: nút ⛶ đưa `.khung` vào fullscreen, trình duyệt ép khung thành đúng cỡ màn hình nên canvas 9:16 bị kéo thành 16:9. Nay `:fullscreen` dùng `object-fit: contain`: video dọc có viền đen hai bên, video ngang viền trên dưới, đúng tỉ lệ đang chọn; tay cầm và lớp phủ ẩn khi đang toàn màn hình. **Thanh điều khiển** kiểu CapCut ở đáy: ▶/⏸, giờ hiện tại / tổng, thanh tua, nút thoát; tự ẩn sau 2,6 s khi đang phát và không rê chuột (rê lại là hiện); bấm vào hình để phát / dừng; Esc để thoát. Kiểm thử `t127.mjs`.
 
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 

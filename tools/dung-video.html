@@ -808,6 +808,13 @@
   .khung:fullscreen canvas{position:static;width:100%;height:100%;object-fit:contain;display:block}
   .khung:fullscreen #tayCam,.khung:fullscreen #trong{display:none}
   .khung:fullscreen #lopPhu{display:none}
+  .fsBar{display:none}
+  .khung:fullscreen .fsBar{display:flex;align-items:center;gap:12px;position:absolute;left:50%;bottom:28px;transform:translateX(-50%);width:min(920px,92vw);height:48px;padding:0 10px 0 6px;border-radius:12px;background:rgba(20,20,24,.78);backdrop-filter:blur(14px);color:#fff;font:600 13px/1 "Be Vietnam Pro",system-ui,sans-serif;opacity:0;transition:opacity .2s;z-index:5;box-sizing:border-box}
+  .khung:fullscreen .fsBar.hien{opacity:1}
+  .khung:fullscreen.anTro{cursor:none}
+  .fsBar button{width:36px;height:36px;border:0;border-radius:9px;background:transparent;color:#fff;display:grid;place-items:center;cursor:pointer;padding:0}.fsBar button:hover{background:rgba(255,255,255,.12)}.fsBar button svg{width:18px;height:18px}
+  .fsBar .tg{white-space:nowrap;color:#cfd2c9;font-variant-numeric:tabular-nums}.fsBar .tg b{color:#fff}
+  .fsBar input[type=range]{flex:1;accent-color:#99DF00;height:4px;cursor:pointer;margin:0}
 </style>
 </head>
 <body>
@@ -5008,7 +5015,21 @@ function khoiTaoCC2() {
   const tabHoaCC2 = tabHoaProp; tabHoaProp = function () { const r = tabHoaCC2.apply(this, arguments); ccSapXepProp(); return r; };
 }
 
-khoiTaoB(); khoiTaoC(); khoiTaoUI(); khoiTaoLop(); khoiTaoBang(); khoiTaoDot1(); khoiTaoDot2(); khoiTaoDot3(); khoiTaoM1(); khoiTaoM2(); khoiTaoM3(); khoiTaoN(); khoiTaoMobi(); khoiTaoCCW(); khoiTaoKho(); khoiTaoDoc(); khoiTaoGon(); khoiTaoMediaCC(); khoiTaoCC2(); veTl();
+/* ═════════ thanh điều khiển khi xem toàn màn hình (phát, giờ, tua, thoát) — như trình phát CapCut ═════════ */
+function khoiTaoFsBar() {
+  const k = $('.khung'); if (!k) return; let bar = null, an = 0;
+  const tong = () => (typeof tongGiay === 'function' ? tongGiay() : 0) || 0;
+  const ve = () => { if (!bar) return; const t = tong(); bar.querySelector('.tg').innerHTML = '<b>' + CC_TC(P.t) + '</b> / ' + CC_TC(t); const sk = bar.querySelector('input'); if (document.activeElement !== sk) sk.value = t ? Math.round(P.t / t * 1000) : 0; bar.querySelector('.play').innerHTML = P.dang ? '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>' : '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>'; };
+  const hien = () => { if (!bar) return; bar.classList.add('hien'); k.classList.remove('anTro'); clearTimeout(an); an = setTimeout(() => { if (P.dang) { bar.classList.remove('hien'); k.classList.add('anTro'); } }, 2600); };
+  const tao = () => { bar = el('div', 'fsBar'); bar.id = 'fsBar'; bar.innerHTML = '<button type="button" class="play" title="Phát / dừng (Space)"></button><span class="tg"></span><input type="range" min="0" max="1000" step="1" aria-label="Tua"><button type="button" class="thoat" title="Thoát toàn màn hình (Esc)">' + ic('full') + '</button>';
+    bar.querySelector('.play').onclick = () => { $('#btnPlay').click(); setTimeout(ve, 50); }; bar.querySelector('.thoat').onclick = () => { if (document.fullscreenElement) document.exitFullscreen(); };
+    const sk = bar.querySelector('input'); sk.oninput = () => { if (P.dang) dung(); P.t = Math.max(0, Math.min(tong(), +sk.value / 1000 * tong())); veKhung(); }; sk.onkeydown = e => e.stopPropagation(); bar.onpointerdown = e => e.stopPropagation();
+    k.appendChild(bar); k.addEventListener('pointermove', hien); k.addEventListener('click', e => { if (e.target === $('#cv')) { $('#btnPlay').click(); setTimeout(ve, 50); } }); ve(); hien(); };
+  document.addEventListener('fullscreenchange', () => { if (document.fullscreenElement === k) { if (!bar) tao(); else { ve(); hien(); } } else if (bar) { bar.remove(); bar = null; k.classList.remove('anTro'); clearTimeout(an); } });
+  const datTgFs = datTg; datTg = function () { const r = datTgFs.apply(this, arguments); if (bar) ve(); return r; };
+}
+
+khoiTaoB(); khoiTaoC(); khoiTaoUI(); khoiTaoLop(); khoiTaoBang(); khoiTaoDot1(); khoiTaoDot2(); khoiTaoDot3(); khoiTaoM1(); khoiTaoM2(); khoiTaoM3(); khoiTaoN(); khoiTaoMobi(); khoiTaoCCW(); khoiTaoKho(); khoiTaoDoc(); khoiTaoGon(); khoiTaoMediaCC(); khoiTaoCC2(); khoiTaoFsBar(); veTl();
 </script>
 <script src="tro-ly.js?v=202610011200"></script>
 </body>
