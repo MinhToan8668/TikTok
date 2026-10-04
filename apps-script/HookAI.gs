@@ -34,7 +34,7 @@ var HOOK_AI_DAILY_MAC_DINH = '20';
 function hookCfg(name){
   var v = cfgProp(name);
   if (v) return v;
-  if (name === 'GEMINI_API_KEY')   return GEMINI_KEY_MAC_DINH;
+  if (name === 'GEMINI_API_KEY')   return GEMINI_KEY_MAC_DINH || String(cfgProp('GEMINI_API_KEYS') || '').split(/[\s,;]+/).filter(String)[0] || '';   // chưa có key chính thì lấy key phụ đầu tiên
   if (name === 'HOOK_AI_PROVIDER') return HOOK_AI_PROVIDER_MAC_DINH;
   if (name === 'HOOK_AI_MODEL')    return HOOK_AI_MODEL_MAC_DINH;
   if (name === 'HOOK_AI_DAILY')    return HOOK_AI_DAILY_MAC_DINH;
@@ -1766,23 +1766,26 @@ function thuHookAI(){
    /keygemini them AIza... → thêm key phụ vào GEMINI_API_KEYS (gọi thử trước, xong xoá tin chứa key khỏi chat)
    /keygemini xoa 2        → xoá key phụ số 2 (hoặc 4 ký tự cuối của key) */
 function hookCheKey(k){ return k ? String(k).slice(0, 4) + '…' + String(k).slice(-4) : ''; }
+var HOOK_KEY_RE = /^(AIza[0-9A-Za-z_-]{30,}|AQ\.[0-9A-Za-z_.-]{20,})$/;   // key Gemini kiểu cũ (AIza…) và kiểu mới (AQ.…)
 function hookLenhKey(arg, chatId, msg, hoi){
   var P = PropertiesService.getScriptProperties();
   var chinh = hookCfg('GEMINI_API_KEY');
   var phu = String(P.getProperty('GEMINI_API_KEYS') || '').split(/[\s,;]+/).map(function(k){ return k.trim(); }).filter(function(k){ return k && k !== chinh; });
   var luuPhu = function(ds){ P.setProperty('GEMINI_API_KEYS', ds.join(',')); try{ CacheService.getScriptCache().remove('gm_list_v2'); }catch(e){} };
   var m = String(arg || '').trim().match(/^(\S+)\s*([\s\S]*)$/), lenh = m ? m[1].toLowerCase() : '', con = m ? m[2].trim() : '';
-  if (/^AIza/.test(lenh)){ con = String(arg).trim(); lenh = 'them'; }   // dán thẳng key sau câu hỏi
+  if (/^(AIza|AQ\.)/i.test(lenh)){ con = String(arg).trim(); lenh = 'them'; }   // dán thẳng key sau câu bot hỏi
+  else if (lenh && !/^(them|add|xoa|xóa)$/.test(lenh)) return hoi('🤔 Chưa hiểu. Gửi key Gemini (bắt đầu bằng `AIza` hoặc `AQ.`) để thêm, hoặc `xoa 2` để xoá key số 2.');
 
   if (lenh === 'them' || lenh === 'add'){
     if (msg && msg.message_id) try{ tgApi('deleteMessage', {chat_id: chatId, message_id: msg.message_id}); }catch(e){}   // không để key nằm lại trong chat
-    var moi = con.split(/[\s,;]+/).filter(function(k){ return /^AIza[0-9A-Za-z_-]{30,}$/.test(k); });
-    if (!moi.length) return hoi('🔑 Dán key Gemini (bắt đầu bằng `AIza`, lấy ở aistudio.google.com/apikey). Nhiều key thì cách nhau dấu cách. Tin chứa key sẽ được bot xoá ngay.');
+    var moi = con.split(/[\s,;]+/).filter(function(k){ return HOOK_KEY_RE.test(k); });
+    if (!moi.length) return hoi('🔑 Gửi key Gemini (bắt đầu bằng `AIza` hoặc `AQ.`, lấy ở aistudio.google.com/apikey). Nhiều key thì cách nhau dấu cách. Tin chứa key sẽ được bot xoá ngay.');
     var kq = [];
     moi.forEach(function(k){
       if (k === chinh || phu.indexOf(k) > -1){ kq.push('• ' + hookCheKey(k) + ': đã có rồi'); return; }
       var ma = 0; try{ ma = UrlFetchApp.fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=5', {muteHttpExceptions:true, headers:{'x-goog-api-key': k}}).getResponseCode(); }catch(e){}
       if (ma !== 200){ kq.push('• ' + hookCheKey(k) + ': ❌ Google từ chối (http ' + ma + '), chưa thêm'); return; }
+      if (!chinh && !P.getProperty('GEMINI_API_KEY')){ P.setProperty('GEMINI_API_KEY', k); chinh = k; kq.push('• ' + hookCheKey(k) + ': ✅ đã thêm, làm key chính'); return; }
       phu.push(k); kq.push('• ' + hookCheKey(k) + ': ✅ đã thêm');
     });
     luuPhu(phu);
@@ -1797,14 +1800,14 @@ function hookLenhKey(arg, chatId, msg, hoi){
   }
   // tình trạng
   var ds = chinh ? [chinh].concat(phu) : phu;
-  if (!ds.length) return tgSend(chatId, '🔑 Chưa có key Gemini nào. Thêm: `/keygemini them AIza...`');
+  if (!ds.length) return hoi('🔑 Chưa có key Gemini nào, các tool AI đang không chạy được.\n\nGửi key Gemini vào đây (bắt đầu bằng `AIza` hoặc `AQ.`, lấy ở aistudio.google.com/apikey). Nhiều key thì cách nhau dấu cách. Bot gọi thử từng key rồi xoá tin chứa key khỏi chat.');
   var models = (geminiModels(ds[0]) || []).slice(0, 3);
   var dong = ds.map(function(k, i){
     var nghi = models.map(function(md){ var n = gemConNghi(k, md); return n.giay ? md.replace(/^gemini-/, '') + ' ' + (n.loai === 'n' ? 'hết ngày' : n.loai === 'h' ? 'key hỏng' : 'hết phút') + ' (~' + hookThoiGian(n.giay) + ')' : ''; }).filter(String);
     return (i + 1) + '. `' + hookCheKey(k) + '`' + (i === 0 && chinh ? ' (chính)' : '') + ' · ' + (nghi.length ? '⏸ ' + nghi.join(', ') : '✅ rảnh');
   });
-  return tgSend(chatId, ['🔑 *Key Gemini* · ' + ds.length + ' key', 'Model chính: ' + models.join(', '), ''].concat(dong).concat(['',
-    'Thêm: `/keygemini them AIza...` · Xoá: `/keygemini xoa 2`',
+  return hoi(['🔑 *Key Gemini* · ' + ds.length + ' key', 'Model chính: ' + models.join(', '), ''].concat(dong).concat(['',
+    '👉 Muốn thêm key: gửi key vào đây luôn. Muốn xoá: gửi `xoa 2` (số thứ tự ở trên).',
     'Hạn mức tính theo project: mỗi key nên ở một project Google Cloud riêng. Hết hạn mức ngày đặt lại lúc 14–15 giờ chiều (giờ VN).',
     '☁️ Cloudflare dùng danh sách key riêng (`GEMINI_API_KEYS` trong Worker), thêm key mới ở cả hai nơi.']).join('\n'));
 }
