@@ -6,8 +6,13 @@ Mỗi tool đăng **2 ảnh cùng một bài**: ảnh chính trước, ảnh "c�
 Gợi ý lịch: ngày 0 đăng bài tổng quan, sau đó mỗi ngày một tool (7 ngày). Đăng trên page
 xong bấm **Chia sẻ → Nhóm** vào group học viên, dán đoạn "Chia sẻ vào group" ở dưới mỗi bài.
 
-Link để ở **bình luận đầu tiên** của bài trên page (bài có link trong thân thường bị Facebook
-giảm hiển thị). Trong group thì để link thẳng trong bài cũng được.
+Poster không in link, chỉ dẫn "👇 Link dùng thử ngay dưới bài viết". Trên page để link ở
+**bình luận đầu tiên** (bài có link trong thân thường bị Facebook giảm hiển thị), trong group
+thì dán link ở cuối bài. Cả hai cách đều khớp với lời dẫn trên ảnh.
+
+Giọng bài trên page viết cho **người ngoài**: dùng thử miễn phí, không cần cài app. Không ghi
+số lượt cụ thể vì lượt chỉnh được qua bot; nếu sau này đặt hạn mức thì chỉ cần sửa caption,
+ảnh vẫn dùng được.
 
 | Ngày | Ảnh | Link tool |
 |---|---|---|
@@ -25,19 +30,21 @@ giảm hiển thị). Trong group thì để link thẳng trong bài cũng đư�
 
 **Bài trên page**
 
-> 6 tool AI làm video viral, mở bằng điện thoại là dùng được.
+> Làm video TikTok mà cứ đoán mò vì sao người ta lướt? Thử bộ tool này đi, miễn phí.
 >
-> Tụi mình gom hết quy trình trong lớp Tự Mình Xây Kênh vào một chỗ tên là Viral Studio:
+> Tụi mình gom hết quy trình làm video trong lớp Tự Mình Xây Kênh vào một chỗ tên là Viral Studio:
 >
 > ⬇️ Tải video: dán link, lấy video không logo, ảnh gốc, nhạc nền
 > 🔎 Soi video viral: mổ vì sao video người ta nổ, áp khuôn sang kênh bạn
 > ⚡ Hook viral: chấm hook trên 100, viết lại 5 bản, đặt chữ lên video
 > 📝 Kịch bản viral: viết theo 11 khung, biết trước giây nào người xem lướt
-> 🎞️ Dựng video (mới): thả footage, nhờ Trợ lý AI dựng, xuất MP4
+> 🎞️ Dựng video (mới): khỏi mua app edit, dựng và xuất MP4 miễn phí
 > 🎯 Chấm video (mới): AI xem trọn video bạn làm, chỉ đúng giây đang hỏng
 >
 > AI được train từ hàng trăm video viral đã mổ bằng số liệu thật, không phải AI chung chung.
-> Ai cũng dùng thử được. Học viên khoá đăng nhập là có Pro, không giới hạn lượt.
+>
+> Mở bằng trình duyệt trên điện thoại là dùng, không cần cài app. Thử ngay không cần tài khoản,
+> tạo tài khoản 30 giây là có thêm lượt AI miễn phí. Link ở bình luận đầu tiên 👇
 >
 > 7 ngày tới mỗi ngày tụi mình giới thiệu một tool và cách dùng. Lưu bài lại để không lỡ nha.
 >
@@ -66,6 +73,8 @@ giảm hiển thị). Trong group thì để link thẳng trong bài cũng đư�
 > Chạy được với TikTok, Douyin, X, YouTube, Instagram, Facebook, Pinterest. Không tốn lượt AI.
 > Tải xong bấm "Soi video này" là AI mổ luôn vì sao video đó viral.
 >
+> Miễn phí, mở bằng trình duyệt là dùng, không cài app. Link ở bình luận đầu tiên 👇
+>
 > Lưu ý: chỉ tải nội dung bạn có quyền dùng. Tải về để soi và học, không đăng lại nguyên bản.
 >
 > #TuMinhXayKenh #ViralStudio
@@ -92,6 +101,8 @@ giảm hiển thị). Trong group thì để link thẳng trong bài cũng đư�
 > vì sao người ta dừng lại, vì sao xem hết, công thức nào lặp lại được.
 > Cuối cùng áp khuôn đó sang kênh bạn: hook mẫu, lời thoại mẫu từng phần.
 >
+> Dùng thử miễn phí, không cần cài app. Link ở bình luận đầu tiên 👇
+>
 > #TuMinhXayKenh #ViralStudio
 
 **Bình luận đầu tiên:** Soi video viral 👉 https://minhtoan8668.github.io/TikTok/tools/soi-video.html
@@ -113,6 +124,8 @@ giảm hiển thị). Trong group thì để link thẳng trong bài cũng đư�
 > 3. Chọn bố cục, font, nhấn màu từ khoá, xuất PNG nền trong suốt rồi kéo thẳng vào CapCut
 >
 > Tool tự xếp chữ né mặt, xem trước trên khung TikTok, Reels, Shorts. 14 bố cục, 19 font Việt.
+>
+> Chấm thử hook của bạn miễn phí, link ở bình luận đầu tiên 👇
 >
 > #TuMinhXayKenh #ViralStudio
 
@@ -136,6 +149,8 @@ giảm hiển thị). Trong group thì để link thẳng trong bài cũng đư�
 >
 > Muốn thì để AI viết lại trọn bài 60–105 giây, bằng giọng người thật chứ không phải văn máy.
 >
+> Dùng thử miễn phí trước khi quay, link ở bình luận đầu tiên 👇
+>
 > #TuMinhXayKenh #ViralStudio
 
 **Bình luận đầu tiên:** Kịch bản viral 👉 https://minhtoan8668.github.io/TikTok/tools/kich-ban.html
@@ -150,17 +165,21 @@ giảm hiển thị). Trong group thì để link thẳng trong bài cũng đư�
 
 **Bài trên page**
 
-> Thả footage vào. Nói AI muốn dựng thế nào.
+> Khỏi tốn tiền mua app edit nữa. Dựng video miễn phí ngay trên trình duyệt.
 >
-> Viral Studio vừa có thêm trình dựng video chạy ngay trên trình duyệt:
+> Mỗi tháng trả tiền gói Pro app edit chỉ để chèn chữ, thêm phụ đề, xuất video không logo?
+> Viral Studio vừa có trình dựng video, mở là dùng, không cài app, không mua gói:
 >
 > 1. Thêm footage: video, ảnh từ máy, thả lên dòng thời gian
-> 2. Mở Trợ lý AI, gõ yêu cầu: "bỏ vấp, giữ 30 giây hay nhất, thêm phụ đề kiểu TikTok, nhấn con số"
-> 3. Chọn mẫu chữ có sẵn, chỉnh trên khung, bấm Xuất là có MP4
+> 2. Cắt, ghép, thêm mẫu chữ có sẵn, phụ đề karaoke, hiệu ứng, nhạc theo beat
+> 3. Bấm Xuất là có file MP4 về máy. 0đ
 >
-> Nhiều track, phụ đề karaoke, mẫu chữ, hiệu ứng, nhạc theo beat. Mở trên máy tính để dựng thoải mái nhất.
+> Lười dựng thì gõ cho Trợ lý AI: "bỏ vấp, giữ 30 giây hay nhất, thêm phụ đề kiểu TikTok", AI dựng giúp
+> (phần AI có lượt dùng thử miễn phí).
 >
-> #TuMinhXayKenh #ViralStudio
+> Mở trên máy tính để dựng thoải mái nhất. Link ở bình luận đầu tiên 👇
+>
+> #TuMinhXayKenh #ViralStudio #dungvideo
 
 **Bình luận đầu tiên:** Dựng video 👉 https://minhtoan8668.github.io/TikTok/tools/dung-video.html
 
@@ -181,6 +200,8 @@ giảm hiển thị). Trong group thì để link thẳng trong bài cũng đư�
 > 3. Sửa ngay trên bản dựng đang có, ghi lại việc cần làm khác ở lần quay sau, lấy 3 kịch bản tiếp theo bám đúng kênh bạn
 >
 > Không phải chê chung chung: AI chỉ đúng giây nào đang hỏng và sửa bằng footage bạn đang có.
+>
+> Chấm thử một video của bạn miễn phí, link ở bình luận đầu tiên 👇
 >
 > #TuMinhXayKenh #ViralStudio
 
