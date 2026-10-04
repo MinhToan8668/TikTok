@@ -293,6 +293,43 @@ https://minhtoan8668.github.io/TikTok/tools/cham-video.html
 
 ---
 
+## 7 · Chốt tuần
+
+Ảnh: `07-chot-tuan.png`
+
+**Facebook**
+
+```
+7 ngày qua tụi mình kể từng tool một, giờ gom lại 1 tấm cho bạn lưu nè.
+
+Tải video mẫu về, soi coi sao người ta nổ, chấm câu hook, viết kịch bản theo khung, dựng, rồi chấm lại trước khi đăng. Làm 1 video mà đi đúng thứ tự vậy là đỡ mò hẳn.
+
+Tất cả mở bằng trình duyệt trên điện thoại, khỏi cài app, có bản thử free. Học viên trong lớp thì đăng nhập là có Pro sẵn.
+
+Tuần qua bạn thử cái nào rồi? Thấy chỗ nào chưa tiện cứ nói, tụi mình sửa.
+```
+
+**Threads**
+
+```
+7 ngày tụi t kể xong 6 cái tool rồi, gom lại 1 tấm cho mn lưu nè
+
+tải video, soi video, chấm hook, kịch bản, dựng video, chấm video. đi đúng thứ tự vậy là làm 1 video đỡ mò hẳn
+
+mn thử cái nào rồi, chỗ nào dở nói tụi t sửa nha =)))
+```
+
+Bình luận đầu: `Link Viral Studio nè https://minhtoan8668.github.io/TikTok/ mở là thấy đủ 6 tool`
+
+Group học viên:
+
+```
+Tổng kết tuần nè cả lớp, 6 tool xếp đúng thứ tự làm 1 video. Lưu lại tấm này, làm video nào cũng đi theo vậy nha.
+https://minhtoan8668.github.io/TikTok/
+```
+
+---
+
 ## Trả lời bình luận
 
 Đọc người ta kể gì rồi trả lời đúng chuyện đó, mỗi người một kiểu, đừng dán y chang. Vài ví dụ:

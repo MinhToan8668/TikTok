@@ -4,7 +4,7 @@ Bộ poster quảng bá 6 tool Viral Studio cho page Tự Mình Xây Kênh, ản
 
 | Thư mục, file | Là gì |
 |---|---|
-| `xuat/*.png` | **Ảnh để đăng**, 2160×2700. `00` tổng quan, `01`–`06` từng tool, `…b-…-cach-dung` là ảnh 3 bước đi kèm |
+| `xuat/*.png` | **Ảnh để đăng**, 2160×2700. `00` tổng quan, `01`–`06` từng tool, `…b-…-cach-dung` là ảnh 3 bước đi kèm, `07` nền xanh chốt tuần |
 | `bai-dang.md` | Caption từng bài, đoạn chia sẻ vào group, lịch đăng 7 ngày, link từng tool |
 | `poster.html` | Bố cục tất cả poster. Mở bằng trình duyệt để xem, sửa chữ ở đây |
 | `anh/` | Ảnh chụp giao diện tool (khổ điện thoại 390px ×3, dựng video khổ máy tính) |
