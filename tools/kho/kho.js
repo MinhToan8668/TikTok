@@ -237,8 +237,34 @@ KHO.hieuUng = [
   { id: 'bui_sang', ten: 'Bụi sáng', nhom: 'hat', ic: '✦', glsl: 'vec4 c=tx(uv);float a=0.;for(int i=0;i<3;i++){float f=float(i)+1.;vec2 p=uv*vec2(8.,14.)*f;p.y-=t*.15*f;p.x+=sin(t*.5+f)*.2;vec2 g=floor(p);vec2 o=vec2(rnd(g+3.),rnd(g+11.));float d=length(fract(p)-o);float tw=.5+.5*sin(t*3.+rnd(g)*6.);a+=smoothstep(.05,.0,d)*tw;}return vec4(c.rgb+a*vec3(1.,.95,.7)*muc,1.);' },
   { id: 'suong_mu', ten: 'Sương mù', nhom: 'hat', ic: '🌁', glsl: 'vec4 c=tx(uv);float n=nse(uv*3.+vec2(t*.1,0.))*.6+nse(uv*7.-vec2(0.,t*.05))*.4;return vec4(mix(c.rgb,vec3(.85,.88,.92),n*.55*muc),1.);' },
   { id: 'lua_vien', ten: 'Lửa viền dưới', nhom: 'hat', ic: '🔥', glsl: 'vec4 c=tx(uv);float h=nse(vec2(uv.x*8.,t*3.))*.25+.1;float f=smoothstep(h,0.,1.-uv.y);vec3 col=mix(vec3(1.,.9,.2),vec3(1.,.2,0.),f);return vec4(mix(c.rgb,col,f*muc*.9),1.);' },
+  /* 10/2026 · thêm: chuyển động, màu, khung hình, ánh sáng, hạt */
+  { id: 'zoom_cham', ten: 'Zoom chậm', nhom: 'dong', ic: '🔍', glsl: 'float z=1.+.15*muc*fract(t/6.);return tx((uv-.5)/z+.5);' },
+  { id: 'rung_may', ten: 'Rung máy', nhom: 'dong', ic: '📳', glsl: 'vec2 o=vec2(rnd(vec2(floor(t*20.),1.))-.5,rnd(vec2(2.,floor(t*20.)))-.5)*.03*muc;return tx(uv+o);' },
+  { id: 'lac_nhe', ten: 'Lắc nhẹ', nhom: 'dong', ic: '🎐', glsl: 'float a=sin(t*1.5)*.03*muc;vec2 c=uv-.5;mat2 m=mat2(cos(a),-sin(a),sin(a),cos(a));return tx((m*c)*(1.-.06*muc)+.5);' },
+  { id: 'nhip_tim', ten: 'Nhịp tim', nhom: 'dong', ic: '💓', glsl: 'float b=pow(abs(sin(t*PI*1.2)),8.);float z=1.+.08*muc*b;return tx((uv-.5)/z+.5);' },
+  { id: 'troi_ngang', ten: 'Trôi ngang', nhom: 'dong', ic: '↔', glsl: 'float x=(fract(t/8.)-.5)*.1*muc;return tx((uv-.5)*(1.-.1*muc)+.5+vec2(x,0.));' },
+  { id: 'nhoe_ngang', ten: 'Nhoè chuyển động', nhom: 'dong', ic: '💨', glsl: 'vec4 c=vec4(0.);for(int i=0;i<8;i++){float f=(float(i)/7.-.5)*.03*muc;c+=tx(uv+vec2(f,0.));}return c/8.;' },
+  { id: 'zoom_dap', ten: 'Zoom đập nhịp', nhom: 'dong', ic: '🥁', glsl: 'float ph=fract(t);float z=1.+.12*muc*exp(-ph*6.);return tx((uv-.5)/z+.5);' },
+  { id: 'xoay_cham', ten: 'Xoay chậm', nhom: 'dong', ic: '🔄', glsl: 'float a=t*.15*muc;vec2 c=uv-.5;c.x*=res.x/res.y;mat2 m=mat2(cos(a),-sin(a),sin(a),cos(a));c=m*c;c.x/=res.x/res.y;return tx(c*(1.-.2*muc)+.5);' },
+  { id: 'duotone_tim_vang', ten: 'Hai tông tím vàng', nhom: 'mau', ic: '🟪', glsl: 'vec4 c=tx(uv);float l=dot(c.rgb,vec3(.299,.587,.114));vec3 d=mix(vec3(.05,.02,.2),vec3(.98,.85,.2),l);return vec4(mix(c.rgb,d,muc),1.);' },
+  { id: 'sepia_hu', ten: 'Nâu cổ điển', nhom: 'mau', ic: '🟫', glsl: 'vec4 c=tx(uv);vec3 s2=vec3(dot(c.rgb,vec3(.393,.769,.189)),dot(c.rgb,vec3(.349,.686,.168)),dot(c.rgb,vec3(.272,.534,.131)));return vec4(mix(c.rgb,s2,muc),1.);' },
+  { id: 'poster_hu', ten: 'Poster ít màu', nhom: 'mau', ic: '🎨', glsl: 'vec4 c=tx(uv);float n=mix(256.,4.,muc);return vec4(floor(c.rgb*n)/n,1.);' },
+  { id: 'xoay_mau', ten: 'Đổi màu liên tục', nhom: 'mau', ic: '🌈', glsl: 'vec4 c=tx(uv);float a=t*muc;mat3 m=mat3(.299,.587,.114,.299,.587,.114,.299,.587,.114)+cos(a)*mat3(.701,-.587,-.114,-.299,.413,-.114,-.3,-.588,.886)+sin(a)*mat3(.168,.33,-.497,-.328,.035,.292,1.25,-1.05,-.203);return vec4(clamp(m*c.rgb,0.,1.),1.);' },
+  { id: 'tuong_phan_manh', ten: 'Tương phản mạnh', nhom: 'mau', ic: '◐', glsl: 'vec4 c=tx(uv);vec3 r=(c.rgb-.5)*(1.+2.*muc)+.5;return vec4(clamp(r,0.,1.),1.);' },
+  { id: 'am_ban_nhap', ten: 'Âm bản nhấp nháy', nhom: 'mau', ic: '⚡', glsl: 'vec4 c=tx(uv);float f=step(.9,rnd(vec2(floor(t*8.),3.)))*muc;return vec4(mix(c.rgb,1.-c.rgb,f),1.);' },
+  { id: 'nhiet_hu', ten: 'Camera nhiệt', nhom: 'mau', ic: '🌡', glsl: 'vec4 c=tx(uv);float l=dot(c.rgb,vec3(.299,.587,.114));vec3 h=vec3(smoothstep(.3,.7,l),smoothstep(.1,.5,l)*(1.-smoothstep(.7,1.,l)),1.-smoothstep(.2,.6,l));return vec4(mix(c.rgb,h,muc),1.);' },
+  { id: 'guong_doi', ten: 'Gương đối xứng', nhom: 'khung', ic: '🪞', glsl: 'vec2 p=vec2(uv.x>.5?1.-uv.x:uv.x,uv.y);return mix(tx(uv),tx(p),muc);' },
+  { id: 'bon_o', ten: 'Bốn ô', nhom: 'khung', ic: '▦', glsl: 'vec2 p=fract(uv*2.);return mix(tx(uv),tx(p),muc);' },
+  { id: 'hop_thu', ten: 'Khung điện ảnh', nhom: 'khung', ic: '▬', glsl: 'float b=.1*muc;float m=step(b,uv.y)*step(uv.y,1.-b);return vec4(tx(uv).rgb*m,1.);' },
+  { id: 'vien_bo', ten: 'Viền bo tối', nhom: 'khung', ic: '▢', glsl: 'vec2 c=abs(uv-.5)*2.;float d=length(max(c-vec2(.75),0.));float m=1.-smoothstep(.1,.25,d)*muc;return vec4(tx(uv).rgb*m,1.);' },
+  { id: 'ong_nhom', ten: 'Ống nhòm', nhom: 'khung', ic: '🔭', glsl: 'vec2 c=uv-.5;c.x*=res.x/res.y;float d=min(length(c-vec2(.18,0.)),length(c+vec2(.18,0.)));float m=1.-smoothstep(.28,.3,d)*muc;return vec4(tx(uv).rgb*m,1.);' },
+  { id: 'mat_ca_hu', ten: 'Mắt cá', nhom: 'khung', ic: '🐟', glsl: 'vec2 c=uv*2.-1.;float r=length(c);vec2 p=c*mix(1.,r*r*.5+.5,muc);return tx(p*.5+.5);' },
+  { id: 'den_san_khau', ten: 'Đèn sân khấu', nhom: 'sang', ic: '🔦', glsl: 'vec2 c=uv-vec2(.5+.3*sin(t*.8),.5);c.x*=res.x/res.y;float m=mix(1.,smoothstep(.45,.1,length(c)),muc);return vec4(tx(uv).rgb*(.25+.75*m),1.);' },
+  { id: 'neon_nhay', ten: 'Neon chập chờn', nhom: 'sang', ic: '💡', glsl: 'float f=.8+.2*step(.5,rnd(vec2(floor(t*12.),5.)));vec4 c=tx(uv);return vec4(c.rgb*mix(1.,f,muc)+muc*.15*vec3(.6,.1,1.)*(1.-f),1.);' },
+  { id: 'bui_bay', ten: 'Bụi bay', nhom: 'hat', ic: '✨', glsl: 'float d=0.;for(int i=0;i<3;i++){vec2 p=uv*vec2(20.,36.)+vec2(t*(.3+float(i)*.2),-t*(.5+float(i)*.3));d+=smoothstep(.97,1.,nse(p));}return vec4(tx(uv).rgb+d*.6*muc,1.);' },
+  { id: 'lap_lanh', ten: 'Lấp lánh', nhom: 'hat', ic: '🌟', glsl: 'float d=0.;for(int i=0;i<3;i++){vec2 p=uv*vec2(30.,30.)+vec2(0.,-t*(2.+float(i)));float r=rnd(floor(p));d+=step(.985,r)*smoothstep(.8,0.,length(fract(p)-.5)*2.)*step(.5,fract(t*3.+r*7.));}return vec4(tx(uv).rgb+d*muc,1.);' },
 ];
-KHO.nhomHieuUng = { hong: 'Hỏng hóc · retro', bien: 'Biến dạng', sang: 'Ánh sáng', nghe: 'Nghệ thuật', hat: 'Thời tiết · hạt' };
+KHO.nhomHieuUng = { hong: 'Hỏng hóc · retro', bien: 'Biến dạng', dong: 'Chuyển động', mau: 'Màu sắc', khung: 'Khung hình', sang: 'Ánh sáng', nghe: 'Nghệ thuật', hat: 'Thời tiết · hạt' };
 
 /* ── CHUYỂN CẢNH thêm, viết theo chuẩn gl-transitions: vec4 transition(vec2 uv) với getFromColor/getToColor, progress, ratio ── */
 KHO.chuyenCanh = [
@@ -262,6 +288,22 @@ KHO.chuyenCanh = [
   { id: 'vs_soc_ngang', ten: 'Sọc ngang', ic: '☰', glsl: 'vec4 transition(vec2 uv){float n=10.;float i=floor(uv.y*n);float dir=mod(i,2.)*2.-1.;float a=smoothstep(0.,1.,progress);vec2 q=uv;q.x=fract(uv.x+dir*a);return a<1.?mix(getFromColor(q),getToColor(q),step(fract(uv.x+dir*a*1.),a)):getToColor(uv);}' },
   { id: 'vs_nhip_tim', ten: 'Nhịp đập', ic: '💓', glsl: 'vec4 transition(vec2 uv){float a=progress;float b=abs(sin(a*3.14159*2.))*.1;vec2 q=(uv-.5)/(1.+b)+.5;return mix(getFromColor(q),getToColor(q),smoothstep(.3,.7,a));}' },
   { id: 'vs_cuon_tron', ten: 'Cuộn tròn', ic: '🌪', glsl: 'vec4 transition(vec2 uv){vec2 c=(uv-.5)*vec2(ratio,1.);float r=length(c),an=atan(c.y,c.x);float a=progress;an+=(1.-a)*a*4.*(1.-r);vec2 q=vec2(cos(an),sin(an))*r/vec2(ratio,1.)+.5;return mix(getFromColor(clamp(q,0.,1.)),getToColor(clamp(q,0.,1.)),smoothstep(.2,.8,a));}' },
+  /* 10/2026 · thêm 15 chuyển cảnh */
+  { id: 'vs_tron_mo', ten: 'Tròn mở ra', ic: '⭕', glsl: 'vec4 transition(vec2 uv){vec2 c=uv-.5;c.x*=ratio;float d=length(c);float r=progress*1.2;float m=1.-smoothstep(r-.05,r,d);return mix(getFromColor(uv),getToColor(uv),m);}' },
+  { id: 'vs_tron_dong', ten: 'Tròn khép lại', ic: '🎯', glsl: 'vec4 transition(vec2 uv){vec2 c=uv-.5;c.x*=ratio;float d=length(c);float r=(1.-progress)*1.2;float m=smoothstep(r-.05,r,d);return mix(getFromColor(uv),getToColor(uv),m);}' },
+  { id: 'vs_rem_soc', ten: 'Rèm sọc', ic: '🪟', glsl: 'vec4 transition(vec2 uv){float f=fract(uv.x*8.);float m=step(f,progress);return mix(getFromColor(uv),getToColor(uv),m);}' },
+  { id: 'vs_o_ngau_nhien', ten: 'Ô vuông ngẫu nhiên', ic: '🧩', glsl: 'vec4 transition(vec2 uv){vec2 g=floor(uv*vec2(12.*ratio,12.));float r=fract(sin(dot(g,vec2(12.9898,78.233)))*43758.5453);return mix(getFromColor(uv),getToColor(uv),step(r,progress));}' },
+  { id: 'vs_day_trai', ten: 'Đẩy sang trái', ic: '⬅', glsl: 'vec4 transition(vec2 uv){vec2 a=uv+vec2(progress,0.);return a.x<1.?getFromColor(a):getToColor(uv+vec2(progress-1.,0.));}' },
+  { id: 'vs_day_len', ten: 'Đẩy lên', ic: '⬆', glsl: 'vec4 transition(vec2 uv){vec2 a=uv+vec2(0.,progress);return a.y<1.?getFromColor(a):getToColor(uv+vec2(0.,progress-1.));}' },
+  { id: 'vs_quet_phai', ten: 'Quét sang phải', ic: '➡', glsl: 'vec4 transition(vec2 uv){float m=smoothstep(progress-.02,progress,uv.x);return mix(getToColor(uv),getFromColor(uv),m);}' },
+  { id: 'vs_quet_cheo', ten: 'Quét chéo', ic: '↗', glsl: 'vec4 transition(vec2 uv){float m=smoothstep(progress-.03,progress,(uv.x+uv.y)*.5);return mix(getToColor(uv),getFromColor(uv),m);}' },
+  { id: 'vs_zoom_mo', ten: 'Zoom mờ dần', ic: '🔎', glsl: 'vec4 transition(vec2 uv){float z=1.+progress*.3;vec4 a=getFromColor((uv-.5)/z+.5);float z2=1.3-progress*.3;vec4 b=getToColor((uv-.5)/z2+.5);return mix(a,b,smoothstep(.2,.8,progress));}' },
+  { id: 'vs_loe_trang', ten: 'Loé trắng', ic: '⚪', glsl: 'vec4 transition(vec2 uv){float f=sin(progress*3.14159);vec4 c=mix(getFromColor(uv),getToColor(uv),step(.5,progress));return mix(c,vec4(1.),f*f);}' },
+  { id: 'vs_chim_den', ten: 'Chìm đen', ic: '⚫', glsl: 'vec4 transition(vec2 uv){float f=sin(progress*3.14159);vec4 c=mix(getFromColor(uv),getToColor(uv),step(.5,progress));return c*(1.-f);}' },
+  { id: 'vs_xoan_oc', ten: 'Xoắn ốc', ic: '🌪', glsl: 'vec4 transition(vec2 uv){vec2 c=uv-.5;float r=length(c);float a=atan(c.y,c.x)+sin(progress*3.14159)*4.*(1.-r);vec2 p=vec2(cos(a),sin(a))*r+.5;return mix(getFromColor(p),getToColor(p),progress);}' },
+  { id: 'vs_song_nuoc', ten: 'Sóng nước', ic: '🌊', glsl: 'vec4 transition(vec2 uv){vec2 c=uv-.5;float d=length(c);float w=sin(d*40.-progress*12.)*.02*sin(progress*3.14159);vec2 p=uv+c/max(d,1e-3)*w;return mix(getFromColor(p),getToColor(p),progress);}' },
+  { id: 'vs_cua_mo', ten: 'Cửa mở hai bên', ic: '🚪', glsl: 'vec4 transition(vec2 uv){float h=abs(uv.x-.5)*2.;return mix(getFromColor(uv),getToColor(uv),1.-smoothstep(progress-.03,progress,h));}' },
+  { id: 'vs_nhoe_doc', ten: 'Nhoè dọc hoà tan', ic: '〰', glsl: 'vec4 transition(vec2 uv){vec4 a=vec4(0.),b=vec4(0.);for(int i=0;i<6;i++){float o=(float(i)/5.-.5)*.08*sin(progress*3.14159);a+=getFromColor(uv+vec2(0.,o));b+=getToColor(uv+vec2(0.,o));}return mix(a,b,progress)/6.;}' },
 ];
 
 /* ── ÂM THANH tổng hợp tại máy (không file, không bản quyền). Mỗi mục: id, tên, icon, nhóm, dai (giây), cong = danh sách lớp:
