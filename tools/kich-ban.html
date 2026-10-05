@@ -101,6 +101,11 @@
   .khung small{color:var(--muted);font-size:12px;line-height:1.35}
   .khung[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 2px var(--accent) inset}
   .khung .use{font-size:11px;color:var(--ok);font-weight:600}
+  .khung-nhom{grid-column:1/-1;font-family:var(--font-display);font-weight:800;font-size:12.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin:8px 0 -2px}
+  .khung-nhom:first-child{margin-top:0}
+  .tl-lbl-moc{position:relative;height:16px}
+  .tl-lbl-moc .moc{position:absolute;transform:translateX(-50%)}
+  .tl-lbl-moc span:last-child{position:absolute;right:0}
   /* phần kịch bản */
   .phan{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:10px;background:var(--surface)}
   .phan-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:6px}
@@ -209,13 +214,13 @@
 
       <section class="card">
         <h2>2 · Chọn khung kịch bản</h2>
-        <p class="hint">Mỗi khung là một bố cục đã ra video triệu view trong khoá. Chọn theo loại chuyện bạn định kể.</p>
+        <p class="hint">Mỗi khung là một bố cục đã ra video triệu view. Chọn theo chuyện bạn có và cách bạn muốn làm: lộ mặt nói, lồng tiếng, hay chỉ chữ chạy ghép nhạc.</p>
         <div class="khung-grid" id="khungGrid"></div>
       </section>
 
       <section class="card">
         <h2>3 · Viết kịch bản theo từng phần <span id="khungTen" class="hint" style="margin:0;font-weight:400"></span></h2>
-        <p class="hint">Viết đúng như bạn sẽ nói, đừng gọt cho văn vẻ. Đồng hồ bên phải mỗi phần đếm theo tốc độ nói bạn chọn. Mục tiêu cả video <b>60–105 giây</b>.</p>
+        <p class="hint">Viết đúng như bạn sẽ nói, đừng gọt cho văn vẻ. Đồng hồ bên phải mỗi phần đếm theo tốc độ nói bạn chọn (chữ chạy thì theo tốc độ đọc). Mục tiêu của khung này <b id="mucGiay">60–105 giây</b>.</p>
         <div id="phanList"></div>
         <div class="tl">
           <div class="row" style="justify-content:space-between;align-items:flex-end;margin-bottom:6px">
@@ -223,7 +228,7 @@
             <div class="hint" style="margin:0;text-align:right" id="tlWords"></div>
           </div>
           <div class="tl-bar" id="tlBar"><div class="tl-band" id="tlBand"></div></div>
-          <div class="tl-lbl"><span>0s</span><span>60s</span><span>105s</span><span id="tlMax">120s</span></div>
+          <div class="tl-lbl tl-lbl-moc"><span>0s</span><span class="moc" id="tlLo">60s</span><span class="moc" id="tlHi">105s</span><span id="tlMax">120s</span></div>
         </div>
         <div class="row" style="margin-top:14px;justify-content:space-between">
           <div class="row" style="gap:8px"><button class="btn pro lg" id="btnCham" type="button">✦ Chấm kịch bản <small style="font-weight:500;opacity:.8">· 1 lượt AI</small></button>
@@ -284,41 +289,46 @@ let toastT; function toast(m) { const t = $('#toast'); t.textContent = m; t.clas
 
 /* ---------- khung kịch bản: từ các buổi Storytelling của khoá ---------- */
 const TOC_DO = { cham: 2.35, vua: 2.8, nhanh: 3.3 };
+const DOC_CHU = 3.2;   // chữ/giây người xem đọc kịp trên màn hình (dạng chữ chạy)
+const NHOM_KHUNG = [['ngan', '⚡ Ngắn, ít lời, ghép nhạc'], ['ke', '📖 Kể chuyện'], ['noi', '🎙 Nói camera, chia sẻ'], ['trai', '🛍 Trải nghiệm, bán hàng'], ['khac', '✏️ Khác']];
+const DANG_TEN = { noi_camera: 'Nói vào camera', voice_over: 'Voice-over', text: 'Chữ chạy' };
+function gKhung(K) { return K.g || [60, 105]; }
+function tocDoHienTai() { return state.dang === 'text' ? DOC_CHU : TOC_DO[state.tocDo]; }
 const KHUNG = [
-  { k: 'khoanhkhac', n: 'Một khoảnh khắc (5W-1H)', d: 'Kể MỘT khoảnh khắc thật, tả từng hành động nhỏ', use: 'Chuyện gia đình, đời thường, cảm xúc', phan: [
+  { k: 'khoanhkhac', n: 'Một khoảnh khắc (5W-1H)', d: 'Kể MỘT khoảnh khắc thật, tả từng hành động nhỏ', use: 'Chuyện gia đình, đời thường, cảm xúc', nhom: 'ke', phan: [
     ['loi_thoai', 'Mở bằng một câu thoại', 'Một câu ai đó nói trong khoảnh khắc đó. VD: "Để tôi bóc tôm cho bà ngoại." Không dẫn chuyện, không chào.', .05],
     ['tai_sao', 'Vì sao có khoảnh khắc đó', 'Ai nói câu đó, với ai, hoàn cảnh nào dẫn tới. 2–3 câu.', .15],
     ['boi_canh', 'Bối cảnh, từng hành động nhỏ', 'Kể liên tiếp 4–5 hành động nhỏ: mời mãi → gắp món khác → nhìn → không nói gì → chọn con to nhất → gỡ từng cái vỏ → bỏ vô chén.', .42],
     ['cam_xuc', 'Cảm xúc của mình (show, đừng kể)', 'Đừng viết "mình xúc động". Viết cơ thể mình làm gì: "miệng nhai cơm mà mắt cay xè".', .2],
     ['ket', 'Bài học cá nhân', 'Một câu cảm nghĩ riêng của mình. Không triết lý chung "hãy trân trọng gia đình".', .18] ] },
-  { k: 'bonnhip', n: 'Kể chuyện 4 nhịp', d: 'Vấn đề → tình huống → hậu quả → quan điểm', use: 'Chuyện đi học, đi làm, mối quan hệ', phan: [
+  { k: 'bonnhip', n: 'Kể chuyện 4 nhịp', d: 'Vấn đề → tình huống → hậu quả → quan điểm', use: 'Chuyện đi học, đi làm, mối quan hệ', nhom: 'ke', phan: [
     ['van_de', 'Câu đánh thẳng vào vấn đề', 'Một câu hỏi hoặc khẳng định người xem đang gặp. VD: "Làm sao sinh viên cân bằng đi học và đi làm?"', .06],
     ['tinh_huong', 'Tình huống thật', 'Chuyện gì xảy ra, khi nào, mình thấy sao. Tả hình ảnh: "3h sáng chạy deadline, 6h chuông iPhone như đấm vào tai, mắt thâm như gấu trúc".', .42],
     ['hau_qua', 'Hậu quả / kết quả', 'Điều gì xảy ra sau đó. Cụ thể, có con số nếu có.', .26],
     ['quan_diem', 'Quan điểm + giải pháp', 'Mình nhận ra gì, giờ mình làm khác đi thế nào. Kết bằng một câu của riêng mình.', .26] ] },
-  { k: 'kinhnghiem', n: 'Chia sẻ kinh nghiệm (6 bước)', d: 'Hook xanh chín, xung đột, giải pháp kèm suy nghĩ', use: 'Xây thương hiệu cá nhân, bán dịch vụ giá cao', phan: [
+  { k: 'kinhnghiem', n: 'Chia sẻ kinh nghiệm (6 bước)', d: 'Hook xanh chín, xung đột, giải pháp kèm suy nghĩ', use: 'Xây thương hiệu cá nhân, bán dịch vụ giá cao', nhom: 'ke', phan: [
     ['hook', 'Hook xanh chín', 'Câu khẳng định chắc nịch dáng chân lý. VD: "Có 3 nguyên lý khi đi tìm việc BẤT DI BẤT DỊCH, dù bạn ở level nào."', .07],
     ['boi_canh', 'Bối cảnh, xuất phát điểm', 'Nhân vật là ai, đang ở đâu, hoàn cảnh thế nào. Có tên trường, tên nghề, con số.', .18],
     ['xung_dot', 'Xung đột', 'Khó khăn cụ thể phải vượt. Cái gì cản đường, ai nói không.', .2],
     ['giai_phap', 'Giải pháp + SUY NGHĨ đằng sau', 'Xương sống: mình nghĩ gì, suy luận thế nào rồi mới làm. Đây là chỗ AI không viết thay được.', .38],
     ['chot', 'Chốt quan điểm', 'Một câu cho người ta lăng kính mới. VD: "Không quan trọng bạn có gì, quan trọng người ta có cần không."', .17] ] },
-  { k: 'chanthuc', n: 'Chân thực 2026', d: 'Nêu vấn đề → mô tả thật cụ thể → giải pháp', use: 'Nỗi đau khách hàng, chuyện nghề', phan: [
+  { k: 'chanthuc', n: 'Chân thực 2026', d: 'Nêu vấn đề → mô tả thật cụ thể → giải pháp', use: 'Nỗi đau khách hàng, chuyện nghề', nhom: 'ke', phan: [
     ['van_de', 'Nêu vấn đề nhiều người gặp', 'Tình huống hoặc nỗi đau của đúng tệp người xem. 1–2 câu.', .1],
     ['mo_ta', 'Mô tả vấn đề cụ thể nhất có thể', 'Kể chuyện mình đã hoặc đang trải qua. Chi tiết nhìn thấy, nghe thấy, con số, thời điểm.', .55],
     ['giai_phap', 'Giải pháp hoặc bài học', 'Mình làm gì để qua, hoặc rút ra gì. Nói như với bạn thân.', .35] ] },
-  { k: 'vlog', n: 'Daily vlog cảm xúc', d: 'Quay cường độ cảm xúc, không quay hành động', use: 'Một ngày của quán, của mẹ bỉm, của người đi làm', phan: [
+  { k: 'vlog', n: 'Daily vlog cảm xúc', d: 'Quay cường độ cảm xúc, không quay hành động', use: 'Một ngày của quán, của mẹ bỉm, của người đi làm', nhom: 'ngan', dang: 'voice_over', g: [30, 75], phan: [
     ['mo_canh', 'Mở cảnh: giờ giấc, cái mệt thật', '"5 giờ sáng, trời tối om, hai vợ chồng lọ mọ kéo cửa quán, mắt còn lờ đờ…"', .12],
     ['canh1', 'Cảnh 1 + cảm xúc trong hành động', 'Không chỉ "mở quán". Có cái ngáp, cái va vấp, cái quên đồ.', .24],
     ['canh2', 'Cảnh 2 + một sự cố nhỏ', 'Chi tiết đời thường khiến người xem thấy "nhà mình cũng vậy".', .24],
     ['canh3', 'Cảnh 3, cao trào của ngày', 'Khoảnh khắc đáng nhớ nhất. Người xem đồng cảm với sự cố gắng, không phải thành công.', .24],
     ['ket', 'Kết', 'Một câu về ngày hôm đó, hoặc câu hỏi mở cho người xem kể chuyện của họ.', .16] ] },
-  { k: 'fichtean', n: 'Thử thách (Fichtean)', d: 'Vào thẳng hành động, khó dần, không đoạn chùng', use: 'Thử thách, phản ứng, "24h không…"', phan: [
+  { k: 'fichtean', n: 'Thử thách (Fichtean)', d: 'Vào thẳng hành động, khó dần, không đoạn chùng', use: 'Thử thách, phản ứng, "24h không…"', nhom: 'noi', phan: [
     ['vao_thang', 'Vào thẳng hành động', '"Tôi đã thử ăn mì cay cấp độ 10 và đây là điều xảy ra." Không giới thiệu.', .07],
     ['tt1', 'Thử thách 1', 'Miếng đầu tiên: chuyện gì xảy ra ngay lập tức.', .22],
     ['tt2', 'Thử thách 2, khó hơn', 'Mồ hôi túa, nước mắt rơi, nhưng vẫn tiếp.', .24],
     ['tt3', 'Thử thách 3, khó nhất', 'Đỉnh căng thẳng. Tưởng không qua nổi.', .26],
     ['ket', 'Kết luận mạnh', 'Hoàn thành hay không, và một bài học thật.', .21] ] },
-  { k: 'baydiem', n: 'Chuyện dài 7 điểm', d: 'Hai lần thắt, hai bước ngoặt, kết sâu', use: 'Chuyện cá nhân truyền cảm hứng', phan: [
+  { k: 'baydiem', n: 'Chuyện dài 7 điểm', d: 'Hai lần thắt, hai bước ngoặt, kết sâu', use: 'Chuyện cá nhân truyền cảm hứng', nhom: 'ke', phan: [
     ['mo', 'Mở đầu hấp dẫn', '"Tôi từng phá sản, mất hết. Nhưng đây là cách tôi trở lại."', .06],
     ['ct1', 'Cao trào 1: sự kiện thú vị', 'Chuyện đang tốt, có gì đó bắt đầu.', .12],
     ['that1', 'Thắt 1: xung đột', 'Một quyết định sai, mọi thứ căng lên.', .15],
@@ -326,23 +336,59 @@ const KHUNG = [
     ['that2', 'Thắt 2: tưởng bế tắc', 'Thử áp dụng nhưng thất bại lần nữa.', .17],
     ['bn2', 'Bước ngoặt 2: phát hiện bất ngờ', 'Tìm ra chiến lược đúng.', .17],
     ['ket', 'Kết: bài học sâu', 'Xây lại, lần này khác chỗ nào. Một câu để lại.', .16] ] },
-  { k: 'tips', n: 'Danh sách hữu ích', d: 'Hook có số, mỗi ý một ví dụ thật', use: '"3 cách…", "5 lỗi…" cho đúng tệp', phan: [
+  { k: 'chu_chay', n: 'Chữ chạy 15–20s ghép nhạc', d: 'Không lời: 4–6 màn chữ, mỗi màn một cảnh, cắt theo beat', use: 'Trải nghiệm, ăn chơi, đi đây đó, đời thường', nhom: 'ngan', dang: 'text', g: [15, 25], phan: [
+    ['hook', 'Màn chữ hook (0–2 giây)', 'Một màn chữ có số, giá hoặc tình huống lạ. VD: "▸ 89k ăn buffet hải sản ở Sài Gòn??"', .14],
+    ['ke1', 'Màn chữ kể 1', 'Mỗi màn một dòng bắt đầu bằng ▸, tối đa 12 chữ, đi với một cảnh. VD: "▸ Tưởng lừa đảo ai dè…"', .2],
+    ['ke2', 'Màn chữ kể 2', 'Thêm một chi tiết thấy được: món, chỗ ngồi, hàng người. VD: "▸ Xếp hàng 20 phút mới vào được"', .2],
+    ['dat', 'Màn chữ chi tiết đắt nhất', 'Cái khiến người xem phải lưu lại. VD: "▸ Tôm hùm nướng phô mai không giới hạn 🦞"', .24],
+    ['chot', 'Màn chữ chốt', 'Giá, địa điểm, twist hoặc câu hỏi kéo bình luận. VD: "▸ Địa chỉ mình để ở bình luận nha"', .22] ] },
+  { k: 'pov', n: 'POV nhập vai', d: 'Chữ POV một dòng, diễn phản ứng, leo thang rồi twist', use: 'Tình huống công sở, gia đình, khách hàng, bạn bè', nhom: 'ngan', dang: 'text', g: [10, 30], phan: [
+    ['pov', 'Chữ POV: tình huống ai cũng gặp', 'Một dòng đọc là thấy mình trong đó. VD: "POV: sếp nhắn lúc 11h đêm"', .12],
+    ['pu1', 'Phản ứng đầu tiên', 'Diễn bằng mặt và hành động, chữ phụ ngắn nếu cần.', .2],
+    ['leo', 'Leo thang', 'Chuyện căng hơn một nấc: thêm tin nhắn, thêm người, thêm việc.', .24],
+    ['twist', 'Twist hoặc đỉnh điểm', 'Điều không ai đoán trước, hoặc khoảnh khắc ai cũng từng muốn làm.', .26],
+    ['ket', 'Phản ứng cuối hoặc câu thoại chốt', 'Một biểu cảm hoặc một câu khiến người xem tag bạn bè.', .18] ] },
+  { k: 'trai_nghiem', n: 'Trải nghiệm thử', d: 'Kết quả hoặc giá ở giây đầu, đánh giá thẳng', use: 'Quán ăn, dịch vụ, sản phẩm, địa điểm', nhom: 'trai', dang: 'voice_over', g: [25, 60], phan: [
+    ['ket_qua', 'Kết quả hoặc giá ngay giây đầu', 'VD: "Bỏ 300k ăn thử quán đang hot nhất quận 3, và đây là kết quả."', .1],
+    ['di_dau', 'Đi đâu, thử gì', 'Tên chỗ, lúc nào, đi với ai. Một câu.', .12],
+    ['diem1', 'Điểm 1: thấy gì', 'Cảnh cận thứ đập vào mắt đầu tiên: chỗ ngồi, món, bao bì.', .2],
+    ['diem2', 'Điểm 2: nếm, chạm, dùng thử', 'Tả cảm giác thật: giòn, mặn, mềm, nóng. Có phản ứng mặt.', .24],
+    ['danh_gia', 'Đánh giá thẳng + giá', 'Khen cái đáng khen, chê cái đáng chê, kèm con số.', .2],
+    ['ai_nen', 'Ai nên thử, ai không', 'Một câu cho đúng người. Không xin follow.', .14] ] },
+  { k: 'truoc_sau', n: 'Trước – sau', d: 'Kết quả SAU ở giây đầu rồi mới quay lại trước', use: 'Dọn nhà, làm đẹp, sửa đồ, giảm cân, thiết kế', nhom: 'ngan', dang: 'voice_over', g: [20, 45], phan: [
+    ['sau', 'Kết quả SAU ngay giây đầu', 'Cảnh đẹp nhất của thành quả, chữ to một dòng.', .12],
+    ['truoc', 'TRƯỚC tệ thế nào', 'Cảnh thật, không filter. Có con số nếu có (bao lâu, bao nhiêu).', .2],
+    ['qua_trinh', 'Quá trình tua nhanh', '3–5 cảnh làm, tăng tốc, cắt theo nhạc.', .3],
+    ['canh_nhau', 'Đặt cạnh nhau, có con số', 'Chia đôi màn hình hoặc cắt qua lại, kèm số: thời gian, chi phí.', .22],
+    ['chot', 'Câu chốt', 'Một câu cảm nghĩ hoặc mẹo đắt nhất.', .16] ] },
+  { k: 'so_sanh', n: 'So sánh A và B', d: 'Thử thật cả hai, có số, chọn rõ ràng', use: 'Hai sản phẩm, hai cách làm, hai lựa chọn', nhom: 'noi', dang: 'noi_camera', g: [30, 60], phan: [
+    ['hoi', 'Câu hỏi: A hay B?', 'VD: "Cùng 200k: đi chợ hay đi siêu thị mua được nhiều hơn?"', .1],
+    ['a', 'A: thử thật, có số', 'Làm thật, đếm thật, có giá và kết quả.', .26],
+    ['b', 'B: thử thật, có số', 'Cùng điều kiện như A để so được.', .26],
+    ['bat_ngo', 'Điều bất ngờ khi đặt cạnh', 'Cái người xem không đoán trước.', .2],
+    ['chon', 'Chọn gì, cho ai', 'Chọn rõ ràng, nói hợp với ai.', .18] ] },
+  { k: 'tra_loi_cmt', n: 'Trả lời bình luận', d: 'Bình luận lên màn hình, trả lời thẳng, có ví dụ', use: 'Câu hỏi lặp lại, chuyên môn, phản biện', nhom: 'noi', dang: 'noi_camera', g: [20, 60], phan: [
+    ['cmt', 'Bình luận hiện trên màn hình', 'Chép đúng bình luận thật, câu hỏi nhiều người cùng hỏi.', .1],
+    ['tra_loi', 'Trả lời thẳng một câu', 'Trả lời ngay câu đầu, không vòng vo.', .2],
+    ['chung_minh', 'Chứng minh bằng ví dụ thật', 'Một lần mình hoặc khách gặp, có số hoặc hình.', .5],
+    ['moi_hoi', 'Mời hỏi tiếp', 'VD: "Còn thắc mắc gì về X cứ để lại, mình làm video trả lời."', .2] ] },
+  { k: 'nguoc_doi', n: 'Sự thật ngược', d: 'Phá một niềm tin ai cũng nghĩ là đúng', use: 'Chuyên môn, sức khoẻ, tiền bạc, nghề', nhom: 'noi', dang: 'noi_camera', g: [30, 60], phan: [
+    ['niem_tin', 'Điều ai cũng nghĩ là đúng', 'VD: "Càng rửa mặt nhiều càng sạch mụn?"', .12],
+    ['vi_sao', 'Vì sao sai + bằng chứng', 'Giải thích như nói với đứa bé 5 tuổi, có ví dụ hoặc số.', .44],
+    ['nen_lam', 'Nên làm gì thay', 'Một việc làm được ngay.', .28],
+    ['chot', 'Câu chốt', 'Một câu dễ nhớ, dễ chia sẻ.', .16] ] },
+  { k: 'tips', n: 'Danh sách hữu ích', d: 'Hook có số, mỗi ý một ví dụ thật', use: '"3 cách…", "5 lỗi…" cho đúng tệp', nhom: 'noi', phan: [
     ['hook', 'Hook có con số và đối tượng', '"3 lỗi khi vay tiêu dùng khiến bạn trả gấp đôi." Có số, có đối tượng, có mất mát cụ thể.', .07],
     ['y1', 'Ý 1 + ví dụ thật', 'Không chỉ nêu ý, kể một lần mình hoặc khách gặp.', .26],
     ['y2', 'Ý 2 + ví dụ thật', 'Ý đắt hơn ý 1.', .26],
     ['y3', 'Ý 3, ý đắt nhất', 'Ý người ta ít biết nhất, giữ tới cuối.', .26],
     ['ket', 'Kết + kêu gọi cụ thể', '"Comment nghề của bạn, mình chỉ đúng lỗi bạn hay mắc." Không like share follow.', .15] ] },
-  { k: 'hoi', n: 'Bán hàng HỜI 3 tầng', d: 'Con số để khách tự chia, xếp từng món', use: 'Combo, set quà, khoá học, sản phẩm có giá', phan: [
-    ['hook', 'Hook 2–3 con số', '"Combo 1tr2 cho gia đình 4 người ăn 10 ngày." Không nói rẻ, không nói hời.', .08],
-    ['tung_mon', 'Xếp từng món vào', 'Mỗi món một câu tả: chất, nguồn, cách ăn. Không quay tổng quan một phát.', .5],
-    ['mon_dat', 'Món ai cũng biết là đắt', 'Dừng lại khen riêng: vì sao nó đắt, vì sao mình vẫn cho vào.', .22],
-    ['cta', 'Kêu gọi', 'Cách đặt, còn bao nhiêu suất, giao thế nào. Một câu.', .2] ] },
-  { k: 'giohang', n: 'Viral có cài giỏ hàng', d: 'Chuyện viral, 5–6 giây cho một tính năng', use: 'Affiliate, tuyến "vợ dạy chồng", review đời thường', phan: [
+  { k: 'giohang', n: 'Viral có cài giỏ hàng', d: 'Chuyện viral, 5–6 giây cho một tính năng', use: 'Affiliate, tuyến "vợ dạy chồng", review đời thường', nhom: 'trai', phan: [
     ['hook', 'Hook của câu chuyện', 'Hook như video viral bình thường, sản phẩm chưa xuất hiện.', .07],
     ['chuyen', 'Câu chuyện có sản phẩm bên trong', 'Tình huống làm nổi bật đúng MỘT tính năng: chồng rán nem be bét vì chảo thường…', .55],
     ['tinh_nang', '5–6 giây cho MỘT tính năng', 'Chỉ một tính năng đặc sắc nhất, nói trong 5–6 giây.', .1],
     ['ket', 'Kết + kêu gọi bấm link', 'Kết câu chuyện rồi chỉ link ở góc trái hoặc bình luận.', .28] ] },
-  { k: 'tudo', n: 'Tự do', d: 'Mở, thân, kết theo ý bạn', use: 'Khi chuyện của bạn không vừa khung nào', phan: [
+  { k: 'tudo', n: 'Tự do', d: 'Mở, thân, kết theo ý bạn', use: 'Khi chuyện của bạn không vừa khung nào', nhom: 'khac', phan: [
     ['mo', 'Mở bài (3–5 giây)', 'Câu đầu tiên người ta nghe. Không chào, không giới thiệu.', .08],
     ['than', 'Thân bài', 'Kể đủ, tả kỹ, một video một khoảnh khắc.', .72],
     ['ket', 'Kết bài', 'Bài học riêng hoặc câu hỏi kéo bình luận.', .2] ] },
@@ -353,25 +399,33 @@ if (!KHUNG.find(x => x.k === state.khung)) state.khung = 'khoanhkhac';
 function khungHienTai() { return KHUNG.find(x => x.k === state.khung); }
 function saveDraft() { ls.set('kb.draft', JSON.stringify({ khung: state.khung, mucTieu: state.mucTieu, dang: state.dang, tocDo: state.tocDo, text: state.text, canh: state.canh, chuDe: $('#chuDe').value, doiTuong: $('#doiTuong').value, xungHo: $('#xungHo').value, sanPham: $('#sanPham').value })); }
 function demChu(t) { return String(t || '').replace(/\*\*|_/g, ' ').split(/\s+/).filter(w => /[0-9A-Za-zÀ-ỹ]/.test(w)).length; }
-function giay(n) { return n / TOC_DO[state.tocDo] * 1.06; }
+function giay(n) { return n / tocDoHienTai() * 1.06; }
 function fmtS(s) { s = Math.round(s); return s >= 60 ? `${Math.floor(s / 60)}p${String(s % 60).padStart(2, '0')}` : `${s}s`; }
 
 function setSeg(id, v) { document.querySelectorAll(`#${id} button`).forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === v))); }
 function bindSeg(id, fn) { document.querySelectorAll(`#${id} button`).forEach(b => b.addEventListener('click', () => { setSeg(id, b.dataset.v); fn(b.dataset.v); })); }
 
+function chonDangTheoKhung(K, baoToast) {
+  const v = K.dang || 'noi_camera'; if (state.dang === v) return;
+  state.dang = v; setSeg('dang', v); if (baoToast) toast('Khung này hợp dạng ' + DANG_TEN[v] + ', mình đã đổi giúp. Muốn khác thì bấm lại ở mục Dạng quay.');
+}
 function buildKhung() {
   const box = $('#khungGrid'); box.innerHTML = '';
-  for (const K of KHUNG) {
-    const b = el('button', 'khung'); b.type = 'button'; b.dataset.k = K.k; b.setAttribute('aria-pressed', String(K.k === state.khung));
-    b.append(el('b', null, K.n), el('small', null, K.d), el('span', 'use', 'Hợp: ' + K.use));
-    b.onclick = () => { state.khung = K.k; document.querySelectorAll('.khung').forEach(x => x.setAttribute('aria-pressed', String(x === b))); buildPhan(); saveDraft(); };
-    box.append(b);
+  for (const [nhom, tenNhom] of NHOM_KHUNG) {
+    const ds = KHUNG.filter(K => (K.nhom || 'khac') === nhom); if (!ds.length) continue;
+    box.append(el('div', 'khung-nhom', tenNhom));
+    for (const K of ds) {
+      const b = el('button', 'khung'); b.type = 'button'; b.dataset.k = K.k; b.setAttribute('aria-pressed', String(K.k === state.khung));
+      const g = gKhung(K); b.append(el('b', null, K.n), el('small', null, K.d), el('span', 'use', 'Hợp: ' + K.use + ' · ' + g[0] + '–' + g[1] + 's'));
+      b.onclick = () => { state.khung = K.k; document.querySelectorAll('.khung').forEach(x => x.setAttribute('aria-pressed', String(x === b))); chonDangTheoKhung(K, true); buildPhan(); saveDraft(); };
+      box.append(b);
+    }
   }
 }
 const COLORS = ['#99DF00', '#5EE7C6', '#FFD166', '#FF9A3C', '#FF6FB5', '#B07CFF', '#4DA3FF'];
 function buildPhan() {
   const K = khungHienTai(); $('#khungTen').textContent = '· ' + K.n;
-  $('#spWrap').hidden = !['hoi', 'giohang'].includes(K.k) && state.mucTieu !== 'chuyen_doi';
+  $('#spWrap').hidden = !['giohang', 'trai_nghiem'].includes(K.k) && state.mucTieu !== 'chuyen_doi';
   const box = $('#phanList'); box.innerHTML = '';
   state.text[K.k] = state.text[K.k] || {};
   K.phan.forEach(([k, ten, tip], i) => {
@@ -385,26 +439,28 @@ function buildPhan() {
   updateTimes();
 }
 function updateTimes() {
-  const K = khungHienTai(), T = state.text[K.k] || {}; let total = 0, words = 0; const segs = [];
+  const K = khungHienTai(), T = state.text[K.k] || {}, G = gKhung(K), td = tocDoHienTai(); let total = 0, words = 0; const segs = [];
+  $('#mucGiay').textContent = G[0] + '–' + G[1] + ' giây'; $('#tlLo').textContent = G[0] + 's'; $('#tlHi').textContent = G[1] + 's';
   K.phan.forEach(([k, ten, tip, share], i) => {
     const n = demChu(T[k]), s = giay(n); total += s; words += n; segs.push([s, COLORS[i % COLORS.length], ten]);
-    const goal = [share * 60, share * 105]; const e = document.querySelector(`.phan-time[data-k="${k}"]`); if (!e) return;
+    const goal = [share * G[0], share * G[1]]; const e = document.querySelector(`.phan-time[data-k="${k}"]`); if (!e) return;
     const cls = !n ? '' : s < goal[0] * .6 ? 'bad' : s < goal[0] ? 'warn' : s > goal[1] * 1.3 ? 'bad' : s > goal[1] ? 'warn' : 'ok';
     e.className = 'phan-time ' + cls; e.textContent = n ? `${n} chữ ≈ ${fmtS(s)} · nên ${Math.round(goal[0])}–${Math.round(goal[1])}s` : `nên ${Math.round(goal[0])}–${Math.round(goal[1])}s`;
   });
-  const max = Math.max(120, total * 1.05); $('#tlMax').textContent = fmtS(max);
+  const max = Math.max(Math.round(G[1] * 1.15), total * 1.05); $('#tlMax').textContent = fmtS(max);
   const bar = $('#tlBar'); bar.querySelectorAll('i,.tl-drop').forEach(x => x.remove()); let x = 0;
   segs.forEach(([s, c, ten]) => { const i = el('i'); i.style.left = (x / max * 100) + '%'; i.style.width = (s / max * 100) + '%'; i.style.background = c; i.title = `${ten}: ${fmtS(s)}`; bar.append(i); x += s; });
-  const band = $('#tlBand'); band.style.left = (60 / max * 100) + '%'; band.style.width = (45 / max * 100) + '%';
+  const band = $('#tlBand'); band.style.left = (G[0] / max * 100) + '%'; band.style.width = ((G[1] - G[0]) / max * 100) + '%';
+  $('#tlLo').style.left = (G[0] / max * 100) + '%'; $('#tlHi').style.left = (G[1] / max * 100) + '%';
   if (state.kq && Array.isArray(state.kq.diem_roi)) state.kq.diem_roi.forEach(d => { const m = el('span', 'tl-drop'); m.style.left = (Math.min(d.giay, max) / max * 100) + '%'; m.title = `Người xem dễ lướt ở giây ${d.giay}: ${d.ly_do}`; bar.append(m); });
   const tot = $('#tlTotal'); tot.textContent = fmtS(total);
-  tot.className = 'tl-total ' + (!words ? '' : total < 45 ? 'bad' : total < 60 ? 'warn' : total <= 105 ? 'ok' : total <= 125 ? 'warn' : 'bad');
-  $('#tlWords').textContent = words ? `${words} chữ · tốc độ ${TOC_DO[state.tocDo]} chữ/giây` : '';
-  const need = [Math.round(60 * TOC_DO[state.tocDo] / 1.06), Math.round(105 * TOC_DO[state.tocDo] / 1.06)];
-  $('#tlNote').textContent = !words ? `Cần khoảng ${need[0]}–${need[1]} chữ cho 60–105 giây ở tốc độ này.`
-    : total < 60 ? `Còn thiếu khoảng ${Math.round((60 - total) * TOC_DO[state.tocDo])} chữ nữa mới đủ 60 giây. Thường thiếu ở phần tả chi tiết.`
-    : total <= 105 ? 'Đúng khung 60–105 giây. Giờ xem từng phần có cân không.'
-    : `Dư khoảng ${Math.round((total - 105) * TOC_DO[state.tocDo])} chữ. Cắt ý trùng, từ thừa trước; đừng cắt chi tiết đắt.`;
+  tot.className = 'tl-total ' + (!words ? '' : total < G[0] * .75 ? 'bad' : total < G[0] ? 'warn' : total <= G[1] ? 'ok' : total <= G[1] * 1.2 ? 'warn' : 'bad');
+  $('#tlWords').textContent = words ? `${words} chữ · ${state.dang === 'text' ? 'tốc độ đọc' : 'tốc độ'} ${td} chữ/giây` : '';
+  const need = [Math.round(G[0] * td / 1.06), Math.round(G[1] * td / 1.06)], vt = state.dang === 'text' ? 'chữ trên màn hình' : 'chữ';
+  $('#tlNote').textContent = !words ? `Cần khoảng ${need[0]}–${need[1]} ${vt} cho ${G[0]}–${G[1]} giây ở tốc độ này.`
+    : total < G[0] ? `Còn thiếu khoảng ${Math.round((G[0] - total) * td)} chữ nữa mới đủ ${G[0]} giây. Thường thiếu ở phần tả chi tiết.`
+    : total <= G[1] ? `Đúng khung ${G[0]}–${G[1]} giây. Giờ xem từng phần có cân không.`
+    : `Dư khoảng ${Math.round((total - G[1]) * td)} chữ. Cắt ý trùng, từ thừa trước; đừng cắt chi tiết đắt.`;
 }
 function goiKichBan() { const K = khungHienTai(), T = state.text[K.k] || {}; return K.phan.map(([k, ten]) => ({ k, ten, text: (T[k] || '').trim() })); }
 function kichBanText(parts) { return parts.filter(p => p.text).map(p => p.text).join('\n\n'); }
@@ -544,7 +600,7 @@ $('#themeBtn').addEventListener('click', () => { const dark = document.documentE
 setSeg('mucTieu', state.mucTieu); setSeg('dang', state.dang); setSeg('tocDo', state.tocDo);
 const nhanSeg = (id, v) => ([...document.querySelectorAll('#' + id + ' button')].find(b => b.dataset.v === v) || {}).textContent || '';
 bindSeg('mucTieu', v => { state.mucTieu = v; hsDien.mucTieu = v; buildPhan(); saveDraft(); TK.ghiTruong('muc_tieu', nhanSeg('mucTieu', v)); });
-bindSeg('dang', v => { state.dang = v; hsDien.dang = v; saveDraft(); TK.ghiTruong('dang', nhanSeg('dang', v)); });
+bindSeg('dang', v => { state.dang = v; hsDien.dang = v; updateTimes(); saveDraft(); TK.ghiTruong('dang', nhanSeg('dang', v)); });
 bindSeg('tocDo', v => { state.tocDo = v; updateTimes(); saveDraft(); });
 ['chuDe', 'doiTuong', 'xungHo', 'sanPham'].forEach(id => $('#' + id).addEventListener('input', saveDraft));
 /* AI viết trọn bài vào khung đang chọn. Dùng khi nhận đề xuất từ Soi video / Chấm video (tự chạy), hoặc bấm tay. */
@@ -596,7 +652,7 @@ async function vietBangAI(im) {
   finally { dangViet = false; btn.disabled = false; }
 }
 let imViet = null;
-(function importSoi() { try { const im = JSON.parse(ls.get('kb.import') || 'null'); if (!im || !im.khung) return; if (im.viet) imViet = im; ls.del ? ls.del('kb.import') : localStorage.removeItem('kb.import'); const K = KHUNG.find(x => x.k === im.khung); if (!K) return; state.khung = K.k; state.text[K.k] = {}; state.canh[K.k] = {}; (im.phan || []).forEach((g, i) => { if (K.phan[i] && g) state.text[K.k][K.phan[i][0]] = String(g).replace(/\*\*/g, ''); }); (im.canh || []).forEach((c, i) => { if (K.phan[i] && c) state.canh[K.k][K.phan[i][0]] = c; }); try { localStorage.removeItem('kb.kq'); } catch {} if (im.chuDe) $('#chuDe').value = im.chuDe; if (im.doiTuong) $('#doiTuong').value = im.doiTuong; if (im.sanPham) $('#sanPham').value = im.sanPham; if (im.mucTieu && $('#mucTieu button[data-v="' + im.mucTieu + '"]')) { state.mucTieu = im.mucTieu; hsDien.mucTieu = im.mucTieu; setSeg('mucTieu', im.mucTieu); } state.kq = null; saveDraft(); if (!im.viet) setTimeout(() => toast('Đã nhập khung' + (im.nguon ? ' mượn từ ' + im.nguon : '') + '. Gợi ý trong [ ] là chỗ bạn thay bằng chuyện thật của mình.'), 400); } catch {} })();
+(function importSoi() { try { const im = JSON.parse(ls.get('kb.import') || 'null'); if (!im || !im.khung) return; if (im.viet) imViet = im; ls.del ? ls.del('kb.import') : localStorage.removeItem('kb.import'); const K = KHUNG.find(x => x.k === im.khung); if (!K) return; state.khung = K.k; state.text[K.k] = {}; state.canh[K.k] = {}; (im.phan || []).forEach((g, i) => { if (K.phan[i] && g) state.text[K.k][K.phan[i][0]] = String(g).replace(/\*\*/g, ''); }); (im.canh || []).forEach((c, i) => { if (K.phan[i] && c) state.canh[K.k][K.phan[i][0]] = c; }); try { localStorage.removeItem('kb.kq'); } catch {} if (im.chuDe) $('#chuDe').value = im.chuDe; if (im.doiTuong) $('#doiTuong').value = im.doiTuong; if (im.sanPham) $('#sanPham').value = im.sanPham; if (im.mucTieu && $('#mucTieu button[data-v="' + im.mucTieu + '"]')) { state.mucTieu = im.mucTieu; hsDien.mucTieu = im.mucTieu; setSeg('mucTieu', im.mucTieu); } if (im.dang && DANG_TEN[im.dang]) { state.dang = im.dang; setSeg('dang', im.dang); } else chonDangTheoKhung(K, false); state.kq = null; saveDraft(); if (!im.viet) setTimeout(() => toast('Đã nhập khung' + (im.nguon ? ' mượn từ ' + im.nguon : '') + '. Gợi ý trong [ ] là chỗ bạn thay bằng chuyện thật của mình.'), 400); } catch {} })();
 buildKhung(); buildPhan();
 (function moLaiKq() { try { const o = JSON.parse(ls.get('kb.kq') || 'null'); if (o && o.d && o.d.score && o.khung === state.khung) { state.kq = o.d; renderKq(o.d, o.parts || goiKichBan()); updateTimes(); } } catch {} })();
 $('#acctBtn').addEventListener('click', () => TK.mo());
