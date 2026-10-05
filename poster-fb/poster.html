@@ -104,14 +104,15 @@
   .luoi6.sang .o .anh{height:200px}
   .luoi6.sang .o h3 b{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--ink);color:var(--lime);font:800 19px/1 var(--font-display)}
   /* ── poster nhá hàng: chỉ chữ + 2 bong bóng chat ── */
-  .nha{display:flex;flex-direction:column;justify-content:center;padding:0 90px}
-  .nha .nho{font:700 44px/1.2 var(--font-ui);color:var(--moss)}
-  .nha .to{font:800 104px/1.02 var(--font-display);letter-spacing:-.03em;margin-top:14px}
-  .nha .to mark{background:var(--ink);color:var(--lime);padding:0 18px;border-radius:16px}
-  .nha .hoi{font:700 44px/1.2 var(--font-ui);color:var(--moss);margin-top:44px}
-  .nha .bb{align-self:flex-start;margin-top:22px;background:var(--surface);border:4px solid var(--ink);border-radius:36px 36px 36px 8px;padding:22px 34px;font:800 52px/1.15 var(--font-ui);box-shadow:8px 8px 0 var(--ink)}
-  .nha .bb.hai{margin-left:90px;transform:rotate(-2deg)}
-  .nha .logo{position:absolute;left:90px;bottom:70px;height:52px}
+  .nha{display:flex;flex-direction:column;justify-content:center;padding:0 70px 40px}
+  .nha.vuong{height:1080px}
+  .nha .nho{font:700 54px/1.15 var(--font-ui);color:var(--moss)}
+  .nha .to{font:800 124px/1 var(--font-display);letter-spacing:-.03em;margin-top:10px}
+  .nha .to mark{background:var(--ink);color:var(--lime);padding:0 16px;border-radius:16px}
+  .nha .hoi{font:700 54px/1.15 var(--font-ui);color:var(--moss);margin-top:34px}
+  .nha .bb{align-self:flex-start;margin-top:20px;background:var(--surface);border:5px solid var(--ink);border-radius:38px 38px 38px 8px;padding:18px 32px;font:800 62px/1.12 var(--font-ui);box-shadow:9px 9px 0 var(--ink)}
+  .nha .bb.hai{margin-left:60px;transform:rotate(-2deg)}
+  .nha .logo{position:absolute;left:70px;bottom:44px;height:48px}
   /* ── trang cách dùng: 3 điện thoại một hàng ── */
   .ba{position:absolute;left:60px;right:60px;top:368px;display:grid;grid-template-columns:repeat(3,1fr);gap:30px}
   .ba .cot{position:relative}
@@ -347,9 +348,9 @@
 </section>
 
 <!-- ═══════════ 08 · NHÁ HÀNG (bài chữ, đăng trước chuỗi) ═══════════ -->
-<section class="poster nha" id="08-nha-hang">
+<section class="poster nha vuong" id="08-nha-hang">
   <div class="nho">Bộ 6 tool dành cho</div>
-  <div class="to">mấy người<br><mark>lười làm content</mark></div>
+  <div class="to">mấy người lười<br><mark>làm content</mark></div>
   <div class="hoi">mà cứ hỏi hoài:</div>
   <div class="bb">“Content này làm sao??”</div>
   <div class="bb hai">“Content này ok chưa??”</div>
