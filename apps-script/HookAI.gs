@@ -1244,8 +1244,34 @@ var CHAM_KIEN_THUC = [
   '12. KỊCH BẢN TIẾP THEO phải nối tiếp từ chính video này: giữ cái đang làm tốt, sửa cái hỏng, bám hồ sơ kênh (ngách, tệp, pillar, điều cấm). Mỗi ý có hook viết sẵn theo một khuôn của khoá và khung kịch bản đúng mã. Ưu tiên format lặp lại được (series) hơn ý lẻ.',
   '13. ĐỐI CHIẾU VỚI SỐ THẬT KHI VIDEO ĐÃ ĐĂNG. Số thật là trọng tài, nhận xét của bạn phải khớp với nó. Tính VIEW MỖI GIỜ = view ÷ số giờ đã đăng. Mốc tham khảo cho kênh nhỏ dưới 10K follow trong 24–48 giờ đầu (TikTok Việt, không phải chuẩn chính thức): dưới 30 view/giờ là video bị giữ ở vòng thử; 30–150 bình thường; 150–500 tốt, thuật toán đã nhả vòng 2; trên 500 rất mạnh; trên 2.000 là viral thật. Kèm tỉ lệ trên view như mục đọc số của khoá (tim 2–5% bình thường, trên 5% tốt; bình luận trên 0,3% là có đồng cảm; lưu trên 1% là có cái mang về; chia sẻ trên 0,3% là nói hộ). Quy tắc ràng buộc: video đã đạt mức TỐT trở lên về view/giờ thì hook và giữ chân KHÔNG được dưới 6,5 và tổng KHÔNG được dưới 65 — nếu mắt bạn thấy lỗi mà số vẫn tốt thì lỗi đó không nặng như bạn nghĩ, hạ mức lưu ý xuống và nói rõ "số liệu cho thấy người xem vẫn ở lại". Ngược lại video đạt dưới 30 view/giờ sau 24 giờ thì tổng không được trên 60 dù quay đẹp. Số chỉ có sau vài giờ thì ghi rõ "còn sớm" và bớt trọng lượng.',
   '14. CHẤM ỔN ĐỊNH, KHÔNG CẢM TÍNH. Với mỗi thang: ghi BẰNG CHỨNG trước (giây thứ mấy, câu gì, thấy gì), rồi mới cho điểm theo đúng mốc ở các mục trên. Cùng một bằng chứng phải ra cùng một điểm: 0–3 hỏng phần cốt lõi · 4–6 có ý nhưng vỏ thường hoặc còn lỗi rõ · 7–8 đúng bài, còn 1–2 chỗ chỉnh · 9–10 không thấy gì để chỉnh, người lạ chắc chắn dừng/xem hết. Không cho điểm lẻ 0,5 chỉ để "cho có"; chỉ dùng 0,5 khi bằng chứng nằm giữa hai mốc. Không thưởng điểm vì nội dung tử tế, không phạt vì gu cá nhân.'
+,
+  '15. BẢN DỰNG LẠI (EDIT LIST). Học viên cần biết mở app dựng lên là cắt chỗ nào, giữ chỗ nào, không phải lời khuyên chung. Chia TRỌN video thành các đoạn liền nhau theo câu thoại (đoạn sau bắt đầu đúng chỗ đoạn trước hết, từ 0 tới hết). Mỗi đoạn một việc: GIỮ (để nguyên), CẮT (bỏ hẳn), RÚT (giữ ý nhưng làm ngắn: tăng tốc 1,2–1,5 lần, hoặc cắt khoảng thở và chữ thừa bên trong), ĐỔI CHỖ (giữ nhưng chuyển lên vị trí khác, hay gặp nhất là kéo câu mạnh nhất hoặc cảnh cao trào lên 0–3 giây làm hook rồi quay lại mạch). Luôn CẮT: câu chào, câu giới thiệu bản thân, câu lặp, câu vấp nói lại, khoảng lặng trên 0,5 giây, đoạn giải thích không phục vụ lời hook hứa, câu xin follow lộ liễu. Đoạn GIỮ nào cần thêm lớp thì ghi rõ: chữ gì (đúng chữ, tối đa 2 dòng), zoom bao nhiêu phần trăm ở giây nào, b-roll gì minh hoạ câu nào, âm thanh gì. Chỉ dùng footage CÓ THẬT trong video; cần cảnh không có thì nói "quay bù" chứ không bịa. Thời lượng bản mới phải ngắn hơn hoặc bằng bản gốc.',
+  '16. CÔNG THỨC DỰNG THEO FORMAT (áp đúng format của video, không áp chung): NÓI CAMERA: jump cut ở mỗi chỗ thở, 2–4 giây có một nhịp mới (cắt, zoom 110–120% xen kẽ để giả hai góc máy, hoặc b-roll), phụ đề to theo lời, chữ hook 1/3 trên trong 3 giây đầu, nhạc nền nhỏ dưới giọng. VOICE-OVER: hình đổi theo từng câu, không cảnh nào đứng quá 3–4 giây, hình phải minh hoạ đúng câu đang nói, lời thu riêng chỗ yên. VLOG/ĐỜI THƯỜNG: giữ âm thanh thật và khoảnh khắc thật, cắt theo hành động, 15–40 giây, chữ POV/ngữ cảnh 1 dòng đầu video. REVIEW: mở bằng kết quả hoặc cận sản phẩm, mỗi chi tiết một cảnh cận, giá và số lên chữ, trước–sau đặt sát nhau. HƯỚNG DẪN/TIPS: mở bằng thành phẩm, đánh số bước bằng chữ, mỗi bước một cảnh, đoạn thao tác lặp tăng tốc 1,5–2 lần. KỂ CHUYỆN: cold open bằng câu hoặc cảnh cao trào, cắt bớt dẫn chuyện, giữ khoảng lặng ngay trước cao trào, nhạc lên ở cao trào. BÁN HÀNG: nỗi đau 3 giây đầu, sản phẩm xuất hiện trước giây 8, bằng chứng (số, phản hồi, trước–sau) trước giá, một CTA rõ 2–3 giây cuối. CHỮ CHẠY: mỗi màn chữ đọc kịp (khoảng 3 chữ mỗi giây), tối đa 2 dòng, đổi màn theo nhịp nhạc. POV: chữ POV 1 dòng ngay giây đầu, quay góc nhìn thứ nhất, cắt nhanh theo hành động, kết bằng phản ứng.'
 ].join('\n');
 
+var CHAM_FORMAT = {noi_camera:'Nói camera', voice_over:'Voice-over', vlog:'Vlog đời thường', review:'Review', huong_dan:'Hướng dẫn, tips', ke_chuyen:'Kể chuyện', ban_hang:'Bán hàng', chu_chay:'Chữ chạy', pov:'POV'};
+var CHAM_VIEC = ['giu', 'cat', 'rut', 'doi_cho'];
+/* Làm sạch bản dựng lại AI trả: mốc trong [0, thời lượng], đoạn sắp theo giờ, thứ tự bản mới chỉ trỏ tới đoạn có thật
+   và không bị cắt, thời lượng bản mới tự tính (rút ≈ 75% đoạn gốc) để không tin con số AI tự cộng. */
+function chamBanDung(bd, giay){
+  bd = (bd && typeof bd === 'object') ? bd : {};
+  var lam1 = function(x){ return Math.round(Math.max(0, Math.min(giay || 3600, Number(x) || 0)) * 10) / 10; };
+  // goc: số thứ tự AI đã đánh (đếm từ 1 theo mảng AI trả) — thu_tu của AI trỏ theo số này, nên phải đổi sang số mới sau khi sắp lại
+  var doan = (Array.isArray(bd.doan) ? bd.doan : []).map(function(x, i){ x = x || {}; return { goc: i + 1, tu: lam1(x.tu), den: lam1(x.den), viec: CHAM_VIEC.indexOf(x.viec) > -1 ? x.viec : 'giu', loi: String(x.loi || '').slice(0, 160), ly_do: String(x.ly_do || '').slice(0, 260), chen: String(x.chen || '').slice(0, 300) }; })
+    .filter(function(x){ return x.den > x.tu; }).sort(function(a, b){ return a.tu - b.tu; }).slice(0, 30);
+  var moiTheoGoc = {}; doan.forEach(function(x, i){ moiTheoGoc[x.goc] = i + 1; delete x.goc; });
+  var conLai = []; doan.forEach(function(x, i){ if (x.viec !== 'cat') conLai.push(i + 1); });
+  var daCo = {}, thuTu = (Array.isArray(bd.thu_tu) ? bd.thu_tu : []).map(function(n){ return moiTheoGoc[Math.round(Number(n) || 0)] || 0; })
+    .filter(function(n){ if (daCo[n] || conLai.indexOf(n) < 0) return false; daCo[n] = 1; return true; });
+  conLai.forEach(function(n){ if (!daCo[n]) thuTu.push(n); });   // đoạn giữ mà AI quên xếp thì nối vào cuối theo thứ tự gốc
+  var dai = function(x){ return (x.den - x.tu) * (x.viec === 'rut' ? 0.75 : 1); };
+  var doDaiMoi = Math.round(thuTu.reduce(function(t, n){ return t + dai(doan[n - 1]); }, 0));
+  var banKhac = (Array.isArray(bd.ban_khac) ? bd.ban_khac : []).slice(0, 2).map(function(k){ k = k || {};
+    var lay = (Array.isArray(k.lay) ? k.lay : []).map(function(x){ x = x || {}; return { tu: lam1(x.tu), den: lam1(x.den), ghi_chu: String(x.ghi_chu || '').slice(0, 200) }; }).filter(function(x){ return x.den > x.tu; }).slice(0, 15);
+    return { ten: String(k.ten || '').slice(0, 80), format: CHAM_FORMAT[k.format] ? k.format : 'noi_camera', cach: String(k.cach || '').slice(0, 500), lay: lay, do_dai: Math.round(lay.reduce(function(t, x){ return t + x.den - x.tu; }, 0)) };
+  }).filter(function(k){ return k.lay.length; });
+  return { format: CHAM_FORMAT[bd.format] ? bd.format : 'noi_camera', cong_thuc: String(bd.cong_thuc || '').slice(0, 600), doan: doan, thu_tu: thuTu, do_dai_moi: doDaiMoi, ban_khac: banKhac };
+}
 var CHAM_B64_TOI_DA  = 62 * 1000 * 1000;   // ký tự base64 ≈ 45MB video; hơn nữa là quá SOI_VIDEO_TOI_DA, chặn trước khi giải mã
 var CHAM_GIAY_TOI_DA = 600;                // 10 phút; dài hơn Gemini xem không kịp trong 6 phút của Apps Script
 var CHAM_HET_GIO_MS  = 330 * 1000;         // ngân sách cả lượt chấm; Apps Script giết ở 360 giây
@@ -1329,12 +1355,13 @@ function hookChamVideo(b, ai, provider, key){
     '7. hook_moi: đúng 3 câu mở lại cho chính video này theo khuôn ở mục CÁCH VIẾT LẠI HOOK (formula = tên khuôn, text tối đa 2 dòng ngăn bằng \\n, dưới 12 chữ, đánh dấu 1–2 từ khoá bằng **...**, cần số thật thì để [ ]). Nếu hook hiện tại đã 9–10 thì vẫn cho 3 biến thể để A/B.',
     '8. kich_ban_tiep: đúng 3 ý tưởng video tiếp theo nối từ video này và hồ sơ kênh (mục 12): tieu_de (tên làm việc), hook (một câu mở viết sẵn), khung (mã khung), y_tuong (2–3 câu: quay gì, kể gì, cao trào ở đâu), vi_sao (1 câu vì sao nên làm cái này tiếp, nối với điểm mạnh hoặc lỗ hổng vừa chấm). huong_di: 2 câu định hướng 2 tuần tới cho kênh dựa trên video này.',
     '9. lam_ngay: 1 việc làm trong 30 phút hôm nay với chính video này.',
+    '10. ban_dung (BẢN DỰNG LẠI, theo mục 15 và 16, phải khớp với boc.loi_thoai và các mốc giây ở luu_y): format = format thật của video này, một mã trong: ' + Object.keys(CHAM_FORMAT).join(', ') + '; cong_thuc = 2–3 câu công thức dựng của ĐÚNG format đó áp vào video này (mấy giây một nhịp, chữ gì ở đâu, zoom, b-roll, nhạc); doan = chia TRỌN video từ 0 tới ' + (giay ? giay + ' giây' : 'hết') + ' thành 5–20 đoạn liền nhau theo câu thoại, mỗi đoạn: tu, den (giây, có thể lẻ 0,5), viec ("giu" | "cat" | "rut" | "doi_cho"), loi (trích 4–12 chữ đầu của lời trong đoạn, không lời thì tả hình), ly_do (1 câu vì sao), chen (lớp thêm khi giữ: chữ gì, zoom bao nhiêu, b-roll gì, âm thanh gì; không cần thì chuỗi rỗng); thu_tu = số thứ tự các đoạn (đếm từ 1 theo mảng doan) xếp theo BẢN MỚI, chỉ gồm đoạn không bị cắt, đoạn doi_cho đặt vào đúng chỗ mới; ban_khac = đúng 2 bản dựng khác từ CHÍNH footage này theo format hoặc độ dài khác (ví dụ bản 15–20 giây chỉ giữ cao trào, bản voice-over hoặc chữ chạy, bản POV), mỗi bản: ten, format (mã như trên), cach (2–3 câu dựng thế nào), lay (các đoạn lấy theo thứ tự bản mới: tu, den, ghi_chu làm gì trên đoạn đó).',
     'Không bịa. Tư liệu không đủ để kết luận phần nào thì nói rõ trong phần đó thay vì đoán.'
   ].filter(function(x){ return x !== '' }).join('\n');
 
   var mocGiay = { type:'array', items:{ type:'object', additionalProperties:false, required:['giay','text'], properties:{ giay:{type:'number'}, text:{type:'string'} } } };
   var schema = { type:'object', additionalProperties:false,
-    required:['boc','tom_tat','thang','tong','manh','luu_y','sua_video_nay','lan_sau','hook_moi','kich_ban_tiep','huong_di','lam_ngay'],
+    required:['boc','tom_tat','thang','tong','manh','luu_y','sua_video_nay','ban_dung','lan_sau','hook_moi','kich_ban_tiep','huong_di','lam_ngay'],
     properties:{
       boc:{ type:'object', additionalProperties:false, required:['loi_thoai','chu_man_hinh','giay','mat_thay','tai_nghe','ghi_chu'],
         properties:{ loi_thoai:mocGiay, chu_man_hinh:mocGiay, giay:{type:'number'}, mat_thay:{type:'string'}, tai_nghe:{type:'string'}, ghi_chu:{type:'string'} } },
@@ -1345,14 +1372,21 @@ function hookChamVideo(b, ai, provider, key){
       manh:{type:'array', items:{type:'string'}},
       luu_y:{ type:'array', items:{ type:'object', additionalProperties:false, required:['giay','van_de','muc','sua'], properties:{ giay:{type:'number'}, van_de:{type:'string'}, muc:{type:'string', enum:['nang','vua','nhe']}, sua:{type:'string'} } } },
       sua_video_nay:{ type:'array', items:{ type:'object', additionalProperties:false, required:['viec','cach','tac_dung'], properties:{ viec:{type:'string'}, cach:{type:'string'}, tac_dung:{type:'string'} } } },
+      ban_dung:{ type:'object', additionalProperties:false, required:['format','cong_thuc','doan','thu_tu','ban_khac'], properties:{
+        format:{type:'string', enum:Object.keys(CHAM_FORMAT)}, cong_thuc:{type:'string'},
+        doan:{ type:'array', items:{ type:'object', additionalProperties:false, required:['tu','den','viec','loi','ly_do','chen'], properties:{ tu:{type:'number'}, den:{type:'number'}, viec:{type:'string', enum:CHAM_VIEC}, loi:{type:'string'}, ly_do:{type:'string'}, chen:{type:'string'} } } },
+        thu_tu:{ type:'array', items:{type:'integer'} },
+        ban_khac:{ type:'array', items:{ type:'object', additionalProperties:false, required:['ten','format','cach','lay'], properties:{ ten:{type:'string'}, format:{type:'string', enum:Object.keys(CHAM_FORMAT)}, cach:{type:'string'},
+          lay:{ type:'array', items:{ type:'object', additionalProperties:false, required:['tu','den','ghi_chu'], properties:{ tu:{type:'number'}, den:{type:'number'}, ghi_chu:{type:'string'} } } } } } }
+      } },
       lan_sau:{ type:'object', additionalProperties:false, required:['quay','thu_am','dung_phim'], properties:{ quay:{type:'array', items:{type:'string'}}, thu_am:{type:'array', items:{type:'string'}}, dung_phim:{type:'array', items:{type:'string'}} } },
       hook_moi:{ type:'array', items:{ type:'object', additionalProperties:false, required:['formula','text'], properties:{ formula:{type:'string'}, text:{type:'string'} } } },
       kich_ban_tiep:{ type:'array', items:{ type:'object', additionalProperties:false, required:['tieu_de','hook','khung','y_tuong','vi_sao'], properties:{ tieu_de:{type:'string'}, hook:{type:'string'}, khung:{type:'string', enum:Object.keys(SOI_KHUNG_PHAN)}, y_tuong:{type:'string'}, vi_sao:{type:'string'} } } },
       huong_di:{type:'string'}, lam_ngay:{type:'string'}
     } };
 
-  var kq = media ? goiGemini(gkey, '', prompt, schema, 9000, media, 0.15, hetGio)
-         : provider === 'claude' ? goiClaude(key, '', prompt, schema, 8000, 0.15) : goiGemini(key, '', prompt, schema, 8000, null, 0.15, hetGio);
+  var kq = media ? goiGemini(gkey, '', prompt, schema, 16000, media, 0.15, hetGio)   // bản dựng lại theo từng đoạn làm câu trả lời dài hơn
+         : provider === 'claude' ? goiClaude(key, '', prompt, schema, 14000, 0.15) : goiGemini(key, '', prompt, schema, 14000, null, 0.15, hetGio);
   if (!kq.ok){
     hoan();
     hookLog(me, nhan, false, kq.loi, kq.vin || 0, kq.vout || 0, kq.model, ai);
@@ -1383,6 +1417,7 @@ function hookChamVideo(b, ai, provider, key){
   ['chu_de','dang','doi_tuong_thuc','verdict'].forEach(function(k){ d.tom_tat[k] = String(d.tom_tat[k] || '').slice(0, k === 'verdict' ? 600 : 200) });
   ['mat_thay','tai_nghe','ghi_chu'].forEach(function(k){ boc[k] = String(boc[k] || '').slice(0, 300) });
   d.huong_di = String(d.huong_di || '').slice(0, 600); d.lam_ngay = String(d.lam_ngay || '').slice(0, 400);
+  d.ban_dung = chamBanDung(d.ban_dung, giay);
   d.meta = { giay: giay, so_chu: soChu, toc_do: giay ? Math.round(soChu / giay * 100) / 100 : 0, ti_le: soiTiLe(so), so_lieu: so, nguon: media ? video.nguon : 'chu', kich_thuoc: video && video.kich_thuoc || 0, canh_bao: canhBao, da_dang: daDang, gio_dang: gioDang, view_gio: viewGio, model: kq.model, luc: nowVN() };
   try{ CacheService.getScriptCache().put(khoaNho, JSON.stringify(d), 21600); }catch(e){}   // nhớ 6 giờ, trần của CacheService
   daHoan = true;   // đã có kết quả và đã cache: log hỏng thì không hoàn lượt nữa

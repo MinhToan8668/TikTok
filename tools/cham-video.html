@@ -166,6 +166,42 @@
   .sv p{margin:4px 0 0;font-size:13.5px;line-height:1.5}
   .sv small{display:block;color:var(--ok);font-size:12.5px;margin-top:4px}
   .sv small::before{content:'✓ ';font-weight:800}
+  /* bản dựng lại: thanh đoạn tô màu theo việc, danh sách cắt/giữ theo timestamp, xem thử trên video đã tải */
+  .bd-fm{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:4px 0 8px}
+  .bd-fm .chip{margin:0}
+  .bd-ct{border:1px solid var(--line);border-left:4px solid var(--line-strong);border-radius:10px;padding:9px 12px;background:var(--surface-2);font-size:13.5px;line-height:1.55}
+  .bd-sum{font-size:13.5px;margin:10px 0 6px}
+  .bd-sum b{font-family:var(--font-display);font-size:15px}
+  .bd-bar{display:flex;height:26px;border-radius:8px;overflow:hidden;border:1px solid var(--line);background:var(--surface-2)}
+  .bd-bar button{flex:0 0 auto;border:0;border-right:1px solid var(--surface);padding:0;min-height:0;cursor:pointer;font:inherit;font-size:10.5px;font-weight:800;color:#fff;overflow:hidden;white-space:nowrap;-webkit-tap-highlight-color:transparent}
+  .bd-bar button:last-child{border-right:0}
+  .bd-bar button:focus-visible{outline:2px solid var(--text);outline-offset:-2px}
+  .v-giu{background:var(--ok)} .v-cat{background:var(--danger)} .v-rut{background:var(--warn)} .v-doi_cho{background:#2E6FB0}
+  .bd-chu{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:var(--muted);margin:5px 0 8px}
+  .bd-chu i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+  .bd-row{display:grid;grid-template-columns:96px 1fr;gap:8px;padding:9px 0;border-top:1px dashed var(--line);font-size:13px;line-height:1.5}
+  .bd-row:first-of-type{border-top:0}
+  .bd-row.hot{background:var(--accent-soft);border-radius:8px}
+  .bd-row .tg{font-family:var(--font-display);font-weight:800;font-size:13px}
+  .bd-row .tg small{display:block;font-family:var(--font-ui);font-weight:600;color:var(--muted);font-size:11px}
+  .bd-tag{display:inline-block;color:#fff;border-radius:6px;padding:1px 7px;font-size:11px;font-weight:800;margin-right:6px}
+  .bd-row q{font-style:italic;color:var(--text)}
+  .bd-row .ld{display:block;color:var(--muted);margin-top:2px}
+  .bd-row .ch{display:block;color:var(--ok);margin-top:3px;font-weight:600}
+  .bd-row .ch::before{content:'➕ '}
+  .bd-row.cat q{text-decoration:line-through;opacity:.7}
+  .bd-row .xem{margin-top:5px;min-height:32px;padding:4px 10px;font-size:12px}
+  .bd-moi{margin:6px 0 0;padding-left:20px;font-size:13px;line-height:1.6}
+  .bd-moi small{color:var(--muted)}
+  .bd-vid{margin:8px 0;border:1px solid var(--line);border-radius:12px;padding:8px;background:var(--surface)}
+  .bd-vid video{display:block;width:100%;max-height:360px;border-radius:8px;background:#000}
+  .bd-vid .row{margin-top:8px}
+  .bd-vid p{margin:6px 0 0;font-size:12.5px;color:var(--muted)}
+  .bk{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:8px;background:var(--surface)}
+  .bk b{font-size:14px}
+  .bk p{margin:4px 0 6px;font-size:13.5px;line-height:1.5}
+  .bk ol{margin:0;padding-left:20px;font-size:13px;line-height:1.6}
+  @media (max-width:560px){ .bd-row{grid-template-columns:78px 1fr} }
   .ls3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:6px}
   .ls3 > div{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--surface-2)}
   .ls3 b{display:block;font-size:13px;margin-bottom:4px}
@@ -614,6 +650,9 @@ function renderKq(d, so, tuLuu) {
     d.sua_video_nay.forEach(v => { const w = el('div', 'sv'); w.append(el('b', null, v.viec)); w.append(el('p', null, v.cach)); if (v.tac_dung) w.append(el('small', null, v.tac_dung)); box.append(w); });
   }
 
+  // bản dựng lại theo từng đoạn
+  if (d.ban_dung && (d.ban_dung.doan || []).length) veBanDung(box, d.ban_dung, giay);
+
   // lần sau
   const ls3 = d.lan_sau || {};
   if ((ls3.quay || []).length || (ls3.thu_am || []).length || (ls3.dung_phim || []).length) {
@@ -653,6 +692,86 @@ function renderKq(d, so, tuLuu) {
   if (navigator.share) { const sh = el('button', 'btn', 'Gửi cho mentor / nhóm'); sh.type = 'button'; sh.onclick = async () => { try { await navigator.share({ title: 'Chấm video · ' + d.tong + '/100', text: baoCaoText(d, so) }); } catch (e) { if (e && e.name !== 'AbortError') copyText(baoCaoText(d, so)); } }; rwAll.append(sh); }
   box.append(rwAll);
 }
+/* ---------- bản dựng lại ---------- */
+const FORMAT_TEN = { noi_camera: 'Nói camera', voice_over: 'Voice-over', vlog: 'Vlog đời thường', review: 'Review', huong_dan: 'Hướng dẫn, tips', ke_chuyen: 'Kể chuyện', ban_hang: 'Bán hàng', chu_chay: 'Chữ chạy', pov: 'POV' };
+const VIEC_TEN = { giu: 'Giữ', cat: 'Cắt', rut: 'Rút gọn', doi_cho: 'Đổi chỗ' };
+const VIEC_ICON = { giu: '✅', cat: '✂️', rut: '⏩', doi_cho: '↕️' };
+function tg(s) { s = Math.max(0, Number(s) || 0); const m = Math.floor(s / 60), r = Math.round((s - m * 60) * 10) / 10; return String(m).padStart(2, '0') + ':' + (r < 10 ? '0' : '') + String(r).replace('.', ','); }
+function doanMoi(bd) { return (bd.thu_tu || []).map(n => ({ n, x: bd.doan[n - 1] })).filter(o => o.x); }
+let bdUrl = '';
+function veBanDung(box, bd, giay) {
+  const tong = Math.max(giay, ...bd.doan.map(x => x.den)) || 1;
+  H(box, 'Bản dựng lại, cắt và giữ theo từng giây');
+  const fm = el('div', 'bd-fm'); fm.append(el('span', 'chip', 'Format: ' + (FORMAT_TEN[bd.format] || bd.format))); box.append(fm);
+  if (bd.cong_thuc) box.append(el('div', 'bd-ct', bd.cong_thuc));
+  const soCat = bd.doan.filter(x => x.viec === 'cat').length, giam = Math.max(0, Math.round(tong) - (bd.do_dai_moi || 0));
+  const sum = el('p', 'bd-sum'); sum.innerHTML = `Bản gốc <b>${Math.round(tong)}s</b> → bản mới khoảng <b>${bd.do_dai_moi || 0}s</b>` + (giam ? ` · bớt ${giam}s` : '') + ` · ${bd.doan.length} đoạn, cắt ${soCat}`; box.append(sum);
+  // thanh đoạn tô màu, bấm để nhảy tới dòng
+  const bar = el('div', 'bd-bar');
+  bd.doan.forEach((x, i) => { const b = el('button', 'v-' + x.viec, (x.den - x.tu) / tong > .07 ? String(i + 1) : ''); b.type = 'button'; b.style.width = ((x.den - x.tu) / tong * 100) + '%'; b.title = `${i + 1} · ${tg(x.tu)}–${tg(x.den)} · ${VIEC_TEN[x.viec]}`; b.setAttribute('aria-label', `Đoạn ${i + 1}, ${tg(x.tu)} đến ${tg(x.den)}, ${VIEC_TEN[x.viec]}`); b.onclick = () => { const r = $('#bd' + i); if (r) { r.scrollIntoView({ behavior: 'smooth', block: 'center' }); r.classList.add('hot'); setTimeout(() => r.classList.remove('hot'), 1500); } }; bar.append(b); });
+  box.append(bar);
+  const chu = el('div', 'bd-chu'); Object.keys(VIEC_TEN).forEach(k => { const s = el('span'); s.append(el('i', 'v-' + k), document.createTextNode(VIEC_TEN[k])); chu.append(s); }); box.append(chu);
+  // xem thử trên chính video đã tải lên (chỉ có khi vừa chấm file trên máy này)
+  const f = state.file && state.file.file instanceof Blob ? state.file.file : null;
+  let vid = null;
+  if (f) {
+    if (bdUrl) URL.revokeObjectURL(bdUrl); bdUrl = URL.createObjectURL(f);
+    const w = el('div', 'bd-vid'); vid = el('video'); vid.src = bdUrl; vid.controls = true; vid.playsInline = true; vid.preload = 'metadata'; w.append(vid);
+    const rw = el('div', 'row'); const xt = el('button', 'btn pro', '▶ Xem thử bản mới'); xt.type = 'button'; xt.onclick = () => phatChuoi(vid, doanMoi(bd).map(o => o.x)); const goc = el('button', 'btn', 'Xem bản gốc'); goc.type = 'button'; goc.onclick = () => phatChuoi(vid, [{ tu: 0, den: tong, viec: 'giu' }]); rw.append(xt, goc); w.append(rw);
+    w.append(el('p', null, 'Xem thử bỏ qua đoạn cắt, đoạn rút gọn chạy nhanh 1,3 lần, đoạn đổi chỗ phát đúng vị trí mới. Chữ, zoom, b-roll gợi ý bên dưới bạn tự thêm khi dựng.'));
+    box.append(w);
+  }
+  const ds = el('div');
+  bd.doan.forEach((x, i) => {
+    const r = el('div', 'bd-row ' + x.viec); r.id = 'bd' + i;
+    const t = el('div', 'tg'); t.append(document.createTextNode(tg(x.tu) + '–' + tg(x.den))); t.append(el('small', null, 'đoạn ' + (i + 1) + ' · ' + Math.round((x.den - x.tu) * 10) / 10 + 's')); r.append(t);
+    const c = el('div'); const tag = el('span', 'bd-tag v-' + x.viec, VIEC_ICON[x.viec] + ' ' + VIEC_TEN[x.viec]); c.append(tag);
+    if (x.loi) c.append(el('q', null, x.loi));
+    if (x.ly_do) c.append(el('span', 'ld', x.ly_do));
+    if (x.chen && x.viec !== 'cat') c.append(el('span', 'ch', x.chen));
+    if (vid) { const xb = el('button', 'btn xem', '▶ Xem đoạn này'); xb.type = 'button'; xb.onclick = () => phatChuoi(vid, [{ tu: x.tu, den: x.den, viec: 'giu' }]); c.append(xb); }
+    r.append(c); ds.append(r);
+  });
+  box.append(ds);
+  // thứ tự bản mới (chỉ hiện khi có đổi chỗ, không thì giống bản gốc bỏ đoạn cắt)
+  const moi = doanMoi(bd), coDoi = moi.some((o, k) => k && o.n < moi[k - 1].n);
+  if (coDoi) {
+    box.append(el('p', 'bd-sum', 'Thứ tự trong bản mới:'));
+    const ol = el('ol', 'bd-moi'); moi.forEach(o => { const li = el('li'); li.append(document.createTextNode(`${tg(o.x.tu)}–${tg(o.x.den)} `)); li.append(el('small', null, `(đoạn ${o.n}${o.x.viec === 'doi_cho' ? ', chuyển lên đây' : o.x.viec === 'rut' ? ', rút gọn' : ''})${o.x.loi ? ' · ' + o.x.loi : ''}`)); ol.append(li); }); box.append(ol);
+  }
+  // dựng theo format khác từ chính footage này
+  if ((bd.ban_khac || []).length) {
+    H(box, 'Dựng thêm bản khác từ footage này');
+    bd.ban_khac.forEach(k => {
+      const w = el('div', 'bk'); const t = el('div', 'bd-fm'); t.append(el('b', null, k.ten || FORMAT_TEN[k.format]), el('span', 'chip', FORMAT_TEN[k.format] || k.format), el('span', 'chip', '~' + k.do_dai + 's')); w.append(t);
+      if (k.cach) w.append(el('p', null, k.cach));
+      const ol = el('ol'); k.lay.forEach(x => ol.append(el('li', null, `${tg(x.tu)}–${tg(x.den)}` + (x.ghi_chu ? ' · ' + x.ghi_chu : '')))); w.append(ol);
+      const rw = el('div', 'row'); if (vid) { const xb = el('button', 'btn', '▶ Xem thử bản này'); xb.type = 'button'; xb.onclick = () => phatChuoi(vid, k.lay.map(x => ({ tu: x.tu, den: x.den, viec: 'giu' }))); rw.append(xb); }
+      const cp = el('button', 'btn', 'Chép danh sách'); cp.type = 'button'; cp.onclick = () => copyText([`${k.ten} · ${FORMAT_TEN[k.format] || k.format} · ~${k.do_dai}s`, k.cach].concat(k.lay.map((x, i) => `${i + 1}. ${tg(x.tu)}–${tg(x.den)}${x.ghi_chu ? ' · ' + x.ghi_chu : ''}`)).join('\n')); rw.append(cp); w.append(rw);
+      box.append(w);
+    });
+  }
+  const rw = el('div', 'row'); const cp = el('button', 'btn', 'Chép danh sách cắt để dựng'); cp.type = 'button'; cp.onclick = () => copyText(banDungText(bd)); rw.append(cp); box.append(rw);
+}
+/* phát lần lượt các đoạn [{tu, den, viec}] trên thẻ video: tới cuối đoạn thì nhảy sang đoạn sau */
+let bdNghe = null;
+function phatChuoi(v, ds) {
+  if (!v || !ds.length) return;
+  if (bdNghe) v.removeEventListener('timeupdate', bdNghe);
+  let i = 0;
+  const vao = () => { const x = ds[i]; v.playbackRate = x.viec === 'rut' ? 1.3 : 1; v.currentTime = x.tu; v.play().catch(() => {}); };
+  bdNghe = () => { if (v.currentTime < ds[i].den - 0.05) return; i++; if (i >= ds.length) { v.pause(); v.playbackRate = 1; v.removeEventListener('timeupdate', bdNghe); bdNghe = null; return; } vao(); };
+  v.addEventListener('timeupdate', bdNghe); v.scrollIntoView({ behavior: 'smooth', block: 'center' }); vao();
+}
+function banDungText(bd) {
+  const L = [`BẢN DỰNG LẠI · Format: ${FORMAT_TEN[bd.format] || bd.format} · bản mới ~${bd.do_dai_moi}s`];
+  if (bd.cong_thuc) L.push(bd.cong_thuc);
+  L.push('', 'TỪNG ĐOẠN (theo giờ của video gốc)');
+  bd.doan.forEach((x, i) => L.push(`${i + 1}. ${tg(x.tu)}–${tg(x.den)} [${VIEC_TEN[x.viec].toUpperCase()}]${x.loi ? ' "' + x.loi + '"' : ''}${x.ly_do ? ' · ' + x.ly_do : ''}${x.chen && x.viec !== 'cat' ? '\n   + ' + x.chen : ''}`));
+  const moi = doanMoi(bd); L.push('', 'THỨ TỰ BẢN MỚI: ' + moi.map(o => `${o.n} (${tg(o.x.tu)}–${tg(o.x.den)})`).join(' → '));
+  (bd.ban_khac || []).forEach(k => { L.push('', `BẢN KHÁC: ${k.ten} · ${FORMAT_TEN[k.format] || k.format} · ~${k.do_dai}s`, k.cach); k.lay.forEach((x, i) => L.push(`${i + 1}. ${tg(x.tu)}–${tg(x.den)}${x.ghi_chu ? ' · ' + x.ghi_chu : ''}`)); });
+  return L.filter(x => x != null).join('\n');
+}
 function baoCaoText(d, so) {
   const tt = d.tom_tat || {}, L = [];
   L.push('CHẤM VIDEO CỦA BẠN · Viral Studio by Tự Mình Xây Kênh', `Điểm: ${d.tong}/100 · ${(KN[tt.kha_nang] || KN.vua)[0]}`, tt.verdict || '', '');
@@ -661,6 +780,7 @@ function baoCaoText(d, so) {
   if ((d.manh || []).length) { L.push('GIỮ LẠI'); d.manh.forEach(x => L.push('- ' + x)); L.push(''); }
   if ((d.luu_y || []).length) { L.push('LƯU Ý THEO GIÂY'); d.luu_y.forEach(m => L.push(`- ${m.giay}s [${MUC_TEN[m.muc] || m.muc}] ${m.van_de}` + (m.sua ? ` → ${m.sua}` : ''))); L.push(''); }
   if ((d.sua_video_nay || []).length) { L.push('SỬA VIDEO NÀY'); d.sua_video_nay.forEach(v => L.push(`- ${v.viec}: ${v.cach}` + (v.tac_dung ? ` (${v.tac_dung})` : ''))); L.push(''); }
+  if (d.ban_dung && (d.ban_dung.doan || []).length) L.push(banDungText(d.ban_dung), '');
   const s3 = d.lan_sau || {}; L.push('LẦN SAU', 'Quay: ' + (s3.quay || []).join('; '), 'Thu âm: ' + (s3.thu_am || []).join('; '), 'Dựng: ' + (s3.dung_phim || []).join('; '), '');
   if ((d.hook_moi || []).length) { L.push('HOOK MỞ LẠI'); d.hook_moi.forEach(h => L.push(`- [${h.formula}] ${h.text.replace(/\*\*/g, '').replace(/\n/g, ' / ')}`)); L.push(''); }
   if ((d.kich_ban_tiep || []).length) { L.push('KỊCH BẢN TIẾP THEO', d.huong_di || ''); d.kich_ban_tiep.forEach((k, i) => L.push(`${i + 1}. ${k.tieu_de} · Hook: ${k.hook} · Khung: ${KHUNG_TEN[k.khung] || k.khung}\n   ${k.y_tuong}\n   Vì sao: ${k.vi_sao}`)); L.push(''); }
@@ -678,6 +798,10 @@ function demoData(so) {
     tong: 0, manh: ['Cận cảnh cá kho sôi lục bục ở 30s: bắt sáng đẹp, có tiếng, giữ lại làm cảnh mở.', 'Câu "vợ về ăn khen ngon" ở 40s là khoảnh khắc thật, chỉ cần thu tiếng vợ nói thay vì kể lại.', 'Chất liệu ngày mưa + chồng nấu là góc đúng với tệp chị em.'],
     luu_y: [{ giay: 0, van_de: '"Chào mọi người, hôm nay mình nấu…" mất 5 giây đầu', muc: 'nang', sua: 'Cắt bỏ hẳn, mở bằng cảnh cá sôi ở 30s kèm chữ to "Chồng nấu, vợ chỉ việc ăn".' }, { giay: 3, van_de: 'Chữ màn hình nhỏ, góc dưới, một dòng', muc: 'nang', sua: 'Đưa lên 1/3 trên, 2 dòng, cỡ chiếm ngang màn hình.' }, { giay: 14, van_de: 'Quay tổng quan nồi cá 12 giây không có gì mới', muc: 'vua', sua: 'Cắt còn 4 giây, chèn cận tay nêm nếm.' }, { giay: 20, van_de: 'Tiếng quạt lọt vào', muc: 'nhe', sua: 'Hạ tiếng gốc đoạn này, để nhạc và voice-over.' }, { giay: 48, van_de: '"Nhớ follow mình nha"', muc: 'vua', sua: 'Thay bằng câu vợ nói thật hoặc chữ "Mai mưa nữa nấu gì đây?".' }],
     sua_video_nay: [{ viec: 'Đổi cảnh mở', cach: 'Kéo cảnh cá sôi ở 30s lên đầu, 2 giây, chồng chữ to 2 dòng. Cắt bỏ 0–5s.', tac_dung: 'Cửa 1 từ 2,5 lên khoảng 6–7 mà không quay thêm gì.' }, { viec: 'Hạ nhạc, nâng giọng', cach: 'Nhạc xuống 15–20%, voice-over lên, đoạn 20–35s tắt hẳn tiếng gốc.', tac_dung: 'Nghe rõ lời, bớt cảm giác nghiệp dư.' }, { viec: 'Cắt 26–40s', cach: 'Giữ 4 giây kho cá, bỏ phần còn lại, nhảy thẳng sang vợ về.', tac_dung: 'Video còn ~42s, không có đoạn chùng.' }, { viec: 'Đổi kết', cach: 'Bỏ câu follow, kết bằng chữ "Mai mưa nữa nấu gì đây?" trên cảnh vợ ăn.', tac_dung: 'Kéo bình luận gợi món thay vì xin follow.' }],
+    ban_dung: { format: 'vlog', cong_thuc: 'Vlog nấu ăn: mở bằng cảnh món đã xong, cắt theo hành động 2–3 giây một nhịp, giữ tiếng sôi thật, chữ ngữ cảnh 1 dòng ở 3 giây đầu, nhạc nhỏ dưới giọng. Bỏ hết phần kể lại, để hình nói.', do_dai_moi: 26,
+      doan: [{ tu: 0, den: 5, viec: 'cat', loi: 'Chào mọi người, hôm nay mình nấu…', ly_do: 'Câu chào, người lạ lướt qua trước khi thấy món.', chen: '' }, { tu: 5, den: 14, viec: 'rut', loi: 'Trời mưa nên mình làm canh chua…', ly_do: 'Giữ ý ngày mưa, bỏ 3 giây thở ở 9–12s.', chen: 'Chữ 1 dòng "Trời mưa, chồng vào bếp".' }, { tu: 14, den: 18, viec: 'giu', loi: 'Cá này mình mua ở chợ sáng…', ly_do: 'Chi tiết thật, có cận con cá.', chen: 'Zoom 115% vào con cá ở 15s.' }, { tu: 18, den: 26, viec: 'cat', loi: 'Quay tổng quan nồi cá', ly_do: 'Tám giây không có gì mới, tiếng quạt lọt vào.', chen: '' }, { tu: 26, den: 30, viec: 'giu', loi: 'Kho tầm 20 phút là được.', ly_do: 'Có con số, giữ nguyên.', chen: 'Chữ "20 phút" to giữa màn hình.' }, { tu: 30, den: 33, viec: 'doi_cho', loi: 'Cận cá kho sôi lục bục', ly_do: 'Cảnh đẹp nhất video, kéo lên đầu làm hook.', chen: 'Chữ hook 2 dòng 1/3 trên: "Chồng nấu, vợ chỉ việc ăn".' }, { tu: 33, den: 40, viec: 'cat', loi: 'Đảo cá, nêm lại', ly_do: 'Lặp lại hành động đã thấy.', chen: '' }, { tu: 40, den: 48, viec: 'giu', loi: 'Vợ về ăn khen ngon, mình vui.', ly_do: 'Khoảnh khắc thật, là cao trào.', chen: 'Bật to tiếng gốc, hạ nhạc xuống 10%.' }, { tu: 48, den: giay, viec: 'cat', loi: 'Mọi người nhớ follow mình nha.', ly_do: 'Xin follow lộ liễu, thay bằng chữ kết.', chen: '' }],
+      thu_tu: [6, 2, 3, 5, 8],
+      ban_khac: [{ ten: 'Bản 15 giây chỉ có món', format: 'pov', cach: 'Chữ POV 1 dòng ngay giây đầu, chỉ giữ hình cá và cảnh vợ ăn, nhạc trend, không lời.', lay: [{ tu: 30, den: 33, ghi_chu: 'POV: chồng nấu ngày mưa' }, { tu: 14, den: 17, ghi_chu: 'cận cá' }, { tu: 26, den: 29, ghi_chu: 'chữ 20 phút' }, { tu: 42, den: 47, ghi_chu: 'vợ ăn, giữ tiếng thật' }] }, { ten: 'Bản kể chuyện vợ chấm điểm', format: 'ke_chuyen', cach: 'Mở bằng câu vợ khen ở 42s làm cold open, rồi quay lại từ lúc đi chợ, kết bằng chữ "Vợ chấm mấy điểm?".', lay: [{ tu: 42, den: 46, ghi_chu: 'cold open: vợ khen' }, { tu: 14, den: 18, ghi_chu: 'đi chợ sáng' }, { tu: 26, den: 33, ghi_chu: 'kho 20 phút, cá sôi' }, { tu: 46, den: 48, ghi_chu: 'chữ kết kéo bình luận' }] }] },
     lan_sau: { quay: ['Đặt máy dọc, tựa vào lọ gia vị ngang tầm nồi.', 'Bật đèn bếp hoặc quay lúc còn sáng cửa sổ.', 'Quay thêm 1 cận tay nêm nếm và 1 cận mặt vợ lúc ăn.'], thu_am: ['Thu voice-over riêng ở phòng ngủ, tối, tắt quạt.', 'Nói như kể cho bạn thân, lên giọng ở câu có món.'], dung_phim: ['Chữ hook 2 dòng, 1/3 trên, cùng một font trắng viền đen mọi video.', 'Cắt tất cả khoảng thở trên 0,5 giây.', 'Nhạc luôn nhỏ hơn giọng.'] },
     hook_moi: [{ formula: 'Tương phản NHƯNG', text: 'Chồng nấu cơm\nNHƯNG **vợ** chỉ việc ăn' }, { formula: 'Mở bằng lời thoại', text: '“Mưa vầy **ở nhà** ăn gì anh?”' }, { formula: 'Con số', text: '**20 phút** cá kho\ncho vợ ngày mưa' }],
     kich_ban_tiep: [{ tieu_de: 'Series: Mưa thì nấu gì', hook: 'Mưa vầy ở nhà ăn gì anh?', khung: 'vlog', y_tuong: 'Mỗi video một ngày mưa một món, mở bằng câu vợ hỏi, cao trào là lúc bưng lên. Giữ cùng chữ và cùng câu mở để thành format nhận ra được.', vi_sao: 'Video này đã có sẵn cảnh đẹp nhất là lúc món xong; lặp format là cách rẻ nhất để có video thứ 2, 3.' }, { tieu_de: 'Vợ chấm điểm chồng nấu', hook: 'Vợ chấm cá kho của chồng được mấy điểm?', khung: 'fichtean', y_tuong: 'Quay vợ ăn và chấm thật, có số điểm trên màn hình, kết bằng câu chê hoặc khen thật.', vi_sao: 'Câu vợ khen ở 40s là khoảnh khắc ăn nhất video này, đẩy nó thành trung tâm.' }, { tieu_de: 'Đi chợ sáng 50k', hook: 'Cầm 50k đi chợ sáng nấu được gì cho hai vợ chồng', khung: 'hoi', y_tuong: 'Quay từng món mua, hiện giá, về nấu, chốt bữa cơm 50k cho 2 người.', vi_sao: 'Bổ sung con số mà video này đang thiếu, đúng tệp chị em lo chi tiêu.' }],
