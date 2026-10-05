@@ -27,7 +27,7 @@
      ANTHROPIC_API_KEY, OPENAI_API_KEY   (Secret) key khi chọn claude / openai
    ═══════════════════════════════════════════════════════════════════════════ */
 
-const PHIEN_BAN = '2026.10.16';
+const PHIEN_BAN = '2026.10.17';
 /* link /exec của Apps Script đang dùng trong tool (công khai sẵn trong tools/*.html). Biến APPS_SCRIPT_URL trên Cloudflare, nếu có, sẽ được ưu tiên. */
 const APPS_SCRIPT_MD = 'https://script.google.com/macros/s/AKfycbyxe1nWupAl6VheDZHaU3Ojm-d6c8F_khhUMtkehNCLh5OnGW6f2uF0PKPYZ4eYUqyGjQ/exec';
 const asUrl = env => String(env.APPS_SCRIPT_URL || env.APPS_SCRIPT || APPS_SCRIPT_MD).trim();
@@ -36,7 +36,7 @@ const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
 const TTS_MODELS = ['gemini-3.8-flash-lite-tts', 'gemini-3.8-flash-tts', 'gemini-2.5-flash-preview-tts'];
 const TTS_GIONG = { nu_am: 'Kore', nu_tre: 'Leda', nu_diu: 'Aoede', nu_sang: 'Zephyr', nam_tram: 'Charon', nam_tre: 'Puck', nam_am: 'Orus', nam_manh: 'Fenrir' };
 /* CDN được tải hộ: chỉ tên miền chứa file của các nền tảng, để máy chủ không thành proxy mở */
-const HOST_TAI = /(^|\.)(pixabay\.com|tiktokcdn(-us|-eu)?\.com|tiktokcdn-us\.com|tikwm\.com|byteoversea\.com|ibyteimg\.com|byteimg\.com|douyinvod\.com|douyinpic\.com|douyinstatic\.com|twimg\.com|fxtwitter\.com|cdninstagram\.com|fbcdn\.net|bsky\.app|bsky\.network|pexels\.com|ytimg\.com|googlevideo\.com|xhscdn\.com|akamaized\.net|redd\.it|redditmedia\.com|pinimg\.com|vimeocdn\.com|threads\.net|giphy\.com|tenor\.com|freesound\.org|gstatic\.com|googleusercontent\.com)$/i;
+const HOST_TAI = /(^|\.)(pixabay\.com|tiktokcdn(-us|-eu)?\.com|tiktokcdn-us\.com|tikwm\.com|byteoversea\.com|ibyteimg\.com|byteimg\.com|douyinvod\.com|douyinpic\.com|douyinstatic\.com|twimg\.com|fxtwitter\.com|cdninstagram\.com|fbcdn\.net|bsky\.app|bsky\.network|pexels\.com|ytimg\.com|googlevideo\.com|xhscdn\.com|akamaized\.net|redd\.it|redditmedia\.com|pinimg\.com|vimeocdn\.com|threads\.net|giphy\.com|tenor\.com|freesound\.org|gstatic\.com|googleusercontent\.com|jamendo\.com|wikimedia\.org|ccmixter\.org|openverse\.org)$/i;
 const HOST_MEDIA = /(^|\.)(pexels\.com|pixabay\.com)$/i;
 
 export default {

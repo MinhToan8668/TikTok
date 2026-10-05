@@ -840,6 +840,11 @@
   .ed.ccw .item.g.fx{background:linear-gradient(90deg,#6C54DE,#8B6CF6);color:#fff}
   .ed .mauLuoi button{position:relative}.ed .mauLuoi button .fxThem{position:absolute;right:4px;top:4px;font:700 10px/1 "Be Vietnam Pro",system-ui,sans-serif;padding:4px 6px;border-radius:6px;background:var(--ea,#99DF00);color:var(--eaInk,#101400);opacity:0;transition:opacity .12s;z-index:2}
   .ed .mauLuoi button:hover .fxThem{opacity:1}
+  /* kho trực tuyến */
+  .sfxDs .sfxHang.ov{grid-template-columns:34px 1fr 24px 24px 24px;cursor:default}.sfxDs .sfxHang.ov .ic img{width:30px;height:30px;border-radius:6px;object-fit:cover;display:block}.sfxDs .sfxHang.ov .ten small{display:block;opacity:.75;font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sfxDs .sfxHang.ov .ten b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sfxDs .sfxHang.ov button.nut{border:0;background:transparent;cursor:pointer}.sfxDs .sfxHang.ov button.nut.them{background:var(--ea,#99DF00);color:var(--eaInk,#101400);font-weight:800}
+  .khuOv .ovDs{display:flex;flex-direction:column;gap:6px;max-height:420px;overflow:auto;scrollbar-width:thin}
+  .notoLuoi button .the img{width:100%;height:100%;object-fit:contain;padding:8%}
 </style>
 </head>
 <body>
@@ -1148,7 +1153,7 @@
 
 <script src="tai-khoan.js?v=202610041200"></script>
 <script>document.addEventListener("DOMContentLoaded",function(){if(typeof TK==="undefined"){var k=document.createElement("div");k.style.cssText="position:fixed;left:12px;right:12px;bottom:12px;z-index:9999;background:#ff4d6d;color:#fff;padding:12px 14px;border-radius:12px;font:14px system-ui;display:flex;gap:10px;align-items:center;justify-content:space-between";k.innerHTML="Trang tải thiếu một phần (mạng chập chờn) nên nút AI chưa chạy được. <button onclick=\"location.reload()\" style=\"background:#fff;color:#000;border:0;border-radius:8px;padding:6px 12px;font-weight:700\">Tải lại trang</button>";document.body.appendChild(k);}});</script>
-<script src="kho/kho.js?v=20261004b"></script>
+<script src="kho/kho.js?v=20261005"></script>
 <script>
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 const el = (t, c, txt) => { const e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; };
@@ -5200,7 +5205,55 @@ function khoiTaoLopFx() {
   $$('.etabs button[data-tab]').forEach(b => { if (b.dataset.tab === 'hieu' || b.dataset.tab === 'loc') b.addEventListener('click', () => { khoAnhMau = null; try { if (b.dataset.tab === 'hieu') veKhoHieuUng(); else veKhoLoc(); } catch { } gan(); }); });
 }
 
-khoiTaoB(); khoiTaoC(); khoiTaoUI(); khoiTaoLop(); khoiTaoBang(); khoiTaoDot1(); khoiTaoDot2(); khoiTaoDot3(); khoiTaoM1(); khoiTaoM2(); khoiTaoM3(); khoiTaoN(); khoiTaoMobi(); khoiTaoCCW(); khoiTaoKho(); khoiTaoDoc(); khoiTaoGon(); khoiTaoMediaCC(); khoiTaoCC2(); khoiTaoFsBar(); khoiTaoKfGfx(); khoiTaoVanBanCC(); khoiTaoBangFont(); khoiTaoLopFx(); veTl();
+/* ═════════ Kho trực tuyến theo chủ đề (như CapCut): nhạc nền + hiệu ứng âm từ Openverse (CC, dùng thương mại), nhãn dán động Noto Emoji (Google, Apache 2.0) ═════════ */
+const OV_API = 'https://api.openverse.org/v1/audio/';
+function ovNhan(r) { return { ten: r.title || 'Không tên', tac_gia: r.creator || '', giay: Math.round((r.duration || 0) / 100) / 10, giay_phep: String(r.license || '').toUpperCase() + (r.license_version ? ' ' + r.license_version : ''), link: r.url, nguon: r.source || r.provider || 'openverse', trang: r.foreign_landing_url || '', thumb: r.thumbnail || '' }; }
+async function ovTim(loai, q, trang) {
+  const key = 'ov:' + loai + ':' + q + ':' + (trang || 1); try { const c = JSON.parse(sessionStorage.getItem(key) || 'null'); if (c && Date.now() - c.luc < 3600e3) return c.ds; } catch { }
+  const u = OV_API + '?' + new URLSearchParams({ q, source: loai === 'nhac' ? 'jamendo' : 'freesound', license_type: 'commercial', page_size: '20', page: String(trang || 1) });   // Jamendo = nhạc, Freesound = hiệu ứng (trường category của Openverse thưa, lọc theo nguồn cho nhiều kết quả)
+  const r = await fetch(u, { headers: { Accept: 'application/json' } }); if (r.status === 429) throw new Error('Openverse giới hạn 20 lượt/phút · chờ một lát'); if (!r.ok) throw new Error('Openverse ' + r.status);
+  const j = await r.json(); const ds = (j.results || []).filter(x => x.url).map(ovNhan); try { sessionStorage.setItem(key, JSON.stringify({ luc: Date.now(), ds })); } catch { } return ds;
+}
+async function taiAmTrucTuyen(link, ten, mime) { try { const r = await fetch(link, { mode: 'cors' }); if (!r.ok) throw 0; const b = await r.blob(); return new File([b], ten, { type: b.type && b.type !== 'application/octet-stream' ? b.type : mime }); } catch { return taiQuaMc(link, ten, mime); } }   // host có CORS (Freesound) tải thẳng; không thì qua máy chủ Cloudflare
+function ghiNguon(s) { P.ghiNguon = P.ghiNguon || []; if (!P.ghiNguon.some(x => x.link === s.link)) P.ghiNguon.push({ ten: s.ten, tac_gia: s.tac_gia, giay_phep: s.giay_phep, nguon: s.nguon, link: s.trang || s.link }); }
+function chepGhiNguon() { const ds = P.ghiNguon || []; if (!ds.length) { toast('Chưa dùng nhạc / âm thanh nào từ kho trực tuyến'); return; } const t = ds.map(x => '“' + x.ten + '” – ' + x.tac_gia + ' (' + x.giay_phep + ', ' + x.nguon + ') ' + x.link).join('\n'); navigator.clipboard.writeText(t).then(() => toast('Đã chép ' + ds.length + ' dòng ghi nguồn · dán vào mô tả video'), () => luuText('ghi-nguon.txt', t)); }
+let ovDangPhat = null;
+function veOvDs(box, loai, q) {
+  box.innerHTML = '<div class="quota">Đang tải…</div>';
+  ovTim(loai, q).then(ds => { box.innerHTML = ''; if (!ds.length) { box.appendChild(el('div', 'quota', 'Không thấy kết quả, thử chủ đề khác.')); return; }
+    ds.forEach(s => { const b = el('div', 'sfxHang ov'); b.innerHTML = '<span class="ic">' + (loai === 'nhac' ? (s.thumb ? '<img alt="" loading="lazy">' : '🎵') : '🔊') + '</span><span class="ten"><b></b><small></small></span>'; const im = b.querySelector('img'); if (im) { im.src = s.thumb; im.onerror = () => { im.replaceWith(document.createTextNode('🎵')); }; } b.querySelector('b').textContent = s.ten; b.querySelector('small').textContent = (s.tac_gia || 'Khuyết danh') + ' · ' + (s.giay >= 60 ? Math.floor(s.giay / 60) + ':' + String(Math.round(s.giay % 60)).padStart(2, '0') : fmt1(s.giay) + 's') + ' · ' + s.giay_phep;
+      const nghe = el('button', 'nut'); nghe.type = 'button'; nghe.textContent = '▶'; nghe.title = 'Nghe thử'; nghe.onclick = e => { e.stopPropagation(); if (ovDangPhat && ovDangPhat.nut === nghe) { ovDangPhat.a.pause(); ovDangPhat = null; nghe.textContent = '▶'; return; } if (ovDangPhat) { ovDangPhat.a.pause(); ovDangPhat.nut.textContent = '▶'; } const a = new Audio(s.link); a.volume = 0.8; a.play().catch(() => { a.src = MC.url + '/tai?xem=1&u=' + encodeURIComponent(s.link); a.play().catch(() => toast('Không phát được, thử bấm +')); }); nghe.textContent = '■'; ovDangPhat = { a, nut: nghe }; a.onended = () => { nghe.textContent = '▶'; ovDangPhat = null; }; };
+      const them = el('button', 'nut them'); them.type = 'button'; them.textContent = '+'; them.title = loai === 'nhac' ? 'Dùng làm nhạc nền (đo beat, tự hạ khi có lời)' : 'Thêm vào dòng thời gian tại đầu phát';
+      them.onclick = async e => { e.stopPropagation(); them.disabled = true; them.textContent = '…'; try { const f = await taiAmTrucTuyen(s.link, (s.ten || 'am-thanh').replace(/[^\w\s-]/g, '').slice(0, 40) + '.mp3', 'audio/mpeg'); if (loai === 'nhac') { const inp = $('#nhacIn'); const dt = new DataTransfer(); dt.items.add(f); inp.files = dt.files; inp.dispatchEvent(new Event('change')); toast('Đang đặt “' + s.ten + '” làm nhạc nền…'); } else { const kho = 'f:' + uid(); await am3NapBlob(kho, f); await themAm3(kho, s.ten || 'Âm thanh', 'file'); toast('Đã thêm “' + s.ten + '” tại đầu phát'); } ghiNguon(s); } catch (er) { toast('Không tải được: ' + (er && er.message || er) + ' · máy chủ Cloudflare cần bản mới để tải nguồn này'); } them.disabled = false; them.textContent = '+'; };
+      if (loai === 'nhac') { const a3 = el('button', 'nut'); a3.type = 'button'; a3.textContent = '⤓'; a3.title = 'Thêm vào track âm thanh A3 tại đầu phát (thay vì làm nhạc nền)'; a3.onclick = async e => { e.stopPropagation(); a3.disabled = true; try { const f = await taiAmTrucTuyen(s.link, (s.ten || 'nhac').replace(/[^\w\s-]/g, '').slice(0, 40) + '.mp3', 'audio/mpeg'); const kho = 'f:' + uid(); await am3NapBlob(kho, f); await themAm3(kho, s.ten || 'Nhạc', 'file'); ghiNguon(s); toast('Đã thêm “' + s.ten + '” vào A3'); } catch (er) { toast('Không tải được: ' + (er && er.message || er)); } a3.disabled = false; }; b.appendChild(nghe); b.appendChild(a3); b.appendChild(them); } else { b.appendChild(nghe); b.appendChild(them); }
+      box.appendChild(b); });
+    const gn = el('div', 'quota'); gn.innerHTML = 'Nguồn: Openverse (Freesound, Jamendo, Wikimedia…) · chỉ lấy giấy phép dùng thương mại. <b>CC0</b> dùng tự do; <b>CC BY</b> cần ghi tên tác giả → nút “Chép ghi nguồn” bên dưới. Giấy phép <b>ND</b>: dùng nguyên bản, không cắt ghép nhạc.'; box.appendChild(gn);
+  }).catch(e => { box.innerHTML = ''; box.appendChild(el('div', 'quota', '⚠ ' + e.message)); });
+}
+function veKhuOv(loai, ds, tieuDe, goiY) {
+  const khu = el('div', 'khuOv'); khu.dataset.loai = loai; khu.innerHTML = '<h3 class="pt"></h3><div class="row khoHang"><input type="search" class="ovTim" placeholder=""><button class="btn nho xanh ovNut" type="button">Tìm</button></div><div class="row khoChip ovChip"></div><div class="sfxDs ovDs"></div><div class="row"><button class="btn nho ghost ovNguon" type="button">📋 Chép ghi nguồn</button></div>';
+  khu.querySelector('h3').textContent = tieuDe; const tim = khu.querySelector('.ovTim'); tim.placeholder = goiY; const chip = khu.querySelector('.ovChip'), kq = khu.querySelector('.ovDs');
+  let dangChon = null; const veChip = () => { chip.innerHTML = ''; ds.forEach(([ten, q]) => { const b = el('button', 'btn nho' + (dangChon === q ? ' xanh' : ''), ten); b.type = 'button'; b.onclick = () => { dangChon = q; tim.value = ''; veChip(); veOvDs(kq, loai, q); }; chip.appendChild(b); }); }; veChip();
+  const timDi = () => { const q = tim.value.trim(); if (!q) return; dangChon = null; veChip(); veOvDs(kq, loai, q); }; khu.querySelector('.ovNut').onclick = timDi; tim.onkeydown = e => { e.stopPropagation(); if (e.key === 'Enter') timDi(); };
+  khu.querySelector('.ovNguon').onclick = chepGhiNguon; kq.appendChild(el('div', 'quota', 'Chọn một chủ đề hoặc gõ từ khoá (tiếng Anh cho nhiều kết quả hơn).'));
+  return khu;
+}
+/* nhãn dán động Noto (Google) */
+const NOTO_URL = 'https://fonts.gstatic.com/s/e/notoemoji/latest/';
+function veNotoLuoi(box, ma) { box.innerHTML = ''; (KHO.notoNhom[ma] || []).forEach(cp => { const b = el('button'); b.type = 'button'; b.title = 'Thêm nhãn dán động lên V3'; const t = el('div', 'the'); const im = el('img'); im.loading = 'lazy'; im.alt = ''; im.src = NOTO_URL + cp + '/512.webp'; im.onerror = () => b.remove(); t.appendChild(im); b.appendChild(t);
+  b.onclick = async () => { b.disabled = true; try { const r = await fetch(NOTO_URL + cp + '/512.gif'); if (!r.ok) throw new Error('tải ' + r.status); const f = new File([await r.blob()], 'noto-' + cp + '.gif', { type: 'image/gif' }); await themSticker([f]); const src = P.srcs.filter(z => z.ten === f.name).pop(); if (src) { await giaiMaDong(src); veKhung(); } toast('Đã thêm nhãn dán động lên V3'); } catch (e) { toast('Không tải được: ' + e.message); } b.disabled = false; }; box.appendChild(b); }); if (!box.children.length) box.appendChild(el('div', 'quota', 'Không tải được nhãn dán (cần mạng).')); }
+function khoiTaoKhoTrucTuyen() {
+  if (!KHO_OK || !KHO.ovNhac) return;
+  // Âm thanh: nhạc theo chủ đề (trước mục Nhạc nền), hiệu ứng âm theo chủ đề (đầu hộp hiệu ứng)
+  const amPane = $('[data-pane="am"]'); if (amPane) { const h3Nhac = [...amPane.querySelectorAll('h3.pt')].find(x => x.textContent.trim() === 'Nhạc nền'); const khuN = veKhuOv('nhac', KHO.ovNhac, 'Nhạc theo chủ đề (miễn phí, dùng thương mại)', 'Tìm nhạc: lofi, piano, upbeat…'); if (h3Nhac) h3Nhac.parentNode.insertBefore(khuN, h3Nhac); else amPane.appendChild(khuN);
+    const am3 = $('#am3Hop'); if (am3) { const h3Sfx = [...am3.querySelectorAll('h3.pt')].find(x => /Hiệu ứng âm thanh/.test(x.textContent)); const khuA = veKhuOv('am', KHO.ovAm, 'Hiệu ứng âm theo chủ đề (trực tuyến)', 'Tìm hiệu ứng: whoosh, ding, pop…'); if (h3Sfx) am3.insertBefore(khuA, h3Sfx); else am3.appendChild(khuA); } }
+  // Nhãn dán động Noto
+  const stPane = $('[data-pane="sticker"]'); if (stPane && KHO.notoNhom) { const khu = el('div', 'khuNoto'); khu.innerHTML = '<h3 class="pt">Nhãn dán động (Noto Emoji · Google)</h3><div class="row khoChip notoChip"></div><div class="mauLuoi khoSticker notoLuoi"></div><div class="quota">Hoạt ảnh gif nền trong suốt, dùng tự do (Apache 2.0). Bấm để thêm lên V3, kéo trên khung để đặt chỗ.</div>'; const neo = $('#emojiNhanh'); (neo ? neo.parentNode : stPane).insertBefore(khu, neo ? neo.nextSibling : null); const chip = khu.querySelector('.notoChip'), luoi = khu.querySelector('.notoLuoi'); const dsNhom = Object.keys(KHO.notoNhom); let cur = dsNhom[0]; const veChip = () => { chip.innerHTML = ''; dsNhom.forEach(k => { const b = el('button', 'btn nho' + (cur === k ? ' xanh' : ''), KHO.notoTen[k] || k); b.type = 'button'; b.onclick = () => { cur = k; veChip(); veNotoLuoi(luoi, k); }; chip.appendChild(b); }); }; veChip(); veNotoLuoi(luoi, cur); }
+  // dựng lại cột danh mục bên trái của hai tab để có mục mới
+  ['am', 'sticker'].forEach(k => { const pane = $('[data-pane="' + k + '"]'); if (!pane) return; const noi = pane.querySelector(':scope > .noi'), ben = pane.querySelector(':scope > .ben'); if (noi) { while (noi.firstChild) pane.appendChild(noi.firstChild); noi.remove(); } if (ben) ben.remove(); pane.classList.remove('coBen'); delete pane._veBen; try { taoBen(pane); } catch { } });
+}
+
+khoiTaoB(); khoiTaoC(); khoiTaoUI(); khoiTaoLop(); khoiTaoBang(); khoiTaoDot1(); khoiTaoDot2(); khoiTaoDot3(); khoiTaoM1(); khoiTaoM2(); khoiTaoM3(); khoiTaoN(); khoiTaoMobi(); khoiTaoCCW(); khoiTaoKho(); khoiTaoDoc(); khoiTaoGon(); khoiTaoMediaCC(); khoiTaoCC2(); khoiTaoFsBar(); khoiTaoKfGfx(); khoiTaoVanBanCC(); khoiTaoBangFont(); khoiTaoLopFx(); khoiTaoKhoTrucTuyen(); veTl();
 </script>
 <script src="tro-ly.js?v=202610011200"></script>
 </body>
