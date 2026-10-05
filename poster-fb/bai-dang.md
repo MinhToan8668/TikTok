@@ -12,11 +12,39 @@ Vài điều giữ khi sửa chữ:
 
 ---
 
-## 0 · Tổng quan
+## 0 · Tổng quan (bài mở đầu chuỗi)
 
-Ảnh: `00-tong-quan.png`
+Ảnh: `00-tong-quan.png`. Đây là bài đầu tiên, đăng trước khi giới thiệu từng tool. Chọn 1 trong 3 bản.
 
-**Facebook**
+**Facebook · bản A (kể vì sao làm ra tool)**
+
+```
+Tụi mình dạy làm TikTok, và học viên hay gửi video hỏi "vậy ổn chưa anh/chị?"
+
+Hỏi xong là ngồi chờ mentor rảnh coi giùm. Video nào cũng chờ vậy thì lâu lắm, mà nhiều lỗi thật ra tự thấy được nếu biết coi chỗ nào.
+
+Nên tụi mình gom mấy cách soi, cách chấm dạy trong lớp lại, code thành một bộ tool cho học viên tự làm luôn. Tên là Viral Studio.
+
+Có 6 món: tải video không logo, soi vì sao video người ta nổ, chấm hook, chấm kịch bản, dựng video, chấm video trước khi đăng. Mở trình duyệt trên điện thoại là xài, không cài app.
+
+Giờ tụi mình mở cho mọi người dùng thử free luôn. Từ mai mỗi ngày kể kỹ 1 món kèm cách dùng, bạn lưu bài này lại làm mục lục nha.
+
+Làm video, bạn đang hay kẹt ở khâu nào nhất?
+```
+
+**Facebook · bản B (ngắn, để ảnh nói)**
+
+```
+6 tool làm video TikTok, mở điện thoại là xài, có bản thử free.
+
+Tụi mình code ra để học viên trong lớp tự soi, tự chấm, tự dựng mà không phải chờ ai. Giờ mở cho mọi người dùng thử luôn.
+
+Ảnh là 6 tool xếp đúng thứ tự làm 1 video. 7 ngày tới tụi mình kể từng cái, lưu lại nha.
+
+Bạn muốn coi cái nào trước?
+```
+
+**Facebook · bản C (6 khâu làm tay)**
 
 ```
 Làm 1 video TikTok có 6 khâu, mà khâu nào hồi trước tụi mình cũng ngồi làm tay hết.
@@ -35,11 +63,11 @@ Bạn đang hay kẹt ở khâu nào nhất?
 **Threads**
 
 ```
-Làm 1 video tiktok có 6 khâu, khâu nào tụi t cũng từng ngồi làm tay muốn xỉu =)))
+tụi t dạy làm tiktok, xong lỡ code luôn 6 cái tool cho học viên tự xài, giờ mở free cho mn thử =)))
 
-Nên tụi t code luôn 6 cái tool: tải video ko logo, soi sao video người ta nổ, chấm hook, chấm kịch bản, dựng video, chấm video trước khi đăng
+tải video ko logo, soi sao video người ta nổ, chấm hook, chấm kịch bản, dựng video, chấm video trước khi đăng
 
-Mở đt là xài, ko cài app, có bản free. Mn đang kẹt khâu nào
+mai t kể từng cái. mn muốn coi cái nào trước
 ```
 
 Bình luận đầu: `Link Viral Studio nè https://minhtoan8668.github.io/TikTok/ kẹt khâu nào cứ nói, tụi mình chỉ tool cho khâu đó`
