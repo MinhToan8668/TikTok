@@ -1298,9 +1298,10 @@ function hookChamVideo(b, ai, provider, key){
 
   // Cùng video + cùng thông số → trả đúng kết quả cũ, KHÔNG trừ lượt. Khóa tính từ đúng những gì học viên gửi
   // (không dùng số tikwm trả về vì nó đổi theo phút), kèm nhà cung cấp AI và hồ sơ kênh để đổi hồ sơ là chấm mới.
+  // Tiền tố cham2_: kết quả từ trước khi có bản dựng lại (ban_dung) không được trả lại nữa.
   var han = hookHan(ai);
   var dauVideo = b.file_uri ? String(b.file_uri) : b.video_b64 ? ('b64:' + String(b.video_b64).length + ':' + String(b.video_b64).slice(0, 3000) + ':' + String(b.video_b64).slice(-1000)) : String(b.link || '').trim();
-  var khoaNho = 'cham_' + Utilities.base64EncodeWebSafe(Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, [me.ma, provider, dauVideo, JSON.stringify(so), gioDang, daDang, b.muc_tieu, yDinh, chuDe, doiTuong, sanPham, loiThoai, JSON.stringify(ai.hs || {})].join('|'), Utilities.Charset.UTF_8)).slice(0, 40);
+  var khoaNho = 'cham2_' + Utilities.base64EncodeWebSafe(Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, [me.ma, provider, dauVideo, JSON.stringify(so), gioDang, daDang, b.muc_tieu, yDinh, chuDe, doiTuong, sanPham, loiThoai, JSON.stringify(ai.hs || {})].join('|'), Utilities.Charset.UTF_8)).slice(0, 40);
   try{
     var nho = CacheService.getScriptCache().get(khoaNho);
     if (nho){ var dn = JSON.parse(nho); dn.meta = dn.meta || {}; dn.meta.tu_bo_nho = true; return jsonOut({ok:true, data:dn, con:null, han:han, loai:ai.loai, tool:ai.tool, luot: hookLuotCon(ai), tu_bo_nho:true}); }
