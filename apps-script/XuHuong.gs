@@ -80,15 +80,17 @@ function xhThongKeText(tk){
 
 /* ── 3. gọi Gemini trả chữ thường, có thể bật tra Google (google_search) ── */
 function xhGoiAi(prompt, timKiem){
-  var key = hookCfg('GEMINI_API_KEY'); if (!key) return {ok:false, loi:'chua_co_key'};
+  var rieng = cfgProp('XH_GEMINI_KEY');   // key riêng cho bản tin (/xhkey): có thì chỉ dùng key này, không đụng key của học viên
+  var key = rieng || hookCfg('GEMINI_API_KEY'); if (!key) return {ok:false, loi:'chua_co_key'};
   var models = (geminiModels(key) || []).filter(function(m){ return !/lite/.test(m); }).slice(0, 3);
   if (!models.length) models = ['gemini-2.5-flash'];
-  var ds = gemDsKey(key), loi = '';
+  var ds = rieng ? [rieng] : gemDsKey(key), loi = '', nghiIt = 0, daGoi = false;
   for (var mi = 0; mi < models.length; mi++){
     for (var ki = 0; ki < ds.length; ki++){
-      var k = ds[ki], model = models[mi];
-      if (gemConNghi(k, model).giay) continue;
-      var body = { contents:[{role:'user', parts:[{text: prompt}]}], generationConfig:{ temperature: 0.4, maxOutputTokens: 8000 } };
+      var k = ds[ki], model = models[mi], nghi = gemConNghi(k, model).giay;
+      if (nghi){ nghiIt = nghiIt ? Math.min(nghiIt, nghi) : nghi; continue; }
+      daGoi = true;
+      var body = { contents:[{role:'user', parts:[{text: prompt}]}], generationConfig:{ temperature: 0.4, maxOutputTokens: 16000 } };
       if (timKiem) body.tools = [{ google_search: {} }];
       var r;
       try{ r = UrlFetchApp.fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':generateContent', {method:'post', contentType:'application/json', muteHttpExceptions:true, headers:{'x-goog-api-key': k}, payload: JSON.stringify(body)}); }
@@ -98,18 +100,38 @@ function xhGoiAi(prompt, timKiem){
         var j = {}; try{ j = JSON.parse(raw); }catch(e){}
         var cand = (j.candidates || [])[0] || {};
         var chu = ((cand.content || {}).parts || []).map(function(p){ return p.text || ''; }).join('').trim();
-        if (!chu){ loi = model + ' tra ve rong'; continue; }
+        if (!chu){ loi = model + ' tra ve rong (' + (cand.finishReason || (j.promptFeedback || {}).blockReason || '?') + ')'; continue; }
         var nguon = [], daCo = {};
         (((cand.groundingMetadata || {}).groundingChunks) || []).forEach(function(c){ var w = c.web || {}; if (w.uri && !daCo[w.uri] && nguon.length < 6){ daCo[w.uri] = 1; nguon.push({ten: String(w.title || '').slice(0, 80), uri: String(w.uri)}); } });
         return {ok:true, text: chu, nguon: nguon, model: model, tim: !!timKiem};
       }
       loi = model + ' http ' + ma + ': ' + String(raw).slice(0, 200);
-      if (ma === 429){ var d4 = gemDoc429(raw); gemKeyNghi(k, d4.ngay ? gemGiayToiReset() : Math.max(20, d4.cho || 0), model, d4.ngay ? 'n' : 'p'); continue; }
-      if (ma === 400 && timKiem) return {ok:false, loi: loi, khong_tim: true};   // model hoặc key không cho tra Google
+      if (ma === 429){
+        // Có tra Google thì 429 có thể chỉ là hết lượt tra Google: không cho key nghỉ, để lượt không tra vẫn chạy và tool của học viên không bị ảnh hưởng
+        if (timKiem) continue;
+        var d4 = gemDoc429(raw); gemKeyNghi(k, d4.ngay ? gemGiayToiReset() : Math.max(20, d4.cho || 0), model, d4.ngay ? 'n' : 'p'); continue;
+      }
+      if (ma === 400 && timKiem && !/API_KEY_INVALID|API key not valid/i.test(raw)) return {ok:false, loi: loi, khong_tim: true};   // model hoặc key không cho tra Google
       if (ma === 404) break;
     }
   }
-  return {ok:false, loi: loi};
+  if (!daGoi && nghiIt) return {ok:false, loi: 'het_luot:' + nghiIt};
+  return {ok:false, loi: loi || 'khong_ro'};
+}
+/* lỗi tạo bản tin → câu dễ hiểu + việc cần làm */
+function xhLoiDe(loi){
+  loi = String(loi || '');
+  var m = loi.match(/^het_luot:(\d+)/);
+  var rieng = !!cfgProp('XH_GEMINI_KEY'), them = rieng ? '/xhkey' : '/keygemini';
+  if (loi === 'chua_co_key') return '🔑 Máy chủ chưa có key Gemini. Bấm /xhkey để gắn key riêng cho bản tin (hoặc /keygemini), xong bấm /xhtao lại.';
+  if (rieng && /^het_luot|http 429/.test(loi)) return '⏳ Key Gemini riêng của bản tin đang hết lượt' + ((loi.match(/^het_luot:(\d+)/) || [])[1] ? ', mở lại sau khoảng ' + hookThoiGian(Number(loi.match(/^het_luot:(\d+)/)[1])) : '') + '. Đổi key khác: /xhkey. Bỏ key riêng để dùng chung key học viên: /xhkey rồi gửi `tat`.';
+  if (m) return '⏳ Các key Gemini đang hết lượt, mở lại sau khoảng ' + hookThoiGian(Number(m[1])) + '. Muốn chạy ngay: thêm key tạo ở project Google khác bằng /keygemini.';
+  if (/http 429/.test(loi)) return '⏳ Key Gemini hết hạn mức. Đợi một lúc rồi bấm /xhtao, hoặc thêm key ở project khác bằng /keygemini.';
+  if (/API_KEY_INVALID|API key not valid|http 401/i.test(loi)) return '🔑 Key Gemini sai hoặc đã bị xoá. Gửi key mới qua ' + them + '.';
+  if (/http 403/.test(loi)) return '🔑 Key Gemini bị chặn (project chưa bật Generative Language API hoặc key giới hạn API). Tạo key mới ở aistudio.google.com rồi thêm bằng ' + them + '.';
+  if (/^mang|Timeout|timed out/i.test(loi)) return '📶 Máy chủ gọi Gemini bị lỗi mạng. Bấm /xhtao lại sau 1 phút.';
+  if (/tra ve rong/.test(loi)) return '🤔 AI trả về rỗng. Bấm /xhtao lại.';
+  return '⚠️ Lỗi chưa rõ. Bấm /xhtao lại; vẫn lỗi thì chụp tin này gửi người làm kỹ thuật.';
 }
 
 /* ── 4. tạo bản tin nháp và gửi bot ── */
@@ -145,7 +167,7 @@ function xhTaoBanTin(){
   var p = xhPrompt(tk, xhNguonText(yt, rss));
   var kq = xhGoiAi(p, true);
   if (!kq.ok) kq = xhGoiAi(p + '\n\nLần này KHÔNG tra được Google: chỉ dựa vào số liệu nội bộ và kiến thức nghề, ghi nguồn (nội bộ) hoặc (kinh nghiệm).', false);
-  if (!kq.ok){ xhBaoAdmin('⚠️ Chưa tạo được bản tin xu hướng tuần: ' + String(kq.loi || '').slice(0, 200) + '\nThử lại: /xuhuong tao'); return {ok:false, loi: kq.loi}; }
+  if (!kq.ok){ xhBaoAdmin('⚠️ Chưa tạo được bản tin xu hướng tuần.\n' + xhLoiDe(kq.loi) + '\n\nChi tiết: `' + String(kq.loi || '').replace(/`/g, "'").slice(0, 200) + '`'); return {ok:false, loi: kq.loi}; }
   var nhap = { id: Utilities.formatDate(new Date(), 'GMT+7', 'yyMMddHHmm'), text: String(kq.text).slice(0, 3000), nguon: kq.nguon || [], tim: kq.tim,
     so_soi: tk.so_soi, so_cham: tk.so_cham, luc: nowVN(),
     yt: yt.ok ? yt.so + ' video thịnh hành (' + yt.so_shorts + ' video ngắn)' : 'không lấy được (' + String(yt.loi || '').slice(0, 80) + ')',
@@ -191,9 +213,9 @@ function xhCallback(cb){
 
 /* ── 6. lệnh bot /xuhuong (Studio.gs chuyển sang) ── */
 /* Lệnh tắt trong menu bot, bấm là chạy không cần gõ chữ phía sau: /xhtao /xhsua /xhyoutube /xhrss /xhlich */
-var XH_LENH_TAT = { xhtao: 'tao', xhsua: 'sua', xhyoutube: 'youtube', xhrss: 'rss', xhlich: 'lich' };
+var XH_LENH_TAT = { xhtao: 'tao', xhsua: 'sua', xhkey: 'key', xhyoutube: 'youtube', xhrss: 'rss', xhlich: 'lich' };
 function xhLenhTat(cmd, arg, chatId, msg){
-  var con = XH_LENH_TAT[cmd], coThem = con === 'youtube' || con === 'rss';
+  var con = XH_LENH_TAT[cmd], coThem = con === 'youtube' || con === 'rss' || con === 'key';
   var choLai = con === 'sua' ? 'xuhuong' : cmd;   // câu trả lời sau khi bot hỏi quay về đúng lệnh này
   var hoi = function(cau){ datCho(chatId, choLai); return tgSend(chatId, cau + '\n\n_Đổi ý thì /huy._'); };
   return xhLenh(coThem ? (con + ' ' + String(arg || '')).trim() : con, chatId, hoi, msg);
@@ -201,20 +223,21 @@ function xhLenhTat(cmd, arg, chatId, msg){
 var XH_NUT = [
   [{text: '🔄 Tạo bản tin mới', callback_data: 'x:l:tao'}, {text: '✏️ Tự viết / sửa', callback_data: 'x:l:sua'}],
   [{text: '▶️ Key YouTube', callback_data: 'x:l:youtube'}, {text: '📰 Nguồn RSS', callback_data: 'x:l:rss'}],
-  [{text: '⏰ Tự chạy mỗi thứ Hai', callback_data: 'x:l:lich'}]
+  [{text: '🔑 Key Gemini riêng', callback_data: 'x:l:key'}, {text: '⏰ Tự chạy mỗi thứ Hai', callback_data: 'x:l:lich'}]
 ];
 function xhLenh(arg, chatId, hoi, msg){
   arg = String(arg || '').trim();
   var c = CacheService.getScriptCache(), dangSua = c.get('xh_sua_' + chatId);
   var lenh = arg.toLowerCase();
   var dau1 = lenh.split(/\s+/)[0], conLai = arg.replace(/^\S+\s*/, '');
-  if (dangSua && arg && !/^(tao|tạo|sua|sửa|tat|tắt|lich|lịch|xem|youtube|yt|rss)$/.test(dau1)){
+  if (dangSua && arg && !/^(tao|tạo|sua|sửa|tat|tắt|lich|lịch|xem|youtube|yt|rss|key)$/.test(dau1)){
     c.remove('xh_sua_' + chatId);
     var nhapCu = xhDocP('XH_NHAP'), o = xhDuyet(arg, nhapCu && nhapCu.nguon);
     return tgSend(chatId, '✅ Đã duyệt bản bạn sửa · các tool AI dùng tới ' + Utilities.formatDate(new Date(o.het), 'GMT+7', 'dd/MM/yyyy') + '.');
   }
   if (/^(AIza|AQ\.)/.test(arg) && !dangSua) return xhLenhYoutube(arg, chatId, hoi, msg);   // dán key sau câu bot hỏi
   if (/^https?:\/\//i.test(arg) && !dangSua) return xhLenhRss(arg, chatId, hoi);           // dán link RSS sau câu bot hỏi
+  if (dau1 === 'key') return xhLenhKey(conLai, chatId, hoi, msg);
   if (dau1 === 'youtube' || dau1 === 'yt') return xhLenhYoutube(conLai, chatId, hoi, msg);
   if (dau1 === 'rss') return xhLenhRss(conLai, chatId, hoi);
   if (lenh === 'tao' || lenh === 'tạo'){
@@ -241,8 +264,8 @@ function xhLenh(arg, chatId, hoi, msg){
   else d.push(duyet ? '⌛ Bản tin cũ đã hết hạn, các tool đang không dùng xu hướng.' : '⛔ Chưa có bản tin nào được duyệt.');
   if (nhap) d.push('', '📝 Có bản nháp ' + nhap.luc + ' đang chờ duyệt (xem lại tin nhắn có nút Duyệt).');
   d.push('', '📊 Số liệu ' + XH_NGAY_DOC + ' ngày: ' + tk.so_soi + ' lượt soi, ' + tk.so_cham + ' lượt chấm.',
-    '▶️ YouTube: ' + (cfgProp('YOUTUBE_API_KEY') ? 'có key riêng' : 'chưa có key riêng, thử bằng key Gemini') + ' · 📰 RSS: ' + xhDsRss().length + ' nguồn',
-    '', 'Bấm nút bên dưới, hoặc chọn trong Menu: /xhtao tạo bản nháp ngay · /xhsua tự viết, sửa · /xhyoutube key YouTube · /xhrss nguồn RSS · /xhlich tự chạy thứ Hai · `/xuhuong tat` gỡ bản tin');
+    '🔑 Gemini: ' + (cfgProp('XH_GEMINI_KEY') ? 'key riêng …' + String(cfgProp('XH_GEMINI_KEY')).slice(-4) : 'dùng chung key của tool học viên') + ' · ▶️ YouTube: ' + (cfgProp('YOUTUBE_API_KEY') ? 'có key riêng' : 'chưa có key riêng, thử bằng key Gemini') + ' · 📰 RSS: ' + xhDsRss().length + ' nguồn',
+    '', 'Bấm nút bên dưới, hoặc chọn trong Menu: /xhtao tạo bản nháp ngay · /xhsua tự viết, sửa · /xhkey key Gemini riêng · /xhyoutube key YouTube · /xhrss nguồn RSS · /xhlich tự chạy thứ Hai · `/xuhuong tat` gỡ bản tin');
   return tgSend(chatId, d.join('\n'), XH_NUT);
 }
 
@@ -318,7 +341,7 @@ function xhLayRss(){
 function xhGiayIso(s){ var m = String(s || '').match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/); return m ? (Number(m[1] || 0) * 3600 + Number(m[2] || 0) * 60 + Number(m[3] || 0)) : 0; }
 var XH_YT_LOAI = { '1':'Phim, hoạt hình', '2':'Xe', '10':'Âm nhạc', '15':'Thú cưng', '17':'Thể thao', '19':'Du lịch', '20':'Game', '22':'Đời sống, vlog', '23':'Hài', '24':'Giải trí', '25':'Tin tức', '26':'Hướng dẫn, phong cách', '27':'Giáo dục', '28':'Khoa học, công nghệ' };
 function xhLayYoutube(){
-  var key = cfgProp('YOUTUBE_API_KEY') || hookCfg('GEMINI_API_KEY');
+  var key = cfgProp('YOUTUBE_API_KEY') || cfgProp('XH_GEMINI_KEY') || hookCfg('GEMINI_API_KEY');
   if (!key) return { ok:false, loi:'chua_co_key' };
   var r;
   try{ r = UrlFetchApp.fetch('https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics,contentDetails&chart=mostPopular&regionCode=VN&hl=vi&maxResults=50', { muteHttpExceptions: true, headers: { 'x-goog-api-key': key } }); }
@@ -347,6 +370,27 @@ function xhNguonText(yt, rss){
   return d.join('\n');
 }
 
+/* /xhkey [AIza... | tat]: key Gemini riêng cho bản tin. Tool học viên không dùng key này, bản tin cũng không dùng key của học viên.
+   Bật thêm YouTube Data API v3 trong cùng project thì key này lấy luôn video thịnh hành (khi chưa có YOUTUBE_API_KEY). */
+function xhLenhKey(arg, chatId, hoi, msg){
+  arg = String(arg || '').trim(); var P = PropertiesService.getScriptProperties(), cu = P.getProperty('XH_GEMINI_KEY');
+  if (/^(tat|tắt|xoa|xóa)$/i.test(arg)){ P.deleteProperty('XH_GEMINI_KEY'); return tgSend(chatId, '✅ Đã bỏ key riêng. Bản tin dùng chung key Gemini của tool học viên.'); }
+  var k = arg.split(/\s+/)[0];
+  if (!/^(AIza[0-9A-Za-z_-]{30,}|AQ\.[0-9A-Za-z_.-]{20,})$/.test(k))
+    return hoi((cu ? '✅ Bản tin đang dùng key riêng …' + cu.slice(-4) + '. Gửi key mới nếu muốn thay.\n\n' : '') +
+      '🔑 Gửi key Gemini (dạng `AIza…` hoặc `AQ.…`) dành riêng cho bản tin xu hướng. Nên tạo ở *một project Google Cloud khác* project của key học viên, vì hạn mức Gemini tính theo project.\n\n`tat` để bỏ key riêng. Tin chứa key sẽ được xoá khỏi chat.');
+  if (msg && msg.message_id) try{ tgApi('deleteMessage', {chat_id: chatId, message_id: msg.message_id}); }catch(e){}   // không để key nằm lại trong chat
+  var r = null; try{ r = UrlFetchApp.fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=5', { muteHttpExceptions: true, headers: { 'x-goog-api-key': k } }); }catch(e){}
+  if (!r || r.getResponseCode() !== 200){
+    var ly = ''; try{ ly = ((JSON.parse(r.getContentText()).error || {}).message) || ''; }catch(e){}
+    return tgSend(chatId, '❌ Key này chưa gọi được Gemini' + (r ? ' (http ' + r.getResponseCode() + (ly ? ': ' + String(ly).slice(0, 120) : '') + ')' : '') + '. Kiểm tra lại key ở aistudio.google.com rồi gửi lại.' + (cu ? ' Bản tin vẫn dùng key cũ.' : ''));
+  }
+  P.setProperty('XH_GEMINI_KEY', k);
+  var yt = cfgProp('YOUTUBE_API_KEY') ? null : xhLayYoutube();
+  return tgSend(chatId, '✅ Đã lưu key Gemini riêng …' + k.slice(-4) + ' cho bản tin xu hướng. Tool học viên vẫn dùng key cũ.' +
+    (yt ? (yt.ok ? '\n▶️ Key này lấy được luôn YouTube thịnh hành (' + yt.so + ' video), không cần /xhyoutube.' : '\n▶️ Key này chưa lấy được YouTube. Muốn dùng chung: bật YouTube Data API v3 trong project của key, hoặc gửi key YouTube riêng qua /xhyoutube.') : '') +
+    '\n\nBấm /xhtao để tạo thử.');
+}
 /* /xuhuong youtube [AIza... | tat | thu] */
 function xhLenhYoutube(arg, chatId, hoi, msg){
   arg = String(arg || '').trim(); var P = PropertiesService.getScriptProperties();
