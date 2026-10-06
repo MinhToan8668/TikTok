@@ -668,6 +668,46 @@ Các tool AI đọc thêm một bản tin xu hướng ngắn do bạn duyệt, �
 - **Dùng ở đâu:** Hook viral, Kịch bản (chấm và viết), Soi video, Chấm video, áp khuôn, Trợ lý AI, thiết kế chữ. Không dùng cho tải video, chép lời, nhận diện source.
 - **Chi phí:** tạo bản tin 1–2 lượt gọi AI mỗi tuần. Mỗi lượt dùng tool đọc thêm tối đa 1.500 ký tự (vài trăm token đầu vào), câu trả lời không dài thêm. Key miễn phí thì không mất tiền, chỉ tốn chút hạn mức. Tra Google dùng chung key Gemini; key nào không cho tra thì bản tin chỉ dựa vào số liệu nội bộ và ghi rõ.
 
+### Menu thả xuống dễ đọc ở tông tối + ô lưới cỡ CapCut (10/2026)
+
+- **Chữ khó đọc trong menu của ô chọn**: menu thả xuống của `<select>` do trình duyệt (hệ điều hành) vẽ, không nhận CSS của trang, nên trước đây nền trắng mà chữ lấy màu sáng của khung dựng. Nay khung dựng khai báo `color-scheme: dark` (tông tối) / `light` (tông sáng) nên trình duyệt vẽ menu đúng tông; thêm màu nền và chữ cho `option` ở trình duyệt nào cho phép.
+- **Ô lưới nhỏ lại như CapCut**: footage 108 → 92px, hiệu ứng / bộ lọc / chuyển cảnh / mẫu chữ 86 → 72px, emoji 52 → 44px, nhãn dán động 68 → 60px, kết quả kho video và ảnh 104 → 88px, Kiểu có sẵn 46 → 42px, font của bạn 130 → 112px; chữ trong ô và nút ＋ thu nhỏ theo, nút trong ô footage cắt bằng dấu … nên không tràn.
+- **Sửa kèm**: khi lưới hiệu ứng / bộ lọc vẽ lại dưới con trỏ đứng yên (đổi tab, lọc nhóm), bản xem thử cũ bị treo và áp chồng lên khung xem. Nay xem thử tự tắt khi con trỏ sang chỗ khác, khi lưới vẽ lại, và bị khoá sau khi bấm áp thật cho tới lúc rời lưới. Kiểm thử `t134.mjs`.
+
+### Nối HyperFrames (HeyGen) và Higgsfield: làm được gì, không làm được gì (10/2026)
+
+- **HyperFrames** (`github.com/heygen-com/hyperframes`, **Apache 2.0** → dùng thương mại được): framework **Node.js ≥ 22** render HTML/CSS/animation thành MP4 bằng **Puppeteer (Chromium thật) + encoder**. Là trình render **phía máy chủ**, không phải trình sửa video trong trình duyệt. Không chạy được trên GitHub Pages (trang tĩnh) hay Cloudflare Workers gói Free (không có Chromium, giới hạn CPU); muốn chạy phải thuê máy chủ Node riêng hoặc dùng gói `aws-lambda` / `gcp-cloud-run` của họ (trả tiền theo lượt render).
+- **Đã lấy phần dùng được**: 13 chuyển cảnh WebGL trong `packages/shader-transitions` chuyển sang chuẩn gl-transitions và thêm vào `tools/kho/kho.js` → **48 chuyển cảnh kho** (Xoáy nhiễu, Cháy giấy, Lia vút, Mống mắt, Gợn nước lan, Hố đen, Zoom điện ảnh, Tách màu lệch, Lốc xoáy, Méo nhiệt, Chớp trắng xuyên, Tan biến dạng, Rò sáng). Màu nhấn trong shader đổi sang bảng màu Tự Mình Xây Kênh. Ghi nguồn giấy phép nằm ngay trong `kho.js` theo yêu cầu của Apache 2.0.
+- **Chưa lấy**: `registry/blocks` có 173 khối motion graphics, nhưng viết bằng HTML/CSS/GSAP trong khi tool vẽ trên canvas → phải viết lại từng khối, không nhập thẳng được. `@hyperframes/player` chỉ hữu ích nếu dùng luôn định dạng dự án của họ.
+- **Higgsfield** (`console.higgsfield.ai`, `docs.higgsfield.ai`): là dịch vụ **sinh ảnh / video bằng AI trả phí theo lượt**, không phải framework dựng video. Có API key, lifecycle polling / webhook nên nối vào worker được như cách đang gọi Gemini, nhưng mỗi lần tạo là tốn tiền thật và cần tài khoản riêng. Để dành khi cần tính năng "tạo cảnh bằng AI", không thay thế được phần dựng.
+
+### Mẫu đồ hoạ dựng sẵn — đợt 1: 10 mẫu (10/2026)
+
+Viết lại các khối `registry/blocks` của HyperFrames thành **cảnh keyframe trên canvas** của tool, nên chạy ngay trên GitHub Pages, không cần Node, không cần máy chủ render, không tốn lượt AI.
+
+- **Chỗ dùng:** tab **Đồ hoạ → Mẫu dựng sẵn**. Mỗi ô là một ảnh thu nhỏ vẽ thật bằng chính bộ vẽ cảnh (không phải ảnh chụp), nên nhìn đúng như khi chèn. Bấm một cái là chèn tại đầu phát, tự chọn và mở bảng thuộc tính.
+- **Sửa:** bảng phải chỉ hiện đúng các ô chữ của mẫu (VD "Tên", "Vai trò", "Con số", "Chú thích") — gõ là khung xem trước đổi ngay. Hai nút `↺ Chữ mặc định` và `⏱ Dài chuẩn`. Vẫn kéo dời / kéo mép trên dòng thời gian, vẫn dùng được keyframe, lớp, blend, màu nhấn của dự án như đồ hoạ thường.
+- **10 mẫu đợt 1:** *Giới thiệu tên* — Thanh trắng gọn, Khối đen chữ đậm, Gạch chân màu, Thẻ tối bo góc, Hai thanh xếp, Viên thuốc mềm; *Nhấn mạnh* — Khung nhấn mạnh, Danh sách 3 ý; *Số liệu* — Thẻ số liệu + thanh; *Khung quay* — Khung quay REC.
+- **Cách lưu mẫu** (`tools/kho/kho.js`, `KHO.doHoa`): `{ id, ten, ic, nhom, dai, text, phu, o: [{nhan, tu}], lop: [...] }`. Lớp dùng đúng định dạng cảnh sẵn có (`hop|tron|chu|duong|vong|so` + keyframe `{t,x,y,w,h,s,xoay,mo,tien_do,ease}`), `x,w` theo bề rộng khung, `y,h` theo chiều cao, `mau: 'nhan'` = màu nhấn dự án, **`t` âm = tính ngược từ cuối** (−0,1 là trước khi hết 0,1 giây) nên kéo dài/ngắn clip là động tác thoát tự dời theo. `tu: 'text' | 'text:<số>' | 'phu'` nối ô người dùng nhập vào lớp chữ/số.
+- **Chỉ là dữ liệu**, không phải mã, nên thêm mẫu mới không rủi ro và không làm nặng trang: toàn bộ 10 mẫu ≈ 10 KB trong `kho.js`.
+- Thiết kế và nhịp chuyển động dựa trên thư viện mở **HyperFrames (HeyGen, Apache 2.0)**, bố cục lại cho khổ dọc 9:16; ghi nguồn nằm trong `kho.js`.
+- Hồi quy: `t135` (10/10) — đủ mẫu và nhóm, mọi mẫu vẽ ra hình ở ≥2/3 thời điểm, ảnh thu nhỏ có nội dung, chèn đúng giây, sửa chữ cập nhật cảnh, `t` âm đúng khi đổi độ dài, nhãn dòng thời gian, khung xem trước có hình, không lỗi JS.
+- **Còn lại:** 30 mẫu nữa chia 3 đợt (biểu đồ, hội thoại, trước/sau, danh sách thông số, khung điện thoại…). 84 khối 3D/WebGL của HyperFrames bỏ qua vì không hợp canvas 2D.
+
+### Sửa lỗi phát thử + mặt nạ cho element (10/2026)
+
+**Lỗi đã sửa — bấm phát là nhảy thẳng về cuối.** Trước đây tổng thời lượng dự án chỉ tính theo track V1. Nên hai trường hợp đều hỏng:
+- Chưa có footage, mới chỉ có chữ / đồ hoạ: vòng phát coi như "đã hết đoạn cuối" ngay ở giây 0 → dừng luôn tại cuối.
+- Có footage nhưng kéo chữ / đồ hoạ dài hơn footage: phần dôi ra không được phát.
+
+Nay **tổng thời lượng = track dài nhất (V1, chữ, đồ hoạ, b-roll, nhạc, lồng tiếng) như CapCut**; vòng phát chỉ dừng khi hết tổng, và khúc sau footage vẽ trên **nền trống** thay vì đứng hình khung cuối. Hồi quy `t136`.
+
+**Mặt nạ cho element.** Trước chỉ đoạn V1 và b-roll V2 có mặt nạ. Nay:
+- **Mọi element đồ hoạ / chữ / sticker / ảnh (track V3)** đều có mục **Mặt nạ** trong bảng phải với 7 kiểu: Không, Đường thẳng, Gương, Tròn, Chữ nhật, Trái tim, Ngôi sao — kèm vị trí ngang/dọc, rộng/cao, xoay, mềm viền, bo góc (chữ nhật) và **đảo ngược**.
+- **Tay cầm mặt nạ ngay trên khung xem trước** (cả V1, V2 lẫn V3) đúng kiểu CapCut: kéo thân để dời, núm góc dưới–phải để phóng to/thu nhỏ, núm tròn phía trên để xoay (giữ Shift để bỏ hít 15°), núm màu nhấn bên trái để chỉnh mềm viền. Với đoạn V1/V2 tay cầm đi theo đúng scale – xoay – vị trí của đoạn.
+- Element được vẽ ra lớp riêng rồi khoét theo hình mặt nạ nên hoạt động chung với hoà trộn, keyframe và hiệu ứng sẵn có.
+- Hồi quy `t137`: mặt nạ khoét đúng phần, đảo ngược đúng phần bù, bảng phải đủ 7 kiểu, tay cầm hiện và kéo được, mặt nạ V1 vẫn chạy.
+
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 
 Cài theo [`cloudflare/CAI-DAT.md`](../cloudflare/CAI-DAT.md) (khoảng 10 phút, không cần thẻ). Có máy chủ này tool thêm:
