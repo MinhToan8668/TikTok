@@ -673,6 +673,19 @@ Các tool AI đọc thêm một bản tin xu hướng ngắn do bạn duyệt, �
 - **Chưa lấy**: `registry/blocks` có 173 khối motion graphics, nhưng viết bằng HTML/CSS/GSAP trong khi tool vẽ trên canvas → phải viết lại từng khối, không nhập thẳng được. `@hyperframes/player` chỉ hữu ích nếu dùng luôn định dạng dự án của họ.
 - **Higgsfield** (`console.higgsfield.ai`, `docs.higgsfield.ai`): là dịch vụ **sinh ảnh / video bằng AI trả phí theo lượt**, không phải framework dựng video. Có API key, lifecycle polling / webhook nên nối vào worker được như cách đang gọi Gemini, nhưng mỗi lần tạo là tốn tiền thật và cần tài khoản riêng. Để dành khi cần tính năng "tạo cảnh bằng AI", không thay thế được phần dựng.
 
+### Mẫu đồ hoạ dựng sẵn — đợt 1: 10 mẫu (10/2026)
+
+Viết lại các khối `registry/blocks` của HyperFrames thành **cảnh keyframe trên canvas** của tool, nên chạy ngay trên GitHub Pages, không cần Node, không cần máy chủ render, không tốn lượt AI.
+
+- **Chỗ dùng:** tab **Đồ hoạ → Mẫu dựng sẵn**. Mỗi ô là một ảnh thu nhỏ vẽ thật bằng chính bộ vẽ cảnh (không phải ảnh chụp), nên nhìn đúng như khi chèn. Bấm một cái là chèn tại đầu phát, tự chọn và mở bảng thuộc tính.
+- **Sửa:** bảng phải chỉ hiện đúng các ô chữ của mẫu (VD "Tên", "Vai trò", "Con số", "Chú thích") — gõ là khung xem trước đổi ngay. Hai nút `↺ Chữ mặc định` và `⏱ Dài chuẩn`. Vẫn kéo dời / kéo mép trên dòng thời gian, vẫn dùng được keyframe, lớp, blend, màu nhấn của dự án như đồ hoạ thường.
+- **10 mẫu đợt 1:** *Giới thiệu tên* — Thanh trắng gọn, Khối đen chữ đậm, Gạch chân màu, Thẻ tối bo góc, Hai thanh xếp, Viên thuốc mềm; *Nhấn mạnh* — Khung nhấn mạnh, Danh sách 3 ý; *Số liệu* — Thẻ số liệu + thanh; *Khung quay* — Khung quay REC.
+- **Cách lưu mẫu** (`tools/kho/kho.js`, `KHO.doHoa`): `{ id, ten, ic, nhom, dai, text, phu, o: [{nhan, tu}], lop: [...] }`. Lớp dùng đúng định dạng cảnh sẵn có (`hop|tron|chu|duong|vong|so` + keyframe `{t,x,y,w,h,s,xoay,mo,tien_do,ease}`), `x,w` theo bề rộng khung, `y,h` theo chiều cao, `mau: 'nhan'` = màu nhấn dự án, **`t` âm = tính ngược từ cuối** (−0,1 là trước khi hết 0,1 giây) nên kéo dài/ngắn clip là động tác thoát tự dời theo. `tu: 'text' | 'text:<số>' | 'phu'` nối ô người dùng nhập vào lớp chữ/số.
+- **Chỉ là dữ liệu**, không phải mã, nên thêm mẫu mới không rủi ro và không làm nặng trang: toàn bộ 10 mẫu ≈ 10 KB trong `kho.js`.
+- Thiết kế và nhịp chuyển động dựa trên thư viện mở **HyperFrames (HeyGen, Apache 2.0)**, bố cục lại cho khổ dọc 9:16; ghi nguồn nằm trong `kho.js`.
+- Hồi quy: `t135` (10/10) — đủ mẫu và nhóm, mọi mẫu vẽ ra hình ở ≥2/3 thời điểm, ảnh thu nhỏ có nội dung, chèn đúng giây, sửa chữ cập nhật cảnh, `t` âm đúng khi đổi độ dài, nhãn dòng thời gian, khung xem trước có hình, không lỗi JS.
+- **Còn lại:** 30 mẫu nữa chia 3 đợt (biểu đồ, hội thoại, trước/sau, danh sách thông số, khung điện thoại…). 84 khối 3D/WebGL của HyperFrames bỏ qua vì không hợp canvas 2D.
+
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 
 Cài theo [`cloudflare/CAI-DAT.md`](../cloudflare/CAI-DAT.md) (khoảng 10 phút, không cần thẻ). Có máy chủ này tool thêm:
