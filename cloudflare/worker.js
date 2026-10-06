@@ -3,7 +3,7 @@
    ─────────────────────────────────────────────────────────────────────────
    Làm những việc Apps Script không làm được hoặc làm chậm:
      GET  /            → tình trạng máy chủ (tool tự dò để bật tính năng)
-     GET  /broll       → tìm kho B-roll miễn phí (Pixabay và/hoặc Pexels), trả link đã qua /media để vẽ lên canvas
+     GET  /broll       → tìm kho B-roll miễn phí (Pixabay và/hoặc Pexels), trả link đã qua /media để vẽ lên canvas; &loai=anh → ảnh minh hoạ
      GET  /media?u=    → phát lại file Pixabay/Pexels có CORS + Range (xem trước, xuất video)
      GET  /tai?u=&ten= → tải hộ file video/ảnh/nhạc từ CDN các nền tảng, không giới hạn 35MB, có tên file
      POST /tts         → lồng tiếng AI tiếng Việt (Gemini TTS), trả WAV; trừ lượt qua Apps Script
@@ -27,7 +27,7 @@
      ANTHROPIC_API_KEY, OPENAI_API_KEY   (Secret) key khi chọn claude / openai
    ═══════════════════════════════════════════════════════════════════════════ */
 
-const PHIEN_BAN = '2026.10.17';
+const PHIEN_BAN = '2026.10.18';
 /* link /exec của Apps Script đang dùng trong tool (công khai sẵn trong tools/*.html). Biến APPS_SCRIPT_URL trên Cloudflare, nếu có, sẽ được ưu tiên. */
 const APPS_SCRIPT_MD = 'https://script.google.com/macros/s/AKfycbyxe1nWupAl6VheDZHaU3Ojm-d6c8F_khhUMtkehNCLh5OnGW6f2uF0PKPYZ4eYUqyGjQ/exec';
 const asUrl = env => String(env.APPS_SCRIPT_URL || env.APPS_SCRIPT || APPS_SCRIPT_MD).trim();
@@ -156,12 +156,26 @@ async function timAmThanh(url, env) {
 async function timBroll(url, env, ctx) {
   if (!coKho(env)) return { ok: false, error: 'chua_co_kho' };
   const q = String(url.searchParams.get('q') || '').trim().slice(0, 100); if (!q) return { ok: false, error: 'thieu_q' };
-  const doc = url.searchParams.get('huong') !== 'ngang', trang = Math.max(1, Math.min(5, +url.searchParams.get('trang') || 1));
-  const khoa = `broll2:${doc ? 'd' : 'n'}:${trang}:${q.toLowerCase()}`;
+  const doc = url.searchParams.get('huong') !== 'ngang', trang = Math.max(1, Math.min(5, +url.searchParams.get('trang') || 1)), anh = url.searchParams.get('loai') === 'anh';
+  const khoa = `broll3:${anh ? 'a' : 'v'}:${doc ? 'd' : 'n'}:${trang}:${q.toLowerCase()}`;
   const cache = globalThis.caches && caches.default, cKey = cache && new Request('https://cache.viral-studio/' + encodeURIComponent(khoa));
   if (cache) { const c = await cache.match(cKey); if (c) return c.json(); }
   // Pixabay: không có lọc hướng cho video → lấy nhiều rồi lọc dọc/ngang; tìm được tiếng Việt (lang=vi)
+  // ảnh minh hoạ (loai=anh): Pixabay photos + Pexels photos, cùng giấy phép dùng thương mại
+  const pixabayAnh = async (query, vi) => {
+    if (!env.PIXABAY_KEY) return [];
+    const p = new URLSearchParams({ key: env.PIXABAY_KEY, q: query.slice(0, 100), per_page: '40', page: String(trang), safesearch: 'true', image_type: 'photo', orientation: doc ? 'vertical' : 'horizontal' }); if (vi) p.set('lang', 'vi');
+    const r = await fetch('https://pixabay.com/api/?' + p); if (!r.ok) throw new Error('pixabay ' + r.status);
+    return ((await r.json()).hits || []).map(h => ({ id: 'pbi' + h.id, anh: true, giay: 0, w: h.imageWidth, h: h.imageHeight, thumb: h.webformatURL, link: h.largeImageURL || h.webformatURL, goc: h.pageURL, tac_gia: (h.user || 'Pixabay') + ' · Pixabay' }));
+  };
+  const pexelsAnh = async (query, vi) => {
+    if (!env.PEXELS_KEY) return [];
+    const p = new URLSearchParams({ query, per_page: '15', page: String(trang), orientation: doc ? 'portrait' : 'landscape' }); if (vi) p.set('locale', 'vi-VN');
+    const r = await fetch('https://api.pexels.com/v1/search?' + p, { headers: { authorization: env.PEXELS_KEY } }); if (!r.ok) throw new Error('pexels ' + r.status);
+    return ((await r.json()).photos || []).map(h => ({ id: 'pxi' + h.id, anh: true, giay: 0, w: h.width, h: h.height, thumb: (h.src || {}).medium, link: (h.src || {}).large2x || (h.src || {}).large, goc: h.url, tac_gia: (h.photographer || 'Pexels') + ' · Pexels' }));
+  };
   const pixabay = async (query, vi) => {
+    if (anh) return pixabayAnh(query, vi);
     if (!env.PIXABAY_KEY) return [];
     const p = new URLSearchParams({ key: env.PIXABAY_KEY, q: query.slice(0, 100), per_page: '60', page: String(trang), safesearch: 'true', video_type: 'film' }); if (vi) p.set('lang', 'vi');
     const r = await fetch('https://pixabay.com/api/videos/?' + p); if (!r.ok) throw new Error('pixabay ' + r.status);
@@ -172,6 +186,7 @@ async function timBroll(url, env, ctx) {
     }).filter(Boolean);
   };
   const pexels = async (query, vi) => {
+    if (anh) return pexelsAnh(query, vi);
     if (!env.PEXELS_KEY) return [];
     const p = new URLSearchParams({ query, per_page: '15', page: String(trang), orientation: doc ? 'portrait' : 'landscape', size: 'medium' }); if (vi) p.set('locale', 'vi-VN');
     const r = await fetch('https://api.pexels.com/videos/search?' + p, { headers: { authorization: env.PEXELS_KEY } }); if (!r.ok) throw new Error('pexels ' + r.status);
