@@ -640,6 +640,7 @@ Mọi tài nguyên tách khỏi code, nằm trong `tools/kho/kho.js` (một file
 - **Ghi nguồn**: mọi bài đã dùng được gom vào `P.ghiNguon`; nút **Chép ghi nguồn** chép sẵn dòng "Tên – Tác giả (giấy phép, nguồn) link" để dán vào mô tả video (CC BY bắt buộc ghi; CC0 không cần; ND = dùng nguyên bản).
 - **Nhãn dán động** (tab Nhãn dán): 8 nhóm (Cảm xúc, Bàn tay, Trái tim, Nhấn mạnh, Ăn mừng, Động vật, Đồ ăn, Khác) ~230 emoji hoạt hình **Noto Animated Emoji** của Google (fonts.gstatic.com, Apache 2.0, dùng tự do), xem trước .webp, bấm là tải .gif nền trong suốt lên V3 và giải mã khung động như sticker thường. Ô không có bản động tự ẩn.
 - Hiệu ứng hình ảnh và chuyển cảnh không có API miễn phí để dùng thương mại; vẫn mở rộng bằng shader trong `tools/kho/kho.js` (hiện 68 + 35) và gl-transitions (67). Kiểm thử `t132.mjs` (chạy qua proxy mạng của máy test).
+- **Key nào còn cần trên Cloudflare** (Settings → Variables and Secrets): `GEMINI_API_KEYS` (AI, lồng tiếng, agent) và `APPS_SCRIPT_URL` bắt buộc; `PIXABAY_KEY` / `PEXELS_KEY` vẫn cần cho **kho B-roll video** (Openverse không có video); `FREESOUND_KEY` **không cần nữa** (Openverse đã gom Freesound); `GIPHY_KEY` / `TENOR_KEY` **tuỳ chọn** (nhãn dán động Noto không cần key; có key thì thêm được tìm GIF meme). Máy chủ thiếu key nào thì mục tìm tương ứng tự ẩn. Worker cài qua GitHub (cách B) nên mỗi lần đẩy `worker.js` lên main là Cloudflare tự cập nhật, không cần dán tay.
 
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 
