@@ -647,6 +647,14 @@ Mọi tài nguyên tách khỏi code, nằm trong `tools/kho/kho.js` (một file
 - **Tab Media** chia ba mục bên trái: **Của bạn** (thêm footage, tìm trong footage, danh sách), **Kho video** (hộp tìm B-roll cũ + 20 chủ đề: Thành phố, Thiên nhiên, Văn phòng, Công nghệ, Tiền bạc, Đồ ăn, Thể thao, Du lịch, Gia đình, Học tập, Gõ phím, Điện thoại, Bầu trời, Biển, Cà phê, Mua sắm, Xe cộ, Sức khoẻ, Làm đẹp, Nông thôn), **Kho ảnh** (mới: ảnh minh hoạ Pixabay / Pexels, cùng chủ đề, chọn dọc / ngang). Bấm ảnh là tải về thành footage ảnh 5 giây (kéo dài tuỳ ý), đánh dấu B-roll, ghi nguồn tự động. Máy chủ không có key thì hai mục kho hiện dòng báo thay vì hộp tìm. Mục đang mở nhớ trong `dv_mediaMuc`.
 - Worker **2026.10.18**: `GET /broll?loai=anh&q=&huong=` → ảnh (Pixabay `image_type=photo` + Pexels `/v1/search`), trả `items[].anh = true`, `url` qua `/media` như video; tự cài qua GitHub.
 - **Nhãn dán động Noto**: dùng danh sách chính thức của Google (`googlefonts.github.io/noto-emoji-animation/data/api.json`, 881 emoji có hoạt ảnh) nhúng sẵn trong `kho.js` kèm thẻ tìm tiếng Anh, 9 nhóm (Cảm xúc 502, Động vật · thiên nhiên 118, Đồ ăn 67, Hoạt động · lễ hội 58, Đồ vật 51, Biểu tượng 42, Du lịch 31, Người 8, Cờ 4), xếp theo độ phổ biến, ô tìm `fire`, `heart`, `cat`… lọc trên toàn bộ. Kiểm thử `t133.mjs`.
+## Lọc kịch bản từ file phụ đề (LocKichBan.gs)
+
+- Ở tool Kịch bản viral, mục **✂️ Có video dài? Lọc kịch bản từ file phụ đề**: học viên thả file `.srt`/`.vtt` của video dài (CapCut xuất được), chọn số video (hoặc để AI gợi ý), kiểu đăng (series / video lẻ), độ dài.
+- AI đọc lời thật + hồ sơ kênh, trả: nội dung nói gì, hợp kênh mấy điểm, nên làm mấy video; từng video với mốc cắt từ video gốc, hook chữ, câu mở đầu, khung, điểm viral, cần quay thêm gì, caption; tên series và lịch đăng; đoạn nên bỏ; câu đắt.
+- Bấm **Viết thành kịch bản** trên một video: AI viết trọn bài vào khung, giữ lời thật, ghi mốc "Cắt 02:15–02:40" cho từng phần.
+- Tính 1 lượt của tool Kịch bản. Cùng file + cùng lựa chọn trong 6 giờ trả lại kết quả cũ, không trừ lượt.
+- Cài: tạo file mới `LocKichBan.gs` trong Apps Script, dán nội dung; dán đè `HookAI.gs`, `Studio.gs`; Deploy → New version.
+
 ## Bản tin xu hướng tuần (XuHuong.gs)
 
 Các tool AI đọc thêm một bản tin xu hướng ngắn do bạn duyệt, để gợi ý format, hook, nhạc, chủ đề cho hợp thời.

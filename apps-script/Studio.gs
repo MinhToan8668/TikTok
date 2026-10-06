@@ -83,7 +83,7 @@ var ST_TOOL = {
   dung:   {cot:'luot_dung', ten:'dựng video',           han:function(){ return ST_LUOT_DUNG }}
 };
 function stToolCua(mode){
-  if (mode === 'script' || mode === 'viet') return 'script';
+  if (mode === 'script' || mode === 'viet' || mode === 'loc_srt') return 'script';
   if (mode === 'soi' || mode === 'link' || mode === 'apkhuon') return 'soi';
   if (mode === 'cham') return 'cham';
   if (mode === 'chat' || mode === 'bh_them' || mode === 'dung_ke_hoach' || mode === 'dung_shorts') return 'chat';

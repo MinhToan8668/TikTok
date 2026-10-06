@@ -18,6 +18,7 @@ tự nhiên như trong code hiện có.
 | `apps-script/Lich.gs` | Lịch kèm 1:1, action tiền tố `hv_` | |
 | `apps-script/Studio.gs` | Tài khoản Viral Studio, gói Pro, action tiền tố `st_` | |
 | `apps-script/HookAI.gs` | Gọi Gemini/Claude cho Hook Pro, soi video, action `hook_ai`, `hook_status` | |
+| `apps-script/LocKichBan.gs` | Lọc kịch bản từ file phụ đề video dài thành nhiều video / series, action `hook_ai` mode `loc_srt` | |
 | `apps-script/HUONG-DAN*.md` | Cách cài backend, Script Properties, webhook | đọc trước khi sửa `.gs` |
 | `bot-tai-video/bot.py` | Bot Telegram tải video bằng yt-dlp | token qua biến môi trường |
 | `.claude/skills/hook-text/` | Skill thiết kế chữ hook lên frame video cho học viên | skill riêng của dự án, không phải của ECC |
