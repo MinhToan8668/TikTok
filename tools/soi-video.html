@@ -343,7 +343,7 @@
           <option value="voice_over">Không lộ mặt, quay cảnh rồi lồng tiếng</option>
           <option value="vlog">Vlog đời thường</option>
           <option value="pov">POV nhập vai, ít lời</option>
-          <option value="chu_chay">Chữ chạy 15–20 giây ghép nhạc, không lời</option>
+          <option value="chu_chay">Chữ story 15 giây ghép nhạc: một cảnh, vài câu chữ cô đọng</option>
           <option value="trai_nghiem">Trải nghiệm thử rồi đánh giá</option>
         </select>
         <label class="lbl" for="mongMuon">Bạn muốn nói về chuyện gì? (không bắt buộc)</label>
@@ -413,9 +413,9 @@ function fmtN(n) { return n >= 1e6 ? (n / 1e6).toFixed(n % 1e6 ? 1 : 0) + 'M' : 
 function fmtSo(n) { return Number(n || 0).toLocaleString('en-US'); }
 function dinhDangSo(inp) { const v = soNhap(inp.value); inp.value = v ? fmtSo(v) : ''; }
 
-const KHUNG_TEN = { khoanhkhac: 'Một khoảnh khắc (5W-1H)', bonnhip: 'Kể chuyện 4 nhịp', kinhnghiem: 'Chia sẻ kinh nghiệm (6 bước)', chanthuc: 'Chân thực 2026', vlog: 'Daily vlog cảm xúc', chu_chay: 'Chữ chạy 15–20s ghép nhạc', pov: 'POV nhập vai', trai_nghiem: 'Trải nghiệm thử', truoc_sau: 'Trước – sau', so_sanh: 'So sánh A và B', tra_loi_cmt: 'Trả lời bình luận', nguoc_doi: 'Sự thật ngược', fichtean: 'Thử thách (Fichtean)', baydiem: 'Chuyện dài 7 điểm', tips: 'Danh sách hữu ích', giohang: 'Viral có cài giỏ hàng', tudo: 'Tự do' };
-const DANG_TEN = { noi_camera: 'Nói vào camera', voice_over: 'Voice-over (không lộ mặt)', text: 'Chữ chạy ghép nhạc, không lời' };
-const KHUNG_PHAN_DEMO = { chu_chay: ['Màn chữ hook (0–2 giây)', 'Màn chữ kể 1', 'Màn chữ kể 2', 'Màn chữ chi tiết đắt nhất', 'Màn chữ chốt'],  bonnhip: ['Câu đánh thẳng vào vấn đề', 'Tình huống thật', 'Hậu quả / kết quả', 'Quan điểm + giải pháp'], chanthuc: ['Nêu vấn đề nhiều người gặp', 'Mô tả vấn đề cụ thể nhất có thể', 'Giải pháp hoặc bài học'], tudo: ['Mở bài (3–5 giây)', 'Thân bài', 'Kết bài'] };
+const KHUNG_TEN = { khoanhkhac: 'Một khoảnh khắc (5W-1H)', bonnhip: 'Kể chuyện 4 nhịp', kinhnghiem: 'Chia sẻ kinh nghiệm (6 bước)', chanthuc: 'Chân thực 2026', vlog: 'Daily vlog cảm xúc', chu_chay: 'Chữ story 15s ghép nhạc', pov: 'POV nhập vai', trai_nghiem: 'Trải nghiệm thử', truoc_sau: 'Trước – sau', so_sanh: 'So sánh A và B', tra_loi_cmt: 'Trả lời bình luận', nguoc_doi: 'Sự thật ngược', fichtean: 'Thử thách (Fichtean)', baydiem: 'Chuyện dài 7 điểm', tips: 'Danh sách hữu ích', giohang: 'Viral có cài giỏ hàng', tudo: 'Tự do' };
+const DANG_TEN = { noi_camera: 'Nói vào camera', voice_over: 'Voice-over (không lộ mặt)', text: 'Chữ story ghép nhạc, không lời' };
+const KHUNG_PHAN_DEMO = { chu_chay: ['Khối chữ 1: quan điểm gắt hoặc thú nhận', 'Khối chữ 2: cú ngoặt', 'Khối chữ 3: điều thấm sau trải nghiệm', 'Khối chữ 4: câu chốt đáng lưu', 'Caption dưới video'],  bonnhip: ['Câu đánh thẳng vào vấn đề', 'Tình huống thật', 'Hậu quả / kết quả', 'Quan điểm + giải pháp'], chanthuc: ['Nêu vấn đề nhiều người gặp', 'Mô tả vấn đề cụ thể nhất có thể', 'Giải pháp hoặc bài học'], tudo: ['Mở bài (3–5 giây)', 'Thân bài', 'Kết bài'] };
 const HOOK_KIEU = { dong_cam: 'Tạo đồng cảm', mau_thuan: 'Tạo mâu thuẫn', bat_ngo: 'Tạo bất ngờ', khoang_trong: 'Khoảng trống thông tin', quan_niem: 'Gợi nhắc quan niệm quen', xanh_chin: 'Xanh chín', loi_thoai: 'Mở bằng lời thoại', con_so: 'Con số', tuong_phan: 'Tương phản NHƯNG', khac: 'Kiểu khác' };
 /* mốc tham khảo tỉ lệ trên view (TikTok Việt) */
 const MOC = {
@@ -738,7 +738,7 @@ function renderKq(d, so, tuLuu) {
       holder.innerHTML = ''; const src = nguon(k, state.dangChon);
       if (!src) { const w = el('div', 'status'); w.innerHTML = '<span class="spinner"></span>AI đang lắp công thức vào khung ' + KHUNG_TEN[k] + ' · ' + DANG_TEN[state.dangChon] + '…'; holder.append(w); return; }
       if (src !== mk && src.ly_do) { const f = el('div'); f.append(Object.assign(el('span', 'fit ' + (src.hop_khong ? 'ok' : 'no')), { textContent: src.hop_khong ? '✓ Công thức lắp được vào khung này' : '✕ Khung này chưa hợp công thức' })); f.append(el('p', 'note', src.ly_do)); holder.append(f); }
-      holder.append(el('div', 'note', state.dangChon === 'text' ? 'Màn chữ mẫu từng phần (mỗi dòng ▸ là một màn, chỗ [ ] thay bằng chuyện thật của bạn) và cảnh cho từng màn' : 'Lời thoại mẫu từng phần (chỗ [ ] thay bằng chuyện thật của bạn) và cảnh quay'));
+      holder.append(el('div', 'note', state.dangChon === 'text' ? 'Khối chữ mẫu từng phần (mỗi dòng ▸ là một khối chữ trên cùng một cảnh, chỗ [ ] thay bằng chuyện thật của bạn) và cảnh nền' : 'Lời thoại mẫu từng phần (chỗ [ ] thay bằng chuyện thật của bạn) và cảnh quay'));
       (src.phan || []).forEach((p, i) => { const g = el('div', 'thoai'); g.append(el('b', null, (i + 1) + ' · ' + p.ten)); const pt = el('p'); pt.innerHTML = markHtml(p.thoai || p.goi_y || '(AI chưa viết lời cho phần này)'); g.append(pt); if (p.canh_quay) g.append(el('small', null, p.canh_quay)); holder.append(g); });
       const rw = el('div', 'row'); const go = el('a', 'btn pro'); go.innerHTML = 'AI viết trọn kịch bản theo khung này → <small style="font-weight:500;opacity:.8">· 1 lượt AI</small>'; go.href = 'kich-ban.html'; go.onclick = () => { ls.set('kb.import', JSON.stringify({ khung: k, dang: state.dangChon, y_do: yDoMuon(), chuDe: $('#chuDe').value.trim(), doiTuong: $('#doiTuong').value.trim(), sanPham: $('#sanPham').value.trim(), phan: (src.phan || []).map(p => p.thoai || p.goi_y || ''), canh: (src.phan || []).map(p => p.canh_quay || ''), nguon: state.link.tac_gia ? '@' + state.link.tac_gia : '', viet: true,
         ngu_canh: { loai: 'soi', tac_gia: state.link.tac_gia ? '@' + state.link.tac_gia : '', tom_tat: [(d.tom_tat || {}).nganh, (d.tom_tat || {}).dang, (d.tom_tat || {}).verdict].filter(Boolean).join(' · '), cong_thuc: (d.cua3 || {}).cong_thuc || '', khuon: (d.cua3 || {}).khuon || [], ky_thuat: (d.cua3 || {}).ky_thuat_muon_duoc || [], chat_lieu: (d.cua3 || {}).chat_lieu_rieng || [], hooks: (mk.hooks || []).map(h => h.text), loi_thoai: ((d.boc || {}).loi_thoai || []).map(m => m.text).join(' ').slice(0, 1200) || $('#loiThoai').value.slice(0, 1200) } })); };
