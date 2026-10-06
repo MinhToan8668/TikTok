@@ -686,6 +686,20 @@ Viết lại các khối `registry/blocks` của HyperFrames thành **cảnh key
 - Hồi quy: `t135` (10/10) — đủ mẫu và nhóm, mọi mẫu vẽ ra hình ở ≥2/3 thời điểm, ảnh thu nhỏ có nội dung, chèn đúng giây, sửa chữ cập nhật cảnh, `t` âm đúng khi đổi độ dài, nhãn dòng thời gian, khung xem trước có hình, không lỗi JS.
 - **Còn lại:** 30 mẫu nữa chia 3 đợt (biểu đồ, hội thoại, trước/sau, danh sách thông số, khung điện thoại…). 84 khối 3D/WebGL của HyperFrames bỏ qua vì không hợp canvas 2D.
 
+### Sửa lỗi phát thử + mặt nạ cho element (10/2026)
+
+**Lỗi đã sửa — bấm phát là nhảy thẳng về cuối.** Trước đây tổng thời lượng dự án chỉ tính theo track V1. Nên hai trường hợp đều hỏng:
+- Chưa có footage, mới chỉ có chữ / đồ hoạ: vòng phát coi như "đã hết đoạn cuối" ngay ở giây 0 → dừng luôn tại cuối.
+- Có footage nhưng kéo chữ / đồ hoạ dài hơn footage: phần dôi ra không được phát.
+
+Nay **tổng thời lượng = track dài nhất (V1, chữ, đồ hoạ, b-roll, nhạc, lồng tiếng) như CapCut**; vòng phát chỉ dừng khi hết tổng, và khúc sau footage vẽ trên **nền trống** thay vì đứng hình khung cuối. Hồi quy `t136`.
+
+**Mặt nạ cho element.** Trước chỉ đoạn V1 và b-roll V2 có mặt nạ. Nay:
+- **Mọi element đồ hoạ / chữ / sticker / ảnh (track V3)** đều có mục **Mặt nạ** trong bảng phải với 7 kiểu: Không, Đường thẳng, Gương, Tròn, Chữ nhật, Trái tim, Ngôi sao — kèm vị trí ngang/dọc, rộng/cao, xoay, mềm viền, bo góc (chữ nhật) và **đảo ngược**.
+- **Tay cầm mặt nạ ngay trên khung xem trước** (cả V1, V2 lẫn V3) đúng kiểu CapCut: kéo thân để dời, núm góc dưới–phải để phóng to/thu nhỏ, núm tròn phía trên để xoay (giữ Shift để bỏ hít 15°), núm màu nhấn bên trái để chỉnh mềm viền. Với đoạn V1/V2 tay cầm đi theo đúng scale – xoay – vị trí của đoạn.
+- Element được vẽ ra lớp riêng rồi khoét theo hình mặt nạ nên hoạt động chung với hoà trộn, keyframe và hiệu ứng sẵn có.
+- Hồi quy `t137`: mặt nạ khoét đúng phần, đảo ngược đúng phần bù, bảng phải đủ 7 kiểu, tay cầm hiện và kéo được, mặt nạ V1 vẫn chạy.
+
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 
 Cài theo [`cloudflare/CAI-DAT.md`](../cloudflare/CAI-DAT.md) (khoảng 10 phút, không cần thẻ). Có máy chủ này tool thêm:

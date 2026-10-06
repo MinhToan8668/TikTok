@@ -211,7 +211,8 @@
   .ruler{height:22px;position:sticky;top:0;z-index:7;background:var(--ep);border-bottom:1px solid var(--el);font-size:10px;color:var(--em)}
   .ruler i{position:absolute;top:0;height:100%;border-left:1px solid #3a4147;padding-left:3px;line-height:22px;font-style:normal}
   .ruler i.nho{height:6px;top:16px;border-left-color:#2c3135}
-  #tayCam{position:absolute;inset:0;pointer-events:none;overflow:hidden}#tayCam .tay{position:absolute;border:1.5px dashed #fff;box-shadow:0 0 0 1px rgba(0,0,0,.5);pointer-events:auto;cursor:move;touch-action:none}#tayCam .goc{position:absolute;width:12px;height:12px;background:#fff;border:2px solid var(--ea);border-radius:3px;cursor:nwse-resize}#tayCam .goc.tl{left:2px;top:2px}#tayCam .goc.tr{right:2px;top:2px;cursor:nesw-resize}#tayCam .goc.bl{left:2px;bottom:2px;cursor:nesw-resize}#tayCam .goc.br{right:2px;bottom:2px}#tayCam .xoay{position:absolute;left:50%;top:18px;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:var(--ea);border:2px solid #fff;cursor:grab}
+  #tayCam{position:absolute;inset:0;pointer-events:none;overflow:hidden}#tayCam .mnT{position:absolute;pointer-events:none;transform-origin:50% 50%}#tayCam .mnH{position:absolute;border:1.5px dashed var(--ea);box-shadow:0 0 0 1px rgba(0,0,0,.45);pointer-events:auto;cursor:move;touch-action:none}#tayCam .mnH i{position:absolute;width:13px;height:13px;background:#fff;border:2px solid var(--ea);border-radius:50%;box-sizing:border-box;touch-action:none}#tayCam .mnH i.co{right:-7px;bottom:-7px;cursor:nwse-resize}#tayCam .mnH i.qu{left:50%;margin-left:-7px;top:-26px;cursor:grab}#tayCam .mnH i.me{left:-7px;top:50%;margin-top:-7px;cursor:ns-resize;background:var(--ea);border-color:#fff}
+  #tayCam .tay{position:absolute;border:1.5px dashed #fff;box-shadow:0 0 0 1px rgba(0,0,0,.5);pointer-events:auto;cursor:move;touch-action:none}#tayCam .goc{position:absolute;width:12px;height:12px;background:#fff;border:2px solid var(--ea);border-radius:3px;cursor:nwse-resize}#tayCam .goc.tl{left:2px;top:2px}#tayCam .goc.tr{right:2px;top:2px;cursor:nesw-resize}#tayCam .goc.bl{left:2px;bottom:2px;cursor:nesw-resize}#tayCam .goc.br{right:2px;bottom:2px}#tayCam .xoay{position:absolute;left:50%;top:18px;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:var(--ea);border:2px solid #fff;cursor:grab}
   .item .kfd{position:absolute;bottom:3px;width:7px;height:7px;background:#ffd400;transform:rotate(45deg);border:1px solid #000;z-index:2;pointer-events:none}.item .anv,.item .anr{position:absolute;top:0;height:4px;background:rgba(255,212,0,.7);pointer-events:none}.item .anv{left:0}.item .anr{right:0}.item canvas.song{position:absolute;left:0;bottom:0;width:100%;height:16px;pointer-events:none;opacity:.9}
   .prop label .kfn{flex:none;width:22px;height:22px;padding:0;border:1px solid var(--el);border-radius:5px;background:transparent;color:var(--em);font-size:13px;line-height:1;cursor:pointer;margin-right:4px}.prop label .kfn.co{color:#ffd400;border-color:#ffd400}.prop label .kfn.nua{color:#ffd400}
   .ruler b.moc{position:absolute;top:0;width:9px;height:9px;margin-left:-4px;background:#ffb020;transform:rotate(45deg);cursor:pointer;z-index:3;border-radius:1px}
@@ -1194,7 +1195,7 @@ const FONT_CSS = { be_vietnam: '"Be Vietnam Pro"', montserrat: '"Montserrat"', b
 const uid = () => 's' + Math.random().toString(36).slice(2, 8);
 const srcCua = id => P.srcs.find(s => s.id === id);
 const tocC = c => c.cong ? congTb(c.cong) : (c.toc || 1), daiC = c => (c.kt - c.bd) / tocC(c);   // tốc độ đoạn (CapCut Speed): độ dài trên dòng thời gian
-const tongGiay = () => { const t = P.clips.reduce((a, c) => a + daiC(c), 0); if (t > 0) return t; /* chưa có footage: vẫn dựng được chữ / sticker / nhạc trên nền đen như CapCut */ let m = 0; (P.gfx || []).forEach(g => { m = Math.max(m, g.kt || 0); }); (P.broll || []).forEach(b => { m = Math.max(m, (b.t_bd || 0) + (b.kt - b.bd)); }); (P.am3 || []).forEach(a => { m = Math.max(m, (a.t_bd || 0) + (a.kt - a.bd)); }); return Math.round(m * 100) / 100; };
+const tongGiay = () => { const t = P.clips.reduce((a, c) => a + daiC(c), 0); /* dài nhất của mọi track như CapCut: kéo chữ / đồ hoạ dài hơn footage thì dự án dài theo */ let m = 0; (P.gfx || []).forEach(g => { m = Math.max(m, g.kt || 0); }); (P.broll || []).forEach(b => { m = Math.max(m, (b.t_bd || 0) + (b.kt - b.bd)); }); (P.am3 || []).forEach(a => { m = Math.max(m, (a.t_bd || 0) + (a.kt - a.bd)); }); (P.tieng || []).forEach(x => { m = Math.max(m, (x.t_bd || 0) + (x.giay || 0)); }); return Math.round(Math.max(t, m) * 100) / 100; };
 const GX = {
   tieu_de: { ic: '💥', ten: 'Tiêu đề đập', dai: 2 }, lower_third: { ic: '🪪', ten: 'Tên + vai trò', dai: 4 }, danh_sach: { ic: '📋', ten: 'Danh sách hiện dần', dai: 6 }, tien_do: { ic: '▬', ten: 'Thanh tiến độ', dai: 0 },
   trich_dan: { ic: '❝', ten: 'Thẻ trích dẫn', dai: 3.5 }, dem_so: { ic: '🔢', ten: 'Đếm số', dai: 2 }, khung_nhan: { ic: '▢', ten: 'Khung nhấn', dai: 1.5 }, mui_ten: { ic: '⬇', ten: 'Mũi tên chỉ', dai: 1.2 }, vong_xoay: { ic: '🌀', ten: 'Vòng màu xoay', dai: 4 }, nhan_goc: { ic: '🏷', ten: 'Nhãn góc', dai: 3 }, chu: { ic: '🔤', ten: 'Chữ tự do', dai: 3 }, sticker: { ic: '😍', ten: 'Sticker', dai: 2 },
@@ -1891,12 +1892,14 @@ function veNen(ctx, W, H, t, nguon) {
 function chuyenTai(t) { const { clip, bdTl } = viTri(t); if (clip <= 0) return null; const tr = P.clips[clip - 1]; if (!tr.chuyen || tr.chuyen === 'cat') return null; const dai = tr.chuyen_dai || (P.cai && P.cai.chuyen) || 0.5; if (t - bdTl >= dai) return null; return { kieu: tr.chuyen, p: Math.max(0, Math.min(1, (t - bdTl) / dai)), truoc: clip - 1 }; }
 function veFrame(ctx, W, H, t, snap) {
   if (nenCv.width !== W || nenCv.height !== H) { nenCv.width = W; nenCv.height = H; }
-  const nctx = nenCv.getContext('2d'), r = veNen(nctx, W, H, t, 'chinh');
+  const nctx = nenCv.getContext('2d');
+  const tV1 = P.clips.reduce((a, c) => a + daiC(c), 0), quaV1 = P.clips.length > 0 && t > tV1 + 0.001;   /* chữ / đồ hoạ dài hơn footage: sau footage là nền trống, không đứng hình */
+  let r = null; if (quaV1) { nctx.fillStyle = '#000'; nctx.fillRect(0, 0, W, H); } else r = veNen(nctx, W, H, t, 'chinh');
   const ch = chuyenTai(t);
   let daVe = false;
   if (ch && snap && snap.width === W) { const g = gltVe(ch.kieu, snap, nenCv, ch.p, W, H); if (g) { ctx.drawImage(g, 0, 0); daVe = true; } else { ctx.drawImage(snap, 0, 0); ctx.globalAlpha = ch.p; ctx.drawImage(nenCv, 0, 0); ctx.globalAlpha = 1; daVe = true; } }
   if (!daVe) ctx.drawImage(nenCv, 0, 0);
-  if (!r && !(!P.clips.length && tongGiay() > 0)) return null;   // chưa có footage nhưng có chữ / sticker: vẫn vẽ các lớp trên nền đen
+  if (!r && !quaV1 && !(!P.clips.length && tongGiay() > 0)) return null;   // chưa có footage nhưng có chữ / sticker: vẫn vẽ các lớp trên nền đen
   veCacLop(ctx, W, H, t);   // b-roll, overlay, chữ, đồ hoạ: lớp thấp vẽ trước, lớp cao phủ lên
   if ($('#phuDe').checked && !trAn('o2')) vePhuDe(ctx, W, H, t);
   const hook = $('#hook').value.trim(); if (hook && t < 3.2 && !trAn('o2')) veHook(ctx, hook, W, H, t);
@@ -1971,7 +1974,7 @@ async function phat(xuat) {
     if (s && nutAm[s.id]) apGiongXem(s, c);
     if (s && nutAm[s.id]) nutAm[s.id].gain.setTargetAtTime(giaTriKf(c, 'am', P.t - bdTl) * fadeHeSo(c, P.t - bdTl) * (coLong ? 0.25 : 1) * (trTat('v1') || c.an ? 0 : 1), ac.currentTime, 0.05);   // âm lượng + fade của đoạn, hạ khi có lồng tiếng
     if (nhacGain) { const coTieng = coLong || (s && s.cau.some(x => tSrc >= x.bd && tSrc <= x.kt)); let m = coTieng ? mucNoi() : mucBroll(); if (tong - P.t < 1.5) m *= Math.max(0, (tong - P.t) / 1.5); nhacGain.gain.setTargetAtTime(trTat('a1') ? 0 : m, ac.currentTime, 0.2); }
-    if (P.t >= bdTl + daiC(c) - 0.02) { if (cur >= P.clips.length - 1) { P.t = tong; xong(); return; } P.t = bdTl + daiC(c) + 0.001; }
+    if (P.t >= bdTl + daiC(c) - 0.02) { if (cur >= P.clips.length - 1) { if (P.t >= tong - 0.02) { P.t = tong; xong(); return; } } else P.t = bdTl + daiC(c) + 0.001; }   /* hết footage mà chữ / đồ hoạ còn dài thì phát tiếp trên nền trống */
     if (!v && tuaTay(c) && s && s.loai === 'video') { try { await seekTo(s.el, viTri(Math.min(P.t, tong - 0.001)).tSrc); } catch { } if (!P.dang) return; }
     veFrame(ctx, W, H, Math.min(P.t, tong), snap);
     if (!xuat) { const mbNay = mbTai(P.t); if (mbNay || mbDangVet) { mbVet(ctx, W, H, mbNay, clip !== mbClipCu); mbDangVet = !!mbNay; mbClipCu = clip; } }
@@ -5404,7 +5407,99 @@ function khoiTaoMauDoHoa() {
   });
 }
 
-khoiTaoB(); khoiTaoC(); khoiTaoUI(); khoiTaoLop(); khoiTaoBang(); khoiTaoDot1(); khoiTaoDot2(); khoiTaoDot3(); khoiTaoM1(); khoiTaoM2(); khoiTaoM3(); khoiTaoN(); khoiTaoMobi(); khoiTaoCCW(); khoiTaoKho(); khoiTaoDoc(); khoiTaoGon(); khoiTaoMediaCC(); khoiTaoCC2(); khoiTaoFsBar(); khoiTaoKfGfx(); khoiTaoVanBanCC(); khoiTaoBangFont(); khoiTaoLopFx(); khoiTaoKhoTrucTuyen(); khoiTaoMediaKho(); khoiTaoMauDoHoa(); veTl();
+
+/* ═════════ MẶT NẠ CHO ELEMENT (gfx) + TAY CẦM MẶT NẠ TRÊN KHUNG XEM TRƯỚC — kiểu CapCut ═════════ */
+const mnCvs = [document.createElement('canvas'), document.createElement('canvas')];
+const mnCua = m => m && m.mn && m.mn.kieu && m.mn.kieu !== 'khong' ? m.mn : null;
+function mnMacDinh(kk) { return { x: 0, y: 0, w: 0.6, h: kk === 'guong' ? 0.3 : 0.6, xoay: 0, mem: 0.1, bo: 0.2, dao: false, kieu: kk }; }
+function khoiTaoMatNaEl() {
+  /* đồ hoạ / chữ / sticker: vẽ ra lớp riêng rồi khoét theo hình mặt nạ (toạ độ tính theo khung) */
+  const veDhCu = veDoHoa;
+  veDoHoa = function (ctx, W, H, g, t) {
+    const mn = mnCua(g); if (!mn) return veDhCu.apply(this, arguments);
+    const [L, M] = mnCvs; [L, M].forEach(x => { if (x.width !== W || x.height !== H) { x.width = W; x.height = H; } });
+    const gl = L.getContext('2d'); gl.clearRect(0, 0, W, H);
+    const kq = veDhCu.call(this, gl, W, H, g, t);
+    const gm = M.getContext('2d'); gm.clearRect(0, 0, W, H); gm.save();
+    const mem = (mn.mem || 0) * Math.min(W, H) * 0.12; if (mem > 0.5) gm.filter = 'blur(' + mem.toFixed(1) + 'px)';
+    gm.fillStyle = '#fff'; veHinhMatNa(gm, W, H, mn); gm.restore();
+    if (mn.dao) { gm.save(); gm.globalCompositeOperation = 'xor'; gm.fillStyle = '#fff'; gm.fillRect(0, 0, W, H); gm.restore(); }
+    gl.save(); gl.globalCompositeOperation = 'destination-in'; gl.globalAlpha = mn.mo == null ? 1 : mn.mo; gl.drawImage(M, 0, 0); gl.restore();
+    ctx.drawImage(L, 0, 0); return kq;
+  };
+  /* bảng thuộc tính của element cũng có mục Mặt nạ */
+  const vePropMn = veProp;
+  veProp = function () { const r = vePropMn.apply(this, arguments); try { themMucMatNa(); } catch (e) { } return r; };
+  /* tay cầm mặt nạ trên khung xem trước */
+  const veTayMn = veTay;
+  veTay = function () { const r = veTayMn.apply(this, arguments); try { veTayMatNa(); } catch (e) { } return r; };
+}
+function themMucMatNa() {
+  const box = $('#propChon'); if (!box || !P.chon || P.chon.k !== 'g') return;
+  const g = mucChon(); if (!g || box.querySelector('.mnMuc')) return;
+  const moc = [...box.querySelectorAll('.nhom2')].find(n => { const b = n.querySelector('b'); return b && b.textContent === 'Hoà trộn'; });
+  const tam = el('div'); box.appendChild(tam); veThuocTinhMatNa(tam, 'g', g);
+  const n = tam.firstChild; if (!n) { tam.remove(); return; } n.classList.add('mnMuc');
+  while (tam.firstChild) box.insertBefore(tam.firstChild, moc || null);
+  tam.remove();
+}
+/* phép biến hình của element (V1/V2 có scale–xoay–dời; element đồ hoạ dùng thẳng toạ độ khung) */
+function mnPhep(k, m) { if (k === 'g') return { x: 0, y: 0, sc: 1, xoay: 0 }; const h = tinhHop(k, m); return { x: h.x, y: h.y, sc: h.sc, xoay: h.xoay }; }
+function veTayMatNa() {
+  const lop = $('#tayCam'); if (!lop || P.keoTay || P.dang || !P.chon) return;
+  const k = P.chon.k; if (!['v', 'b', 'g'].includes(k)) return;
+  const m = mucChon(), mn = mnCua(m); if (!mn) return;
+  const st = batDauMuc(k, m), dai = daiMuc(k, m); if (P.t < st - 0.01 || P.t > st + dai + 0.01) return;
+  const tr = mnPhep(k, m), ngoai = el('div', 'mnT');
+  ngoai.style.cssText = 'left:0;top:0;right:0;bottom:0;transform:translate(' + (tr.x * 100) + '%,' + (tr.y * 100) + '%) rotate(' + tr.xoay + 'deg) scale(' + tr.sc + ')';
+  const cx = 0.5 + (mn.x || 0) / 2, cy = 0.5 + (mn.y || 0) / 2, w = mn.w == null ? 0.6 : mn.w, h = mn.h == null ? 0.6 : mn.h;
+  const hop = el('div', 'mnH mn_' + mn.kieu);
+  if (mn.kieu === 'tuyen') Object.assign(hop.style, { left: '-50%', width: '200%', top: cy * 100 + '%', height: '36%', transformOrigin: '50% 0', transform: 'rotate(' + (mn.xoay || 0) + 'deg)' });
+  else if (mn.kieu === 'guong') Object.assign(hop.style, { left: '-50%', width: '200%', top: (cy - h / 2) * 100 + '%', height: h * 100 + '%', transform: 'rotate(' + (mn.xoay || 0) + 'deg)' });
+  else Object.assign(hop.style, { left: (cx - w / 2) * 100 + '%', top: (cy - h / 2) * 100 + '%', width: w * 100 + '%', height: h * 100 + '%', borderRadius: mn.kieu === 'tron' ? '50%' : mn.kieu === 'chu_nhat' ? Math.round((mn.bo || 0) * 24) + 'px' : '4px', transform: 'rotate(' + (mn.xoay || 0) + 'deg)' });
+  if (mn.kieu !== 'tuyen') hop.appendChild(el('i', 'co'));
+  hop.appendChild(el('i', 'qu')); hop.appendChild(el('i', 'me'));
+  ngoai.appendChild(hop); lop.appendChild(ngoai);
+  hop.addEventListener('pointerdown', e => {
+    e.preventDefault(); e.stopPropagation();
+    const loai = e.target.classList.contains('co') ? 'co' : e.target.classList.contains('qu') ? 'qu' : e.target.classList.contains('me') ? 'me' : 'doi';
+    try { hop.setPointerCapture(e.pointerId); } catch { } luuHoanTac(); P.keoTay = true;
+    const r = lop.getBoundingClientRect(), f = r.width / cv.width, th = tr.xoay * Math.PI / 180;
+    const ax = (cx - 0.5) * cv.width, ay = (cy - 0.5) * cv.height;
+    const rx = (ax * Math.cos(th) - ay * Math.sin(th)) * tr.sc, ry = (ax * Math.sin(th) + ay * Math.cos(th)) * tr.sc;
+    const tamX = r.left + f * (cv.width / 2 + tr.x * cv.width + rx), tamY = r.top + f * (cv.height / 2 + tr.y * cv.height + ry);
+    const x0 = e.clientX, y0 = e.clientY, d0 = Math.hypot(x0 - tamX, y0 - tamY) || 1, a0 = Math.atan2(y0 - tamY, x0 - tamX);
+    const mn0 = { ...mn }, do0 = Math.min(r.width, r.height) * 0.35;
+    let cho = false; const mv = ev => {
+      if (loai === 'doi') {
+        const dx = ev.clientX - x0, dy = ev.clientY - y0;
+        const lx = (dx * Math.cos(th) + dy * Math.sin(th)) / tr.sc / f, ly = (-dx * Math.sin(th) + dy * Math.cos(th)) / tr.sc / f;
+        mn.x = +((mn0.x || 0) + lx / (cv.width / 2)).toFixed(4); mn.y = +((mn0.y || 0) + ly / (cv.height / 2)).toFixed(4);
+      } else if (loai === 'co') {
+        const ti = Math.hypot(ev.clientX - tamX, ev.clientY - tamY) / d0;
+        if (mn.kieu === 'guong') mn.h = +Math.max(0.02, Math.min(1.5, (mn0.h || 0.3) * ti)).toFixed(3);
+        else { mn.w = +Math.max(0.02, Math.min(1.5, (mn0.w || 0.6) * ti)).toFixed(3); mn.h = +Math.max(0.02, Math.min(1.5, (mn0.h || 0.6) * ti)).toFixed(3); }
+      } else if (loai === 'qu') {
+        let a = (mn0.xoay || 0) + (Math.atan2(ev.clientY - tamY, ev.clientX - tamX) - a0) * 180 / Math.PI;
+        if (!ev.shiftKey) { const q = Math.round(a / 15) * 15; if (Math.abs(a - q) < 3) a = q; }
+        mn.xoay = Math.round(a);
+      } else mn.mem = +Math.max(0, Math.min(1, (mn0.mem || 0) + (Math.hypot(ev.clientX - tamX, ev.clientY - tamY) - d0) / do0)).toFixed(3);
+      if (!cho) { cho = true; requestAnimationFrame(() => { cho = false; veFrame(cx2(), cv.width, cv.height, P.t, null); veTayMatNaCapNhat(ngoai, hop, k, m); }); }
+    };
+    const up = () => { hop.removeEventListener('pointermove', mv); hop.removeEventListener('pointerup', up); hop.removeEventListener('pointercancel', up); P.keoTay = false; veProp(); veKhung(); };
+    hop.addEventListener('pointermove', mv); hop.addEventListener('pointerup', up); hop.addEventListener('pointercancel', up);
+  });
+}
+const cx2 = () => cx;
+function veTayMatNaCapNhat(ngoai, hop, k, m) {
+  const mn = mnCua(m); if (!mn) return;
+  const cx3 = 0.5 + (mn.x || 0) / 2, cy = 0.5 + (mn.y || 0) / 2, w = mn.w == null ? 0.6 : mn.w, h = mn.h == null ? 0.6 : mn.h;
+  if (mn.kieu === 'tuyen') Object.assign(hop.style, { top: cy * 100 + '%', transform: 'rotate(' + (mn.xoay || 0) + 'deg)' });
+  else if (mn.kieu === 'guong') Object.assign(hop.style, { top: (cy - h / 2) * 100 + '%', height: h * 100 + '%', transform: 'rotate(' + (mn.xoay || 0) + 'deg)' });
+  else Object.assign(hop.style, { left: (cx3 - w / 2) * 100 + '%', top: (cy - h / 2) * 100 + '%', width: w * 100 + '%', height: h * 100 + '%', transform: 'rotate(' + (mn.xoay || 0) + 'deg)' });
+}
+
+khoiTaoB(); khoiTaoC(); khoiTaoUI(); khoiTaoLop(); khoiTaoBang(); khoiTaoDot1(); khoiTaoDot2(); khoiTaoDot3(); khoiTaoM1(); khoiTaoM2(); khoiTaoM3(); khoiTaoN(); khoiTaoMobi(); khoiTaoCCW(); khoiTaoKho(); khoiTaoDoc(); khoiTaoGon(); khoiTaoMediaCC(); khoiTaoCC2(); khoiTaoFsBar(); khoiTaoKfGfx(); khoiTaoVanBanCC(); khoiTaoBangFont(); khoiTaoLopFx(); khoiTaoKhoTrucTuyen(); khoiTaoMediaKho(); khoiTaoMauDoHoa(); khoiTaoMatNaEl(); veTl();
 </script>
 <script src="tro-ly.js?v=202610011200"></script>
 </body>
