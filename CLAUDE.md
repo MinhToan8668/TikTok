@@ -22,6 +22,7 @@ tự nhiên như trong code hiện có.
 | `bot-tai-video/bot.py` | Bot Telegram tải video bằng yt-dlp | token qua biến môi trường |
 | `.claude/skills/hook-text/` | Skill thiết kế chữ hook lên frame video cho học viên | skill riêng của dự án, không phải của ECC |
 | `assets/` | Logo, brand | |
+| `team/` | Quy chuẩn thương hiệu (giọng văn từng kênh, màu, font, logo, video) và quy trình chia việc team | Viết nội dung hay làm thiết kế cho TMXK thì theo `team/QUY-CHUAN-THUONG-HIEU.md` |
 | `poster-fb/` | Poster Facebook quảng bá Viral Studio, ảnh cắt từ giao diện thật | **Làm poster hay viết bài FB/Threads thì đọc `poster-fb/HUONG-DAN-POSTER.md` trước.** `chup.js` chụp tool, `xuat.js` xuất PNG |
 
 ## Kiến trúc và luồng dữ liệu
