@@ -101,6 +101,12 @@
   .khung small{color:var(--muted);font-size:12px;line-height:1.35}
   .khung[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 2px var(--accent) inset}
   .khung .use{font-size:11px;color:var(--ok);font-weight:600}
+  .story-xem{margin:14px auto 4px;max-width:300px}
+  .story-khung{aspect-ratio:9/16;border-radius:14px;background:linear-gradient(160deg,#5b6b78,#2b3540 60%,#1d2329);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:7px;padding:22px 14px;overflow:hidden}
+  .story-khung span{background:rgba(20,20,20,.62);color:#fff;font-weight:700;font-size:14px;line-height:1.3;text-align:center;border-radius:6px;padding:5px 9px;max-width:100%;white-space:pre-line;opacity:0;animation:storyHien .5s ease forwards}
+  .story-khung em{color:#cfd6dc;font-style:normal;font-size:12px}
+  @keyframes storyHien{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){.story-khung span{animation:none;opacity:1}}
   .khung-nhom{grid-column:1/-1;font-family:var(--font-display);font-weight:800;font-size:12.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin:8px 0 -2px}
   .khung-nhom:first-child{margin-top:0}
   .tl-lbl-moc{position:relative;height:16px}
@@ -207,7 +213,7 @@
           <div id="spWrap" hidden><label class="lbl" for="sanPham">Sản phẩm / dịch vụ (nếu có)</label><input type="text" id="sanPham" placeholder="VD: combo hải sản 1tr2, khoá học 540k, chảo chống dính"></div>
         </div>
         <div class="two">
-          <div><label class="lbl">Dạng quay</label><div class="seg" id="dang" role="group"><button type="button" data-v="noi_camera" aria-pressed="true">Nói vào camera</button><button type="button" data-v="voice_over" aria-pressed="false">Voice-over</button><button type="button" data-v="text" aria-pressed="false">Chữ chạy</button></div></div>
+          <div><label class="lbl">Dạng quay</label><div class="seg" id="dang" role="group"><button type="button" data-v="noi_camera" aria-pressed="true">Nói vào camera</button><button type="button" data-v="voice_over" aria-pressed="false">Voice-over</button><button type="button" data-v="text" aria-pressed="false">Chữ story</button></div></div>
           <div><label class="lbl">Tốc độ nói của bạn</label><div class="seg" id="tocDo" role="group"><button type="button" data-v="cham" aria-pressed="false">Chậm · 2,3 chữ/s</button><button type="button" data-v="vua" aria-pressed="true">Vừa · 2,8</button><button type="button" data-v="nhanh" aria-pressed="false">Nhanh · 3,3</button></div></div>
         </div>
       </section>
@@ -220,8 +226,9 @@
 
       <section class="card">
         <h2>3 · Viết kịch bản theo từng phần <span id="khungTen" class="hint" style="margin:0;font-weight:400"></span></h2>
-        <p class="hint">Viết đúng như bạn sẽ nói, đừng gọt cho văn vẻ. Đồng hồ bên phải mỗi phần đếm theo tốc độ nói bạn chọn (chữ chạy thì theo tốc độ đọc). Mục tiêu của khung này <b id="mucGiay">60–105 giây</b>.</p>
+        <p class="hint">Viết đúng như bạn sẽ nói, đừng gọt cho văn vẻ. Đồng hồ bên phải mỗi phần đếm theo tốc độ nói bạn chọn (chữ story thì theo tốc độ đọc). Mục tiêu của khung này <b id="mucGiay">60–105 giây</b>.</p>
         <div id="phanList"></div>
+        <div class="story-xem" id="storyXem" hidden aria-label="Xem trước khối chữ kiểu story"><div class="story-khung" id="storyKhung"></div><p class="hint" style="margin:6px 0 0;text-align:center">Xem trước: khối chữ trên một cảnh, hiện dần theo nhạc</p></div>
         <div class="tl">
           <div class="row" style="justify-content:space-between;align-items:flex-end;margin-bottom:6px">
             <div><div class="tl-total" id="tlTotal">0s</div><div class="hint" style="margin:0" id="tlNote">Chưa có chữ nào.</div></div>
@@ -291,7 +298,7 @@ let toastT; function toast(m) { const t = $('#toast'); t.textContent = m; t.clas
 const TOC_DO = { cham: 2.35, vua: 2.8, nhanh: 3.3 };
 const DOC_CHU = 3.2;   // chữ/giây người xem đọc kịp trên màn hình (dạng chữ chạy)
 const NHOM_KHUNG = [['ngan', '⚡ Ngắn, ít lời, ghép nhạc'], ['ke', '📖 Kể chuyện'], ['noi', '🎙 Nói camera, chia sẻ'], ['trai', '🛍 Trải nghiệm, bán hàng'], ['khac', '✏️ Khác']];
-const DANG_TEN = { noi_camera: 'Nói vào camera', voice_over: 'Voice-over', text: 'Chữ chạy' };
+const DANG_TEN = { noi_camera: 'Nói vào camera', voice_over: 'Voice-over', text: 'Chữ story' };
 function gKhung(K) { return K.g || [60, 105]; }
 function tocDoHienTai() { return state.dang === 'text' ? DOC_CHU : TOC_DO[state.tocDo]; }
 const KHUNG = [
@@ -336,12 +343,12 @@ const KHUNG = [
     ['that2', 'Thắt 2: tưởng bế tắc', 'Thử áp dụng nhưng thất bại lần nữa.', .17],
     ['bn2', 'Bước ngoặt 2: phát hiện bất ngờ', 'Tìm ra chiến lược đúng.', .17],
     ['ket', 'Kết: bài học sâu', 'Xây lại, lần này khác chỗ nào. Một câu để lại.', .16] ] },
-  { k: 'chu_chay', n: 'Chữ chạy 15–20s ghép nhạc', d: 'Không lời: 4–6 màn chữ, mỗi màn một cảnh, cắt theo beat', use: 'Trải nghiệm, ăn chơi, đi đây đó, đời thường', nhom: 'ngan', dang: 'text', g: [15, 25], phan: [
-    ['hook', 'Màn chữ hook (0–2 giây)', 'Một màn chữ có số, giá hoặc tình huống lạ. VD: "▸ 89k ăn buffet hải sản ở Sài Gòn??"', .14],
-    ['ke1', 'Màn chữ kể 1', 'Mỗi màn một dòng bắt đầu bằng ▸, tối đa 12 chữ, đi với một cảnh. VD: "▸ Tưởng lừa đảo ai dè…"', .2],
-    ['ke2', 'Màn chữ kể 2', 'Thêm một chi tiết thấy được: món, chỗ ngồi, hàng người. VD: "▸ Xếp hàng 20 phút mới vào được"', .2],
-    ['dat', 'Màn chữ chi tiết đắt nhất', 'Cái khiến người xem phải lưu lại. VD: "▸ Tôm hùm nướng phô mai không giới hạn 🦞"', .24],
-    ['chot', 'Màn chữ chốt', 'Giá, địa điểm, twist hoặc câu hỏi kéo bình luận. VD: "▸ Địa chỉ mình để ở bình luận nha"', .22] ] },
+  { k: 'chu_chay', n: 'Chữ story 15s ghép nhạc', d: 'Một cảnh đời thường, 3–5 khối chữ cô đọng hiện dần như story', use: 'Chia sẻ trải nghiệm, quan điểm nghề, trả lời bình luận', nhom: 'ngan', dang: 'text', g: [10, 20], phan: [
+    ['k1', 'Khối chữ 1: quan điểm gắt hoặc thú nhận', 'Một câu cảm xúc mạnh. VD: "▸ Telesale là cái nghề t rất ghét!" hoặc "▸ Cần gì phải giỏi tiếng Anh rồi mới dám học CFA?"', .22],
+    ['k2', 'Khối chữ 2: cú ngoặt', 'Chuyện đổi chiều. VD: "▸ Cho đến khi chính t phải nhảy vào làm nó"', .2],
+    ['k3', 'Khối chữ 3: điều thấm sau trải nghiệm', 'Điều mình nhận ra, nhấn nhá bằng ngoặc kép. VD: "▸ Trải rồi mới thấm, \"nỗi sợ bị từ chối\" nó chả là cái gì cả"', .3],
+    ['k4', 'Khối chữ 4: câu chốt đáng lưu', 'Một câu quan điểm riêng, người xem muốn lưu lại. VD: "▸ Cái kỹ năng này chưa chắc AI nào làm thay t được!"', .2],
+    ['caption', 'Caption dưới video', 'Kể thêm 1–2 câu đời thường + hashtag. VD: "Mình từng rất khinh thường công việc này… #trainghiem"', .08] ] },
   { k: 'pov', n: 'POV nhập vai', d: 'Chữ POV một dòng, diễn phản ứng, leo thang rồi twist', use: 'Tình huống công sở, gia đình, khách hàng, bạn bè', nhom: 'ngan', dang: 'text', g: [10, 30], phan: [
     ['pov', 'Chữ POV: tình huống ai cũng gặp', 'Một dòng đọc là thấy mình trong đó. VD: "POV: sếp nhắn lúc 11h đêm"', .12],
     ['pu1', 'Phản ứng đầu tiên', 'Diễn bằng mặt và hành động, chữ phụ ngắn nếu cần.', .2],
@@ -436,12 +443,13 @@ function buildPhan() {
     const cq = ((state.canh || {})[K.k] || {})[k]; if (cq) { const c = el('small', 'tip canh'); c.textContent = '🎬 Cảnh quay gợi ý: ' + cq; c.style.marginTop = '6px'; c.style.color = 'var(--ok)'; w.append(c); }
     box.append(w);
   });
-  updateTimes();
+  updateTimes(); veStory();
 }
 function updateTimes() {
   const K = khungHienTai(), T = state.text[K.k] || {}, G = gKhung(K), td = tocDoHienTai(); let total = 0, words = 0; const segs = [];
   $('#mucGiay').textContent = G[0] + '–' + G[1] + ' giây'; $('#tlLo').textContent = G[0] + 's'; $('#tlHi').textContent = G[1] + 's';
   K.phan.forEach(([k, ten, tip, share], i) => {
+    if (k === 'caption') { const e = document.querySelector(`.phan-time[data-k="${k}"]`); if (e) { e.className = 'phan-time'; e.textContent = 'nằm dưới video, không tính giờ'; } return; }
     const n = demChu(T[k]), s = giay(n); total += s; words += n; segs.push([s, COLORS[i % COLORS.length], ten]);
     const goal = [share * G[0], share * G[1]]; const e = document.querySelector(`.phan-time[data-k="${k}"]`); if (!e) return;
     const cls = !n ? '' : s < goal[0] * .6 ? 'bad' : s < goal[0] ? 'warn' : s > goal[1] * 1.3 ? 'bad' : s > goal[1] ? 'warn' : 'ok';
@@ -461,6 +469,17 @@ function updateTimes() {
     : total < G[0] ? `Còn thiếu khoảng ${Math.round((G[0] - total) * td)} chữ nữa mới đủ ${G[0]} giây. Thường thiếu ở phần tả chi tiết.`
     : total <= G[1] ? `Đúng khung ${G[0]}–${G[1]} giây. Giờ xem từng phần có cân không.`
     : `Dư khoảng ${Math.round((total - G[1]) * td)} chữ. Cắt ý trùng, từ thừa trước; đừng cắt chi tiết đắt.`;
+  clearTimeout(veStory.t); veStory.t = setTimeout(veStory, 350);
+}
+/* Xem trước kiểu story: mỗi dòng ▸ (hoặc mỗi dòng) là một khối chữ nền tối giữa khung dọc, hiện dần */
+function veStory() {
+  const box = $('#storyXem'); if (!box) return;
+  const K = khungHienTai(), T = state.text[K.k] || {}; box.hidden = state.dang !== 'text';
+  if (box.hidden) return;
+  const dong = K.phan.filter(([k]) => k !== 'caption').flatMap(([k]) => String(T[k] || '').split('\n')).map(x => x.replace(/^\s*▸\s*/, '').trim()).filter(Boolean).slice(0, 7);
+  const kh = $('#storyKhung'); kh.innerHTML = '';
+  if (!dong.length) { kh.append(el('em', null, 'Gõ khối chữ ở các phần trên, mỗi dòng ▸ là một khối')); return; }
+  dong.forEach((t, i) => { const sp = el('span', null, t); sp.style.animationDelay = (i * .45) + 's'; kh.append(sp); });
 }
 function goiKichBan() { const K = khungHienTai(), T = state.text[K.k] || {}; return K.phan.map(([k, ten]) => ({ k, ten, text: (T[k] || '').trim() })); }
 function kichBanText(parts) { return parts.filter(p => p.text).map(p => p.text).join('\n\n'); }
@@ -508,7 +527,7 @@ function hsMucTieu(t) {
 function hsDang(t) {
   t = (t || '').toLowerCase();
   if (/voice|lồng tiếng|thuyết minh/.test(t)) return 'voice_over';
-  if (/chữ chạy|text on screen|không lộ mặt/.test(t)) return 'text';
+  if (/chữ chạy|chữ story|text on screen|không lộ mặt/.test(t)) return 'text';
   if (/camera|talking head|pov|lộ mặt|nói vào/.test(t)) return 'noi_camera';
   return '';
 }

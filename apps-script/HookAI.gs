@@ -175,7 +175,7 @@ function hookCfQuaTai(b){
 function hookAi(b){
   if (b.mode === 'job_kq') return jobKq(b);
   if (b.mode === 'cf_qua_tai') return hookCfQuaTai(b);   // máy chủ Cloudflare báo key Gemini quá tải → bot
-  HOOK_QUA_TAI = null; HOOK_LA_MENTOR = false; HOOK_TOOL = '';
+  HOOK_QUA_TAI = null; HOOK_LA_MENTOR = false; HOOK_TOOL = ''; HOOK_XH = '';
   var id = /^[A-Za-z0-9_-]{12,48}$/.test(String(b.job_id || '')) ? String(b.job_id) : '';
   if (!id) return hookLocLoi(hookAiChinh(b));
   try{ CacheService.getScriptCache().put(jobKhoa(id), JSON.stringify({dang:1, t:Date.now()}), 21600); }catch(e){}
@@ -206,6 +206,10 @@ function hookAiChinh(b){
   HOOK_BH = '';
   if (typeof bhKhoi === 'function' && /^(|script|soi|cham|viet|design|apkhuon|layer)$/.test(String(b.mode || '')))
     try{ HOOK_BH = bhKhoi(ai.tool, ai.hs, String(b.text || b.chu_de || b.y_do || b.loi_thoai || '').slice(0, 400)); }catch(e){ HOOK_BH = ''; }
+  // bản tin xu hướng tuần đã duyệt (XuHuong.gs): chỉ cho các lượt gợi ý nội dung, không cho việc chép lời hay nhận diện
+  HOOK_XH = '';
+  if (typeof xhKhoi === 'function' && /^(|script|soi|cham|viet|apkhuon|chat|design)$/.test(String(b.mode || '')))
+    try{ HOOK_XH = xhKhoi(); }catch(e){ HOOK_XH = ''; }
 
   var provider = (hookCfg('HOOK_AI_PROVIDER') || 'gemini').toLowerCase();
   var key = provider === 'claude' ? cfgProp('ANTHROPIC_API_KEY') : hookCfg('GEMINI_API_KEY');
@@ -421,6 +425,7 @@ var HOOK_TOOL_TEN = {hook:'Hook viral', script:'Kịch bản viral', soi:'Soi vi
 var HOOK_MODEL_UU_TIEN = null, HOOK_SUY_NGHI = '';
 function goiGemini(key, img, prompt, schema, maxTok, media, nhiet, hetGio){
   if (typeof HOOK_BH === 'string' && HOOK_BH) prompt = HOOK_BH + '\n\n' + prompt;   // bài học mentor (TroLy.gs)
+  if (typeof HOOK_XH === 'string' && HOOK_XH) prompt = HOOK_XH + '\n\n' + prompt;   // xu hướng tuần đã duyệt (XuHuong.gs)
   var uuTien = Array.isArray(HOOK_MODEL_UU_TIEN) ? HOOK_MODEL_UU_TIEN.slice() : null, suyNghi = HOOK_SUY_NGHI || '';
   HOOK_MODEL_UU_TIEN = null; HOOK_SUY_NGHI = '';
   schema = schema || HOOK_SCHEMA; maxTok = maxTok || 6000;
@@ -535,6 +540,7 @@ function goiGemini(key, img, prompt, schema, maxTok, media, nhiet, hetGio){
 /* ── Claude: trả tiền theo lượt, chất lượng tiếng Việt tốt hơn ── */
 function goiClaude(key, img, prompt, schema, maxTok, nhiet){
   if (typeof HOOK_BH === 'string' && HOOK_BH) prompt = HOOK_BH + '\n\n' + prompt;
+  if (typeof HOOK_XH === 'string' && HOOK_XH) prompt = HOOK_XH + '\n\n' + prompt;
   schema = schema || HOOK_SCHEMA; maxTok = maxTok || 6000;
   var model = hookCfg('HOOK_AI_MODEL') || 'claude-opus-5';
   var noiDung = [];
@@ -741,7 +747,7 @@ var KB_KIEN_THUC = [
   '',
   'N. KẾT BÀI VÀ CHUYỂN ĐỔI. Kết là bài học cá nhân, quan điểm rõ, hoặc câu hỏi kéo bình luận cụ thể ("comment X để nhận Y"), không "like share follow" chung chung. Tuyến nhận biết: không bán hàng, chỉ cần xem xong người ta biết kênh này về gì. Tuyến hiểu và tin: SHOW sản phẩm hoạt động, show chuyên môn bằng quan điểm riêng, show quy trình, show khách thật. Cài giỏ hàng vào video viral: ở giữa hoặc cuối dành 5–6 giây cho MỘT tính năng đặc sắc nhất rồi kêu gọi bấm link; sản phẩm phải nằm trong chính câu chuyện, nhịp 4–5 video viral mới 1 video bán. Lồng sản phẩm nhận booking: chọn MỘT tính năng nổi nhất rồi viết tình huống làm nó nổi bật (chồng rán nem be bét vì chảo thường → chảo chống dính). Công thức HỜI: nêu 2–3 con số để khách tự chia ra con số nhỏ hơn bữa cơm bụi, tuyệt đối không nói "rẻ", "hời"; xếp từng món vào thay vì quay tổng quan; có một món ai cũng biết là đắt để dừng lại khen riêng.',
   '',
-  'P. KHUNG NGẮN THEO XU HƯỚNG 2026 (đích thời lượng riêng, không ép 60–105 giây). CHỮ CHẠY 15–20 GIÂY GHÉP NHẠC (trải nghiệm, ăn chơi, đi đây đó, đời thường): không lời, 4–6 màn chữ, mỗi màn một cảnh 2–3 giây, chữ to 1/3 trên, màn đầu là hook có số hoặc tình huống lạ, màn cuối chốt bằng giá, địa điểm, twist hoặc câu hỏi kéo bình luận; cảnh cắt đúng beat nhạc trend; người xem thường xem lại 2–3 lần nên giữ chân rất tốt. POV: chữ POV một dòng nêu tình huống ai cũng gặp, quay góc nhìn thứ nhất hoặc diễn phản ứng, leo thang rồi twist, 10–30 giây. VLOG ngắn 30–75 giây: quay cường độ cảm xúc, chữ mốc giờ hoặc ngữ cảnh, voice-over hoặc chữ. TRẢI NGHIỆM THỬ: kết quả hoặc giá ở giây đầu, 2–3 điểm thấy nếm chạm thật, đánh giá thẳng, ai nên ai không. TRƯỚC – SAU: kết quả ở giây đầu rồi mới quay lại trước. SO SÁNH A–B, TRẢ LỜI BÌNH LUẬN, SỰ THẬT NGƯỢC: nói camera 30–60 giây, một ý, có bằng chứng. Chọn khung theo CHẤT LIỆU người làm có thật và cách họ muốn làm (có muốn lộ mặt, có muốn nói không), không ép mọi thứ thành video nói dài.',
+  'P. KHUNG NGẮN THEO XU HƯỚNG 2026 (đích thời lượng riêng, không ép 60–105 giây). CHỮ STORY 15 GIÂY GHÉP NHẠC (chia sẻ trải nghiệm, quan điểm nghề, trả lời bình luận): không lời, một cảnh đời thường 10–15 giây, 3–5 khối chữ cô đọng giữa màn hình hiện dần như story, giọng người từng trải, câu gắt có nhấn nhá; mạch quan điểm hoặc thú nhận → cú ngoặt → điều thấm → câu chốt; người xem đọc xong thường xem lại và lưu. TRẢI NGHIỆM THỬ: kết quả hoặc giá ở giây đầu, 2–3 điểm thấy nếm chạm thật, đánh giá thẳng, ai nên ai không. TRƯỚC – SAU: kết quả ở giây đầu rồi mới quay lại trước. SO SÁNH A–B, TRẢ LỜI BÌNH LUẬN, SỰ THẬT NGƯỢC: nói camera 30–60 giây, một ý, có bằng chứng. Chọn khung theo CHẤT LIỆU người làm có thật và cách họ muốn làm (có muốn lộ mặt, có muốn nói không), không ép mọi thứ thành video nói dài.',
   '',
   'O. CHẤM KỊCH BẢN THEO KHOÁ, thang 100, năm tiêu chí mỗi tiêu chí 0–20, bám đúng ba mức 0–6 / 7–13 / 14–20.',
   'HOOK 3 GIÂY: 0–6 mở bằng giới thiệu, chào hỏi, "hôm nay mình chia sẻ", màn hình trống, hoặc hứa giả; 7–13 có vấn đề hoặc tò mò nhưng vỏ giống mọi kênh, chưa có tương phản, lời thoại hay khoảng trống thông tin; 14–20 vào thẳng cảm xúc hoặc vấn đề trong 1–2 câu, có một trong 5 kiểu hook, lời hứa có thật và thân bài trả được.',
@@ -760,7 +766,7 @@ var KB_KHUNG = {
   fichtean:   'Fichtean thử thách: vào thẳng hành động → thử thách 1 → thử thách 2 (khó hơn) → thử thách 3 (khó nhất) → kết luận mạnh',
   chanthuc:   'Chân thực 2026: nêu vấn đề → mô tả thật cụ thể → giải pháp hoặc bài học',
   vlog:       'Daily vlog cường độ cảm xúc: mở cảnh (giờ giấc, cái mệt) → cảnh 1 → cảnh 2 → cảnh 3 (mỗi cảnh một cường độ cảm xúc) → kết',
-  chu_chay:   'Chữ chạy 15–20 giây ghép nhạc (trải nghiệm, ăn chơi, đi đây đó, đời thường): màn chữ hook → 2 màn chữ kể theo cảnh → màn chữ chi tiết đắt nhất → màn chữ chốt (giá, địa điểm, twist hoặc câu kéo bình luận); không lời, nhạc trend cắt theo beat',
+  chu_chay:   'Chữ story 15 giây ghép nhạc (chia sẻ trải nghiệm, quan điểm nghề, trả lời bình luận): một cảnh quay đời thường, 3–5 khối chữ cô đọng hiện dần giữa màn hình: câu quan điểm gắt hoặc thú nhận → cú ngoặt → điều thấm sau trải nghiệm → câu chốt đáng lưu; không lời, nhạc trend',
   pov:        'POV nhập vai: chữ POV một dòng nêu tình huống ai cũng gặp → phản ứng đầu → leo thang → twist hoặc đỉnh điểm → phản ứng cuối hoặc câu thoại chốt; ít lời, diễn bằng mặt và hành động',
   trai_nghiem:'Trải nghiệm thử: kết quả hoặc giá ngay giây đầu → đi đâu, thử gì → điểm 1 thấy gì → điểm 2 nếm, chạm, dùng thử → đánh giá thẳng kèm giá → ai nên thử, ai không',
   truoc_sau:  'Trước – sau: kết quả SAU ngay giây đầu → TRƯỚC tệ thế nào → quá trình tua nhanh → đặt cạnh nhau có con số → câu chốt',
@@ -774,16 +780,16 @@ var KB_KHUNG = {
 var KB_TOC_DO = { cham: 2.35, vua: 2.8, nhanh: 3.3 };
 /* Thời lượng đích và dạng quay mặc định theo khung. Khung không có trong bảng: 60–105 giây, nói camera.
    Khung ngắn ghép nhạc (chữ chạy, POV) đọc theo tốc độ đọc chữ trên màn hình, không theo tốc độ nói. */
-var KB_KHUNG_GIAY = { chu_chay:[15,25], pov:[10,30], truoc_sau:[20,45], trai_nghiem:[25,60], so_sanh:[30,60], tra_loi_cmt:[20,60], nguoc_doi:[30,60], vlog:[30,75] };
+var KB_KHUNG_GIAY = { chu_chay:[10,20], pov:[10,30], truoc_sau:[20,45], trai_nghiem:[25,60], so_sanh:[30,60], tra_loi_cmt:[20,60], nguoc_doi:[30,60], vlog:[30,75] };
 var KB_KHUNG_DANG = { chu_chay:'text', pov:'text', truoc_sau:'voice_over', trai_nghiem:'voice_over', vlog:'voice_over' };
-var KB_DANG_TEN = { noi_camera:'nói thẳng vào camera', voice_over:'voice-over trên cảnh quay', text:'chữ chạy trên màn hình ghép nhạc, không lời' };
+var KB_DANG_TEN = { noi_camera:'nói thẳng vào camera', voice_over:'voice-over trên cảnh quay', text:'chữ story trên màn hình ghép nhạc, không lời' };
 var KB_DOC_CHU = 3.2;   // chữ/giây người xem đọc kịp trên màn hình
 function kbGiay(khung){ return KB_KHUNG_GIAY[khung] || [60, 105]; }
 function kbTocDo(b){ return b && b.dang === 'text' ? KB_DOC_CHU : (KB_TOC_DO[b && b.toc_do] || KB_TOC_DO.vua); }
 /* Luật viết riêng cho dạng chữ chạy: "lời" của từng phần là các MÀN CHỮ, không phải câu nói. */
 function kbLuatDang(dang){
   if (dang !== 'text') return '';
-  return 'DẠNG CHỮ CHẠY GHÉP NHẠC: video không lời, câu chuyện chạy bằng chữ trên màn hình. Trong mỗi phần, "lời" là các MÀN CHỮ, mỗi màn một dòng bắt đầu bằng "▸ ", tối đa 2 dòng hiển thị và 6–12 chữ, đọc kịp trong 2–3 giây; mỗi màn đi với ĐÚNG một cảnh quay. Màn đầu là hook (con số, giá, tình huống lạ, câu hỏi), màn cuối là chốt (giá, địa điểm, twist hoặc câu kéo bình luận). Giọng chữ như nhắn tin cho bạn thân, có cảm thán, emoji vừa phải (tối đa 1 mỗi màn), không văn máy. Cảnh cắt theo beat nhạc; gợi ý kiểu nhạc trend hợp cảm xúc (vui nhộn, chill, hồi hộp, cảm động) chứ không bịa tên bài.';
+  return 'DẠNG CHỮ STORY GHÉP NHẠC (kiểu người từng trải đăng story): video không lời, thường CHỈ MỘT cảnh quay đời thường dài 10–15 giây (đang làm việc, gọi điện, ngồi cà phê, nhìn thẳng camera, đi trên đường), KHÔNG chuyển cảnh liên tục. Chữ nằm giữa màn hình thành 3–5 KHỐI CHỮ có nền tối mờ, hiện dần từng khối theo nhịp nhạc rồi đứng lại cùng nhau như story. Trong mỗi phần, mỗi dòng bắt đầu bằng "▸ " là MỘT KHỐI CHỮ (1–2 dòng hiển thị, 6–16 chữ), không phải một cảnh mới; cả video 30–60 chữ. Giọng người có nhiều trải nghiệm, xưng t hoặc mình, câu ngắn và gắt, cảm xúc mạnh, nhấn nhá bằng "ngoặc kép", chấm than, câu hỏi tu từ; được viết tắt kiểu nhắn tin (t, ngkh, ko) nếu hợp giọng kênh; emoji tối đa 1. Mạch hay chạy: câu quan điểm gắt hoặc thú nhận (VD "Telesale là cái nghề t rất ghét!") → cú ngoặt ("Cho đến khi chính t phải nhảy vào làm nó") → điều thấm sau trải nghiệm, có chữ trong ngoặc kép → câu chốt đáng lưu. Có thể mở bằng sticker trả lời một bình luận thật. Caption dưới video kể thêm 1–2 câu đời thường và hashtag. Gợi ý kiểu nhạc trend hợp cảm xúc (chill, sâu lắng, hào hứng), không bịa tên bài.';
 }
 var KB_MUC_TIEU = { nhan_biet: 'NHẬN BIẾT (kéo tệp mới, không bán hàng)', uy_tin: 'HIỂU và TIN (show chuyên môn, quy trình, khách thật)', chuyen_doi: 'CHUYỂN ĐỔI (giỏ hàng, booking, inbox)' };
 
@@ -796,9 +802,10 @@ function hookScript(b, ai, provider, key){
   });
   var toanBo = phan.map(function(p){ return p.text }).join('\n').trim();
   if (!toanBo) return jsonOut({ok:false, error:'thieu_text'});
+  var trenHinh = phan.filter(function(p){ return p.k !== 'caption' && !/^Caption/.test(p.ten); }).map(function(p){ return p.text }).join('\n');   // caption dưới video không tính giờ
   var khung = KB_KHUNG[b.khung] ? String(b.khung) : 'tudo';
   var tocDo = kbTocDo(b), gD = kbGiay(khung), laChu = b.dang === 'text';
-  var soChu = kbDemChu(toanBo), giay = Math.round(soChu / tocDo * 1.06);
+  var soChu = kbDemChu(trenHinh), giay = Math.round(soChu / tocDo * 1.06);
   var muc = KB_MUC_TIEU[b.muc_tieu] || KB_MUC_TIEU.nhan_biet;
   var chuDich = { tu: Math.round(gD[0] * tocDo / 1.06), den: Math.round(gD[1] * tocDo / 1.06), dep: Math.round((gD[0] + gD[1]) / 2 * tocDo / 1.06) };
   var mucGiay = gD[0] + '–' + gD[1] + ' giây';
@@ -831,7 +838,7 @@ function hookScript(b, ai, provider, key){
     '3. diem_roi: 1–3 chỗ người xem sẽ lướt, mỗi chỗ ghi giay (ước tính từ đầu video), doan (trích 5–10 chữ trong kịch bản), ly_do (một câu, gọi tên lỗi theo khoá: hook giới thiệu, đoạn chùng, kể sự việc, nhồi ý, giải thích dài...).',
     '4. khen: 1 câu khen cụ thể (trích đúng cụm chữ hay và nói vì sao nó hay). sua: đúng 3 việc sửa cụ thể, mỗi việc chỉ đúng câu cần đổi và đổi thành gì, nêu nguyên tắc khoá đang dùng. lam_ngay: 1 việc làm trong 10 phút trước khi quay.',
     '5. giong: diem 0–10 mức "nghe như người thật đang nói"; cau_may: tối đa 4 cụm trong kịch bản nghe như văn máy, đọc kịch bản hoặc sáo (trích nguyên văn); sua_thanh: cách nói lại tương ứng theo giọng của học viên, cùng số phần tử với cau_may.',
-    '6. viet_lai: kịch bản viết lại HOÀN CHỈNH theo đúng khung đã chọn' + (laChu ? ' (text của mỗi phần là các màn chữ theo luật DẠNG CHỮ CHẠY ở trên, canh_quay ghi cảnh cho từng màn và chỗ cắt theo beat)' : '') + ', giữ đúng số phần và tên phần như học viên, tổng ' + chuDich.tu + '–' + chuDich.den + ' chữ (hãy đếm), nhắm ' + chuDich.dep + ' chữ. Mỗi phần: phan (tên), text (lời nói thật, câu ngắn, có cảm thán và ngắt nghỉ tự nhiên, có ít nhất 4–5 hành động nhỏ hoặc chi tiết giác quan ở phần thân, cảm xúc show không kể, có suy nghĩ đằng sau hành động; hook là lời thoại hoặc câu đánh thẳng vấn đề, không giới thiệu), tu và den là mốc giây bắt đầu và kết thúc tính theo số chữ của chính phần đó ở tốc độ trên, canh_quay là 1–2 câu HƯỚNG DẪN QUAY cụ thể cho phần này: góc máy (cận, trung, POV, đặt máy ở đâu), bối cảnh và ánh sáng, hành động của bạn hoặc nhân vật trong khung, chữ nào hiện trên màn hình lúc đó, cắt cảnh hay giữ một cú. Với dạng voice-over hay daily vlog, text vẫn PHẢI là lời dẫn/voice-over đầy đủ để đọc, không được chỉ ghi hướng dẫn quay. Bản viết lại phải có một móc mới mỗi 15–20 giây và cao trào rơi ở khoảng 55–75% thời lượng.',
+    '6. viet_lai: kịch bản viết lại HOÀN CHỈNH theo đúng khung đã chọn' + (laChu ? ' (text của mỗi phần là các khối chữ theo luật DẠNG CHỮ STORY ở trên, canh_quay tả cảnh nền và lúc khối chữ hiện theo nhịp nhạc)' : '') + ', giữ đúng số phần và tên phần như học viên, tổng ' + chuDich.tu + '–' + chuDich.den + ' chữ (hãy đếm), nhắm ' + chuDich.dep + ' chữ. Mỗi phần: phan (tên), text (lời nói thật, câu ngắn, có cảm thán và ngắt nghỉ tự nhiên, có ít nhất 4–5 hành động nhỏ hoặc chi tiết giác quan ở phần thân, cảm xúc show không kể, có suy nghĩ đằng sau hành động; hook là lời thoại hoặc câu đánh thẳng vấn đề, không giới thiệu), tu và den là mốc giây bắt đầu và kết thúc tính theo số chữ của chính phần đó ở tốc độ trên, canh_quay là 1–2 câu HƯỚNG DẪN QUAY cụ thể cho phần này: góc máy (cận, trung, POV, đặt máy ở đâu), bối cảnh và ánh sáng, hành động của bạn hoặc nhân vật trong khung, chữ nào hiện trên màn hình lúc đó, cắt cảnh hay giữ một cú. Với dạng voice-over hay daily vlog, text vẫn PHẢI là lời dẫn/voice-over đầy đủ để đọc, không được chỉ ghi hướng dẫn quay. Bản viết lại phải có một móc mới mỗi 15–20 giây và cao trào rơi ở khoảng 55–75% thời lượng.',
     '7. y_chinh: 4–5 gạch đầu dòng ngắn để học viên quay không cần nhìn kịch bản (mỗi dòng dưới 10 chữ).',
     '8. chu_man_hinh: dòng chữ hook đặt lên khung hình cho 3 giây đầu, tối đa 2 dòng ngăn bằng \\n, dưới 12 chữ, đánh dấu 1–2 từ khoá bằng **...**.',
     '9. caption: 1–2 câu có câu hỏi hoặc kêu gọi bình luận cụ thể, không lặp hook. hashtags: 5 hashtag tiếng Việt không dấu, có #tuminhxaykenh.'
@@ -881,7 +888,7 @@ var SOI_KHUNG_PHAN = {
   fichtean:   ['Vào thẳng hành động','Thử thách 1','Thử thách 2, khó hơn','Thử thách 3, khó nhất','Kết luận mạnh'],
   baydiem:    ['Mở đầu hấp dẫn','Cao trào 1: sự kiện thú vị','Thắt 1: xung đột','Điểm giữa: bước ngoặt','Thắt 2: tưởng bế tắc','Bước ngoặt 2: phát hiện bất ngờ','Kết: bài học sâu'],
   tips:       ['Hook có con số và đối tượng','Ý 1 + ví dụ thật','Ý 2 + ví dụ thật','Ý 3, ý đắt nhất','Kết + kêu gọi cụ thể'],
-  chu_chay:   ['Màn chữ hook (0–2 giây)','Màn chữ kể 1','Màn chữ kể 2','Màn chữ chi tiết đắt nhất','Màn chữ chốt'],
+  chu_chay:   ['Khối chữ 1: quan điểm gắt hoặc thú nhận','Khối chữ 2: cú ngoặt','Khối chữ 3: điều thấm sau trải nghiệm','Khối chữ 4: câu chốt đáng lưu','Caption dưới video'],
   pov:        ['Chữ POV: tình huống ai cũng gặp','Phản ứng đầu tiên','Leo thang','Twist hoặc đỉnh điểm','Phản ứng cuối hoặc câu thoại chốt'],
   trai_nghiem:['Kết quả hoặc giá ngay giây đầu','Đi đâu, thử gì','Điểm 1: thấy gì','Điểm 2: nếm, chạm, dùng thử','Đánh giá thẳng + giá','Ai nên thử, ai không'],
   truoc_sau:  ['Kết quả SAU ngay giây đầu','TRƯỚC tệ thế nào','Quá trình tua nhanh','Đặt cạnh nhau, có con số','Câu chốt'],
@@ -898,7 +905,7 @@ var SOI_DANG_MUON = {
   voice_over: 'không lộ mặt, quay cảnh rồi lồng tiếng',
   vlog:       'vlog đời thường, quay cường độ cảm xúc (khung vlog)',
   pov:        'POV nhập vai, ít lời (khung pov)',
-  chu_chay:   'chữ chạy 15–20 giây ghép nhạc, không lời (khung chu_chay)',
+  chu_chay:   'chữ story 15 giây ghép nhạc: một cảnh đời thường, 3–5 khối chữ cô đọng, không lời (khung chu_chay)',
   trai_nghiem:'trải nghiệm thử rồi đánh giá thẳng (khung trai_nghiem)'
 };
 function soiMongMuonText(b){
@@ -1141,7 +1148,7 @@ function hookSoi(b, ai, provider, key){
     '4. cua3 (LẶP LẠI ĐƯỢC): diem 0–10 (mức dễ mượn cho người khác); cong_thuc: MỘT dòng công thức của video theo kiểu [A] + [B] + [C]; khuon: 4–7 bước, mỗi bước 1 câu có chỗ trống trong ngoặc vuông để ai cũng điền được (VD: "Mở bằng câu thoại của [người thân] về [một việc rất nhỏ]"); ky_thuat_muon_duoc: 2–4 kỹ thuật học viên mượn được ngay; chat_lieu_rieng: 1–3 thứ là của riêng người làm video, không copy được (trải nghiệm, quan hệ, nghề, hoàn cảnh).',
     '5. binh_luan: nếu có bình luận thì dong_cam (người xem đồng cảm với cái gì, 1–2 câu), tep (tệp thật lộ qua bình luận), y_tuong_tiep: 2–3 ý tưởng video tiếp theo rút từ câu hỏi lặp lại trong bình luận; không có bình luận thì ghi dong_cam = "Chưa có bình luận để đọc" và để mảng rỗng.',
     '6. chi_so: nếu có số liệu thì doc 2–3 câu đọc theo mục 4 (tỉ lệ nào nổi, nói lên điều gì về cửa nào, có lặp lại được không); không có thì ghi "Chưa có số liệu".',
-    '7. muon_khuon (ÁP SANG KÊNH HỌC VIÊN): hop_khong: true nếu học viên có thể có chất liệu tương đương với ngách và tệp đã ghi, false nếu không; ly_do 1–2 câu thẳng; khung: mã khung HỢP NHẤT, xét theo thứ tự (a) mong muốn và dạng học viên chọn nếu có, (b) format thật của video gốc (video chữ chạy ghép nhạc → chu_chay, POV → pov, vlog đời thường → vlog, trải nghiệm hoặc review → trai_nghiem, trước–sau → truoc_sau, so sánh → so_sanh, trả lời bình luận → tra_loi_cmt, phá niềm tin → nguoc_doi), (c) chất liệu học viên có thể có; dang: dạng quay hợp với khung và mong muốn, một trong noi_camera | voice_over | text (text = chữ chạy ghép nhạc, không lời); ly_do_khung: 1 câu vì sao chọn khung và dạng này cho đúng mong muốn của học viên; nếu dang là text thì thoai của từng phần là các MÀN CHỮ (mỗi màn một dòng bắt đầu bằng "▸ ", tối đa 12 chữ) chứ không phải lời nói, và canh_quay là cảnh cho từng màn, cắt theo beat nhạc; hooks: đúng 3 hook mượn cấu trúc câu của video gốc nhưng ruột là ngách học viên, mỗi cái có formula (tên khuôn) và text (tối đa 2 dòng ngăn bằng \\n, dưới 12 chữ, đánh dấu 1–2 từ khoá bằng **...**, chỗ cần số liệu thật thì để [ ]); phan: đúng số phần và đúng thứ tự của khung đã chọn, mỗi phần có ten (đúng tên phần trong danh sách), thoai (LỜI THOẠI MẪU 1–3 câu học viên sẽ NÓI hoặc đọc voice-over ở phần này, viết theo giọng người thật, xưng hô hợp tệp của học viên, mượn kỹ thuật của video gốc nhưng ruột là ngách học viên; chỗ cần chất liệu thật thì để [ ]; kể cả daily vlog cũng phải có lời dẫn) và canh_quay (1–2 câu hướng dẫn quay: góc máy, bối cảnh, hành động trong khung, chữ trên màn hình); y_chinh: 4–5 ý chính để quay; luu_y: 1 câu về thứ không được copy từ video gốc.',
+    '7. muon_khuon (ÁP SANG KÊNH HỌC VIÊN): hop_khong: true nếu học viên có thể có chất liệu tương đương với ngách và tệp đã ghi, false nếu không; ly_do 1–2 câu thẳng; khung: mã khung HỢP NHẤT, xét theo thứ tự (a) mong muốn và dạng học viên chọn nếu có, (b) format thật của video gốc (video một cảnh đời thường với nhiều khối chữ cô đọng ghép nhạc kiểu story, hoặc chữ chạy ghép nhạc → chu_chay, POV → pov, vlog đời thường → vlog, trải nghiệm hoặc review → trai_nghiem, trước–sau → truoc_sau, so sánh → so_sanh, trả lời bình luận → tra_loi_cmt, phá niềm tin → nguoc_doi), (c) chất liệu học viên có thể có; dang: dạng quay hợp với khung và mong muốn, một trong noi_camera | voice_over | text (text = chữ story ghép nhạc, không lời); ly_do_khung: 1 câu vì sao chọn khung và dạng này cho đúng mong muốn của học viên; nếu dang là text thì thoai của từng phần là các KHỐI CHỮ story (mỗi khối một dòng bắt đầu bằng "▸ ", 6–16 chữ, giọng người từng trải, có nhấn nhá) chứ không phải lời nói, và canh_quay tả MỘT cảnh đời thường làm nền cho cả video (thường không đổi cảnh); hooks: đúng 3 hook mượn cấu trúc câu của video gốc nhưng ruột là ngách học viên, mỗi cái có formula (tên khuôn) và text (tối đa 2 dòng ngăn bằng \\n, dưới 12 chữ, đánh dấu 1–2 từ khoá bằng **...**, chỗ cần số liệu thật thì để [ ]); phan: đúng số phần và đúng thứ tự của khung đã chọn, mỗi phần có ten (đúng tên phần trong danh sách), thoai (LỜI THOẠI MẪU 1–3 câu học viên sẽ NÓI hoặc đọc voice-over ở phần này, viết theo giọng người thật, xưng hô hợp tệp của học viên, mượn kỹ thuật của video gốc nhưng ruột là ngách học viên; chỗ cần chất liệu thật thì để [ ]; kể cả daily vlog cũng phải có lời dẫn) và canh_quay (1–2 câu hướng dẫn quay: góc máy, bối cảnh, hành động trong khung, chữ trên màn hình); y_chinh: 4–5 ý chính để quay; luu_y: 1 câu về thứ không được copy từ video gốc.',
     '8. dung_copy: 1–3 thứ trong video này KHÔNG nên bắt chước và vì sao (trend trần, drama, từ tuyệt đối, gợi dục, đặc thù kênh lớn, may mắn thời điểm...). lam_ngay: 1 việc làm trong 30 phút hôm nay.',
     'Không bịa số liệu. Không bịa chi tiết không có trong video, lời thoại, bình luận hoặc ảnh. Nếu tư liệu không đủ để kết luận phần nào, nói rõ trong phần đó thay vì đoán.'
   ].filter(function(x){ return x !== '' }).join('\n');
@@ -1205,6 +1212,7 @@ function hookSoi(b, ai, provider, key){
   d.muon_khuon = mk;
   d.meta = { giay: giay, so_chu: soChu, toc_do: giay ? Math.round(soChu / giay * 100) / 100 : 0, ti_le: soiTiLe(so), so_lieu: so, nguon: media ? video.nguon : 'chu', kich_thuoc: video && video.kich_thuoc || 0, canh_bao: canhBao };
   daHoan = true;   // đã có kết quả: log hỏng thì không hoàn lượt
+  if (typeof xhGhiSoi === 'function') xhGhiSoi(d, so, b);   // dữ liệu cho bản tin xu hướng tuần
   hookLog(me, nhan, true, '', kq.vin || 0, kq.vout || 0, kq.model, ai);
   return jsonOut({ok:true, data:d, con: khongGioiHan ? null : con, han:han, loai:ai.loai, tool:ai.tool, luot: hookLuotCon(ai)});
   }catch(err){
@@ -1299,10 +1307,10 @@ var CHAM_KIEN_THUC = [
   '14. CHẤM ỔN ĐỊNH, KHÔNG CẢM TÍNH. Với mỗi thang: ghi BẰNG CHỨNG trước (giây thứ mấy, câu gì, thấy gì), rồi mới cho điểm theo đúng mốc ở các mục trên. Cùng một bằng chứng phải ra cùng một điểm: 0–3 hỏng phần cốt lõi · 4–6 có ý nhưng vỏ thường hoặc còn lỗi rõ · 7–8 đúng bài, còn 1–2 chỗ chỉnh · 9–10 không thấy gì để chỉnh, người lạ chắc chắn dừng/xem hết. Không cho điểm lẻ 0,5 chỉ để "cho có"; chỉ dùng 0,5 khi bằng chứng nằm giữa hai mốc. Không thưởng điểm vì nội dung tử tế, không phạt vì gu cá nhân.'
 ,
   '15. BẢN DỰNG LẠI (EDIT LIST). Học viên cần biết mở app dựng lên là cắt chỗ nào, giữ chỗ nào, không phải lời khuyên chung. Chia TRỌN video thành các đoạn liền nhau theo câu thoại (đoạn sau bắt đầu đúng chỗ đoạn trước hết, từ 0 tới hết). Mỗi đoạn một việc: GIỮ (để nguyên), CẮT (bỏ hẳn), RÚT (giữ ý nhưng làm ngắn: tăng tốc 1,2–1,5 lần, hoặc cắt khoảng thở và chữ thừa bên trong), ĐỔI CHỖ (giữ nhưng chuyển lên vị trí khác, hay gặp nhất là kéo câu mạnh nhất hoặc cảnh cao trào lên 0–3 giây làm hook rồi quay lại mạch). Luôn CẮT: câu chào, câu giới thiệu bản thân, câu lặp, câu vấp nói lại, khoảng lặng trên 0,5 giây, đoạn giải thích không phục vụ lời hook hứa, câu xin follow lộ liễu. Đoạn GIỮ nào cần thêm lớp thì ghi rõ: chữ gì (đúng chữ, tối đa 2 dòng), zoom bao nhiêu phần trăm ở giây nào, b-roll gì minh hoạ câu nào, âm thanh gì. Chỉ dùng footage CÓ THẬT trong video; cần cảnh không có thì nói "quay bù" chứ không bịa. Thời lượng bản mới phải ngắn hơn hoặc bằng bản gốc. Viết cho NGƯỜI MỚI dựng trên điện thoại (CapCut hoặc app tương tự): LÝ DO phải nói được tác động lên người xem (giữ họ ở lại giây nào, vì sao họ sẽ lướt nếu để nguyên, chỗ này phục vụ hook / nhịp / cao trào / kết thế nào), không chỉ "cho gọn"; CÁCH LÀM phải là thao tác bấm được (tách clip ở giây mấy, xoá đoạn nào, tốc độ bao nhiêu, thêm chữ gì cỡ nào ở đâu, giữ bao lâu, zoom bao nhiêu từ giây nào tới giây nào), không dùng thuật ngữ khó.',
-  '16. CÔNG THỨC DỰNG THEO FORMAT (áp đúng format của video, không áp chung): NÓI CAMERA: jump cut ở mỗi chỗ thở, 2–4 giây có một nhịp mới (cắt, zoom 110–120% xen kẽ để giả hai góc máy, hoặc b-roll), phụ đề to theo lời, chữ hook 1/3 trên trong 3 giây đầu, nhạc nền nhỏ dưới giọng. VOICE-OVER: hình đổi theo từng câu, không cảnh nào đứng quá 3–4 giây, hình phải minh hoạ đúng câu đang nói, lời thu riêng chỗ yên. VLOG/ĐỜI THƯỜNG: giữ âm thanh thật và khoảnh khắc thật, cắt theo hành động, 15–40 giây, chữ POV/ngữ cảnh 1 dòng đầu video. REVIEW: mở bằng kết quả hoặc cận sản phẩm, mỗi chi tiết một cảnh cận, giá và số lên chữ, trước–sau đặt sát nhau. HƯỚNG DẪN/TIPS: mở bằng thành phẩm, đánh số bước bằng chữ, mỗi bước một cảnh, đoạn thao tác lặp tăng tốc 1,5–2 lần. KỂ CHUYỆN: cold open bằng câu hoặc cảnh cao trào, cắt bớt dẫn chuyện, giữ khoảng lặng ngay trước cao trào, nhạc lên ở cao trào. BÁN HÀNG: nỗi đau 3 giây đầu, sản phẩm xuất hiện trước giây 8, bằng chứng (số, phản hồi, trước–sau) trước giá, một CTA rõ 2–3 giây cuối. CHỮ CHẠY: mỗi màn chữ đọc kịp (khoảng 3 chữ mỗi giây), tối đa 2 dòng, đổi màn theo nhịp nhạc. POV: chữ POV 1 dòng ngay giây đầu, quay góc nhìn thứ nhất, cắt nhanh theo hành động, kết bằng phản ứng.'
+  '16. CÔNG THỨC DỰNG THEO FORMAT (áp đúng format của video, không áp chung): NÓI CAMERA: jump cut ở mỗi chỗ thở, 2–4 giây có một nhịp mới (cắt, zoom 110–120% xen kẽ để giả hai góc máy, hoặc b-roll), phụ đề to theo lời, chữ hook 1/3 trên trong 3 giây đầu, nhạc nền nhỏ dưới giọng. VOICE-OVER: hình đổi theo từng câu, không cảnh nào đứng quá 3–4 giây, hình phải minh hoạ đúng câu đang nói, lời thu riêng chỗ yên. VLOG/ĐỜI THƯỜNG: giữ âm thanh thật và khoảnh khắc thật, cắt theo hành động, 15–40 giây, chữ POV/ngữ cảnh 1 dòng đầu video. REVIEW: mở bằng kết quả hoặc cận sản phẩm, mỗi chi tiết một cảnh cận, giá và số lên chữ, trước–sau đặt sát nhau. HƯỚNG DẪN/TIPS: mở bằng thành phẩm, đánh số bước bằng chữ, mỗi bước một cảnh, đoạn thao tác lặp tăng tốc 1,5–2 lần. KỂ CHUYỆN: cold open bằng câu hoặc cảnh cao trào, cắt bớt dẫn chuyện, giữ khoảng lặng ngay trước cao trào, nhạc lên ở cao trào. BÁN HÀNG: nỗi đau 3 giây đầu, sản phẩm xuất hiện trước giây 8, bằng chứng (số, phản hồi, trước–sau) trước giá, một CTA rõ 2–3 giây cuối. CHỮ STORY: giữ một cảnh đời thường, chữ thành 3–5 khối nền tối mờ giữa màn hình, khối sau hiện theo nhịp nhạc, đủ thời gian đọc (khoảng 3 chữ mỗi giây), không chuyển cảnh lung tung. POV: chữ POV 1 dòng ngay giây đầu, quay góc nhìn thứ nhất, cắt nhanh theo hành động, kết bằng phản ứng.'
 ].join('\n');
 
-var CHAM_FORMAT = {noi_camera:'Nói camera', voice_over:'Voice-over', vlog:'Vlog đời thường', review:'Review', huong_dan:'Hướng dẫn, tips', ke_chuyen:'Kể chuyện', ban_hang:'Bán hàng', chu_chay:'Chữ chạy', pov:'POV'};
+var CHAM_FORMAT = {noi_camera:'Nói camera', voice_over:'Voice-over', vlog:'Vlog đời thường', review:'Review', huong_dan:'Hướng dẫn, tips', ke_chuyen:'Kể chuyện', ban_hang:'Bán hàng', chu_chay:'Chữ story ghép nhạc', pov:'POV'};
 var CHAM_VIEC = ['giu', 'cat', 'rut', 'doi_cho'];
 /* Làm sạch bản dựng lại AI trả: mốc trong [0, thời lượng], đoạn sắp theo giờ, thứ tự bản mới chỉ trỏ tới đoạn có thật
    và không bị cắt, thời lượng bản mới tự tính (rút ≈ 75% đoạn gốc) để không tin con số AI tự cộng. */
@@ -1479,6 +1487,7 @@ function hookChamVideo(b, ai, provider, key){
   d.meta = { giay: giay, so_chu: soChu, toc_do: giay ? Math.round(soChu / giay * 100) / 100 : 0, ti_le: soiTiLe(so), so_lieu: so, nguon: media ? video.nguon : 'chu', kich_thuoc: video && video.kich_thuoc || 0, canh_bao: canhBao, da_dang: daDang, gio_dang: gioDang, view_gio: viewGio, model: kq.model, luc: nowVN() };
   try{ CacheService.getScriptCache().put(khoaNho, JSON.stringify(d), 21600); }catch(e){}   // nhớ 6 giờ, trần của CacheService
   daHoan = true;   // đã có kết quả và đã cache: log hỏng thì không hoàn lượt nữa
+  if (typeof xhGhiCham === 'function') xhGhiCham(d, b);   // dữ liệu cho bản tin xu hướng tuần
   hookLog(me, nhan, true, '', kq.vin || 0, kq.vout || 0, kq.model, ai);
   return jsonOut({ok:true, data:d, con: khongGioiHan ? null : con, han:han, loai:ai.loai, tool:ai.tool, luot: hookLuotCon(ai)});
   }catch(err){
@@ -1555,7 +1564,7 @@ function hookVietKichBan(b, ai, provider, key){
     hienCo.length ? '- Học viên đã viết dở mấy phần này, GIỮ Ý và viết lại cho trọn, đừng bỏ:\n' + hienCo.join('\n') : '',
     '',
     'YÊU CẦU ĐẦU RA (JSON đúng schema):',
-    '1. phan: đúng ' + tenPhan.length + ' phần tử theo thứ tự trên. Mỗi phần: ten (đúng tên đã cho), thoai (' + (laChu ? 'CÁC MÀN CHỮ của phần này theo luật DẠNG CHỮ CHẠY, mỗi màn một dòng bắt đầu bằng "▸ ";' : 'LỜI SẼ NÓI, viết trọn câu, đúng xưng hô; kể cả daily vlog / POV / voice-over cũng phải có lời dẫn hoặc lời thoại;') + ' chỗ nào bắt buộc cần chi tiết thật của học viên mà không suy ra được từ hồ sơ và nguồn thì để trong ngoặc vuông như [tên món], [con số thật] — TỐI ĐA 3 chỗ cả bài, còn lại phải viết sẵn), canh_quay (1–2 câu: góc máy, bối cảnh, hành động trong khung, ánh sáng, cắt ở đâu), chu_man_hinh (chữ hiện trên màn hình ở phần này, tối đa 2 dòng ngăn bằng \\n, để chuỗi rỗng nếu không cần).',
+    '1. phan: đúng ' + tenPhan.length + ' phần tử theo thứ tự trên. Mỗi phần: ten (đúng tên đã cho), thoai (' + (laChu ? 'CÁC KHỐI CHỮ của phần này theo luật DẠNG CHỮ STORY, mỗi khối một dòng bắt đầu bằng "▸ "; phần Caption dưới video thì viết caption 1–2 câu và hashtag;' : 'LỜI SẼ NÓI, viết trọn câu, đúng xưng hô; kể cả daily vlog / POV / voice-over cũng phải có lời dẫn hoặc lời thoại;') + ' chỗ nào bắt buộc cần chi tiết thật của học viên mà không suy ra được từ hồ sơ và nguồn thì để trong ngoặc vuông như [tên món], [con số thật] — TỐI ĐA 3 chỗ cả bài, còn lại phải viết sẵn), canh_quay (1–2 câu: góc máy, bối cảnh, hành động trong khung, ánh sáng, cắt ở đâu), chu_man_hinh (chữ hiện trên màn hình ở phần này, tối đa 2 dòng ngăn bằng \\n, để chuỗi rỗng nếu không cần).',
     '2. hook_chu: chữ hook to cho 3 giây đầu, tối đa 2 dòng ngăn bằng \\n, dưới 12 chữ, đánh dấu 1–2 từ khoá bằng **...**.',
     '3. ghi_chu: 1–2 câu cho học viên: chỗ [ ] cần thay bằng gì, và một điều phải giữ khi quay (từ nguồn nếu có). nhac: 1 câu gợi ý nhạc nền (kiểu nhạc, nhịp, chỗ đổi nhạc; không bịa tên bài) và cách cắt theo nhạc.',
     '4. giay_uoc: tổng số giây ước tính khi đọc với tốc độ trên.',
@@ -1582,7 +1591,7 @@ function hookVietKichBan(b, ai, provider, key){
   d.hook_chu = String(d.hook_chu || '').slice(0, 160); d.ghi_chu = String(d.ghi_chu || '').slice(0, 500);
   d.nhac = String(d.nhac || '').slice(0, 300); if (d.nhac) d.ghi_chu = (d.ghi_chu ? d.ghi_chu + ' ' : '') + '🎵 ' + d.nhac;   // trang Kịch bản hiện ghi_chu sẵn
   d.dang = dangMa; d.giay_dich = gD;
-  var soChu = kbDemChu(d.phan.map(function(p){ return p.thoai }).join(' '));
+  var soChu = kbDemChu(d.phan.filter(function(p){ return !/^Caption/.test(p.ten); }).map(function(p){ return p.thoai }).join(' '));   // caption nằm dưới video, không tính giờ
   d.giay_uoc = Math.round(soChu / tocDo * 1.06) || Math.round(Number(d.giay_uoc) || 0);
   d.so_chu = soChu;
   hookLog(me, nhan, true, '', kq.vin || 0, kq.vout || 0, kq.model, ai);
