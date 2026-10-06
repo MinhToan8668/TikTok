@@ -1115,6 +1115,7 @@ var MENU_BOT = [
     {command:'xuhuong',    description:'🗞 Bản tin xu hướng tuần: xem + nút bấm'},
     {command:'xhtao',      description:'🔄 Xu hướng: tạo bản nháp mới ngay'},
     {command:'xhsua',      description:'✏️ Xu hướng: tự viết / sửa bản đang dùng'},
+    {command:'xhkey',      description:'🔑 Xu hướng: key Gemini riêng cho bản tin'},
     {command:'xhyoutube',  description:'▶️ Xu hướng: gửi key YouTube · thu · tat'},
     {command:'xhrss',      description:'📰 Xu hướng: nguồn RSS, gửi link để thêm'},
     {command:'xhlich',     description:'⏰ Xu hướng: tự chạy mỗi sáng thứ Hai'},
