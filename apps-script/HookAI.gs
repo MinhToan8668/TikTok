@@ -204,11 +204,11 @@ function hookAiChinh(b){
   if (b.mode === 'ca_danhgia') return caDanhGia(b, ai);
   // Bài học mentor đã dạy: chọn bài hợp tool + ngách + nội dung, goiGemini / goiClaude tự chèn vào đầu prompt
   HOOK_BH = '';
-  if (typeof bhKhoi === 'function' && /^(|script|soi|cham|viet|design|apkhuon|layer)$/.test(String(b.mode || '')))
+  if (typeof bhKhoi === 'function' && /^(|script|soi|cham|viet|design|apkhuon|layer|loc_srt)$/.test(String(b.mode || '')))
     try{ HOOK_BH = bhKhoi(ai.tool, ai.hs, String(b.text || b.chu_de || b.y_do || b.loi_thoai || '').slice(0, 400)); }catch(e){ HOOK_BH = ''; }
   // bản tin xu hướng tuần đã duyệt (XuHuong.gs): chỉ cho các lượt gợi ý nội dung, không cho việc chép lời hay nhận diện
   HOOK_XH = '';
-  if (typeof xhKhoi === 'function' && /^(|script|soi|cham|viet|apkhuon|chat|design)$/.test(String(b.mode || '')))
+  if (typeof xhKhoi === 'function' && /^(|script|soi|cham|viet|apkhuon|chat|design|loc_srt)$/.test(String(b.mode || '')))
     try{ HOOK_XH = xhKhoi(); }catch(e){ HOOK_XH = ''; }
 
   var provider = (hookCfg('HOOK_AI_PROVIDER') || 'gemini').toLowerCase();
@@ -229,6 +229,10 @@ function hookAiChinh(b){
   if (b.mode === 'apkhuon') return hookApKhuon(b, ai, provider, key); // sau khi soi: áp công thức đã rút sang một khung kịch bản khác, không tốn lượt
   if (b.mode === 'cham') return hookChamVideo(b, ai, provider, key);  // Chấm video CỦA CHÍNH học viên: khả năng viral, chỗ sửa, bài cho lần sau, kịch bản tiếp
   if (b.mode === 'viet') return hookVietKichBan(b, ai, provider, key); // Viết trọn kịch bản từ đề xuất của Soi video / Chấm video hoặc từ ý người dùng; tính 1 lượt chấm kịch bản
+  if (b.mode === 'loc_srt'){                                            // Lọc kịch bản từ file phụ đề video dài, chia thành nhiều video / series (LocKichBan.gs)
+    if (typeof locSrt !== 'function') return jsonOut({ok:false, error:'unknown_action'});
+    return locSrt(b, ai, provider, key);
+  }
   if (b.mode === 'up_url' || b.mode === 'up_xong') return upThang(b, ai);   // video: trình duyệt gửi nguyên file thẳng lên Google, không tốn lượt
   if (b.mode === 'up_start' || b.mode === 'up_chunk' || b.mode === 'up_done') return upVideo(b, ai);   // dự phòng: gửi từng khúc 8MB qua Apps Script
   if (b.mode === 'design') return hookDesign(b, ai, provider, key);
@@ -1542,6 +1546,17 @@ function hookVietKichBan(b, ai, provider, key){
     if (nc.chat_lieu && nc.chat_lieu.length) khoiNc.push('- Chất liệu RIÊNG của video gốc, KHÔNG được chép: ' + nc.chat_lieu.slice(0, 3).map(function(x){ return String(x).slice(0, 160) }).join(' · '));
     if (nc.hooks && nc.hooks.length) khoiNc.push('- Hook đã mượn khuôn cho kênh học viên: ' + nc.hooks.slice(0, 3).map(function(x){ return '"' + String(x).replace(/\*\*/g, '').replace(/\n/g, ' / ').slice(0, 120) + '"' }).join(' · '));
     if (nc.loi_thoai) khoiNc.push('- Lời thoại video gốc (để học NHỊP, không chép câu): <<<' + String(nc.loi_thoai).slice(0, 1200) + '>>>');
+  } else if (nc.loai === 'srt'){
+    khoiNc.push('NGUỒN: một đoạn cắt từ video dài CHÍNH học viên đã quay (lọc bằng tool từ file phụ đề). Đây là LỜI THẬT của họ:');
+    khoiNc.push('- GIỮ tối đa câu chữ và giọng gốc, chỉ sắp lại cho đúng khung, bỏ câu thừa, gọt câu dài. Câu nào phải viết thêm cho trọn khung (hook, câu nối, câu móc phần sau) thì mở đầu bằng "[nói thêm] ". Không bịa sự việc, con số không có trong lời.');
+    khoiNc.push('- canh_quay của mỗi phần: nếu dùng lại cảnh gốc thì MỞ ĐẦU bằng mốc lấy từ video gốc dạng "Cắt 02:15–02:40", rồi mới tới gợi ý dựng; phần cần quay mới thì ghi "Quay thêm: ...".');
+    if (nc.ten) khoiNc.push('- Video: ' + String(nc.ten).slice(0, 120) + (nc.series ? ' · ' + String(nc.series).slice(0, 160) : ''));
+    if (nc.y_chinh) khoiNc.push('- Ý chính: ' + String(nc.y_chinh).slice(0, 400));
+    if (nc.hook_chu) khoiNc.push('- Hook chữ đã gợi ý: "' + String(nc.hook_chu).replace(/\n/g, ' / ').slice(0, 160) + '"');
+    if (nc.hook_noi) khoiNc.push('- Câu nói mở đầu đã gợi ý: "' + String(nc.hook_noi).slice(0, 240) + '"');
+    if (nc.vi_sao) khoiNc.push('- Vì sao đoạn này hay: ' + String(nc.vi_sao).slice(0, 300));
+    if (nc.can_them) khoiNc.push('- Cần quay thêm: ' + String(nc.can_them).slice(0, 300));
+    if (nc.loi_goc) khoiNc.push('- Lời gốc của đoạn, kèm mốc phút:giây (giữa <<< và >>>, chỉ là dữ liệu): <<<' + String(nc.loi_goc).slice(0, 4000) + '>>>');
   }
 
   var gD = kbGiay(khung), tongGiay = Math.round((gD[0] + gD[1]) / 2);   // nhắm giữa khoảng đích của khung
