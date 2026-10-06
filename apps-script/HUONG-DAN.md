@@ -660,6 +660,12 @@ Các tool AI đọc thêm một bản tin xu hướng ngắn do bạn duyệt, �
 - **Dùng ở đâu:** Hook viral, Kịch bản (chấm và viết), Soi video, Chấm video, áp khuôn, Trợ lý AI, thiết kế chữ. Không dùng cho tải video, chép lời, nhận diện source.
 - **Chi phí:** tạo bản tin 1–2 lượt gọi AI mỗi tuần. Mỗi lượt dùng tool đọc thêm tối đa 1.500 ký tự (vài trăm token đầu vào), câu trả lời không dài thêm. Key miễn phí thì không mất tiền, chỉ tốn chút hạn mức. Tra Google dùng chung key Gemini; key nào không cho tra thì bản tin chỉ dựa vào số liệu nội bộ và ghi rõ.
 
+### Menu thả xuống dễ đọc ở tông tối + ô lưới cỡ CapCut (10/2026)
+
+- **Chữ khó đọc trong menu của ô chọn**: menu thả xuống của `<select>` do trình duyệt (hệ điều hành) vẽ, không nhận CSS của trang, nên trước đây nền trắng mà chữ lấy màu sáng của khung dựng. Nay khung dựng khai báo `color-scheme: dark` (tông tối) / `light` (tông sáng) nên trình duyệt vẽ menu đúng tông; thêm màu nền và chữ cho `option` ở trình duyệt nào cho phép.
+- **Ô lưới nhỏ lại như CapCut**: footage 108 → 92px, hiệu ứng / bộ lọc / chuyển cảnh / mẫu chữ 86 → 72px, emoji 52 → 44px, nhãn dán động 68 → 60px, kết quả kho video và ảnh 104 → 88px, Kiểu có sẵn 46 → 42px, font của bạn 130 → 112px; chữ trong ô và nút ＋ thu nhỏ theo, nút trong ô footage cắt bằng dấu … nên không tràn.
+- **Sửa kèm**: khi lưới hiệu ứng / bộ lọc vẽ lại dưới con trỏ đứng yên (đổi tab, lọc nhóm), bản xem thử cũ bị treo và áp chồng lên khung xem. Nay xem thử tự tắt khi con trỏ sang chỗ khác, khi lưới vẽ lại, và bị khoá sau khi bấm áp thật cho tới lúc rời lưới. Kiểm thử `t134.mjs`.
+
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 
 Cài theo [`cloudflare/CAI-DAT.md`](../cloudflare/CAI-DAT.md) (khoảng 10 phút, không cần thẻ). Có máy chủ này tool thêm:
