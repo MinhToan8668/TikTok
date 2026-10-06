@@ -759,7 +759,7 @@ function stNapHoSoMau(){
 
 /* ═══════ LỆNH BOT TELEGRAM (chỉ chat quản trị) ═══════
    Code.gs gọi:  if (quanTri && studioCoLenh(cmd)) return studioLenh(cmd, arg, chatId);  */
-var LENH_STUDIO = ['studio','keygemini','stk','giapro','ngaypro','ngayhv','giahv','uudaihv','maychu','luotthu','luotkb','luotsoi','luotcham','luottai','luotchat','luotdung','luotai','baihoc','duyetbh','tatbh','xoabh','day','chatngay','tuvan','tonghop','mopro','tatpro','dsck','timnd','ckkhoa','tienkhoa','hoso','lichsu','dshv','naphoso'];
+var LENH_STUDIO = ['studio','keygemini','xuhuong','stk','giapro','ngaypro','ngayhv','giahv','uudaihv','maychu','luotthu','luotkb','luotsoi','luotcham','luottai','luotchat','luotdung','luotai','baihoc','duyetbh','tatbh','xoabh','day','chatngay','tuvan','tonghop','mopro','tatpro','dsck','timnd','ckkhoa','tienkhoa','hoso','lichsu','dshv','naphoso'];
 function studioCoLenh(cmd){ return LENH_STUDIO.indexOf(cmd) > -1; }
 
 var ST_MA_NH = {vietcombank:'VCB', vcb:'VCB', mb:'MB', mbbank:'MB', quandoi:'MB', techcombank:'TCB', tcb:'TCB',
@@ -815,6 +815,7 @@ function studioLenh(cmd, arg, chatId, msg){
       '⬇️ /luottai `10` — lượt tải video miễn phí cho khách (học viên, Pro không giới hạn)',
       '🎞 /luotdung `2` — số source AI nhận diện miễn phí ở tool Dựng video cho tài khoản Free',
       '💬 /luotchat `15` — tin chat với Trợ lý AI cho tài khoản Free · /chatngay `60` — mỗi ngày cho Pro, học viên',
+      '🗞 /xuhuong — bản tin xu hướng tuần cho các tool AI · `tao` tạo ngay · `sua` tự viết · `tat` gỡ · `lich` tự chạy thứ Hai',
       '🔑 /keygemini — xem key Gemini đang rảnh hay hết hạn mức, bot hỏi lại để bạn gửi key mới hoặc `xoa 2`',
       '☁️ /maychu `https://…workers.dev` — máy chủ phụ Cloudflare (kho B-roll, lồng tiếng AI, tải hộ file lớn) · hiện: ' + (stMayChu() ? '`' + stMayChu() + '`' : '_chưa cài_'),
       '🧠 /baihoc — bộ nhớ AI · /day `nội dung` — dạy AI · /duyetbh /tatbh /xoabh `id`',
@@ -871,6 +872,7 @@ function studioLenh(cmd, arg, chatId, msg){
     var h2 = stHV(); h2.gia = th; P.setProperty('ST_HV', JSON.stringify(h2));
     return tgSend(chatId, '✅ Gói học viên khoá: *' + (h2.gia ? stTien(h2.gia) : 'miễn phí') + '* · ' + (h2.ngay ? h2.ngay + ' ngày' : 'suốt đời') + '. Landing cập nhật ngay lần mở sau.');
   }
+  if (cmd === 'xuhuong' && typeof xhLenh === 'function') return xhLenh(arg, chatId, hoi);   // bản tin xu hướng tuần (XuHuong.gs)
   if (cmd === 'keygemini' && typeof hookLenhKey === 'function') return hookLenhKey(arg, chatId, msg, hoi);   // thêm / xoá / xem key Gemini (HookAI.gs)
   if (cmd === 'maychu'){
     if (!arg) return hoi('☁️ Gửi link máy chủ Cloudflare Worker (dạng `https://ten.tai-khoan.workers.dev`), xem hướng dẫn cài trong `cloudflare/CAI-DAT.md`. Gửi `xoa` để tắt.' + (stMayChu() ? '\n\nHiện: `' + stMayChu() + '`' : ''));

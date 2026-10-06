@@ -867,6 +867,8 @@ function handleCallback(cb){
   if (String(cb.data||'').indexOf('l:') === 0) return lichCallback(cb);
   // Nút duyệt chuyển khoản Viral Studio (Studio.gs) mang tiền tố "s:"
   if (String(cb.data||'').indexOf('s:') === 0) return studioCallback(cb);
+  // Nút duyệt bản tin xu hướng tuần (XuHuong.gs) mang tiền tố "x:"
+  if (String(cb.data||'').indexOf('x:') === 0) return xhCallback(cb);
 
   var p = String(cb.data||'').split(':');
   var act = p[0], ma = p[1];
@@ -1110,6 +1112,7 @@ var MENU_BOT = [
     {command:'tuchoi',     description:'❌ Từ chối — /tuchoi AB12'},
     {command:'nen',        description:'🖼 Vẽ nền Teams — /nen Minh Toàn'},
     {command:'studio',     description:'🎬 Viral Studio: STK, giá Pro, lượt AI'},
+    {command:'xuhuong',    description:'🗞 Bản tin xu hướng tuần: xem · tao · sua · tat · lich'},
     {command:'keygemini',  description:'🔑 Key Gemini: xem · them AIza... · xoa 2'},
     {command:'dsck',       description:'🧾 Viral Studio: giao dịch chờ mở Pro'},
     {command:'lichtuan',   description:'📆 Lịch kèm 1:1 cả tuần + ai đã đặt'},

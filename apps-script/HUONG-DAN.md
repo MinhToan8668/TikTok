@@ -642,6 +642,16 @@ Mọi tài nguyên tách khỏi code, nằm trong `tools/kho/kho.js` (một file
 - Hiệu ứng hình ảnh và chuyển cảnh không có API miễn phí để dùng thương mại; vẫn mở rộng bằng shader trong `tools/kho/kho.js` (hiện 68 + 35) và gl-transitions (67). Kiểm thử `t132.mjs` (chạy qua proxy mạng của máy test).
 - **Key nào còn cần trên Cloudflare** (Settings → Variables and Secrets): `GEMINI_API_KEYS` (AI, lồng tiếng, agent) và `APPS_SCRIPT_URL` bắt buộc; `PIXABAY_KEY` / `PEXELS_KEY` vẫn cần cho **kho B-roll video** (Openverse không có video); `FREESOUND_KEY` **không cần nữa** (Openverse đã gom Freesound); `GIPHY_KEY` / `TENOR_KEY` **tuỳ chọn** (nhãn dán động Noto không cần key; có key thì thêm được tìm GIF meme). Máy chủ thiếu key nào thì mục tìm tương ứng tự ẩn. Worker cài qua GitHub (cách B) nên mỗi lần đẩy `worker.js` lên main là Cloudflare tự cập nhật, không cần dán tay.
 
+## Bản tin xu hướng tuần (XuHuong.gs)
+
+Các tool AI đọc thêm một bản tin xu hướng ngắn do bạn duyệt, để gợi ý format, hook, nhạc, chủ đề cho hợp thời.
+
+- **Dữ liệu:** mỗi lượt Soi video và Chấm video ghi một dòng vào sheet `XuHuong` (khung, dạng, kiểu hook, concept, view, điểm). Video học viên đem soi là video đang viral ngoài thị trường.
+- **Tạo bản tin:** `/xuhuong tao` (hoặc tự chạy mỗi sáng thứ Hai 8 giờ sau khi gõ `/xuhuong lich`, hoặc chạy hàm `xhCaiLich` một lần trong Apps Script). AI đọc số liệu 14 ngày, tra Google xu hướng TikTok, Reels Việt Nam, viết 10–14 dòng theo 5 mục, ghi nguồn từng dòng (nội bộ / Google).
+- **Duyệt:** bot gửi bản nháp kèm nút ✅ Duyệt · ✏️ Sửa · 🗑 Bỏ. Chưa duyệt thì không tool nào dùng. Bản đã duyệt dùng 21 ngày rồi tự thôi. `/xuhuong sua` để tự viết, `/xuhuong tat` để gỡ ngay, `/xuhuong` xem tình trạng.
+- **Dùng ở đâu:** Hook viral, Kịch bản (chấm và viết), Soi video, Chấm video, áp khuôn, Trợ lý AI, thiết kế chữ. Không dùng cho tải video, chép lời, nhận diện source.
+- **Chi phí:** tạo bản tin 1–2 lượt gọi AI mỗi tuần. Mỗi lượt dùng tool đọc thêm tối đa 1.500 ký tự (vài trăm token đầu vào), câu trả lời không dài thêm. Key miễn phí thì không mất tiền, chỉ tốn chút hạn mức. Tra Google dùng chung key Gemini; key nào không cho tra thì bản tin chỉ dựa vào số liệu nội bộ và ghi rõ.
+
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 
 Cài theo [`cloudflare/CAI-DAT.md`](../cloudflare/CAI-DAT.md) (khoảng 10 phút, không cần thẻ). Có máy chủ này tool thêm:

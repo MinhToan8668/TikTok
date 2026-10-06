@@ -175,7 +175,7 @@ function hookCfQuaTai(b){
 function hookAi(b){
   if (b.mode === 'job_kq') return jobKq(b);
   if (b.mode === 'cf_qua_tai') return hookCfQuaTai(b);   // máy chủ Cloudflare báo key Gemini quá tải → bot
-  HOOK_QUA_TAI = null; HOOK_LA_MENTOR = false; HOOK_TOOL = '';
+  HOOK_QUA_TAI = null; HOOK_LA_MENTOR = false; HOOK_TOOL = ''; HOOK_XH = '';
   var id = /^[A-Za-z0-9_-]{12,48}$/.test(String(b.job_id || '')) ? String(b.job_id) : '';
   if (!id) return hookLocLoi(hookAiChinh(b));
   try{ CacheService.getScriptCache().put(jobKhoa(id), JSON.stringify({dang:1, t:Date.now()}), 21600); }catch(e){}
@@ -206,6 +206,10 @@ function hookAiChinh(b){
   HOOK_BH = '';
   if (typeof bhKhoi === 'function' && /^(|script|soi|cham|viet|design|apkhuon|layer)$/.test(String(b.mode || '')))
     try{ HOOK_BH = bhKhoi(ai.tool, ai.hs, String(b.text || b.chu_de || b.y_do || b.loi_thoai || '').slice(0, 400)); }catch(e){ HOOK_BH = ''; }
+  // bản tin xu hướng tuần đã duyệt (XuHuong.gs): chỉ cho các lượt gợi ý nội dung, không cho việc chép lời hay nhận diện
+  HOOK_XH = '';
+  if (typeof xhKhoi === 'function' && /^(|script|soi|cham|viet|apkhuon|chat|design)$/.test(String(b.mode || '')))
+    try{ HOOK_XH = xhKhoi(); }catch(e){ HOOK_XH = ''; }
 
   var provider = (hookCfg('HOOK_AI_PROVIDER') || 'gemini').toLowerCase();
   var key = provider === 'claude' ? cfgProp('ANTHROPIC_API_KEY') : hookCfg('GEMINI_API_KEY');
@@ -421,6 +425,7 @@ var HOOK_TOOL_TEN = {hook:'Hook viral', script:'Kịch bản viral', soi:'Soi vi
 var HOOK_MODEL_UU_TIEN = null, HOOK_SUY_NGHI = '';
 function goiGemini(key, img, prompt, schema, maxTok, media, nhiet, hetGio){
   if (typeof HOOK_BH === 'string' && HOOK_BH) prompt = HOOK_BH + '\n\n' + prompt;   // bài học mentor (TroLy.gs)
+  if (typeof HOOK_XH === 'string' && HOOK_XH) prompt = HOOK_XH + '\n\n' + prompt;   // xu hướng tuần đã duyệt (XuHuong.gs)
   var uuTien = Array.isArray(HOOK_MODEL_UU_TIEN) ? HOOK_MODEL_UU_TIEN.slice() : null, suyNghi = HOOK_SUY_NGHI || '';
   HOOK_MODEL_UU_TIEN = null; HOOK_SUY_NGHI = '';
   schema = schema || HOOK_SCHEMA; maxTok = maxTok || 6000;
@@ -535,6 +540,7 @@ function goiGemini(key, img, prompt, schema, maxTok, media, nhiet, hetGio){
 /* ── Claude: trả tiền theo lượt, chất lượng tiếng Việt tốt hơn ── */
 function goiClaude(key, img, prompt, schema, maxTok, nhiet){
   if (typeof HOOK_BH === 'string' && HOOK_BH) prompt = HOOK_BH + '\n\n' + prompt;
+  if (typeof HOOK_XH === 'string' && HOOK_XH) prompt = HOOK_XH + '\n\n' + prompt;
   schema = schema || HOOK_SCHEMA; maxTok = maxTok || 6000;
   var model = hookCfg('HOOK_AI_MODEL') || 'claude-opus-5';
   var noiDung = [];
@@ -1206,6 +1212,7 @@ function hookSoi(b, ai, provider, key){
   d.muon_khuon = mk;
   d.meta = { giay: giay, so_chu: soChu, toc_do: giay ? Math.round(soChu / giay * 100) / 100 : 0, ti_le: soiTiLe(so), so_lieu: so, nguon: media ? video.nguon : 'chu', kich_thuoc: video && video.kich_thuoc || 0, canh_bao: canhBao };
   daHoan = true;   // đã có kết quả: log hỏng thì không hoàn lượt
+  if (typeof xhGhiSoi === 'function') xhGhiSoi(d, so, b);   // dữ liệu cho bản tin xu hướng tuần
   hookLog(me, nhan, true, '', kq.vin || 0, kq.vout || 0, kq.model, ai);
   return jsonOut({ok:true, data:d, con: khongGioiHan ? null : con, han:han, loai:ai.loai, tool:ai.tool, luot: hookLuotCon(ai)});
   }catch(err){
@@ -1480,6 +1487,7 @@ function hookChamVideo(b, ai, provider, key){
   d.meta = { giay: giay, so_chu: soChu, toc_do: giay ? Math.round(soChu / giay * 100) / 100 : 0, ti_le: soiTiLe(so), so_lieu: so, nguon: media ? video.nguon : 'chu', kich_thuoc: video && video.kich_thuoc || 0, canh_bao: canhBao, da_dang: daDang, gio_dang: gioDang, view_gio: viewGio, model: kq.model, luc: nowVN() };
   try{ CacheService.getScriptCache().put(khoaNho, JSON.stringify(d), 21600); }catch(e){}   // nhớ 6 giờ, trần của CacheService
   daHoan = true;   // đã có kết quả và đã cache: log hỏng thì không hoàn lượt nữa
+  if (typeof xhGhiCham === 'function') xhGhiCham(d, b);   // dữ liệu cho bản tin xu hướng tuần
   hookLog(me, nhan, true, '', kq.vin || 0, kq.vout || 0, kq.model, ai);
   return jsonOut({ok:true, data:d, con: khongGioiHan ? null : con, han:han, loai:ai.loai, tool:ai.tool, luot: hookLuotCon(ai)});
   }catch(err){
