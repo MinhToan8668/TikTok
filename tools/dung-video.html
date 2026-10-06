@@ -845,6 +845,14 @@
   .sfxDs .sfxHang.ov button.nut{border:0;background:transparent;cursor:pointer}.sfxDs .sfxHang.ov button.nut.them{background:var(--ea,#99DF00);color:var(--eaInk,#101400);font-weight:800}
   .khuOv .ovDs{display:flex;flex-direction:column;gap:6px;max-height:420px;overflow:auto;scrollbar-width:thin}
   .notoLuoi button .the img{width:100%;height:100%;object-fit:contain;padding:8%}
+  /* tab Media: Của bạn · Kho video · Kho ảnh */
+  .ed.ccw .epane.on[data-pane="footage"]{display:grid;grid-template-columns:104px minmax(0,1fr);gap:12px;align-content:start}
+  .ed.ccw .epane[data-pane="footage"] .snav{display:flex;flex-direction:column;gap:6px;position:sticky;top:0;align-self:start}
+  .ed.ccw .epane[data-pane="footage"] .snav button{text-align:left;border:0;border-radius:9px;background:var(--ep2);color:var(--et);padding:9px 10px;font:600 12.5px/1.25 "Be Vietnam Pro",system-ui,sans-serif;cursor:pointer}
+  .ed.ccw .epane[data-pane="footage"] .snav button:hover{background:var(--el)}.ed.ccw .epane[data-pane="footage"] .snav button.on{color:var(--eaChu);background:var(--ep)}
+  .ed.ccw .epane[data-pane="footage"] .snoi{min-width:0}.ed.ccw .epane[data-pane="footage"] .snoi > section{display:flex;flex-direction:column;gap:10px}.ed.ccw .epane[data-pane="footage"] .snoi > section[hidden]{display:none}
+  .ed.ccw .epane[data-pane="footage"] .kho{display:block}.ed.ccw .epane[data-pane="footage"] .kho .kq{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px}.ed.ccw .epane[data-pane="footage"] .kho .kq button{display:flex;flex-direction:column;border:1px solid var(--el);border-radius:10px;overflow:hidden;background:var(--ep2);padding:0;cursor:pointer;text-align:left}.ed.ccw .epane[data-pane="footage"] .kho .kq button img{width:100%;aspect-ratio:9/16;object-fit:cover;display:block}.ed.ccw .epane[data-pane="footage"] .kho .kq button span{font-size:10px;color:var(--em);padding:4px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ed.ccw .epane[data-pane="footage"] .kho .khoChip{margin:6px 0}
 </style>
 </head>
 <body>
@@ -1153,7 +1161,7 @@
 
 <script src="tai-khoan.js?v=202610041200"></script>
 <script>document.addEventListener("DOMContentLoaded",function(){if(typeof TK==="undefined"){var k=document.createElement("div");k.style.cssText="position:fixed;left:12px;right:12px;bottom:12px;z-index:9999;background:#ff4d6d;color:#fff;padding:12px 14px;border-radius:12px;font:14px system-ui;display:flex;gap:10px;align-items:center;justify-content:space-between";k.innerHTML="Trang tải thiếu một phần (mạng chập chờn) nên nút AI chưa chạy được. <button onclick=\"location.reload()\" style=\"background:#fff;color:#000;border:0;border-radius:8px;padding:6px 12px;font-weight:700\">Tải lại trang</button>";document.body.appendChild(k);}});</script>
-<script src="kho/kho.js?v=20261005"></script>
+<script src="kho/kho.js?v=20261006"></script>
 <script>
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 const el = (t, c, txt) => { const e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; };
@@ -5241,15 +5249,15 @@ function veKhuOv(loai, ds, tieuDe, goiY) {
 }
 /* nhãn dán động Noto (Google) */
 const NOTO_URL = 'https://fonts.gstatic.com/s/e/notoemoji/latest/';
-function veNotoLuoi(box, ma) { box.innerHTML = ''; (KHO.notoNhom[ma] || []).forEach(cp => { const b = el('button'); b.type = 'button'; b.title = 'Thêm nhãn dán động lên V3'; const t = el('div', 'the'); const im = el('img'); im.loading = 'lazy'; im.alt = ''; im.src = NOTO_URL + cp + '/512.webp'; im.onerror = () => b.remove(); t.appendChild(im); b.appendChild(t);
-  b.onclick = async () => { b.disabled = true; try { const r = await fetch(NOTO_URL + cp + '/512.gif'); if (!r.ok) throw new Error('tải ' + r.status); const f = new File([await r.blob()], 'noto-' + cp + '.gif', { type: 'image/gif' }); await themSticker([f]); const src = P.srcs.filter(z => z.ten === f.name).pop(); if (src) { await giaiMaDong(src); veKhung(); } toast('Đã thêm nhãn dán động lên V3'); } catch (e) { toast('Không tải được: ' + e.message); } b.disabled = false; }; box.appendChild(b); }); if (!box.children.length) box.appendChild(el('div', 'quota', 'Không tải được nhãn dán (cần mạng).')); }
+function veNotoLuoi(box, ma, q) { box.innerHTML = ''; q = (q || '').trim().toLowerCase(); const ds = q ? Object.values(KHO.notoNhom).flat().filter(x => (x[1] || '').includes(q) || x[0] === q) : (KHO.notoNhom[ma] || []); ds.slice(0, 240).forEach(x => { const cp = Array.isArray(x) ? x[0] : x; const b = el('button'); b.type = 'button'; b.title = 'Thêm nhãn dán động lên V3'; const t = el('div', 'the'); const im = el('img'); im.loading = 'lazy'; im.alt = ''; im.src = NOTO_URL + cp + '/512.webp'; im.onerror = () => b.remove(); t.appendChild(im); b.appendChild(t);
+  b.title = (Array.isArray(x) && x[1] ? x[1] + ' · ' : '') + 'Thêm nhãn dán động lên V3'; b.onclick = async () => { b.disabled = true; try { const r = await fetch(NOTO_URL + cp + '/512.gif'); if (!r.ok) throw new Error('tải ' + r.status); const f = new File([await r.blob()], 'noto-' + cp + '.gif', { type: 'image/gif' }); await themSticker([f]); const src = P.srcs.filter(z => z.ten === f.name).pop(); if (src) { await giaiMaDong(src); veKhung(); } toast('Đã thêm nhãn dán động lên V3'); } catch (e) { toast('Không tải được: ' + e.message); } b.disabled = false; }; box.appendChild(b); }); if (!box.children.length) box.appendChild(el('div', 'quota', q ? 'Không có nhãn dán nào khớp “' + q + '” (gõ tiếng Anh: fire, heart, cat…).' : 'Không tải được nhãn dán (cần mạng).')); }
 function khoiTaoKhoTrucTuyen() {
   if (!KHO_OK || !KHO.ovNhac) return;
   // Âm thanh: nhạc theo chủ đề (trước mục Nhạc nền), hiệu ứng âm theo chủ đề (đầu hộp hiệu ứng)
   const amPane = $('[data-pane="am"]'); if (amPane) { const h3Nhac = [...amPane.querySelectorAll('h3.pt')].find(x => x.textContent.trim() === 'Nhạc nền'); const khuN = veKhuOv('nhac', KHO.ovNhac, 'Nhạc theo chủ đề (miễn phí, dùng thương mại)', 'Tìm nhạc: lofi, piano, upbeat…'); if (h3Nhac) h3Nhac.parentNode.insertBefore(khuN, h3Nhac); else amPane.appendChild(khuN);
     const am3 = $('#am3Hop'); if (am3) { const h3Sfx = [...am3.querySelectorAll('h3.pt')].find(x => /Hiệu ứng âm thanh/.test(x.textContent)); const khuA = veKhuOv('am', KHO.ovAm, 'Hiệu ứng âm theo chủ đề (trực tuyến)', 'Tìm hiệu ứng: whoosh, ding, pop…'); if (h3Sfx) am3.insertBefore(khuA, h3Sfx); else am3.appendChild(khuA); } }
   // Nhãn dán động Noto
-  const stPane = $('[data-pane="sticker"]'); if (stPane && KHO.notoNhom) { const khu = el('div', 'khuNoto'); khu.innerHTML = '<h3 class="pt">Nhãn dán động (Noto Emoji · Google)</h3><div class="row khoChip notoChip"></div><div class="mauLuoi khoSticker notoLuoi"></div><div class="quota">Hoạt ảnh gif nền trong suốt, dùng tự do (Apache 2.0). Bấm để thêm lên V3, kéo trên khung để đặt chỗ.</div>'; const neo = $('#emojiNhanh'); (neo ? neo.parentNode : stPane).insertBefore(khu, neo ? neo.nextSibling : null); const chip = khu.querySelector('.notoChip'), luoi = khu.querySelector('.notoLuoi'); const dsNhom = Object.keys(KHO.notoNhom); let cur = dsNhom[0]; const veChip = () => { chip.innerHTML = ''; dsNhom.forEach(k => { const b = el('button', 'btn nho' + (cur === k ? ' xanh' : ''), KHO.notoTen[k] || k); b.type = 'button'; b.onclick = () => { cur = k; veChip(); veNotoLuoi(luoi, k); }; chip.appendChild(b); }); }; veChip(); veNotoLuoi(luoi, cur); }
+  const stPane = $('[data-pane="sticker"]'); if (stPane && KHO.notoNhom) { const khu = el('div', 'khuNoto'); khu.innerHTML = '<h3 class="pt">Nhãn dán động (Noto Emoji · Google)</h3><div class="row khoHang"><input type="search" class="notoTim" id="notoTim" placeholder="Tìm nhãn dán (tiếng Anh): fire, heart, cat, money…"></div><div class="row khoChip notoChip"></div><div class="mauLuoi khoSticker notoLuoi"></div><div class="quota">Hoạt ảnh gif nền trong suốt, dùng tự do (Apache 2.0). Bấm để thêm lên V3, kéo trên khung để đặt chỗ.</div>'; const neo = $('#emojiNhanh'); (neo ? neo.parentNode : stPane).insertBefore(khu, neo ? neo.nextSibling : null); const chip = khu.querySelector('.notoChip'), luoi = khu.querySelector('.notoLuoi'), timN = khu.querySelector('.notoTim'); const dsNhom = Object.keys(KHO.notoNhom); let cur = dsNhom[0]; timN.oninput = () => { if (timN.value.trim()) { chip.querySelectorAll('.btn').forEach(x => x.classList.remove('xanh')); veNotoLuoi(luoi, cur, timN.value); } else { veChip(); veNotoLuoi(luoi, cur); } }; timN.onkeydown = e => e.stopPropagation(); const veChip = () => { chip.innerHTML = ''; dsNhom.forEach(k => { const b = el('button', 'btn nho' + (cur === k ? ' xanh' : ''), KHO.notoTen[k] || k); b.type = 'button'; b.onclick = () => { cur = k; timN.value = ''; veChip(); veNotoLuoi(luoi, k); }; chip.appendChild(b); }); }; veChip(); veNotoLuoi(luoi, cur); }
   // máy chủ không có key Freesound / Giphy thì ẩn hai mục tìm cũ (đã có Openverse + Noto thay thế), tránh bấm ra lỗi "chưa có key"
   const anKhuKey = () => { let doi = false; [['#khoAmTim', 'am_thanh'], ['#khoStickerTim', 'nhan_dan']].forEach(([sel, co]) => { const i = $(sel); if (!i) return; const khu = i.closest('.khoHang') && i.closest('.khoHang').parentNode; if (khu && !(MC.url && MC.dich_vu[co])) { khu.hidden = true; doi = true; } }); if (doi) ['am', 'sticker'].forEach(k => { const pane = $('[data-pane="' + k + '"]'); if (pane && pane._veBen) pane._veBen(); }); };
   const t0 = Date.now(); const cho = () => { if (MC.url || Date.now() - t0 > 8000) anKhuKey(); else setTimeout(cho, 300); }; setTimeout(cho, 300);
@@ -5257,7 +5265,54 @@ function khoiTaoKhoTrucTuyen() {
   ['am', 'sticker'].forEach(k => { const pane = $('[data-pane="' + k + '"]'); if (!pane) return; const noi = pane.querySelector(':scope > .noi'), ben = pane.querySelector(':scope > .ben'); if (noi) { while (noi.firstChild) pane.appendChild(noi.firstChild); noi.remove(); } if (ben) ben.remove(); pane.classList.remove('coBen'); delete pane._veBen; try { taoBen(pane); } catch { } });
 }
 
-khoiTaoB(); khoiTaoC(); khoiTaoUI(); khoiTaoLop(); khoiTaoBang(); khoiTaoDot1(); khoiTaoDot2(); khoiTaoDot3(); khoiTaoM1(); khoiTaoM2(); khoiTaoM3(); khoiTaoN(); khoiTaoMobi(); khoiTaoCCW(); khoiTaoKho(); khoiTaoDoc(); khoiTaoGon(); khoiTaoMediaCC(); khoiTaoCC2(); khoiTaoFsBar(); khoiTaoKfGfx(); khoiTaoVanBanCC(); khoiTaoBangFont(); khoiTaoLopFx(); khoiTaoKhoTrucTuyen(); veTl();
+/* ═════════ Tab Media kiểu CapCut: Của bạn · Kho video · Kho ảnh (Pixabay / Pexels qua máy chủ, chủ đề sẵn) ═════════ */
+const MEDIA_MUC = [['cuaban', 'Của bạn'], ['video', 'Kho video'], ['anh', 'Kho ảnh']];
+const KHO_CHU_DE = [['Thành phố', 'city street'], ['Thiên nhiên', 'nature'], ['Văn phòng', 'office work'], ['Công nghệ', 'technology'], ['Tiền bạc', 'money'], ['Đồ ăn', 'food'], ['Thể thao', 'fitness'], ['Du lịch', 'travel'], ['Gia đình', 'family'], ['Học tập', 'study'], ['Gõ phím', 'typing keyboard'], ['Điện thoại', 'smartphone'], ['Bầu trời', 'sky clouds'], ['Biển', 'beach'], ['Cà phê', 'coffee'], ['Mua sắm', 'shopping'], ['Xe cộ', 'car driving'], ['Sức khoẻ', 'health'], ['Làm đẹp', 'beauty skincare'], ['Nông thôn', 'countryside']];
+function moMediaMuc(id) { const pane = $('[data-pane="footage"]'); if (!pane || !pane.querySelector('.snav')) return; P.mediaMuc = id; pane.querySelectorAll('.snav button').forEach(b => b.classList.toggle('on', b.dataset.muc === id)); pane.querySelectorAll('.snoi > section').forEach(sx => { sx.hidden = sx.dataset.muc !== id; }); try { localStorage.setItem('dv_mediaMuc', id); } catch { } }
+async function khoTimAnh() {
+  const q = ($('#khoAnhQ').value || '').trim(); if (!q) { $('#khoAnhQ').focus(); return; } const tt = $('#khoAnhTt'), kq = $('#khoAnhKq'); tt.textContent = 'Đang tìm ảnh “' + q + '”…'; kq.innerHTML = '';
+  try {
+    const r = await fetch(MC.url + '/broll?loai=anh&q=' + encodeURIComponent(q) + '&huong=' + $('#khoAnhHuong').value); const j = await r.json();
+    if (!j.ok) { tt.textContent = 'Máy chủ chưa có key kho ảnh (PIXABAY_KEY hoặc PEXELS_KEY).'; return; }
+    if (!j.items.length) { tt.textContent = 'Không có ảnh hợp “' + q + '”, thử từ khác.'; return; }
+    j.items.forEach(it => { const b = el('button'); b.type = 'button'; b.title = 'Thêm vào footage · ' + it.tac_gia; const im = el('img'); im.src = it.thumb; im.alt = ''; im.loading = 'lazy'; b.appendChild(im); b.appendChild(el('span', null, it.tac_gia)); b.onclick = () => themBrollAnh(it, q, b); kq.appendChild(b); });
+    tt.textContent = j.items.length + ' ảnh' + (j.tu_khoa && j.tu_khoa !== q ? ' · tìm bằng “' + j.tu_khoa + '”' : '') + ' · ' + (j.nguon || 'kho miễn phí') + '. Bấm để thêm vào footage (đoạn ảnh 5 giây, kéo dài tuỳ ý).';
+  } catch (e) { tt.textContent = 'Không gọi được máy chủ kho ảnh.'; }
+}
+async function themBrollAnh(it, q, nut) {
+  const ten = it.id + '.jpg'; if (P.srcs.some(s => s.ten === ten)) { toast('Ảnh này đã có trong footage'); return; }
+  const cu = nut.querySelector('span').textContent; nut.querySelector('span').textContent = 'Đang tải…'; nut.disabled = true;
+  try {
+    const r = await fetch(MC.url + it.url); if (!r.ok) throw new Error('http ' + r.status); const blob = await r.blob(); const f = new File([blob], ten, { type: blob.type && blob.type.startsWith('image/') ? blob.type : 'image/jpeg' });
+    await themFile([f]); const s = P.srcs.find(z => z.ten === f.name); if (!s) throw new Error('khong_them_duoc');
+    Object.assign(s, { loai_canh: 'broll', mo_ta: 'Ảnh kho: ' + q + ' (' + it.tac_gia + ')', tt: 'xong', canh: [{ bd: 0, kt: s.giay || 3, mo_ta: q, tags: ['broll', 'kho', 'anh'] }], cau: [], tu: [], khoanh_khac: [] }); if (s.thumbs) s.thumbs[0] = s.thumb;
+    ghiNguon && ghiNguon({ ten: it.id, tac_gia: it.tac_gia, giay_phep: 'Pixabay/Pexels License', nguon: it.tac_gia.split('·').pop().trim(), link: it.goc || '' });
+    veSrcs(); veLoi(); toast('Đã thêm ảnh vào footage. Kéo vào V2 làm hình minh hoạ hoặc bấm ＋ V1.');
+  } catch (e) { toast('Không tải được ảnh: ' + e.message); }
+  nut.disabled = false; nut.querySelector('span').textContent = cu;
+}
+function khoiTaoMediaKho() {
+  const pane = $('[data-pane="footage"]'); if (!pane || !$('#ed').classList.contains('ccw') || pane.querySelector('.snav')) return;
+  const cu = [...pane.children]; const nav = el('div', 'snav'), noi = el('div', 'snoi'), sec = {};
+  MEDIA_MUC.forEach(([id, ten]) => { const b = el('button', null, ten); b.type = 'button'; b.dataset.muc = id; b.onclick = () => moMediaMuc(id); nav.appendChild(b); const sx = el('section'); sx.dataset.muc = id; sx.hidden = true; noi.appendChild(sx); sec[id] = sx; });
+  pane.appendChild(nav); pane.appendChild(noi);
+  // Của bạn: mọi thứ cũ trừ hộp kho video
+  const kho = $('#kho'); cu.forEach(x => { if (x !== kho && x.parentNode === pane) sec.cuaban.appendChild(x); });
+  // Kho video: hộp tìm cũ + chủ đề
+  const chipV = el('div', 'row khoChip'); KHO_CHU_DE.forEach(([ten, q]) => { const b = el('button', 'btn nho', ten); b.type = 'button'; b.onclick = () => { $('#khoQ').value = q; khoTim(); chipV.querySelectorAll('.btn').forEach(x => x.classList.toggle('xanh', x === b)); }; chipV.appendChild(b); });
+  sec.video.appendChild(el('h3', 'pt', 'Kho video B-roll (Pixabay · Pexels, miễn phí dùng thương mại)')); if (kho) { sec.video.appendChild(kho); kho.insertBefore(chipV, kho.children[1] || null); } const bv = el('div', 'quota khoBao'); bv.id = 'khoVideoBao'; bv.textContent = 'Máy chủ Cloudflare chưa có key kho video (PIXABAY_KEY / PEXELS_KEY).'; sec.video.appendChild(bv);
+  // Kho ảnh
+  const ka = el('div', 'kho'); ka.id = 'khoAnh'; ka.innerHTML = '<div class="hang"><input id="khoAnhQ" type="search" placeholder="Kho ảnh minh hoạ: văn phòng, bầu trời, tiền…"><select id="khoAnhHuong" title="Hướng ảnh"><option value="doc">Dọc</option><option value="ngang">Ngang</option></select><button class="btn nho xanh" id="khoAnhTim" type="button">Tìm</button></div><div class="row khoChip" id="khoAnhChip"></div><div class="kq" id="khoAnhKq"></div><div class="quota" id="khoAnhTt">Chọn chủ đề hoặc gõ từ khoá. Ảnh thêm vào footage như một đoạn 5 giây, kéo dài tuỳ ý.</div>';
+  sec.anh.appendChild(el('h3', 'pt', 'Kho ảnh minh hoạ (Pixabay · Pexels, miễn phí dùng thương mại)')); sec.anh.appendChild(ka); const ba = el('div', 'quota khoBao'); ba.id = 'khoAnhBao'; ba.textContent = 'Máy chủ Cloudflare chưa có key kho ảnh (PIXABAY_KEY / PEXELS_KEY).'; sec.anh.appendChild(ba);
+  const chipA = $('#khoAnhChip'); KHO_CHU_DE.forEach(([ten, q]) => { const b = el('button', 'btn nho', ten); b.type = 'button'; b.onclick = () => { $('#khoAnhQ').value = q; khoTimAnh(); chipA.querySelectorAll('.btn').forEach(x => x.classList.toggle('xanh', x === b)); }; chipA.appendChild(b); });
+  $('#khoAnhTim').onclick = khoTimAnh; $('#khoAnhQ').addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Enter') { e.preventDefault(); khoTimAnh(); } });
+  // theo máy chủ: có kho thì hiện hộp, không thì hiện thông báo
+  const dongBo = () => { const co = !!(MC.url && MC.dich_vu.broll); if (kho) kho.hidden = !co; ka.hidden = !co; bv.hidden = co; ba.hidden = co; };
+  const mcCu = mayChuKhoiDong; mayChuKhoiDong = async function () { const r = await mcCu.apply(this, arguments); dongBo(); return r; }; dongBo(); const t0 = Date.now(); const cho = () => { dongBo(); if (!MC.url && Date.now() - t0 < 8000) setTimeout(cho, 300); }; setTimeout(cho, 300);
+  let luu = 'cuaban'; try { luu = localStorage.getItem('dv_mediaMuc') || 'cuaban'; } catch { } moMediaMuc(MEDIA_MUC.some(([id]) => id === luu) ? luu : 'cuaban');
+}
+
+khoiTaoB(); khoiTaoC(); khoiTaoUI(); khoiTaoLop(); khoiTaoBang(); khoiTaoDot1(); khoiTaoDot2(); khoiTaoDot3(); khoiTaoM1(); khoiTaoM2(); khoiTaoM3(); khoiTaoN(); khoiTaoMobi(); khoiTaoCCW(); khoiTaoKho(); khoiTaoDoc(); khoiTaoGon(); khoiTaoMediaCC(); khoiTaoCC2(); khoiTaoFsBar(); khoiTaoKfGfx(); khoiTaoVanBanCC(); khoiTaoBangFont(); khoiTaoLopFx(); khoiTaoKhoTrucTuyen(); khoiTaoMediaKho(); veTl();
 </script>
 <script src="tro-ly.js?v=202610011200"></script>
 </body>
