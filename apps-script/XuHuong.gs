@@ -83,12 +83,13 @@ function xhGoiAi(prompt, timKiem){
   var key = hookCfg('GEMINI_API_KEY'); if (!key) return {ok:false, loi:'chua_co_key'};
   var models = (geminiModels(key) || []).filter(function(m){ return !/lite/.test(m); }).slice(0, 3);
   if (!models.length) models = ['gemini-2.5-flash'];
-  var ds = gemDsKey(key), loi = '';
+  var ds = gemDsKey(key), loi = '', nghiIt = 0, daGoi = false;
   for (var mi = 0; mi < models.length; mi++){
     for (var ki = 0; ki < ds.length; ki++){
-      var k = ds[ki], model = models[mi];
-      if (gemConNghi(k, model).giay) continue;
-      var body = { contents:[{role:'user', parts:[{text: prompt}]}], generationConfig:{ temperature: 0.4, maxOutputTokens: 8000 } };
+      var k = ds[ki], model = models[mi], nghi = gemConNghi(k, model).giay;
+      if (nghi){ nghiIt = nghiIt ? Math.min(nghiIt, nghi) : nghi; continue; }
+      daGoi = true;
+      var body = { contents:[{role:'user', parts:[{text: prompt}]}], generationConfig:{ temperature: 0.4, maxOutputTokens: 16000 } };
       if (timKiem) body.tools = [{ google_search: {} }];
       var r;
       try{ r = UrlFetchApp.fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':generateContent', {method:'post', contentType:'application/json', muteHttpExceptions:true, headers:{'x-goog-api-key': k}, payload: JSON.stringify(body)}); }
@@ -98,18 +99,36 @@ function xhGoiAi(prompt, timKiem){
         var j = {}; try{ j = JSON.parse(raw); }catch(e){}
         var cand = (j.candidates || [])[0] || {};
         var chu = ((cand.content || {}).parts || []).map(function(p){ return p.text || ''; }).join('').trim();
-        if (!chu){ loi = model + ' tra ve rong'; continue; }
+        if (!chu){ loi = model + ' tra ve rong (' + (cand.finishReason || (j.promptFeedback || {}).blockReason || '?') + ')'; continue; }
         var nguon = [], daCo = {};
         (((cand.groundingMetadata || {}).groundingChunks) || []).forEach(function(c){ var w = c.web || {}; if (w.uri && !daCo[w.uri] && nguon.length < 6){ daCo[w.uri] = 1; nguon.push({ten: String(w.title || '').slice(0, 80), uri: String(w.uri)}); } });
         return {ok:true, text: chu, nguon: nguon, model: model, tim: !!timKiem};
       }
       loi = model + ' http ' + ma + ': ' + String(raw).slice(0, 200);
-      if (ma === 429){ var d4 = gemDoc429(raw); gemKeyNghi(k, d4.ngay ? gemGiayToiReset() : Math.max(20, d4.cho || 0), model, d4.ngay ? 'n' : 'p'); continue; }
-      if (ma === 400 && timKiem) return {ok:false, loi: loi, khong_tim: true};   // model hoặc key không cho tra Google
+      if (ma === 429){
+        // Có tra Google thì 429 có thể chỉ là hết lượt tra Google: không cho key nghỉ, để lượt không tra vẫn chạy và tool của học viên không bị ảnh hưởng
+        if (timKiem) continue;
+        var d4 = gemDoc429(raw); gemKeyNghi(k, d4.ngay ? gemGiayToiReset() : Math.max(20, d4.cho || 0), model, d4.ngay ? 'n' : 'p'); continue;
+      }
+      if (ma === 400 && timKiem && !/API_KEY_INVALID|API key not valid/i.test(raw)) return {ok:false, loi: loi, khong_tim: true};   // model hoặc key không cho tra Google
       if (ma === 404) break;
     }
   }
-  return {ok:false, loi: loi};
+  if (!daGoi && nghiIt) return {ok:false, loi: 'het_luot:' + nghiIt};
+  return {ok:false, loi: loi || 'khong_ro'};
+}
+/* lỗi tạo bản tin → câu dễ hiểu + việc cần làm */
+function xhLoiDe(loi){
+  loi = String(loi || '');
+  var m = loi.match(/^het_luot:(\d+)/);
+  if (loi === 'chua_co_key') return '🔑 Máy chủ chưa có key Gemini. Bấm /keygemini rồi dán key, xong bấm /xhtao lại.';
+  if (m) return '⏳ Các key Gemini đang hết lượt, mở lại sau khoảng ' + hookThoiGian(Number(m[1])) + '. Muốn chạy ngay: thêm key tạo ở project Google khác bằng /keygemini.';
+  if (/http 429/.test(loi)) return '⏳ Key Gemini hết hạn mức. Đợi một lúc rồi bấm /xhtao, hoặc thêm key ở project khác bằng /keygemini.';
+  if (/API_KEY_INVALID|API key not valid|http 401/i.test(loi)) return '🔑 Key Gemini sai hoặc đã bị xoá. Xem /keygemini, xoá key hỏng và thêm key mới.';
+  if (/http 403/.test(loi)) return '🔑 Key Gemini bị chặn (project chưa bật Generative Language API hoặc key giới hạn API). Tạo key mới ở aistudio.google.com rồi thêm bằng /keygemini.';
+  if (/^mang|Timeout|timed out/i.test(loi)) return '📶 Máy chủ gọi Gemini bị lỗi mạng. Bấm /xhtao lại sau 1 phút.';
+  if (/tra ve rong/.test(loi)) return '🤔 AI trả về rỗng. Bấm /xhtao lại.';
+  return '⚠️ Lỗi chưa rõ. Bấm /xhtao lại; vẫn lỗi thì chụp tin này gửi người làm kỹ thuật.';
 }
 
 /* ── 4. tạo bản tin nháp và gửi bot ── */
@@ -145,7 +164,7 @@ function xhTaoBanTin(){
   var p = xhPrompt(tk, xhNguonText(yt, rss));
   var kq = xhGoiAi(p, true);
   if (!kq.ok) kq = xhGoiAi(p + '\n\nLần này KHÔNG tra được Google: chỉ dựa vào số liệu nội bộ và kiến thức nghề, ghi nguồn (nội bộ) hoặc (kinh nghiệm).', false);
-  if (!kq.ok){ xhBaoAdmin('⚠️ Chưa tạo được bản tin xu hướng tuần: ' + String(kq.loi || '').slice(0, 200) + '\nThử lại: /xuhuong tao'); return {ok:false, loi: kq.loi}; }
+  if (!kq.ok){ xhBaoAdmin('⚠️ Chưa tạo được bản tin xu hướng tuần.\n' + xhLoiDe(kq.loi) + '\n\nChi tiết: `' + String(kq.loi || '').replace(/`/g, "'").slice(0, 200) + '`'); return {ok:false, loi: kq.loi}; }
   var nhap = { id: Utilities.formatDate(new Date(), 'GMT+7', 'yyMMddHHmm'), text: String(kq.text).slice(0, 3000), nguon: kq.nguon || [], tim: kq.tim,
     so_soi: tk.so_soi, so_cham: tk.so_cham, luc: nowVN(),
     yt: yt.ok ? yt.so + ' video thịnh hành (' + yt.so_shorts + ' video ngắn)' : 'không lấy được (' + String(yt.loi || '').slice(0, 80) + ')',
