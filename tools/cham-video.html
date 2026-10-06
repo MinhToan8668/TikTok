@@ -390,7 +390,7 @@ function dinhDangSo(inp) { const v = soNhap(inp.value); inp.value = v ? fmtSo(v)
 function nhanGio(h) { h = Number(h) || 0; return !h ? '' : h < 24 ? Math.round(h) + ' giờ' : h < 168 ? Math.round(h / 24) + ' ngày' : h < 720 ? Math.round(h / 168) + ' tuần' : Math.round(h / 720) + ' tháng'; }
 function veViewGio() { const v = soNhap($('#nView').value), h = Number($('#gioDang').value) || 0, o = $('#viewGio'); if (!v || !h) { o.textContent = ''; return; } const vg = Math.round(v / h); const muc = vg < 30 ? 'chậm, đang ở vòng thử' : vg < 150 ? 'bình thường' : vg < 500 ? 'tốt, đã qua vòng 2' : vg < 2000 ? 'rất mạnh' : 'viral thật'; o.innerHTML = `≈ <b>${fmtSo(vg)} view/giờ</b> · ${muc} <span style="opacity:.7">(mốc cho kênh nhỏ trong 1–2 ngày đầu)</span>`; }
 
-const KHUNG_TEN = { khoanhkhac: 'Một khoảnh khắc (5W-1H)', bonnhip: 'Kể chuyện 4 nhịp', kinhnghiem: 'Chia sẻ kinh nghiệm (6 bước)', chanthuc: 'Chân thực 2026', vlog: 'Daily vlog cảm xúc', chu_chay: 'Chữ chạy 15–20s ghép nhạc', pov: 'POV nhập vai', trai_nghiem: 'Trải nghiệm thử', truoc_sau: 'Trước – sau', so_sanh: 'So sánh A và B', tra_loi_cmt: 'Trả lời bình luận', nguoc_doi: 'Sự thật ngược', fichtean: 'Thử thách (Fichtean)', baydiem: 'Chuyện dài 7 điểm', tips: 'Danh sách hữu ích', giohang: 'Viral có cài giỏ hàng', tudo: 'Tự do' };
+const KHUNG_TEN = { khoanhkhac: 'Một khoảnh khắc (5W-1H)', bonnhip: 'Kể chuyện 4 nhịp', kinhnghiem: 'Chia sẻ kinh nghiệm (6 bước)', chanthuc: 'Chân thực 2026', vlog: 'Daily vlog cảm xúc', chu_chay: 'Chữ story 15s ghép nhạc', pov: 'POV nhập vai', trai_nghiem: 'Trải nghiệm thử', truoc_sau: 'Trước – sau', so_sanh: 'So sánh A và B', tra_loi_cmt: 'Trả lời bình luận', nguoc_doi: 'Sự thật ngược', fichtean: 'Thử thách (Fichtean)', baydiem: 'Chuyện dài 7 điểm', tips: 'Danh sách hữu ích', giohang: 'Viral có cài giỏ hàng', tudo: 'Tự do' };
 const THANG_TEN = { hook: ['Hook 3 giây', '25%'], giu_chan: ['Giữ chân, nhịp kể', '25%'], noi_dung: ['Nội dung, giá trị', '15%'], hinh_anh: ['Hình ảnh, khung hình', '10%'], am_thanh: ['Âm thanh, giọng', '10%'], dung_phim: ['Dựng, chữ, nhịp cắt', '10%'], ket: ['Kết, CTA', '5%'] };
 const KN = { thap: ['Khả năng viral: THẤP', 'var(--danger)'], vua: ['Khả năng viral: VỪA', 'var(--warn)'], cao: ['Khả năng viral: CAO', 'var(--accent)'] };
 const MUC_TEN = { nang: 'nặng', vua: 'vừa', nhe: 'nhẹ' };
@@ -705,7 +705,7 @@ function renderKq(d, so, tuLuu) {
   box.append(rwAll);
 }
 /* ---------- bản dựng lại ---------- */
-const FORMAT_TEN = { noi_camera: 'Nói camera', voice_over: 'Voice-over', vlog: 'Vlog đời thường', review: 'Review', huong_dan: 'Hướng dẫn, tips', ke_chuyen: 'Kể chuyện', ban_hang: 'Bán hàng', chu_chay: 'Chữ chạy', pov: 'POV' };
+const FORMAT_TEN = { noi_camera: 'Nói camera', voice_over: 'Voice-over', vlog: 'Vlog đời thường', review: 'Review', huong_dan: 'Hướng dẫn, tips', ke_chuyen: 'Kể chuyện', ban_hang: 'Bán hàng', chu_chay: 'Chữ story ghép nhạc', pov: 'POV' };
 const VIEC_TEN = { giu: 'Giữ', cat: 'Cắt', rut: 'Rút gọn', doi_cho: 'Đổi chỗ' };
 const VIEC_ICON = { giu: '✅', cat: '✂️', rut: '⏩', doi_cho: '↕️' };
 function tg(s) { s = Math.max(0, Number(s) || 0); const m = Math.floor(s / 60), r = Math.round((s - m * 60) * 10) / 10; return String(m).padStart(2, '0') + ':' + (r < 10 ? '0' : '') + String(r).replace('.', ','); }
