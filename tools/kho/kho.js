@@ -410,7 +410,7 @@ KHO.notoNhom = {
    tu: 'text' | 'text:<số>' | 'phu' → lấy chữ từ ô người dùng nhập. rong = bề rộng tối đa của lớp chữ (chữ dài tự thu nhỏ). mau 'nhan' = màu nhấn của dự án. ── */
 KHO.nhomDoHoa = { lt: 'Giới thiệu tên (lower third)', nhan: 'Nhấn mạnh', so_lieu: 'Số liệu', khung: 'Khung quay' };
 KHO.doHoa = [
-  { id: 'lt_thanh_sach', ten: 'Thanh trắng gọn', ic: '▭', nhom: 'lt', dai: 4.4, text: 'Minh Toàn', phu: 'Tự Mình Xây Kênh',
+  { id: 'lt_thanh_sach', ten: 'Thanh trắng gọn', ic: '▭', nhom: 'lt', dai: 4.4, text: 'Tên của bạn', phu: 'Chức danh của bạn',
     o: [{ nhan: 'Tên', tu: 'text' }, { nhan: 'Vai trò', tu: 'phu' }],
     lop: [
       { loai: 'hop', mau: '#FFFFFF', bo_goc: 0.28, kf: [{ t: 0, x: 0.07, y: 0.80, w: 0, h: 0.125, mo: 1 }, { t: 0.55, x: 0.50, w: 0.86 }, { t: -0.45, y: 0.80, mo: 1 }, { t: -0.1, y: 0.814, mo: 0, ease: 'ra' }] },
@@ -418,21 +418,21 @@ KHO.doHoa = [
       { loai: 'chu', tu: 'text', co: 0.058, dam: 800, mau: '#0F1115', can: 'left', rong: 0.82, kf: [{ t: 0, x: 0.115, y: 0.800, mo: 0 }, { t: 0.34, y: 0.800, mo: 0 }, { t: 0.84, y: 0.786, mo: 1 }, { t: -0.45, mo: 1 }, { t: -0.1, mo: 0, ease: 'ra' }] },
       { loai: 'chu', tu: 'phu', co: 0.032, dam: 500, mau: '#5A6170', can: 'left', rong: 0.82, kf: [{ t: 0, x: 0.115, y: 0.840, mo: 0 }, { t: 0.44, y: 0.840, mo: 0 }, { t: 0.94, y: 0.832, mo: 1 }, { t: -0.45, mo: 1 }, { t: -0.1, mo: 0, ease: 'ra' }] },
     ] },
-  { id: 'lt_khoi_dam', ten: 'Khối đen chữ đậm', ic: '■', nhom: 'lt', dai: 4.4, text: 'MINH TOÀN', phu: 'TỰ MÌNH XÂY KÊNH',
+  { id: 'lt_khoi_dam', ten: 'Khối đen chữ đậm', ic: '■', nhom: 'lt', dai: 4.4, text: 'TÊN CỦA BẠN', phu: 'CHỨC DANH CỦA BẠN',
     o: [{ nhan: 'Tên', tu: 'text' }, { nhan: 'Vai trò', tu: 'phu' }],
     lop: [
       { loai: 'hop', mau: '#141518', kf: [{ t: 0, x: 0.07, y: 0.80, w: 0, h: 0.135, mo: 1 }, { t: 0.5, x: 0.50, w: 0.86 }, { t: -0.45, mo: 1 }, { t: -0.1, mo: 0, ease: 'ra' }] },
       { loai: 'chu', tu: 'text', co: 0.064, dam: 900, mau: '#FFFFFF', can: 'left', rong: 0.83, kf: [{ t: 0, x: 0.105, y: 0.800, mo: 0 }, { t: 0.26, y: 0.800, mo: 0 }, { t: 0.68, y: 0.784, mo: 1, ease: 'nay' }, { t: -0.45, mo: 1 }, { t: -0.1, mo: 0, ease: 'ra' }] },
       { loai: 'chu', tu: 'phu', co: 0.030, dam: 700, mau: '#FFD23F', can: 'left', rong: 0.83, kf: [{ t: 0, x: 0.105, y: 0.856, mo: 0 }, { t: 0.5, y: 0.856, mo: 0 }, { t: 0.95, y: 0.845, mo: 1, ease: 'nay' }, { t: -0.45, mo: 1 }, { t: -0.1, mo: 0, ease: 'ra' }] },
     ] },
-  { id: 'lt_gach_chan', ten: 'Gạch chân màu', ic: '⎯', nhom: 'lt', dai: 4.6, text: 'MINH TOÀN', phu: 'Tự Mình Xây Kênh',
+  { id: 'lt_gach_chan', ten: 'Gạch chân màu', ic: '⎯', nhom: 'lt', dai: 4.6, text: 'TÊN CỦA BẠN', phu: 'Chức danh của bạn',
     o: [{ nhan: 'Tên', tu: 'text' }, { nhan: 'Vai trò', tu: 'phu' }],
     lop: [
       { loai: 'chu', tu: 'text', co: 0.074, dam: 900, mau: '#FFFFFF', vien: 'rgba(0,0,0,.5)', day: 0.003, can: 'left', rong: 0.85, kf: [{ t: 0, x: 0.08, y: 0.800, mo: 0 }, { t: 0.1, y: 0.800, mo: 0 }, { t: 0.65, y: 0.786, mo: 1 }, { t: -0.5, mo: 1 }, { t: -0.12, y: 0.776, mo: 0, ease: 'ra' }] },
       { loai: 'duong', mau: 'nhan', day: 0.007, kf: [{ t: 0, x: 0.08, y: 0.818, w: 0.52, h: 0, tien_do: 0, mo: 1 }, { t: 0.3, tien_do: 0 }, { t: 0.8, tien_do: 1 }, { t: -0.5, tien_do: 1 }, { t: -0.2, tien_do: 0, ease: 'ra' }] },
       { loai: 'chu', tu: 'phu', co: 0.032, dam: 600, mau: '#E7EAF0', vien: 'rgba(0,0,0,.5)', day: 0.002, can: 'left', rong: 0.85, kf: [{ t: 0, x: 0.08, y: 0.858, mo: 0 }, { t: 0.46, y: 0.858, mo: 0 }, { t: 0.96, y: 0.850, mo: 1 }, { t: -0.55, mo: 1 }, { t: -0.25, mo: 0, ease: 'ra' }] },
     ] },
-  { id: 'lt_the_toi', ten: 'Thẻ tối bo góc', ic: '▢', nhom: 'lt', dai: 4.4, text: 'Minh Toàn', phu: 'Người sáng lập · Tự Mình Xây Kênh',
+  { id: 'lt_the_toi', ten: 'Thẻ tối bo góc', ic: '▢', nhom: 'lt', dai: 4.4, text: 'Tên của bạn', phu: 'Chức danh · Tên kênh',
     o: [{ nhan: 'Tên', tu: 'text' }, { nhan: 'Vai trò', tu: 'phu' }],
     lop: [
       { loai: 'hop', mau: 'rgba(16,18,22,.88)', bo_goc: 0.3, kf: [{ t: 0, x: 0.50, y: 0.825, w: 0.86, h: 0.125, mo: 0 }, { t: 0.1, y: 0.825, mo: 0 }, { t: 0.6, y: 0.810, mo: 1 }, { t: -0.45, y: 0.810, mo: 1 }, { t: -0.1, y: 0.826, mo: 0, ease: 'ra' }] },
@@ -440,7 +440,7 @@ KHO.doHoa = [
       { loai: 'duong', mau: 'nhan', day: 0.006, kf: [{ t: 0, x: 0.11, y: 0.818, w: 0.30, h: 0, tien_do: 0, mo: 1 }, { t: 0.42, tien_do: 0 }, { t: 0.92, tien_do: 1 }, { t: -0.45, tien_do: 1 }, { t: -0.15, tien_do: 0, ease: 'ra' }] },
       { loai: 'chu', tu: 'phu', co: 0.030, dam: 500, mau: '#C9CEDA', can: 'left', rong: 0.77, kf: [{ t: 0, x: 0.11, y: 0.842, mo: 0 }, { t: 0.56, mo: 0 }, { t: 1.0, mo: 1 }, { t: -0.45, mo: 1 }, { t: -0.1, mo: 0, ease: 'ra' }] },
     ] },
-  { id: 'lt_hai_thanh', ten: 'Hai thanh xếp', ic: '☰', nhom: 'lt', dai: 4.4, text: 'Minh Toàn', phu: 'TỰ MÌNH XÂY KÊNH',
+  { id: 'lt_hai_thanh', ten: 'Hai thanh xếp', ic: '☰', nhom: 'lt', dai: 4.4, text: 'Tên của bạn', phu: 'CHỨC DANH CỦA BẠN',
     o: [{ nhan: 'Tên', tu: 'text' }, { nhan: 'Vai trò', tu: 'phu' }],
     lop: [
       { loai: 'hop', mau: '#101316', bo_goc: 0.12, kf: [{ t: 0, x: 0.07, y: 0.790, w: 0, h: 0.072, mo: 1 }, { t: 0.5, x: 0.47, w: 0.80 }, { t: -0.48, x: 0.47, w: 0.80 }, { t: -0.12, x: 0.07, w: 0, ease: 'ra' }] },
@@ -448,7 +448,7 @@ KHO.doHoa = [
       { loai: 'hop', mau: 'nhan', bo_goc: 0.12, kf: [{ t: 0, x: 0.07, y: 0.856, w: 0, h: 0.052, mo: 1 }, { t: 0.34, x: 0.07, w: 0 }, { t: 0.84, x: 0.355, w: 0.57 }, { t: -0.55, x: 0.355, w: 0.57 }, { t: -0.25, x: 0.07, w: 0, ease: 'ra' }] },
       { loai: 'chu', tu: 'phu', co: 0.029, dam: 700, mau: '#101316', can: 'left', rong: 0.5, kf: [{ t: 0, x: 0.10, y: 0.856, mo: 0 }, { t: 0.5, mo: 0 }, { t: 0.9, mo: 1 }, { t: -0.5, mo: 1 }, { t: -0.3, mo: 0, ease: 'ra' }] },
     ] },
-  { id: 'lt_vien_thuoc', ten: 'Viên thuốc mềm', ic: '⬭', nhom: 'lt', dai: 4.4, text: 'Minh Toàn', phu: 'Tự Mình Xây Kênh',
+  { id: 'lt_vien_thuoc', ten: 'Viên thuốc mềm', ic: '⬭', nhom: 'lt', dai: 4.4, text: 'Tên của bạn', phu: 'Chức danh của bạn',
     o: [{ nhan: 'Tên', tu: 'text' }, { nhan: 'Vai trò', tu: 'phu' }],
     lop: [
       { loai: 'hop', mau: 'rgba(255,255,255,.94)', bo_goc: 1, kf: [{ t: 0, x: 0.50, y: 0.824, w: 0.80, h: 0.098, s: 0.9, mo: 0 }, { t: 0.1, s: 0.9, y: 0.824, mo: 0 }, { t: 0.65, s: 1, y: 0.812, mo: 1, ease: 'nay' }, { t: -0.45, s: 1, y: 0.812, mo: 1 }, { t: -0.1, s: 0.96, y: 0.826, mo: 0, ease: 'ra' }] },
