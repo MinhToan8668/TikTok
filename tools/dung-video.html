@@ -865,6 +865,53 @@
   .ed.ccw .ccPreset .luoi{grid-template-columns:repeat(auto-fill,minmax(42px,1fr));max-height:92px}.ed.ccw .ccPreset .luoi button{height:42px}
   .ed.ccw .fontToi{grid-template-columns:repeat(auto-fill,minmax(112px,1fr))}.ed.ccw .fontToi .fontThe{height:42px;font-size:14px}
   .ed.ccw .mauLuoi button:hover .the::after{width:16px;height:16px;font:800 12px/16px system-ui}
+  /* ═══ bảng Thuộc tính gọn kiểu CapCut: chữ nhỏ, hàng thấp, nhãn trái – điều khiển phải ═══ */
+  .ed.ccw .prop{font-size:11.5px}
+  .ed.ccw .prop label{min-height:26px;padding:1px 0;gap:8px;font-size:11.5px}
+  .ed.ccw .prop label>span:first-child{flex:0 0 auto;min-width:82px;max-width:58%;color:var(--em);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ed.ccw .prop label.full{flex-wrap:wrap;gap:3px}
+  .ed.ccw .prop label.full>span:first-child{flex:1 1 100%;max-width:none}
+  .ed.ccw .prop label.full>input,.ed.ccw .prop label.full>textarea,.ed.ccw .prop label.full>select{flex:1 1 100%;width:100%}
+  .ed.ccw .prop label input[type=text],.ed.ccw .prop label input[type=number],.ed.ccw .prop label input[type=search],.ed.ccw .prop select{height:24px;min-height:24px;padding:0 6px;font-size:11.5px;border-radius:6px}
+  .ed.ccw .prop textarea{font-size:12px;min-height:44px;padding:5px 7px;border-radius:7px;line-height:1.35}
+  .ed.ccw .prop label output{font-size:10.5px;min-width:32px}
+  .ed.ccw .prop .btn.nho{height:24px;padding:0 8px;font-size:11px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;gap:4px}
+  .ed.ccw .prop .row{gap:4px;margin:3px 0}
+  .ed.ccw .prop h3{font-size:10.5px;margin:9px 0 3px}
+  .ed.ccw .prop .nhom2{margin-top:3px;padding-top:1px}
+  .ed.ccw .prop .nhom2>b{font-size:10px;letter-spacing:.09em;margin:5px 0 2px}
+  .ed.ccw .prop .quota{font-size:10.5px;line-height:1.35;margin:2px 0}
+  .ed.ccw .prop label .kfn{width:18px;height:18px;font-size:11px;border-radius:4px;margin-right:2px}
+  .ed.ccw .prop input[type=color]{height:22px;width:38px}
+  .ed.ccw .prop .ccGrp .btn.nho{min-width:26px;height:22px;font-size:11px}
+  .ed.ccw .prop .kfHD{font-size:10px;line-height:1.35}
+  .ed.ccw .prop .ccHd{padding:6px 0 2px;font-size:11.5px;gap:5px;min-height:22px}
+  .ed.ccw .prop .ccHd .caret{font-size:9px}
+  .ed.ccw .prop .ccHd .ic.nho{width:18px;height:18px;font-size:12px}
+  .ed.ccw .prop .ccHd .kfNav button{font-size:11px;padding:0 2px}.ed.ccw .prop .ccHd .kfNav button.kf{font-size:12px}
+  .ed.ccw .prop .ccHd input[type=checkbox]{width:13px;height:13px}
+  .ed.ccw .prop .nhom2.gap{margin-top:0;padding-top:0}
+  .ed.ccw .prop .ccSo .buoc button{font-size:8px}
+  /* thanh trượt mảnh, phần đã chọn tô màu nhấn (--pc do JS đặt) */
+  .ed.ccw .prop input[type=range]{-webkit-appearance:none;appearance:none;height:14px;background:transparent;cursor:pointer}
+  .ed.ccw .prop input[type=range]::-webkit-slider-runnable-track{height:3px;border-radius:2px;background:linear-gradient(90deg,var(--ea) 0,var(--ea) var(--pc,50%),var(--el) var(--pc,50%),var(--el) 100%)}
+  .ed.ccw .prop input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;margin-top:-4px;border-radius:50%;background:#fff;border:0;box-shadow:0 1px 3px rgba(0,0,0,.55)}
+  .ed.ccw .prop input[type=range]::-moz-range-track{height:3px;border-radius:2px;background:var(--el)}
+  .ed.ccw .prop input[type=range]::-moz-range-progress{height:3px;border-radius:2px;background:var(--ea)}
+  .ed.ccw .prop input[type=range]::-moz-range-thumb{width:11px;height:11px;border:0;border-radius:50%;background:#fff}
+  /* tay cầm mặt nạ trên khung xem trước */
+  #tayCam .mnH{border:1px dashed rgba(255,255,255,.92);box-shadow:0 0 0 1px rgba(0,0,0,.35)}
+  #tayCam .mnH i{width:9px;height:9px;background:#fff;border:0;box-shadow:0 1px 3px rgba(0,0,0,.5)}
+  #tayCam .mnH i.co{right:-4.5px;bottom:-4.5px}
+  #tayCam .mnH i.e_t{left:50%;margin-left:-4.5px;top:-4.5px;cursor:ns-resize}
+  #tayCam .mnH i.e_b{left:50%;margin-left:-4.5px;bottom:-4.5px;cursor:ns-resize}
+  #tayCam .mnH i.e_l{top:50%;margin-top:-4.5px;left:-4.5px;cursor:ew-resize}
+  #tayCam .mnH i.e_r{top:50%;margin-top:-4.5px;right:-4.5px;cursor:ew-resize}
+  #tayCam .mnH i.qu{left:50%;margin-left:-9px;top:auto;bottom:-26px;width:18px;height:18px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.9);border-radius:50%}
+  #tayCam .mnH i.me{left:-9px;top:-26px;width:18px;height:18px;background:rgba(0,0,0,.55);border:1px solid var(--ea);border-radius:50%;margin:0}
+  #tayCam .mnH::before,#tayCam .mnH::after{content:"";position:absolute;background:rgba(255,255,255,.3)}
+  #tayCam .mnH::before{left:50%;top:14%;bottom:14%;width:1px}
+  #tayCam .mnH::after{top:50%;left:14%;right:14%;height:1px}
 </style>
 </head>
 <body>
@@ -4992,6 +5039,8 @@ function khoiTaoBangMau() {
 /* ── bảng thuộc tính kiểu CapCut ── */
 function dvGap() { try { return JSON.parse(localStorage.getItem('dv_gap') || '{}'); } catch { return {}; } }
 const CC2_TEN_MUC = { 'Khung hình': 'Biến đổi', 'Khung hình (overlay)': 'Biến đổi', 'Keyframe ◇': 'Keyframe', 'Hoạt ảnh vào / ra': 'Hoạt ảnh' };
+/* như CapCut: mục phụ thu gọn sẵn, chỉ mở khi cần — người dùng mở ra thì nhớ lựa chọn đó */
+const CC2_GAP_MD = ['Hoà trộn', 'Keyframe ◇', 'Lật & cắt khung', 'Bo góc, viền & bóng', 'Nhoè chuyển động', 'Ghép nền (chroma key) & độ mờ', 'Bánh xe màu', 'HSL', 'Đường cong', 'Bám vật thể', 'Hình vẽ', 'Lớp & khớp khung'];
 function ccNhom(n, ten, opt) {
   if (n.querySelector(':scope > .ccHd')) return; const b = n.querySelector(':scope > b'); if (!ten) ten = b ? b.textContent.trim() : ''; if (!ten) return; if (b) b.classList.add('anCC');
   const hien = CC2_TEN_MUC[ten] || ten, hd = el('div', 'ccHd');
@@ -4999,7 +5048,7 @@ function ccNhom(n, ten, opt) {
   const tenEl = el('span', 'ten', hien), caret = el('button', 'caret', '▾'); caret.type = 'button'; caret.title = 'Thu gọn / mở rộng'; hd.appendChild(tenEl); hd.appendChild(caret); hd.appendChild(el('span', 'gian'));
   if (n.querySelector(':scope > label input[type=range], :scope > div:not(.ccSec) input[type=range]')) { const rs = el('button', 'ic nho', '↺'); rs.type = 'button'; rs.title = 'Đặt lại các thanh trượt trong mục này'; rs.onclick = () => { n.querySelectorAll(':scope > label > span:first-child, :scope > div:not(.ccSec) label > span:first-child').forEach(sp => { if (sp.parentElement.querySelector('input[type=range]')) sp.dispatchEvent(new Event('dblclick')); }); }; hd.appendChild(rs); }
   if (n.querySelector(':scope > label .kfn, :scope > div:not(.ccSec) .kfn')) { const nav = el('span', 'kfNav'); const tim = t => [...$('#propChon').querySelectorAll('button')].find(x => x.textContent.trim() === t); const b1 = el('button', null, '‹'); b1.type = 'button'; b1.title = 'Keyframe trước'; b1.onclick = () => { const x = tim('◀ ◇'); if (x && !x.disabled) x.click(); }; const b2 = el('button', 'kf', n.querySelector('.kfn.co') ? '◆' : '◇'); b2.type = 'button'; b2.title = 'Thêm keyframe cho mọi thuộc tính trong mục tại đầu phát'; b2.onclick = () => { const ds = [...n.querySelectorAll(':scope > label .kfn:not(.co):not(:disabled), :scope > div:not(.ccSec) .kfn:not(.co):not(:disabled)')]; if (!ds.length) { toast('Mục này đã có keyframe tại đầu phát'); return; } ds.forEach(k => k.click()); }; const b3 = el('button', null, '›'); b3.type = 'button'; b3.title = 'Keyframe sau'; b3.onclick = () => { const x = tim('◇ ▶'); if (x && !x.disabled) x.click(); }; nav.append(b1, b2, b3); hd.appendChild(nav); }
-  if (dvGap()[ten]) n.classList.add('gap'); const lat = () => { n.classList.toggle('gap'); const d = dvGap(); d[ten] = n.classList.contains('gap'); try { localStorage.setItem('dv_gap', JSON.stringify(d)); } catch { } }; caret.onclick = lat; tenEl.onclick = lat;
+  { const d0 = dvGap(); if (d0[ten] === undefined ? CC2_GAP_MD.includes(ten) : d0[ten]) n.classList.add('gap'); } const lat = () => { n.classList.toggle('gap'); const d = dvGap(); d[ten] = n.classList.contains('gap'); try { localStorage.setItem('dv_gap', JSON.stringify(d)); } catch { } }; caret.onclick = lat; tenEl.onclick = lat;
   n.insertBefore(hd, n.firstChild);
 }
 function ccSo(o) {
@@ -5457,12 +5506,13 @@ function veTayMatNa() {
   if (mn.kieu === 'tuyen') Object.assign(hop.style, { left: '-50%', width: '200%', top: cy * 100 + '%', height: '36%', transformOrigin: '50% 0', transform: 'rotate(' + (mn.xoay || 0) + 'deg)' });
   else if (mn.kieu === 'guong') Object.assign(hop.style, { left: '-50%', width: '200%', top: (cy - h / 2) * 100 + '%', height: h * 100 + '%', transform: 'rotate(' + (mn.xoay || 0) + 'deg)' });
   else Object.assign(hop.style, { left: (cx - w / 2) * 100 + '%', top: (cy - h / 2) * 100 + '%', width: w * 100 + '%', height: h * 100 + '%', borderRadius: mn.kieu === 'tron' ? '50%' : mn.kieu === 'chu_nhat' ? Math.round((mn.bo || 0) * 24) + 'px' : '4px', transform: 'rotate(' + (mn.xoay || 0) + 'deg)' });
-  if (mn.kieu !== 'tuyen') hop.appendChild(el('i', 'co'));
+  if (mn.kieu === 'guong') ['e_t', 'e_b'].forEach(c => hop.appendChild(el('i', c)));
+  else if (mn.kieu !== 'tuyen') ['co', 'e_t', 'e_b', 'e_l', 'e_r'].forEach(c => hop.appendChild(el('i', c)));
   hop.appendChild(el('i', 'qu')); hop.appendChild(el('i', 'me'));
   ngoai.appendChild(hop); lop.appendChild(ngoai);
   hop.addEventListener('pointerdown', e => {
     e.preventDefault(); e.stopPropagation();
-    const loai = e.target.classList.contains('co') ? 'co' : e.target.classList.contains('qu') ? 'qu' : e.target.classList.contains('me') ? 'me' : 'doi';
+    const cl = e.target.classList, loai = cl.contains('co') ? 'co' : cl.contains('qu') ? 'qu' : cl.contains('me') ? 'me' : /^e_/.test([...cl].find(x => /^e_/.test(x)) || '') ? [...cl].find(x => /^e_/.test(x)) : 'doi';
     try { hop.setPointerCapture(e.pointerId); } catch { } luuHoanTac(); P.keoTay = true;
     const r = lop.getBoundingClientRect(), f = r.width / cv.width, th = tr.xoay * Math.PI / 180;
     const ax = (cx - 0.5) * cv.width, ay = (cy - 0.5) * cv.height;
@@ -5479,6 +5529,12 @@ function veTayMatNa() {
         const ti = Math.hypot(ev.clientX - tamX, ev.clientY - tamY) / d0;
         if (mn.kieu === 'guong') mn.h = +Math.max(0.02, Math.min(1.5, (mn0.h || 0.3) * ti)).toFixed(3);
         else { mn.w = +Math.max(0.02, Math.min(1.5, (mn0.w || 0.6) * ti)).toFixed(3); mn.h = +Math.max(0.02, Math.min(1.5, (mn0.h || 0.6) * ti)).toFixed(3); }
+      } else if (loai[0] === 'e') {
+        const tc = th + (mn0.xoay || 0) * Math.PI / 180, dx = ev.clientX - x0, dy = ev.clientY - y0;
+        const ldx = (dx * Math.cos(tc) + dy * Math.sin(tc)) / tr.sc / f, ldy = (-dx * Math.sin(tc) + dy * Math.cos(tc)) / tr.sc / f;
+        const dau = loai === 'e_b' || loai === 'e_r' ? 1 : -1;
+        if (loai === 'e_t' || loai === 'e_b') mn.h = +Math.max(0.02, Math.min(1.5, (mn0.h == null ? 0.6 : mn0.h) + dau * 2 * ldy / cv.height)).toFixed(3);
+        else mn.w = +Math.max(0.02, Math.min(1.5, (mn0.w == null ? 0.6 : mn0.w) + dau * 2 * ldx / cv.width)).toFixed(3);
       } else if (loai === 'qu') {
         let a = (mn0.xoay || 0) + (Math.atan2(ev.clientY - tamY, ev.clientX - tamX) - a0) * 180 / Math.PI;
         if (!ev.shiftKey) { const q = Math.round(a / 15) * 15; if (Math.abs(a - q) < 3) a = q; }
@@ -5499,7 +5555,17 @@ function veTayMatNaCapNhat(ngoai, hop, k, m) {
   else Object.assign(hop.style, { left: (cx3 - w / 2) * 100 + '%', top: (cy - h / 2) * 100 + '%', width: w * 100 + '%', height: h * 100 + '%', transform: 'rotate(' + (mn.xoay || 0) + 'deg)' });
 }
 
-khoiTaoB(); khoiTaoC(); khoiTaoUI(); khoiTaoLop(); khoiTaoBang(); khoiTaoDot1(); khoiTaoDot2(); khoiTaoDot3(); khoiTaoM1(); khoiTaoM2(); khoiTaoM3(); khoiTaoN(); khoiTaoMobi(); khoiTaoCCW(); khoiTaoKho(); khoiTaoDoc(); khoiTaoGon(); khoiTaoMediaCC(); khoiTaoCC2(); khoiTaoFsBar(); khoiTaoKfGfx(); khoiTaoVanBanCC(); khoiTaoBangFont(); khoiTaoLopFx(); khoiTaoKhoTrucTuyen(); khoiTaoMediaKho(); khoiTaoMauDoHoa(); khoiTaoMatNaEl(); veTl();
+
+/* thanh trượt kiểu CapCut: tô phần bên trái theo giá trị (CSS đọc --pc) */
+function truotTo(r) { const mn = r.min === '' ? 0 : +r.min, mx = r.max === '' ? 100 : +r.max, v = +r.value; r.style.setProperty('--pc', (mx > mn ? Math.max(0, Math.min(100, (v - mn) / (mx - mn) * 100)) : 0).toFixed(1) + '%'); }
+function khoiTaoTruotTo() {
+  const box = $('#prop'); if (!box) return;
+  const quet = () => box.querySelectorAll('input[type=range]').forEach(truotTo);
+  box.addEventListener('input', e => { if (e.target.type === 'range') truotTo(e.target); }, true);
+  const vePropTt = veProp; veProp = function () { const r = vePropTt.apply(this, arguments); quet(); return r; };
+  quet();
+}
+khoiTaoB(); khoiTaoC(); khoiTaoUI(); khoiTaoLop(); khoiTaoBang(); khoiTaoDot1(); khoiTaoDot2(); khoiTaoDot3(); khoiTaoM1(); khoiTaoM2(); khoiTaoM3(); khoiTaoN(); khoiTaoMobi(); khoiTaoCCW(); khoiTaoKho(); khoiTaoDoc(); khoiTaoGon(); khoiTaoMediaCC(); khoiTaoCC2(); khoiTaoFsBar(); khoiTaoKfGfx(); khoiTaoVanBanCC(); khoiTaoBangFont(); khoiTaoLopFx(); khoiTaoKhoTrucTuyen(); khoiTaoMediaKho(); khoiTaoMauDoHoa(); khoiTaoMatNaEl(); khoiTaoTruotTo(); veTl();
 </script>
 <script src="tro-ly.js?v=202610011200"></script>
 </body>

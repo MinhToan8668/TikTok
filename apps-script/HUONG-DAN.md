@@ -700,6 +700,17 @@ Nay **tổng thời lượng = track dài nhất (V1, chữ, đồ hoạ, b-roll
 - Element được vẽ ra lớp riêng rồi khoét theo hình mặt nạ nên hoạt động chung với hoà trộn, keyframe và hiệu ứng sẵn có.
 - Hồi quy `t137`: mặt nạ khoét đúng phần, đảo ngược đúng phần bù, bảng phải đủ 7 kiểu, tay cầm hiện và kéo được, mặt nạ V1 vẫn chạy.
 
+### Bảng Thuộc tính gọn lại kiểu CapCut (10/2026)
+
+Bảng phải trước đây chữ to, hàng cao, mọi mục mở sẵn nên phải cuộn nhiều. Rà lại theo ảnh chụp CapCut:
+
+- **Cỡ chữ và hàng**: chữ 11,5px, hàng cao 26px (trước ~38px), nhãn bên trái cùng cột 82px, điều khiển dồn về phải. Ô nhập / menu cao 24px, nút nhỏ cao 24px, tiêu đề mục 11,5px.
+- **Thanh trượt mảnh như CapCut**: rãnh 3px, núm tròn trắng 11px, **phần bên trái tô màu nhấn** theo giá trị (JS đặt biến `--pc`, CSS vẽ gradient) thay vì thanh dày mặc định của trình duyệt.
+- **Mục phụ thu gọn sẵn** (Hoà trộn, Keyframe, Lật & cắt khung, Bo góc – viền – bóng, Nhoè chuyển động, Ghép nền, Bánh xe màu, HSL, Đường cong, Bám vật thể, Hình vẽ, Lớp & khớp khung) — bấm tiêu đề để mở, trạng thái được nhớ lại trong `dv_gap`. Mục chính (Biến đổi, Kiểu chữ, Mặt nạ) vẫn mở sẵn.
+- Kết quả: bảng của một đoạn V1 **vừa một màn hình**, không phải cuộn; tổng chiều cao bảng giảm ~20%.
+- **Tay cầm mặt nạ trên khung** gọn và đủ như CapCut: viền nét đứt mảnh, **chữ thập mờ ở giữa**, núm tròn trắng ở 4 cạnh để kéo riêng chiều rộng / chiều cao, núm góc để phóng đều, núm tròn dưới để xoay, núm màu nhấn phía trên trái để chỉnh mềm viền.
+- Hồi quy: các bài cũ được gieo sẵn `dv_gap` (mở hết mục) để vẫn thao tác được như trước; `t137` cập nhật theo số núm mới.
+
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 
 Cài theo [`cloudflare/CAI-DAT.md`](../cloudflare/CAI-DAT.md) (khoảng 10 phút, không cần thẻ). Có máy chủ này tool thêm:
