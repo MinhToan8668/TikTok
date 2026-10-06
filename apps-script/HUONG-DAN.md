@@ -666,6 +666,13 @@ Các tool AI đọc thêm một bản tin xu hướng ngắn do bạn duyệt, �
 - **Ô lưới nhỏ lại như CapCut**: footage 108 → 92px, hiệu ứng / bộ lọc / chuyển cảnh / mẫu chữ 86 → 72px, emoji 52 → 44px, nhãn dán động 68 → 60px, kết quả kho video và ảnh 104 → 88px, Kiểu có sẵn 46 → 42px, font của bạn 130 → 112px; chữ trong ô và nút ＋ thu nhỏ theo, nút trong ô footage cắt bằng dấu … nên không tràn.
 - **Sửa kèm**: khi lưới hiệu ứng / bộ lọc vẽ lại dưới con trỏ đứng yên (đổi tab, lọc nhóm), bản xem thử cũ bị treo và áp chồng lên khung xem. Nay xem thử tự tắt khi con trỏ sang chỗ khác, khi lưới vẽ lại, và bị khoá sau khi bấm áp thật cho tới lúc rời lưới. Kiểm thử `t134.mjs`.
 
+### Nối HyperFrames (HeyGen) và Higgsfield: làm được gì, không làm được gì (10/2026)
+
+- **HyperFrames** (`github.com/heygen-com/hyperframes`, **Apache 2.0** → dùng thương mại được): framework **Node.js ≥ 22** render HTML/CSS/animation thành MP4 bằng **Puppeteer (Chromium thật) + encoder**. Là trình render **phía máy chủ**, không phải trình sửa video trong trình duyệt. Không chạy được trên GitHub Pages (trang tĩnh) hay Cloudflare Workers gói Free (không có Chromium, giới hạn CPU); muốn chạy phải thuê máy chủ Node riêng hoặc dùng gói `aws-lambda` / `gcp-cloud-run` của họ (trả tiền theo lượt render).
+- **Đã lấy phần dùng được**: 13 chuyển cảnh WebGL trong `packages/shader-transitions` chuyển sang chuẩn gl-transitions và thêm vào `tools/kho/kho.js` → **48 chuyển cảnh kho** (Xoáy nhiễu, Cháy giấy, Lia vút, Mống mắt, Gợn nước lan, Hố đen, Zoom điện ảnh, Tách màu lệch, Lốc xoáy, Méo nhiệt, Chớp trắng xuyên, Tan biến dạng, Rò sáng). Màu nhấn trong shader đổi sang bảng màu Tự Mình Xây Kênh. Ghi nguồn giấy phép nằm ngay trong `kho.js` theo yêu cầu của Apache 2.0.
+- **Chưa lấy**: `registry/blocks` có 173 khối motion graphics, nhưng viết bằng HTML/CSS/GSAP trong khi tool vẽ trên canvas → phải viết lại từng khối, không nhập thẳng được. `@hyperframes/player` chỉ hữu ích nếu dùng luôn định dạng dự án của họ.
+- **Higgsfield** (`console.higgsfield.ai`, `docs.higgsfield.ai`): là dịch vụ **sinh ảnh / video bằng AI trả phí theo lượt**, không phải framework dựng video. Có API key, lifecycle polling / webhook nên nối vào worker được như cách đang gọi Gemini, nhưng mỗi lần tạo là tốn tiền thật và cần tài khoản riêng. Để dành khi cần tính năng "tạo cảnh bằng AI", không thay thế được phần dựng.
+
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 
 Cài theo [`cloudflare/CAI-DAT.md`](../cloudflare/CAI-DAT.md) (khoảng 10 phút, không cần thẻ). Có máy chủ này tool thêm:
