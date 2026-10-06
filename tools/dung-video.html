@@ -988,6 +988,7 @@
           <label><span>Tỉ lệ khung</span><select id="tiLe"><option value="9:16">9:16 · TikTok, Reels</option><option value="1:1">1:1 · vuông</option><option value="4:5">4:5 · Facebook, IG</option><option value="16:9">16:9 · YouTube</option><option value="4:3">4:3</option><option value="3:4">3:4</option><option value="21:9">21:9 · siêu rộng</option><option value="2.35:1">2.35:1 · điện ảnh</option><option value="1.85:1">1.85:1</option></select></label>
           <label><span>Phong cách</span><select id="phongCach"></select></label>
           <div class="row"><button class="btn nho" id="btnApPC" type="button">Áp phong cách</button><button class="btn nho" id="btnLuuPC" type="button" title="Lưu phụ đề, font, màu, chuyển cảnh, khung, bộ lọc hiện tại thành phong cách của bạn">＋ Lưu phong cách này</button></div>
+          <div class="row"><button class="btn nho ghost" id="btnChiaPC" type="button" title="Tạo link và mã của phong cách đang chọn để gửi cho team qua Zalo, Messenger">🔗 Chia sẻ</button><button class="btn nho ghost" id="btnNhapPC" type="button" title="Dán link hoặc mã phong cách người khác gửi">📥 Nhập mã</button><button class="btn nho ghost" id="btnXoaPC" type="button" title="Xoá phong cách của bạn đang chọn">Xoá</button></div>
           <label><span>Nền người nói</span><select id="nenKieu" title="Xoá nền chạy trên máy bằng AI, không tốn lượt. Hợp video một người nói trước camera."><option value="giu">Giữ nguyên</option><option value="mo">Xoá nền → nhoè</option><option value="mau">Xoá nền → màu</option><option value="toi">Xoá nền → tối</option></select></label>
           <label id="nenMauHang" hidden><span>Màu nền</span><input type="color" id="nenMau" value="#99DF00"></label>
           <div class="quota" id="nenTt" hidden></div>
@@ -3278,6 +3279,7 @@ function datTiLe(v, yen) {
 $('#tiLe').addEventListener('change', () => datTiLe($('#tiLe').value));
 /* ── phong cách (style preset): có sẵn + của bạn (lưu trên máy) ── */
 const PHONG_CACH = {
+  tmxk: { ten: '🧱 Tự Mình Xây Kênh', pdKieu: 'highlight', mau: '#99DF00', font: 'be_vietnam', pdCum: 3, chuyen: 'cat', zoomOn: true, loc: 'khong' },
   hormozi: { ten: '🔥 Podcast bùng nổ', pdKieu: 'highlight', mau: '#FFD400', font: 'anton', pdCum: 2, chuyen: 'cat', zoomOn: true, loc: 'ruc_ro' },
   vlog: { ten: '🌿 Vlog nhẹ nhàng', pdKieu: 'rise', mau: '#ffffff', font: 'lexend', pdCum: 4, chuyen: 'fade', zoomOn: false, loc: 'am' },
   tin_tuc: { ten: '📰 Tin nhanh', pdKieu: 'toi', mau: '#4bc3ff', font: 'be_vietnam', pdCum: 5, chuyen: 'wipe', zoomOn: true, loc: 'sang' },
@@ -3299,6 +3301,51 @@ function apPhongCach(k) {
 $('#btnApPC').onclick = () => { if (apPhongCach($('#phongCach').value)) toast('Đã áp phong cách ' + $('#phongCach').selectedOptions[0].textContent); };
 $('#btnLuuPC').onclick = () => { const ten = prompt('Tên phong cách', 'Phong cách của tôi'); if (!ten) return; const ds = pcCuaToi(), k = 'cua_toi_' + Date.now().toString(36); ds[k] = { ten: '⭐ ' + ten.slice(0, 40), pdKieu: $('#pdKieu').value, mau: mauNhan(), font: $('#font').value, pdCum: +$('#pdCum').value, chuyen: $('#chuyenMacDinh').value, zoomOn: $('#zoomOn').checked, loc: (P.clips[0] || {}).loc || 'khong', pdY: P.pdY, khung: $('#khungKieu').value }; ls.set('dv_phong_cach', JSON.stringify(ds)); vePhongCach(); $('#phongCach').value = k; toast('Đã lưu phong cách, dùng lại ở mọi dự án trên máy này'); };
 vePhongCach();
+/* ── chia sẻ phong cách cho cả team: mã TMXK-PC1.<base64> gửi qua Zalo, hoặc link dung-video.html#pc=<mã> mở ra là tự nhập ── */
+const PC_MA = 'TMXK-PC1.';
+const coKhoa = (o, k) => typeof k === 'string' && Object.prototype.hasOwnProperty.call(o, k);
+const coOpt = (id, v) => { const sl = $('#' + id); return !!sl && typeof v === 'string' && [...sl.options].some(o => o.value === v); };
+const b64Url = s => btoa(String.fromCharCode(...new TextEncoder().encode(s))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const tuB64Url = s => new TextDecoder().decode(Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0)));
+// dữ liệu do người khác gửi: chỉ nhận đúng các trường đã biết, sai kiểu hay ngoài giới hạn thì bỏ qua
+function lamSachPC(o) {
+  if (!o || typeof o !== 'object') return null;
+  const p = { ten: '⭐ ' + String(o.ten || 'Phong cách được chia sẻ').replace(/^⭐\s*/, '').slice(0, 40) };
+  if (coOpt('pdKieu', o.pdKieu)) p.pdKieu = o.pdKieu;
+  if (/^#[0-9a-f]{6}$/i.test(String(o.mau || ''))) p.mau = o.mau;
+  if (coKhoa(FONT_CSS, o.font)) p.font = o.font;
+  if (Number.isFinite(+o.pdCum) && +o.pdCum >= 2 && +o.pdCum <= 6) p.pdCum = Math.round(+o.pdCum);
+  if (coOpt('chuyenMacDinh', o.chuyen)) p.chuyen = o.chuyen;
+  if (typeof o.zoomOn === 'boolean') p.zoomOn = o.zoomOn;
+  if (coKhoa(LOC, o.loc)) p.loc = o.loc;
+  if (Number.isFinite(+o.pdY) && +o.pdY >= 0.15 && +o.pdY <= 0.92) p.pdY = +o.pdY;
+  if (coOpt('khungKieu', o.khung)) p.khung = o.khung;
+  return Object.keys(p).length > 1 ? p : null;
+}
+function maPC(p) { const { ten, ...gon } = p; return PC_MA + b64Url(JSON.stringify({ ten: String(ten).replace(/^⭐\s*/, ''), ...gon })); }
+function docMaPC(chu) {
+  const m = String(chu || '').match(/TMXK-PC1\.([A-Za-z0-9_-]+)/); if (!m) return null;
+  try { return lamSachPC(JSON.parse(tuB64Url(m[1]))); } catch { return null; }
+}
+function nhapPC(chu) {
+  const p = docMaPC(chu); if (!p) { toast('Mã phong cách không đúng. Nhờ người gửi bấm Chia sẻ rồi gửi lại nguyên đoạn.'); return false; }
+  const ds = pcCuaToi(), k = 'cua_toi_' + Date.now().toString(36); ds[k] = p; ls.set('dv_phong_cach', JSON.stringify(ds));
+  vePhongCach(); $('#phongCach').value = k; toast('Đã thêm ' + p.ten + '. Bấm Áp phong cách để dùng.'); return true;
+}
+async function chepChu(chu) { try { await navigator.clipboard.writeText(chu); return true; } catch { prompt('Chép đoạn này gửi cho team', chu); return false; } }
+$('#btnChiaPC').onclick = async () => {
+  const k = $('#phongCach').value, p = { ...PHONG_CACH, ...pcCuaToi() }[k]; if (!p) return;
+  const ma = maPC(p), link = location.origin + location.pathname + '#pc=' + ma.slice(PC_MA.length);
+  const tin = 'Phong cách dựng "' + p.ten.replace(/^⭐\s*/, '') + '" của TMXK.\nMở link này là có sẵn trong tool Dựng video: ' + link + '\nHoặc vào Dựng video → Nhập mã, dán mã: ' + ma;
+  if (await chepChu(tin)) toast('Đã chép link và mã. Dán vào Zalo gửi cho team là xong.');
+};
+$('#btnNhapPC').onclick = () => { const chu = prompt('Dán link hoặc mã phong cách (bắt đầu bằng TMXK-PC1.)'); if (chu) nhapPC(chu); };
+$('#btnXoaPC').onclick = () => {
+  const k = $('#phongCach').value, ds = pcCuaToi(); if (!coKhoa(ds, k)) { toast('Chỉ xoá được phong cách bạn tự lưu hoặc nhập.'); return; }
+  if (!confirm('Xoá phong cách ' + ds[k].ten + '?')) return; delete ds[k]; ls.set('dv_phong_cach', JSON.stringify(ds)); vePhongCach(); toast('Đã xoá.');
+};
+// mở bằng link chia sẻ (#pc=…): nhập luôn rồi dọn link cho gọn
+{ const m = location.hash.match(/(?:^#|&)pc=([A-Za-z0-9_-]+)/); if (m) { history.replaceState(null, '', location.pathname + location.search); setTimeout(() => nhapPC(PC_MA + m[1]), 600); } }
 /* ── phiên bản dòng thời gian & tạo nhiều short từ video dài (AutoCut) ── */
 function banChup() { return JSON.parse(JSON.stringify({ clips: P.clips, gfx: P.gfx, broll: P.broll, zoom: P.zoom, moc: P.moc, hook: $('#hook').value, tieng: tiengNhe() })); }
 function banLuuHienTai() { if (P.banDang >= 0 && P.ban[P.banDang]) Object.assign(P.ban[P.banDang], banChup()); }
