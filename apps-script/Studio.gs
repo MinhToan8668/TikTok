@@ -872,7 +872,7 @@ function studioLenh(cmd, arg, chatId, msg){
     var h2 = stHV(); h2.gia = th; P.setProperty('ST_HV', JSON.stringify(h2));
     return tgSend(chatId, '✅ Gói học viên khoá: *' + (h2.gia ? stTien(h2.gia) : 'miễn phí') + '* · ' + (h2.ngay ? h2.ngay + ' ngày' : 'suốt đời') + '. Landing cập nhật ngay lần mở sau.');
   }
-  if (cmd === 'xuhuong' && typeof xhLenh === 'function') return xhLenh(arg, chatId, hoi);   // bản tin xu hướng tuần (XuHuong.gs)
+  if (cmd === 'xuhuong' && typeof xhLenh === 'function') return xhLenh(arg, chatId, hoi, msg);   // bản tin xu hướng tuần (XuHuong.gs)
   if (cmd === 'keygemini' && typeof hookLenhKey === 'function') return hookLenhKey(arg, chatId, msg, hoi);   // thêm / xoá / xem key Gemini (HookAI.gs)
   if (cmd === 'maychu'){
     if (!arg) return hoi('☁️ Gửi link máy chủ Cloudflare Worker (dạng `https://ten.tai-khoan.workers.dev`), xem hướng dẫn cài trong `cloudflare/CAI-DAT.md`. Gửi `xoa` để tắt.' + (stMayChu() ? '\n\nHiện: `' + stMayChu() + '`' : ''));
