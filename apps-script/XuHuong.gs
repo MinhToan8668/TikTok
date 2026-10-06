@@ -175,6 +175,7 @@ function xhDuyet(text, nguon){
 function xhCallback(cb){
   var p = String(cb.data || '').split(':'), act = p[1], id = p[2];
   var chatId = cb.message.chat.id, msgId = cb.message.message_id, nhap = xhDocP('XH_NHAP'), nhan;
+  if (act === 'l'){ tgAnswer(cb.id); return XH_LENH_TAT['xh' + id] ? xhLenhTat('xh' + id, '', chatId, null) : null; }   // nút dưới /xuhuong
   if (!nhap || String(nhap.id) !== String(id)) return tgAnswer(cb.id, 'Bản nháp này đã cũ hoặc đã xử lý');
   if (act === 'ok'){ var o = xhDuyet(nhap.text, nhap.nguon); nhan = '✅ Đã duyệt · dùng tới ' + Utilities.formatDate(new Date(o.het), 'GMT+7', 'dd/MM'); }
   else if (act === 'bo'){ PropertiesService.getScriptProperties().deleteProperty('XH_NHAP'); nhan = '🗑 Đã bỏ bản nháp'; }
@@ -189,6 +190,19 @@ function xhCallback(cb){
 }
 
 /* ── 6. lệnh bot /xuhuong (Studio.gs chuyển sang) ── */
+/* Lệnh tắt trong menu bot, bấm là chạy không cần gõ chữ phía sau: /xhtao /xhsua /xhyoutube /xhrss /xhlich */
+var XH_LENH_TAT = { xhtao: 'tao', xhsua: 'sua', xhyoutube: 'youtube', xhrss: 'rss', xhlich: 'lich' };
+function xhLenhTat(cmd, arg, chatId, msg){
+  var con = XH_LENH_TAT[cmd], coThem = con === 'youtube' || con === 'rss';
+  var choLai = con === 'sua' ? 'xuhuong' : cmd;   // câu trả lời sau khi bot hỏi quay về đúng lệnh này
+  var hoi = function(cau){ datCho(chatId, choLai); return tgSend(chatId, cau + '\n\n_Đổi ý thì /huy._'); };
+  return xhLenh(coThem ? (con + ' ' + String(arg || '')).trim() : con, chatId, hoi, msg);
+}
+var XH_NUT = [
+  [{text: '🔄 Tạo bản tin mới', callback_data: 'x:l:tao'}, {text: '✏️ Tự viết / sửa', callback_data: 'x:l:sua'}],
+  [{text: '▶️ Key YouTube', callback_data: 'x:l:youtube'}, {text: '📰 Nguồn RSS', callback_data: 'x:l:rss'}],
+  [{text: '⏰ Tự chạy mỗi thứ Hai', callback_data: 'x:l:lich'}]
+];
 function xhLenh(arg, chatId, hoi, msg){
   arg = String(arg || '').trim();
   var c = CacheService.getScriptCache(), dangSua = c.get('xh_sua_' + chatId);
@@ -228,8 +242,8 @@ function xhLenh(arg, chatId, hoi, msg){
   if (nhap) d.push('', '📝 Có bản nháp ' + nhap.luc + ' đang chờ duyệt (xem lại tin nhắn có nút Duyệt).');
   d.push('', '📊 Số liệu ' + XH_NGAY_DOC + ' ngày: ' + tk.so_soi + ' lượt soi, ' + tk.so_cham + ' lượt chấm.',
     '▶️ YouTube: ' + (cfgProp('YOUTUBE_API_KEY') ? 'có key riêng' : 'chưa có key riêng, thử bằng key Gemini') + ' · 📰 RSS: ' + xhDsRss().length + ' nguồn',
-    '', 'Lệnh: `/xuhuong tao` tạo bản nháp ngay · `/xuhuong sua` tự viết hoặc sửa bản đang dùng · `/xuhuong tat` gỡ bản tin · `/xuhuong lich` bật tự chạy mỗi sáng thứ Hai · `/xuhuong youtube` key YouTube · `/xuhuong rss` nguồn RSS');
-  return tgSend(chatId, d.join('\n'));
+    '', 'Bấm nút bên dưới, hoặc chọn trong Menu: /xhtao tạo bản nháp ngay · /xhsua tự viết, sửa · /xhyoutube key YouTube · /xhrss nguồn RSS · /xhlich tự chạy thứ Hai · `/xuhuong tat` gỡ bản tin');
+  return tgSend(chatId, d.join('\n'), XH_NUT);
 }
 
 /* Lịch tự chạy mỗi thứ Hai 8 giờ sáng giờ Việt Nam. Chạy tay một lần trong Apps Script nếu bot báo chưa đặt được. */
@@ -350,7 +364,7 @@ function xhLenhYoutube(arg, chatId, hoi, msg){
     if (!r.ok) return tgSend(chatId, '❌ Chưa lấy được YouTube: ' + r.loi + '\nCài key: `/xuhuong youtube AIza...` (key Google Cloud đã bật YouTube Data API v3).');
     return tgSend(chatId, '▶️ YouTube thịnh hành Việt Nam: ' + r.so + ' video, ' + r.so_shorts + ' video ngắn.\n' + (r.shorts.length ? r.shorts : r.vids).slice(0, 8).map(function(v, i){ return (i + 1) + '. ' + v.tieu_de + ' · ' + v.kenh; }).join('\n'));
   }
-  return hoi('▶️ Gửi key Google Cloud đã bật *YouTube Data API v3* để bản tin đọc video thịnh hành Việt Nam (mỗi tuần tốn 1 đơn vị hạn mức, miễn phí). Có thể dùng chính key Gemini nếu bật API này trong cùng project.\n\n`thu` để thử lấy ngay · `tat` để xoá key. Tin chứa key sẽ được xoá khỏi chat.');
+  return hoi((cfgProp('YOUTUBE_API_KEY') ? '✅ Đang có key YouTube riêng. Gửi key mới nếu muốn thay.\n\n' : '') + '▶️ Gửi key Google Cloud đã bật *YouTube Data API v3* để bản tin đọc video thịnh hành Việt Nam (mỗi tuần tốn 1 đơn vị hạn mức, miễn phí). Có thể dùng chính key Gemini nếu bật API này trong cùng project.\n\n`thu` để thử lấy ngay · `tat` để xoá key. Tin chứa key sẽ được xoá khỏi chat.');
 }
 /* /xuhuong rss [them <link> | xoa <số> | macdinh | thu] */
 function xhLenhRss(arg, chatId, hoi){
@@ -378,6 +392,6 @@ function xhLenhRss(arg, chatId, hoi){
     return tgSend(chatId, '📰 Lấy được ' + kq.tin.length + ' tin ' + XH_NGAY_DOC + ' ngày từ ' + kq.so_nguon + ' nguồn' + (kq.loi.length ? '\n⚠️ ' + kq.loi.join('; ') : '') + '\n' + kq.tin.slice(0, 8).map(function(x, i){ return (i + 1) + '. ' + x.tieu_de; }).join('\n'));
   }
   return tgSend(chatId, ['📰 *Nguồn RSS của bản tin* · ' + ds.length + '/' + XH_RSS_TOI_DA, ''].concat(ds.map(function(u, i){ return (i + 1) + '. ' + xhTenNguon(u); })).concat(['',
-    'Thêm: `/xuhuong rss them https://...` (trang tin, blog marketing, kênh YouTube dạng `https://www.youtube.com/feeds/videos.xml?channel_id=UC...`)',
+    'Thêm: gửi /xhrss rồi dán link, hoặc `/xuhuong rss them https://...` (trang tin, blog marketing, kênh YouTube dạng `https://www.youtube.com/feeds/videos.xml?channel_id=UC...`)',
     'Xoá: `/xuhuong rss xoa 2` · Về mặc định: `/xuhuong rss macdinh` · Thử đọc: `/xuhuong rss thu`']).join('\n'));
 }
