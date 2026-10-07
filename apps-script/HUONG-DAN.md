@@ -769,6 +769,16 @@ Trước đây sau khi "Hiểu footage" thẻ tự bung ra hết cỡ (tên file
 - Tiêu đề mục 11 px, dòng ghi chú 10,5 px, ô tìm 26 px, **chip chủ đề 20 px chữ 10,5 px**, hàng hiệu ứng âm thấp hơn (icon 24 px, nút 22 px), ô "Tải lên" nhỏ lại. Emoji nhanh vẫn giữ ô 44 px.
 - Hồi quy `t134` (cỡ ô) vẫn 8/8.
 
+### Clip ghép (compound clip) như CapCut + mục Keyframe gọn (10/2026)
+
+- **Tạo:** chọn ≥ 2 element (Ctrl + bấm: chữ, sticker, đồ hoạ, mẫu dựng sẵn, ảnh phủ) → **Ctrl+G** (hoặc chuột phải → Tạo clip ghép). Chúng thành **một clip màu xanh ▣** trên dòng thời gian, kéo dời / kéo dài / keyframe (phóng to, vị trí, xoay, độ mờ) / hoà trộn như một clip bình thường. Video phủ chưa gộp được (dùng Gộp nhóm).
+- **Sửa bên trong:** **nháy đúp** vào clip (hoặc nút ✎ Sửa bên trong ở bảng phải) → dòng thời gian chuyển sang nội dung của clip ghép, có thanh xanh "◀ Quay lại" phía trên; sửa chữ, dời, kéo dài tuỳ ý rồi Quay lại — clip ghép tự dài / ngắn theo. Tự lưu và xuất khi đang ở trong vẫn ghi đúng clip ghép, không ghi nhầm phần con.
+- **Tách:** **Ctrl+Shift+G** (hoặc ⇲ Tách clip ghép) trả các element về dòng thời gian ở đúng giây cũ.
+- **Gộp nhóm** (chỉ dời cùng nhau, không thành clip) chuyển sang **Alt+G / Alt+Shift+G**; menu chuột phải ghi phím mới.
+- Mã: element `kieu: 'ghep'`, con nằm trong `con.gfx` / `con.broll` theo giây tương đối (0 = đầu clip); `veClipGhep` vẽ con qua đúng các lớp bọc keyframe / mặt nạ / mẫu của `veDoHoa`; vào trong = tạm thay `P.gfx` / `P.broll` bằng con (giây tuyệt đối), `duAnJson` / xuất được bọc để đồng bộ trước.
+- **Mục Keyframe:** bỏ đoạn diễn giải 4 bước chiếm chỗ, thay bằng biểu tượng **ⓘ** — rê chuột mới hiện hướng dẫn. Cảnh báo "đầu phát ngoài đoạn" vẫn giữ.
+- Hồi quy `t138`: tạo, vẽ, bảng phải, nháy đúp vào trong, sửa rồi Quay lại, lưu khi đang ở trong, tách, ⓘ.
+
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 
 Cài theo [`cloudflare/CAI-DAT.md`](../cloudflare/CAI-DAT.md) (khoảng 10 phút, không cần thẻ). Có máy chủ này tool thêm:
