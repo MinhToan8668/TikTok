@@ -1014,6 +1014,11 @@
   .ghepBar{display:flex;align-items:center;gap:8px;padding:4px 8px;background:rgba(79,143,224,.14);border-bottom:1px solid rgba(79,143,224,.45);font-size:11.5px}.ghepBar .ten{font-weight:700;color:var(--et)}.ghepBar .quota{margin:0}.ghepBar[hidden]{display:none}
   .ed.ghepMo .etl{box-shadow:inset 0 0 0 1.5px rgba(79,143,224,.55)}
   .kfHoi{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;border:1px solid var(--el);color:var(--em);font-size:11px;cursor:help;margin:2px 0 4px}
+  /* kéo thả vào đoạn + huy hiệu ✨ */
+  .ed .item.dropHot{outline:2px dashed var(--ea);outline-offset:-2px;filter:brightness(1.15)}
+  .ed .item .fxTag{position:absolute;top:1px;right:3px;z-index:3;font-size:10px;line-height:1;padding:2px 4px;border-radius:5px;background:rgba(0,0,0,.6);color:#fff;cursor:pointer;pointer-events:auto}
+  .ed .item .fxTag:hover{background:var(--ea);color:var(--eaInk)}
+  .ed .prop label.nhay{animation:nhayFx 1.2s ease}@keyframes nhayFx{0%,60%{box-shadow:inset 0 0 0 1px var(--ea);background:rgba(153,223,0,.12)}100%{box-shadow:none;background:transparent}}
 </style>
 </head>
 <body>
@@ -5806,7 +5811,49 @@ function khoiTaoClipGhep() {
   ['duAnJson', 'batDauXuat', 'moHopXuat', 'xacNhanXuat'].forEach(ten => { if (typeof window[ten] !== 'function') return; const cu = window[ten]; window[ten] = function () { if (!P.ghepMo) return cu.apply(this, arguments); const g = P.ghepMo.g; dongClipGhep(true); try { return cu.apply(this, arguments); } finally { if (ten === 'duAnJson') moClipGhep(g, true); } }; });
 }
 
-khoiTaoB(); khoiTaoC(); khoiTaoUI(); khoiTaoLop(); khoiTaoBang(); khoiTaoDot1(); khoiTaoDot2(); khoiTaoDot3(); khoiTaoM1(); khoiTaoM2(); khoiTaoM3(); khoiTaoN(); khoiTaoMobi(); khoiTaoCCW(); khoiTaoKho(); khoiTaoDoc(); khoiTaoGon(); khoiTaoMediaCC(); khoiTaoCC2(); khoiTaoFsBar(); khoiTaoKfGfx(); khoiTaoVanBanCC(); khoiTaoBangFont(); khoiTaoLopFx(); khoiTaoKhoTrucTuyen(); khoiTaoMediaKho(); khoiTaoMauDoHoa(); khoiTaoMatNaEl(); khoiTaoTruotTo(); khoiTaoClipGhep(); veTl();
+
+/* ═════════ KÉO THẢ NHƯ CAPCUT: hiệu ứng / bộ lọc / mẫu chữ kéo thẳng vào đoạn video (áp cho đoạn đó) hoặc xuống dòng thời gian (thành lớp / chữ mới).
+   Đoạn có hiệu ứng hiện huy hiệu ✨ ở mép trên — bấm vào là mở đúng chỗ chỉnh. ═════════ */
+function tenFxNgan(c) { const ds = []; if (c.hu2 && c.hu2 !== 'khong') ds.push('Hiệu ứng: ' + (HIEU_UNG[c.hu2] || c.hu2)); if (c.lut && P.luts && P.luts[c.lut]) ds.push('Bộ lọc: ' + P.luts[c.lut].ten); else if (c.loc && c.loc !== 'khong' && typeof LOC === 'object' && LOC[c.loc]) ds.push('Bộ lọc: ' + LOC[c.loc][0]); return ds; }
+function apFxVaoDoan(k, i, o) {
+  const m = MANG()[k][i]; if (!m) return false; luuHoanTac(); P.nhieu = []; P.chon = { k, i };
+  if (o.loai === 'bo_loc') { const id = String(o.fx).replace(/^kho:/, ''); if (typeof dangKyLutKho === 'function') dangKyLutKho(id); if (typeof apLutChon === 'function') apLutChon('kho:' + id); else m.lut = 'kho:' + id; }
+  else { m.hu2 = o.fx; if (m.huMuc == null) m.huMuc = 1; }
+  veTl(); veKhung(); veProp(); moTabProp('Điều chỉnh'); moPhaiNeuCan(); cuonToiFx();
+  toast((o.loai === 'bo_loc' ? 'Đã áp bộ lọc' : 'Đã áp hiệu ứng') + ' cho đoạn ' + (k === 'v' ? 'V1' : 'V2') + ' · bấm ✨ trên đoạn để chỉnh'); return true;
+}
+function cuonToiFx() { setTimeout(() => { const l = [...$('#propChon').querySelectorAll('label')].find(x => x.firstElementChild && /^(Hiệu ứng|LUT|Bộ lọc)$/.test(x.firstElementChild.textContent.trim())); if (l) { const n = l.closest('.nhom2'); if (n && n.classList.contains('gap')) { const c = n.querySelector('.ccHd .caret'); if (c) c.click(); } l.scrollIntoView({ block: 'center', behavior: 'smooth' }); l.classList.add('nhay'); setTimeout(() => l.classList.remove('nhay'), 1200); } }, 60); }
+function themChuTai(t, mau) {
+  const tCu = P.t; P.t = Math.max(0, +t.toFixed(2));
+  let g = null; if (mau === 'moi' || mau == null) { luuHoanTac(); g = { id: uid(), kieu: 'chu', bd: +P.t.toFixed(2), kt: +(P.t + 3).toFixed(2), text: 'Chữ của bạn', phu: '', ...GX_MD.chu }; P.gfx.push(g); P.chon = { k: 'g', i: P.gfx.length - 1 }; veTl(); veProp(); veKhung(); toast('Đã thêm chữ tại ' + fmt1(P.t) + 's'); }
+  else g = themMauChu(+mau);
+  moPhaiNeuCan(); return g;
+}
+function khoiTaoKeoTha() {
+  const tin = $('#tlIn'); if (!tin) return;
+  // thẻ mẫu chữ + nút Thêm chữ kéo được
+  const ganChu = () => { $$('#mauChu button').forEach(b => { if (b.dataset.keoChu) return; const i = MAU_CHU.findIndex(([ten]) => ten === b.title); if (i < 0) return; b.dataset.keoChu = 1; b.draggable = true; b.addEventListener('dragstart', e => { e.dataTransfer.setData('text/plain', JSON.stringify({ chu: i })); e.dataTransfer.effectAllowed = 'copy'; }); });
+    ['#btnThemChu', '.theChuMacDinh'].forEach(s => $$(s).forEach(b => { if (b.dataset.keoChu) return; b.dataset.keoChu = 1; b.draggable = true; b.title = (b.title ? b.title + ' · ' : '') + 'kéo thả xuống dòng thời gian cũng được'; b.addEventListener('dragstart', e => { e.dataTransfer.setData('text/plain', JSON.stringify({ chu: 'moi' })); e.dataTransfer.effectAllowed = 'copy'; }); })); };
+  ganChu(); const mc = $('#mauChu'); if (mc) new MutationObserver(ganChu).observe(mc, { childList: true }); const cp = $('[data-pane="chu"]'); if (cp) new MutationObserver(ganChu).observe(cp, { childList: true, subtree: true });
+  // rê qua đoạn nào thì đoạn đó sáng viền
+  let hot = null; const boHot = () => { if (hot) { hot.classList.remove('dropHot'); hot = null; } };
+  tin.addEventListener('dragover', e => { const it = e.target.closest('.item[data-k="v"],.item[data-k="b"]'); if (it !== hot) { boHot(); if (it) { it.classList.add('dropHot'); hot = it; } } });
+  tin.addEventListener('dragleave', e => { if (!tin.contains(e.relatedTarget)) boHot(); });
+  // thả: vào đoạn → áp cho đoạn; vào chỗ trống → lớp hiệu ứng / chữ mới tại giây đó
+  /* bắt ở phần tử cha (capture) để chạy TRƯỚC bộ xử lý thả-thành-lớp đã gắn trên #tlIn */
+  (tin.parentElement || document).addEventListener('drop', e => {
+    if (!tin.contains(e.target)) return; let o = null; try { o = JSON.parse(e.dataTransfer.getData('text/plain')); } catch { } if (!o) { boHot(); return; }
+    const it = e.target.closest('.item[data-k="v"],.item[data-k="b"]'), r = tin.getBoundingClientRect(), t = Math.max(0, (e.clientX - r.left - LB) / PX()); boHot();
+    if (o.fx && it) { e.preventDefault(); e.stopImmediatePropagation(); apFxVaoDoan(it.dataset.k, +it.dataset.i, o); return; }
+    if (o.chu != null) { e.preventDefault(); e.stopImmediatePropagation(); themChuTai(t, o.chu); return; }
+  }, true);
+  // huy hiệu ✨ ở mép trên đoạn có hiệu ứng / bộ lọc
+  const veTlFx = veTl; veTl = function () { const r = veTlFx.apply(this, arguments); try { $$('#tlIn .item[data-k="v"],#tlIn .item[data-k="b"]').forEach(it => { const m = MANG()[it.dataset.k][+it.dataset.i]; if (!m) return; const ds = tenFxNgan(m); if (!ds.length) return; const tag = el('i', 'fxTag', '✨'); tag.title = ds.join(' · ') + ' — bấm để chỉnh'; it.appendChild(tag); }); } catch { } return r; };
+  tin.addEventListener('pointerdown', e => { const tag = e.target.closest('.fxTag'); if (!tag) return; e.preventDefault(); e.stopPropagation(); const it = tag.closest('.item'); P.nhieu = []; P.chon = { k: it.dataset.k, i: +it.dataset.i }; chonHien && chonHien(); veProp(); moTabProp('Điều chỉnh'); moPhaiNeuCan(); cuonToiFx(); }, true);
+  tin.addEventListener('click', e => { if (e.target.closest('.fxTag')) { e.preventDefault(); e.stopPropagation(); } }, true);
+}
+
+khoiTaoB(); khoiTaoC(); khoiTaoUI(); khoiTaoLop(); khoiTaoBang(); khoiTaoDot1(); khoiTaoDot2(); khoiTaoDot3(); khoiTaoM1(); khoiTaoM2(); khoiTaoM3(); khoiTaoN(); khoiTaoMobi(); khoiTaoCCW(); khoiTaoKho(); khoiTaoDoc(); khoiTaoGon(); khoiTaoMediaCC(); khoiTaoCC2(); khoiTaoFsBar(); khoiTaoKfGfx(); khoiTaoVanBanCC(); khoiTaoBangFont(); khoiTaoLopFx(); khoiTaoKhoTrucTuyen(); khoiTaoMediaKho(); khoiTaoMauDoHoa(); khoiTaoMatNaEl(); khoiTaoTruotTo(); khoiTaoClipGhep(); khoiTaoKeoTha(); veTl();
 </script>
 <script src="tro-ly.js?v=202610011200"></script>
 </body>

@@ -779,6 +779,15 @@ Trước đây sau khi "Hiểu footage" thẻ tự bung ra hết cỡ (tên file
 - **Mục Keyframe:** bỏ đoạn diễn giải 4 bước chiếm chỗ, thay bằng biểu tượng **ⓘ** — rê chuột mới hiện hướng dẫn. Cảnh báo "đầu phát ngoài đoạn" vẫn giữ.
 - Hồi quy `t138`: tạo, vẽ, bảng phải, nháy đúp vào trong, sửa rồi Quay lại, lưu khi đang ở trong, tách, ⓘ.
 
+### Kéo thả hiệu ứng / bộ lọc / mẫu chữ như CapCut (10/2026)
+
+- **Thả thẳng vào đoạn video** (V1 hoặc V2): rê hiệu ứng / bộ lọc từ tab Hiệu ứng, Bộ lọc lên đoạn — đoạn sáng viền nét đứt — thả là **áp cho riêng đoạn đó** (hiệu ứng → `hu2`, bộ lọc kho → LUT của đoạn), tự chọn đoạn, mở tab *Điều chỉnh* và cuộn tới hàng Hiệu ứng / LUT (nháy sáng).
+- **Thả xuống chỗ trống** trên dòng thời gian: vẫn thành **lớp hiệu ứng** áp cho mọi thứ bên dưới (như trước).
+- **Huy hiệu ✨ ở mép trên đoạn** có hiệu ứng / bộ lọc; rê chuột thấy tên, **bấm vào là mở đúng chỗ chỉnh** (cường độ, đổi hiệu ứng, LUT).
+- **Mẫu chữ** (tab Văn bản) và nút *Thêm chữ* **kéo được**: thả xuống dòng thời gian → chữ mới ngay tại giây thả, đúng kiểu mẫu.
+- Mã: `khoiTaoKeoTha` — bộ xử lý `drop` gắn ở phần tử cha (capture) để chạy trước bộ thả-thành-lớp; `apFxVaoDoan`, `themChuTai`, `tenFxNgan`; `veTl` được bọc để gắn `.fxTag`.
+- Hồi quy `t139` (8/8).
+
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 
 Cài theo [`cloudflare/CAI-DAT.md`](../cloudflare/CAI-DAT.md) (khoảng 10 phút, không cần thẻ). Có máy chủ này tool thêm:
