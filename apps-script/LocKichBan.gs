@@ -78,7 +78,7 @@ function locChuanKq(d, cau, soMuon, khungPhan, dangHop, giayKhung){
   var chu = function(x, n){ return String(x == null ? '' : x).trim().slice(0, n); };
   var videos = (Array.isArray(d.videos) ? d.videos : []).map(function(v){
     v = v || {};
-    var khung = khungPhan[v.khung] ? String(v.khung) : 'tudo', tenPhan = khungPhan[khung];
+    var khung = Array.isArray(khungPhan[v.khung]) ? String(v.khung) : 'tudo', tenPhan = Array.isArray(khungPhan[khung]) ? khungPhan[khung] : [];
     var ct = Array.isArray(v.cau_truc) ? v.cau_truc : [];
     // ép đúng số phần và đúng tên theo khung (AI lệch tên cũng không làm hỏng việc đổ vào khung)
     var cauTruc = tenPhan.map(function(ten, i){
