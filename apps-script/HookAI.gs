@@ -135,6 +135,8 @@ function jobKq(b){
   var c = CacheService.getScriptCache(), m = null;
   try{ m = JSON.parse(c.get(jobKhoa(id)) || 'null'); }catch(e){}
   if (!m) return jsonOut({ok:false, error:'khong_thay'});
+  // Apps Script dừng mọi lượt chạy quá 6 phút mà không kịp ghi kết quả: quá 6,5 phút còn "đang chạy" là đã bị dừng
+  if (m.dang && Date.now() - m.t > 390000) return jsonOut({ok:false, error:'may_chu_dung', giay: Math.round((Date.now() - m.t) / 1000)});
   if (m.dang) return jsonOut({ok:false, error:'dang_chay', giay: Math.round((Date.now() - m.t) / 1000)});
   var ks = []; for (var i = 0; i < m.n; i++) ks.push(jobKhoa(id) + '_' + i);
   var all = c.getAll(ks), chu = ks.map(function(k){ return all[k] || '' }).join('');

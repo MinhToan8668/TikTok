@@ -156,7 +156,7 @@ function locGopYText(gy){
 
 /* ── mode:'loc_srt' ── */
 function locSrt(b, ai, provider, key){
-  var me = ai.me;
+  var me = ai.me, T0 = Date.now();
   var cau = locChuanCau(b.cau);
   if (cau.length < 5) return jsonOut({ok:false, error:'thieu_text'});
   var soMuon = Math.max(0, Math.min(LOC_TOI_DA_VIDEO, parseInt(b.so_video, 10) || 0));   // 0 = để AI gợi ý
@@ -235,7 +235,9 @@ function locSrt(b, ai, provider, key){
     cau_dat:{ type:'array', items:{ type:'object', properties:{ giay:{type:'number'}, cau:{type:'string'}, vi_sao:{type:'string'} }, required:['cau'] } }
   } };
 
-  var kq = provider === 'claude' ? goiClaude(key, '', prompt, schema, 30000, 0.4) : goiGemini(key, '', prompt, schema, 30000, null, 0.4);
+  // Apps Script dừng lượt chạy quá 6 phút (không kịp hoàn lượt): model flash, suy nghĩ ít, không bắt đầu lần thử mới sau ~2,5 phút
+  HOOK_MODEL_UU_TIEN = ['gemini-3.5-flash', 'gemini-2.5-flash', 'gemini-flash-latest']; HOOK_SUY_NGHI = 'low';
+  var kq = provider === 'claude' ? goiClaude(key, '', prompt, schema, 20000, 0.4) : goiGemini(key, '', prompt, schema, 20000, null, 0.4, T0 + 200000);
   var nhan = '[loc_srt] ' + Math.round(tongGiay / 60) + 'p ' + cau.length + ' câu · ' + (soMuon || 'auto') + ' video · ' + kieu;
   if (!kq.ok){
     hookHoan(ai);
