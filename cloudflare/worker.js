@@ -157,7 +157,7 @@ async function timBroll(url, env, ctx) {
   if (!coKho(env)) return { ok: false, error: 'chua_co_kho' };
   const q = String(url.searchParams.get('q') || '').trim().slice(0, 100); if (!q) return { ok: false, error: 'thieu_q' };
   const doc = url.searchParams.get('huong') !== 'ngang', trang = Math.max(1, Math.min(5, +url.searchParams.get('trang') || 1)), anh = url.searchParams.get('loai') === 'anh';
-  const khoa = `broll3:${anh ? 'a' : 'v'}:${doc ? 'd' : 'n'}:${trang}:${q.toLowerCase()}`;
+  const khoa = `broll4:${anh ? 'a' : 'v'}:${doc ? 'd' : 'n'}:${trang}:${q.toLowerCase()}`;
   const cache = globalThis.caches && caches.default, cKey = cache && new Request('https://cache.viral-studio/' + encodeURIComponent(khoa));
   if (cache) { const c = await cache.match(cKey); if (c) return c.json(); }
   // Pixabay: không có lọc hướng cho video → lấy nhiều rồi lọc dọc/ngang; tìm được tiếng Việt (lang=vi)
