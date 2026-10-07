@@ -37,7 +37,7 @@ const TTS_MODELS = ['gemini-3.8-flash-lite-tts', 'gemini-3.8-flash-tts', 'gemini
 const TTS_GIONG = { nu_am: 'Kore', nu_tre: 'Leda', nu_diu: 'Aoede', nu_sang: 'Zephyr', nam_tram: 'Charon', nam_tre: 'Puck', nam_am: 'Orus', nam_manh: 'Fenrir' };
 /* CDN được tải hộ: chỉ tên miền chứa file của các nền tảng, để máy chủ không thành proxy mở */
 const HOST_TAI = /(^|\.)(pixabay\.com|tiktokcdn(-us|-eu)?\.com|tiktokcdn-us\.com|tikwm\.com|byteoversea\.com|ibyteimg\.com|byteimg\.com|douyinvod\.com|douyinpic\.com|douyinstatic\.com|twimg\.com|fxtwitter\.com|cdninstagram\.com|fbcdn\.net|bsky\.app|bsky\.network|pexels\.com|ytimg\.com|googlevideo\.com|xhscdn\.com|akamaized\.net|redd\.it|redditmedia\.com|pinimg\.com|vimeocdn\.com|threads\.net|giphy\.com|tenor\.com|freesound\.org|gstatic\.com|googleusercontent\.com|jamendo\.com|wikimedia\.org|ccmixter\.org|openverse\.org)$/i;
-const HOST_MEDIA = /(^|\.)(pexels\.com|pixabay\.com)$/i;
+const HOST_MEDIA = /(^|\.)(pexels\.com|pixabay\.com|openverse\.org|staticflickr\.com|wikimedia\.org|rawpixel\.com|stocksnap\.io|nappy\.co|wp\.com|wordpress\.com|europeana\.eu|nasa\.gov|si\.edu|geograph\.org\.uk|wixmp\.com|digitaltmuseum\.org|museumsvictoria\.com\.au)$/i;   // ảnh Openverse nằm rải ở Flickr, Wikimedia, bảo tàng…
 
 export default {
   async fetch(req, env, ctx) {
@@ -174,6 +174,12 @@ async function timBroll(url, env, ctx) {
     const r = await fetch('https://api.pexels.com/v1/search?' + p, { headers: { authorization: env.PEXELS_KEY } }); if (!r.ok) throw new Error('pexels ' + r.status);
     return ((await r.json()).photos || []).map(h => ({ id: 'pxi' + h.id, anh: true, giay: 0, w: h.width, h: h.height, thumb: (h.src || {}).medium, link: (h.src || {}).large2x || (h.src || {}).large, goc: h.url, tac_gia: (h.photographer || 'Pexels') + ' · Pexels' }));
   };
+  // Openverse (không cần key, CC/PD dùng thương mại): nguồn ảnh dự phòng khi Pixabay bị 429 vì IP chung của Cloudflare
+  const openverseAnh = async (query) => {
+    const p = new URLSearchParams({ q: query.slice(0, 100), license_type: 'commercial', aspect_ratio: doc ? 'tall' : 'wide', page_size: '20', page: String(trang), mature: 'false' });
+    const r = await fetchLai('https://api.openverse.org/v1/images/?' + p, { headers: { 'user-agent': UA } }); if (!r.ok) throw new Error('openverse ' + r.status);
+    return ((await r.json()).results || []).filter(h => h.url && h.thumbnail && /\.(jpe?g|png|webp)(\?|$)/i.test(h.url)).map(h => ({ id: 'ov' + String(h.id).slice(0, 8), anh: true, giay: 0, w: h.width || (doc ? 1000 : 1600), h: h.height || (doc ? 1600 : 1000), thumb: h.thumbnail, link: h.url, goc: h.foreign_landing_url, tac_gia: (h.creator || h.source || 'Openverse') + ' · ' + String(h.license || 'cc').toUpperCase() + ' · Openverse' }));
+  };
   const pixabay = async (query, vi) => {
     if (anh) return pixabayAnh(query, vi);
     if (!env.PIXABAY_KEY) return [];
@@ -199,8 +205,9 @@ async function timBroll(url, env, ctx) {
   const hopHuong = it => doc ? it.h >= it.w : it.w > it.h;
   // nguồn nào lỗi (429 quá tải, 400, mạng) thì ghi lại để trả về cho trang báo đúng lý do — trước đây lỗi bị nuốt thành "không có kết quả" rồi còn cache 24h
   const loi = [];
-  const tim = async (query, vi) => { const kq = await Promise.allSettled([pexels(query, vi), pixabay(query, vi)]); kq.forEach(x => { if (x.status === 'rejected') loi.push(String((x.reason && x.reason.message) || x.reason).slice(0, 120)); }); return kq.flatMap(x => x.status === 'fulfilled' ? x.value : []); };
+  const tim = async (query, vi) => { const kq = await Promise.allSettled([pexels(query, vi), pixabay(query, vi), anh && !vi ? openverseAnh(query) : Promise.resolve([])]); kq.forEach(x => { if (x.status === 'rejected') loi.push(String((x.reason && x.reason.message) || x.reason).slice(0, 120)); }); return kq.flatMap(x => x.status === 'fulfilled' ? x.value : []); };
   let vids = (await tim(q, true)).filter(hopHuong), tuKhoa = q;
+  if (vids.length < 6 && anh && !dsKey(env).length) { const co = new Set(vids.map(v => v.id)); vids = vids.concat((await tim(q, false)).filter(v => hopHuong(v) && !co.has(v.id))); }
   if (vids.length < 6 && dsKey(env).length) {
     try {
       const j = await goiGemini(env, 'gemini-3.5-flash-lite', { contents: [{ parts: [{ text: 'Dịch cụm tìm kiếm stock video sau sang 2–4 từ khoá tiếng Anh ngắn gọn, chỉ trả về từ khoá, không giải thích: ' + q }] }], generationConfig: { maxOutputTokens: 30, temperature: 0.2 } });
@@ -209,7 +216,7 @@ async function timBroll(url, env, ctx) {
     } catch { }
   }
   const items = vids.slice(0, 18).map(({ link, ...it }) => ({ ...it, url: `/media?u=${encodeURIComponent(link)}` }));
-  const nguon = [env.PIXABAY_KEY && 'Pixabay', env.PEXELS_KEY && 'Pexels'].filter(Boolean).join(' + ');
+  const nguon = [env.PIXABAY_KEY && 'Pixabay', env.PEXELS_KEY && 'Pexels', anh && 'Openverse'].filter(Boolean).join(' + ');
   const kq = { ok: true, items, tu_khoa: tuKhoa, nguon: nguon + ' · miễn phí dùng thương mại' }; if (loi.length) kq.loi = loi;
   if (cache && ctx && (items.length || !loi.length)) ctx.waitUntil(cache.put(cKey, new Response(JSON.stringify(kq), { headers: { 'content-type': 'application/json', 'cache-control': 'public, max-age=86400' } })));   // Pixabay yêu cầu cache 24h; kết quả rỗng do nguồn lỗi thì không cache
   return kq;
