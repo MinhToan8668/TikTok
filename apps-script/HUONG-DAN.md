@@ -771,7 +771,7 @@ Trước đây sau khi "Hiểu footage" thẻ tự bung ra hết cỡ (tên file
 
 ### Clip ghép (compound clip) như CapCut + mục Keyframe gọn (10/2026)
 
-- **Tạo:** chọn ≥ 2 element (Ctrl + bấm: chữ, sticker, đồ hoạ, mẫu dựng sẵn, ảnh phủ) → **Ctrl+G** (hoặc chuột phải → Tạo clip ghép). Chúng thành **một clip màu xanh ▣** trên dòng thời gian, kéo dời / kéo dài / keyframe (phóng to, vị trí, xoay, độ mờ) / hoà trộn như một clip bình thường. Video phủ chưa gộp được (dùng Gộp nhóm).
+- **Tạo:** chọn 1 hay nhiều element (Ctrl + bấm: chữ, sticker, đồ hoạ, mẫu dựng sẵn, **video / ảnh phủ V2**) → **Ctrl+G** (hoặc chuột phải → Tạo clip ghép). Như CapCut, **một element cũng tạo được**. Chúng thành **một clip màu xanh ▣** trên dòng thời gian, kéo dời / kéo dài / keyframe (phóng to, vị trí, xoay, độ mờ) / hoà trộn như một clip bình thường. Video phủ bên trong vẫn tua theo đầu phát và chạy khi phát (`ghepTuaVideo` / `ghepPhatVideo`). Đoạn V1 là track chính nên không gộp.
 - **Sửa bên trong:** **nháy đúp** vào clip (hoặc nút ✎ Sửa bên trong ở bảng phải) → dòng thời gian chuyển sang nội dung của clip ghép, có thanh xanh "◀ Quay lại" phía trên; sửa chữ, dời, kéo dài tuỳ ý rồi Quay lại — clip ghép tự dài / ngắn theo. Tự lưu và xuất khi đang ở trong vẫn ghi đúng clip ghép, không ghi nhầm phần con.
 - **Tách:** **Ctrl+Shift+G** (hoặc ⇲ Tách clip ghép) trả các element về dòng thời gian ở đúng giây cũ.
 - **Gộp nhóm** (chỉ dời cùng nhau, không thành clip) chuyển sang **Alt+G / Alt+Shift+G**; menu chuột phải ghi phím mới.

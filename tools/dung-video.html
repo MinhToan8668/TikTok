@@ -2066,6 +2066,7 @@ async function veKhung() {
   const { clip, tSrc } = viTri(P.t);
   if (clip >= 0) { const s = srcCua(P.clips[clip].src); if (s && s.el && s.loai === 'video' && !P.dang) await seekTo(s.el, tSrc); }
   for (const b of P.broll) { const dai = b.kt - b.bd; if (P.t >= b.t_bd && P.t < b.t_bd + dai) { const sb = srcCua(b.src); if (sb && sb.loai === 'video' && !P.dang) await seekTo(elPhu(sb, 'elB'), b.bd + (P.t - b.t_bd)); } }
+  if (!P.dang && typeof ghepTuaVideo === 'function') await ghepTuaVideo();
   let snap = null; const ch = chuyenTai(P.t); if (ch && !P.dang) { await gltNap(); snap = await laySnapTruoc(cv.width, cv.height, ch.truoc); }
   veFrame(cx, cv.width, cv.height, P.t, snap); veTay();
   $('#seek').value = Math.round(P.t * 100); datTg(tongGiay()); $('#tg2').innerHTML = fmtF(P.t) + ' <small>/ ' + fmt(tongGiay()) + '</small>'; vePh();
@@ -2116,6 +2117,7 @@ async function phat(xuat) {
     if ((bNay && bNay.id) !== (brollDang && brollDang.id)) { if (brollDang) { const sb0 = srcCua(brollDang.src); if (sb0 && sb0.elB) { try { sb0.elB.pause(); } catch {} } } brollDang = bNay; if (bNay) { const sb = srcCua(bNay.src); if (sb && sb.loai === 'video') { const eb = elPhu(sb, 'elB'); await seekTo(eb, bNay.bd + (P.t - bNay.t_bd)); try { await eb.play(); } catch {} } } }
     const c = P.clips[cur] || { bd: 0, kt: 0, src: null }, s = srcCua(c.src);
     if (v && !v.paused && !v.ended) P.t = bdTl + tlTuSrc(c, v.currentTime - c.bd); else P.t = tlLuc + (performance.now() - batDau) / 1000;
+    if (typeof ghepPhatVideo === 'function') ghepPhatVideo();
     if (v && (c.cong || (P.tocPhat || 1) !== 1)) { try { const r = Math.max(0.0625, Math.min(16, tocTai(c, P.t - bdTl) * (xuat ? 1 : (P.tocPhat || 1)))); if (Math.abs(v.playbackRate - r) > 0.01) v.playbackRate = r; } catch { } }   // đường cong tốc độ / tua J-K-L
     if (!xuat && P.lap && P.t >= Math.min(tong, P.ra == null ? tong : P.ra) - 0.03) { xong(); P.t = P.vao || 0; setTimeout(() => phat(false), 30); return; }   // phát lặp trong vùng In–Out
     // A2 lồng tiếng: phát đúng chỗ, tiếng gốc video hạ còn 25% khi có lồng tiếng
@@ -5730,9 +5732,10 @@ function laGhep(m) { return !!(m && m.kieu === 'ghep'); }
 function conGhep(g) { if (!g.con) g.con = { gfx: [], broll: [] }; g.con.gfx = g.con.gfx || []; g.con.broll = g.con.broll || []; return g.con; }
 function taoClipGhep() {
   if (P.ghepMo) { toast('Đang ở trong một clip ghép — bấm Quay lại trước'); return; }
-  const ds = dsNhieu().filter(o => o.k === 'g' || o.k === 'b');
-  if (ds.length < 2) { toast('Chọn ít nhất 2 element (Ctrl + bấm) rồi nhấn Ctrl+G để tạo clip ghép'); return; }
-  const video = ds.find(o => o.k === 'b' && (srcCua(o.m.src) || {}).loai === 'video'); if (video) { toast('Clip ghép hiện chỉ gộp chữ, sticker, đồ hoạ và ảnh phủ — video phủ thì dùng Gộp nhóm (Alt+G)'); return; }
+  let ds = dsNhieu().filter(o => o.k === 'g' || o.k === 'b');
+  if (!ds.length && P.chon && (P.chon.k === 'g' || P.chon.k === 'b') && mucChon()) ds = [{ k: P.chon.k, m: mucChon() }];   /* như CapCut: 1 element cũng tạo được */
+  if (!ds.length) { toast(P.chon && P.chon.k === 'v' ? 'Clip ghép gộp các element phủ (chữ, sticker, đồ hoạ, video / ảnh phủ V2). Đoạn V1 là track chính nên không gộp.' : 'Chọn element (chữ, sticker, đồ hoạ, video / ảnh phủ) rồi nhấn Ctrl+G'); return; }
+  if (ds.some(o => laGhep(o.m)) && ds.length === 1) { toast('Mục này đã là clip ghép — nháy đúp để sửa bên trong'); return; }
   luuHoanTac();
   const bd = Math.min(...ds.map(o => batDauMuc(o.k, o.m))), kt = Math.max(...ds.map(o => batDauMuc(o.k, o.m) + daiMuc(o.k, o.m)));
   const con = { gfx: [], broll: [] }; let lop = null;
@@ -5782,6 +5785,10 @@ function veClipGhep(ctx, W, H, g, t) {
     .forEach(o => { if (o.k === 'b') veMotBroll(ctx, W, H, tl, o.m); else if (!o.m.an && tl >= o.m.bd && tl < o.m.kt) { const bl = o.m.blend && BLEND[o.m.blend]; if (bl) { ctx.save(); ctx.globalCompositeOperation = bl[1]; } veDoHoa(ctx, W, H, o.m, tl); if (bl) ctx.restore(); } });
   ctx.restore();
 }
+/* video phủ nằm trong clip ghép: tua theo đầu phát khi đứng; khi phát thì bật / tắt đúng lúc */
+function ghepVideoCon() { const out = []; (P.gfx || []).forEach(g => { if (!laGhep(g)) return; conGhep(g).broll.forEach(c => { const sb = srcCua(c.src); if (sb && sb.loai === 'video' && sb.el) out.push({ g, c, sb }); }); }); return out; }
+async function ghepTuaVideo() { for (const { g, c, sb } of ghepVideoCon()) { const tl = P.t - g.bd, dai = (c.kt - c.bd) / tocC(c); if (P.t < g.bd || P.t >= g.kt || tl < c.t_bd || tl >= c.t_bd + dai) continue; try { await seekTo(elPhu(sb, 'elB'), c.bd + (tl - c.t_bd) * tocC(c)); } catch { } } }
+function ghepPhatVideo() { ghepVideoCon().forEach(({ g, c, sb }) => { const eb = elPhu(sb, 'elB'); if (!eb) return; const tl = P.t - g.bd, dai = (c.kt - c.bd) / tocC(c), trong = P.t >= g.bd && P.t < g.kt && tl >= c.t_bd && tl < c.t_bd + dai; if (!trong) { if (!eb.paused) { try { eb.pause(); } catch { } } return; } const muon = c.bd + (tl - c.t_bd) * tocC(c); if (eb.paused || Math.abs(eb.currentTime - muon) > 0.35) { try { eb.currentTime = muon; eb.muted = true; eb.play().catch(() => { }); } catch { } } }); }
 function veThuocTinhGhep(box, g) {
   const con = conGhep(g), n = el('div', 'nhom2'); n.appendChild(el('b', null, 'Clip ghép')); box.appendChild(n);
   const lt = el('label', 'full'); lt.appendChild(el('span', null, 'Tên clip')); const it = el('input'); it.type = 'text'; it.value = g.ten || ''; it.oninput = () => { g.ten = it.value; veTl(); }; lt.appendChild(it); n.appendChild(lt);
