@@ -3683,11 +3683,11 @@ async function khoTim() {
   const q = $('#khoQ').value.trim(); if (!q) { $('#khoQ').focus(); return; }
   $('#khoTt').textContent = 'Đang tìm “' + q + '”…'; $('#khoKq').innerHTML = '';
   try {
-    const r = await fetch(MC.url + '/broll?q=' + encodeURIComponent(q) + '&huong=' + $('#khoHuong').value); const j = await r.json();
+    const j = await timKho(q, false, $('#khoHuong').value);
     if (!j.ok) { $('#khoTt').textContent = j.error === 'chua_co_kho' || j.error === 'chua_co_pexels' ? 'Máy chủ chưa có key kho video (PIXABAY_KEY, mentor thêm ở Cloudflare).' : 'Kho chưa trả lời, thử lại.'; return; }
     if (!j.items.length) { $('#khoTt').textContent = j.loi && j.loi.length ? 'Kho báo lỗi: ' + j.loi.join(' · ') + ' — thử lại sau một lát.' : 'Không có video hợp “' + q + '”, thử từ khác ngắn hơn.'; return; }
     j.items.forEach(it => { const b = el('button'); b.type = 'button'; b.title = 'Thêm vào footage · ' + it.tac_gia + ' · ' + fmt1(it.giay) + 's'; const im = el('img'); im.src = it.thumb; im.alt = ''; im.loading = 'lazy'; b.appendChild(im); b.appendChild(el('span', null, fmt1(it.giay) + 's · ' + it.tac_gia)); b.onclick = () => themBroll(it, q, b); $('#khoKq').appendChild(b); });
-    $('#khoTt').textContent = j.items.length + ' video' + (j.tu_khoa && j.tu_khoa !== q ? ' · tìm bằng “' + j.tu_khoa + '”' : '') + ' · ' + (j.nguon || 'kho miễn phí') + '. Bấm để thêm vào footage, rồi kéo cảnh vào V2.';
+    $('#khoTt').textContent = j.items.length + ' video' + (j.tu_khoa && j.tu_khoa !== q ? ' · tìm bằng “' + j.tu_khoa + '”' : '') + ' · ' + (j.nguon || 'kho miễn phí') + (j.truc_tiep ? ' · gọi thẳng' : '') + '. Bấm để thêm vào footage, rồi kéo cảnh vào V2.';
   } catch (e) { $('#khoTt').textContent = 'Không gọi được máy chủ B-roll.'; }
 }
 async function themBroll(it, q, nut) {
@@ -5382,11 +5382,11 @@ function moMediaMuc(id) { const pane = $('[data-pane="footage"]'); if (!pane || 
 async function khoTimAnh() {
   const q = ($('#khoAnhQ').value || '').trim(); if (!q) { $('#khoAnhQ').focus(); return; } const tt = $('#khoAnhTt'), kq = $('#khoAnhKq'); tt.textContent = 'Đang tìm ảnh “' + q + '”…'; kq.innerHTML = '';
   try {
-    const r = await fetch(MC.url + '/broll?loai=anh&q=' + encodeURIComponent(q) + '&huong=' + $('#khoAnhHuong').value); const j = await r.json();
+    const j = await timKho(q, true, $('#khoAnhHuong').value);
     if (!j.ok) { tt.textContent = 'Máy chủ chưa có key kho ảnh (PIXABAY_KEY hoặc PEXELS_KEY).'; return; }
     if (!j.items.length) { tt.textContent = j.loi && j.loi.length ? 'Kho báo lỗi: ' + j.loi.join(' · ') + ' — thử lại sau một lát.' : 'Không có ảnh hợp “' + q + '”, thử từ khác.'; return; }
     j.items.forEach(it => { const b = el('button'); b.type = 'button'; b.title = 'Thêm vào footage · ' + it.tac_gia; const im = el('img'); im.src = it.thumb; im.alt = ''; im.loading = 'lazy'; b.appendChild(im); b.appendChild(el('span', null, it.tac_gia)); b.onclick = () => themBrollAnh(it, q, b); kq.appendChild(b); });
-    tt.textContent = j.items.length + ' ảnh' + (j.tu_khoa && j.tu_khoa !== q ? ' · tìm bằng “' + j.tu_khoa + '”' : '') + ' · ' + (j.nguon || 'kho miễn phí') + '. Bấm để thêm vào footage (đoạn ảnh 5 giây, kéo dài tuỳ ý).';
+    tt.textContent = j.items.length + ' ảnh' + (j.tu_khoa && j.tu_khoa !== q ? ' · tìm bằng “' + j.tu_khoa + '”' : '') + ' · ' + (j.nguon || 'kho miễn phí') + (j.truc_tiep ? ' · gọi thẳng' : '') + '. Bấm để thêm vào footage (đoạn ảnh 5 giây, kéo dài tuỳ ý).';
   } catch (e) { tt.textContent = 'Không gọi được máy chủ kho ảnh.'; }
 }
 async function themBrollAnh(it, q, nut) {
@@ -5607,6 +5607,47 @@ function khoiTaoTruotTo() {
   box.addEventListener('input', e => { if (e.target.type === 'range') truotTo(e.target); }, true);
   const vePropTt = veProp; veProp = function () { const r = vePropTt.apply(this, arguments); quet(); return r; };
   quet();
+}
+
+/* ═════════ KHO PIXABAY GỌI THẲNG TỪ TRÌNH DUYỆT: mỗi học viên dùng IP riêng (100 lượt/phút) nên không dính 429 của IP chung Cloudflare.
+   Key chỉ phát cho trang của khoá khi đã đăng nhập (/kho-key). Không được / ít kết quả thì rơi về worker (dịch từ khoá bằng AI + Openverse). ═════════ */
+async function khoKey() {
+  if (P._khoKey !== undefined) return P._khoKey;
+  try { const c = sessionStorage.getItem('dv_khoKey'); if (c) { P._khoKey = c; return c; } } catch { }
+  P._khoKey = '';
+  try { if (MC.url && MC.dich_vu.kho_truc_tiep && TK.token()) { const r = await fetch(MC.url + '/kho-key?token=' + encodeURIComponent(TK.token())); const j = await r.json(); if (j.ok && j.pixabay) { P._khoKey = j.pixabay; try { sessionStorage.setItem('dv_khoKey', j.pixabay); } catch { } } } } catch { }
+  return P._khoKey;
+}
+async function pixabayTrucTiep(q, anh, doc, trang) {
+  const key = await khoKey(); if (!key) return null;
+  const kc = 'dv_pb:' + (anh ? 'a' : 'v') + (doc ? 'd' : 'n') + (trang || 1) + ':' + q.toLowerCase();
+  try { const c = JSON.parse(sessionStorage.getItem(kc) || 'null'); if (c && Date.now() - c.t < 3600e3) return c.ds; } catch { }
+  const goi = async vi => {
+    const p = new URLSearchParams({ key, q: q.slice(0, 100), per_page: anh ? '40' : '60', page: String(trang || 1), safesearch: 'true' });
+    if (anh) { p.set('image_type', 'photo'); p.set('orientation', doc ? 'vertical' : 'horizontal'); } else p.set('video_type', 'film');
+    if (vi) p.set('lang', 'vi');
+    const r = await fetch('https://pixabay.com/api/' + (anh ? '' : 'videos/') + '?' + p); if (!r.ok) throw new Error('pixabay ' + r.status);
+    const hits = (await r.json()).hits || [];
+    if (anh) return hits.map(h => ({ id: 'pbi' + h.id, anh: true, giay: 0, w: h.imageWidth, h: h.imageHeight, thumb: h.webformatURL, link: h.largeImageURL || h.webformatURL, goc: h.pageURL, tac_gia: (h.user || 'Pixabay') + ' · Pixabay' }));
+    return hits.map(h => { const v = h.videos || {}, ds = ['medium', 'small', 'large', 'tiny'].map(k => v[k]).filter(x => x && x.url && x.width); const f = ds.find(x => Math.max(x.width, x.height) <= 1280) || ds[0]; if (!f) return null; return { id: 'pb' + h.id, giay: h.duration, w: f.width, h: f.height, thumb: f.thumbnail || (v.tiny || {}).thumbnail || '', link: f.url, goc: h.pageURL, tac_gia: (h.user || 'Pixabay') + ' · Pixabay' }; }).filter(Boolean);
+  };
+  const hop = it => doc ? it.h >= it.w : it.w > it.h;
+  let ds = (await goi(true)).filter(hop);
+  if (ds.length < 6) { const co = new Set(ds.map(x => x.id)); try { ds = ds.concat((await goi(false)).filter(x => hop(x) && !co.has(x.id))); } catch { } }
+  ds = ds.slice(0, 18).map(({ link, ...it }) => ({ ...it, url: '/media?u=' + encodeURIComponent(link) }));
+  try { sessionStorage.setItem(kc, JSON.stringify({ t: Date.now(), ds })); } catch { }
+  return ds;
+}
+/* tìm kho: thẳng Pixabay trước, thiếu thì nhờ worker (dịch từ khoá + Openverse), gộp lại */
+async function timKho(q, anh, huong, trang) {
+  const doc = huong !== 'ngang'; let truc = null, loiTruc = '';
+  try { truc = await pixabayTrucTiep(q, anh, doc, trang); } catch (e) { loiTruc = String(e.message || e); }
+  if (truc && truc.length >= 6) return { ok: true, items: truc, tu_khoa: q, nguon: 'Pixabay · miễn phí dùng thương mại', truc_tiep: true };
+  let j = null; try { const r = await fetch(MC.url + '/broll?' + (anh ? 'loai=anh&' : '') + 'q=' + encodeURIComponent(q) + '&huong=' + (doc ? 'doc' : 'ngang') + (trang ? '&trang=' + trang : '')); j = await r.json(); } catch (e) { j = { ok: false, error: String(e.message || e) }; }
+  if (!j.ok) { if (truc && truc.length) return { ok: true, items: truc, tu_khoa: q, nguon: 'Pixabay · miễn phí dùng thương mại', truc_tiep: true }; return j; }
+  if (truc && truc.length) { const co = new Set(truc.map(x => x.id)); j.items = truc.concat((j.items || []).filter(x => !co.has(x.id))).slice(0, 24); }
+  if (loiTruc && (!j.items || !j.items.length)) j.loi = (j.loi || []).concat(['trực tiếp: ' + loiTruc]);
+  return j;
 }
 khoiTaoB(); khoiTaoC(); khoiTaoUI(); khoiTaoLop(); khoiTaoBang(); khoiTaoDot1(); khoiTaoDot2(); khoiTaoDot3(); khoiTaoM1(); khoiTaoM2(); khoiTaoM3(); khoiTaoN(); khoiTaoMobi(); khoiTaoCCW(); khoiTaoKho(); khoiTaoDoc(); khoiTaoGon(); khoiTaoMediaCC(); khoiTaoCC2(); khoiTaoFsBar(); khoiTaoKfGfx(); khoiTaoVanBanCC(); khoiTaoBangFont(); khoiTaoLopFx(); khoiTaoKhoTrucTuyen(); khoiTaoMediaKho(); khoiTaoMauDoHoa(); khoiTaoMatNaEl(); khoiTaoTruotTo(); veTl();
 </script>

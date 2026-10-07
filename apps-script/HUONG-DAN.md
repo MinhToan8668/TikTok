@@ -733,6 +733,15 @@ Bảng phải trước đây chữ to, hàng cao, mọi mục mở sẵn nên ph
 - **Ảnh minh hoạ** gộp thêm **Openverse** (CC/PD dùng thương mại, không cần key, ~20 lượt/phút) nên kho ảnh luôn có kết quả kể cả khi Pixabay đang chặn; `/media` cho tải ảnh từ Flickr, Wikimedia, các kho bảo tàng mà Openverse dẫn tới. Tên tác giả + giấy phép ghi trong `tac_gia` để chèn ghi nguồn.
 - **Video** chưa có nguồn không-key tương đương. Cách chắc nhất: thêm **`PEXELS_KEY`** (miễn phí tại pexels.com/api, giới hạn theo key 200 lượt/giờ, 20 000/tháng — không theo IP) vào Secrets của Worker; có cả hai thì worker gộp kết quả, Pexels gánh khi Pixabay 429.
 
+### Pixabay gọi thẳng từ trình duyệt — hết 429 (10/2026)
+
+Muốn **luôn lấy dữ liệu Pixabay** thì phải tránh IP chung của Cloudflare. Cách làm: **trình duyệt của từng học viên tự gọi Pixabay** (API Pixabay mở CORS `*`), mỗi máy một IP, hạn mức 100 lượt/phút riêng — đúng cách Pixabay thiết kế cho ứng dụng web.
+
+- Worker `2026.10.20` có `GET /kho-key?token=…`: chỉ trả `PIXABAY_KEY` cho **đúng origin của trang khoá** (danh sách `ORIGINS`) và khi **đã đăng nhập** (có token); không cache. `dich_vu.kho_truc_tiep` báo cho trang biết có đường này.
+- Trang: `khoKey()` lấy key một lần mỗi phiên (sessionStorage), `pixabayTrucTiep()` tìm thẳng (ảnh / video, `lang=vi` trước, thiếu thì tìm lại không lang), cache kết quả 1 giờ trong phiên theo yêu cầu cache của Pixabay. `timKho()` gộp: **thẳng Pixabay trước**, được ≥ 6 kết quả là dùng ngay (dòng trạng thái ghi "gọi thẳng"); thiếu thì nhờ worker (dịch từ khoá bằng AI + Openverse) rồi gộp, worker lỗi thì vẫn trả phần đã có.
+- File ảnh / video vẫn tải qua `/media` của worker để vẽ được lên canvas (CORS), như cũ.
+- **Đánh đổi cần biết:** key Pixabay sẽ nhìn thấy được trong DevTools của học viên đã đăng nhập. Key này chỉ đọc, miễn phí, giới hạn theo IP người gọi nên rủi ro thấp; nếu lộ ra ngoài thì vào pixabay.com/api/docs tạo key mới và đổi Secret `PIXABAY_KEY` là xong — không ảnh hưởng key Gemini hay Apps Script.
+
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 
 Cài theo [`cloudflare/CAI-DAT.md`](../cloudflare/CAI-DAT.md) (khoảng 10 phút, không cần thẻ). Có máy chủ này tool thêm:

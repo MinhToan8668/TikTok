@@ -27,7 +27,7 @@
      ANTHROPIC_API_KEY, OPENAI_API_KEY   (Secret) key khi chọn claude / openai
    ═══════════════════════════════════════════════════════════════════════════ */
 
-const PHIEN_BAN = '2026.10.19';
+const PHIEN_BAN = '2026.10.20';
 /* link /exec của Apps Script đang dùng trong tool (công khai sẵn trong tools/*.html). Biến APPS_SCRIPT_URL trên Cloudflare, nếu có, sẽ được ưu tiên. */
 const APPS_SCRIPT_MD = 'https://script.google.com/macros/s/AKfycbyxe1nWupAl6VheDZHaU3Ojm-d6c8F_khhUMtkehNCLh5OnGW6f2uF0PKPYZ4eYUqyGjQ/exec';
 const asUrl = env => String(env.APPS_SCRIPT_URL || env.APPS_SCRIPT || APPS_SCRIPT_MD).trim();
@@ -47,8 +47,10 @@ export default {
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: { ...cors, 'access-control-max-age': '86400' } });
     try {
       if (path === '/suc-khoe') return sucKhoe(env, cors);
-      if (path === '/') return json({ ok: true, ten: 'Viral Studio · máy chủ Cloudflare', phien_ban: PHIEN_BAN, dich_vu: { broll: coKho(env), nhan_dan: !!(env.GIPHY_KEY || env.TENOR_KEY), am_thanh: !!env.FREESOUND_KEY, tts: !!dsKey(env).length, tai: true, kiem_luot: !!asUrl(env), agent: !!llmCoKey(env), agent_ncc: llmNcc(env) } }, cors);
+      if (path === '/') return json({ ok: true, ten: 'Viral Studio · máy chủ Cloudflare', phien_ban: PHIEN_BAN, dich_vu: { broll: coKho(env), kho_truc_tiep: !!env.PIXABAY_KEY, nhan_dan: !!(env.GIPHY_KEY || env.TENOR_KEY), am_thanh: !!env.FREESOUND_KEY, tts: !!dsKey(env).length, tai: true, kiem_luot: !!asUrl(env), agent: !!llmCoKey(env), agent_ncc: llmNcc(env) } }, cors);
       if (path === '/broll' && req.method === 'GET') return json(await timBroll(url, env, ctx), cors);
+      /* trình duyệt học viên gọi thẳng Pixabay bằng IP riêng (hết 429 do IP chung của Cloudflare): chỉ phát key cho trang của khoá đang đăng nhập */
+      if (path === '/kho-key' && req.method === 'GET') { if (!cors['access-control-allow-origin'] || cors['access-control-allow-origin'] === '*') return json({ ok: false, error: 'origin' }, cors, 403); if (!String(url.searchParams.get('token') || '').trim()) return json({ ok: false, error: 'can_dang_nhap' }, cors, 401); return json({ ok: true, pixabay: env.PIXABAY_KEY || '' }, { ...cors, 'cache-control': 'private, no-store' }); }
       if (path === '/nhan-dan' && req.method === 'GET') return json(await timSticker(url, env), cors);
       if (path === '/am-thanh' && req.method === 'GET') return json(await timAmThanh(url, env), cors);
       if (path === '/media' && req.method === 'GET') return media(req, url, cors);
