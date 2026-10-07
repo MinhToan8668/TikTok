@@ -912,6 +912,37 @@
   #tayCam .mnH::before,#tayCam .mnH::after{content:"";position:absolute;background:rgba(255,255,255,.3)}
   #tayCam .mnH::before{left:50%;top:14%;bottom:14%;width:1px}
   #tayCam .mnH::after{top:50%;left:14%;right:14%;height:1px}
+  /* ═══ hai tầng tab kiểu CapCut: tab chính ngang + dải sub-tab Cơ bản · Mặt nạ · Xoá nền ═══ */
+  .ed.ccw .ecol.phai{padding-left:0}
+  .ed.ccw .ecol.phai .ptabs{position:sticky;left:auto;right:auto;top:-12px;bottom:auto;width:auto;margin:2px -12px 8px;padding:0 8px;flex-direction:row;gap:0;border:0;border-bottom:1px solid var(--el);background:var(--ep);overflow-x:auto;overflow-y:hidden;z-index:4;scrollbar-width:none}
+  .ed.ccw .ecol.phai .ptabs button{border:0;border-radius:0;padding:8px 9px 6px;font-size:11.5px;font-weight:600;line-height:1.2;white-space:nowrap;word-break:normal;text-align:center;color:var(--em);border-bottom:2px solid transparent;background:transparent}
+  .ed.ccw .ecol.phai .ptabs button:hover{background:transparent;color:var(--et)}
+  .ed.ccw .ecol.phai .ptabs button.on{background:transparent;color:var(--eaChu);border-bottom-color:var(--ea)}
+  .ed.ccw .prop .psub{display:flex;background:var(--ep2);border-radius:8px;padding:2px;margin:0 0 8px;gap:2px}
+  .ed.ccw .prop .psub button{flex:1;min-width:0;border:0;border-radius:6px;background:transparent;color:var(--em);font:600 10.5px/1.2 "Be Vietnam Pro",system-ui,sans-serif;padding:5px 4px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ed.ccw .prop .psub button:hover{color:var(--et)}
+  .ed.ccw .prop .psub button.on{background:var(--ep);color:var(--et);box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  /* nấc nhỏ hơn: chữ 11px, hàng 24px, ô nhập 22px, nút 22px, thanh trượt núm 10px */
+  .ed.ccw .prop{font-size:11px}
+  .ed.ccw .prop label{min-height:24px;font-size:11px;gap:6px}
+  .ed.ccw .prop label>span:first-child{min-width:78px;font-weight:500}
+  .ed.ccw .prop label input[type=text],.ed.ccw .prop label input[type=number],.ed.ccw .prop label input[type=search],.ed.ccw .prop select{height:22px;min-height:22px;font-size:11px;border-radius:5px;padding:0 5px}
+  .ed.ccw .prop textarea{font-size:11.5px;min-height:40px}
+  .ed.ccw .prop .btn.nho{height:22px;padding:0 7px;font-size:10.5px;border-radius:5px}
+  .ed.ccw .prop .lopHang{font-size:10.5px}
+  .ed.ccw .prop .ccHd{font-size:11px;padding:5px 0 1px;min-height:20px}
+  .ed.ccw .prop h3{font-size:10px;letter-spacing:.07em}
+  .ed.ccw .prop .quota{font-size:10px}
+  .ed.ccw .prop label output{font-size:10px;min-width:30px}
+  .ed.ccw .prop .ccSo input{font-size:10.5px;height:20px}
+  .ed.ccw .prop label .kfn{width:16px;height:16px;font-size:10px}
+  .ed.ccw .prop input[type=range]{height:12px}
+  .ed.ccw .prop input[type=range]::-webkit-slider-runnable-track{height:2px}
+  .ed.ccw .prop input[type=range]::-webkit-slider-thumb{width:10px;height:10px;margin-top:-4px}
+  .ed.ccw .prop input[type=range]::-moz-range-track,.ed.ccw .prop input[type=range]::-moz-range-progress{height:2px}
+  .ed.ccw .prop input[type=range]::-moz-range-thumb{width:10px;height:10px}
+  .ed.ccw .prop .ccGrp .btn.nho{min-width:24px;height:20px;font-size:10.5px}
+  .ed.ccw .prop input[type=color]{height:20px;width:34px}
 </style>
 </head>
 <body>
@@ -2745,8 +2776,12 @@ function taoBen(pane) {
   noi.addEventListener('scroll', soi, { passive: true }); pane._veBen = ve; ve();
 }
 /* thuộc tính theo tab (Video · Hoạt ảnh · Tốc độ & âm · Điều chỉnh…) */
-const TAB_NHOM = { 'Khung hình': 'Video', 'Keyframe ◇': 'Video', 'Lật & cắt khung': 'Video', 'Khung hình (overlay)': 'Video', 'Lớp & khớp khung': 'Video', 'Ghép nền (chroma key) & độ mờ': 'Video', 'Hoạt ảnh vào / ra': 'Hoạt ảnh', 'Hoạt ảnh chữ': 'Hoạt ảnh', 'Tốc độ & âm thanh': 'Tốc độ & âm', 'Màu': 'Điều chỉnh', 'Mặt nạ': 'Mặt nạ', 'Hoà trộn': 'Video', 'Bo góc, viền & bóng': 'Video', 'Nhoè chuyển động': 'Video', 'Phụ đề': 'Văn bản', 'Kiểu phụ đề (cho tất cả câu)': 'Văn bản', 'Bánh xe màu': 'Điều chỉnh', 'Đường cong': 'Điều chỉnh', 'HSL': 'Điều chỉnh', 'Hình vẽ': 'Đồ hoạ', 'Dữ liệu biểu đồ': 'Đồ hoạ', 'Bám vật thể': 'Đồ hoạ', 'Kiểu chữ': 'Văn bản', 'Sticker': 'Nhãn dán', 'Bám theo lời nói': 'Đồ hoạ', 'Đồ hoạ AI': 'Đồ hoạ' };
+const TAB_NHOM = { 'Khung hình': 'Video', 'Keyframe ◇': 'Video', 'Lật & cắt khung': 'Video', 'Khung hình (overlay)': 'Video', 'Lớp & khớp khung': 'Video', 'Ghép nền (chroma key) & độ mờ': 'Video', 'Hoạt ảnh vào / ra': 'Hoạt ảnh', 'Hoạt ảnh chữ': 'Hoạt ảnh', 'Tốc độ & âm thanh': 'Tốc độ & âm', 'Màu': 'Điều chỉnh', 'Mặt nạ': '*', 'Hoà trộn': 'Video', 'Bo góc, viền & bóng': 'Video', 'Nhoè chuyển động': 'Video', 'Phụ đề': 'Văn bản', 'Kiểu phụ đề (cho tất cả câu)': 'Văn bản', 'Bánh xe màu': 'Điều chỉnh', 'Đường cong': 'Điều chỉnh', 'HSL': 'Điều chỉnh', 'Hình vẽ': 'Đồ hoạ', 'Dữ liệu biểu đồ': 'Đồ hoạ', 'Bám vật thể': 'Đồ hoạ', 'Kiểu chữ': 'Văn bản', 'Sticker': 'Nhãn dán', 'Bám theo lời nói': 'Đồ hoạ', 'Đồ hoạ AI': 'Đồ hoạ' };
 function tenNhom(n) { const b = n.querySelector(':scope > b'), t = b ? b.textContent.trim() : 'Khác'; return TAB_NHOM[t] || t; }
+/* tầng 2 như CapCut (Basic · Mask · Remove BG… / Basic · Curves · HSL · Wheels): mục không có trong bảng này nằm ở "Cơ bản" */
+const SUB_NHOM = { 'Mặt nạ': 'Mặt nạ', 'Ghép nền (chroma key) & độ mờ': 'Xoá nền', 'Bánh xe màu': 'Bánh xe màu', 'Đường cong': 'Đường cong', 'HSL': 'HSL' };
+function subNhom(n) { const b = n.querySelector(':scope > b'); return SUB_NHOM[b ? b.textContent.trim() : ''] || 'Cơ bản'; }
+function moSubProp(t) { const ds = [...$('#propChon').querySelectorAll(':scope > .nhom2')], n = ds.find(x => subNhom(x) === t); if (!n) return; const tabs0 = [...new Set(ds.map(tenNhom).filter(x => x !== '*'))]; const tab = tenNhom(n) === '*' ? (tabs0[0] || 'Video') : tenNhom(n); P.propTab = tab; P.propSub = P.propSub || {}; P.propSub[tab] = t; tabHoaProp(); }
 function moTabProp(t) { P.propTab = t; tabHoaProp(); }
 function tabHoaProp() {
   { const ds = dsNhieu(); if (ds.length > 1) { const box = $('#propChon'); box.innerHTML = ''; $('#ed').classList.add('coChon'); const tde = $('#phaiTieuDe'); if (tde) tde.textContent = 'Nhiều mục'; box.appendChild(el('h3', null, ds.length + ' mục đang chọn')); const dem = {}; ds.forEach(o => { const t = { v: 'đoạn video', b: 'video phủ', g: 'chữ/đồ hoạ', a: 'âm thanh', t: 'lồng tiếng' }[o.k]; dem[t] = (dem[t] || 0) + 1; }); box.appendChild(el('div', 'quota', Object.entries(dem).map(([t, n]) => n + ' ' + t).join(' · ') + '. Kéo một mục là cả nhóm dời theo.')); const row = el('div', 'row'); [['🗑 Xoá', () => xoaNhieu()], ['⧉ Sao chép', () => saoChepNhieu()], ['🔗 Gộp nhóm', () => gopNhom()], ['Bỏ gộp', () => boGopNhom()], ['Bỏ chọn', () => { P.nhieu = []; veProp(); danhDauNhieu(); }]].forEach(([t, f]) => { const b = el('button', 'btn nho', t); b.type = 'button'; b.onclick = f; row.appendChild(b); }); box.appendChild(row); return; } }
@@ -2754,11 +2789,19 @@ function tabHoaProp() {
   const co = !!(P.chon && box.children.length); $('#ed').classList.toggle('coChon', co);
   if (co && (P.chon.k === 'b' || P.chon.k === 'g')) { const m = (P.chon.k === 'b' ? P.broll : P.gfx)[P.chon.i]; if (m) { const ds = cacLop(), l = lopCua(P.chon.k, m), r = el('div', 'lopHang'); r.appendChild(el('span', null, 'Lớp ' + (ds.length - ds.indexOf(l)) + '/' + ds.length)); [['⬆ Lên trên', 1], ['⬇ Xuống dưới', -1]].forEach(([t, h]) => { const b = el('button', 'btn nho', t); b.type = 'button'; b.onclick = () => doiLop(P.chon.k, P.chon.i, h); r.appendChild(b); }); box.insertBefore(r, box.children[1] || null); } }
   const tde = $('#phaiTieuDe'); if (tde) tde.textContent = co ? ({ v: 'Video', b: 'Overlay', g: 'Văn bản & đồ hoạ', a: 'Âm thanh', t: 'Lồng tiếng' }[P.chon.k] || 'Thuộc tính') : 'Dự án';
-  const ds = [...box.children].filter(x => x.classList.contains('nhom2')); if (ds.length < 2) { ds.forEach(n => n.classList.remove('an')); return; }
-  const tabs = [...new Set(ds.map(tenNhom))]; if (tabs.length < 2) { ds.forEach(n => n.classList.remove('an')); return; }
-  const cur = tabs.includes(P.propTab) ? P.propTab : tabs[0], bar = el('div', 'ptabs');
-  tabs.forEach(t => { const b = el('button', t === cur ? 'on' : null, t); b.type = 'button'; b.onclick = () => moTabProp(t); bar.appendChild(b); });
-  ds.forEach(n => n.classList.toggle('an', tenNhom(n) !== cur)); box.insertBefore(bar, ds[0]);
+  box.querySelectorAll(':scope > .psub').forEach(x => x.remove());
+  const ds = [...box.children].filter(x => x.classList.contains('nhom2')); if (!ds.length) return;
+  const gC = P.chon && P.chon.k === 'g' ? P.gfx[P.chon.i] : null, uuTien = P.chon && P.chon.k === 'g' ? (gC && gC.kieu === 'chu' ? ['Văn bản', 'Video', 'Hoạt ảnh', 'Đồ hoạ', 'Nhãn dán'] : ['Đồ hoạ', 'Nhãn dán', 'Văn bản', 'Video', 'Hoạt ảnh']) : ['Video', 'Hoạt ảnh', 'Tốc độ & âm', 'Điều chỉnh'];
+  const thu = t => { const i = uuTien.indexOf(t); return i < 0 ? 99 : i; };
+  const tabs0 = [...new Set(ds.map(tenNhom).filter(t => t !== '*'))].sort((a, b) => thu(a) - thu(b)), tabCua = n => { const t = tenNhom(n); return t === '*' ? (tabs0[0] || 'Video') : t; };   /* Mặt nạ là sub-tab của tab chính (Video / Văn bản / Đồ hoạ) như CapCut */
+  const tabs = [...new Set(ds.map(tabCua))].sort((a, b) => thu(a) - thu(b)), cur = tabs.includes(P.propTab) ? P.propTab : tabs[0];
+  const dau = box.querySelector(':scope > .lopHang') || box.querySelector(':scope > h3'); let bar = null;
+  if (tabs.length >= 2) { bar = el('div', 'ptabs'); tabs.forEach(t => { const b = el('button', t === cur ? 'on' : null, t); b.type = 'button'; b.onclick = () => moTabProp(t); bar.appendChild(b); }); box.insertBefore(bar, dau ? dau.nextSibling : box.firstChild); }
+  /* tầng 2: dải nút tròn Cơ bản · Mặt nạ · Xoá nền… ngay dưới tab chính như CapCut */
+  const trongTab = ds.filter(n => tabCua(n) === cur), subs = [...new Set(trongTab.map(subNhom))].sort((a, b) => a === 'Cơ bản' ? -1 : b === 'Cơ bản' ? 1 : 0);
+  P.propSub = P.propSub || {}; const subCur = subs.length > 1 ? (subs.includes(P.propSub[cur]) ? P.propSub[cur] : subs[0]) : null;
+  if (subCur) { const sb = el('div', 'psub'); subs.forEach(t => { const b = el('button', t === subCur ? 'on' : null, t); b.type = 'button'; b.onclick = () => { P.propSub[cur] = t; tabHoaProp(); }; sb.appendChild(b); }); box.insertBefore(sb, bar ? bar.nextSibling : (dau ? dau.nextSibling : box.firstChild)); }
+  ds.forEach(n => n.classList.toggle('an', tabCua(n) !== cur || (!!subCur && subNhom(n) !== subCur)));
 }
 function moTabTinh(t) { $$('#prop > .tinh').forEach(s => s.classList.toggle('an', s.dataset.ten !== t)); $$('#tinhTabs button').forEach(b => b.classList.toggle('on', b.textContent === t)); try { localStorage.setItem('dv_tinh', t); } catch { } }
 function tabHoaTinh() {
@@ -3642,7 +3685,7 @@ async function khoTim() {
   try {
     const r = await fetch(MC.url + '/broll?q=' + encodeURIComponent(q) + '&huong=' + $('#khoHuong').value); const j = await r.json();
     if (!j.ok) { $('#khoTt').textContent = j.error === 'chua_co_kho' || j.error === 'chua_co_pexels' ? 'Máy chủ chưa có key kho video (PIXABAY_KEY, mentor thêm ở Cloudflare).' : 'Kho chưa trả lời, thử lại.'; return; }
-    if (!j.items.length) { $('#khoTt').textContent = 'Không có video hợp “' + q + '”, thử từ khác ngắn hơn.'; return; }
+    if (!j.items.length) { $('#khoTt').textContent = j.loi && j.loi.length ? 'Kho báo lỗi: ' + j.loi.join(' · ') + ' — thử lại sau một lát.' : 'Không có video hợp “' + q + '”, thử từ khác ngắn hơn.'; return; }
     j.items.forEach(it => { const b = el('button'); b.type = 'button'; b.title = 'Thêm vào footage · ' + it.tac_gia + ' · ' + fmt1(it.giay) + 's'; const im = el('img'); im.src = it.thumb; im.alt = ''; im.loading = 'lazy'; b.appendChild(im); b.appendChild(el('span', null, fmt1(it.giay) + 's · ' + it.tac_gia)); b.onclick = () => themBroll(it, q, b); $('#khoKq').appendChild(b); });
     $('#khoTt').textContent = j.items.length + ' video' + (j.tu_khoa && j.tu_khoa !== q ? ' · tìm bằng “' + j.tu_khoa + '”' : '') + ' · ' + (j.nguon || 'kho miễn phí') + '. Bấm để thêm vào footage, rồi kéo cảnh vào V2.';
   } catch (e) { $('#khoTt').textContent = 'Không gọi được máy chủ B-roll.'; }
@@ -5341,7 +5384,7 @@ async function khoTimAnh() {
   try {
     const r = await fetch(MC.url + '/broll?loai=anh&q=' + encodeURIComponent(q) + '&huong=' + $('#khoAnhHuong').value); const j = await r.json();
     if (!j.ok) { tt.textContent = 'Máy chủ chưa có key kho ảnh (PIXABAY_KEY hoặc PEXELS_KEY).'; return; }
-    if (!j.items.length) { tt.textContent = 'Không có ảnh hợp “' + q + '”, thử từ khác.'; return; }
+    if (!j.items.length) { tt.textContent = j.loi && j.loi.length ? 'Kho báo lỗi: ' + j.loi.join(' · ') + ' — thử lại sau một lát.' : 'Không có ảnh hợp “' + q + '”, thử từ khác.'; return; }
     j.items.forEach(it => { const b = el('button'); b.type = 'button'; b.title = 'Thêm vào footage · ' + it.tac_gia; const im = el('img'); im.src = it.thumb; im.alt = ''; im.loading = 'lazy'; b.appendChild(im); b.appendChild(el('span', null, it.tac_gia)); b.onclick = () => themBrollAnh(it, q, b); kq.appendChild(b); });
     tt.textContent = j.items.length + ' ảnh' + (j.tu_khoa && j.tu_khoa !== q ? ' · tìm bằng “' + j.tu_khoa + '”' : '') + ' · ' + (j.nguon || 'kho miễn phí') + '. Bấm để thêm vào footage (đoạn ảnh 5 giây, kéo dài tuỳ ý).';
   } catch (e) { tt.textContent = 'Không gọi được máy chủ kho ảnh.'; }
@@ -5490,7 +5533,7 @@ function themMucMatNa() {
   const tam = el('div'); box.appendChild(tam); veThuocTinhMatNa(tam, 'g', g);
   const n = tam.firstChild; if (!n) { tam.remove(); return; } n.classList.add('mnMuc');
   while (tam.firstChild) box.insertBefore(tam.firstChild, moc || null);
-  tam.remove();
+  tam.remove(); tabHoaProp();   /* vẽ lại tab để Mặt nạ vào đúng sub-tab, CC2 gắn tiêu đề thu gọn */
 }
 /* phép biến hình của element (V1/V2 có scale–xoay–dời; element đồ hoạ dùng thẳng toạ độ khung) */
 function mnPhep(k, m) { if (k === 'g') return { x: 0, y: 0, sc: 1, xoay: 0 }; const h = tinhHop(k, m); return { x: h.x, y: h.y, sc: h.sc, xoay: h.xoay }; }

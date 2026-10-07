@@ -719,6 +719,20 @@ Bảng phải trước đây chữ to, hàng cao, mọi mục mở sẵn nên ph
 - **Tay cầm mặt nạ trên khung** gọn và đủ như CapCut: viền nét đứt mảnh, **chữ thập mờ ở giữa**, núm tròn trắng ở 4 cạnh để kéo riêng chiều rộng / chiều cao, núm góc để phóng đều, núm tròn dưới để xoay, núm màu nhấn phía trên trái để chỉnh mềm viền.
 - Hồi quy: các bài cũ được gieo sẵn `dv_gap` (mở hết mục) để vẫn thao tác được như trước; `t137` cập nhật theo số núm mới.
 
+### Hai tầng tab kiểu CapCut + kho ảnh không còn rỗng (10/2026)
+
+**Bảng Thuộc tính 2 tầng** như CapCut desktop:
+- Tầng 1 — tab chính nằm ngang trên đầu bảng, gạch chân màu nhấn: đoạn video có *Video · Hoạt ảnh · Tốc độ & âm · Điều chỉnh*; chữ có *Văn bản · Hoạt ảnh · Đồ hoạ*; tab hợp với loại mục luôn đứng đầu và được mở sẵn.
+- Tầng 2 — dải nút tròn (segmented) ngay dưới, chỉ hiện khi tab có nhiều mục: *Video → Cơ bản | Mặt nạ | Xoá nền*; *Điều chỉnh → Cơ bản | Bánh xe màu | Đường cong | HSL*; *Văn bản → Cơ bản | Mặt nạ*. Mặt nạ không còn là tab riêng mà là sub-tab của tab chính (đúng vị trí CapCut để nó).
+- Cỡ nhỏ thêm một nấc: chữ 11px, hàng 24px, ô nhập / nút 22px, thanh trượt rãnh 2px núm 10px, tiêu đề mục 11px.
+- Mã: `TAB_NHOM` (mục → tab chính; `'*'` = tab chính đầu tiên của mục đang chọn) và `SUB_NHOM` (mục → sub-tab, mặc định "Cơ bản"); `moTabProp(tab)` / `moSubProp(sub)` để mở bằng mã; trạng thái nhớ trong `P.propTab` / `P.propSub`.
+
+**Kho ảnh / video Pixabay tìm gì cũng rỗng — nguyên nhân và cách sửa:**
+- Pixabay giới hạn theo **IP** của máy gọi. Worker chạy trên Cloudflare dùng IP chung với rất nhiều worker khác nên chỉ 1–2 lượt là Pixabay trả **429**; key của anh vẫn đúng. Trước đây worker nuốt lỗi này thành "không có kết quả" **và cache 24 giờ**, nên từ khoá nào lỡ dính 429 là rỗng cả ngày.
+- Worker `2026.10.19`: lỗi từng nguồn trả về trong trường `loi` (trang hiện "Kho báo lỗi: pixabay 429…"), kết quả rỗng do lỗi **không cache**, bị 429 / 5xx thì chờ 1,2 giây thử lại một lần.
+- **Ảnh minh hoạ** gộp thêm **Openverse** (CC/PD dùng thương mại, không cần key, ~20 lượt/phút) nên kho ảnh luôn có kết quả kể cả khi Pixabay đang chặn; `/media` cho tải ảnh từ Flickr, Wikimedia, các kho bảo tàng mà Openverse dẫn tới. Tên tác giả + giấy phép ghi trong `tac_gia` để chèn ghi nguồn.
+- **Video** chưa có nguồn không-key tương đương. Cách chắc nhất: thêm **`PEXELS_KEY`** (miễn phí tại pexels.com/api, giới hạn theo key 200 lượt/giờ, 20 000/tháng — không theo IP) vào Secrets của Worker; có cả hai thì worker gộp kết quả, Pexels gánh khi Pixabay 429.
+
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 
 Cài theo [`cloudflare/CAI-DAT.md`](../cloudflare/CAI-DAT.md) (khoảng 10 phút, không cần thẻ). Có máy chủ này tool thêm:
