@@ -206,8 +206,27 @@
   .loc-dl dd{margin:0}
   .loc-cat{display:flex;flex-wrap:wrap;gap:5px}
   .loc-cat span{font-family:var(--font-display);font-weight:700;font-size:12px;border:1px solid var(--line-strong);border-radius:6px;padding:1px 6px}
-  .loc-v details{margin-top:8px;font-size:12.5px}
-  .loc-v details summary{cursor:pointer;color:var(--muted);font-weight:600}
+  .loc-bc{margin-top:12px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .loc-bc-tde{background:var(--surface-2);font-weight:800;font-size:13px;padding:8px 12px;border-bottom:1px solid var(--line)}
+  .loc-bp{padding:10px 12px;border-top:1px dashed var(--line)}
+  .loc-bp:nth-child(2){border-top:0}
+  .loc-bp.them{background:repeating-linear-gradient(135deg,transparent 0 10px,rgba(184,134,11,.07) 10px 20px)}
+  .loc-bp-dau{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .loc-bp-dau i{flex:none;width:22px;height:22px;border-radius:50%;background:var(--text);color:var(--surface);font-style:normal;font-size:11.5px;font-weight:800;display:grid;place-items:center}
+  .loc-bp-dau b{font-size:13.5px}
+  .loc-bp-dau .loc-cat{margin-left:auto}
+  .loc-cat .quay{border-color:var(--warn);color:var(--warn)}
+  .loc-bp p{margin:6px 0 0;font-size:14px;line-height:1.6;white-space:pre-wrap}
+  .loc-bp small{display:block;color:var(--muted);font-size:12px;margin-top:4px}
+  .loc-nhac{margin:10px 0 0;padding:8px 10px;border-radius:10px;background:rgba(184,134,11,.12);font-size:13px}
+  .loc-goc{margin-top:10px;border:1.5px solid var(--line-strong);border-radius:10px;background:var(--accent-soft)}
+  .loc-goc summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;font-weight:800;font-size:13.5px}
+  .loc-goc summary::-webkit-details-marker{display:none}
+  .loc-goc summary small{font-weight:600;color:var(--muted);font-size:12px}
+  .loc-goc summary::after{content:"▾";font-size:14px;transition:transform .15s}
+  .loc-goc[open] summary::after{transform:rotate(180deg)}
+  .loc-goc .loc-xem{margin:0 10px 10px;max-height:260px;background:var(--surface)}
+  @media (max-width:520px){.loc-bp-dau .loc-cat{margin-left:30px;width:100%}}
   .loc-v .row{margin-top:10px}
   .loc-ds{margin:4px 0 0;padding-left:18px;font-size:13px}
   .loc-ds li{margin:3px 0}
@@ -808,7 +827,7 @@ async function docFile(f) {
 function locDemo() {
   const tong = loc.cau[loc.cau.length - 1].kt, n = Math.min(4, Math.max(2, Math.floor(loc.cau.length / 8))), buoc = Math.floor(loc.cau.length / n);
   return { chu_de: 'Bản demo: chuyện nghề của bạn trong video dài.', hop_kenh: 8, hop_kenh_nx: 'Đúng ngách, đoạn đầu hơi lan man.', so_goi_y: n, ly_do_so: 'Có ' + n + ' đoạn trọn ý, mỗi đoạn một chuyện riêng.', series: { ten: 'Chuyện nghề mỗi ngày', soi_chi: 'Mỗi phần một tình huống thật', lich_dang: 'Mỗi tối 1 phần lúc 20h' }, tong_giay: Math.round(tong), so_cau: loc.cau.length,
-    videos: Array.from({ length: n }, (_, i) => { const a = loc.cau[i * buoc], b = loc.cau[Math.min(loc.cau.length - 1, i * buoc + Math.max(2, buoc - 2))]; return { ten: 'Đoạn ' + (i + 1) + ' (demo)', phan: i + 1, diem_viral: 8 - i, hop_kenh: 8, khung: ['khoanhkhac', 'bonnhip', 'kinhnghiem', 'chu_chay'][i % 4], dang: '', hook_chu: 'Chữ hook **demo** số ' + (i + 1), hook_noi: a.text, y_chinh: 'Ý chính của đoạn ' + (i + 1), vi_sao: 'Có chuyện thật và câu chốt rõ.', doan: [{ bd: a.bd, kt: b.kt }], giay: Math.round(b.kt - a.bd), mo_dau_tu: -1, can_them: i === 0 ? 'Quay thêm 1 cảnh cận tay đang làm việc.' : '', caption: 'Caption demo #demo' }; }),
+    videos: Array.from({ length: n }, (_, i) => { const a = loc.cau[i * buoc], b = loc.cau[Math.min(loc.cau.length - 1, i * buoc + Math.max(2, buoc - 2))]; return { ten: 'Đoạn ' + (i + 1) + ' (demo)', phan: i + 1, diem_viral: 8 - i, hop_kenh: 8, khung: ['khoanhkhac', 'bonnhip', 'kinhnghiem', 'chu_chay'][i % 4], dang: '', hook_chu: 'Chữ hook **demo** số ' + (i + 1), hook_noi: a.text, y_chinh: 'Ý chính của đoạn ' + (i + 1), vi_sao: 'Có chuyện thật và câu chốt rõ.', doan: [{ bd: a.bd, kt: b.kt }], giay: Math.round(b.kt - a.bd), mo_dau_tu: -1, ngan: false, cau_truc: (KHUNG.find(x => x.k === ['khoanhkhac', 'bonnhip', 'kinhnghiem', 'chu_chay'][i % 4]) || KHUNG[0]).phan.map((ph, j, all) => { const c1 = loc.cau[Math.min(loc.cau.length - 1, i * buoc + j)]; return j === all.length - 1 ? { ten: ph[1], doan: [], loi: '[nói thêm] Câu chốt demo cho phần này.', canh: '', noi_them: true } : { ten: ph[1], doan: [{ bd: c1.bd, kt: c1.kt }], loi: c1.text, canh: 'Chữ màn hình demo', noi_them: false }; }), can_them: i === 0 ? 'Quay thêm 1 cảnh cận tay đang làm việc.' : '', caption: 'Caption demo #demo' }; }),
     bo: [{ bd: loc.cau[0].bd, kt: loc.cau[0].kt, ly_do: 'Chào hỏi' }], cau_dat: [{ giay: loc.cau[1].bd, cau: loc.cau[1].text, vi_sao: 'Câu thật, gọn' }] };
 }
 let dangLoc = false;
@@ -842,7 +861,8 @@ function nhanLoc(r) {
   $('#locKq').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 function locVideoText(v, i) {
-  return [`${v.phan ? 'PHẦN ' + v.phan + ' · ' : ''}${v.ten} (≈${fmtT(v.giay)}, viral ${v.diem_viral}/10)`, `Cắt: ${v.doan.map(d => fmtT(d.bd) + '–' + fmtT(d.kt)).join(' + ')}` + (v.mo_dau_tu >= 0 ? ` · đảo câu ở ${fmtT(v.mo_dau_tu)} lên đầu` : ''), `Khung: ${LOC_KHUNG_TEN(v.khung)}`, `Hook chữ: ${v.hook_chu.replace(/\*\*/g, '').replace(/\n/g, ' / ')}`, `Câu mở đầu: ${v.hook_noi}`, v.can_them ? `Cần quay thêm: ${v.can_them}` : '', v.caption ? `Caption: ${v.caption}` : ''].filter(Boolean).join('\n');
+  const ct = (v.cau_truc || []).map((p, j) => `${j + 1}. ${p.ten}${p.doan.length ? ' [' + p.doan.map(d => fmtT(d.bd) + '–' + fmtT(d.kt)).join(' + ') + ']' : ' [QUAY THÊM]'}\n${p.loi}${p.canh ? '\n   ↳ ' + p.canh : ''}`).join('\n');
+  return [`${v.phan ? 'PHẦN ' + v.phan + ' · ' : ''}${v.ten} (≈${fmtT(v.giay)}, viral ${v.diem_viral}/10)`, `Khung: ${LOC_KHUNG_TEN(v.khung)}`, `Hook chữ: ${v.hook_chu.replace(/\*\*/g, '').replace(/\n/g, ' / ')}`, ct || `Cắt: ${v.doan.map(d => fmtT(d.bd) + '–' + fmtT(d.kt)).join(' + ')}\nCâu mở đầu: ${v.hook_noi}`, v.can_them ? `Cần quay thêm: ${v.can_them}` : '', v.caption ? `Caption: ${v.caption}` : ''].filter(Boolean).join('\n');
 }
 function veLoc() {
   const box = $('#locKq'), d = loc.kq; box.innerHTML = ''; if (!d || !d.videos || !d.videos.length) { box.hidden = true; return; }
@@ -877,7 +897,7 @@ function veLoc() {
   if ((d.bo || []).length) { box.appendChild(el('h3', null, '🗑 Đoạn nên bỏ')); const ul = el('ul', 'loc-ds'); d.bo.forEach(b => { const li = el('li'); li.append(el('span', 't', fmtT(b.bd) + '–' + fmtT(b.kt)), document.createTextNode(b.ly_do || '')); ul.appendChild(li); }); box.appendChild(ul); }
 }
 function theVideo(v, k) {
-  const mau = LOC_MAU[k % LOC_MAU.length], co = loc.chon.includes(k);
+  const mau = LOC_MAU[k % LOC_MAU.length], co = loc.chon.includes(k), ct = v.cau_truc || [];
   const c = el('article', 'loc-v' + (co ? ' chon' : ''));
   const dau = el('div', 'loc-v-dau'), cb = el('input'); cb.type = 'checkbox'; cb.checked = co; cb.id = 'locV' + k; cb.setAttribute('aria-label', 'Chọn làm video ' + v.ten);
   cb.onchange = () => { loc.chon = cb.checked ? [...new Set([...loc.chon, k])].sort((a, b) => a - b) : loc.chon.filter(x => x !== k); luuLoc(); veLoc(); };
@@ -889,27 +909,64 @@ function theVideo(v, k) {
   ben.append(ten, chip); dau.append(cb, ben); c.appendChild(dau);
   if (v.hook_chu) c.appendChild(hookHtml(v.hook_chu));
   const dl = el('dl', 'loc-dl'), dong = (a, b) => { if (!b) return; dl.appendChild(el('dt', null, a)); const dd = el('dd'); if (b instanceof Node) dd.appendChild(b); else dd.textContent = b; dl.appendChild(dd); };
-  const cat = el('div', 'loc-cat'); v.doan.forEach(x => cat.appendChild(el('span', null, `${fmtT(x.bd)}–${fmtT(x.kt)}`)));
-  dong('Cắt từ gốc', cat);
-  if (v.mo_dau_tu >= 0) dong('Đảo lên đầu', `Đưa câu ở ${fmtT(v.mo_dau_tu)} lên mở video làm hook`);
-  dong('Câu mở đầu', v.hook_noi ? '"' + v.hook_noi + '"' : ''); dong('Ý chính', v.y_chinh); dong('Vì sao hay', v.vi_sao); dong('Cần quay thêm', v.can_them); dong('Caption', v.caption);
+  dong('Ý chính', v.y_chinh); dong('Vì sao hay', v.vi_sao);
+  if (!ct.length) { const cat = el('div', 'loc-cat'); v.doan.forEach(x => cat.appendChild(el('span', null, `${fmtT(x.bd)}–${fmtT(x.kt)}`))); dong('Cắt từ gốc', cat); dong('Câu mở đầu', v.hook_noi ? '"' + v.hook_noi + '"' : ''); }
+  if (v.mo_dau_tu >= 0) dong('Đảo lên đầu', `Câu ở ${fmtT(v.mo_dau_tu)} đưa lên mở video làm hook`);
   c.appendChild(dl);
-  if (loc.cau.length) { const det = el('details'); det.appendChild(el('summary', null, 'Lời gốc của đoạn này')); det.appendChild(el('div', 'loc-xem', loiDoan(loc.cau, v.doan))); c.appendChild(det); }
+  // bố cục đầy đủ theo khung: mỗi phần lấy từ đâu, nói gì
+  if (ct.length) {
+    const bc = el('div', 'loc-bc');
+    bc.appendChild(el('div', 'loc-bc-tde', `📐 Kịch bản theo khung "${LOC_KHUNG_TEN(v.khung)}" · ${ct.length} phần`));
+    ct.forEach((p, j) => {
+      const r = el('div', 'loc-bp' + (p.noi_them ? ' them' : ''));
+      const h = el('div', 'loc-bp-dau'); h.append(el('i', null, String(j + 1)), el('b', null, p.ten));
+      const moc = el('span', 'loc-cat'); if (p.doan.length) p.doan.forEach(x => moc.appendChild(el('span', null, `${fmtT(x.bd)}–${fmtT(x.kt)}`))); else moc.appendChild(el('span', 'quay', '🎙 Quay thêm'));
+      h.appendChild(moc); r.appendChild(h);
+      r.appendChild(el('p', null, p.loi));
+      if (p.canh) r.appendChild(el('small', null, '🎬 ' + p.canh));
+      bc.appendChild(r);
+    });
+    c.appendChild(bc);
+  }
+  if (v.ngan) c.appendChild(el('p', 'loc-nhac', `⚠️ Video này ngắn hơn khung (${fmtT(v.giay)}). Quay thêm phần còn thiếu ở dưới cho đủ ý.`));
+  const dl2 = el('dl', 'loc-dl'); ['Cần quay thêm', 'Caption'].forEach((a, i) => { const b = i ? v.caption : v.can_them; if (!b) return; dl2.appendChild(el('dt', null, a)); dl2.appendChild(el('dd', null, b)); });
+  if (dl2.children.length) c.appendChild(dl2);
+  if (loc.cau.length) {
+    const det = el('details', 'loc-goc'), sm = el('summary');
+    sm.append(el('span', null, '📜 Xem lời gốc trong video'), el('small', null, `${v.doan.length} khúc · ${fmtT(v.giay)} · chưa dọn`));
+    det.append(sm, el('div', 'loc-xem', loiDoan(loc.cau, v.doan))); c.appendChild(det);
+  }
   const row = el('div', 'row'); row.style.gap = '6px';
-  const viet = el('button', 'btn pro', '✍️ Viết thành kịch bản · 1 lượt'); viet.type = 'button'; viet.onclick = () => vietTuDoan(v, k);
+  if (ct.length) { const dua = el('button', 'btn pro', '📥 Đưa vào khung để quay · không tốn lượt'); dua.type = 'button'; dua.onclick = () => duaVaoKhung(v); row.appendChild(dua); }
+  const viet = el('button', 'btn' + (ct.length ? '' : ' pro'), ct.length ? '✍️ AI viết lại mượt hơn · 1 lượt' : '✍️ Viết thành kịch bản · 1 lượt'); viet.type = 'button'; viet.onclick = () => vietTuDoan(v, k);
   const cp = el('button', 'btn', '📋 Chép'); cp.type = 'button'; cp.onclick = () => copyText(locVideoText(v, k));
   row.append(viet, cp); c.appendChild(row);
   return c;
 }
+/* chọn khung + dạng quay theo video đã lọc, xoá chữ cũ của khung đó */
+function moKhungCho(v) {
+  const K = KHUNG.find(x => x.k === v.khung) || KHUNG.find(x => x.k === 'tudo');
+  state.khung = K.k; state.text[K.k] = {}; state.canh[K.k] = {}; state.kq = null; try { localStorage.removeItem('kb.kq'); } catch {}
+  if (v.dang && DANG_TEN[v.dang]) { state.dang = v.dang; setSeg('dang', v.dang); } else chonDangTheoKhung(K, false);
+  return K;
+}
+/* Đổ thẳng bố cục AI đã dựng vào từng phần của khung, không gọi AI */
+function duaVaoKhung(v) {
+  const K = moKhungCho(v);
+  (v.cau_truc || []).forEach((p, i) => { const id = K.phan[i] && K.phan[i][0]; if (!id) return; state.text[K.k][id] = p.loi; state.canh[K.k][id] = [p.doan.length ? 'Cắt ' + p.doan.map(d => fmtT(d.bd) + '–' + fmtT(d.kt)).join(' + ') : 'Quay thêm', p.canh].filter(Boolean).join(' · '); });
+  if (v.hook_chu) ls.set('hook.text', v.hook_chu);
+  buildKhung(); buildPhan(); updateTimes(); saveDraft();
+  $('#phanList').closest('section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const st = $('#chamStatus'); st.className = 'status ok'; st.textContent = `Đã đưa "${v.ten}" vào khung ${K.n}. Chỗ ghi [nói thêm] là câu bạn quay bổ sung. Bấm Chấm kịch bản nếu muốn AI soi lại.`;
+  toast('Đã đưa kịch bản vào khung');
+}
 /* Đưa một video đã lọc sang khung bên dưới, AI viết trọn bài giữ lời thật */
 function vietTuDoan(v, k) {
-  const K = KHUNG.find(x => x.k === v.khung) || KHUNG.find(x => x.k === 'tudo');
-  state.khung = K.k; state.text[K.k] = {}; state.canh[K.k] = {}; state.kq = null;
-  if (v.dang && DANG_TEN[v.dang]) { state.dang = v.dang; setSeg('dang', v.dang); } else chonDangTheoKhung(K, false);
+  moKhungCho(v);
   buildKhung(); buildPhan(); updateTimes(); saveDraft();
   $('#phanList').closest('section').scrollIntoView({ behavior: 'smooth', block: 'start' });
   const d = loc.kq || {};
-  vietBangAI({ y_do: '', ngu_canh: { loai: 'srt', ten: v.ten, series: d.series && v.phan ? `Phần ${v.phan}/${d.videos.length} của series "${d.series.ten}" (${d.series.soi_chi || ''})` : '', y_chinh: v.y_chinh, hook_chu: v.hook_chu, hook_noi: v.hook_noi, vi_sao: v.vi_sao, can_them: v.can_them, loi_goc: loiDoan(loc.cau, v.doan).slice(0, 4000) } });
+  vietBangAI({ y_do: '', ngu_canh: { loai: 'srt', ten: v.ten, series: d.series && v.phan ? `Phần ${v.phan}/${d.videos.length} của series "${d.series.ten}" (${d.series.soi_chi || ''})` : '', y_chinh: v.y_chinh, hook_chu: v.hook_chu, hook_noi: v.hook_noi, vi_sao: v.vi_sao, can_them: v.can_them, loi_goc: (((v.cau_truc || []).length ? 'BỐ CỤC ĐÃ DỰNG TỪ LỜI GỐC:\n' + locVideoText(v, k) + '\n\nLỜI GỐC CHƯA DỌN:\n' : '') + loiDoan(loc.cau, v.doan)).slice(0, 7000) } });
 }
 const locOpt = { kieu: 'tu_dong', dai: 'tu_dong' };
 let imViet = null;
