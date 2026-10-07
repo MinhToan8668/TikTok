@@ -205,7 +205,7 @@ async function timBroll(url, env, ctx) {
   const hopHuong = it => doc ? it.h >= it.w : it.w > it.h;
   // nguồn nào lỗi (429 quá tải, 400, mạng) thì ghi lại để trả về cho trang báo đúng lý do — trước đây lỗi bị nuốt thành "không có kết quả" rồi còn cache 24h
   const loi = [];
-  const tim = async (query, vi) => { const kq = await Promise.allSettled([pexels(query, vi), pixabay(query, vi), anh && !vi ? openverseAnh(query) : Promise.resolve([])]); kq.forEach(x => { if (x.status === 'rejected') loi.push(String((x.reason && x.reason.message) || x.reason).slice(0, 120)); }); return kq.flatMap(x => x.status === 'fulfilled' ? x.value : []); };
+  let ovCo = false; const tim = async (query, vi) => { const kq = await Promise.allSettled([pexels(query, vi), pixabay(query, vi), anh && !ovCo ? openverseAnh(query) : Promise.resolve([])]); if (kq[2].status === 'fulfilled' && kq[2].value.length) ovCo = true; kq.forEach(x => { if (x.status === 'rejected') loi.push(String((x.reason && x.reason.message) || x.reason).slice(0, 120)); }); return kq.flatMap(x => x.status === 'fulfilled' ? x.value : []); };
   let vids = (await tim(q, true)).filter(hopHuong), tuKhoa = q;
   if (vids.length < 6 && anh && !dsKey(env).length) { const co = new Set(vids.map(v => v.id)); vids = vids.concat((await tim(q, false)).filter(v => hopHuong(v) && !co.has(v.id))); }
   if (vids.length < 6 && dsKey(env).length) {
