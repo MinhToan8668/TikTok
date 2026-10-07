@@ -1019,6 +1019,23 @@
   .ed .item .fxTag{position:absolute;top:1px;right:3px;z-index:3;font-size:10px;line-height:1;padding:2px 4px;border-radius:5px;background:rgba(0,0,0,.6);color:#fff;cursor:pointer;pointer-events:auto}
   .ed .item .fxTag:hover{background:var(--ea);color:var(--eaInk)}
   .ed .prop label.nhay{animation:nhayFx 1.2s ease}@keyframes nhayFx{0%,60%{box-shadow:inset 0 0 0 1px var(--ea);background:rgba(153,223,0,.12)}100%{box-shadow:none;background:transparent}}
+  /* ═══ đoạn trên dòng thời gian kiểu CapCut: viền chọn trắng mảnh, núm kéo chỉ hiện khi rê chuột / đang chọn, nhãn nhỏ ═══ */
+  .ed.ccw .item{border:1px solid transparent;border-radius:5px;box-shadow:none}
+  .ed.ccw .item.chon,.ed.ccw .item.nhieu,.ed.ccw .item.pdIt.nhieu{border-color:#fff;box-shadow:0 0 0 .5px #fff}
+  .ed.ccw .item .h{width:7px;opacity:0;background:rgba(255,255,255,.92);transition:opacity .12s;z-index:3}
+  .ed.ccw .item .h.l{border-radius:4px 0 0 4px}.ed.ccw .item .h.r{border-radius:0 4px 4px 0}
+  .ed.ccw .item:hover .h,.ed.ccw .item.chon .h{opacity:1;background:#fff}
+  .ed.ccw .item .h::after{content:'';position:absolute;top:50%;left:3px;width:1px;height:10px;margin-top:-5px;background:#2a2a2e;box-shadow:none}
+  .ed.ccw .item.chon .h::after{background:#2a2a2e;box-shadow:none}
+  .ed.ccw .item b{font-size:10.5px;font-weight:600}
+  .ed.ccw .item small{font-size:10px}
+  .ed.ccw .item.g:has(small:not(:empty)) small{font-size:10.5px}
+  .ed.ccw .item .kfd{z-index:4}
+  .ed.ccw .item:hover:not(.chon):not(.nhieu){border-color:rgba(255,255,255,.4)}
+  /* thắng các rule màu riêng từng đoạn (.item.v.s0…): viền mặc định trong suốt, chọn mới trắng */
+  .ed.ccw .item[data-k]{border-color:transparent;border-width:1px}
+  .ed.ccw .item[data-k]:hover:not(.chon):not(.nhieu){border-color:rgba(255,255,255,.4)}
+  .ed.ccw .item[data-k].chon,.ed.ccw .item[data-k].nhieu{border-color:#fff}
 </style>
 </head>
 <body>

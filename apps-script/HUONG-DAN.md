@@ -788,6 +788,13 @@ Trước đây sau khi "Hiểu footage" thẻ tự bung ra hết cỡ (tên file
 - Mã: `khoiTaoKeoTha` — bộ xử lý `drop` gắn ở phần tử cha (capture) để chạy trước bộ thả-thành-lớp; `apFxVaoDoan`, `themChuTai`, `tenFxNgan`; `veTl` được bọc để gắn `.fxTag`.
 - Hồi quy `t139` (8/8).
 
+### Đoạn trên dòng thời gian trình bày như CapCut (10/2026)
+
+- **Viền chọn trắng mảnh** 1 px (bỏ hai mép lime dày): đoạn đang chọn / chọn nhiều chỉ có viền trắng, áp cho mọi loại (video, phủ, chữ, đồ hoạ, âm, lồng tiếng, phụ đề).
+- **Núm kéo dài / thu ngắn chỉ hiện khi rê chuột vào đoạn hoặc đoạn đang chọn**: hai thanh trắng 7 px ở hai mép với một vạch xám ở giữa, bo góc theo đoạn; rê qua đoạn chưa chọn thì viền sáng nhẹ 40 %.
+- Nhãn trên đoạn 10,5 px, dòng phụ 10 px; bo góc 5 px.
+- Hồi quy `t121` cập nhật màu viền chọn; `t89` cắt sớm các host ngoài (mediapipe, gstatic, jsdelivr…) vì máy test không có internet, tránh treo ở sự kiện `load`.
+
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 
 Cài theo [`cloudflare/CAI-DAT.md`](../cloudflare/CAI-DAT.md) (khoảng 10 phút, không cần thẻ). Có máy chủ này tool thêm:
