@@ -27,7 +27,7 @@
      ANTHROPIC_API_KEY, OPENAI_API_KEY   (Secret) key khi chọn claude / openai
    ═══════════════════════════════════════════════════════════════════════════ */
 
-const PHIEN_BAN = '2026.10.18';
+const PHIEN_BAN = '2026.10.19';
 /* link /exec của Apps Script đang dùng trong tool (công khai sẵn trong tools/*.html). Biến APPS_SCRIPT_URL trên Cloudflare, nếu có, sẽ được ưu tiên. */
 const APPS_SCRIPT_MD = 'https://script.google.com/macros/s/AKfycbyxe1nWupAl6VheDZHaU3Ojm-d6c8F_khhUMtkehNCLh5OnGW6f2uF0PKPYZ4eYUqyGjQ/exec';
 const asUrl = env => String(env.APPS_SCRIPT_URL || env.APPS_SCRIPT || APPS_SCRIPT_MD).trim();
@@ -165,7 +165,7 @@ async function timBroll(url, env, ctx) {
   const pixabayAnh = async (query, vi) => {
     if (!env.PIXABAY_KEY) return [];
     const p = new URLSearchParams({ key: env.PIXABAY_KEY, q: query.slice(0, 100), per_page: '40', page: String(trang), safesearch: 'true', image_type: 'photo', orientation: doc ? 'vertical' : 'horizontal' }); if (vi) p.set('lang', 'vi');
-    const r = await fetch('https://pixabay.com/api/?' + p); if (!r.ok) throw new Error('pixabay ' + r.status);
+    const r = await fetchLai('https://pixabay.com/api/?' + p); if (!r.ok) throw new Error('pixabay ' + r.status + (r.status === 429 ? ' (quá giới hạn, thử lại sau 1 phút)' : ''));
     return ((await r.json()).hits || []).map(h => ({ id: 'pbi' + h.id, anh: true, giay: 0, w: h.imageWidth, h: h.imageHeight, thumb: h.webformatURL, link: h.largeImageURL || h.webformatURL, goc: h.pageURL, tac_gia: (h.user || 'Pixabay') + ' · Pixabay' }));
   };
   const pexelsAnh = async (query, vi) => {
@@ -178,7 +178,7 @@ async function timBroll(url, env, ctx) {
     if (anh) return pixabayAnh(query, vi);
     if (!env.PIXABAY_KEY) return [];
     const p = new URLSearchParams({ key: env.PIXABAY_KEY, q: query.slice(0, 100), per_page: '60', page: String(trang), safesearch: 'true', video_type: 'film' }); if (vi) p.set('lang', 'vi');
-    const r = await fetch('https://pixabay.com/api/videos/?' + p); if (!r.ok) throw new Error('pixabay ' + r.status);
+    const r = await fetchLai('https://pixabay.com/api/videos/?' + p); if (!r.ok) throw new Error('pixabay ' + r.status + (r.status === 429 ? ' (quá giới hạn, thử lại sau 1 phút)' : ''));
     return ((await r.json()).hits || []).map(h => {
       const v = h.videos || {}, ds = ['medium', 'small', 'large', 'tiny'].map(k => v[k]).filter(x => x && x.url && x.width);
       const f = ds.find(x => Math.max(x.width, x.height) <= 1280) || ds[0]; if (!f) return null;
@@ -197,7 +197,9 @@ async function timBroll(url, env, ctx) {
     }).filter(Boolean);
   };
   const hopHuong = it => doc ? it.h >= it.w : it.w > it.h;
-  const tim = async (query, vi) => { const kq = await Promise.allSettled([pexels(query, vi), pixabay(query, vi)]); const ds = kq.flatMap(x => x.status === 'fulfilled' ? x.value : []); if (!ds.length && kq.every(x => x.status === 'rejected')) throw kq[0].reason; return ds; };
+  // nguồn nào lỗi (429 quá tải, 400, mạng) thì ghi lại để trả về cho trang báo đúng lý do — trước đây lỗi bị nuốt thành "không có kết quả" rồi còn cache 24h
+  const loi = [];
+  const tim = async (query, vi) => { const kq = await Promise.allSettled([pexels(query, vi), pixabay(query, vi)]); kq.forEach(x => { if (x.status === 'rejected') loi.push(String((x.reason && x.reason.message) || x.reason).slice(0, 120)); }); return kq.flatMap(x => x.status === 'fulfilled' ? x.value : []); };
   let vids = (await tim(q, true)).filter(hopHuong), tuKhoa = q;
   if (vids.length < 6 && dsKey(env).length) {
     try {
@@ -208,11 +210,12 @@ async function timBroll(url, env, ctx) {
   }
   const items = vids.slice(0, 18).map(({ link, ...it }) => ({ ...it, url: `/media?u=${encodeURIComponent(link)}` }));
   const nguon = [env.PIXABAY_KEY && 'Pixabay', env.PEXELS_KEY && 'Pexels'].filter(Boolean).join(' + ');
-  const kq = { ok: true, items, tu_khoa: tuKhoa, nguon: nguon + ' · miễn phí dùng thương mại' };
-  if (cache && ctx) ctx.waitUntil(cache.put(cKey, new Response(JSON.stringify(kq), { headers: { 'content-type': 'application/json', 'cache-control': 'public, max-age=86400' } })));   // Pixabay yêu cầu cache 24h
+  const kq = { ok: true, items, tu_khoa: tuKhoa, nguon: nguon + ' · miễn phí dùng thương mại' }; if (loi.length) kq.loi = loi;
+  if (cache && ctx && (items.length || !loi.length)) ctx.waitUntil(cache.put(cKey, new Response(JSON.stringify(kq), { headers: { 'content-type': 'application/json', 'cache-control': 'public, max-age=86400' } })));   // Pixabay yêu cầu cache 24h; kết quả rỗng do nguồn lỗi thì không cache
   return kq;
 }
 function coKho(env) { return !!(env.PIXABAY_KEY || env.PEXELS_KEY); }
+async function fetchLai(u, opt) { let r = await fetch(u, opt); if (r.status === 429 || r.status >= 500) { await new Promise(x => setTimeout(x, 1200)); r = await fetch(u, opt); } return r; }
 
 /* ── phát lại file Pexels có CORS (canvas cần) và Range (video tua được) ── */
 async function media(req, url, cors) {
