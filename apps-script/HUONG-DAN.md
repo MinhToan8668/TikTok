@@ -749,6 +749,12 @@ Trước đây sau khi "Hiểu footage" thẻ tự bung ra hết cỡ (tên file
 - Hiểu xong **không tự bung** nữa; bấm vào tên mới mở chi tiết (cảnh để kéo vào V2, khoảnh khắc ★, tag), bấm lần nữa để gọn lại.
 - Hồi quy: `hien.mjs` tự mở ô khi bài test cần bấm vào cảnh / khoảnh khắc, giống thao tác người dùng.
 
+### Thanh công cụ dòng thời gian gọn + font Be Vietnam Pro (10/2026)
+
+- Thanh công cụ cao 38px (trước 48px), nút 26px, icon 14px, nút bật (nam châm, liên kết, ripple…) chỉ ánh màu nhấn nhạt có viền thay vì khối lime đặc; đồng hồ `00:01:15 | 00:05:00` nằm một dòng ở giữa, số dạng tabular để không nhảy; thanh zoom mảnh cùng kiểu với thanh trượt trong bảng Thuộc tính.
+- Toàn bộ trình dựng (`.ed.ccw`) dùng **Be Vietnam Pro** (đã tải sẵn từ Google Fonts), thay cho font hệ thống.
+- Hồi quy `t121` cập nhật chiều cao thanh công cụ.
+
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 
 Cài theo [`cloudflare/CAI-DAT.md`](../cloudflare/CAI-DAT.md) (khoảng 10 phút, không cần thẻ). Có máy chủ này tool thêm:

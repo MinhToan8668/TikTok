@@ -957,6 +957,24 @@
     .ed.ccw #srcs.luoi:not(.dangTim) .fsrc:not(.mo) .acts:has(.btn.xanh) .btn:not(.xanh){display:none}
     .ed.ccw #srcs.luoi:not(.dangTim) .fsrc:not(.mo):hover .acts .btn:not(.xanh){display:inline-flex}
   }
+  /* ═══ thanh công cụ dòng thời gian gọn kiểu CapCut: nút 26px, icon 14px, giờ một dòng, nút bật chỉ ánh màu nhấn; cả trình dựng dùng Be Vietnam Pro ═══ */
+  .ed.ccw{font-family:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif}
+  .ed.ccw .etool{height:38px;padding:0 8px}
+  .ed.ccw .etool .cum{gap:1px}
+  .ed.ccw .etool .ic{width:26px;height:26px;border-radius:6px;font-size:12px;color:var(--em)}
+  .ed.ccw .etool .ic svg{width:14px;height:14px}
+  .ed.ccw .etool .ic:hover{background:var(--ep2);color:var(--et)}
+  .ed.ccw .etool .ic[aria-pressed="true"]{background:rgba(153,223,0,.14);color:var(--eaChu);box-shadow:inset 0 0 0 1px rgba(153,223,0,.45)}
+  .ed.ccw .etool .cum .ic + .ic{margin-left:0}
+  .ed.ccw .etool .ccGiua{gap:6px}
+  .ed.ccw .etool .ccGiua .play{width:26px;height:26px;font-size:12px}
+  .ed.ccw .etool .ccGiua .tg{font-size:11.5px;font-weight:500;white-space:nowrap;font-variant-numeric:tabular-nums;letter-spacing:.01em}
+  .ed.ccw .etool .ccGiua .tg b{font-weight:600}
+  .ed.ccw .etool #zoomTl{-webkit-appearance:none;appearance:none;width:78px;height:12px;background:transparent;cursor:pointer}
+  .ed.ccw .etool #zoomTl::-webkit-slider-runnable-track{height:2px;border-radius:2px;background:linear-gradient(90deg,var(--ea) 0,var(--ea) var(--pc,50%),var(--el) var(--pc,50%),var(--el) 100%)}
+  .ed.ccw .etool #zoomTl::-webkit-slider-thumb{-webkit-appearance:none;width:10px;height:10px;margin-top:-4px;border-radius:50%;background:#fff;border:0;box-shadow:0 1px 3px rgba(0,0,0,.55)}
+  .ed.ccw .etool #zoomTl::-moz-range-track{height:2px;background:var(--el)}.ed.ccw .etool #zoomTl::-moz-range-progress{height:2px;background:var(--ea)}.ed.ccw .etool #zoomTl::-moz-range-thumb{width:10px;height:10px;border:0;border-radius:50%;background:#fff}
+  .ed.ccw .etool select,.ed.ccw .etool .btn.nho{height:24px;font-size:11px;padding:0 6px;border-radius:5px}
 </style>
 </head>
 <body>
@@ -5621,6 +5639,7 @@ function khoiTaoTruotTo() {
   box.addEventListener('input', e => { if (e.target.type === 'range') truotTo(e.target); }, true);
   const vePropTt = veProp; veProp = function () { const r = vePropTt.apply(this, arguments); quet(); return r; };
   quet();
+  const z = $('#zoomTl'); if (z) { truotTo(z); z.addEventListener('input', () => truotTo(z)); const veTlZ = veTl; veTl = function () { const r = veTlZ.apply(this, arguments); truotTo(z); return r; }; }   /* thanh zoom dòng thời gian cùng kiểu */
 }
 
 /* ═════════ KHO PIXABAY GỌI THẲNG TỪ TRÌNH DUYỆT: mỗi học viên dùng IP riêng (100 lượt/phút) nên không dính 429 của IP chung Cloudflare.
