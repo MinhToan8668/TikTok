@@ -742,6 +742,13 @@ Muốn **luôn lấy dữ liệu Pixabay** thì phải tránh IP chung của Clo
 - File ảnh / video vẫn tải qua `/media` của worker để vẽ được lên canvas (CORS), như cũ.
 - **Đánh đổi cần biết:** key Pixabay sẽ nhìn thấy được trong DevTools của học viên đã đăng nhập. Key này chỉ đọc, miễn phí, giới hạn theo IP người gọi nên rủi ro thấp; nếu lộ ra ngoài thì vào pixabay.com/api/docs tạo key mới và đổi Secret `PIXABAY_KEY` là xong — không ảnh hưởng key Gemini hay Apps Script.
 
+### Ô footage gọn như CapCut (10/2026)
+
+Trước đây sau khi "Hiểu footage" thẻ tự bung ra hết cỡ (tên file dài, dòng tóm tắt, dải cảnh, tag, khoảnh khắc) chiếm cả hàng. Nay:
+- Ô chỉ còn **hình thu nhỏ + huy hiệu thời lượng + tên 1 dòng (bỏ đuôi file, tên đầy đủ ở tooltip) + 1 dòng "0:19 · ngang"**. Nút 🙂 / ＋V1 / 🗑 chỉ hiện khi rê chuột (máy cảm ứng vẫn hiện); nút **✨ Hiểu footage** luôn hiện khi chưa hiểu.
+- Hiểu xong **không tự bung** nữa; bấm vào tên mới mở chi tiết (cảnh để kéo vào V2, khoảnh khắc ★, tag), bấm lần nữa để gọn lại.
+- Hồi quy: `hien.mjs` tự mở ô khi bài test cần bấm vào cảnh / khoảnh khắc, giống thao tác người dùng.
+
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 
 Cài theo [`cloudflare/CAI-DAT.md`](../cloudflare/CAI-DAT.md) (khoảng 10 phút, không cần thẻ). Có máy chủ này tool thêm:
