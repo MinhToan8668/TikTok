@@ -755,6 +755,20 @@ Trước đây sau khi "Hiểu footage" thẻ tự bung ra hết cỡ (tên file
 - Toàn bộ trình dựng (`.ed.ccw`) dùng **Be Vietnam Pro** (đã tải sẵn từ Google Fonts), thay cho font hệ thống.
 - Hồi quy `t121` cập nhật chiều cao thanh công cụ.
 
+### Dọn giao diện tổng thể: bỏ kính mờ, màu đặc, tràn viền (10/2026)
+
+Ảnh anh gửi là **bố cục dọc** (nút 📱 trên thanh trên: khung xem đứng bên phải, cao hết cột) cộng với lớp "kính mờ": các tấm (thanh trên, 3 cột, dòng thời gian) trong suốt 72 % + blur, đặt trên nền có quầng lime/cyan, trình dựng lại nổi cách mép màn hình 6 px bo góc 20 px — nên thanh trên và thanh công cụ nhìn như bị nhoè, lime bleed loang ra, khung trông lộn xộn. Sửa:
+- **Bỏ kính mờ và quầng sáng**: mọi tấm dùng **màu đặc** (`--ep #15170F`, timeline `#101209`, nền khung `#0A0B07`), viền mảnh 7 % trắng, không bóng đổ, không highlight. Tông sáng cũng đặc tương ứng.
+- **Tràn viền màn hình** như CapCut: `inset:0`, không bo góc ngoài; các tấm cách nhau 6 px, bo 10 px. Thanh trên 46 px.
+- **Bố cục dọc khi đang chọn mục**: thư viện lấy phần dư, bảng Thuộc tính rộng cố định 360 px (trước thư viện bị ép còn ~190 px, chữ ô "Thêm footage" rơi từng từ một dòng).
+- Hồi quy `t121` cập nhật chiều cao thanh trên (46 px, màu đặc).
+
+### Các tab bên trái gọn lại (Âm thanh, Hiệu ứng, Nhãn dán, Văn bản…) (10/2026)
+
+- **Cột danh mục** bên trái mỗi tab: rộng 100 px, chữ 11 px, **một dòng** — tên ngắn ("Kho online", "Hiệu ứng âm", "Ghi âm", "Nhạc chủ đề", "Nhạc nền", "Nhãn động"…; `BEN_TEN` + tự bỏ phần trong ngoặc), tên đầy đủ hiện ở tooltip. Trước đây "Hiệu ứng âm theo chủ đề (trực tuyến)" gãy thành 5 dòng.
+- Tiêu đề mục 11 px, dòng ghi chú 10,5 px, ô tìm 26 px, **chip chủ đề 20 px chữ 10,5 px**, hàng hiệu ứng âm thấp hơn (icon 24 px, nút 22 px), ô "Tải lên" nhỏ lại. Emoji nhanh vẫn giữ ô 44 px.
+- Hồi quy `t134` (cỡ ô) vẫn 8/8.
+
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 
 Cài theo [`cloudflare/CAI-DAT.md`](../cloudflare/CAI-DAT.md) (khoảng 10 phút, không cần thẻ). Có máy chủ này tool thêm:
