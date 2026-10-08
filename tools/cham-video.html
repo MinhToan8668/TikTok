@@ -238,6 +238,21 @@
   .sumbar b{font-size:13.5px}
   .sumbar small{display:block;color:var(--muted);font-size:12px}
   .sumbar .row{margin-left:auto;gap:6px}
+  /* gọn form: hồ sơ kênh một dòng, ô không bắt buộc gom lại */
+  .hs-dau{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
+  .hs-dau h2{margin:0}
+  .hs-dau .btn{padding:6px 12px;font-size:13px}
+  .hs-tom{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border-radius:12px;background:var(--accent-soft);border:1.5px solid var(--accent);font-size:13px;margin-bottom:4px}
+  .hs-tom b{font-size:14.5px}
+  .hs-tom span{color:var(--muted)}
+  .them{margin-top:14px;border:1.5px dashed var(--line-strong);border-radius:12px;background:var(--surface-2)}
+  .them > summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 12px;font-weight:700;font-size:13.5px}
+  .them > summary::-webkit-details-marker{display:none}
+  .them > summary small{font-weight:500;color:var(--muted);font-size:12px;display:block}
+  .them > summary::after{content:"▾";font-size:14px;transition:transform .15s}
+  .them[open] > summary::after{transform:rotate(180deg)}
+  .them > .them-ruot{padding:0 12px 12px}
+  .them > .them-ruot > .lbl:first-child{margin-top:0}
   @media (max-width:900px){
     .grid{grid-template-columns:1fr} .two{grid-template-columns:1fr} .brand h1{font-size:19px}
     .nums{grid-template-columns:repeat(3,1fr)} .linkrow{grid-template-columns:1fr} .sumbar .row{margin-left:0;width:100%}
@@ -322,6 +337,9 @@
         <label class="lbl" for="yDinh">Bạn định truyền tải điều gì? <span style="font-weight:500">(tuỳ chọn, nhưng nên ghi)</span></label>
         <textarea id="yDinh" rows="3" placeholder="VD: Muốn người xem thấy mình bận nhưng vẫn nấu cơm cho con, để họ đồng cảm và hỏi công thức. Ghi vào đây để AI so ý định với thứ video thật sự truyền tải."></textarea>
 
+        <details class="them" id="themBox">
+          <summary><span>➕ Thêm thông tin cho AI <small id="themDem"></small></span></summary>
+          <div class="them-ruot">
         <label class="lbl" for="loiThoai">Kịch bản hoặc lời thoại <span style="font-weight:500" id="loiOpt">(tuỳ chọn khi đã có video)</span></label>
         <textarea id="loiThoai" rows="3" placeholder="Có video thì AI tự nghe. Chỉ cần dán khi không có video, hoặc muốn AI so kịch bản bạn viết với thứ bạn nói thật trong video."></textarea>
         <div class="cnt"><span id="cntChu">0 chữ</span><span id="cntGiay"></span></div>
@@ -329,10 +347,15 @@
           <div><label class="lbl" for="giay">Thời lượng (giây)</label><input type="text" id="giay" inputmode="numeric" placeholder="Tự lấy từ file, sửa được"></div>
           <div></div>
         </div>
-      </section>
+          </div>
+        </details>
+
+              </section>
 
       <section class="card">
-        <h2>2 · Kênh của bạn</h2>
+        <div class="hs-dau"><h2>2 · Kênh của bạn</h2><button type="button" class="btn" id="hsDoi" aria-expanded="true" aria-controls="hsMo">Thu gọn ▴</button></div>
+        <div class="hs-tom" id="hsTom" hidden></div>
+        <div id="hsMo">
         <p class="hint">AI chấm theo đúng ngách, tệp và luật kênh của bạn. Học viên đăng nhập là mấy ô này tự có sẵn.</p>
         <div class="two">
           <div><label class="lbl" for="chuDe">Chủ đề / ngách của kênh</label><input type="text" id="chuDe" placeholder="VD: cơm nhà cho mẹ bỉm, sửa xe máy, luyện thi IELTS"></div>
@@ -340,6 +363,7 @@
         </div>
         <label class="lbl" for="sanPham">Sản phẩm / dịch vụ (nếu có)</label>
         <input type="text" id="sanPham" placeholder="VD: khoá học, set hải sản 1tr2, dịch vụ spa">
+        </div>
         <div class="row" style="margin-top:14px;gap:10px">
           <button class="btn pro lg" id="btnCham" type="button">🎯 Chấm video <small style="font-weight:500;opacity:.8">· 1 lượt AI</small></button>
           <button class="btn" id="btnClear" type="button">Xoá form</button>
@@ -871,7 +895,24 @@ $('#videoClear').addEventListener('click', () => { state.file = null; $('#giay')
 ['dragover', 'drop'].forEach(ev => window.addEventListener(ev, e => { if (!dz.contains(e.target)) e.preventDefault(); }));
 $('#acctBtn').addEventListener('click', () => TK.mo());
 TK.ganO({ nganh: '#chuDe', doi_tuong: '#doiTuong', san_pham: '#sanPham' });
-TK.oMoiHoSo($('#chuDe').closest('section'), ['muc_tieu']);   // mục tiêu đã có nút chọn ở phần 1
+TK.oMoiHoSo($('#hsMo'), ['muc_tieu']);   // mục tiêu đã có nút chọn ở phần 1
+/* hồ sơ kênh gói thành một dòng khi đã điền ngách và người xem; bấm Sửa để mở lại */
+function thuHoSo(thu) {
+  const tom = $('#hsTom'), cd = $('#chuDe').value.trim(), dt = $('#doiTuong').value.trim(), sp = $('#sanPham').value.trim();
+  $('#hsMo').hidden = thu; tom.hidden = !thu; $('#hsDoi').setAttribute('aria-expanded', String(!thu)); $('#hsDoi').textContent = thu ? 'Sửa hồ sơ ▾' : 'Thu gọn ▴';
+  tom.innerHTML = ''; tom.append(el('b', null, cd || 'Chưa điền ngách'), el('span', null, [dt, sp].filter(Boolean).join(' · ')));
+}
+function tuThuHoSo() { if (ls.get('cham.hs_thu') !== '0' && $('#chuDe').value.trim() && $('#doiTuong').value.trim()) thuHoSo(true); }
+$('#hsDoi').addEventListener('click', () => { const thu = !$('#hsMo').hidden; ls.set('cham.hs_thu', thu ? '1' : '0'); thuHoSo(thu); });
+/* mục "thêm thông tin": đếm ô đã có chữ (kể cả ô link tự điền) để biết bên trong có gì mà không cần mở */
+function veThem() {
+  const box = $('#themBox'); if (!box) return;
+  const co = [...box.querySelectorAll('.them-ruot input[type=text], .them-ruot textarea')].filter(x => x.value.trim()).length + (box.querySelector('.them-ruot img:not([hidden])') ? 1 : 0);
+  $('#themDem').textContent = co ? `Đã có ${co} mục · bấm để xem, sửa` : 'Kịch bản, lời thoại, thời lượng · không bắt buộc khi đã có video';
+}
+['input', 'change'].forEach(ev => $('#themBox').addEventListener(ev, veThem)); setInterval(veThem, 1500);
+tuThuHoSo(); setTimeout(tuThuHoSo, 1500); veThem();
+
 $('#btnCham').addEventListener('click', cham);
 $('#btnClear').addEventListener('click', () => xoaHet(true));
 TK.khoiDong({ api: API, tool: 'cham', onDoi: () => { veQuota(); dienTuHoSo(); } });
