@@ -10,7 +10,7 @@ Bộ poster quảng bá 6 tool Viral Studio cho page Tự Mình Xây Kênh, ản
 | `poster.html` | Bố cục tất cả poster. Mở bằng trình duyệt để xem, sửa chữ ở đây |
 | `anh/` | Ảnh chụp giao diện tool (khổ điện thoại 390px ×3, dựng video khổ máy tính) |
 | `logo/` | Logo đổi màu theo nền: `lockup-nen-lime.svg` (viên gạch play màu kem), `lockup-nen-toi.svg` (gạch sáng, viên play lime). Nền kem dùng logo gốc trong `assets/brand/` |
-| `mau/` | Dữ liệu mẫu để chụp: ảnh bìa và 3 cảnh webm cho Tải video, Dựng video |
+| `mau/` | Dữ liệu mẫu để chụp, cắt từ hai bài thật của @financewithto: `bia.jpg`, `anh-bai1/2.jpg` (bài nhiều ảnh), `canh1-3.webm` (3 cảnh cho Dựng video) |
 | `chup.js` | Chụp lại `anh/` từ tool trong repo |
 | `xuat.js` | Xuất `poster.html` ra `xuat/` |
 
@@ -33,6 +33,8 @@ NODE_PATH=$(npm root -g) node poster-fb/xuat.js
 Cần Playwright cài toàn cục (`npm i -g playwright && npx playwright install chromium`).
 Tool chạy chế độ demo (`#demo`, `#demo-pro`) nên không gọi Apps Script, không tốn lượt AI.
 Kết quả trên ảnh là dữ liệu demo, poster đã ghi "dữ liệu minh hoạ".
+Riêng tool Tải video dùng media thật trong `mau/`, poster ghi công `@financewithto`.
+Thay bài khác thì sửa `BAI_VIDEO`, `BAI_ANH`, `TAC_GIA` ở đầu `chup.js` và thay file trong `mau/`.
 
 Máy không vào được Google Fonts thì cài Be Vietnam Pro và Bricolage Grotesque vào máy
 rồi chạy kèm `KHONG_FONT_MANG=1`.

@@ -2,8 +2,9 @@
    Chạy từ gốc repo:  NODE_PATH=$(npm root -g) node poster-fb/chup.js
    Cần Playwright (npm i -g playwright) và Chromium của nó.
    Tool chạy ở chế độ demo (#demo, #demo-pro) nên không gọi Apps Script, không tốn lượt AI.
-   Tải video và dựng video dùng dữ liệu mẫu trong poster-fb/mau (ảnh bìa, 3 cảnh webm),
-   link tikwm được giả lập ngay trong trình duyệt nên không tải gì từ TikTok thật.
+   Tải video và dựng video dùng dữ liệu mẫu trong poster-fb/mau (ảnh bìa, 2 ảnh bài, 3 cảnh webm
+   cắt từ hai bài thật của @financewithto), link tikwm được giả lập ngay trong trình duyệt nên
+   lúc chụp không tải gì từ TikTok thật.
    Máy không vào được Google Fonts: đặt KHONG_FONT_MANG=1 và cài sẵn Be Vietnam Pro, Bricolage Grotesque. */
 const { chromium } = require('playwright');
 const http = require('http'), fs = require('fs'), path = require('path');
@@ -49,20 +50,62 @@ async function cuonToi(pg, sel, lech = 0) {
   await nghi(pg, 300);
 }
 
-async function taiVideo(c) {
-  const bia = fs.readFileSync(path.join(MAU, 'bia.jpg'));
-  await c.route(/tikwm\.com\/api/, r => r.fulfill({ contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify({ code: 0, data: {
-    id: '7412345678901234567', title: '3 lỗi khiến video của bạn bị lướt ngay giây đầu #xaykenh #tiktoktips', duration: 47,
-    play_count: 128400, digg_count: 9620, comment_count: 412, share_count: 1530, author: { nickname: 'Kênh Mẫu', unique_id: 'kenhmau' },
+/* Dữ liệu mẫu lấy từ hai bài thật của kênh @financewithto (Toàn Thích Trải Nghiệm):
+   một video và một bài nhiều ảnh. Media đã tải sẵn về poster-fb/mau, tool không gọi
+   TikTok thật lúc chụp — route tikwm bên dưới trả thẳng file trong mau. */
+const BAI_VIDEO = {
+  id: '7555544433322211100',
+  title: 'Tại sao nó KO phải là 1 đường hồi quy tuyến tính 😭 #toanthichtrainghiem #viral #cfa #finance',
+  duration: 23, play_count: 387269, digg_count: 13286, comment_count: 156, share_count: 6168,
+};
+const BAI_ANH = {
+  id: '7555544433322211101',
+  title: 'Đôi khi phải đánh đổi để thấy mình trân quý những thứ mình đang có hơn ạ 😊 #Toanthichtrainghiem #xuhuong',
+  duration: 0, play_count: 60482, digg_count: 2158, comment_count: 122, share_count: 91,
+};
+const TAC_GIA = { nickname: 'Toàn Thích Trải Nghiệm', unique_id: 'financewithto' };
+
+/* Dựng JSON đúng dạng tikwm trả về. anh=true thì ra bài nhiều ảnh, không có file video. */
+function duLieuTikwm(bai, anh) {
+  return { code: 0, data: Object.assign({}, bai, {
+    author: TAC_GIA,
     cover: 'https://www.tikwm.com/bia.jpg', origin_cover: 'https://www.tikwm.com/bia.jpg',
-    hdplay: 'https://www.tikwm.com/v-hd.mp4', hd_size: 18234567, play: 'https://www.tikwm.com/v.mp4', size: 12345678,
-    wmplay: 'https://www.tikwm.com/v-wm.mp4', wm_size: 13345678, music: 'https://www.tikwm.com/m.mp3', music_info: { title: 'âm thanh gốc', author: 'Kênh Mẫu' } } }) }));
-  await c.route(/tikwm\.com\/bia\.jpg/, r => r.fulfill({ contentType: 'image/jpeg', body: bia }));
+    music: 'https://www.tikwm.com/m.mp3', music_info: { title: 'âm thanh gốc', author: TAC_GIA.unique_id },
+  }, anh
+    ? { images: ['https://www.tikwm.com/anh1.jpg', 'https://www.tikwm.com/anh2.jpg'] }
+    : { hdplay: 'https://www.tikwm.com/v-hd.mp4', hd_size: 18234567, play: 'https://www.tikwm.com/v.mp4', size: 12345678,
+        wmplay: 'https://www.tikwm.com/v-wm.mp4', wm_size: 13345678 }) };
+}
+
+async function taiVideo(c) {
+  const anhTheoTen = { 'bia.jpg': 'bia.jpg', 'anh1.jpg': 'anh-bai1.jpg', 'anh2.jpg': 'anh-bai2.jpg' };
+  let nhieuAnh = false;          // đổi cờ này để mock trả bài ảnh thay vì bài video
+  await c.route(/tikwm\.com\/api/, r => r.fulfill({ contentType: 'application/json', headers: { 'access-control-allow-origin': '*' },
+    body: JSON.stringify(duLieuTikwm(nhieuAnh ? BAI_ANH : BAI_VIDEO, nhieuAnh)) }));
+  await c.route(/tikwm\.com\/(bia|anh1|anh2)\.jpg/, r => {
+    const ten = anhTheoTen[r.request().url().split('/').pop()];
+    r.fulfill({ contentType: 'image/jpeg', body: fs.readFileSync(path.join(MAU, ten)) });
+  });
+
   const pg = await mo(c, 'tai-ve.html');
-  await pg.fill('#link', 'https://vt.tiktok.com/ZSkXy7a9b/'); await chup(pg, 'tai-1');
+  await pg.fill('#link', 'https://vt.tiktok.com/ZSbgF1kBE/'); await chup(pg, 'tai-1');
+  await chupKhoi(pg, '.card, main section', 'tv-nen');
   await pg.click('#btnLay'); await nghi(pg, 2500);
   await cuonToi(pg, '#st', 90); await chup(pg, 'tai-2');
   await cuonToi(pg, '#kq .grp', 10); await chup(pg, 'tai-3');
+  await chup(pg, 'tv-man-kq');
+  await chupKhoi(pg, '#kq .info', 'tv-info');
+  await chupKhoi(pg, '#kq .grp', 'tv-video');
+  const soNhom = await pg.locator('#kq .grp').count();
+  if (soNhom > 1) await chupKhoi(pg, '#kq .grp >> nth=' + (soNhom - 1), 'tv-am');
+
+  nhieuAnh = true;
+  await pg.fill('#link', 'https://vt.tiktok.com/ZSbgFxXJg/');
+  await pg.click('#btnLay'); await nghi(pg, 2500);
+  await chupKhoi(pg, '#kq .grp', 'tv-nhieuanh');
+
+  await pg.reload({ waitUntil: 'load' }); await pg.addStyleTag({ content: AN }); await nghi(pg, 1200);
+  if (await pg.locator('#lichSu').isVisible().catch(() => false)) await chupKhoi(pg, '#lichSu', 'tv-lichsu');
   await pg.close();
 }
 

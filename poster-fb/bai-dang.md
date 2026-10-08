@@ -381,7 +381,7 @@ Học viên tụi mình hay hỏi: lưu video người ta về để học thì 
 
 Thế là tụi mình làm luôn cái tool tải video trong Viral Studio.
 
-Dán link vô, nó ra cho bạn video HD không logo, nhạc nền riêng dạng mp3, với cả ảnh bìa gốc. Bài dạng 5-6 tấm ảnh cũng tải một phát về đủ.
+Dán link vô, nó ra cho bạn video HD không logo, nhạc nền riêng dạng mp3, với cả ảnh bìa gốc. Bài dạng nhiều ảnh cũng tải một phát về đủ, kèm cả ảnh bìa.
 
 Lười lọc link thì cứ copy nguyên đoạn chữ lúc bấm Chia sẻ rồi dán vô, tool tự mò ra link.
 
@@ -399,7 +399,7 @@ Bình luận đầu (ghim): `Link nè https://minhtoan8668.github.io/TikTok/tool
 ```
 tụi t dạy làm content, học viên than lưu video về học mà dính logo bự chà bá giữa màn hình
 
-thế là code luôn cái tool tải video cho xài free. dán link vô ra video hd không logo, kèm nhạc nền mp3 với ảnh bìa gốc. bài nhiều ảnh bấm 1 nút về hết
+thế là code luôn cái tool tải video cho xài free. dán link vô ra video hd không logo, kèm nhạc nền mp3 với ảnh bìa gốc. bài nhiều ảnh bấm 1 nút về hết luôn
 
 tải về coi người ta dựng sao thôi nha đừng đăng lại =)))
 
@@ -410,7 +410,7 @@ mn hay lưu video về để học cái gì?
 
 ```
 Cả lớp ơi, tool Tải video trong Viral Studio xài được rồi nha.
-Dán link → ra video HD không logo + nhạc nền + ảnh bìa. Bài nhiều ảnh tải một lần về hết.
+Dán link → ra video HD không logo + nhạc nền + ảnh bìa. Bài nhiều ảnh tải một lần về hết, kèm ảnh bìa.
 https://minhtoan8668.github.io/TikTok/tools/tai-ve.html
 Tuần này lấy 3 video cùng ngách về, coi họ đặt chữ hook chỗ nào rồi mang vô lớp nói nha.
 ```
