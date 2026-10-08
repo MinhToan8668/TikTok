@@ -165,6 +165,27 @@
   .upsell.show{display:grid}
   .upsell .box2{background:var(--surface);border-radius:20px;padding:22px;max-width:440px;width:100%;box-shadow:var(--shadow)}
   .upsell h3{margin:0 0 6px;font-family:var(--font-display);font-size:20px}
+  /* hai tab của tool: viết kịch bản · lọc từ video dài */
+  .kb-tabs{position:sticky;top:0;z-index:5;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 14px;padding:6px;border-radius:16px;background:var(--surface);border:2px solid var(--text);box-shadow:0 4px 0 rgba(28,38,0,.22)}
+  .kb-tabs button{display:flex;align-items:center;gap:10px;text-align:left;font:inherit;color:var(--text);background:transparent;border:0;border-radius:11px;padding:9px 12px;cursor:pointer}
+  .kb-tabs button .ti{font-size:22px;line-height:1}
+  .kb-tabs button b{display:block;font-size:15px;font-weight:800}
+  .kb-tabs button small{display:block;font-size:12px;color:var(--muted);line-height:1.3}
+  .kb-tabs button:hover{background:var(--surface-2)}
+  .kb-tabs button[aria-selected="true"]{background:var(--text);color:var(--bg)}
+  .kb-tabs button[aria-selected="true"] small{color:inherit;opacity:.8}
+  :root[data-theme="dark"] .kb-tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .kb-tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}}
+  .kb-tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  @media (max-width:520px){.kb-tabs button{padding:8px;gap:6px}.kb-tabs button .ti{font-size:18px}.kb-tabs button b{font-size:13.5px}.kb-tabs button small{display:none}}
+  .grid.mot-cot{grid-template-columns:minmax(0,1fr)}
+  .grid.mot-cot #colKq{display:none}
+  .khung-dau{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
+  .khung-dau h2{margin:0}
+  .khung-dau .btn{padding:6px 12px;font-size:13px}
+  .khung-dang{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border-radius:12px;background:var(--accent-soft);border:1.5px solid var(--accent);font-size:13px}
+  .khung-dang b{font-size:14.5px}
+  .khung-dang span{color:var(--muted)}
   /* lọc kịch bản từ file phụ đề */
   .loc summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px}
   .loc summary::-webkit-details-marker{display:none}
@@ -278,10 +299,17 @@
     <a class="ft" href="cham-video.html"><span class="fi" aria-hidden="true">🎯</span>Chấm video của bạn</a>
   </nav>
 
-  <div class="grid">
+  <div class="kb-tabs" role="tablist" aria-label="Hai cách làm kịch bản">
+    <button type="button" role="tab" id="tabNutViet" aria-controls="tabViet" aria-selected="true" data-tab="viet"><span class="ti" aria-hidden="true">✍️</span><span><b>Viết kịch bản</b><small>Chọn khung, tự viết hoặc AI viết, AI chấm</small></span></button>
+    <button type="button" role="tab" id="tabNutLoc" aria-controls="tabLoc" aria-selected="false" data-tab="loc"><span class="ti" aria-hidden="true">✂️</span><span><b>Lọc từ video dài</b><small>Thả file .srt, AI chia thành nhiều video</small></span></button>
+  </div>
+
+  <div class="grid" id="kbGrid">
     <div class="col">
       <section class="card">
-        <h2>1 · Hồ sơ kênh của bạn</h2>
+        <div class="khung-dau"><h2>1 · Hồ sơ kênh của bạn</h2><button type="button" class="btn" id="hsDoi" aria-expanded="true" aria-controls="hsMo">Thu gọn ▴</button></div>
+        <div class="khung-dang" id="hsTom" hidden></div>
+        <div id="hsMo">
         <p class="hint">AI chấm theo đúng kênh bạn thay vì nói chung chung. Điền càng thật, góp ý càng trúng. Học viên đăng nhập là mấy ô này tự có sẵn.</p>
         <div class="two">
           <div><label class="lbl" for="chuDe">Chủ đề / ngách của kênh</label><input type="text" id="chuDe" placeholder="VD: nấu ăn cho mẹ bỉm đi làm, kinh nghiệm đi làm ngân hàng, quán bún nhà mình"></div>
@@ -298,12 +326,14 @@
           <div><label class="lbl">Dạng quay</label><div class="seg" id="dang" role="group"><button type="button" data-v="noi_camera" aria-pressed="true">Nói vào camera</button><button type="button" data-v="voice_over" aria-pressed="false">Voice-over</button><button type="button" data-v="text" aria-pressed="false">Chữ story</button></div></div>
           <div><label class="lbl">Tốc độ nói của bạn</label><div class="seg" id="tocDo" role="group"><button type="button" data-v="cham" aria-pressed="false">Chậm · 2,3 chữ/s</button><button type="button" data-v="vua" aria-pressed="true">Vừa · 2,8</button><button type="button" data-v="nhanh" aria-pressed="false">Nhanh · 3,3</button></div></div>
         </div>
+        </div>
       </section>
 
+      <div id="tabLoc" role="tabpanel" aria-labelledby="tabNutLoc" hidden>
       <section class="card">
-        <details class="loc" id="locWrap">
-          <summary><h2>✂️ Có video dài? Lọc kịch bản từ file phụ đề <span class="loc-moi">MỚI</span></h2><span class="mo">Mở ▾</span></summary>
-          <p class="hint" style="margin-top:8px">Quay một lần 10–20 phút, xuất phụ đề <b>.srt</b> (CapCut: Văn bản → Chú thích tự động → Xuất → SRT) rồi thả vào đây. AI đọc lời thật của bạn, lọc đoạn hay, dễ viral, đúng hồ sơ kênh ở trên, chia thành nhiều video hoặc series để bạn chọn làm bao nhiêu tuỳ sức.</p>
+        <div class="loc" id="locWrap">
+          <h2>2 · Lọc kịch bản từ video dài</h2>
+          <p class="hint">Quay một lần 10–20 phút, xuất phụ đề <b>.srt</b> (CapCut: Văn bản → Chú thích tự động → Xuất → SRT) rồi thả vào đây. AI đọc lời thật của bạn, lọc đoạn hay, dễ viral, đúng hồ sơ kênh ở trên, chia thành nhiều video hoặc series để bạn chọn làm bao nhiêu tuỳ sức.</p>
           <label class="tha" id="locTha">
             <input type="file" id="locFile" accept=".srt,.vtt,.txt,text/plain">
             <b>📄 Chọn hoặc kéo thả file .srt / .vtt</b>
@@ -326,13 +356,18 @@
           <div class="row" style="margin-top:12px"><button class="btn pro lg" id="btnLoc" type="button">✦ Lọc kịch bản <small style="font-weight:500;opacity:.8">· 1 lượt AI</small></button></div>
           <div class="status" id="locStatus"></div>
           <div id="locKq" hidden></div>
-        </details>
+        </div>
       </section>
+      </div>
 
+      <div id="tabViet" role="tabpanel" aria-labelledby="tabNutViet">
       <section class="card">
-        <h2>2 · Chọn khung kịch bản</h2>
-        <p class="hint">Mỗi khung là một bố cục đã ra video triệu view. Chọn theo chuyện bạn có và cách bạn muốn làm: lộ mặt nói, lồng tiếng, hay chỉ chữ chạy ghép nhạc.</p>
-        <div class="khung-grid" id="khungGrid"></div>
+        <div class="khung-dau"><h2>2 · Chọn khung kịch bản</h2><button type="button" class="btn" id="khungDoi" aria-expanded="true" aria-controls="khungMo">Đổi khung ▾</button></div>
+        <div class="khung-dang" id="khungDang" hidden></div>
+        <div id="khungMo">
+          <p class="hint">Mỗi khung là một bố cục đã ra video triệu view. Chọn theo chuyện bạn có và cách bạn muốn làm: lộ mặt nói, lồng tiếng, hay chỉ chữ chạy ghép nhạc.</p>
+          <div class="khung-grid" id="khungGrid"></div>
+        </div>
       </section>
 
       <section class="card">
@@ -355,9 +390,10 @@
         </div>
         <div class="status" id="chamStatus"></div>
       </section>
+      </div>
     </div>
 
-    <div class="col">
+    <div class="col" id="colKq">
       <section class="card kq" id="kq">
         <h2>Kết quả khám kịch bản</h2>
         <div class="empty" id="kqEmpty">
@@ -527,6 +563,27 @@ function chonDangTheoKhung(K, baoToast) {
   const v = K.dang || 'noi_camera'; if (state.dang === v) return;
   state.dang = v; setSeg('dang', v); if (baoToast) toast('Khung này hợp dạng ' + DANG_TEN[v] + ', mình đã đổi giúp. Muốn khác thì bấm lại ở mục Dạng quay.');
 }
+/* chọn xong khung thì gói lưới khung lại thành một dòng, đỡ phải lướt qua 17 khung mỗi lần */
+function thuKhung(thu) {
+  const K = khungHienTai(), g = gKhung(K), dang = $('#khungDang');
+  $('#khungMo').hidden = thu; dang.hidden = !thu; $('#khungDoi').setAttribute('aria-expanded', String(!thu)); $('#khungDoi').textContent = thu ? 'Đổi khung ▾' : 'Thu gọn ▴';
+  dang.innerHTML = ''; dang.append(el('span', null, 'Đang dùng'), el('b', null, K.n), el('span', null, `${g[0]}–${g[1]} giây · ${K.d}`));
+}
+/* hồ sơ kênh gói thành một dòng khi đã điền ngách và người xem; bấm Sửa để mở lại */
+function thuHoSo(thu) {
+  const tom = $('#hsTom'), cd = $('#chuDe').value.trim(), dt = $('#doiTuong').value.trim();
+  $('#hsMo').hidden = thu; tom.hidden = !thu; $('#hsDoi').setAttribute('aria-expanded', String(!thu)); $('#hsDoi').textContent = thu ? 'Sửa hồ sơ ▾' : 'Thu gọn ▴';
+  tom.innerHTML = ''; tom.append(el('b', null, cd || 'Chưa điền ngách'), el('span', null, [dt, nhanSeg('mucTieu', state.mucTieu), $('#xungHo').value, DANG_TEN[state.dang]].filter(Boolean).join(' · ')));
+}
+function tuThuHoSo() { const nho = ls.get('kb.hs_thu'); if (nho !== '0' && $('#chuDe').value.trim() && $('#doiTuong').value.trim()) thuHoSo(true); }
+/* hai tab: viết kịch bản (khung + viết + chấm) và lọc từ video dài; hồ sơ kênh dùng chung ở trên */
+function moTab(t, cuon) {
+  t = t === 'loc' ? 'loc' : 'viet';
+  document.querySelectorAll('.kb-tabs [role=tab]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === t)));
+  $('#tabViet').hidden = t !== 'viet'; $('#tabLoc').hidden = t !== 'loc'; $('#kbGrid').classList.toggle('mot-cot', t === 'loc');
+  ls.set('kb.tab', t);
+  if (cuon) $('.kb-tabs').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
 function buildKhung() {
   const box = $('#khungGrid'); box.innerHTML = '';
   for (const [nhom, tenNhom] of NHOM_KHUNG) {
@@ -535,7 +592,7 @@ function buildKhung() {
     for (const K of ds) {
       const b = el('button', 'khung'); b.type = 'button'; b.dataset.k = K.k; b.setAttribute('aria-pressed', String(K.k === state.khung));
       const g = gKhung(K); b.append(el('b', null, K.n), el('small', null, K.d), el('span', 'use', 'Hợp: ' + K.use + ' · ' + g[0] + '–' + g[1] + 's'));
-      b.onclick = () => { state.khung = K.k; document.querySelectorAll('.khung').forEach(x => x.setAttribute('aria-pressed', String(x === b))); chonDangTheoKhung(K, true); buildPhan(); saveDraft(); };
+      b.onclick = () => { state.khung = K.k; document.querySelectorAll('.khung').forEach(x => x.setAttribute('aria-pressed', String(x === b))); chonDangTheoKhung(K, true); buildPhan(); saveDraft(); thuKhung(true); $('#phanList').closest('section').scrollIntoView({ behavior: 'smooth', block: 'start' }); };
       box.append(b);
     }
   }
@@ -744,6 +801,7 @@ function apViet(d, K) {
 }
 /* Kết quả về trong lúc bạn đã rời trang (xem TK.goiNen) */
 TK.nhanViec('viet', (r, v) => {
+  moTab('viet');
   const st = $('#chamStatus'); if (!r.ok) { st.className = 'status err'; st.textContent = 'Lượt AI viết lúc nãy chưa xong: ' + (ERR[r.error] || r.error || 'lỗi'); return; }
   const K = KHUNG.find(x => x.k === (v.them && v.them.khung)) || khungHienTai();
   if (state.khung !== K.k) { state.khung = K.k; buildKhung(); }
@@ -751,6 +809,7 @@ TK.nhanViec('viet', (r, v) => {
   st.className = 'status ok'; st.textContent = 'AI đã viết xong bài trong lúc bạn rời trang. Sửa chỗ [ ] thành chuyện thật của bạn rồi bấm Chấm kịch bản.';
 });
 TK.nhanViec('script', (r, v) => {
+  moTab('viet');
   const st = $('#chamStatus'); if (!r.ok || !r.data || !r.data.score) { st.className = 'status err'; st.textContent = 'Lượt chấm kịch bản lúc nãy chưa xong: ' + (ERR[r.error] || r.error || 'lỗi'); return; }
   if (v.them && v.them.khung && v.them.khung !== state.khung) { state.khung = v.them.khung; buildKhung(); buildPhan(); }
   const parts = goiKichBan(); state.kq = r.data; renderKq(r.data, parts); updateTimes(); try { ls.set('kb.kq', JSON.stringify({ khung: state.khung, d: r.data, parts })); } catch {}
@@ -1045,7 +1104,7 @@ function duaVaoKhung(v) {
   (v.cau_truc || []).forEach((p, i) => { const id = K.phan[i] && K.phan[i][0]; if (!id) return; state.text[K.k][id] = p.loi; state.canh[K.k][id] = [p.doan.length ? 'Cắt ' + p.doan.map(d => fmtT(d.bd) + '–' + fmtT(d.kt)).join(' + ') : 'Quay thêm', p.canh].filter(Boolean).join(' · '); });
   if (v.hook_chu) ls.set('hook.text', v.hook_chu);
   buildKhung(); buildPhan(); updateTimes(); saveDraft();
-  $('#phanList').closest('section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  moTab('viet'); thuKhung(true); $('#phanList').closest('section').scrollIntoView({ behavior: 'smooth', block: 'start' });
   const st = $('#chamStatus'); st.className = 'status ok'; st.textContent = `Đã đưa "${v.ten}" vào khung ${K.n}. Chỗ ghi [nói thêm] là câu bạn quay bổ sung. Bấm Chấm kịch bản nếu muốn AI soi lại.`;
   toast('Đã đưa kịch bản vào khung');
 }
@@ -1053,19 +1112,19 @@ function duaVaoKhung(v) {
 function vietTuDoan(v, k) {
   moKhungCho(v);
   buildKhung(); buildPhan(); updateTimes(); saveDraft();
-  $('#phanList').closest('section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  moTab('viet'); thuKhung(true); $('#phanList').closest('section').scrollIntoView({ behavior: 'smooth', block: 'start' });
   const d = loc.kq || {};
   vietBangAI({ y_do: '', ngu_canh: { loai: 'srt', ten: v.ten, series: d.series && v.phan ? `Phần ${v.phan}/${d.videos.length} của series "${d.series.ten}" (${d.series.soi_chi || ''})` : '', y_chinh: v.y_chinh, hook_chu: v.hook_chu, hook_noi: v.hook_noi, vi_sao: v.vi_sao, can_them: v.can_them, loi_goc: (((v.cau_truc || []).length ? 'BỐ CỤC ĐÃ DỰNG TỪ LỜI GỐC:\n' + locVideoText(v, k) + '\n\nLỜI GỐC CHƯA DỌN:\n' : '') + loiDoan(loc.cau, v.doan)).slice(0, 7000) } });
 }
 const locOpt = { kieu: 'tu_dong', dai: 'tu_dong' };
 let imViet = null;
-(function importSoi() { try { const im = JSON.parse(ls.get('kb.import') || 'null'); if (!im || !im.khung) return; if (im.viet) imViet = im; ls.del ? ls.del('kb.import') : localStorage.removeItem('kb.import'); const K = KHUNG.find(x => x.k === im.khung); if (!K) return; state.khung = K.k; state.text[K.k] = {}; state.canh[K.k] = {}; (im.phan || []).forEach((g, i) => { if (K.phan[i] && g) state.text[K.k][K.phan[i][0]] = String(g).replace(/\*\*/g, ''); }); (im.canh || []).forEach((c, i) => { if (K.phan[i] && c) state.canh[K.k][K.phan[i][0]] = c; }); try { localStorage.removeItem('kb.kq'); } catch {} if (im.chuDe) $('#chuDe').value = im.chuDe; if (im.doiTuong) $('#doiTuong').value = im.doiTuong; if (im.sanPham) $('#sanPham').value = im.sanPham; if (im.mucTieu && $('#mucTieu button[data-v="' + im.mucTieu + '"]')) { state.mucTieu = im.mucTieu; hsDien.mucTieu = im.mucTieu; setSeg('mucTieu', im.mucTieu); } if (im.dang && DANG_TEN[im.dang]) { state.dang = im.dang; setSeg('dang', im.dang); } else chonDangTheoKhung(K, false); state.kq = null; saveDraft(); if (!im.viet) setTimeout(() => toast('Đã nhập khung' + (im.nguon ? ' mượn từ ' + im.nguon : '') + '. Gợi ý trong [ ] là chỗ bạn thay bằng chuyện thật của mình.'), 400); } catch {} })();
+(function importSoi() { try { const im = JSON.parse(ls.get('kb.import') || 'null'); if (!im || !im.khung) return; if (im.viet) imViet = im; ls.del ? ls.del('kb.import') : localStorage.removeItem('kb.import'); const K = KHUNG.find(x => x.k === im.khung); if (!K) return; ls.set('kb.tab', 'viet'); state.khung = K.k; state.text[K.k] = {}; state.canh[K.k] = {}; (im.phan || []).forEach((g, i) => { if (K.phan[i] && g) state.text[K.k][K.phan[i][0]] = String(g).replace(/\*\*/g, ''); }); (im.canh || []).forEach((c, i) => { if (K.phan[i] && c) state.canh[K.k][K.phan[i][0]] = c; }); try { localStorage.removeItem('kb.kq'); } catch {} if (im.chuDe) $('#chuDe').value = im.chuDe; if (im.doiTuong) $('#doiTuong').value = im.doiTuong; if (im.sanPham) $('#sanPham').value = im.sanPham; if (im.mucTieu && $('#mucTieu button[data-v="' + im.mucTieu + '"]')) { state.mucTieu = im.mucTieu; hsDien.mucTieu = im.mucTieu; setSeg('mucTieu', im.mucTieu); } if (im.dang && DANG_TEN[im.dang]) { state.dang = im.dang; setSeg('dang', im.dang); } else chonDangTheoKhung(K, false); state.kq = null; saveDraft(); if (!im.viet) setTimeout(() => toast('Đã nhập khung' + (im.nguon ? ' mượn từ ' + im.nguon : '') + '. Gợi ý trong [ ] là chỗ bạn thay bằng chuyện thật của mình.'), 400); } catch {} })();
 buildKhung(); buildPhan();
 (function moLaiKq() { try { const o = JSON.parse(ls.get('kb.kq') || 'null'); if (o && o.d && o.d.score && o.khung === state.khung) { state.kq = o.d; renderKq(o.d, o.parts || goiKichBan()); updateTimes(); } } catch {} })();
 $('#acctBtn').addEventListener('click', () => TK.mo());
 $('#xungHo').addEventListener('change', e => { e.target.dataset.nguoiChon = '1'; });
 TK.ganO({ nganh: '#chuDe', doi_tuong: '#doiTuong', san_pham: '#sanPham', xung_ho: '#xungHo' });
-TK.oMoiHoSo($('#chuDe').closest('section'), ['muc_tieu', 'dang']);   // hai mục này đã có nút chọn ở trên
+TK.oMoiHoSo($('#hsMo'), ['muc_tieu', 'dang']);   // hai mục này đã có nút chọn ở trên
 $('#btnCham').addEventListener('click', cham);
 $('#btnCopy').addEventListener('click', () => { const K = khungHienTai(); copyText(goiKichBan().filter(p => p.text).map(p => `[${p.ten}]\n${p.text}`).join('\n\n')); });
 $('#btnClear').addEventListener('click', () => { if (!confirm('Xoá hết chữ trong các phần của khung này?')) return; state.text[state.khung] = {}; state.canh[state.khung] = {}; state.kq = null; try { localStorage.removeItem('kb.kq'); } catch {} buildPhan(); saveDraft(); $('#kqBody').hidden = true; $('#kqEmpty').hidden = false; });
@@ -1083,10 +1142,15 @@ $('#locDan').addEventListener('input', e => { const v = e.target.value; if (/-->
 $('#locDoi').addEventListener('click', () => { Object.assign(loc, { ten: '', cau: [], kq: null, chon: [], gy: {}, gyChung: '', gyCu: [], cu: [], cho: null }); luuLoc(); veFile(); $('#locKq').hidden = true; $('#locStatus').textContent = ''; $('#locDan').value = ''; });
 bindSeg('locKieu', v => { locOpt.kieu = v; }); bindSeg('locDai', v => { locOpt.dai = v; });
 $('#btnLoc').addEventListener('click', () => { if (loc.kq && coGopY() && !confirm('Bạn đang có góp ý chưa gửi. Lọc mới từ đầu sẽ bỏ góp ý đó. Muốn dùng góp ý thì bấm "Lọc lại theo góp ý" ở cuối kết quả. Vẫn lọc mới?')) return; loc.gy = {}; loc.gyChung = ''; locKichBan(false); });
-$('#locWrap').addEventListener('toggle', e => ls.set('kb.loc_mo', e.target.open ? '1' : '0'));
-if (ls.get('kb.loc_mo') === '1' || loc.cau.length) $('#locWrap').open = true;
+document.querySelectorAll('.kb-tabs [role=tab]').forEach(b => b.addEventListener('click', () => moTab(b.dataset.tab)));
+$('.kb-tabs').addEventListener('keydown', e => { if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return; const t = ls.get('kb.tab') === 'loc' ? 'viet' : 'loc'; moTab(t); (t === 'loc' ? $('#tabNutLoc') : $('#tabNutViet')).focus(); });
+$('#khungDoi').addEventListener('click', () => thuKhung(!$('#khungMo').hidden));
+$('#hsDoi').addEventListener('click', () => { const thu = !$('#hsMo').hidden; ls.set('kb.hs_thu', thu ? '1' : '0'); thuHoSo(thu); });
+tuThuHoSo(); setTimeout(tuThuHoSo, 1500);   // hồ sơ học viên đăng nhập về sau một nhịp
+moTab(ls.get('kb.tab') || 'viet');
+thuKhung(Object.values(state.text[state.khung] || {}).some(t => String(t || '').trim()));
 veFile(); veLoc();
-TK.nhanViec('loc_srt', r => { $('#locWrap').open = true; nhanLoc(r); });
+TK.nhanViec('loc_srt', r => { moTab('loc'); nhanLoc(r); });
 if (imViet) { const im = imViet; imViet = null; setTimeout(async () => { if (!DEMO) await TK.nap(); $('#chamStatus').className = 'status'; $('#chamStatus').textContent = 'Đã nhận đề xuất, AI sắp viết trọn kịch bản…'; vietBangAI(im); }, 600); }
 loadQuota();
 </script>
