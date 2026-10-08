@@ -154,6 +154,21 @@
   .upsell.show{display:grid}
   .upsell .box2{background:var(--surface);border-radius:20px;padding:22px;max-width:440px;width:100%;box-shadow:var(--shadow)}
   .upsell h3{margin:0 0 6px;font-family:var(--font-display);font-size:20px}
+  /* gọn form: hồ sơ kênh một dòng, ô không bắt buộc gom lại */
+  .hs-dau{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
+  .hs-dau h2{margin:0}
+  .hs-dau .btn{padding:6px 12px;font-size:13px}
+  .hs-tom{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border-radius:12px;background:var(--accent-soft);border:1.5px solid var(--accent);font-size:13px;margin-bottom:4px}
+  .hs-tom b{font-size:14.5px}
+  .hs-tom span{color:var(--muted)}
+  .them{margin-top:14px;border:1.5px dashed var(--line-strong);border-radius:12px;background:var(--surface-2)}
+  .them > summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 12px;font-weight:700;font-size:13.5px}
+  .them > summary::-webkit-details-marker{display:none}
+  .them > summary small{font-weight:500;color:var(--muted);font-size:12px;display:block}
+  .them > summary::after{content:"▾";font-size:14px;transition:transform .15s}
+  .them[open] > summary::after{transform:rotate(180deg)}
+  .them > .them-ruot{padding:0 12px 12px}
+  .them > .them-ruot > .lbl:first-child{margin-top:0}
   @media (max-width:900px){
     .grid{grid-template-columns:1fr}
     .two{grid-template-columns:1fr}
@@ -294,6 +309,9 @@
         <label class="lbl">Nền tảng</label>
         <div class="seg" id="nen" role="group"><button type="button" data-v="tiktok" aria-pressed="true">TikTok</button><button type="button" data-v="facebook" aria-pressed="false">Facebook Reels</button><button type="button" data-v="instagram" aria-pressed="false">Instagram</button><button type="button" data-v="youtube" aria-pressed="false">YouTube Shorts</button></div>
 
+        <details class="them" id="themBox">
+          <summary><span>➕ Thêm thông tin cho AI <small id="themDem"></small></span></summary>
+          <div class="them-ruot">
         <label class="lbl" for="loiThoai">Lời thoại <span id="loiOpt" style="font-weight:500">(tuỳ chọn khi đã có video: AI tự nghe và bóc)</span></label>
         <textarea id="loiThoai" rows="4" placeholder="Có video từ link hoặc file thì để trống, AI tự nghe. Chỉ cần dán lời thoại khi không có video (Facebook, Instagram không tải được), hoặc khi bạn muốn sửa lại bản AI đã bóc rồi soi lại."></textarea>
         <div class="cnt"><span id="cntChu">0 chữ</span><span id="cntGiay"></span></div>
@@ -325,10 +343,15 @@
 
         <label class="lbl" for="binhLuan">Bình luận nổi bật (5–10 cái, mỗi cái một dòng)</label>
         <textarea id="binhLuan" rows="4" placeholder="Chép những bình luận được tim nhiều nhất và những bình luận kể lại chuyện của chính họ. Đây là chỗ AI đọc ra tệp thật và lý do người ta đồng cảm."></textarea>
-      </section>
+          </div>
+        </details>
+
+              </section>
 
       <section class="card">
-        <h2>2 · Kênh của bạn (để áp khuôn)</h2>
+        <div class="hs-dau"><h2>2 · Kênh của bạn (để áp khuôn)</h2><button type="button" class="btn" id="hsDoi" aria-expanded="true" aria-controls="hsMo">Thu gọn ▴</button></div>
+        <div class="hs-tom" id="hsTom" hidden></div>
+        <div id="hsMo">
         <p class="hint">AI mượn cấu trúc của video gốc rồi lắp ngách và tệp của bạn vào, tự chọn khung và dạng quay hợp với cách bạn muốn làm: 3 hook, khung kịch bản, lời mẫu từng phần.</p>
         <div class="two">
           <div><label class="lbl" for="chuDe">Chủ đề / ngách của kênh</label><input type="text" id="chuDe" placeholder="VD: quán bún nhà mình, kinh nghiệm đi làm ngân hàng, nấu ăn cho mẹ bỉm"></div>
@@ -336,6 +359,7 @@
         </div>
         <label class="lbl" for="sanPham">Sản phẩm / dịch vụ (nếu có)</label>
         <input type="text" id="sanPham" placeholder="VD: khoá học, set hải sản 1tr2, dịch vụ spa">
+        </div>
         <label class="lbl" for="dangMuon">Bạn muốn làm video theo dạng nào?</label>
         <select id="dangMuon">
           <option value="">Để AI chọn theo video gốc</option>
@@ -665,7 +689,7 @@ function renderKq(d, so, tuLuu) {
     if ((boc.chu_man_hinh || []).length) { const cm = el('div', 'note'); cm.textContent = 'Chữ trên màn hình: ' + boc.chu_man_hinh.map(m => `${m.giay}s “${m.text}”`).join(' · '); box.append(cm); }
     if (boc.ghi_chu) box.append(el('p', 'note', boc.ghi_chu));
     const rw = el('div', 'row'); const c = el('button', 'btn', 'Chép lời thoại'); c.type = 'button'; c.onclick = () => copyText(boc.loi_thoai.map(m => m.text).join(' '));
-    const e2 = el('button', 'btn', 'Sửa lời thoại rồi soi lại'); e2.type = 'button'; e2.onclick = () => { $('#loiThoai').value = boc.loi_thoai.map(m => m.text).join(' '); state.tuVideo = false; state.file = null; updateSrc(); updateCount(); saveDraft(); $('#loiThoai').scrollIntoView({ behavior: 'smooth', block: 'center' }); $('#loiThoai').focus(); toast('Sửa xong bấm Soi video, lần này AI mổ trên chữ bạn sửa'); };
+    const e2 = el('button', 'btn', 'Sửa lời thoại rồi soi lại'); e2.type = 'button'; e2.onclick = () => { $('#loiThoai').value = boc.loi_thoai.map(m => m.text).join(' '); state.tuVideo = false; state.file = null; updateSrc(); updateCount(); saveDraft(); $('#themBox').open = true; $('#loiThoai').scrollIntoView({ behavior: 'smooth', block: 'center' }); $('#loiThoai').focus(); toast('Sửa xong bấm Soi video, lần này AI mổ trên chữ bạn sửa'); };
     rw.append(c, e2); box.append(rw);
   }
 
@@ -822,7 +846,24 @@ $('#frameFile').addEventListener('change', async e => { const f = e.target.files
 $('#frameClear').addEventListener('click', () => { state.image = ''; state.imageFrom = ''; syncFrameUI(); if (!$('#vidprev').hidden) showPrev(); });
 $('#acctBtn').addEventListener('click', () => TK.mo());
 TK.ganO({ nganh: '#chuDe', doi_tuong: '#doiTuong', san_pham: '#sanPham' });
-TK.oMoiHoSo($('#chuDe').closest('section'));
+TK.oMoiHoSo($('#hsMo'));
+/* hồ sơ kênh gói thành một dòng khi đã điền ngách và người xem; bấm Sửa để mở lại */
+function thuHoSo(thu) {
+  const tom = $('#hsTom'), cd = $('#chuDe').value.trim(), dt = $('#doiTuong').value.trim(), sp = $('#sanPham').value.trim();
+  $('#hsMo').hidden = thu; tom.hidden = !thu; $('#hsDoi').setAttribute('aria-expanded', String(!thu)); $('#hsDoi').textContent = thu ? 'Sửa hồ sơ ▾' : 'Thu gọn ▴';
+  tom.innerHTML = ''; tom.append(el('b', null, cd || 'Chưa điền ngách'), el('span', null, [dt, sp].filter(Boolean).join(' · ')));
+}
+function tuThuHoSo() { if (ls.get('soi.hs_thu') !== '0' && $('#chuDe').value.trim() && $('#doiTuong').value.trim()) thuHoSo(true); }
+$('#hsDoi').addEventListener('click', () => { const thu = !$('#hsMo').hidden; ls.set('soi.hs_thu', thu ? '1' : '0'); thuHoSo(thu); });
+/* mục "thêm thông tin": đếm ô đã có chữ (kể cả ô link tự điền) để biết bên trong có gì mà không cần mở */
+function veThem() {
+  const box = $('#themBox'); if (!box) return;
+  const co = [...box.querySelectorAll('.them-ruot input[type=text], .them-ruot textarea')].filter(x => x.value.trim()).length + (box.querySelector('.them-ruot img:not([hidden])') ? 1 : 0);
+  $('#themDem').textContent = co ? `Đã có ${co} mục · bấm để xem, sửa` : 'Lời thoại, thời lượng, chữ màn hình, ảnh giây đầu, số liệu, bình luận · không bắt buộc, link tự điền';
+}
+['input', 'change'].forEach(ev => $('#themBox').addEventListener(ev, veThem)); setInterval(veThem, 1500);
+tuThuHoSo(); setTimeout(tuThuHoSo, 1500); veThem();
+
 $('#btnSoi').addEventListener('click', soi);
 $('#btnClear').addEventListener('click', () => { if (state.kq && !$('#kqBody').hidden === false) {} if (!$('#grid').classList.contains('has-kq') && !confirm('Xoá hết thông tin video đang điền?')) return; xoaKq(); ['link', 'loiThoai', 'giay', 'chuManHinh', 'binhLuan', 'nView', 'nLike', 'nCmt', 'nLuu', 'nShare'].forEach(id => $('#' + id).value = ''); state.image = ''; state.imageFrom = ''; state.link = { tac_gia: '', caption: '', video: false, giay: 0 }; state.file = null; state.tuVideo = true; state.kq = null; $('#vidprev').hidden = true; $('#linkStatus').textContent = ''; syncFrameUI(); updateCount(); updateRatios(); updateSrc(); saveDraft(); $('#kqBody').hidden = true; $('#kqEmpty').hidden = false; });
 $('#upClose').addEventListener('click', () => $('#upsell').classList.remove('show'));
