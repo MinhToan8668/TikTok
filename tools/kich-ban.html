@@ -186,6 +186,11 @@
   .khung-dang{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border-radius:12px;background:var(--accent-soft);border:1.5px solid var(--accent);font-size:13px}
   .khung-dang b{font-size:14.5px}
   .khung-dang span{color:var(--muted)}
+  .giay-dich{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:-2px 0 6px;padding:8px 10px;border:1px dashed var(--line-strong);border-radius:10px;background:var(--surface-2)}
+  .giay-dich select{width:auto;flex:0 1 auto;padding:6px 10px;font-size:13.5px}
+  .giay-tuy{display:inline-flex;align-items:center;gap:4px;font-size:13px}
+  .giay-tuy input{width:64px!important;padding:6px 8px!important;text-align:center}
+  .giay-dich .note{flex-basis:100%;margin:0;font-size:12px;color:var(--muted)}
   /* lọc kịch bản từ file phụ đề */
   .loc summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px}
   .loc summary::-webkit-details-marker{display:none}
@@ -372,7 +377,19 @@
 
       <section class="card">
         <h2>3 · Viết kịch bản theo từng phần <span id="khungTen" class="hint" style="margin:0;font-weight:400"></span></h2>
-        <p class="hint">Viết đúng như bạn sẽ nói, đừng gọt cho văn vẻ. Đồng hồ bên phải mỗi phần đếm theo tốc độ nói bạn chọn (chữ story thì theo tốc độ đọc). Mục tiêu của khung này <b id="mucGiay">60–105 giây</b>.</p>
+        <p class="hint">Viết đúng như bạn sẽ nói, đừng gọt cho văn vẻ. Đồng hồ bên phải mỗi phần đếm theo tốc độ nói bạn chọn (chữ story thì theo tốc độ đọc). Mục tiêu đang canh <b id="mucGiay">60–105 giây</b>.</p>
+        <div class="giay-dich">
+          <label class="lbl" for="giayDich" style="margin:0">⏱ Thời lượng video mong muốn</label>
+          <select id="giayDich" aria-describedby="giayDichNote">
+            <option value="">Theo gợi ý của khung</option>
+            <option value="15-30">15–30 giây</option><option value="30-45">30–45 giây</option><option value="45-60">45–60 giây</option>
+            <option value="60-90">60–90 giây</option><option value="60-120">60–120 giây</option><option value="90-120">90–120 giây</option>
+            <option value="120-150">2 phút – 2 phút 30</option><option value="150-180">2 phút 30 – 3 phút</option>
+            <option value="tuy">Tự nhập…</option>
+          </select>
+          <span class="giay-tuy" id="giayTuy" hidden><input type="text" id="giayTu" inputmode="numeric" aria-label="Từ bao nhiêu giây" placeholder="từ"> – <input type="text" id="giayDen" inputmode="numeric" aria-label="Đến bao nhiêu giây" placeholder="đến"> giây</span>
+          <small class="note" id="giayDichNote"></small>
+        </div>
         <div id="phanList"></div>
         <div class="story-xem" id="storyXem" hidden aria-label="Xem trước khối chữ kiểu story"><div class="story-khung" id="storyKhung"></div><p class="hint" style="margin:6px 0 0;text-align:center">Xem trước: khối chữ trên một cảnh, hiện dần theo nhạc</p></div>
         <div class="tl">
@@ -447,6 +464,23 @@ const DOC_CHU = 3.2;   // chữ/giây người xem đọc kịp trên màn hình
 const NHOM_KHUNG = [['ngan', '⚡ Ngắn, ít lời, ghép nhạc'], ['ke', '📖 Kể chuyện'], ['noi', '🎙 Nói camera, chia sẻ'], ['trai', '🛍 Trải nghiệm, bán hàng'], ['khac', '✏️ Khác']];
 const DANG_TEN = { noi_camera: 'Nói vào camera', voice_over: 'Voice-over', text: 'Chữ story' };
 function gKhung(K) { return K.g || [60, 105]; }
+/* thời lượng đang canh: bạn tự chọn cho khung này (state.giayTuy[khung]) hoặc gợi ý của khung */
+function gDich(K) { K = K || khungHienTai(); const t = (state.giayTuy || {})[K.k]; return Array.isArray(t) && t[1] > t[0] ? t : gKhung(K); }
+function giayDichGui() { const t = (state.giayTuy || {})[state.khung]; return Array.isArray(t) && t[1] > t[0] ? t : null; }
+function veGiayDich() {
+  const K = khungHienTai(), g = gKhung(K), t = (state.giayTuy || {})[K.k], sel = $('#giayDich');
+  sel.options[0].textContent = `Theo gợi ý của khung (${g[0]}–${g[1]}s)`;
+  const ma = Array.isArray(t) ? t.join('-') : '', coSan = [...sel.options].some(o => o.value === ma);
+  sel.value = !t ? '' : coSan ? ma : 'tuy';
+  $('#giayTuy').hidden = sel.value !== 'tuy';
+  if (sel.value === 'tuy' && t) { $('#giayTu').value = t[0]; $('#giayDen').value = t[1]; }
+  $('#giayDichNote').textContent = t ? `Đang canh theo ý bạn: ${t[0]}–${t[1]} giây. AI viết và chấm cũng theo mốc này.` : 'Mặc định theo gợi ý của khung. Muốn dài hơn, ví dụ 120 giây, thì chọn ở đây.';
+}
+function datGiayDich(t) {
+  state.giayTuy = { ...(state.giayTuy || {}) };
+  if (t) state.giayTuy[state.khung] = t; else delete state.giayTuy[state.khung];
+  veGiayDich(); updateTimes(); thuKhung($('#khungMo').hidden); saveDraft();
+}
 function tocDoHienTai() { return state.dang === 'text' ? DOC_CHU : TOC_DO[state.tocDo]; }
 const KHUNG = [
   { k: 'khoanhkhac', n: 'Một khoảnh khắc (5W-1H)', d: 'Kể MỘT khoảnh khắc thật, tả từng hành động nhỏ', use: 'Chuyện gia đình, đời thường, cảm xúc', nhom: 'ke', phan: [
@@ -551,7 +585,7 @@ const state = { khung: 'khoanhkhac', mucTieu: 'nhan_biet', dang: 'noi_camera', t
 try { Object.assign(state, JSON.parse(ls.get('kb.draft') || '{}'), { kq: null }); } catch {}
 if (!KHUNG.find(x => x.k === state.khung)) state.khung = 'khoanhkhac';
 function khungHienTai() { return KHUNG.find(x => x.k === state.khung); }
-function saveDraft() { ls.set('kb.draft', JSON.stringify({ khung: state.khung, mucTieu: state.mucTieu, dang: state.dang, tocDo: state.tocDo, text: state.text, canh: state.canh, chuDe: $('#chuDe').value, doiTuong: $('#doiTuong').value, xungHo: $('#xungHo').value, sanPham: $('#sanPham').value })); }
+function saveDraft() { ls.set('kb.draft', JSON.stringify({ giayTuy: state.giayTuy || {}, khung: state.khung, mucTieu: state.mucTieu, dang: state.dang, tocDo: state.tocDo, text: state.text, canh: state.canh, chuDe: $('#chuDe').value, doiTuong: $('#doiTuong').value, xungHo: $('#xungHo').value, sanPham: $('#sanPham').value })); }
 function demChu(t) { return String(t || '').replace(/\*\*|_/g, ' ').split(/\s+/).filter(w => /[0-9A-Za-zÀ-ỹ]/.test(w)).length; }
 function giay(n) { return n / tocDoHienTai() * 1.06; }
 function fmtS(s) { s = Math.round(s); return s >= 60 ? `${Math.floor(s / 60)}p${String(s % 60).padStart(2, '0')}` : `${s}s`; }
@@ -565,7 +599,7 @@ function chonDangTheoKhung(K, baoToast) {
 }
 /* chọn xong khung thì gói lưới khung lại thành một dòng, đỡ phải lướt qua 17 khung mỗi lần */
 function thuKhung(thu) {
-  const K = khungHienTai(), g = gKhung(K), dang = $('#khungDang');
+  const K = khungHienTai(), g = gDich(K), dang = $('#khungDang');
   $('#khungMo').hidden = thu; dang.hidden = !thu; $('#khungDoi').setAttribute('aria-expanded', String(!thu)); $('#khungDoi').textContent = thu ? 'Đổi khung ▾' : 'Thu gọn ▴';
   dang.innerHTML = ''; dang.append(el('span', null, 'Đang dùng'), el('b', null, K.n), el('span', null, `${g[0]}–${g[1]} giây · ${K.d}`));
 }
@@ -599,6 +633,7 @@ function buildKhung() {
 }
 const COLORS = ['#99DF00', '#5EE7C6', '#FFD166', '#FF9A3C', '#FF6FB5', '#B07CFF', '#4DA3FF'];
 function buildPhan() {
+  veGiayDich();
   const K = khungHienTai(); $('#khungTen').textContent = '· ' + K.n;
   $('#spWrap').hidden = !['giohang', 'trai_nghiem'].includes(K.k) && state.mucTieu !== 'chuyen_doi';
   const box = $('#phanList'); box.innerHTML = '';
@@ -614,8 +649,8 @@ function buildPhan() {
   updateTimes(); veStory();
 }
 function updateTimes() {
-  const K = khungHienTai(), T = state.text[K.k] || {}, G = gKhung(K), td = tocDoHienTai(); let total = 0, words = 0; const segs = [];
-  $('#mucGiay').textContent = G[0] + '–' + G[1] + ' giây'; $('#tlLo').textContent = G[0] + 's'; $('#tlHi').textContent = G[1] + 's';
+  const K = khungHienTai(), T = state.text[K.k] || {}, G = gDich(K), td = tocDoHienTai(); let total = 0, words = 0; const segs = [];
+  $('#mucGiay').textContent = G[0] + '–' + G[1] + ' giây' + (giayDichGui() ? ' (bạn chọn)' : ' (gợi ý của khung)'); $('#tlLo').textContent = G[0] + 's'; $('#tlHi').textContent = G[1] + 's';
   K.phan.forEach(([k, ten, tip, share], i) => {
     if (k === 'caption') { const e = document.querySelector(`.phan-time[data-k="${k}"]`); if (e) { e.className = 'phan-time'; e.textContent = 'nằm dưới video, không tính giờ'; } return; }
     const n = demChu(T[k]), s = giay(n); total += s; words += n; segs.push([s, COLORS[i % COLORS.length], ten]);
@@ -635,7 +670,7 @@ function updateTimes() {
   const need = [Math.round(G[0] * td / 1.06), Math.round(G[1] * td / 1.06)], vt = state.dang === 'text' ? 'chữ trên màn hình' : 'chữ';
   $('#tlNote').textContent = !words ? `Cần khoảng ${need[0]}–${need[1]} ${vt} cho ${G[0]}–${G[1]} giây ở tốc độ này.`
     : total < G[0] ? `Còn thiếu khoảng ${Math.round((G[0] - total) * td)} chữ nữa mới đủ ${G[0]} giây. Thường thiếu ở phần tả chi tiết.`
-    : total <= G[1] ? `Đúng khung ${G[0]}–${G[1]} giây. Giờ xem từng phần có cân không.`
+    : total <= G[1] ? `Đúng mốc ${G[0]}–${G[1]} giây. Giờ xem từng phần có cân không.`
     : `Dư khoảng ${Math.round((total - G[1]) * td)} chữ. Cắt ý trùng, từ thừa trước; đừng cắt chi tiết đắt.`;
   clearTimeout(veStory.t); veStory.t = setTimeout(veStory, 350);
 }
@@ -725,7 +760,7 @@ async function cham() {
   try {
     let r;
     if (DEMO) { await new Promise(z => setTimeout(z, 1200)); r = { ok: true, data: demoData(parts), con: 9, han: 10 }; }
-    else r = await TK.goiNen({ action: 'hook_ai', mode: 'script', token: TK.token(), dev: TK.dev(), ho_so: TK.hoSo(), khung: state.khung, phan: parts, chu_de: $('#chuDe').value.trim(), doi_tuong: $('#doiTuong').value.trim(), muc_tieu: state.mucTieu, xung_ho: $('#xungHo').value, dang: state.dang, toc_do: state.tocDo, san_pham: $('#sanPham').value.trim() }, { tool: 'script', nhan: 'Chấm kịch bản', them: { khung: state.khung } });
+    else r = await TK.goiNen({ action: 'hook_ai', mode: 'script', giay_dich: giayDichGui(), token: TK.token(), dev: TK.dev(), ho_so: TK.hoSo(), khung: state.khung, phan: parts, chu_de: $('#chuDe').value.trim(), doi_tuong: $('#doiTuong').value.trim(), muc_tieu: state.mucTieu, xung_ho: $('#xungHo').value, dang: state.dang, toc_do: state.tocDo, san_pham: $('#sanPham').value.trim() }, { tool: 'script', nhan: 'Chấm kịch bản', them: { khung: state.khung } });
     clearInterval(tick);
     if (!r.ok) {
       st.className = 'status err'; st.textContent = (ERR[r.error] || 'Có lỗi khi gọi AI, thử lại sau.') + (r.chi_tiet ? ' Mã lỗi: ' + r.chi_tiet : '');
@@ -825,7 +860,7 @@ async function vietBangAI(im) {
     const hienCo = K.phan.map(([k]) => (state.text[K.k] || {})[k] || '');
     let r;
     if (DEMO) { await new Promise(z => setTimeout(z, 1000)); r = { ok: true, con: 2, han: 3, data: { phan: K.phan.map(([k, ten]) => ({ ten, thoai: 'Lời thoại mẫu (demo) cho phần "' + ten + '": mình kể chuyện [chi tiết thật] cho mấy bạn nghe.', canh_quay: 'Quay cận, ánh sáng cửa sổ.', chu_man_hinh: '' })), hook_chu: 'Chữ hook **demo**', ghi_chu: 'Bản demo.', giay_uoc: 70 } }; }
-    else r = await TK.goiNen({ action: 'hook_ai', mode: 'viet', token: TK.token(), dev: TK.dev(), ho_so: TK.hoSo(), khung: K.k, chu_de: $('#chuDe').value.trim(), doi_tuong: $('#doiTuong').value.trim(), san_pham: $('#sanPham').value.trim(), muc_tieu: state.mucTieu, xung_ho: $('#xungHo').value, dang: state.dang, toc_do: state.tocDo, ngu_canh: im && im.ngu_canh || null, y_do: im && im.y_do || '', phan_hien_co: hienCo }, { tool: 'viet', nhan: 'AI viết kịch bản', them: { khung: K.k } });
+    else r = await TK.goiNen({ action: 'hook_ai', mode: 'viet', giay_dich: giayDichGui(), token: TK.token(), dev: TK.dev(), ho_so: TK.hoSo(), khung: K.k, chu_de: $('#chuDe').value.trim(), doi_tuong: $('#doiTuong').value.trim(), san_pham: $('#sanPham').value.trim(), muc_tieu: state.mucTieu, xung_ho: $('#xungHo').value, dang: state.dang, toc_do: state.tocDo, ngu_canh: im && im.ngu_canh || null, y_do: im && im.y_do || '', phan_hien_co: hienCo }, { tool: 'viet', nhan: 'AI viết kịch bản', them: { khung: K.k } });
     clearInterval(tick);
     if (!r.ok) {
       st.className = 'status err'; st.textContent = (ERR[r.error] || 'AI chưa viết được, thử lại.') + (r.chi_tiet ? ' Mã lỗi: ' + r.chi_tiet : '');
@@ -1145,6 +1180,8 @@ $('#btnLoc').addEventListener('click', () => { if (loc.kq && coGopY() && !confir
 document.querySelectorAll('.kb-tabs [role=tab]').forEach(b => b.addEventListener('click', () => moTab(b.dataset.tab)));
 $('.kb-tabs').addEventListener('keydown', e => { if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return; const t = ls.get('kb.tab') === 'loc' ? 'viet' : 'loc'; moTab(t); (t === 'loc' ? $('#tabNutLoc') : $('#tabNutViet')).focus(); });
 $('#khungDoi').addEventListener('click', () => thuKhung(!$('#khungMo').hidden));
+$('#giayDich').addEventListener('change', e => { const v = e.target.value; if (v === 'tuy') { $('#giayTuy').hidden = false; $('#giayTu').focus(); return; } datGiayDich(v ? v.split('-').map(Number) : null); });
+['giayTu', 'giayDen'].forEach(id => $('#' + id).addEventListener('change', () => { const a = parseInt($('#giayTu').value, 10), b = parseInt($('#giayDen').value, 10); if (a >= 5 && b > a && b <= 600) datGiayDich([a, b]); else { $('#giayDichNote').textContent = 'Nhập số giây hợp lệ, ví dụ từ 90 đến 120.'; } }));
 $('#hsDoi').addEventListener('click', () => { const thu = !$('#hsMo').hidden; ls.set('kb.hs_thu', thu ? '1' : '0'); thuHoSo(thu); });
 tuThuHoSo(); setTimeout(tuThuHoSo, 1500);   // hồ sơ học viên đăng nhập về sau một nhịp
 moTab(ls.get('kb.tab') || 'viet');
