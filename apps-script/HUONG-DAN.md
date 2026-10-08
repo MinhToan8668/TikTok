@@ -795,6 +795,25 @@ Trước đây sau khi "Hiểu footage" thẻ tự bung ra hết cỡ (tên file
 - Nhãn trên đoạn 10,5 px, dòng phụ 10 px; bo góc 5 px.
 - Hồi quy `t121` cập nhật màu viền chọn; `t89` cắt sớm các host ngoài (mediapipe, gstatic, jsdelivr…) vì máy test không có internet, tránh treo ở sự kiện `load`.
 
+### Nghiệm thu theo spec hành vi CapCut (10/2026)
+
+Đối chiếu trình dựng với mục 8 "Checklist nghiệm thu" của *CapCut — spec hành vi chi tiết* (07/10/2026), viết thành 3 bộ test `t140`–`t142` (36 bài, chạy bằng phím / chuột thật như người dùng). Những chỗ lệch spec đã sửa:
+
+| Spec | Trước | Nay |
+|---|---|---|
+| 1.5 Split: sau khi tách **nửa phải được chọn** | vẫn chọn nửa trái | chọn nửa phải |
+| 1.5 Split khi **không chọn gì** → tách **mọi track** tại đầu phát | chỉ tách track chính | tách mọi track (V1, phủ, chữ, âm) |
+| 1.5 Split chỉ bỏ qua khi **trùng mép**; nhỏ nhất 1 khung | không tách nếu cách mép < 0,25 s / 0,05 s | không tách khi trùng mép, còn lại tách tới 1 khung (1/30 s), không báo lỗi khi trùng mép |
+| 1.5 Split có keyframe → **thêm keyframe nội suy tại điểm cắt** | animation nhảy ở chỗ cắt | mỗi nửa có ◆ đúng giá trị tại điểm cắt |
+| Nửa phải sau split có id riêng | trùng id với nửa trái | id mới |
+| 1.8 **Dán giữa một đoạn** track chính → tách đoạn, bản dán nằm giữa | chèn vào mép gần nhất | tách rồi chèn đúng đầu phát |
+| 3.2 Keyframe **mặc định tuyến tính** (Linear) | mặc định "mượt" (ease-in-out) | Linear; đổi đường cong bằng chuột phải ◆ như cũ |
+| 6 **Ctrl+T** thêm chữ mặc định 3 s tại đầu phát, focus ô nhập | không có | có |
+| 1.7 **Bấm khoảng trống** trên track phủ (highlight nét đứt) + **Delete** → mục sau dồn lên | không chọn được khoảng trống | có (`xoaKhoangTrong`) |
+| 1.12 **Giữ Alt khi kéo** = tắt hít tạm thời | Alt không tác dụng | tắt hít khi giữ Alt |
+
+Đã đạt sẵn (test xác nhận): 3 clip xếp sát 0/5/8, xoá clip giữa ripple, Q / W đúng nguồn và đúng vị trí đầu phát, undo trả về đúng trạng thái, 50 lần split không lệch tổng, → 30 lần = 1,000 s ở 30 fps, Shift+→ 10 khung, Home / End, ↑ / ↓ điểm cắt, trim mép phải dừng ở cuối nguồn, trim mép trái track chính giữ start + ripple, trim mép trái overlay giữ mép phải, Ctrl+D (track chính chèn sau + đẩy; overlay đặt tại cuối gốc), clamp keyframe hai đầu, tự thêm ◆ khi đổi giá trị lúc đã có ◆, M thêm mốc, Ctrl+A, hít 8 px vào đầu phát, kéo quá nửa đoạn bên cạnh trên track chính thì đổi chỗ, kéo chữ chồng lên hàng khác đang trùng giờ thì sang hàng khác, xoá mục overlay để lại khoảng trống.
+
 ## Máy chủ phụ Cloudflare (miễn phí, tuỳ chọn)
 
 Cài theo [`cloudflare/CAI-DAT.md`](../cloudflare/CAI-DAT.md) (khoảng 10 phút, không cần thẻ). Có máy chủ này tool thêm:
