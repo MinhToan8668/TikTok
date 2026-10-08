@@ -98,6 +98,9 @@
   .tpl-custom{margin:10px 0 4px;padding:10px 12px;border:1px solid var(--line);border-radius:14px;background:var(--surface-2)}
   .tc-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}
   .tc-head b{font-size:13px}
+  .tc-head{margin-bottom:0}
+  .tc-body{margin-top:8px}
+  .tc-mo{font:inherit;font-size:12.5px;font-weight:700;border:1px solid var(--line-strong);background:var(--surface);color:var(--text);border-radius:999px;padding:4px 10px;cursor:pointer}
   .tc-head .lock{position:static!important;display:inline-block;margin-left:4px;vertical-align:1px}
   .tc-cols{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px 10px;margin-bottom:4px}
   .tc-col{display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer}
@@ -322,6 +325,9 @@
   .pv-bar{display:flex;gap:6px;align-items:center;margin-top:8px}
   .pv-bar select{width:auto;flex:1;min-width:0;padding:7px 10px;font-size:13px}
   .pv-bar .chip{background:var(--surface-2);color:var(--text);border:1px solid var(--line)}
+  .pv-bar .chip,.pv-bar .tgl span{white-space:nowrap}
+  @media (max-width:400px){.pv-bar{gap:4px}.pv-bar select{max-width:28%!important}.pv-bar .chip,.pv-bar .tgl.sm span{padding:5px 7px!important;font-size:11.5px!important}}
+  .pv-bar .chip.pv-png{background:var(--accent);color:var(--accent-ink);border-color:transparent;font-weight:800}
   .tgl.sm span{padding:7px 10px;font-size:12.5px;background:var(--surface-2);color:var(--text);border:1px solid var(--line)}
   .tgl input:checked + span{background:var(--text);color:var(--surface)}
   .safe-status{font-size:12px;margin-top:6px;line-height:1.4}
@@ -370,6 +376,7 @@
     .main-col{display:contents}
     .main-col > *{min-width:0;max-width:100%}
     #proPanel{order:0}
+    .pst-grid{grid-auto-flow:column;grid-auto-columns:92px;grid-template-columns:none;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin}
     .preview-col{order:1;position:sticky;top:0;z-index:6;background:var(--bg);margin:0 -16px;padding:8px 16px 8px;box-shadow:0 10px 14px -12px rgba(0,0,0,.45)}
     .main-col > .studio{order:2}
     #exportCard{order:3}
@@ -772,6 +779,7 @@
         </select>
         <label class="tgl sm"><input type="checkbox" id="showUi" checked><span>Khung UI</span></label>
         <button class="chip" id="btnFit" type="button">Né UI</button>
+        <button class="chip pv-png" id="btnPvPng" type="button" title="Tải PNG chữ nền trong suốt để kéo vào CapCut" aria-label="Tải PNG chữ">⤓ PNG</button>
         <button class="chip pv-size" id="btnPvSize" type="button" aria-label="Phóng to khung xem" title="Phóng to hoặc thu nhỏ khung xem">⤢</button>
       </div>
       <div class="safe-status" id="safeStatus"></div>
@@ -1584,7 +1592,12 @@ function buildTplCustom() {
   const head = el('div', 'tc-head'); const hb = el('b'); hb.innerHTML = `Tuỳ chỉnh bố cục "${TEMPLATES[t].name}" <span class="lock">PRO</span>`;
   const rs = el('button', 'chip', 'Về màu TMXK'); rs.type = 'button'; rs.hidden = !tplCustomized(t);
   rs.onclick = () => { delete state.tplOpt[t]; saveTplOpt(); buildTplCustom(); scheduleRender(); };
-  head.append(hb, rs); box.append(head);
+  const mo = tplCustomized(t) || ls.get('ht.tc_mo') === '1';
+  const nut = el('button', 'tc-mo', mo ? 'Thu gọn ▴' : 'Mở ▾'); nut.type = 'button'; nut.setAttribute('aria-expanded', String(mo));
+  const body = el('div', 'tc-body'); body.hidden = !mo;
+  nut.onclick = () => { body.hidden = !body.hidden; nut.textContent = body.hidden ? 'Mở ▾' : 'Thu gọn ▴'; nut.setAttribute('aria-expanded', String(!body.hidden)); ls.set('ht.tc_mo', body.hidden ? '0' : '1'); };
+  const phai = el('div', 'row'); phai.style.gap = '6px'; phai.append(rs, nut);
+  head.append(hb, phai); box.append(head, body);
   const set = (grp, k, v) => { const o = state.tplOpt[t] = state.tplOpt[t] || {}; (o[grp] = o[grp] || {})[k] = v; saveTplOpt(); rs.hidden = false; if (!state.pro && !proToasted) { proToasted = true; toast('Tuỳ chỉnh bố cục là Pro: xem thử thoải mái, xuất file cần mở Pro'); } scheduleRender(); };
   const cols = el('div', 'tc-cols');
   for (const [k, label] of Object.entries(E.c || {})) {
@@ -1592,12 +1605,12 @@ function buildTplCustom() {
     i.value = (cur.c && cur.c[k]) || (k === 'box' ? E.box || '#000000' : state.brand[k]);
     i.addEventListener('input', () => set('c', k, i.value)); l.append(i, el('span', null, label)); cols.append(l);
   }
-  box.append(cols);
+  body.append(cols);
   for (const [k, label, mn, mx, st, d] of E.n || []) {
     const row = el('div', 'slider'); const i = document.createElement('input'); i.type = 'range'; i.min = mn; i.max = mx; i.step = st;
     const v = cur.n && cur.n[k] != null ? cur.n[k] : d; i.value = v; const out = el('output', null, fmtN(v, k));
     i.addEventListener('input', () => { out.textContent = fmtN(+i.value, k); set('n', k, +i.value); });
-    row.append(el('span', null, label), i, out); box.append(row);
+    row.append(el('span', null, label), i, out); body.append(row);
   }
   box.querySelectorAll('.lock').forEach(e => e.hidden = state.pro);
 }
@@ -3117,6 +3130,7 @@ async function saveAllLayers() {
   $('#goHoSo').addEventListener('click', () => { $('#acctSheet').classList.remove('show'); TK.mo('hoso'); });
   if (/taikhoan/.test(location.hash)) { history.replaceState(null, '', location.pathname); setTimeout(() => openAcct(), 300); }
   $('#btnUnlock').addEventListener('click', () => state.acct ? openUpsell() : openAcct('signup'));
+  $('#btnPvPng').addEventListener('click', () => $('#btnPng').click());   // xuất ngay dưới khung xem, khỏi cuộn xuống cuối trang
   $('#btnPvSize').addEventListener('click', () => { document.body.classList.toggle('pv-big'); $('#btnPvSize').textContent = document.body.classList.contains('pv-big') ? '⤡' : '⤢'; setTimeout(drawSelection, 250); });
   $('#btnDemoAI').addEventListener('click', () => { showResult(DEMO_DATA, true); openSheet(true); });
   $('#btnAiShow').addEventListener('click', () => openSheet());
