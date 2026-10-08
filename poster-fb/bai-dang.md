@@ -377,42 +377,54 @@ Facebook sẽ xếp ảnh ngang nằm trên, 3 ô vuông nằm dưới. Ảnh đ
 **Facebook**
 
 ```
-Học viên tụi mình hay hỏi: lưu video người ta về để học thì làm sao cho khỏi dính cái logo chình ình giữa màn.
+Cái logo TikTok nó không đứng yên. Nó nhảy qua nhảy lại, mà toàn nhảy trúng chỗ người ta đặt chữ hook.
 
-Thế là tụi mình làm luôn cái tool tải video trong Viral Studio.
+Nên lưu video về định coi kỹ cách dựng thì đúng chỗ cần coi nhất lại bị che.
 
-Dán link vô, nó ra cho bạn video HD không logo, nhạc nền riêng dạng mp3, với cả ảnh bìa gốc. Bài dạng nhiều ảnh cũng tải một phát về đủ, kèm cả ảnh bìa.
+Tụi mình làm cái tool tải video trong Viral Studio cho khỏi vướng chuyện đó.
 
-Lười lọc link thì cứ copy nguyên đoạn chữ lúc bấm Chia sẻ rồi dán vô, tool tự mò ra link.
+Dán link vô, ra video HD sạch logo, nhạc nền riêng dạng mp3, với ảnh bìa gốc. Bài dạng nhiều ảnh thì một nút về đủ từng tấm.
 
-Mở trình duyệt trên điện thoại là xài, không cần cài app, không quảng cáo.
+Lười lọc link thì copy nguyên đoạn chữ lúc bấm Chia sẻ rồi dán vô, tool tự mò ra link.
 
-Mà nhắc nhỏ: tải về để coi người ta dựng sao, chữ đặt chỗ nào, nhạc cắt ở đâu thôi nha. Đừng đăng lại nguyên bản của người ta =)))
+Mở trình duyệt trên điện thoại là xài, không cần cài app.
 
-Bạn hay tải video về để học khâu nào nhất, hook hay cách dựng?
+Tải về để coi người ta cắt cảnh ở giây nào, chữ để cỡ nào thôi nha. Đừng đăng lại nguyên bản của người ta =)))
+
+Bạn tải video về thường để coi lại cái gì?
 ```
 
 Bình luận đầu (ghim): `Link nè https://minhtoan8668.github.io/TikTok/tools/tai-ve.html mở là dán link được liền`
 
+**Hai cách mở khác, nếu muốn đổi:**
+
+```
+Mấy trang tải video TikTok ngoài kia: coi quảng cáo xong, file về vẫn dính logo. Nên tụi mình tự làm một cái.
+```
+
+```
+Một video hay, muốn coi lại khung hình thứ 3 giây. Mở app tua tới tua lui, bấm tạm dừng mãi không trúng. Tải thẳng về máy cho rồi.
+```
+
 **Threads**
 
 ```
-tụi t dạy làm content, học viên than lưu video về học mà dính logo bự chà bá giữa màn hình
+cái logo tiktok nó nhảy qua nhảy lại, mà toàn nhảy trúng chỗ người ta đặt chữ hook
 
-thế là code luôn cái tool tải video cho xài free. dán link vô ra video hd không logo, kèm nhạc nền mp3 với ảnh bìa gốc. bài nhiều ảnh bấm 1 nút về hết luôn
+lưu video về định coi kỹ cách dựng mà chỗ cần coi nhất thì bị che =)))
 
-tải về coi người ta dựng sao thôi nha đừng đăng lại =)))
+tụi t làm cái tool tải video cho xài free luôn. dán link vô ra video hd sạch logo, kèm nhạc nền mp3 với ảnh bìa gốc. bài nhiều ảnh bấm 1 nút về hết
 
-mn hay lưu video về để học cái gì?
+mn lưu video về thường để coi lại cái gì?
 ```
 
 **Group học viên**
 
 ```
-Cả lớp ơi, tool Tải video trong Viral Studio xài được rồi nha.
-Dán link → ra video HD không logo + nhạc nền + ảnh bìa. Bài nhiều ảnh tải một lần về hết, kèm ảnh bìa.
+Cả lớp ơi, tool Tải video xài được rồi nha.
+Dán link → video HD sạch logo + nhạc nền + ảnh bìa gốc. Bài nhiều ảnh tải một lần về hết.
 https://minhtoan8668.github.io/TikTok/tools/tai-ve.html
-Tuần này lấy 3 video cùng ngách về, coi họ đặt chữ hook chỗ nào rồi mang vô lớp nói nha.
+Bài tuần này: lấy 3 video cùng ngách về, coi kỹ chữ hook họ để cỡ nào, nằm chỗ nào trên màn, rồi mang vô lớp nói nha.
 ```
 
 **Ảnh để dành bỏ bình luận:** `tn1`–`tn6` (khổ 4:5, mỗi tính năng một tấm). Ai hỏi kỹ cái nào thì thả tấm đó vô trả lời.
