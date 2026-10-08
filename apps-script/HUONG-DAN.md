@@ -854,6 +854,34 @@ Hai bộ test mới `t143` (xuất, 20 bài, xuất file thật rồi đọc l�
 | 4.5 Nhập **.lrc** | .srt / .vtt | thêm .lrc (`[mm:ss.xx]câu`, câu kết thúc ở mốc kế tiếp, một dòng nhiều mốc → nhiều câu) |
 
 Đã đạt sẵn (test xác nhận): thời lượng file xuất đúng vùng In–Out ±0,05 s, Huỷ giữa chừng không tải file nào (cả file phụ đề), 60 s lời → 27 câu (≥ 10), mỗi câu ≤ 8 từ, Ctrl+B giữa câu thì phụ đề cắt đúng chỗ, xoá câu không dồn timeline, .srt theo dòng thời gian.
+
+### Nghiệm thu phần còn lại: chuyển cảnh, phím tắt, đồng hồ, khung xem trước
+
+Hai bộ test `t145` (20 bài) và `t146` (9 bài).
+
+| Spec | Trước | Nay |
+|---|---|---|
+| 5.1 Chuyển cảnh **nằm giữa điểm nối** `[nối − d/2, nối + d/2]`, tại điểm nối trộn **50/50** | chạy toàn bộ sau điểm nối, đoạn trước là ảnh đứng | nửa đầu đoạn trước vẫn chạy, đoạn sau lấy thêm khung **trước điểm vào**; nửa sau ngược lại (lấy khung **sau điểm ra**); nguồn không đủ thì giữ khung mép |
+| 5.1 Đoạn quá ngắn → **tự co** thời lượng chuyển cảnh | không co | co về độ dài đoạn ngắn hơn |
+| 5.1 **Ô vuông trên mép nối**, bấm để chọn, **Delete** xoá chuyển cảnh | không có | có, đoạn giữ nguyên |
+| 5.1 Kéo một trong hai đoạn đi / xoá đoạn → **mất chuyển cảnh** | chuyển cảnh dính sang đoạn láng giềng mới | tự xoá |
+| 1.5 Tách đoạn có chuyển cảnh mép phải → chỉ nửa phải giữ | cả hai nửa có chuyển cảnh | đúng spec |
+| 5.1 Thời lượng **0,1–2 s** (mặc định 0,5 s) | 0,2–1,2 s | 0,1–2 s |
+| 6 **Ctrl+Shift+M** tắt/bật tiếng mục chọn | không có phím | có (bật lại về âm lượng cũ) |
+| 6 **Ctrl+Shift+L** tách / liên kết lại âm thanh | không có | lần 1 tách âm xuống A3 (liên kết với đoạn), lần 2 gộp lại |
+| 6 **Ctrl+Shift+F** đóng băng khung; **F** toàn màn hình | F = đóng băng | Ctrl+Shift+F = đóng băng, F = xem toàn màn hình |
+| 6 **Enter** khi chọn chữ → sửa chữ | không có | vào ô sửa chữ |
+| 2.1 Đồng hồ **giờ:phút:giây:khung "vị trí / tổng"**, bấm để gõ | `mm:ss:ff \| tổng`, không gõ được | `00:00:12:15 / 00:00:14:00` theo fps dự án; bấm vào gõ `12`, `1:05` hoặc `00:00:12:15` |
+| 2.4 **Shift + xoay = bước 15°**; hít **tâm khung 5 px** có vạch hồng | Shift tắt hít mềm; không hít tâm | đúng spec (Alt khi kéo = tắt hít) |
+| 1.2 / 2.4 **Bấm vật thể trên khung → chọn mục**; bấm chỗ trống → bỏ chọn | chỉ bấm đúp chữ | bấm chữ / B-roll / video là chọn, bấm vùng không có gì là bỏ chọn |
+| 1.3 **Shift + kéo** = khoá trục (chỉ đổi thời gian) | Shift chỉ để chọn thêm | Shift + kéo mục đang chọn: giữ nguyên hàng; Shift + bấm mục khác vẫn là chọn thêm |
+| 1.10 Khi phát, **tới 90% bề rộng thì lật trang** | cuộn khi còn cách mép 120 px | lật trang ở 90% |
+| 3.6 Hoạt ảnh **Vào + Ra không vượt thời lượng** | có thể chồng nhau | tự co theo tỉ lệ |
+| Ghi chú: **mọi con số mặc định một chỗ** | rải rác | `MAC_DINH` (hít 8 px, hít khung 5 px, chữ 3 s, ảnh 5 s, chuyển cảnh 0,5 s, đóng băng 3 s, fps 30…) |
+
+Đo hiệu năng (máy test): dự án 45 mục / 5 track, tách mọi track ~37 ms, Q ~1 ms (spec < 50 ms). Vẽ lại cả dòng thời gian ~39 ms, còn trên ngưỡng 16 ms của spec khi cuộn (chưa ảo hoá danh sách mục).
+
+Chưa làm (spec ghi P1/P2): kéo góc + Shift để co giãn không giữ tỉ lệ và 4 tay nắm mép (cần lưu tỉ lệ X/Y riêng), khung bao + tay nắm cho chữ trên khung (chữ hiện kéo dời được, chưa có góc co giãn), bảng đổi phím tắt trong Cài đặt (đang chỉ xem), xuất MP3 (trình duyệt không có bộ mã MP3; dùng M4A/WAV).
 ### Hiểu footage (Footage Understanding)
 Bấm **✨ Hiểu footage** trên từng đoạn (1 lượt "dựng video" mỗi đoạn, Free mặc định 2, bot `/luotdung`). Trình duyệt tách WAV 16kHz, đo khoảng lặng, lấy 4–12 khung hình. Máy chủ chạy 2 bước:
 1. **Gemini 3.5 Transcribe** (Interactions API, `timestamp_granularities: word`) → từng từ có mốc giây, giữ cả "ờ, à". Nhanh (8 giây audio ≈ 2 giây).
