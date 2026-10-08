@@ -6,13 +6,29 @@ xuất bằng `xuat.js`.
 
 ## Khổ ảnh
 
-| Loại bài | Khổ | Ghi chú |
+**Luật quan trọng nhất: một bài chỉ đăng MỘT ảnh.** Đăng từ 2 ảnh trở lên là Facebook tự ghép
+lưới và cắt ảnh theo khung của nó, poster 4:5 sẽ mất tiêu đề hoặc mất chân. Ảnh phụ (cách dùng,
+chi tiết) bỏ xuống bình luận, ở đó vẫn hiện nguyên khổ.
+
+| Loại bài | Khổ ta làm | Vì sao |
 |---|---|---|
-| Bài có ảnh minh hoạ, bài album | 4:5, 1080×1350 | Chiếm nhiều màn hình nhất trên feed điện thoại |
-| Bài chữ ngắn, nhá hàng, câu hỏi | 1:1, 1080×1080 (class `vuong`) | Chữ thật to, gọn |
-| Album nhiều ảnh | Ảnh đầu là ảnh bìa đọc được một mình, các ảnh sau là chi tiết | Ảnh sau có thể bỏ dưới bình luận |
+| Bài một ảnh (mặc định) | 4:5, xuất 2160×2700 | Khung dọc cao nhất Facebook cho ảnh đơn (960×1200), chiếm nhiều màn hình nhất |
+| Bài chữ ngắn, nhá hàng | 1:1, xuất 2160×2160 (class `vuong`) | Chữ to, gọn |
+| Ảnh bìa page | 1920×710 | Khổ điện thoại; máy tính là 1920×1080, lấy 1920×710 là an toàn cho cả hai |
+| Ảnh đại diện | 1000×1000 | Facebook cắt tròn, chừa lề an toàn quanh logo |
 
 Xuất gấp đôi (2160 px) để Facebook nén xong chữ vẫn nét.
+
+### Facebook cắt thế nào khi đăng nhiều ảnh
+
+Chỉ dùng bảng này khi buộc phải đăng nhiều ảnh một bài. Làm ảnh sẵn đúng khung thì không bị cắt:
+
+| Số ảnh | Facebook xếp thành |
+|---|---|
+| 2 ảnh | 2 ảnh ngang 1200×600 xếp chồng |
+| 3 ảnh | 1 ảnh dọc 960×1920 bên trái + 2 ảnh vuông bên phải |
+| 4 ảnh | 1 ảnh ngang 1920×1280 trên + 3 ảnh vuông dưới |
+| 5 ảnh | 2 ảnh vuông lớn trái + 3 ảnh vuông nhỏ phải |
 
 ## Màu, chữ, logo
 
