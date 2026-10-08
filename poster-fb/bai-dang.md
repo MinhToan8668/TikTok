@@ -433,8 +433,13 @@ Bài tuần này: lấy 3 video cùng ngách về, coi kỹ chữ hook họ đ�
 
 ## Bài một ảnh ngang · giới thiệu cả 6 tool
 
-Ảnh `ng-6-tool.png` (1920×1280). Bài này đăng **một ảnh duy nhất**, dùng khi muốn giới thiệu
-tổng quan Viral Studio chứ không đi sâu một tool.
+Chọn một trong ba ảnh 1920×1280, bài này đăng **một ảnh duy nhất**:
+
+| Ảnh | Khi nào dùng |
+|---|---|
+| `ng-6-toi.png` | **Mặc định.** Nền mực, hai điện thoại chồng lớp. Nền tối nổi nhất giữa feed Facebook toàn trắng |
+| `ng-6-lime.png` | Cùng bố cục, nền lime, hợp khi đăng liền sau một bài nền tối |
+| `ng-6-tool.png` | Bản 6 ô có mô tả từng tool, dùng khi muốn ảnh nói đủ mà không cần đọc caption |
 
 **Facebook**
 

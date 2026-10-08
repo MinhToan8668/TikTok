@@ -47,6 +47,21 @@ Chọn ảnh khi đăng phải đúng thứ tự: ảnh ngang trước, rồi ba
 Mảnh giao diện dài quá khung thì đặt `height` cho `.manh` và thêm class `cat`, đáy sẽ mờ
 dần vào nền thẻ thay vì cụt ngang.
 
+### Làm một tấm ngang bắt mắt hơn
+
+Lưới ô đều tăm tắp đọc được nhưng trôi trong feed. Ba thứ kéo mắt lại:
+
+1. **Cho giao diện thật vào ảnh.** Hai khung điện thoại chồng lớp, nghiêng ngược chiều nhau
+   (`transform:rotate(-3deg)` và `rotate(4deg)`), cái sau đè lên cái trước. Có chiều sâu thì
+   mắt dừng lại; chỉ chữ với ô thì không.
+2. **Chia hẳn hai nửa**: nửa trái toàn chữ, nửa phải toàn hình. Đừng rải hình quanh chữ.
+3. **Nền mực cho bài chính.** Feed Facebook toàn trắng, một tấm nền tối nổi hơn nền lime.
+   Để dành nền lime cho bài kế tiếp, đăng hai bài tối liền nhau là chìm.
+
+Danh sách tool rút còn số + tên, mô tả đẩy xuống caption. Tem (MỚI, 0Đ) đặt `position:absolute`
+ở góc ô, đừng để trong luồng chữ: tem nằm cùng dòng sẽ nở cột grid ra và chữ đội sang phần hình.
+Grid trong một cột hẹp thì dùng `minmax(0,1fr)`, `repeat(2,1fr)` sẽ nở theo chữ dài nhất.
+
 ## Màu, chữ, logo
 
 - Màu: lime `#99DF00`, mực `#26210F`, kem `#F9E8DD`, nền thẻ `#FDFBF3`, đỏ nhấn `#FF5A36` (chỉ cho tem MỚI, 0đ).
