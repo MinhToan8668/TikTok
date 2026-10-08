@@ -428,3 +428,50 @@ Bài tuần này: lấy 3 video cùng ngách về, coi kỹ chữ hook họ đ�
 ```
 
 **Ảnh để dành bỏ bình luận:** `tn1`–`tn6` (khổ 4:5, mỗi tính năng một tấm). Ai hỏi kỹ cái nào thì thả tấm đó vô trả lời.
+
+---
+
+## Bài một ảnh ngang · giới thiệu cả 6 tool
+
+Ảnh `ng-6-tool.png` (1920×1280). Bài này đăng **một ảnh duy nhất**, dùng khi muốn giới thiệu
+tổng quan Viral Studio chứ không đi sâu một tool.
+
+**Facebook**
+
+```
+Người mới làm video hay kẹt không phải vì lười. Kẹt vì xong khâu này rồi không biết khâu kế tiếp là gì.
+
+Một video TikTok thật ra đi qua 6 khâu: coi video mẫu, viết hook, viết kịch bản, quay, dựng, rồi coi lại trước khi đăng.
+
+Tụi mình làm Viral Studio theo đúng 6 khâu đó, mỗi khâu một tool, xếp sẵn theo thứ tự. Làm xong cái số 1 thì biết ngay cái số 2 là gì.
+
+Tải video thì sạch logo, có nhạc nền với ảnh bìa. Chấm hook thì cho điểm trên 100 rồi viết lại giùm 5 bản. Dựng video thì xuất MP4 thẳng về máy, khỏi mua app edit. Chấm video thì AI coi hết, chỉ đúng giây đang hỏng.
+
+Mở trình duyệt trên điện thoại là xài, không cần cài app.
+
+Bạn đang kẹt ở khâu nào trong 6 khâu đó?
+```
+
+Bình luận đầu (ghim): `Link nè https://minhtoan8668.github.io/TikTok/ mở ra là thấy đủ 6 tool`
+
+**Threads**
+
+```
+làm 1 video tiktok thật ra đi qua 6 khâu: coi video mẫu, viết hook, viết kịch bản, quay, dựng, coi lại trước khi đăng
+
+người mới kẹt không phải vì lười, kẹt vì xong khâu này không biết khâu kế là gì
+
+tụi t gom đúng 6 khâu đó thành 6 cái tool, xếp sẵn theo thứ tự, xài free
+
+mn đang kẹt khâu nào?
+```
+
+**Group học viên**
+
+```
+Cả lớp ơi, Viral Studio đủ 6 tool rồi nha, xếp đúng thứ tự làm 1 video.
+https://minhtoan8668.github.io/TikTok/
+Lưu tấm này lại, làm video nào cũng đi theo thứ tự đó cho khỏi sót khâu.
+```
+
+**Ảnh bỏ bình luận:** `01`–`06` (mỗi tool một tấm 4:5), ai hỏi tool nào thì thả tấm đó.

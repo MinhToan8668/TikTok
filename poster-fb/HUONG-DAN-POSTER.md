@@ -14,6 +14,7 @@ chi tiết) bỏ xuống bình luận, ở đó vẫn hiện nguyên khổ.
 |---|---|---|
 | Bài một ảnh (mặc định) | 4:5, xuất 2160×2700 | Khung dọc cao nhất Facebook cho ảnh đơn (960×1200), chiếm nhiều màn hình nhất |
 | Bài chữ ngắn, nhá hàng | 1:1, xuất 2160×2160 (class `vuong`) | Chữ to, gọn |
+| Bài một ảnh ngang (nhiều ý trong một tấm) | 3:2, xuất 1920×1280 (class `ngang`) | Chứa được lưới 6 ô mà chữ vẫn đọc được; khổ dọc nhét 6 ô là chữ bé quá |
 | Ảnh bìa page | 1920×710 | Khổ điện thoại; máy tính là 1920×1080, lấy 1920×710 là an toàn cho cả hai |
 | Ảnh đại diện | 1000×1000 | Facebook cắt tròn, chừa lề an toàn quanh logo |
 
