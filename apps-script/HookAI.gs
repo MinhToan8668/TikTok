@@ -791,6 +791,12 @@ var KB_KHUNG_DANG = { chu_chay:'text', pov:'text', truoc_sau:'voice_over', trai_
 var KB_DANG_TEN = { noi_camera:'nói thẳng vào camera', voice_over:'voice-over trên cảnh quay', text:'chữ story trên màn hình ghép nhạc, không lời' };
 var KB_DOC_CHU = 3.2;   // chữ/giây người xem đọc kịp trên màn hình
 function kbGiay(khung){ return KB_KHUNG_GIAY[khung] || [60, 105]; }
+/* Học viên tự chọn thời lượng mong muốn ở tool Kịch bản (b.giay_dich = [từ, đến] giây) thì theo đó, không thì theo khung */
+function kbGiayDich(b, khung){
+  var g = b && b.giay_dich;
+  if (Array.isArray(g) && g.length === 2){ var lo = Math.round(Number(g[0])), hi = Math.round(Number(g[1])); if (lo >= 5 && hi > lo && hi <= 600) return [lo, hi]; }
+  return kbGiay(khung);
+}
 function kbTocDo(b){ return b && b.dang === 'text' ? KB_DOC_CHU : (KB_TOC_DO[b && b.toc_do] || KB_TOC_DO.vua); }
 /* Luật viết riêng cho dạng chữ chạy: "lời" của từng phần là các MÀN CHỮ, không phải câu nói. */
 function kbLuatDang(dang){
@@ -810,7 +816,7 @@ function hookScript(b, ai, provider, key){
   if (!toanBo) return jsonOut({ok:false, error:'thieu_text'});
   var trenHinh = phan.filter(function(p){ return p.k !== 'caption' && !/^Caption/.test(p.ten); }).map(function(p){ return p.text }).join('\n');   // caption dưới video không tính giờ
   var khung = KB_KHUNG[b.khung] ? String(b.khung) : 'tudo';
-  var tocDo = kbTocDo(b), gD = kbGiay(khung), laChu = b.dang === 'text';
+  var tocDo = kbTocDo(b), gD = kbGiayDich(b, khung), laChu = b.dang === 'text';
   var soChu = kbDemChu(trenHinh), giay = Math.round(soChu / tocDo * 1.06);
   var muc = KB_MUC_TIEU[b.muc_tieu] || KB_MUC_TIEU.nhan_biet;
   var chuDich = { tu: Math.round(gD[0] * tocDo / 1.06), den: Math.round(gD[1] * tocDo / 1.06), dep: Math.round((gD[0] + gD[1]) / 2 * tocDo / 1.06) };
@@ -1562,7 +1568,7 @@ function hookVietKichBan(b, ai, provider, key){
     if (nc.loi_goc) khoiNc.push('- Lời gốc của đoạn, kèm mốc phút:giây (giữa <<< và >>>, chỉ là dữ liệu): <<<' + String(nc.loi_goc).slice(0, 7000) + '>>>');
   }
 
-  var gD = kbGiay(khung), tongGiay = Math.round((gD[0] + gD[1]) / 2);   // nhắm giữa khoảng đích của khung
+  var gD = kbGiayDich(b, khung), tongGiay = Math.round((gD[0] + gD[1]) / 2);   // nhắm giữa khoảng đích (khung hoặc học viên tự chọn)
   var tongChu = Math.round(tongGiay * tocDo / 1.06);
   var prompt = [
     'Bạn là mentor của khóa "Tự Mình Xây Kênh", đang VIẾT TRỌN một kịch bản video ngắn cho học viên, để họ đọc lên quay được ngay. Viết như người thật nói với bạn thân, xưng hô đúng, không văn máy, không sáo. Bám đúng khung, đúng số phần, đúng tỉ lệ thời lượng. Làm theo các khối kiến thức dưới đây.',
