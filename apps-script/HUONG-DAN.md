@@ -855,6 +855,10 @@ Hai bộ test mới `t143` (xuất, 20 bài, xuất file thật rồi đọc l�
 
 Đã đạt sẵn (test xác nhận): thời lượng file xuất đúng vùng In–Out ±0,05 s, Huỷ giữa chừng không tải file nào (cả file phụ đề), 60 s lời → 27 câu (≥ 10), mỗi câu ≤ 8 từ, Ctrl+B giữa câu thì phụ đề cắt đúng chỗ, xoá câu không dồn timeline, .srt theo dòng thời gian.
 
+### Sửa lỗi: chuột phải chữ / video phủ không hiện menu
+
+Menu chuột phải của chữ, đồ hoạ và video phủ bị lỗi JS (`m is not defined` ở mục clip ghép) nên không mở được, chỉ đoạn V1 còn menu. Đã sửa. Bảng "N mục đang chọn" có thêm nút **▣ Tạo clip ghép** (bên cạnh Ctrl+G và menu chuột phải → "Tạo clip ghép"). Test `t147`.
+
 ### Nghiệm thu phần còn lại: chuyển cảnh, phím tắt, đồng hồ, khung xem trước
 
 Hai bộ test `t145` (20 bài) và `t146` (9 bài).
