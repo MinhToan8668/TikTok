@@ -61,8 +61,8 @@
   .buoc{position:absolute;list-style:none;display:flex;flex-direction:column;gap:20px}
   .buoc li{display:flex;gap:18px;align-items:flex-start;background:var(--surface);border:3px solid var(--ink);border-radius:20px;padding:20px 22px;box-shadow:6px 6px 0 var(--ink)}
   .buoc b{flex:none;width:52px;height:52px;border-radius:50%;background:var(--ink);color:var(--lime);display:grid;place-items:center;font:800 28px/1 var(--font-display)}
-  .buoc strong{display:block;font:800 27px/1.2 var(--font-ui)}
-  .buoc span{display:block;font:500 21px/1.42 var(--font-ui);color:var(--muted);margin-top:6px}
+  .buoc strong{display:block;font:800 29px/1.2 var(--font-ui)}
+  .buoc span{display:block;font:500 22px/1.4 var(--font-ui);color:var(--muted);margin-top:6px}
   .buoc.ngang{flex-direction:row}
   .buoc.ngang li{flex:1;flex-direction:column;gap:12px}
 
@@ -89,6 +89,16 @@
   .ghichu{position:absolute;right:60px;top:112px;font:500 15px/1 var(--font-ui);color:var(--muted);opacity:.85}
   .toi .ghichu{color:#b7b89a}
 
+  /* ── poster tổng quan: 6 ô, số to, chữ đọc được khi lướt feed ── */
+  .sau{position:absolute;left:60px;right:60px;top:500px;display:grid;grid-template-columns:repeat(2,1fr);gap:26px}
+  .sau .o6{display:flex;gap:20px;align-items:center;background:var(--surface);color:var(--ink);border:3px solid var(--ink);border-radius:22px;padding:30px 26px;box-shadow:7px 7px 0 var(--lime);position:relative}
+  .sau .o6 b{flex:none;width:72px;height:72px;border-radius:50%;background:var(--ink);color:var(--lime);display:grid;place-items:center;font:800 40px/1 var(--font-display)}
+  .sau .o6 strong{display:block;font:800 35px/1.1 var(--font-ui)}
+  .sau .o6 span{display:block;font:500 22px/1.38 var(--font-ui);color:var(--muted);margin-top:6px}
+  .sau .o6 i{position:absolute;top:-11px;right:14px;font:900 15px/1 var(--font-ui);font-style:normal;background:var(--red);color:#fff;padding:6px 10px;border-radius:999px;letter-spacing:.06em}
+  .sau .o6 i.free{background:var(--lime);color:var(--ink);border:2px solid var(--ink)}
+
+  .chot{position:absolute;left:60px;right:60px;bottom:150px;background:var(--lime);color:var(--ink);border-radius:20px;padding:24px 28px;font:800 32px/1.25 var(--font-ui);text-align:center}
   /* ── poster tổng quan ── */
   .luoi6{position:absolute;left:60px;right:60px;top:492px;display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
   .o{background:var(--paper);color:var(--ink);border-radius:22px;overflow:hidden;position:relative;border:3px solid var(--lime)}
@@ -132,17 +142,17 @@
   <div class="tieude">
     <span class="nhan" style="color:var(--ink)">✦ Dùng thử miễn phí</span>
     <h1>Làm 1 video TikTok có 6 khâu.<br><mark>Mỗi khâu, 1 tool.</mark></h1>
-    <p>Xếp đúng thứ tự làm một video, lưu lại dùng dần. Mở trình duyệt là dùng, không cần cài app.</p>
+    <p>Xếp đúng thứ tự làm một video, lưu lại dùng dần. Mở trình duyệt trên điện thoại là xài, không cần cài app.</p>
   </div>
-  <div class="luoi6">
-    <div class="o"><i class="free">FREE</i><div class="anh" style="background-image:url(anh/tai-2.jpg);background-position:center 18%"></div><div class="chu"><h3>1 · Tải video</h3><p>Dán link, lấy video không logo, ảnh gốc, nhạc nền.</p></div></div>
-    <div class="o"><div class="anh" style="background-image:url(anh/soi-3.jpg)"></div><div class="chu"><h3>2 · Soi video</h3><p>Mổ vì sao video người ta nổ, áp khuôn sang kênh bạn.</p></div></div>
-    <div class="o"><div class="anh" style="background-image:url(anh/hook-3.jpg);background-position:center 9%"></div><div class="chu"><h3>3 · Chấm hook</h3><p>Chấm hook trên 100, viết lại 5 bản, đặt chữ lên video.</p></div></div>
-    <div class="o"><div class="anh" style="background-image:url(anh/kb-3.jpg)"></div><div class="chu"><h3>4 · Kịch bản</h3><p>Viết theo 11 khung, biết trước giây nào người xem lướt.</p></div></div>
-    <div class="o"><i>MỚI</i><div class="anh" style="background-image:url(anh/dung-3.jpg);background-size:190% auto;background-position:62% 22%"></div><div class="chu"><h3>5 · Dựng video</h3><p>Khỏi mua app edit: dựng, chèn chữ, xuất MP4 0đ.</p></div></div>
-    <div class="o"><i>MỚI</i><div class="anh" style="background-image:url(anh/cv-2.jpg)"></div><div class="chu"><h3>6 · Chấm video</h3><p>AI xem trọn video bạn làm, chỉ đúng giây đang hỏng.</p></div></div>
+  <div class="sau">
+    <div class="o6"><i class="free">FREE</i><b>1</b><div><strong>Tải video</strong><span>Dán link, ra video không logo, nhạc nền, ảnh bìa.</span></div></div>
+    <div class="o6"><b>2</b><div><strong>Soi video</strong><span>Coi sao video người ta nổ, mượn sườn về kênh mình.</span></div></div>
+    <div class="o6"><b>3</b><div><strong>Chấm hook</strong><span>Hook được mấy điểm trên 100, AI viết lại 5 bản.</span></div></div>
+    <div class="o6"><b>4</b><div><strong>Kịch bản</strong><span>11 khung, biết trước giây nào người xem lướt.</span></div></div>
+    <div class="o6"><i>MỚI</i><b>5</b><div><strong>Dựng video</strong><span>Khỏi mua app edit, xuất MP4 về máy. 0đ.</span></div></div>
+    <div class="o6"><i>MỚI</i><b>6</b><div><strong>Chấm video</strong><span>AI coi hết video, chỉ đúng giây đang hỏng.</span></div></div>
   </div>
-  <div class="ghichu">Ảnh chụp giao diện thật · dữ liệu minh hoạ</div>
+  <div class="chot">6 bài tiếp theo tụi mình kể kỹ từng tool 👇</div>
   <div class="chan"><div class="link">Viral Studio · 6 tool làm video viral<b>👇 Link dùng thử ở bình luận đầu tiên</b></div><div class="hv">Dùng thử miễn phí<br>không cần cài app</div></div>
 </section>
 
@@ -154,13 +164,12 @@
     <h1>Từ 1 link TikTok,<br><mark>lấy được 3 thứ.</mark></h1>
     <p>Video HD không logo, nhạc nền, ảnh bìa gốc. TikTok, Douyin, YouTube, Instagram, Facebook, X, Pinterest đều được.</p>
   </div>
-  <div class="dt" style="--w:380px;left:60px;top:500px"><div class="man"><img src="anh/tai-2.jpg" alt=""></div></div>
-  <ol class="buoc" style="left:478px;right:60px;top:520px">
+  <div class="dt" style="--w:446px;left:60px;top:498px"><div class="man"><img src="anh/tai-2.jpg" alt=""></div></div>
+  <ol class="buoc" style="left:548px;right:60px;top:512px">
     <li><b>1</b><div><strong>Copy link video</strong><span>Trong app bấm Chia sẻ → Sao chép liên kết. Dán cả đoạn chữ cũng được.</span></div></li>
     <li><b>2</b><div><strong>Bấm Lấy file</strong><span>Hiện đủ: video HD không logo, nhạc nền, ảnh bìa.</span></div></li>
     <li><b>3</b><div><strong>Tải về, hoặc soi luôn</strong><span>Bấm “Soi video này” để AI mổ vì sao video đó viral.</span></div></li>
   </ol>
-  <div class="zoom" style="--src:url(anh/tai-3.jpg);--x:30;--y:465;--cw:330;--ch:125;--k:1.5;right:66px;bottom:136px"><em>Không logo</em></div>
   <div class="ghichu">Ảnh chụp giao diện thật · dữ liệu minh hoạ</div>
   <div class="chan"><div class="link">Viral Studio · Tải video<b>👇 Link dùng thử ở bình luận đầu tiên</b></div><div class="hv">Miễn phí<br>không logo, không app</div></div>
 </section>
@@ -185,13 +194,12 @@
     <h1>Muốn học, đừng soi<br><mark>video triệu view.</mark></h1>
     <p>Soi video 50–200K cùng ngách: cùng tệp người xem với bạn, khuôn của nó mượn được. Dán link, AI mổ giúp 3 cửa.</p>
   </div>
-  <div class="dt" style="--w:380px;left:60px;top:500px"><div class="man"><img src="anh/soi-3.jpg" alt=""></div></div>
-  <ol class="buoc" style="left:478px;right:60px;top:520px">
+  <div class="dt" style="--w:446px;left:60px;top:498px"><div class="man"><img src="anh/soi-3.jpg" alt=""></div></div>
+  <ol class="buoc" style="left:548px;right:60px;top:512px">
     <li><b>1</b><div><strong>Dán link video mẫu</strong><span>Cùng ngách, 50–200K view là đủ học. Không cần triệu view.</span></div></li>
     <li><b>2</b><div><strong>Ghi kênh của bạn</strong><span>Chủ đề, người xem, sản phẩm để AI áp khuôn đúng kênh.</span></div></li>
     <li><b>3</b><div><strong>Bấm Soi video</strong><span>Mổ 3 cửa: vì sao dừng lại, vì sao xem hết, công thức lặp lại được.</span></div></li>
   </ol>
-  <div class="zoom" style="--src:url(anh/soi-cua3.jpg);--x:0;--y:90;--cw:390;--ch:140;--k:1.28;right:66px;bottom:136px"><em>Khuôn để mượn</em></div>
   <div class="ghichu">Ảnh chụp giao diện thật · dữ liệu minh hoạ</div>
   <div class="chan"><div class="link">Viral Studio · Soi video viral<b>👇 Link dùng thử ở bình luận đầu tiên</b></div><div class="hv">Dùng thử AI<br>miễn phí</div></div>
 </section>
@@ -215,13 +223,12 @@
     <h1>4 lỗi hook khiến video<br><mark>bị lướt trước giây thứ 3.</mark></h1>
     <p>Mở bằng “chào mọi người”, chữ nhỏ, con số nằm cuối câu, không nói rõ cho ai. Dán hook vào, AI chấm trên 100.</p>
   </div>
-  <div class="dt" style="--w:380px;left:60px;top:500px"><div class="man"><img src="anh/hook-3.jpg" alt=""></div></div>
-  <ol class="buoc" style="left:478px;right:60px;top:520px">
+  <div class="dt" style="--w:446px;left:60px;top:498px"><div class="man"><img src="anh/hook-3.jpg" alt=""></div></div>
+  <ol class="buoc" style="left:548px;right:60px;top:512px">
     <li><b>1</b><div><strong>Đưa frame và câu hook</strong><span>Chụp khung đầu video, gõ câu hook bạn định dùng.</span></div></li>
     <li><b>2</b><div><strong>Bấm Phân tích</strong><span>Chấm 4 tiêu chí: tò mò, dễ hiểu, độ dài, từ khoá. Viết lại 5 bản.</span></div></li>
     <li><b>3</b><div><strong>Xuất PNG chữ</strong><span>Chọn bố cục, font. Tải PNG nền trong suốt, kéo vào CapCut.</span></div></li>
   </ol>
-  <div class="zoom" style="--src:url(anh/hook-2.jpg);--x:20;--y:665;--cw:355;--ch:148;--k:1.4;right:66px;bottom:136px"><em>Kéo vào CapCut</em></div>
   <div class="ghichu">Ảnh chụp giao diện thật · dữ liệu minh hoạ</div>
   <div class="chan"><div class="link">Viral Studio · Hook viral<b>👇 Link dùng thử ở bình luận đầu tiên</b></div><div class="hv">Dùng thử AI<br>miễn phí</div></div>
 </section>
@@ -245,13 +252,12 @@
     <h1>11 khung kịch bản.<br><mark>Chuyện nào khung nấy.</mark></h1>
     <p>Chọn đúng khung cho đúng chuyện. Viết xong, AI chấm 5 tiêu chí và chỉ đúng giây nào người xem sẽ lướt.</p>
   </div>
-  <div class="dt" style="--w:380px;left:60px;top:500px"><div class="man"><img src="anh/kb-3.jpg" alt=""></div></div>
-  <ol class="buoc" style="left:478px;right:60px;top:520px">
+  <div class="dt" style="--w:446px;left:60px;top:498px"><div class="man"><img src="anh/kb-3.jpg" alt=""></div></div>
+  <ol class="buoc" style="left:548px;right:60px;top:512px">
     <li><b>1</b><div><strong>Chọn khung</strong><span>Một khoảnh khắc, Kể chuyện 4 nhịp, Chia sẻ kinh nghiệm…</span></div></li>
     <li><b>2</b><div><strong>Viết từng phần</strong><span>Tool đếm chữ, đổi ra giây, báo phần nào đang thiếu hay thừa.</span></div></li>
     <li><b>3</b><div><strong>Bấm Chấm</strong><span>Điểm 5 tiêu chí, chỗ người xem lướt, 3 chỗ cần sửa.</span></div></li>
   </ol>
-  <div class="zoom" style="--src:url(anh/kb-2.jpg);--x:15;--y:460;--cw:362;--ch:140;--k:1.38;right:66px;bottom:136px"><em>Canh từng giây</em></div>
   <div class="ghichu">Ảnh chụp giao diện thật · dữ liệu minh hoạ</div>
   <div class="chan"><div class="link">Viral Studio · Kịch bản viral<b>👇 Link dùng thử ở bình luận đầu tiên</b></div><div class="hv">Dùng thử AI<br>miễn phí</div></div>
 </section>
@@ -305,13 +311,12 @@
     <h1>Lọt QR code: 3.600 view.<br><mark>Bỏ QR: 84.500 view.</mark></h1>
     <p>Lỗi nhỏ vậy thôi mà tự xem lại khó thấy. AI xem trọn video, chỉ đúng giây nào đang hỏng và sửa sao với footage đang có.</p>
   </div>
-  <div class="dt" style="--w:380px;left:60px;top:500px"><div class="man"><img src="anh/cv-2.jpg" alt=""></div></div>
-  <ol class="buoc" style="left:478px;right:60px;top:520px">
+  <div class="dt" style="--w:446px;left:60px;top:498px"><div class="man"><img src="anh/cv-2.jpg" alt=""></div></div>
+  <ol class="buoc" style="left:548px;right:60px;top:512px">
     <li><b>1</b><div><strong>Dán link hoặc tải video</strong><span>Video đã đăng hay bản dựng chưa đăng đều được.</span></div></li>
     <li><b>2</b><div><strong>Bấm Chấm video</strong><span>Điểm trên 100, 7 thang, chỗ cần lưu ý theo từng giây.</span></div></li>
     <li><b>3</b><div><strong>Sửa ngay, làm tiếp</strong><span>Việc sửa trên bản dựng này, việc làm khác lần sau, 3 kịch bản tiếp theo.</span></div></li>
   </ol>
-  <div class="zoom" style="--src:url(anh/cv-3.jpg);--x:15;--y:122;--cw:362;--ch:128;--k:1.32;right:66px;bottom:136px"><em>Lỗi theo từng giây</em></div>
   <div class="ghichu">Ảnh chụp giao diện thật · dữ liệu minh hoạ</div>
   <div class="chan"><div class="link">Viral Studio · Chấm video của bạn<b>👇 Link dùng thử ở bình luận đầu tiên</b></div><div class="hv">Dùng thử AI<br>miễn phí</div></div>
 </section>
