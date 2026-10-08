@@ -78,6 +78,15 @@
 
   .khong-d{position:absolute;z-index:3;width:132px;height:132px;border-radius:50%;background:var(--red);color:#fff;display:grid;place-items:center;
     font:800 58px/1 var(--font-display);transform:rotate(10deg);box-shadow:6px 6px 0 var(--lime);letter-spacing:-.03em}
+  /* ── poster tính năng: một mảnh giao diện cắt sẵn, căn giữa ── */
+  .manh{position:absolute;left:50%;transform:translateX(-50%) rotate(var(--r,0deg));background:var(--surface);
+    border:4px solid var(--ink);border-radius:24px;overflow:hidden;box-shadow:11px 11px 0 var(--ink)}
+  .manh img{width:100%;display:block}
+  /* mảnh phải cắt bớt đáy: mờ dần vào nền thẻ cho ra vẻ chủ ý, không như bị cụt */
+  .manh.cat::after{content:"";position:absolute;left:0;right:0;bottom:0;height:130px;
+    background:linear-gradient(rgba(253,251,243,0),var(--surface));pointer-events:none}
+  .tn-ghi{position:absolute;left:60px;right:60px;bottom:134px;text-align:center;font:700 25px/1.35 var(--font-ui);color:var(--moss)}
+  .toi .tn-ghi{color:#c7c8b0}
   /* ── chân trang ── */
   .chan{position:absolute;left:0;right:0;bottom:0;height:104px;background:var(--ink);color:var(--paper);display:flex;align-items:center;justify-content:space-between;padding:0 60px;gap:20px}
   .chan .link{font:600 23px/1.3 var(--font-ui)}
@@ -130,6 +139,30 @@
   .ba .soto{position:absolute;top:-24px;left:-14px;z-index:3;width:66px;height:66px;border-radius:50%;background:var(--lime);border:4px solid var(--ink);display:grid;place-items:center;font:800 34px/1 var(--font-display);box-shadow:4px 4px 0 var(--ink)}
   .ba h4{font:800 26px/1.2 var(--font-ui);margin-top:24px}
   .ba p{font:500 20px/1.4 var(--font-ui);color:var(--muted);margin-top:6px}
+
+  /* ══ BỘ 4 ẢNH FACEBOOK ══
+     Facebook xếp bài 4 ảnh thành: 1 ảnh ngang 1920×1280 trên + 3 ảnh vuông dưới.
+     Làm sẵn đúng khung đó nên không bị cắt mất chữ. Ảnh đầu đặt id bắt đầu bằng b4-1. */
+  .poster.ngang{width:960px;height:640px}
+  .poster.o4{width:1080px;height:1080px}
+
+  .b4-trai{position:absolute;left:54px;top:46px;bottom:46px;width:506px;display:flex;flex-direction:column}
+  .b4-trai img.lg{height:42px;align-self:flex-start}
+  .b4-trai .nhan{margin-top:auto;align-self:flex-start;font-size:23px;padding:9px 15px}
+  .b4-trai h1{font-size:57px;line-height:1.04;margin-top:18px}
+  .b4-trai p{font:500 23px/1.4 var(--font-ui);color:var(--moss);margin-top:14px}
+  .b4-trai .duoi{margin-top:auto;display:flex;flex-direction:column;align-items:flex-start;gap:9px}
+  .b4-trai .duoi b{font:800 27px/1.15 var(--font-display);background:var(--ink);color:var(--lime);padding:12px 18px;border-radius:14px}
+  .b4-trai .duoi span{font:700 20px/1.35 var(--font-ui);color:var(--moss)}
+
+  /* ô vuông: chữ phải to vì Facebook thu nhỏ còn khoảng 1/4 màn hình */
+  .o4 .o4-dau{position:absolute;left:56px;right:56px;top:52px;display:flex;align-items:center;justify-content:space-between}
+  .o4 .o4-dau img{height:40px}
+  .o4 .o4-dau .so{font-size:20px;padding:11px 17px}
+  .o4 h2{position:absolute;left:56px;right:56px;top:152px;font:800 84px/1.04 var(--font-display);letter-spacing:-.025em}
+  .o4 h2 mark{background:var(--ink);color:var(--lime);padding:0 14px;border-radius:14px;
+    box-decoration-break:clone;-webkit-box-decoration-break:clone}
+  .o4 .o4-ghi{position:absolute;left:56px;right:56px;bottom:52px;font:700 27px/1.3 var(--font-ui);color:var(--moss)}
   .tieude.nho h1{font-size:60px}
   .toi .buoc li{color:var(--ink)}
 </style>
@@ -360,6 +393,122 @@
   <div class="bb">“Content này làm sao??”</div>
   <div class="bb hai">“Content này ok chưa??”</div>
   <img class="logo" src="logo/lockup-nen-lime.svg" alt="Tự Mình Xây Kênh">
+</section>
+
+<!-- ═══════════ TÍNH NĂNG TOOL TẢI VIDEO ═══════════ -->
+<section class="poster" id="tn1-nen-tang">
+  <div class="dau"><img src="logo/lockup-nen-lime.svg" alt="Tự Mình Xây Kênh"><span class="so">Tải video · 1/6</span></div>
+  <div class="ghichu">Ảnh chụp giao diện thật · dữ liệu minh hoạ</div>
+  <div class="tieude">
+    <span class="nhan">🔗 Một ô dán link</span>
+    <h1>Dán link gì cũng được.<br><mark>10 nền tảng.</mark></h1>
+    <p>TikTok, Douyin, YouTube, Instagram, Facebook, X, Threads, Pinterest, Reddit, hoặc link file thẳng.</p>
+  </div>
+  <div class="manh cat" style="width:620px;top:496px;height:650px"><img src="anh/tv-nen.jpg" alt=""></div>
+  <div class="tn-ghi">Lười lọc link thì dán nguyên đoạn “Chia sẻ”, tool tự tìm ra link</div>
+  <div class="chan"><div class="link">Viral Studio · Tải video<b>👇 Link dùng thử ở bình luận đầu tiên</b></div><div class="hv">Miễn phí<br>không cần cài app</div></div>
+</section>
+
+<section class="poster" id="tn2-khong-logo">
+  <div class="dau"><img src="logo/lockup-nen-lime.svg" alt="Tự Mình Xây Kênh"><span class="so">Tải video · 2/6</span></div>
+  <div class="ghichu">Ảnh chụp giao diện thật · dữ liệu minh hoạ</div>
+  <div class="tieude">
+    <span class="nhan">🎬 Chất lượng video</span>
+    <h1>Video HD,<br><mark>không logo.</mark></h1>
+    <p>Mỗi video ra 3 bản để bạn chọn: HD không logo, bản nhẹ không logo, và bản gốc có logo.</p>
+  </div>
+  <div class="manh cat" style="width:470px;top:486px;height:652px"><img src="anh/tv-video.jpg" alt=""></div>
+  <div class="tn-ghi">Không logo che góc, xem lại từng khung hình cho rõ</div>
+  <div class="chan"><div class="link">Viral Studio · Tải video<b>👇 Link dùng thử ở bình luận đầu tiên</b></div><div class="hv">Miễn phí<br>không cần cài app</div></div>
+</section>
+
+<section class="poster" id="tn3-nhac-nen">
+  <div class="dau"><img src="logo/lockup-nen-lime.svg" alt="Tự Mình Xây Kênh"><span class="so">Tải video · 3/6</span></div>
+  <div class="ghichu">Ảnh chụp giao diện thật · dữ liệu minh hoạ</div>
+  <div class="tieude">
+    <span class="nhan">🎵 Nhạc nền</span>
+    <h1>Lấy luôn<br><mark>nhạc nền dạng mp3.</mark></h1>
+    <p>Thấy video dùng nhạc hợp, tải riêng file nhạc về nghe kỹ hoặc để dành dùng cho video của mình.</p>
+  </div>
+  <div class="manh" style="width:760px;top:560px;--r:-1.5deg"><img src="anh/tv-am.jpg" alt=""></div>
+  <div class="tn-ghi">Nghe kỹ họ chọn nhạc gì, nhạc có hợp nội dung không</div>
+  <div class="chan"><div class="link">Viral Studio · Tải video<b>👇 Link dùng thử ở bình luận đầu tiên</b></div><div class="hv">Miễn phí<br>không cần cài app</div></div>
+</section>
+
+<section class="poster" id="tn4-nhieu-anh">
+  <div class="dau"><img src="logo/lockup-nen-lime.svg" alt="Tự Mình Xây Kênh"><span class="so">Tải video · 4/6</span></div>
+  <div class="ghichu">Ảnh chụp giao diện thật · dữ liệu minh hoạ</div>
+  <div class="tieude">
+    <span class="nhan">🖼️ Bài nhiều ảnh</span>
+    <h1>Bài 5 tấm?<br><mark>Tải tất cả một lần.</mark></h1>
+    <p>Bài dạng ảnh thì hiện đủ từng tấm, kèm ảnh bìa gốc. Bấm Tải tất cả là xong, khỏi lưu từng cái.</p>
+  </div>
+  <div class="manh cat" style="width:560px;top:486px;height:652px"><img src="anh/tv-nhieuanh.jpg" alt=""></div>
+  <div class="tn-ghi">Có cả ảnh bìa gốc để coi chữ trên bìa nằm ở đâu, mấy dòng</div>
+  <div class="chan"><div class="link">Viral Studio · Tải video<b>👇 Link dùng thử ở bình luận đầu tiên</b></div><div class="hv">Miễn phí<br>không cần cài app</div></div>
+</section>
+
+<section class="poster" id="tn5-so-lieu">
+  <div class="dau"><img src="logo/lockup-nen-lime.svg" alt="Tự Mình Xây Kênh"><span class="so">Tải video · 5/6</span></div>
+  <div class="ghichu">Ảnh chụp giao diện thật · dữ liệu minh hoạ</div>
+  <div class="tieude">
+    <span class="nhan">📊 Số liệu</span>
+    <h1>Thấy luôn<br><mark>view, tim, bình luận.</mark></h1>
+    <p>Tải xong hiện ngay số của video đó, khỏi phải mở app đếm tay. Bấm một nút là nhảy qua tool Soi video.</p>
+  </div>
+  <div class="manh" style="width:700px;top:540px;--r:-1deg"><img src="anh/tv-info.jpg" alt=""></div>
+  <div class="tn-ghi">Nút “Soi video này” nối thẳng sang tool mổ vì sao video đó viral</div>
+  <div class="chan"><div class="link">Viral Studio · Tải video<b>👇 Link dùng thử ở bình luận đầu tiên</b></div><div class="hv">Miễn phí<br>không cần cài app</div></div>
+</section>
+
+<section class="poster" id="tn6-lich-su">
+  <div class="dau"><img src="logo/lockup-nen-lime.svg" alt="Tự Mình Xây Kênh"><span class="so">Tải video · 6/6</span></div>
+  <div class="ghichu">Ảnh chụp giao diện thật · dữ liệu minh hoạ</div>
+  <div class="tieude">
+    <span class="nhan">🕘 Lịch sử tải</span>
+    <h1>Tải cả buổi,<br><mark>vẫn tìm lại được.</mark></h1>
+    <p>Tool nhớ những link bạn vừa tải. Chạm một cái là lấy lại, khỏi đi lục lại link trong app.</p>
+  </div>
+  <div class="manh" style="width:820px;top:600px;--r:-1deg"><img src="anh/tv-lichsu.jpg" alt=""></div>
+  <div class="tn-ghi">Lưu ngay trên máy bạn, không gửi đi đâu hết</div>
+  <div class="chan"><div class="link">Viral Studio · Tải video<b>👇 Link dùng thử ở bình luận đầu tiên</b></div><div class="hv">Miễn phí<br>không cần cài app</div></div>
+</section>
+
+<!-- ═══════════ BỘ 4 ẢNH · TẢI VIDEO ═══════════
+     Đăng một bài, chọn đủ 4 ảnh theo đúng thứ tự b4-1 → b4-4.
+     b4-1 là ảnh ngang nằm trên, 3 ảnh còn lại là 3 ô vuông bên dưới. -->
+<section class="poster ngang" id="b4-1-ngang">
+  <div class="b4-trai">
+    <img class="lg" src="logo/lockup-nen-lime.svg" alt="Tự Mình Xây Kênh">
+    <span class="nhan">⬇️ Tải video · 0đ</span>
+    <h1>Dán link vô,<br>ra video<br><mark>không logo.</mark></h1>
+    <p>TikTok, Douyin, YouTube, Instagram, Facebook, X, Threads, Pinterest, Reddit — 10 nền tảng.</p>
+    <div class="duoi"><b>👇 Link ở bình luận đầu</b><span>Mở trình duyệt là xài, không cần cài app</span></div>
+  </div>
+  <div class="manh cat" style="width:336px;left:auto;right:52px;top:40px;height:470px;transform:rotate(-2deg)"><img src="anh/tv-nen.jpg" alt=""></div>
+  <div class="manh" style="width:300px;left:auto;right:36px;top:420px;transform:rotate(3deg)"><img src="anh/tv-am.jpg" alt=""></div>
+  <div class="ghichu" style="top:auto;bottom:22px;right:54px">Ảnh chụp giao diện thật · dữ liệu minh hoạ</div>
+</section>
+
+<section class="poster o4" id="b4-2-khong-logo">
+  <div class="o4-dau"><img src="logo/lockup-nen-lime.svg" alt="Tự Mình Xây Kênh"><span class="so">Tải video · 1</span></div>
+  <h2>Video HD,<br><mark>không logo.</mark></h2>
+  <div class="manh cat" style="width:462px;top:398px;height:530px"><img src="anh/tv-video.jpg" alt=""></div>
+  <div class="o4-ghi">Ra 3 bản để chọn: HD, bản nhẹ, bản gốc</div>
+</section>
+
+<section class="poster o4" id="b4-3-nhac-nen">
+  <div class="o4-dau"><img src="logo/lockup-nen-lime.svg" alt="Tự Mình Xây Kênh"><span class="so">Tải video · 2</span></div>
+  <h2>Lấy luôn<br><mark>nhạc nền mp3.</mark></h2>
+  <div class="manh" style="width:880px;top:472px;--r:-1.5deg"><img src="anh/tv-am.jpg" alt=""></div>
+  <div class="o4-ghi">Thấy nhạc hợp thì tải riêng về để dành</div>
+</section>
+
+<section class="poster o4" id="b4-4-nhieu-anh">
+  <div class="o4-dau"><img src="logo/lockup-nen-lime.svg" alt="Tự Mình Xây Kênh"><span class="so">Tải video · 3</span></div>
+  <h2>Bài 5 tấm?<br><mark>Tải tất cả.</mark></h2>
+  <div class="manh cat" style="width:506px;top:398px;height:530px"><img src="anh/tv-nhieuanh.jpg" alt=""></div>
+  <div class="o4-ghi">Một nút, về đủ từng tấm, kèm ảnh bìa gốc</div>
 </section>
 
 </body>

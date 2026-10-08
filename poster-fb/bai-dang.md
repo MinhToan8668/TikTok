@@ -366,3 +366,53 @@ https://minhtoan8668.github.io/TikTok/
 - Người dán câu hook: góp ý thật 1 câu (đưa số lên đầu, nói rõ cho ai, cắt bớt chữ), rồi hỏi `bạn tính để chữ này ở đâu trên video?`
 - `Link ở bình luận ghim trên cùng á bạn, mở trình duyệt là xài liền`
 - `Có bản thử free nha, khỏi cài app, tạo tài khoản 30 giây là có thêm lượt AI`
+
+---
+
+## Bài 4 ảnh · tool Tải video
+
+Đăng **một bài, chọn đủ 4 ảnh theo đúng thứ tự** `b4-1-ngang` → `b4-2` → `b4-3` → `b4-4`.
+Facebook sẽ xếp ảnh ngang nằm trên, 3 ô vuông nằm dưới. Ảnh đã làm sẵn đúng khung nên không bị cắt chữ.
+
+**Facebook**
+
+```
+Học viên tụi mình hay hỏi: lưu video người ta về để học thì làm sao cho khỏi dính cái logo chình ình giữa màn.
+
+Thế là tụi mình làm luôn cái tool tải video trong Viral Studio.
+
+Dán link vô, nó ra cho bạn video HD không logo, nhạc nền riêng dạng mp3, với cả ảnh bìa gốc. Bài dạng 5-6 tấm ảnh cũng tải một phát về đủ.
+
+Lười lọc link thì cứ copy nguyên đoạn chữ lúc bấm Chia sẻ rồi dán vô, tool tự mò ra link.
+
+Mở trình duyệt trên điện thoại là xài, không cần cài app, không quảng cáo.
+
+Mà nhắc nhỏ: tải về để coi người ta dựng sao, chữ đặt chỗ nào, nhạc cắt ở đâu thôi nha. Đừng đăng lại nguyên bản của người ta =)))
+
+Bạn hay tải video về để học khâu nào nhất, hook hay cách dựng?
+```
+
+Bình luận đầu (ghim): `Link nè https://minhtoan8668.github.io/TikTok/tools/tai-ve.html mở là dán link được liền`
+
+**Threads**
+
+```
+tụi t dạy làm content, học viên than lưu video về học mà dính logo bự chà bá giữa màn hình
+
+thế là code luôn cái tool tải video cho xài free. dán link vô ra video hd không logo, kèm nhạc nền mp3 với ảnh bìa gốc. bài nhiều ảnh bấm 1 nút về hết
+
+tải về coi người ta dựng sao thôi nha đừng đăng lại =)))
+
+mn hay lưu video về để học cái gì?
+```
+
+**Group học viên**
+
+```
+Cả lớp ơi, tool Tải video trong Viral Studio xài được rồi nha.
+Dán link → ra video HD không logo + nhạc nền + ảnh bìa. Bài nhiều ảnh tải một lần về hết.
+https://minhtoan8668.github.io/TikTok/tools/tai-ve.html
+Tuần này lấy 3 video cùng ngách về, coi họ đặt chữ hook chỗ nào rồi mang vô lớp nói nha.
+```
+
+**Ảnh để dành bỏ bình luận:** `tn1`–`tn6` (khổ 4:5, mỗi tính năng một tấm). Ai hỏi kỹ cái nào thì thả tấm đó vô trả lời.

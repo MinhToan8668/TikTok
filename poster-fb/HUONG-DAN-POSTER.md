@@ -30,6 +30,22 @@ Chỉ dùng bảng này khi buộc phải đăng nhiều ảnh một bài. Làm 
 | 4 ảnh | 1 ảnh ngang 1920×1280 trên + 3 ảnh vuông dưới |
 | 5 ảnh | 2 ảnh vuông lớn trái + 3 ảnh vuông nhỏ phải |
 
+### Bài 4 ảnh (khi muốn khoe nhiều tính năng trong một bài)
+
+Cách duy nhất đăng nhiều ảnh mà không bị cắt: làm sẵn ảnh đúng khung Facebook ghép.
+
+| Vị trí | Khổ ta làm | Class trong `poster.html` |
+|---|---|---|
+| Ảnh 1, nằm ngang phía trên | 960×640 css → xuất 1920×1280 | `.poster.ngang` |
+| Ảnh 2, 3, 4, ba ô vuông dưới | 1080×1080 css → xuất 2160×2160 | `.poster.o4` |
+
+Ba ô vuông bị Facebook thu còn khoảng 1/4 bề ngang màn hình, nên mỗi ô chỉ một câu
+(tiêu đề 84px) + một mảnh giao diện + một dòng ghi nhỏ. Nhồi thêm là không ai đọc được.
+Chọn ảnh khi đăng phải đúng thứ tự: ảnh ngang trước, rồi ba ô vuông.
+
+Mảnh giao diện dài quá khung thì đặt `height` cho `.manh` và thêm class `cat`, đáy sẽ mờ
+dần vào nền thẻ thay vì cụt ngang.
+
 ## Màu, chữ, logo
 
 - Màu: lime `#99DF00`, mực `#26210F`, kem `#F9E8DD`, nền thẻ `#FDFBF3`, đỏ nhấn `#FF5A36` (chỉ cho tem MỚI, 0đ).
