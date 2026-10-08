@@ -6,9 +6,18 @@ xuất bằng `xuat.js`.
 
 ## Khổ ảnh
 
-**Luật quan trọng nhất: một bài chỉ đăng MỘT ảnh.** Đăng từ 2 ảnh trở lên là Facebook tự ghép
-lưới và cắt ảnh theo khung của nó, poster 4:5 sẽ mất tiêu đề hoặc mất chân. Ảnh phụ (cách dùng,
-chi tiết) bỏ xuống bình luận, ở đó vẫn hiện nguyên khổ.
+**Facebook quyết định lưới theo SỐ ẢNH bạn chọn, không theo khổ ảnh bạn làm.** Một ảnh thì hiện
+nguyên khổ. Từ 2 ảnh trở lên nó ghép lưới và crop theo khung của nó, poster 4:5 sẽ mất tiêu đề
+hoặc mất chân.
+
+Nên chỉ có hai cách đăng an toàn:
+
+1. **Một ảnh.** Mặc định, chắc ăn nhất.
+2. **Đúng bốn ảnh làm sẵn theo khung lưới 4 ảnh** (1 ngang 3:2 + 3 vuông), chọn đúng thứ tự khi
+   đăng: ảnh ngang trước, rồi ba ảnh vuông. Thứ tự chọn quyết định bố cục, tên file không liên quan.
+
+Chọn 5 ảnh trở lên, hay trộn ảnh 4:5 vào bộ 4 ảnh, là lưới đổi và crop hết — kể cả khi bốn tấm
+đầu đúng khung. Ảnh phụ bỏ xuống bình luận, ở đó vẫn hiện nguyên khổ.
 
 | Loại bài | Khổ ta làm | Vì sao |
 |---|---|---|

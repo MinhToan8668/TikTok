@@ -433,17 +433,15 @@ Bài tuần này: lấy 3 video cùng ngách về, coi kỹ chữ hook họ đ�
 
 ## Bài một ảnh ngang · giới thiệu cả 6 tool
 
-Chọn một trong ba ảnh 1920×1280, bài này đăng **một ảnh duy nhất**:
+**Cách đăng, chọn một trong hai:**
 
-| Ảnh | Khi nào dùng |
-|---|---|
-| `ng-6-toi.png` | **Mặc định.** Nền mực, hai điện thoại chồng lớp. Nền tối nổi nhất giữa feed Facebook toàn trắng |
-| `ng-6-lime.png` | Cùng bố cục, nền lime, hợp khi đăng liền sau một bài nền tối |
-| `ng-6-tool.png` | Bản 6 ô có mô tả từng tool, dùng khi muốn ảnh nói đủ mà không cần đọc caption |
+| Kiểu | Ảnh | Lưu ý |
+|---|---|---|
+| **Bốn ảnh** (khuyên dùng) | Chọn **đúng 4 tấm, đúng thứ tự**: `b6-1-ngang` → `b6-2-truoc-khi-quay` → `b6-3-luc-dung` → `b6-4-truoc-khi-dang` | Thêm tấm thứ 5 là Facebook đổi lưới, crop hết. Thứ tự chọn quyết định bố cục, không phải tên file |
+| **Một ảnh** | `ng-6-toi.png` (nền mực) hoặc `ng-6-lime.png` | Chắc ăn nhất, hiện nguyên khổ |
 
-Viết theo cẩm nang FB viral của page: xưng **"mình"** số ít, không phải "tụi mình".
-Quy luật số 1 trong cẩm nang — bài cá nhân thắng bài giọng thương hiệu ở mọi mảng.
-Công thức: tổng hợp tài nguyên (mục lục) + hook thú nhận. Mục tiêu: lưu và dùng thử.
+Mấy tấm 4:5 (`00`–`06`, `tn1`–`tn6`) **đừng chọn chung với bộ trên**. Khổ khác nhau là lưới vỡ.
+Để dành thả xuống bình luận, ở đó vẫn hiện nguyên khổ.
 
 **Facebook**
 
