@@ -1181,12 +1181,13 @@
           <label class="full"><span>Từ nhấn (to + màu), cách nhau dấu phẩy</span><input type="text" id="pdNhan" placeholder="80%, 3 bước, miễn phí"></label>
           <h3 class="pt">Danh sách câu</h3>
           <div class="row"><input id="pdTim" type="search" placeholder="Tìm trong phụ đề…" style="flex:1;min-width:80px"><input id="pdThay" type="text" placeholder="Thay bằng…" style="flex:1;min-width:80px"><button class="btn nho" id="btnPdThay" type="button">Thay hết</button></div>
+          <div class="row" id="pdDemHang"><label style="display:flex;gap:6px;align-items:center;flex:1"><input type="checkbox" id="pdDanhDem"> Đánh dấu tiếng đệm</label><button class="btn nho" id="btnXoaDem" type="button" title="Cắt hẳn các tiếng ờ, ừ, ừm khỏi video (dồn khoảng trống). Thì, là, kiểu, à chỉ đánh dấu vàng để anh tự nghe lại.">✂ Xoá hết tiếng đệm</button></div>
           <div class="pdDs" id="pdDs"></div>
           <div class="quota">Bấm giờ để tới câu · gõ để sửa · Enter tách câu tại con trỏ · Backspace ở đầu câu để gộp với câu trước.</div>
           <h3 class="pt">Phụ đề song ngữ</h3>
           <div class="row"><select id="pdNgonNgu" title="Ngôn ngữ dịch"><option value="en">Tiếng Anh</option><option value="zh">Tiếng Trung</option><option value="ko">Tiếng Hàn</option><option value="ja">Tiếng Nhật</option><option value="th">Tiếng Thái</option><option value="id">Tiếng Indonesia</option><option value="fr">Tiếng Pháp</option><option value="es">Tiếng Tây Ban Nha</option></select><button class="btn nho xanh" id="btnDichPd" type="button">🌐 Dịch phụ đề</button></div>
           <label><span>Hiện dòng dịch dưới phụ đề</span><input type="checkbox" id="pdSongNgu"></label>
-          <div class="row"><label class="btn nho" style="cursor:pointer">📥 Nhập .srt<input type="file" id="srtIn" accept=".srt,.vtt,text/plain" hidden></label><button class="btn nho ghost" id="btnBoSrt" type="button" hidden>Bỏ phụ đề nhập</button><span class="quota" id="srtTt" style="margin:0"></span></div>
+          <div class="row"><label class="btn nho" style="cursor:pointer">📥 Nhập .srt<input type="file" id="srtIn" accept=".srt,.vtt,.lrc,text/plain" hidden></label><button class="btn nho ghost" id="btnBoSrt" type="button" hidden>Bỏ phụ đề nhập</button><span class="quota" id="srtTt" style="margin:0"></span></div>
           <h3 class="pt">Lời thoại</h3>
           <div class="quota">Bỏ tick câu = cắt khỏi video. Bấm chữ để sửa phụ đề. Bấm mốc giây để nhảy tới.</div>
           <div class="langCai"><label>Lặng dài hơn <select id="langNguong"><option value="0.3">0,3s (dồn dập)</option><option value="0.5" selected>0,5s</option><option value="0.8">0,8s</option><option value="1.2">1,2s (nhẹ tay)</option></select></label><label><input type="checkbox" id="langDem" checked> bỏ ờ, ừm, à</label></div>
@@ -1245,7 +1246,9 @@
         <div class="xuat" id="xuatCaiHop"><div class="box" style="max-width:520px;text-align:left"><b style="font-size:15px">⬆ Xuất</b>
           <label class="full"><span>Tên</span><input type="text" id="xcTen"></label>
           <label><span>Định dạng</span><select id="xc_xuatDD"></select></label>
-          <div id="xcVideo"><label><span>Độ phân giải</span><select id="xc_doPhanGiai"></select></label><label><span>Khung/giây</span><select id="xc_xuatFps"></select></label><label><span>Chất lượng</span><select id="xc_xuatCL"></select></label></div>
+          <div id="xcVideo"><label><span>Độ phân giải</span><select id="xc_doPhanGiai"></select></label><label><span>Khung/giây</span><select id="xc_xuatFps"></select></label><label><span>Tốc độ bit</span><select id="xc_xuatCL"></select></label><label id="xcMbpsHang" hidden><span>Mbps</span><input type="number" id="xc_xuatMbps" min="1" max="100" step="1"></label></div>
+          <div id="xcAm"><label><span>Âm thanh</span><select id="xc_xuatAm"></select></label></div>
+          <label><span>Kèm phụ đề</span><select id="xc_xuatPd"></select></label>
           <div id="xcGif" hidden><label><span>GIF khung/giây</span><select id="xc_gifFps"></select></label><label><span>GIF rộng</span><select id="xc_gifRong"></select></label></div>
           <label><span>Khoảng xuất</span><select id="xc_xuatKhoang"></select></label>
           <label><span>Ghi thời gian thực (máy cũ)</span><input type="checkbox" id="xcTuyChinh"></label>
@@ -1270,11 +1273,14 @@
           <label><span>Font chữ</span><select id="font"><option value="be_vietnam">Be Vietnam Pro</option><option value="montserrat">Montserrat</option><option value="bricolage">Bricolage</option><option value="lexend">Lexend</option><option value="oswald">Oswald (hẹp)</option><option value="anton">Anton (đập)</option><option value="playfair">Playfair (thanh lịch)</option></select></label>
           <label><span>Zoom nhấn</span><input type="checkbox" id="zoomOn" checked></label>
           <h3>Xuất</h3>
-          <label><span>Định dạng</span><select id="xuatDD"><option value="mp4_avc" selected>MP4 · H.264 (đăng TikTok)</option><option value="mp4_av1">MP4 · AV1 (nhẹ hơn, máy mới)</option><option value="webm_vp9">WebM · VP9</option><option value="wav">Chỉ âm thanh · WAV</option><option value="gif">Ảnh động · GIF</option></select></label>
-          <label><span>Khung/giây</span><select id="xuatFps"><option value="24">24</option><option value="25">25</option><option value="30" selected>30</option><option value="60">60 (mượt, nặng)</option></select></label>
-          <label><span>Chất lượng</span><select id="xuatCL"><option value="vua">Vừa (file nhẹ)</option><option value="cao" selected>Cao</option><option value="rat_cao">Rất cao</option></select></label>
+          <label><span>Định dạng</span><select id="xuatDD"><option value="mp4_avc" selected>MP4 · H.264 (đăng TikTok)</option><option value="mp4_av1">MP4 · AV1 (nhẹ hơn, máy mới)</option><option value="mp4_hevc">MP4 · H.265/HEVC (nhẹ, máy hỗ trợ)</option><option value="mov_avc">MOV · H.264 (Final Cut, Premiere)</option><option value="webm_vp9">WebM · VP9</option><option value="wav">Chỉ âm thanh · WAV</option><option value="m4a">Chỉ âm thanh · M4A (AAC)</option><option value="gif">Ảnh động · GIF</option></select></label>
+          <label><span>Khung/giây</span><select id="xuatFps"><option value="24">24</option><option value="25">25</option><option value="30" selected>30</option><option value="50">50</option><option value="60">60 (mượt, nặng)</option></select></label>
+          <label><span>Tốc độ bit</span><select id="xuatCL" title="Tốc độ bit video"><option value="vua">Thấp hơn (file nhẹ)</option><option value="cao" selected>Đề xuất</option><option value="rat_cao">Cao hơn</option><option value="tuy">Tuỳ chỉnh (Mbps)</option></select></label>
+          <label id="xuatMbpsHang" hidden><span>Tốc độ bit (Mbps)</span><input type="number" id="xuatMbps" min="1" max="100" step="1" value="12"></label>
+          <label><span>Âm thanh</span><select id="xuatAm"><option value="128">AAC 128 kbps</option><option value="192" selected>AAC 192 kbps</option><option value="320">AAC 320 kbps</option></select></label>
+          <label><span>Kèm phụ đề</span><select id="xuatPd" title="Lưu thêm file phụ đề cạnh video, khớp đúng khoảng xuất"><option value="khong" selected>Không</option><option value="srt">File .srt</option><option value="txt">File .txt</option></select></label>
           <label><span>Cách xuất</span><select id="xuatCach" title="Chính xác từng khung: nhanh, không rớt khung, chạy nền được. Ghi thời gian thực: cho máy/trình duyệt cũ."><option value="nhanh" selected>Chính xác từng khung</option><option value="ghi">Ghi thời gian thực (máy cũ)</option></select></label>
-          <label><span>Độ phân giải</span><select id="doPhanGiai"><option value="1080">1080p</option><option value="720">720p (nhẹ)</option><option value="1440">1440p (máy mạnh)</option><option value="2160">4K (máy rất mạnh)</option></select></label>
+          <label><span>Độ phân giải</span><select id="doPhanGiai"><option value="480">480p (rất nhẹ)</option><option value="720">720p (nhẹ)</option><option value="1080" selected>1080p</option><option value="1440">1440p (máy mạnh)</option><option value="2160">4K (máy rất mạnh)</option></select></label>
           <label><span>Khoảng xuất</span><select id="xuatKhoang"><option value="tat">Cả video</option><option value="vr">Vùng In–Out (I / O)</option></select></label>
           <div id="gifCai" hidden><label><span>GIF khung/giây</span><select id="gifFps"><option value="10">10</option><option value="12" selected>12</option><option value="15">15</option></select></label><label><span>GIF rộng</span><select id="gifRong"><option value="240">240px</option><option value="360" selected>360px</option><option value="480">480px</option></select></label></div>
           <div class="quota" id="uocTinh"></div>
@@ -1620,7 +1626,7 @@ function veLoi() {
   });
 }
 /* sửa chữ câu → chia đều lại các từ trong khoảng câu để phụ đề karaoke theo kịp */
-function suaTu(s, c) { const ws = c.text.trim().split(/\s+/).filter(Boolean); if (!ws.length) return; const i0 = c.i0 != null ? c.i0 : s.tu.findIndex(t => t.bd >= c.bd - 0.01), i1 = c.i1 != null ? c.i1 : s.tu.map((t, i) => t.kt <= c.kt + 0.01 ? i : -1).filter(i => i >= 0).pop(); if (i0 < 0 || i1 == null || i1 < i0) return; const moi = ws.map((w, k) => ({ w, bd: Math.round((c.bd + (c.kt - c.bd) * k / ws.length) * 100) / 100, kt: Math.round((c.bd + (c.kt - c.bd) * (k + 1) / ws.length) * 100) / 100 })); s.tu.splice(i0, i1 - i0 + 1, ...moi); const lech = moi.length - (i1 - i0 + 1); s.cau.forEach(x => { if (x.i0 != null && x.i0 > i1) { x.i0 += lech; x.i1 += lech; } }); c.i1 = i0 + moi.length - 1; }
+function suaTu(s, c) { const ws = c.text.trim().split(/\s+/).filter(Boolean); if (!ws.length) return; const i0 = c.i0 != null ? c.i0 : s.tu.findIndex(t => t.bd >= c.bd - 0.01), i1 = c.i1 != null ? c.i1 : s.tu.map((t, i) => t.kt <= c.kt + 0.01 ? i : -1).filter(i => i >= 0).pop(); if (i0 < 0 || i1 == null || i1 < i0) return; const tl = chiaTheoKyTu(ws), moi = ws.map((w, k) => ({ w, bd: Math.round((c.bd + (c.kt - c.bd) * tl[k]) * 100) / 100, kt: Math.round((c.bd + (c.kt - c.bd) * tl[k + 1]) * 100) / 100 })); s.tu.splice(i0, i1 - i0 + 1, ...moi); const lech = moi.length - (i1 - i0 + 1); s.cau.forEach(x => { if (x.i0 != null && x.i0 > i1) { x.i0 += lech; x.i1 += lech; } }); c.i1 = i0 + moi.length - 1; }
 function batCau(s, c, bat) {
   luuHoanTac();
   if (bat) { let vt = P.clips.length; for (let i = 0; i < P.clips.length; i++) if (P.clips[i].src === s.id && P.clips[i].bd > c.bd) { vt = i; break; } P.clips.splice(vt, 0, { src: s.id, bd: c.bd, kt: c.kt, ly_do: 'bật câu' }); }
@@ -1896,7 +1902,8 @@ $('#nhacIn').onchange = async e => { const f = e.target.files[0]; if (!f) return
 function cumTu() {
   if (P.pdNgoai && P.pdNgoai.length) return cumNgoai();
   const n = +$('#pdCum').value || 4, out = []; let acc = 0;
-  P.clips.forEach(c => { const s = srcCua(c.src); if (s && s.tu.length) { const ws = s.tu.filter(t => !t.an && t.bd >= c.bd - 0.05 && t.kt <= c.kt + 0.05); for (let i = 0; i < ws.length; i += n) { const g = ws.slice(i, i + n); let cat = g.length; for (let k = 0; k < g.length - 1; k++) if (/[.!?…,]$/.test(g[k].w) && k >= 1) { cat = k + 1; break; } if (ws[i].nhom) { cat = 1; while (i + cat < ws.length && ws[i + cat].nhom === ws[i].nhom) cat++; } else for (let k = 1; k < cat; k++) if (ws[i + k] && ws[i + k].nhom) { cat = k; break; } const gg = ws.slice(i, i + cat); i += cat - n; const k = tocC(c); out.push({ s: s.id, w: gg, bd: acc + tlTuSrc(c, gg[0].bd - c.bd), kt: acc + tlTuSrc(c, gg[gg.length - 1].kt - c.bd) + 0.12, tu: gg.map(t => ({ w: t.w, bd: acc + tlTuSrc(c, t.bd - c.bd), kt: acc + tlTuSrc(c, t.kt - c.bd) })) }); } } acc += daiC(c); });
+  P.clips.forEach(c => { const s = srcCua(c.src); if (s && s.tu.length) { const ws = s.tu.filter(t => !t.an && t.bd >= c.bd - 0.05 && t.kt <= c.kt + 0.05); for (let i = 0; i < ws.length; i += n) { const g = ws.slice(i, i + n); let cat = g.length; for (let k = 0; k < g.length - 1; k++) if (/[.!?…,]$/.test(g[k].w) && k >= 1) { cat = k + 1; break; } if (ws[i].nhom) { cat = 1; while (i + cat < ws.length && ws[i + cat].nhom === ws[i].nhom) cat++; } else for (let k = 1; k < cat; k++) if (ws[i + k] && ws[i + k].nhom) { cat = k; break; } const gg = ws.slice(i, i + cat); i += cat - n; const k = tocC(c); out.push({ s: s.id, ci: P.clips.indexOf(c), w: gg, bd: acc + tlTuSrc(c, gg[0].bd - c.bd), kt: acc + tlTuSrc(c, gg[gg.length - 1].kt - c.bd) + 0.12, tu: gg.map(t => ({ w: t.w, bd: acc + tlTuSrc(c, t.bd - c.bd), kt: acc + tlTuSrc(c, t.kt - c.bd) })) }); } } acc += daiC(c); });
+  for (let k = 0; k < out.length - 1; k++) { const a = out[k], b = out[k + 1]; if (a.kt > b.bd) { a.kt = Math.max(a.bd + 0.05, b.bd); a.tu.forEach(t => { if (t.kt > a.kt) t.kt = a.kt; }); } }   // không cho hai câu chồng nhau
   return out;
 }
 let cumCache = null, cumKey = '';
@@ -2124,7 +2131,7 @@ async function phat(xuat) {
     const stream = canvas.captureStream(30); dest.stream.getAudioTracks().forEach(t => stream.addTrack(t));
     const mimes = ['video/mp4;codecs="avc1.42E01E,mp4a.40.2"', 'video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'];
     const mime = mimes.find(m => { try { return MediaRecorder.isTypeSupported(m); } catch { return false; } }) || '';
-    rec = new MediaRecorder(stream, { mimeType: mime || undefined, videoBitsPerSecond: Math.min(W, H) >= 2160 ? 35e6 : Math.min(W, H) >= 1440 ? 14e6 : Math.min(W, H) >= 1080 ? 8e6 : 4e6, audioBitsPerSecond: 128000 });
+    rec = new MediaRecorder(stream, { mimeType: mime || undefined, videoBitsPerSecond: caiXuat().cl === 'tuy' ? caiXuat().mbps * 1e6 : Math.min(W, H) >= 2160 ? 35e6 : Math.min(W, H) >= 1440 ? 14e6 : Math.min(W, H) >= 1080 ? 8e6 : 4e6, audioBitsPerSecond: caiXuat().am * 1000 });
     rec.ondataavailable = e => { if (e.data && e.data.size) khuc.push(e.data); }; rec.start(500);
   }
   if (xuat || P.t >= tongGiay() - 0.05) P.t = 0;
@@ -2172,11 +2179,11 @@ $('#xuatDong').onclick = () => $('#xuatHop').classList.remove('mo');
 function luuFile(blob, ghiChu) {
   try { if (P.wl) P.wl.release(); } catch {}
   if (P.huyXuat) return;
-  const mp4 = /mp4/.test(blob.type), ten = ($('#tenDuAn').value.trim() || 'video').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').replace(/[^A-Za-z0-9]+/g, '-').toLowerCase().replace(/^-|-$/g, '').slice(0, 40) + '-' + new Date().toISOString().slice(5, 16).replace(/[-:T]/g, '') + (/wav/.test(blob.type) ? '.wav' : /gif/.test(blob.type) ? '.gif' : mp4 ? '.mp4' : '.webm');
-  const u = URL.createObjectURL(blob); const a = $('#xuatTai'); a.href = u; a.download = ten; a.textContent = /wav/.test(blob.type) ? '⬇️ Tải âm thanh' : /gif/.test(blob.type) ? '⬇️ Tải GIF' : '⬇️ Tải video';
+  const mp4 = /mp4/.test(blob.type), ten = ($('#tenDuAn').value.trim() || 'video').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').replace(/[^A-Za-z0-9]+/g, '-').toLowerCase().replace(/^-|-$/g, '').slice(0, 40) + '-' + new Date().toISOString().slice(5, 16).replace(/[-:T]/g, '') + (/wav/.test(blob.type) ? '.wav' : /gif/.test(blob.type) ? '.gif' : /^audio\/mp4/.test(blob.type) ? '.m4a' : /quicktime/.test(blob.type) ? '.mov' : mp4 ? '.mp4' : '.webm');
+  const u = URL.createObjectURL(blob); const a = $('#xuatTai'); a.href = u; a.download = ten; a.textContent = /^audio/.test(blob.type) ? '⬇️ Tải âm thanh' : /gif/.test(blob.type) ? '⬇️ Tải GIF' : '⬇️ Tải video';
   $('#xuatTieuDe').textContent = '✓ Xong · ' + ten + ' (' + (blob.size / 1048576).toFixed(1).replace('.', ',') + ' MB)'; $('#xuatBar').style.width = '100%'; $('#xuatTt').textContent = ghiChu ? ghiChu : mp4 ? 'Bấm Tải video rồi đăng, hoặc đưa sang Chấm video để AI chấm bản này.' : 'Máy này xuất WebM (không có bộ mã H.264). TikTok web vẫn nhận; cần MP4 thì mở lại bằng Chrome trên máy tính hoặc Safari.';
   $('#xuatXong').style.display = ''; $('#xuatHuy').style.display = 'none';
-  a.click(); toast('Đã lưu ' + ten); P.t = 0; veKhung();
+  a.click(); toast('Đã lưu ' + ten); xuatPdKem(ten); P.t = 0; veKhung();
 }
 
 /* ═════════ tab, kéo thả, boot ═════════ */
@@ -2682,7 +2689,7 @@ const MB_URL = 'https://cdn.jsdelivr.net/npm/mediabunny@1.61.0/+esm';
 let MB = null;
 async function napMB() { if (!MB) MB = await import(MB_URL); return MB; }
 function coWebCodecs() { return typeof VideoEncoder === 'function' && typeof AudioEncoder === 'function'; }
-const DD_XUAT = { mp4_avc: ['mp4', 'avc'], mp4_av1: ['mp4', 'av1'], webm_vp9: ['webm', 'vp9'] };
+const DD_XUAT = { mp4_avc: ['mp4', 'avc'], mp4_av1: ['mp4', 'av1'], mp4_hevc: ['mp4', 'hevc'], mov_avc: ['mov', 'avc'], webm_vp9: ['webm', 'vp9'] };
 const TEN_CODEC = { avc: 'H.264', hevc: 'H.265', vp9: 'VP9', vp8: 'VP8', av1: 'AV1', aac: 'AAC', opus: 'Opus', mp3: 'MP3' };
 function wavTuBuf(ab) {
   const nc = ab.numberOfChannels, sr = ab.sampleRate, n = ab.length, buf = new ArrayBuffer(44 + n * nc * 2), v = new DataView(buf), ws = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
@@ -2736,30 +2743,30 @@ async function veKhungXuat(ctx, W, H, t) {
   const ch = chuyenTai(t), snap = ch ? await laySnapTruoc(W, H, ch.truoc) : null;
   veFrame(ctx, W, H, t, snap);
 }
-function caiXuat() { return { fps: +$('#xuatFps').value || 30, cl: $('#xuatCL').value || 'cao', dd: $('#xuatDD').value || 'mp4_avc', cach: $('#xuatCach').value || 'nhanh', res: +$('#doPhanGiai').value || 1080, gifFps: +($('#gifFps') || {}).value || 12, gifRong: +($('#gifRong') || {}).value || 360, khoang: ($('#xuatKhoang') || {}).value || 'tat' }; }
+function caiXuat() { return { fps: +$('#xuatFps').value || 30, cl: $('#xuatCL').value || 'cao', dd: $('#xuatDD').value || 'mp4_avc', cach: $('#xuatCach').value || 'nhanh', res: +$('#doPhanGiai').value || 1080, gifFps: +($('#gifFps') || {}).value || 12, gifRong: +($('#gifRong') || {}).value || 360, khoang: ($('#xuatKhoang') || {}).value || 'tat', mbps: Math.max(1, Math.min(100, +($('#xuatMbps') || {}).value || 12)), am: +($('#xuatAm') || {}).value || 192, pd: ($('#xuatPd') || {}).value || 'khong' }; }
 function khoangXuat(o) { const tong = tongGiay(); if (o && o.khoang === 'vr' && (P.vao != null || P.ra != null)) { const a = Math.max(0, Math.min(tong, P.vao || 0)), b = Math.max(a + 0.05, Math.min(tong, P.ra == null ? tong : P.ra)); return [a, b]; } return [0, tong]; }
 function catBuf(buf, a, b) { if (a <= 0 && b >= buf.duration - 0.001) return buf; const sr = buf.sampleRate, i0 = Math.floor(a * sr), i1 = Math.min(buf.length, Math.ceil(b * sr)), n = Math.max(1, i1 - i0), o = new AudioBuffer({ numberOfChannels: buf.numberOfChannels, length: n, sampleRate: sr }); for (let ch = 0; ch < buf.numberOfChannels; ch++) o.copyToChannel(buf.getChannelData(ch).subarray(i0, i0 + n), ch); return o; }
 async function chuanBiVe() { try { await document.fonts.load('900 40px ' + (FONT_CSS[$('#font').value] || FONT_CSS.be_vietnam)); } catch { } if (segBat() && !segModel && !segLoi) { try { await segNap(); } catch { } } if (P.clips.some(c => c.chuyen && c.chuyen !== 'cat')) await gltNap(); }
 async function xuatWebCodecs(o) {
   const M = await napMB(), [ka, kb] = khoangXuat(o), tong = tongGiay(), fps = o.fps, N = Math.max(1, Math.round((kb - ka) * fps)), { W, H } = kichThuoc(o.res), [loai, muon] = DD_XUAT[o.dd] || DD_XUAT.mp4_avc;
-  const fmt = loai === 'webm' ? new M.WebMOutputFormat() : new M.Mp4OutputFormat({ fastStart: 'in-memory' });
-  const hoTro = fmt.getSupportedVideoCodecs(), thu = [muon, ...['avc', 'vp9', 'av1', 'vp8'].filter(c => c !== muon)].filter(c => hoTro.includes(c));
+  const fmt = loai === 'webm' ? new M.WebMOutputFormat() : loai === 'mov' && M.MovOutputFormat ? new M.MovOutputFormat({ fastStart: 'in-memory' }) : new M.Mp4OutputFormat({ fastStart: 'in-memory' });
+  const hoTro = fmt.getSupportedVideoCodecs(), thu = [muon, ...['avc', 'hevc', 'vp9', 'av1', 'vp8'].filter(c => c !== muon)].filter(c => hoTro.includes(c));
   const vc = await M.getFirstEncodableVideoCodec(thu, { width: W, height: H }); if (!vc) throw new Error('máy không mã hoá được video ' + W + '×' + H);
   const acd = await M.getFirstEncodableAudioCodec(['aac', 'opus'].filter(c => fmt.getSupportedAudioCodecs().includes(c)), { numberOfChannels: 2, sampleRate: 48000 });
   const canvas = Object.assign(document.createElement('canvas'), { width: W, height: H }), ctx = canvas.getContext('2d');
-  const out = new M.Output({ format: fmt, target: new M.BufferTarget() }), cl = { vua: M.QUALITY_MEDIUM, cao: M.QUALITY_HIGH, rat_cao: M.QUALITY_VERY_HIGH }[o.cl] || M.QUALITY_HIGH;
+  const out = new M.Output({ format: fmt, target: new M.BufferTarget() }), cl = o.cl === 'tuy' ? Math.round(o.mbps * 1e6) : { vua: M.QUALITY_MEDIUM, cao: M.QUALITY_HIGH, rat_cao: M.QUALITY_VERY_HIGH }[o.cl] || M.QUALITY_HIGH;
   const vs = new M.CanvasSource(canvas, { codec: vc, bitrate: cl, keyFrameInterval: 2 }); out.addVideoTrack(vs, { frameRate: fps });
-  let as = null; if (acd) { as = new M.AudioBufferSource({ codec: acd, bitrate: o.cl === 'vua' ? 128000 : 192000 }); out.addAudioTrack(as); }
+  let as = null; if (acd) { as = new M.AudioBufferSource({ codec: acd, bitrate: (o.am || 192) * 1000 }); out.addAudioTrack(as); }
   await out.start();
   if (as) { $('#xuatTt').textContent = 'Đang trộn âm thanh…'; const mix = catBuf(await tronAmThanh(tong), ka, kb); if (P.huyXuat) { await out.cancel(); return null; } await as.add(mix); as.close(); }
   await chuanBiVe(); const t0 = performance.now();
   for (let n = 0; n < N; n++) {
     if (P.huyXuat) { await out.cancel(); return null; }
     const t = n / fps; await veKhungXuat(ctx, W, H, Math.min(ka + t, kb - 0.001)); await vs.add(t, 1 / fps);
-    if (n % 3 === 0 || n === N - 1) { $('#xuatBar').style.width = ((n + 1) / N * 100).toFixed(1) + '%'; const tg = (performance.now() - t0) / 1000, con = tg / (n + 1) * (N - n - 1); $('#xuatTt').textContent = 'Khung ' + (n + 1) + '/' + N + ' · ' + fps + ' khung/giây · ' + TEN_CODEC[vc] + (acd ? ' + ' + TEN_CODEC[acd] : '') + ' · còn ~' + Math.ceil(con) + 's'; }
+    if (n % 3 === 0 || n === N - 1) { $('#xuatBar').style.width = ((n + 1) / N * 100).toFixed(1) + '%'; const tg = (performance.now() - t0) / 1000, con = tg / (n + 1) * (N - n - 1); $('#xuatTt').textContent = Math.floor((n + 1) / N * 100) + '% · còn ~' + tgCon(con) + ' · khung ' + (n + 1) + '/' + N + ' · ' + fps + ' khung/giây · ' + TEN_CODEC[vc] + (acd ? ' + ' + TEN_CODEC[acd] : ''); }
   }
   vs.close(); $('#xuatTt').textContent = 'Đang đóng gói file…'; await out.finalize();
-  return { blob: new Blob([out.target.buffer], { type: loai === 'webm' ? 'video/webm' : 'video/mp4' }), vc, acd, muon };
+  return { blob: new Blob([out.target.buffer], { type: loai === 'webm' ? 'video/webm' : loai === 'mov' && M.MovOutputFormat ? 'video/quicktime' : 'video/mp4' }), vc, acd, muon };
 }
 async function batDauXuat() {
   if (!P.clips.length) { toast('Chưa có đoạn nào để xuất'); return; } if (P.dang) dung();
@@ -2767,6 +2774,7 @@ async function batDauXuat() {
   $('#xuatHop').classList.add('mo'); $('#xuatXong').style.display = 'none'; $('#xuatHuy').style.display = ''; $('#xuatBar').style.width = '0'; P.huyXuat = false;
   try { if ('wakeLock' in navigator) P.wl = await navigator.wakeLock.request('screen'); } catch { }
   if (o.dd === 'wav') { $('#xuatTieuDe').textContent = 'Đang xuất âm thanh…'; $('#xuatTt').textContent = 'Đang trộn lồng tiếng, nhạc, hiệu ứng…'; try { const [ka, kb] = khoangXuat(o), mix = catBuf(await tronAmThanh(tongGiay()), ka, kb); if (P.huyXuat) return; luuFile(wavTuBuf(mix), 'File WAV 48 kHz, đủ lồng tiếng, nhạc (đã hạ khi nói) và hiệu ứng. Dùng để làm podcast hoặc chỉnh tiếp ở phần mềm khác.'); } catch (e) { toast('Xuất âm thanh lỗi: ' + (e.message || e)); $('#xuatHop').classList.remove('mo'); } return; }
+  if (o.dd === 'm4a') { $('#xuatTieuDe').textContent = 'Đang xuất âm thanh…'; $('#xuatTt').textContent = 'Đang trộn lồng tiếng, nhạc, hiệu ứng…'; try { const blob = await xuatM4a(o); if (!blob) return; luuFile(blob, 'File M4A (AAC ' + o.am + ' kbps), đủ lồng tiếng, nhạc và hiệu ứng.'); } catch (e) { if (P.huyXuat) return; toast('M4A lỗi (' + (e.message || e) + '), xuất WAV thay thế'); try { const [ka, kb] = khoangXuat(o); luuFile(wavTuBuf(catBuf(await tronAmThanh(tongGiay()), ka, kb)), 'Máy này không mã hoá được AAC nên đã xuất WAV.'); } catch (e2) { toast('Xuất âm thanh lỗi: ' + (e2.message || e2)); $('#xuatHop').classList.remove('mo'); } } return; }
   if (o.dd === 'gif') { $('#xuatTieuDe').textContent = 'Đang xuất GIF…'; try { const [ka, kb] = khoangXuat(o), cu = [P.vao, P.ra]; P.vao = ka; P.ra = kb; let blob; try { blob = await xuatGif(o); } finally { [P.vao, P.ra] = cu; } if (!blob) return; luuFile(blob, 'GIF ' + o.gifRong + 'px · ' + o.gifFps + ' khung/giây, không có tiếng. Dùng làm ảnh động xem trước hoặc gửi tin nhắn.'); } catch (e) { toast('Xuất GIF lỗi: ' + (e.message || e)); $('#xuatHop').classList.remove('mo'); } return; }
   if (o.cach === 'nhanh' && coWebCodecs()) {
     $('#xuatTieuDe').textContent = 'Đang dựng video (chính xác từng khung)…'; $('#xuatTt').textContent = 'Đang nạp bộ mã hoá…';
@@ -3968,7 +3976,7 @@ async function xuatGif(o) {
     if (n % 3 === 0) { $('#xuatBar').style.width = ((n + 1) / N * 100).toFixed(1) + '%'; $('#xuatTt').textContent = 'GIF khung ' + (n + 1) + '/' + N; await new Promise(r => setTimeout(r, 0)); } }
   bytes.push(0x3B); return new Blob([new Uint8Array(bytes)], { type: 'image/gif' });
 }
-function uocTinh() { const o = caiXuat(), tong = (P.ra == null ? tongGiay() : P.ra) - (P.vao || 0), { W, H } = kichThuoc(o.res); if (o.dd === 'wav') return tong * 48000 * 4; if (o.dd === 'gif') return tong * (o.gifFps || 12) * (o.gifRong || 360) * (o.gifRong || 360) * 1.6 * 0.35; const bpp = { vua: 0.05, cao: 0.09, rat_cao: 0.15 }[o.cl] || 0.09; return tong * (W * H * o.fps * bpp + 160000) / 8 * (o.dd === 'mp4_av1' ? 0.7 : 1); }
+function uocTinh() { const o = caiXuat(), tong = (P.ra == null ? tongGiay() : P.ra) - (P.vao || 0), { W, H } = kichThuoc(o.res); if (o.dd === 'wav') return tong * 48000 * 4; if (o.dd === 'm4a') return tong * o.am * 1000 / 8; if (o.dd === 'gif') return tong * (o.gifFps || 12) * (o.gifRong || 360) * (o.gifRong || 360) * 1.6 * 0.35; const bpp = { vua: 0.05, cao: 0.09, rat_cao: 0.15 }[o.cl] || 0.09, vb = o.cl === 'tuy' ? o.mbps * 1e6 : W * H * o.fps * bpp * (o.dd === 'mp4_av1' ? 0.7 : o.dd === 'mp4_hevc' ? 0.6 : 1); return tong * (vb + o.am * 1000) / 8; }
 function veUocTinh() { const t = $('#uocTinh'); if (!t) return; const n = uocTinh(), tong = (P.ra == null ? tongGiay() : P.ra) - (P.vao || 0); t.textContent = 'Ước tính: ~' + (n / 1048576).toFixed(1).replace('.', ',') + ' MB · ' + fmt1(Math.max(0, tong)) + 's' + (P.vao != null || P.ra != null ? ' (vùng In–Out)' : ''); }
 /* ── 1.2 Media: lọc theo loại, rê chuột xem trước trên thẻ ── */
 function locMedia() { const k = $('#locMedia') ? $('#locMedia').value : 'tat'; $$('#srcs .fsrc').forEach(d => { const s = P.srcs.find(x => x.id === d.dataset.id); d.hidden = !!(s && k !== 'tat' && s.loai !== k); }); }
@@ -3984,7 +3992,7 @@ function khoiTaoDot1() {
   // trình phát
   $('#lopPhuChon').onchange = veLopPhu; $('#zoomKhung').onchange = datZoomKhung; $('#btnLap').onclick = () => { P.lap = !P.lap; $('#btnLap').setAttribute('aria-pressed', String(P.lap)); toast(P.lap ? 'Phát lặp: BẬT (lặp trong vùng In–Out nếu có)' : 'Phát lặp: TẮT'); };
   // xuất
-  $('#btnAnhTinh').onclick = xuatAnhTinh; ['xuatDD', 'xuatFps', 'xuatCL', 'doPhanGiai', 'gifFps', 'gifRong'].forEach(id => { const x = $('#' + id); if (x) x.addEventListener('change', () => { $('#gifCai').hidden = $('#xuatDD').value !== 'gif'; veUocTinh(); }); }); setInterval(veUocTinh, 2000); veUocTinh();
+  $('#btnAnhTinh').onclick = xuatAnhTinh; ['xuatDD', 'xuatFps', 'xuatCL', 'doPhanGiai', 'gifFps', 'gifRong', 'xuatMbps', 'xuatAm'].forEach(id => { const x = $('#' + id); if (x) x.addEventListener('change', () => { $('#gifCai').hidden = $('#xuatDD').value !== 'gif'; $('#xuatMbpsHang').hidden = $('#xuatCL').value !== 'tuy'; veUocTinh(); }); }); setInterval(veUocTinh, 2000); veUocTinh();
   // media
   $('#locMedia').onchange = locMedia;
   $('#srcs').addEventListener('pointermove', e => { const im = e.target.closest('img.th'); if (!im) return; const d = im.closest('.fsrc'), s = d && P.srcs.find(x => x.id === d.dataset.id); if (!s || !s.phim || s.loai !== 'video') return; const r = im.getBoundingClientRect(), f = Math.max(0, Math.min(0.999, (e.clientX - r.left) / r.width)), k = Math.floor(f * s.phim.n); let cvx = d.querySelector('canvas.xemThe'); if (!cvx) { cvx = el('canvas', 'xemThe'); im.parentNode.insertBefore(cvx, im.nextSibling); } cvx.width = s.phim.fw; cvx.height = s.phim.fh; cvx.getContext('2d').drawImage(s.phim.cv, k * s.phim.fw, 0, s.phim.fw, s.phim.fh, 0, 0, s.phim.fw, s.phim.fh); Object.assign(cvx.style, { left: im.offsetLeft + 'px', top: im.offsetTop + 'px', width: im.offsetWidth + 'px', height: im.offsetHeight + 'px', display: 'block' }); });
@@ -4296,7 +4304,9 @@ function chuyenPdDocLap(im) {
   $('#srtTt').textContent = 'Phụ đề đã tách thành đoạn chữ riêng (không còn bám theo cắt ghép V1).'; $('#btnBoSrt').hidden = false; cumKey = '';
   if (!im) toast('Phụ đề đã tách thành đoạn chữ riêng: kéo, cắt mép tự do như CapCut'); return true;
 }
-function chuanTu(o) { const ws = String(o.text || '').trim().split(/\s+/).filter(Boolean), d = (o.kt - o.bd) / Math.max(1, ws.length); o.tu = ws.map((w, k) => ({ w, bd: +(o.bd + k * d).toFixed(3), kt: +(o.bd + (k + 1) * d).toFixed(3) })); }
+function chuanTu(o) { const ws = String(o.text || '').trim().split(/\s+/).filter(Boolean), tl = chiaTheoKyTu(ws), d = o.kt - o.bd; o.tu = ws.map((w, k) => ({ w, bd: +(o.bd + tl[k] * d).toFixed(3), kt: +(o.bd + tl[k + 1] * d).toFixed(3) })); }
+/* sửa chữ: chia lại mốc từng từ theo số ký tự (từ dài đọc lâu hơn) → trả về mốc tỉ lệ 0..1, dài ws.length + 1 */
+function chiaTheoKyTu(ws) { const n = ws.map(w => Math.max(1, [...String(w).replace(/[.,!?…:;"“”]/g, '')].length)), tong = n.reduce((a, b) => a + b, 0) || 1; let a = 0; return [0, ...n.map(x => (a += x) / tong)]; }
 function suaPd(i, text) {
   const c = dsPd()[i]; if (!c) return; text = String(text).replace(/\s+/g, ' ').trim();
   if (c.ng != null) { const o = P.pdNgoai[c.ng]; o.text = text; chuanTu(o); }
@@ -4507,10 +4517,10 @@ async function xoaCache() { if (!confirm('Xoá footage đã lưu trong trình du
 /* ── hộp Xuất kiểu CapCut ── */
 function moHopXuat() {
   if (!P.clips.length) { toast('Chưa có đoạn nào để xuất'); return; } const h = $('#xuatCaiHop'); h.classList.add('mo');
-  $('#xcTen').value = $('#tenDuAn').value; ['xuatDD', 'xuatFps', 'xuatCL', 'doPhanGiai', 'xuatKhoang', 'gifFps', 'gifRong'].forEach(id => { const a = $('#' + id), b = $('#xc_' + id); if (a && b) { b.innerHTML = a.innerHTML; b.value = a.value; } });
+  $('#xcTen').value = $('#tenDuAn').value; ['xuatDD', 'xuatFps', 'xuatCL', 'doPhanGiai', 'xuatKhoang', 'gifFps', 'gifRong', 'xuatMbps', 'xuatAm', 'xuatPd'].forEach(id => { const a = $('#' + id), b = $('#xc_' + id); if (a && b) { b.innerHTML = a.innerHTML; b.value = a.value; } });
   $('#xcTuyChinh').checked = $('#xuatCach').value === 'ghi'; capNhatHopXuat();
 }
-function capNhatHopXuat() { const dd = $('#xc_xuatDD').value; $('#xcGif').hidden = dd !== 'gif'; $('#xcVideo').hidden = dd === 'wav' || dd === 'gif'; ['xuatDD', 'xuatFps', 'xuatCL', 'doPhanGiai', 'xuatKhoang', 'gifFps', 'gifRong'].forEach(id => { const a = $('#' + id), b = $('#xc_' + id); if (a && b) a.value = b.value; }); const o = caiXuat(), [ka, kb] = khoangXuat(o), { W, H } = kichThuoc(o.res); veUocTinh(); $('#xcTomTat').textContent = (dd === 'wav' ? 'WAV 48 kHz' : dd === 'gif' ? 'GIF ' + o.gifRong + 'px · ' + o.gifFps + ' khung/giây' : W + '×' + H + ' · ' + o.fps + ' khung/giây') + ' · ' + fmt1(kb - ka) + 's · ' + ($('#uocTinh').textContent || ''); }
+function capNhatHopXuat() { const dd = $('#xc_xuatDD').value, chiAm = dd === 'wav' || dd === 'm4a'; $('#xcGif').hidden = dd !== 'gif'; $('#xcVideo').hidden = chiAm || dd === 'gif'; $('#xcAm').hidden = dd === 'wav' || dd === 'gif'; $('#xcMbpsHang').hidden = $('#xc_xuatCL').value !== 'tuy'; $('#xuatMbpsHang').hidden = $('#xc_xuatCL').value !== 'tuy'; ['xuatDD', 'xuatFps', 'xuatCL', 'doPhanGiai', 'xuatKhoang', 'gifFps', 'gifRong', 'xuatMbps', 'xuatAm', 'xuatPd'].forEach(id => { const a = $('#' + id), b = $('#xc_' + id); if (a && b) a.value = b.value; }); const o = caiXuat(), [ka, kb] = khoangXuat(o), { W, H } = kichThuoc(o.res); veUocTinh(); $('#xcTomTat').textContent = (dd === 'wav' ? 'WAV 48 kHz' : dd === 'm4a' ? 'M4A · AAC ' + o.am + ' kbps' : dd === 'gif' ? 'GIF ' + o.gifRong + 'px · ' + o.gifFps + ' khung/giây' : W + '×' + H + ' · ' + o.fps + ' khung/giây · ' + (o.cl === 'tuy' ? o.mbps + ' Mbps' : $('#xuatCL').selectedOptions[0].textContent.replace(/ \(.*/, '')) + ' · AAC ' + o.am + ' kbps') + ' · ' + fmt1(kb - ka) + 's · ước tính ~' + (uocTinh() / 1048576).toFixed(1).replace('.', ',') + ' MB'; }
 function xacNhanXuat() { $('#tenDuAn').value = $('#xcTen').value.trim() || $('#tenDuAn').value; capNhatHopXuat(); $('#xuatCach').value = $('#xcTuyChinh').checked ? 'ghi' : 'nhanh'; $('#xuatCaiHop').classList.remove('mo'); batDauXuat(); }
 /* ── danh sách phụ đề (Enter tách, Backspace gộp, tìm & thay) ── */
 function veDsPd() {
@@ -5339,7 +5349,7 @@ function khoiTaoVanBanCC() {
   const sSN = $('#pdSongNguChon'), goc = $('#pdNgonNgu'); if (goc) [...goc.options].forEach(op => { const o2 = el('option', null, op.textContent); o2.value = op.value; sSN.appendChild(o2); });
   $('#btnTaoPd').onclick = async () => { const bt = $('#btnTaoPd'), tt = $('#pdTuDongTt'); const vids = P.srcs.filter(z => z.loai === 'video'); if (!vids.length) { toast('Thêm footage trước đã'); return; } if ($('#pdXoaCu').checked && P.pdNgoai) { luuHoanTac(); P.pdNgoai = null; if ($('#btnBoSrt')) $('#btnBoSrt').hidden = true; } const chua = vids.filter(z => z.tt === 'san_sang' || (z.tt === 'loi' && z.giay)); bt.disabled = true; try { for (const z of chua) { tt.textContent = 'Đang nghe ' + z.ten + '…'; await hieu(z); } } finally { bt.disabled = false; } const pd = $('#phuDe'); if (pd && !pd.checked) { pd.checked = true; pd.dispatchEvent(new Event('change')); } if (sSN.value && goc) { goc.value = sSN.value; const bd = $('#btnDichPd'); if (bd) bd.click(); } const n = cumTu().length; tt.textContent = n ? 'Đã có ' + n + ' cụm phụ đề · chỉnh kiểu, sửa câu ở mục Phụ đề bên trái.' : 'Chưa nhận được lời nói: kiểm tra footage có tiếng, hoặc bấm Hiểu footage ở Media.'; veTl(); veKhung(); };
   // Phụ đề từ file: nhập + xuất
-  const tp = sec.tep; tp.innerHTML = '<h3 class="pt">Nhập</h3><div class="row"><label class="btn nho" style="cursor:pointer">📥 Nhập .srt / .vtt<input type="file" id="srtIn2" accept=".srt,.vtt,text/plain" hidden></label><span class="quota" style="margin:0">Thay phụ đề tự sinh bằng file của bạn.</span></div><h3 class="pt">Xuất phụ đề</h3><div class="row"><button class="btn nho" id="btnXuatSrt2" type="button">.srt</button><button class="btn nho" id="btnXuatVtt" type="button">.vtt</button><button class="btn nho" id="btnXuatTxt" type="button">.txt lời thoại</button><button class="btn nho ghost" id="btnChepPd" type="button">Chép lời thoại</button></div><div class="quota">Mang sang CapCut, Premiere, YouTube hoặc dán vào mô tả video. Đang bật song ngữ thì .srt / .vtt kèm dòng dịch.</div>';
+  const tp = sec.tep; tp.innerHTML = '<h3 class="pt">Nhập</h3><div class="row"><label class="btn nho" style="cursor:pointer">📥 Nhập .srt / .vtt / .lrc<input type="file" id="srtIn2" accept=".srt,.vtt,.lrc,text/plain" hidden></label><span class="quota" style="margin:0">Thay phụ đề tự sinh bằng file của bạn.</span></div><h3 class="pt">Xuất phụ đề</h3><div class="row"><button class="btn nho" id="btnXuatSrt2" type="button">.srt</button><button class="btn nho" id="btnXuatVtt" type="button">.vtt</button><button class="btn nho" id="btnXuatTxt" type="button">.txt lời thoại</button><button class="btn nho ghost" id="btnChepPd" type="button">Chép lời thoại</button></div><div class="quota">Mang sang CapCut, Premiere, YouTube hoặc dán vào mô tả video. Đang bật song ngữ thì .srt / .vtt kèm dòng dịch.</div>';
   $('#srtIn2').onchange = e => { const g0 = $('#srtIn'); if (!g0) return; const dt = new DataTransfer(); [...e.target.files].forEach(f => dt.items.add(f)); g0.files = dt.files; g0.dispatchEvent(new Event('change')); e.target.value = ''; };
   const canLoi = () => { if (!cumTu().length) { toast('Chưa có phụ đề: bấm Tạo phụ đề hoặc Hiểu footage trước'); return false; } return true; };
   const loiThoai = () => cumTu().map(c => c.tu.map(t => t.w).join(' ')).join('\n');
@@ -5912,7 +5922,81 @@ function khoiTaoKhoangTrong() {
   const hitCu = hit; hit = function (t) { if (P.giuAlt) { const sl = $('#snapLine'); if (sl) sl.style.display = 'none'; return t; } return hitCu.apply(this, arguments); };
 }
 
-khoiTaoB(); khoiTaoC(); khoiTaoUI(); khoiTaoLop(); khoiTaoBang(); khoiTaoDot1(); khoiTaoDot2(); khoiTaoDot3(); khoiTaoM1(); khoiTaoM2(); khoiTaoM3(); khoiTaoN(); khoiTaoMobi(); khoiTaoCCW(); khoiTaoKho(); khoiTaoDoc(); khoiTaoGon(); khoiTaoMediaCC(); khoiTaoCC2(); khoiTaoFsBar(); khoiTaoKfGfx(); khoiTaoVanBanCC(); khoiTaoBangFont(); khoiTaoLopFx(); khoiTaoKhoTrucTuyen(); khoiTaoMediaKho(); khoiTaoMauDoHoa(); khoiTaoMatNaEl(); khoiTaoTruotTo(); khoiTaoClipGhep(); khoiTaoKeoTha(); khoiTaoKhoangTrong(); veTl();
+/* ═════════ XUẤT + PHỤ ĐỀ THEO SPEC: M4A, file phụ đề kèm, % + thời gian còn lại; tách/gộp phụ đề vẫn bám footage, tiếng đệm, nhập .lrc ═════════ */
+function tgCon(g) { g = Math.max(0, Math.ceil(g)); return g < 60 ? g + 's' : Math.floor(g / 60) + ':' + String(g % 60).padStart(2, '0'); }
+async function xuatM4a(o) {
+  const M = await napMB(), [ka, kb] = khoangXuat(o), fmt = new M.Mp4OutputFormat({ fastStart: 'in-memory' });
+  const acd = await M.getFirstEncodableAudioCodec(['aac'], { numberOfChannels: 2, sampleRate: 48000 }); if (!acd) throw new Error('máy không mã hoá được AAC');
+  const out = new M.Output({ format: fmt, target: new M.BufferTarget() }), as = new M.AudioBufferSource({ codec: acd, bitrate: (o.am || 192) * 1000 }); out.addAudioTrack(as); await out.start();
+  const mix = catBuf(await tronAmThanh(tongGiay()), ka, kb); if (P.huyXuat) { await out.cancel(); return null; }
+  $('#xuatBar').style.width = '60%'; $('#xuatTt').textContent = '60% · đang mã hoá AAC ' + (o.am || 192) + ' kbps…'; await as.add(mix); as.close(); await out.finalize();
+  return new Blob([out.target.buffer], { type: 'audio/mp4' });
+}
+function pdTrongKhoang(a, b) { return cumTu().filter(c => c.kt > a + 0.01 && c.bd < b - 0.01).map(c => ({ bd: +Math.max(0, c.bd - a).toFixed(3), kt: +(Math.min(b, c.kt) - a).toFixed(3), text: c.tu.map(w => w.w).join(' ') })); }
+function xuatPdKem(ten) {
+  const o = caiXuat(); P.pdKemTen = null; if (o.pd === 'khong' || o.dd === 'gif') return;
+  const [ka, kb] = khoangXuat(o), ds = pdTrongKhoang(ka, kb); if (!ds.length) { toast('Không có phụ đề trong khoảng xuất nên không lưu file phụ đề'); return; }
+  const goc = ten.replace(/\.[a-z0-9]+$/i, ''), noi = o.pd === 'srt' ? ds.map((c, i) => (i + 1) + '\n' + srtTg(c.bd) + ' --> ' + srtTg(c.kt) + '\n' + c.text + '\n').join('\n') : ds.map(c => c.text).join('\n') + '\n';
+  P.pdKemTen = goc + '.' + o.pd; P.pdKemNoi = noi; luuText(P.pdKemTen, noi); $('#xuatTt').textContent += ' Kèm ' + P.pdKemTen + ' (' + ds.length + ' câu).';
+}
+/* nhập .lrc: [mm:ss.xx]câu — câu kết thúc ở mốc kế tiếp */
+function docLrc(txt) {
+  const mk = []; String(txt).replace(/\r/g, '').split('\n').forEach(d => { const ts = [...d.matchAll(/\[(\d+):(\d+(?:[.:]\d+)?)\]/g)]; if (!ts.length) return; const text = d.replace(/\[[^\]]*\]/g, '').replace(/<[^>]+>/g, '').trim(); ts.forEach(m => mk.push({ bd: +m[1] * 60 + parseFloat(m[2].replace(':', '.')), text })); });
+  mk.sort((a, b) => a.bd - b.bd); const out = [];
+  mk.forEach((m, i) => { if (!m.text) return; const kt = mk[i + 1] ? mk[i + 1].bd : m.bd + Math.min(5, Math.max(1.5, m.text.split(/\s+/).length * 0.4)); if (kt > m.bd) out.push({ bd: +m.bd.toFixed(3), kt: +kt.toFixed(3), text: m.text }); });
+  return out;
+}
+const docSrtGoc = docSrt; docSrt = function (txt) { const r = docSrtGoc(txt); return r.length ? r : docLrc(txt); };
+/* tách / gộp câu phụ đề bám footage: đổi nhóm từ (w.nhom) thay vì tách phụ đề ra đoạn chữ riêng → cắt V1 vẫn cắt phụ đề theo */
+function chiaNhomPd(c, k) { const A = 'n' + uid(), B = 'n' + uid(); c.w.forEach((w, j) => { w.nhom = j < k ? A : B; }); }
+const tachPdTaiChuGoc = tachPdTaiChu; tachPdTaiChu = function (i, pos) {
+  const c = dsPd()[i]; if (!c || c.ng != null || !c.w || c.w.length !== c.tu.length) return tachPdTaiChuGoc(i, pos);
+  const text = c.tu.map(w => w.w).join(' '); if (pos <= 0 || pos >= text.length) { toast('Đặt con trỏ vào giữa câu rồi Enter để tách'); return; }
+  const truoc = text.slice(0, pos).trim().split(/\s+/).filter(Boolean).length; if (!truoc || truoc >= c.tu.length) { toast('Đặt con trỏ giữa hai từ'); return; }
+  luuHoanTac(); chiaNhomPd(c, truoc); lamMoiPd(); P.chon = { k: 'pd', i: i + 1 }; veProp(); veDsPd(); toast('Đã tách câu');
+};
+const tachPdGoc = tachPd; tachPd = function (i, t) {
+  const c = dsPd()[i]; if (!c || c.ng != null || !c.w || c.w.length !== c.tu.length) return tachPdGoc(i, t);
+  const k = c.tu.filter(w => (w.bd + w.kt) / 2 < t).length; if (t <= c.bd + 0.05 || t >= c.kt - 0.05 || !k || k >= c.tu.length) { toast('Đưa đầu phát vào giữa hai từ của câu rồi bấm Tách'); return; }
+  luuHoanTac(); chiaNhomPd(c, k); lamMoiPd(); P.chon = { k: 'pd', i: i + 1 }; veProp(); toast('Đã tách câu phụ đề');
+};
+const gopPdGoc = gopPd; gopPd = function (i) {
+  const ds = dsPd(), a = ds[i - 1], b = ds[i]; if (i <= 0 || !a || !b) return;
+  if (a.ng != null || b.ng != null || a.s !== b.s || a.ci !== b.ci || !a.w || !b.w) return gopPdGoc(i);
+  const s = srcCua(a.s), i0 = s.tu.indexOf(a.w[0]), i1 = s.tu.indexOf(b.w[b.w.length - 1]); if (i0 < 0 || i1 < i0) return gopPdGoc(i);
+  luuHoanTac(); const nh = 'n' + uid(); for (let k = i0; k <= i1; k++) s.tu[k].nhom = nh; lamMoiPd(); P.chon = { k: 'pd', i: i - 1 }; veProp(); veDsPd(); toast('Đã gộp với câu trước');
+};
+/* tiếng đệm: đánh dấu trong danh sách câu (đỏ = sẽ cắt, vàng = nghe lại) + xoá hết (cắt V1, dồn khoảng trống) */
+function laDem(w) { w = String(w || '').trim(); return FILLER.test(w) ? 'chac' : FILLER_NGO.test(w) ? 'ngo' : ''; }
+function tinhXoaDem() {
+  const moi = [], cat = []; let acc = 0, bot = 0; const dem = [];
+  P.clips.forEach(c => {
+    const s = srcCua(c.src), dai = daiC(c), k = tocC(c) || 1, ws = s && s.tu ? s.tu.filter(w => !w.an && laDem(w.w) === 'chac' && w.bd >= c.bd - 0.02 && w.kt <= c.kt + 0.02) : [];
+    if (!ws.length) { moi.push(c); acc += dai; return; }
+    const bo = []; ws.forEach(w => { dem.push(w); const x = Math.max(c.bd, w.bd - 0.02), y = Math.min(c.kt, w.kt + 0.02), l = bo[bo.length - 1]; if (l && x - l[1] < 0.04) l[1] = y; else bo.push([x, y]); });
+    const giu = []; let tr = c.bd; bo.forEach(([x, y]) => { if (x - tr > 0.04) giu.push([tr, x]); tr = y; }); if (c.kt - tr > 0.04) giu.push([tr, c.kt]);
+    let truoc = c.bd; giu.forEach(([x, y], j) => { if (x > truoc) { cat.push([acc + (truoc - c.bd) / k, (x - truoc) / k]); bot += (x - truoc) / k; } moi.push({ ...c, id: j ? uid() : c.id, bd: +x.toFixed(3), kt: +y.toFixed(3) }); truoc = y; });
+    if (c.kt > truoc + 0.001) { cat.push([acc + (truoc - c.bd) / k, (c.kt - truoc) / k]); bot += (c.kt - truoc) / k; }
+    acc += dai;
+  });
+  return { moi, cat, bot, dem };
+}
+function xoaHetDem() {
+  const r = tinhXoaDem(); if (!r.dem.length) { toast('Không thấy tiếng ờ, ừ, ừm nào'); return { so: 0, bot: 0 }; }
+  luuHoanTac(); r.dem.forEach(w => { w.an = true; }); r.cat.slice().sort((a, b) => b[0] - a[0]).forEach(([diem, len]) => ripple(diem + len, -len)); P.clips = r.moi.filter(c => c.kt - c.bd > 0.04);
+  cumKey = ''; veTl(); veLoi(); veKhung(); veDsPd(); toast('Đã xoá ' + r.dem.length + ' tiếng đệm · ngắn đi ' + fmt1(r.bot) + 's'); return { so: r.dem.length, bot: r.bot };
+}
+const veDsPdGoc = veDsPd; veDsPd = function () {
+  veDsPdGoc(); const box = $('#pdDs'); if (!box || !$('#pdDanhDem') || !$('#pdDanhDem').checked) return;
+  const ds = dsPd(); box.querySelectorAll('.pdHang').forEach(h => { const c = ds[+h.dataset.i], t = h.querySelector('.t'); if (!c || !t || document.activeElement === t) return; t.innerHTML = c.tu.map(w => { const l = laDem(w.w), e = String(w.w).replace(/[&<>"]/g, z => '&#' + z.charCodeAt(0) + ';'); return l ? '<mark class="dem ' + l + '">' + e + '</mark>' : e; }).join(' '); });
+};
+function khoiTaoXuatPd() {
+  const st = document.createElement('style'); st.textContent = '.pdHang mark.dem{background:rgba(255,90,36,.28);color:inherit;border-radius:3px;padding:0 2px;text-decoration:line-through}.pdHang mark.dem.ngo{background:rgba(255,212,0,.28);text-decoration:none}'; document.head.appendChild(st);
+  const d = $('#pdDanhDem'); if (d) d.onchange = () => veDsPd(); const x = $('#btnXoaDem'); if (x) x.onclick = () => xoaHetDem();
+  const cl = $('#xc_xuatCL'); if (cl) cl.addEventListener('change', capNhatHopXuat);
+  $('#xuatMbpsHang').hidden = $('#xuatCL').value !== 'tuy'; $('#pdTim').oninput = () => veDsPd();
+}
+khoiTaoB(); khoiTaoC(); khoiTaoUI(); khoiTaoLop(); khoiTaoBang(); khoiTaoDot1(); khoiTaoDot2(); khoiTaoDot3(); khoiTaoM1(); khoiTaoM2(); khoiTaoM3(); khoiTaoN(); khoiTaoMobi(); khoiTaoCCW(); khoiTaoKho(); khoiTaoDoc(); khoiTaoGon(); khoiTaoMediaCC(); khoiTaoCC2(); khoiTaoFsBar(); khoiTaoKfGfx(); khoiTaoVanBanCC(); khoiTaoBangFont(); khoiTaoLopFx(); khoiTaoKhoTrucTuyen(); khoiTaoMediaKho(); khoiTaoMauDoHoa(); khoiTaoMatNaEl(); khoiTaoTruotTo(); khoiTaoClipGhep(); khoiTaoKeoTha(); khoiTaoKhoangTrong(); khoiTaoXuatPd(); veTl();
 </script>
 <script src="tro-ly.js?v=202610011200"></script>
 </body>

@@ -833,6 +833,27 @@ Trình dựng kiểu Vyra, giao diện tối chuyên nghiệp: **Footage → AI 
 
 **Cài:** ➕ Script tên `DungVideo`, dán `DungVideo.gs`. Dán đè `HookAI.gs`, `Studio.gs`. Deploy → New version. Key Gemini phải dùng được model `gemini-3.5-transcribe` (key AI Studio thường có sẵn).
 
+
+### Nghiệm thu Xuất (§7) và Phụ đề (§4.5)
+
+Hai bộ test mới `t143` (xuất, 20 bài, xuất file thật rồi đọc lại bằng mediabunny) và `t144` (phụ đề, 15 bài).
+
+| Spec | Trước | Nay |
+|---|---|---|
+| 7 Độ phân giải **480p**–4K | 720p–4K | thêm 480p (mặc định vẫn 1080p) |
+| 7 Khung/giây có **50** | 24/25/30/60 | 24/25/30/50/60 |
+| 7 Tốc độ bit **Thấp hơn / Đề xuất / Cao hơn / Tuỳ chỉnh (Mbps)** | Vừa / Cao / Rất cao | đổi tên + ô **Mbps** (1–100) hiện khi chọn Tuỳ chỉnh, ước tính dung lượng theo đúng Mbps |
+| 7 Codec **H.264 / HEVC**, vỏ **MP4 / MOV** | MP4 H.264, AV1, WebM | thêm **MP4 · H.265/HEVC** (máy không mã hoá được thì tự lùi về H.264/VP9 và báo) và **MOV · H.264** |
+| 7 Âm thanh **AAC 128 / 192 / 320 kbps**; xuất **chỉ âm thanh** | AAC cố định 128/192, chỉ WAV | chọn kbps; thêm **M4A (AAC)** — trình duyệt không có AAC (Chromium bản mở) thì tự xuất WAV |
+| 7 **Kèm phụ đề** .srt / .txt | phải xuất riêng | ô "Kèm phụ đề": lưu cùng tên video, **khớp đúng khoảng xuất** (In–Out lùi mốc, cắt câu ở mép, bỏ câu ngoài vùng) |
+| 7 Tiến trình **% + thời gian còn lại** | "Khung n/N … còn ~Xs" | "37% · còn ~12s · khung …" (phút:giây khi > 60s) |
+| 4.5 Tách / gộp câu phụ đề **vẫn gắn theo footage** (clone nên làm vậy) | Enter tách, Backspace gộp, nút Tách → phụ đề bị chuyển thành đoạn chữ riêng, cắt V1 không còn cắt theo | chỉ đổi nhóm từ; cắt / tỉa V1 sau đó phụ đề vẫn chạy theo |
+| 4.5 Câu phụ đề **không chồng nhau** | đuôi câu +0,12 s có thể đè đầu câu sau | cắt đuôi tại đầu câu sau |
+| 4.5 Sửa chữ → **chia lại mốc từ theo số ký tự** | chia đều | từ dài giữ lâu hơn (bỏ dấu câu khi đếm) |
+| 4.5 **Đánh dấu tiếng đệm** + **Xoá hết tiếng đệm** | chỉ có trong Cắt khoảng lặng | ô "Đánh dấu tiếng đệm" trong Danh sách câu: đỏ gạch = ờ, ừ, ừm (sẽ cắt), vàng = thì, là, kiểu, à (nghe lại); nút **✂ Xoá hết tiếng đệm** cắt hẳn khỏi V1 và dồn khoảng trống, Ctrl+Z hoàn tác |
+| 4.5 Nhập **.lrc** | .srt / .vtt | thêm .lrc (`[mm:ss.xx]câu`, câu kết thúc ở mốc kế tiếp, một dòng nhiều mốc → nhiều câu) |
+
+Đã đạt sẵn (test xác nhận): thời lượng file xuất đúng vùng In–Out ±0,05 s, Huỷ giữa chừng không tải file nào (cả file phụ đề), 60 s lời → 27 câu (≥ 10), mỗi câu ≤ 8 từ, Ctrl+B giữa câu thì phụ đề cắt đúng chỗ, xoá câu không dồn timeline, .srt theo dòng thời gian.
 ### Hiểu footage (Footage Understanding)
 Bấm **✨ Hiểu footage** trên từng đoạn (1 lượt "dựng video" mỗi đoạn, Free mặc định 2, bot `/luotdung`). Trình duyệt tách WAV 16kHz, đo khoảng lặng, lấy 4–12 khung hình. Máy chủ chạy 2 bước:
 1. **Gemini 3.5 Transcribe** (Interactions API, `timestamp_granularities: word`) → từng từ có mốc giây, giữ cả "ờ, à". Nhanh (8 giây audio ≈ 2 giây).
