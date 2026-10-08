@@ -871,13 +871,15 @@ Bản spec đầy đủ (kể cả 2 mục bổ sung này) lưu ở [`docs/capcu
 | **Hoàn tác bao gồm thay đổi bên trong** | không | bên trong có Hoàn tác riêng; ra ngoài cả lần sửa là **1 bước** Ctrl+Z |
 | **Tách đôi / cắt mép** như clip, không quá độ dài timeline con | không tách được | tách đôi ra 2 clip ghép (vào/ra khác nhau), kéo mép dừng ở độ dài timeline con |
 | **Tốc độ** = co giãn cả timeline con, **âm thanh bên trong cũng theo** | không | có (âm thanh đổi tốc độ cùng) |
+| Tách đôi → hai nửa **cùng trỏ một timeline con** | — | có (sửa một nửa, nửa kia đổi theo) |
+| Chuyển cảnh giữa các đoạn **bên trong** clip ghép | — | vẽ như ngoài (trộn 50/50 tại điểm nối) |
 | **Tách (Ungroup)** trả mục về đúng chỗ, giữ keyframe bên trong, **thuộc tính đặt lên clip ghép bị mất** | có, chỉ chữ / phủ | mọi loại, đúng chỗ, chỉ trả phần đang hiện trong vào/ra |
 | **Copy / nhân đôi độc lập** | có | có (sửa bên trong bản A không đổi bản B) |
 | **Lồng nhau** | không | tạo clip ghép bên trong clip ghép được (giới hạn 6 tầng khi vẽ) |
 | **Phụ đề** | — | phụ đề theo lời của đoạn video bên trong clip ghép vẫn hiện |
 | Âm thanh bên trong | không có | tiếng của đoạn video con + âm thanh con trải thành A3 "ảo" → nghe được khi xem trước và có trong file xuất |
 
-Lệch nhỏ so với spec: hai nửa sau khi tách đôi là 2 bản **độc lập** (spec: cùng trỏ một timeline con); chuyển cảnh bên trong timeline con chưa vẽ (chỉ cắt thẳng). Dự án cũ có clip ghép kiểu cũ tự đổi sang kiểu mới khi mở.
+**Tách đôi dùng chung timeline con:** hai nửa cùng id timeline (`con.id`) và cùng nằm trong danh sách chủ (`con.chu`); sửa bên trong một nửa thì nửa kia đổi theo (vào/ra mỗi nửa giữ nguyên). Bản nhân đôi / dán không nằm trong danh sách chủ nên tự được cấp timeline riêng (độc lập). **Chuyển cảnh bên trong timeline con** vẽ đúng như ngoài (cửa sổ giữa điểm nối, trộn 50/50 tại điểm nối, đoạn bên kia lấy khung trước điểm vào / sau điểm ra). Dự án cũ có clip ghép kiểu cũ tự đổi sang kiểu mới khi mở. Sửa kèm: Ctrl+D đoạn video chính trước đây sao chép trùng id với bản gốc, nay cấp id mới.
 
 | Spec 9.2 mặt nạ | Trước | Nay |
 |---|---|---|

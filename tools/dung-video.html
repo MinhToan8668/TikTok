@@ -1871,7 +1871,7 @@ function lenh(act) {
   if (k === 't') { const t = P.tieng[i]; if (act === 'xoa') { P.tieng.splice(i, 1); P.chon = null; } if (act === 'nhan') P.tieng.splice(i + 1, 0, { ...t, id: uid(), t_bd: t.t_bd + t.giay }); if (act === 'tach') toast('Lồng tiếng không tách được, tạo câu ngắn hơn'); veTl(); return; }
   if (k === 'a') { const a = P.am3[i]; if (act === 'xoa') { P.am3.splice(i, 1); P.chon = null; } if (act === 'nhan') P.am3.splice(i + 1, 0, { ...a, id: uid(), t_bd: +(a.t_bd + a.kt - a.bd).toFixed(2) }); if (act === 'tach') { const o = P.t - a.t_bd; if (o > 0.05 && o < a.kt - a.bd - 0.05) { const giua = +(a.bd + o).toFixed(3); P.am3.splice(i + 1, 0, { ...a, id: uid(), bd: giua, t_bd: +P.t.toFixed(3), fi: 0 }); a.kt = giua; a.fo = 0; } else toast('Đưa đầu phát vào giữa âm thanh đang chọn rồi bấm Tách'); } veTl(); return; }
   if (k === 'b') { const b = P.broll[i]; if (act === 'xoa') { P.broll.splice(i, 1); P.chon = null; } if (act === 'nhan') P.broll.splice(i + 1, 0, { ...b, id: uid(), t_bd: b.t_bd + (b.kt - b.bd) }); if (act === 'tach') toast('B-roll không tách được, kéo mép để đổi độ dài'); veTl(); veKhung(); return; }
-  if (k === 'v') { const c = P.clips[i]; if (act === 'xoa') { let acc = 0; for (let j = 0; j < i; j++) acc += daiC(P.clips[j]); ripple(acc + daiC(c), -daiC(c)); P.clips.splice(i, 1); P.chon = null; } if (act === 'nhan') P.clips.splice(i + 1, 0, { ...c }); if (act === 'tach') { const { clip } = viTri(P.t), off = P.t - batDauC(c); if (clip === i && off > 1 / 30 - 1e-6 && off < daiC(c) - 1 / 30 + 1e-6) { if (tachV1(i, off)) P.chon = { k: 'v', i: i + 1 }; } else if (!(Math.abs(off) < 1e-3 || Math.abs(off - daiC(c)) < 1e-3)) toast('Đưa đầu phát vào giữa đoạn đang chọn rồi bấm Tách'); } }
+  if (k === 'v') { const c = P.clips[i]; if (act === 'xoa') { let acc = 0; for (let j = 0; j < i; j++) acc += daiC(P.clips[j]); ripple(acc + daiC(c), -daiC(c)); P.clips.splice(i, 1); P.chon = null; } if (act === 'nhan') P.clips.splice(i + 1, 0, { ...JSON.parse(JSON.stringify(c)), ...(c.id ? { id: uid() } : {}) }); if (act === 'tach') { const { clip } = viTri(P.t), off = P.t - batDauC(c); if (clip === i && off > 1 / 30 - 1e-6 && off < daiC(c) - 1 / 30 + 1e-6) { if (tachV1(i, off)) P.chon = { k: 'v', i: i + 1 }; } else if (!(Math.abs(off) < 1e-3 || Math.abs(off - daiC(c)) < 1e-3)) toast('Đưa đầu phát vào giữa đoạn đang chọn rồi bấm Tách'); } }
   else { const g = P.gfx[i]; if (act === 'xoa') { P.gfx.splice(i, 1); P.chon = null; } if (act === 'nhan') P.gfx.splice(i + 1, 0, { ...g, id: uid(), bd: g.kt, kt: g.kt + (g.kt - g.bd) }); if (act === 'tach') toast('Đồ hoạ không tách được, kéo mép để đổi độ dài'); }
   veTl(); veLoi(); veKhung();
 }
@@ -5821,11 +5821,21 @@ function veConGhep(m, local, W, H) {
   const s = nguonGhep('ghep:' + m.id); if (!s) return null; const cvx = s.el; if (cvx.width !== W || cvx.height !== H) { cvx.width = W; cvx.height = H; } s.w = W; s.h = H;
   const g = cvx.getContext('2d'); g.clearRect(0, 0, W, H); if (ghepSau > 6) return s;
   const con = conGhep(m), cu = { clips: P.clips, gfx: P.gfx, broll: P.broll, am3: P.am3 }; ghepSau++;
-  try { P.clips = con.clips; P.gfx = con.gfx; P.broll = con.broll; P.am3 = con.am3; const { clip } = viTri(local), tong = con.clips.reduce((a, c) => a + daiC(c), 0); if (clip >= 0 && local < tong && !con.clips[clip].trong) veNen(g, W, H, local, 'ghep'); veCacLop(g, W, H, local); }
+  try { P.clips = con.clips; P.gfx = con.gfx; P.broll = con.broll; P.am3 = con.am3; const { clip } = viTri(local), tong = con.clips.reduce((a, c) => a + daiC(c), 0); if (clip >= 0 && local < tong && !con.clips[clip].trong) { const ch = chuyenTai(local); if (ch) veChuyenConGhep(g, W, H, local, ch); else veNen(g, W, H, local, 'ghep'); } veCacLop(g, W, H, local); }
   catch (e) { console.warn('veConGhep', e); } finally { Object.assign(P, cu); ghepSau--; }
   return s;
 }
 const localGhep = (m, off) => m.bd + off * tocC(m);
+/* chuyển cảnh giữa các đoạn bên trong timeline con (cùng cách tính spec 5.1: cửa sổ giữa điểm nối, đoạn bên kia lấy khung trước điểm vào / sau điểm ra) */
+const GHEP_TAM = [];
+function canvasTam(i, W, H) { const c = GHEP_TAM[i] || (GHEP_TAM[i] = document.createElement('canvas')); if (c.width !== W || c.height !== H) { c.width = W; c.height = H; } const g = c.getContext('2d'); g.clearRect(0, 0, W, H); return [c, g]; }
+function tSrcBenKia(ch, local) { const k = ch.nua === 1 ? ch.sau : ch.truoc, c = P.clips[k], s = c && srcCua(c.src); if (!s) return null; const lech = (local - ch.noi) * tocC(c), het = (s.giay || c.kt) - 0.04; return { c, s, k, t: ch.nua === 1 ? Math.max(0, Math.min(het, c.bd + lech)) : Math.max(0, Math.min(het, c.kt + lech - 0.001)) }; }
+function veChuyenConGhep(g, W, H, local, ch) {
+  const [A, gA] = canvasTam(ghepSau * 2, W, H), [B, gB] = canvasTam(ghepSau * 2 + 1, W, H); veNen(gA, W, H, local, 'ghep');
+  const bk = tSrcBenKia(ch, local); if (bk && !bk.c.trong) { let im = null; if (laGhep(bk.c)) { const s2 = veConGhep(bk.c, bk.t, W, H); im = s2 && s2.el; } else im = bk.s.loai === 'video' ? elPhu(bk.s, 'elGs') : bk.s.el; if (im) { try { veNguon(gB, W, H, bk.s, im, bk.t, 1); } catch { } } }
+  const tu = ch.nua === 1 ? A : B, den = ch.nua === 1 ? B : A, gl = typeof gltVe === 'function' ? gltVe(ch.kieu, tu, den, ch.p, W, H) : null;
+  if (gl) g.drawImage(gl, 0, 0); else { g.drawImage(tu, 0, 0); g.globalAlpha = ch.p; g.drawImage(den, 0, 0); g.globalAlpha = 1; }
+}
 /* âm thanh bên trong clip ghép: trải thành các mục A3 ảo (đoạn video con + âm con), cắt theo vào/ra, nhân tốc độ → phát xem trước và xuất đều nghe được */
 function amAo() {
   const out = [];
@@ -5846,14 +5856,15 @@ function mucTuaGhep(t) {
   const out = [];
   const vao = (m, local, sau) => { if (sau > 6) return; const con = conGhep(m), cu = { clips: P.clips, gfx: P.gfx, broll: P.broll, am3: P.am3 };
     try { P.clips = con.clips; P.gfx = con.gfx; P.broll = con.broll; P.am3 = con.am3; const { clip, tSrc, bdTl } = viTri(local), tong = con.clips.reduce((a, c) => a + daiC(c), 0);
-      if (clip >= 0 && local < tong) { const c = con.clips[clip], s = srcCua(c.src); if (laGhep(c)) vao(c, localGhep(c, local - bdTl), sau + 1); else if (s && s.loai === 'video') out.push({ el: elPhu(s, 'elG'), t: tSrc, toc: tocC(c) * tocC(m) }); }
+      if (clip >= 0 && local < tong) { const c = con.clips[clip], s = srcCua(c.src); if (laGhep(c)) vao(c, localGhep(c, local - bdTl), sau + 1); else if (s && s.loai === 'video') out.push({ el: elPhu(s, 'elG'), t: tSrc, toc: tocC(c) * tocC(m) }); const ch = chuyenTai(local), bk = ch && tSrcBenKia(ch, local); if (bk && !bk.c.trong) { if (laGhep(bk.c)) vao(bk.c, bk.t, sau + 1); else if (bk.s.loai === 'video') out.push({ el: elPhu(bk.s, 'elGs'), t: bk.t, toc: tocC(bk.c) * tocC(m) }); } }
       con.broll.forEach(b => { const d = (b.kt - b.bd) / tocC(b); if (local < b.t_bd || local >= b.t_bd + d) return; if (laGhep(b)) vao(b, localGhep(b, local - b.t_bd), sau + 1); else { const sb = srcCua(b.src); if (sb && sb.loai === 'video') out.push({ el: elPhu(sb, 'elB'), t: b.bd + (local - b.t_bd) * tocC(b), toc: tocC(b) * tocC(m) }); } });
     } finally { Object.assign(P, cu); } };
   const { clip, bdTl } = viTri(t); if (clip >= 0 && laGhep(P.clips[clip])) vao(P.clips[clip], localGhep(P.clips[clip], t - bdTl), 0);
   P.broll.forEach(b => { const d = (b.kt - b.bd) / tocC(b); if (laGhep(b) && t >= b.t_bd && t < b.t_bd + d) vao(b, localGhep(b, t - b.t_bd), 0); });
   return out;
 }
-async function ghepTuaVideo(t) { for (const x of mucTuaGhep(t == null ? P.t : t)) { try { await seekTo(x.el, x.t); if (Math.abs(x.el.currentTime - x.t) > 0.04) await seekTo(x.el, x.t); } catch { } } }
+const doiSanSang = v => v.readyState >= 2 ? Promise.resolve() : new Promise(ok => { const h = () => { v.removeEventListener('loadeddata', h); ok(); }; v.addEventListener('loadeddata', h); setTimeout(h, 3000); });   // phần tử video phụ mới tạo: chờ nạp xong rồi mới tua
+async function ghepTuaVideo(t) { for (const x of mucTuaGhep(t == null ? P.t : t)) { try { await doiSanSang(x.el); await seekTo(x.el, x.t); if (Math.abs(x.el.currentTime - x.t) > 0.04) await seekTo(x.el, x.t); } catch { } } }
 let ghepDangChay = new Set();
 function ghepPhatVideo() { const nay = new Set(); mucTuaGhep(P.t).forEach(x => { nay.add(x.el); try { x.el.muted = true; const r = Math.max(0.0625, Math.min(16, x.toc || 1)); if (Math.abs(x.el.playbackRate - r) > 0.01) x.el.playbackRate = r; if (x.el.paused || Math.abs(x.el.currentTime - x.t) > 0.35) { x.el.currentTime = x.t; x.el.play().catch(() => { }); } } catch { } }); ghepDangChay.forEach(el => { if (!nay.has(el)) { try { el.pause(); } catch { } } }); ghepDangChay = nay; }
 /* ── tạo / tách ── */
@@ -5873,9 +5884,9 @@ function taoClipGhep() {
   const sao = x => JSON.parse(JSON.stringify(x)), con = { clips: [], gfx: [], broll: [], am3: [] };
   if (v1.length) { if (v1Bd - S > 0.001) con.clips.push({ trong: true, src: '', bd: 0, kt: +(v1Bd - S).toFixed(3) }); v1.forEach(c => { const x = sao(c); delete x.chuyenSau; con.clips.push(x); }); const cuoi = con.clips[con.clips.length - 1]; if (cuoi) { delete cuoi.chuyen; delete cuoi.chuyen_dai; } }
   ngoaiV.forEach(o => { const x = sao(o.m); delete x.nhom; if (o.k === 'g') { x.bd = +(x.bd - S).toFixed(3); x.kt = +(x.kt - S).toFixed(3); con.gfx.push(x); } else { x.t_bd = +(x.t_bd - S).toFixed(3); (o.k === 'b' ? con.broll : con.am3).push(x); } });
-  con.dai = +Math.max(0.1, E - S, daiCon(con)).toFixed(3);
+  con.dai = +Math.max(0.1, E - S, daiCon(con)).toFixed(3); con.id = 'tl' + uid();
   P.gfx = P.gfx.filter(g => !ngoaiV.some(o => o.m === g)); P.broll = P.broll.filter(b => !ngoaiV.some(o => o.m === b)); P.am3 = P.am3.filter(a => !ngoaiV.some(o => o.m === a));
-  const id = uid(), ten = 'Clip ghép ' + (demGhep() + 1); let m, k;
+  const id = uid(), ten = 'Clip ghép ' + (demGhep() + 1); con.chu = [id]; let m, k;
   if (v1.length) {   // nằm trên track chính tại chỗ đoạn đầu tiên, vào = phần trước đoạn đầu (giữ nguyên thời điểm nội dung), dồn như đoạn thường
     m = { id, kieu: 'ghep', ten, src: 'ghep:' + id, bd: +(v1Bd - S).toFixed(3), kt: con.dai, con }; const cu = v1Kt - v1Bd, moi = (m.kt - m.bd); P.clips.splice(i0, v1.length, m); if (moi - cu > 0.001) ripple(v1Kt, moi - cu); k = 'v';
   } else {   // chỉ có mục phủ / âm: nằm ở hàng phủ thấp nhất trong nhóm
@@ -5896,6 +5907,16 @@ function tachClipGhep(m) {
   else { P.broll.splice(P.broll.indexOf(m), 1); con.clips.forEach(() => { }); let acc = 0; con.clips.forEach(c => { const d = daiC(c); if (!c.trong && trong(acc, d)) { const x = moiId(sao(c)); delete x.chuyen; delete x.chuyen_dai; delete x.chuyenSau; Object.assign(x, { t_bd: +(lech + acc).toFixed(3), lop: m.lop }); P.broll.push(x); } acc += d; }); }   // đoạn video con của clip ghép phủ → video phủ
   GHEP_NGUON.delete('ghep:' + m.id); P.nhieu = []; P.chon = null; veTl(); veLoi(); veKhung(); veProp(); toast('Đã tách clip ghép');
 }
+/* chia sẻ timeline con: hai nửa của một lần tách đôi cùng id timeline (con.id) và cùng nằm trong danh sách chủ (con.chu);
+   bản nhân đôi / dán thì không nằm trong danh sách chủ → được cấp timeline riêng (độc lập như CapCut) */
+function anhEmGhep(m) { const c = conGhep(m); if (!c.id) return []; return [...P.clips, ...P.broll].filter(x => x !== m && laGhep(x) && x.con.id === c.id && (c.chu || []).includes(x.id)); }
+function noiLien(a, b, ds) { if (Math.abs(a.kt - b.bd) > 0.002) return false; if (ds === P.clips) return ds.indexOf(b) === ds.indexOf(a) + 1; const ea = a.t_bd + (a.kt - a.bd) / tocC(a); return Math.abs(ea - b.t_bd) < 0.002; }
+function chuanHoaGhepChung() {
+  [P.clips, P.broll].forEach(ds => ds.forEach(m => { if (!laGhep(m)) return; if (m.id && m.src !== 'ghep:' + m.id) m.src = 'ghep:' + m.id; const c = conGhep(m); if (!c.id) { c.id = 'tl' + uid(); c.chu = [m.id]; return; } if (!Array.isArray(c.chu)) c.chu = []; if (c.chu.includes(m.id)) return;
+    const anh = ds.find(x => x !== m && laGhep(x) && x.con.id === c.id && (x.con.chu || []).includes(x.id) && (noiLien(x, m, ds) || noiLien(m, x, ds)));
+    if (anh) { const chu = [...new Set([...(anh.con.chu || []), m.id])]; [P.clips, P.broll].forEach(d2 => d2.forEach(x => { if (laGhep(x) && x.con.id === c.id) x.con.chu = chu.slice(); })); }
+    else { m.con = JSON.parse(JSON.stringify(c)); m.con.id = 'tl' + uid(); m.con.chu = [m.id]; GHEP_NGUON.delete('ghep:' + m.id); } }));
+}
 function tachClipGhepChon() { const m = mucChon(); if (P.chon && (P.chon.k === 'v' || P.chon.k === 'b') && laGhep(m)) { tachClipGhep(m); return true; } return false; }
 /* ── vào / ra sửa bên trong: timeline chuyển sang timeline con (giây cục bộ), thanh "Dự án › Clip ghép 1 › …" để quay ra; Hoàn tác bên trong tách riêng, ra ngoài thành 1 bước ── */
 function moClipGhep(m, yen) {
@@ -5908,10 +5929,10 @@ function moClipGhep(m, yen) {
 }
 function dongClipGhep(yen) {
   const f = (P.ghepNgan || []).pop(); if (!f) return; const m = f.m, local = P.t;
-  const con = { clips: P.clips, gfx: P.gfx, broll: P.broll, am3: typeof am3Nhe === 'function' ? JSON.parse(JSON.stringify(P.am3)) : P.am3 }; con.dai = +daiCon(con).toFixed(3);
-  const thayDoi = JSON.stringify({ ...conGhep(m), dai: 0 }) !== JSON.stringify({ ...con, dai: 0 });
+  const con = { clips: P.clips, gfx: P.gfx, broll: P.broll, am3: typeof am3Nhe === 'function' ? JSON.parse(JSON.stringify(P.am3)) : P.am3 }; con.dai = +daiCon(con).toFixed(3); const cuCon = conGhep(m); if (cuCon.id) con.id = cuCon.id; if (cuCon.chu) con.chu = cuCon.chu.slice();
+  const noiDung = c => JSON.stringify([c.clips, c.gfx, c.broll, c.am3]), thayDoi = noiDung(cuCon) !== noiDung(con);
   P.clips = f.ngoai.clips; P.gfx = f.ngoai.gfx; P.broll = f.ngoai.broll; P.am3 = f.ngoai.am3; P.hoanTac = f.hoanTac; P.lamLai = f.lamLai;
-  if (thayDoi) { P.hoanTac.push(f.truoc); P.lamLai = []; const daiCu = conGhep(m).dai || 0; m.con = con; if (m.kt >= daiCu - 0.01 || m.kt > con.dai) m.kt = con.dai; if (m.bd > m.kt - 0.05) m.bd = Math.max(0, m.kt - 0.05); GHEP_NGUON.delete('ghep:' + m.id); }
+  if (thayDoi) { P.hoanTac.push(f.truoc); P.lamLai = []; const daiCu = cuCon.dai || 0; [m, ...anhEmGhep(m)].forEach(x => { x.con = x === m ? con : JSON.parse(JSON.stringify(con)); if (x.kt >= daiCu - 0.01 || x.kt > con.dai) x.kt = con.dai; if (x.bd > x.kt - 0.05) x.bd = Math.max(0, x.kt - 0.05); GHEP_NGUON.delete('ghep:' + x.id); }); }   /* các nửa tách đôi cùng trỏ một timeline con: sửa một nửa thì nửa kia đổi theo */
   const O = f.k === 'v' ? batDauC(m) : m.t_bd; P.t = Math.max(0, O + (Math.max(m.bd, Math.min(m.kt, local)) - m.bd) / tocC(m));
   const i = (f.k === 'v' ? P.clips : P.broll).indexOf(m); P.chon = i >= 0 ? { k: f.k, i } : null; P.nhieu = [];
   P.ghepMo = P.ghepNgan.length > 0; $('#ed').classList.toggle('ghepMo', P.ghepMo); veDuongGhep();
@@ -5927,7 +5948,7 @@ function veDuongGhep() {
   bar.appendChild(el('span', 'quota', 'Đang sửa bên trong clip ghép · sửa xong bấm “Dự án” để quay ra'));
 }
 /* trạng thái gốc (đã gộp các chỉnh sửa đang mở bên trong) mà không đóng — dùng cho lưu dự án / tự lưu */
-function trangThaiGoc() { let cur = { clips: P.clips, gfx: P.gfx, broll: P.broll, am3: P.am3 }; for (let i = (P.ghepNgan || []).length - 1; i >= 0; i--) { const f = P.ghepNgan[i], ng = JSON.parse(JSON.stringify(f.ngoai)), con = JSON.parse(JSON.stringify(cur)); con.dai = +daiCon(con).toFixed(3); const m = [...ng.clips, ...ng.broll].find(x => x.id === f.m.id); if (m) { m.con = con; if (m.kt > con.dai) m.kt = con.dai; } cur = ng; } return cur; }
+function trangThaiGoc() { let cur = { clips: P.clips, gfx: P.gfx, broll: P.broll, am3: P.am3 }; for (let i = (P.ghepNgan || []).length - 1; i >= 0; i--) { const f = P.ghepNgan[i], ng = JSON.parse(JSON.stringify(f.ngoai)), con = JSON.parse(JSON.stringify(cur)); con.dai = +daiCon(con).toFixed(3); const m = [...ng.clips, ...ng.broll].find(x => x.id === f.m.id); if (m) { const cu = conGhep(m); if (cu.id) con.id = cu.id; if (cu.chu) con.chu = cu.chu.slice(); [m, ...[...ng.clips, ...ng.broll].filter(x => x !== m && laGhep(x) && cu.id && x.con.id === cu.id && (cu.chu || []).includes(x.id))].forEach(x => { x.con = JSON.parse(JSON.stringify(con)); if (x.kt > con.dai) x.kt = con.dai; }); } cur = ng; } return cur; }
 function veThuocTinhGhep(box, m) {
   const con = conGhep(m), n = el('div', 'nhom2 ghepNhom'); n.appendChild(el('b', null, '▣ Clip ghép')); box.insertBefore(n, box.firstChild);
   const lt = el('label', 'full'); lt.appendChild(el('span', null, 'Tên clip')); const it = el('input'); it.type = 'text'; it.value = m.ten || ''; it.oninput = () => { m.ten = it.value; veTl(); }; lt.appendChild(it); n.appendChild(lt);
@@ -5949,9 +5970,10 @@ function khoiTaoClipGhep() {
   /* phụ đề theo lời: tính trên track chính đã trải clip ghép */
   const cumCu = cumTu; cumTu = function () { if (!P.clips.some(laGhep) || (P.pdNgoai && P.pdNgoai.length)) return cumCu.apply(this, arguments); const cu = P.clips; P.clips = traiV1(cu); try { return cumCu.apply(this, arguments); } finally { P.clips = cu; } };
   /* vẽ dòng thời gian: đổi clip ghép kiểu cũ, đánh dấu ô clip ghép, nạp sẵn âm thanh bên trong */
-  const veTlCu = veTl; veTl = function () { doiGhepCu(P.gfx, P.broll); const r = veTlCu.apply(this, arguments); try {
+  const veTlCu = veTl; veTl = function () { doiGhepCu(P.gfx, P.broll); try { chuanHoaGhepChung(); } catch (e) { console.warn(e); } const r = veTlCu.apply(this, arguments); try {
     $$('#tlIn .item[data-k="v"], #tlIn .item[data-k="b"]').forEach(d => { const m = (d.dataset.k === 'v' ? P.clips : P.broll)[+d.dataset.i]; if (!laGhep(m)) return; d.classList.add('ghep'); const b = d.querySelector('b'); if (b) b.textContent = (m.ten || 'Clip ghép') + ' · ' + fmt1(d.dataset.k === 'v' ? daiC(m) : (m.kt - m.bd) / tocC(m)) + 's' + (tocC(m) !== 1 ? ' · ' + tocC(m) + '×' : ''); const sm = d.querySelector('small'); if (sm) sm.textContent = 'timeline con ' + fmt1(conGhep(m).dai || 0) + 's'; });
-    amAo().forEach(a => { const k = AM3_KHO[a.kho]; if (!k || (!k.buf && !k.dang)) am3NapKho(a.kho).catch(() => { }); }); } catch (e) { console.warn(e); } return r; };
+    amAo().forEach(a => { const k = AM3_KHO[a.kho]; if (!k || (!k.buf && !k.dang)) am3NapKho(a.kho).catch(() => { }); });
+    if (P.clips.some(laGhep) || P.broll.some(laGhep)) P.srcs.forEach(s => { if (s.loai === 'video') { elPhu(s, 'elG'); elPhu(s, 'elGs'); } });   /* tạo sẵn phần tử video phụ cho clip ghép để lần vẽ đầu đã nạp xong */ } catch (e) { console.warn(e); } return r; };
   /* nháy đúp clip ghép → vào trong */
   const tin = $('#tlIn'); if (tin) tin.addEventListener('dblclick', e => { const it = e.target.closest('.item.ghep'); if (!it) return; const m = (it.dataset.k === 'v' ? P.clips : P.broll)[+it.dataset.i]; if (laGhep(m)) { e.preventDefault(); e.stopPropagation(); moClipGhep(m); } }, true);
   /* thuộc tính: đoạn / video phủ là clip ghép → thêm mục Clip ghép ở đầu, đủ thuộc tính video như thường */
