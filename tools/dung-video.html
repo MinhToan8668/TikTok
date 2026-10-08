@@ -1036,6 +1036,11 @@
   .ed.ccw .item[data-k]{border-color:transparent;border-width:1px}
   .ed.ccw .item[data-k]:hover:not(.chon):not(.nhieu){border-color:rgba(255,255,255,.4)}
   .ed.ccw .item[data-k].chon,.ed.ccw .item[data-k].nhieu{border-color:#fff}
+  /* mép trái / phải giống mép trên / dưới (viền trắng mảnh); thanh kéo chỉ hiện khi trỏ đúng vào mép hoặc đang kéo */
+  .ed.ccw .item .h,.ed.ccw .item:hover .h,.ed.ccw .item.chon .h{opacity:0;background:transparent}
+  .ed.ccw .item .h::after{display:none}
+  .ed.ccw .item .h:hover,.ed.ccw .item .h:active{opacity:1;background:#fff}
+  .ed.ccw .item .h:hover::after,.ed.ccw .item .h:active::after{display:block}
 </style>
 </head>
 <body>

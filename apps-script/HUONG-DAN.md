@@ -791,7 +791,7 @@ Trước đây sau khi "Hiểu footage" thẻ tự bung ra hết cỡ (tên file
 ### Đoạn trên dòng thời gian trình bày như CapCut (10/2026)
 
 - **Viền chọn trắng mảnh** 1 px (bỏ hai mép lime dày): đoạn đang chọn / chọn nhiều chỉ có viền trắng, áp cho mọi loại (video, phủ, chữ, đồ hoạ, âm, lồng tiếng, phụ đề).
-- **Núm kéo dài / thu ngắn chỉ hiện khi rê chuột vào đoạn hoặc đoạn đang chọn**: hai thanh trắng 7 px ở hai mép với một vạch xám ở giữa, bo góc theo đoạn; rê qua đoạn chưa chọn thì viền sáng nhẹ 40 %.
+- **Mép trái / phải giống mép trên / dưới** (viền trắng mảnh đều 4 cạnh khi chọn). **Thanh kéo dài / thu ngắn chỉ hiện khi trỏ chuột đúng vào mép** (vùng 7 px, con trỏ ↔) hoặc đang kéo: thanh trắng với vạch xám ở giữa; rê qua đoạn chưa chọn thì viền sáng nhẹ 40 %.
 - Nhãn trên đoạn 10,5 px, dòng phụ 10 px; bo góc 5 px.
 - Hồi quy `t121` cập nhật màu viền chọn; `t89` cắt sớm các host ngoài (mediapipe, gstatic, jsdelivr…) vì máy test không có internet, tránh treo ở sự kiện `load`.
 
