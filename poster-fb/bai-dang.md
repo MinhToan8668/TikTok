@@ -441,62 +441,82 @@ Chọn một trong ba ảnh 1920×1280, bài này đăng **một ảnh duy nhấ
 | `ng-6-lime.png` | Cùng bố cục, nền lime, hợp khi đăng liền sau một bài nền tối |
 | `ng-6-tool.png` | Bản 6 ô có mô tả từng tool, dùng khi muốn ảnh nói đủ mà không cần đọc caption |
 
+Viết theo cẩm nang FB viral của page: xưng **"mình"** số ít, không phải "tụi mình".
+Quy luật số 1 trong cẩm nang — bài cá nhân thắng bài giọng thương hiệu ở mọi mảng.
+Công thức: tổng hợp tài nguyên (mục lục) + hook thú nhận. Mục tiêu: lưu và dùng thử.
+
 **Facebook**
 
 ```
-Tụi mình vọc cái này mấy tháng nay, giờ xong đủ 6 cái rồi.
+Mình bỏ mấy tháng làm 6 cái tool rồi cho xài free. Nói luôn mình được gì.
 
-Chuyện là đi dạy thì thấy hoài một cảnh: ai cũng muốn làm video, viết xong cái hook rồi ngồi đực ra không biết bước kế là gì. Hoặc dựng xong thấy nó sai sai mà không biết sai chỗ nào, đăng đại rồi tắt máy.
+Chứ thấy chữ "free" là nhiều người nghĩ sắp bị lùa rồi =)))
 
-Nên tụi mình gom đúng 6 khâu của một video thành 6 cái tool, xếp sẵn theo thứ tự:
+Lý do thật: mình dạy xây kênh, mà dạy xong ai về nhà cũng tắc. Không tắc ý tưởng thì tắc lúc dựng. Chữa từng người qua tin nhắn không xuể, nên mình gom hết thành tool.
+
+6 cái, xếp đúng thứ tự làm một video:
 
 1. Tải video — dán link, ra video sạch logo, nhạc nền, ảnh bìa
-2. Soi video — coi vì sao video người ta nổ, mượn cái sườn về
-3. Chấm hook — hook của bạn mấy điểm trên 100, AI viết lại 5 bản khác
-4. Kịch bản — 11 khung dựng sẵn, biết trước giây nào người xem lướt
-5. Dựng video — xuất MP4 thẳng về máy, khỏi mua app edit
-6. Chấm video — AI coi hết video rồi chỉ đúng giây đang hỏng
+2. Soi video — mổ video người ta nổ nhờ gì, lấy cái sườn về dùng
+3. Chấm hook — hook của bạn mấy điểm trên 100, AI viết lại 5 bản
+4. Kịch bản — 11 khung dựng sẵn, biết trước giây nào người ta lướt
+5. Dựng video — xuất MP4 về máy, khỏi mua app edit
+6. Chấm video — AI coi hết, chỉ đúng giây đang hỏng
 
-Làm xong cái số 1 là biết ngay cái số 2 làm gì. Khỏi nhớ, khỏi đoán.
+Làm xong cái 1 là biết cái 2 làm gì. Chỗ đó mới là cái mình muốn chữa, chứ không phải từng cái tool riêng lẻ.
 
-Nói thiệt luôn chứ tụi mình không làm từ thiện đâu: mấy bạn xài quen đồ của tụi mình thì sau này tụi mình có gì mới, mấy bạn cũng nhớ tới. Vậy thôi. Còn tool thì free thiệt, đăng nhập là dùng, mấy tính năng gọi AI tốn tiền máy chủ nên có giới hạn lượt, còn lại xài thoải mái.
+Mình được gì: bạn xài quen đồ của mình, sau này mình ra khoá gì bạn nhớ tới mình trước. Hết. Không thu phí, không bán gói, mấy tính năng gọi AI tốn tiền máy chủ nên có giới hạn lượt.
 
-Mà nó còn thô lắm, tụi mình vừa làm vừa sửa. Bạn dùng thấy chỗ nào dở thì nhắn một câu, sửa được là tụi mình sửa liền.
+Còn thô lắm. Bạn bấm vô thấy chỗ nào dở thì nhắn mình một câu.
 
-Mở trình duyệt trên điện thoại là xài, không cần cài app.
-
-Bạn đang kẹt ở khâu nào trong 6 khâu đó? Nói mình nghe, tool nào hợp mình chỉ cho.
+Bạn đang tắc ở khâu nào trong 6 khâu đó?
 ```
 
-Bình luận đầu (ghim): `Link nè https://minhtoan8668.github.io/TikTok/ mở ra là thấy đủ 6 tool`
+Bình luận đầu (ghim): `Link nè https://minhtoan8668.github.io/TikTok/ đăng nhập là dùng được`
 
-Ba chỗ cố ý viết vậy, sửa thì giữ lại:
-- **Mở bằng cảnh thật** (viết xong hook rồi đực ra) thay vì "sau bao ngày ấp ủ". Người đọc thấy mình trong đó thì mới đọc tiếp.
-- **Nói mình được gì** khi cho free. Giấu mới bị nghi là lùa gà; nói ra thì hết chuyện để nghi.
-- **Nhận là còn thô.** Ai cũng biết bản đầu không thể hoàn hảo, nhận trước thì người ta tin phần còn lại.
+**Bản ngắn, nếu muốn gọn hơn**
 
-Đừng viết "hoàn toàn Free", "cam kết", "đảm bảo viral", cũng đừng ghi số lượt cụ thể.
+```
+Tốn mấy tháng làm 6 cái tool. Xong cho xài free.
+
+Nghe hơi khùng, nhưng mình dạy xây kênh mà dạy xong ai về nhà cũng tắc. Không tắc ý tưởng thì tắc lúc dựng. Chữa từng người qua tin nhắn không xuể.
+
+Nên gom thành 6 tool xếp theo đúng thứ tự làm một video: tải video, soi video, chấm hook, kịch bản, dựng video, chấm video. Làm xong cái 1 là biết cái 2 làm gì.
+
+Mình được gì? Bạn xài quen đồ của mình, sau này mình ra khoá gì bạn nhớ tới mình trước. Vậy thôi.
+
+Bạn đang tắc ở khâu nào?
+```
+
+Ba chỗ khác hẳn mấy bản trước:
+- **Xưng "mình", bỏ "tụi mình".** Nguyên nhân chính của cái giọng nghe như văn mẫu.
+- **Hook là lời thú nhận,** nói thẳng "mình được gì" ngay câu đầu. Định kiến lùa gà bị chặn trước khi người đọc kịp nghĩ ra.
+- **Động cơ nói bằng cảnh thật** (chữa từng người qua tin nhắn không xuể) chứ không bằng tính từ "muốn hỗ trợ mọi người".
+
+Cẩm nang cấm: mồi tương tác, bịa số, giọng PR trên trang cá nhân. "Mấy tháng" để vậy vì mình không biết số chính xác — bạn biết thì điền số thật vào, có số luôn mạnh hơn.
+
+Giờ đăng theo cẩm nang: 11h30–13h hoặc 20h–22h30. Ở lại trả lời comment 60 phút đầu, mỗi câu trả lời kèm một câu hỏi ngược lại.
 
 **Threads**
 
 ```
-tụi t vọc mấy tháng, xong bộ 6 tool xây kênh rồi
+tốn mấy tháng làm 6 cái tool xong cho xài free
 
-đi dạy thấy hoài cảnh này: viết xong cái hook là ngồi đực ra không biết bước kế làm gì. nên tụi t gom đúng 6 khâu của 1 video thành 6 cái tool, xếp sẵn theo thứ tự, làm xong cái 1 biết ngay cái 2
+t dạy xây kênh, dạy xong ai về nhà cũng tắc. không tắc ý tưởng thì tắc lúc dựng. chữa từng người qua tin nhắn không xuể nên gom thành tool luôn
 
-free. nói thiệt chứ tụi t cũng không làm từ thiện, mn xài quen đồ của tụi t thì sau này tụi t ra gì mn cũng nhớ tới, vậy thôi
+6 cái xếp đúng thứ tự làm 1 video, làm xong cái 1 là biết cái 2 làm gì
 
-còn thô lắm, mn xài thấy dở chỗ nào nói t sửa nha
+t được gì? mn xài quen đồ của t thì sau này t ra gì mn nhớ tới t trước, vậy thôi =)))
 
-mn đang kẹt khâu nào?
+mn đang tắc khâu nào?
 ```
 
 **Group học viên**
 
 ```
-Cả lớp ơi, bộ 6 tool xong hết rồi nha, xếp đúng thứ tự làm một video.
+Cả lớp ơi, 6 tool xong hết rồi nha.
 https://minhtoan8668.github.io/TikTok/
-Tool làm ra là để cả lớp xài chứ không phải để coi cho vui, tuần này ai cũng chạy thử ít nhất 2 cái rồi vô nói cho mình nghe chỗ nào khó dùng nha.
+Mình làm ra là để cả lớp xài chứ không để coi cho vui. Tuần này ai cũng chạy thử ít nhất 2 cái rồi vô nói mình nghe chỗ nào khó dùng nha.
 ```
 
 **Ảnh bỏ bình luận:** `01`–`06` (mỗi tool một tấm 4:5), ai hỏi tool nào thì thả tấm đó.
