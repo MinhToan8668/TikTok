@@ -855,6 +855,39 @@ Hai bộ test mới `t143` (xuất, 20 bài, xuất file thật rồi đọc l�
 
 Đã đạt sẵn (test xác nhận): thời lượng file xuất đúng vùng In–Out ±0,05 s, Huỷ giữa chừng không tải file nào (cả file phụ đề), 60 s lời → 27 câu (≥ 10), mỗi câu ≤ 8 từ, Ctrl+B giữa câu thì phụ đề cắt đúng chỗ, xoá câu không dồn timeline, .srt theo dòng thời gian.
 
+### Clip ghép theo spec 9.1 và mặt nạ theo spec 9.2
+
+Bản spec đầy đủ (kể cả 2 mục bổ sung này) lưu ở [`docs/capcut-spec-hanh-vi.md`](../docs/capcut-spec-hanh-vi.md) để các đợt sau đối chiếu. Test `t148` (clip ghép, 23 bài) và `t149` (mặt nạ, 14 bài).
+
+**Clip ghép giờ là một timeline con** (track chính + video phủ + chữ / sticker / đồ hoạ + âm thanh) bọc thành một "nguồn ảo" `ghep:<id>`; mục bên ngoài trỏ tới nó như trỏ một video.
+
+| Spec 9.1 | Trước | Nay |
+|---|---|---|
+| Tạo từ mục **bất kỳ track nào** (kể cả đoạn video chính, âm thanh) | chỉ chữ / sticker / đồ hoạ / video phủ | mọi loại (track chính lấy dải liền từ đoạn đầu tới đoạn cuối được chọn); chuột phải → Tạo clip ghép, Ctrl+G, hoặc nút ▣ ở bảng "N mục đang chọn" |
+| Nằm trên **track của mục thấp nhất**; ở track chính thì **dồn** như đoạn thường | luôn ở hàng chữ | có đoạn video chính → nằm trên track chính đúng chỗ, đoạn sau bị đẩy nếu dài hơn; chỉ mục phủ → hàng phủ thấp nhất trong nhóm |
+| `start` nhỏ nhất, `end` lớn nhất, **khoảng trống bên trong trong suốt** | có | có (track chính con có khoảng trống đầu → vẽ trong suốt) |
+| **Đủ thuộc tính video** áp lên kết quả (biến đổi, độ mờ, tốc độ, hoạt ảnh, bộ lọc, mặt nạ, keyframe) | chỉ phóng / dời / xoay / mờ | đủ bảng như đoạn video / video phủ, áp lên ảnh đã vẽ của timeline con |
+| **Sửa bên trong**: timeline con, **đường dẫn** `Dự án › Clip ghép 1`, ra ngoài phản ánh ngay; con dài ra / ngắn đi thì mục ngoài đổi theo | thanh ◀ Quay lại, giây tuyệt đối | timeline con theo giây cục bộ (bắt đầu 0), thanh `◀ Dự án › Clip ghép 1 › …` bấm cấp nào về cấp đó, độ dài mục ngoài đổi theo (track chính dồn theo) |
+| **Hoàn tác bao gồm thay đổi bên trong** | không | bên trong có Hoàn tác riêng; ra ngoài cả lần sửa là **1 bước** Ctrl+Z |
+| **Tách đôi / cắt mép** như clip, không quá độ dài timeline con | không tách được | tách đôi ra 2 clip ghép (vào/ra khác nhau), kéo mép dừng ở độ dài timeline con |
+| **Tốc độ** = co giãn cả timeline con, **âm thanh bên trong cũng theo** | không | có (âm thanh đổi tốc độ cùng) |
+| **Tách (Ungroup)** trả mục về đúng chỗ, giữ keyframe bên trong, **thuộc tính đặt lên clip ghép bị mất** | có, chỉ chữ / phủ | mọi loại, đúng chỗ, chỉ trả phần đang hiện trong vào/ra |
+| **Copy / nhân đôi độc lập** | có | có (sửa bên trong bản A không đổi bản B) |
+| **Lồng nhau** | không | tạo clip ghép bên trong clip ghép được (giới hạn 6 tầng khi vẽ) |
+| **Phụ đề** | — | phụ đề theo lời của đoạn video bên trong clip ghép vẫn hiện |
+| Âm thanh bên trong | không có | tiếng của đoạn video con + âm thanh con trải thành A3 "ảo" → nghe được khi xem trước và có trong file xuất |
+
+Lệch nhỏ so với spec: hai nửa sau khi tách đôi là 2 bản **độc lập** (spec: cùng trỏ một timeline con); chuyển cảnh bên trong timeline con chưa vẽ (chỉ cắt thẳng). Dự án cũ có clip ghép kiểu cũ tự đổi sang kiểu mới khi mở.
+
+| Spec 9.2 mặt nạ | Trước | Nay |
+|---|---|---|
+| Hình: None, Linear, Mirror, Circle, Rectangle, Heart, Star | có đủ | giữ |
+| Tay cầm riêng: tâm, viền (rộng / cao riêng), xoay, mềm viền, bo góc | có | giữ; **Shift khi kéo mép = co giãn đều hai chiều** |
+| **Mọi thông số keyframe được** (◇ riêng) | không | vị trí ngang / dọc, rộng, cao, xoay, mềm viền, bo góc đều có ◇ riêng; đã có keyframe thì kéo thanh **hoặc kéo tay cầm trên khung** tự thêm keyframe tại đầu phát; tay cầm đứng đúng giá trị tại đầu phát |
+| Lưu trong **không gian mục** (dời / xoay / phóng mục thì mặt nạ đi theo) | có | giữ (test xác nhận) |
+| Đảo ngược, **Reset** | có đảo ngược | thêm **↺ Đặt lại mặt nạ** (về mặc định, bỏ keyframe mặt nạ, giữ hình) |
+| Mặt nạ trên **chữ, sticker, clip ghép** | chữ có | clip ghép có (áp lên kết quả cả video lẫn chữ bên trong) |
+
 ### Sửa lỗi: chuột phải chữ / video phủ không hiện menu
 
 Menu chuột phải của chữ, đồ hoạ và video phủ bị lỗi JS (`m is not defined` ở mục clip ghép) nên không mở được, chỉ đoạn V1 còn menu. Đã sửa. Bảng "N mục đang chọn" có thêm nút **▣ Tạo clip ghép** (bên cạnh Ctrl+G và menu chuột phải → "Tạo clip ghép"). Test `t147`.
