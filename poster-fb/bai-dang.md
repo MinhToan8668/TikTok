@@ -444,29 +444,49 @@ Chọn một trong ba ảnh 1920×1280, bài này đăng **một ảnh duy nhấ
 **Facebook**
 
 ```
-Người mới làm video hay kẹt không phải vì lười. Kẹt vì xong khâu này rồi không biết khâu kế tiếp là gì.
+Tụi mình vọc cái này mấy tháng nay, giờ xong đủ 6 cái rồi.
 
-Một video TikTok thật ra đi qua 6 khâu: coi video mẫu, viết hook, viết kịch bản, quay, dựng, rồi coi lại trước khi đăng.
+Chuyện là đi dạy thì thấy hoài một cảnh: ai cũng muốn làm video, viết xong cái hook rồi ngồi đực ra không biết bước kế là gì. Hoặc dựng xong thấy nó sai sai mà không biết sai chỗ nào, đăng đại rồi tắt máy.
 
-Tụi mình làm Viral Studio theo đúng 6 khâu đó, mỗi khâu một tool, xếp sẵn theo thứ tự. Làm xong cái số 1 thì biết ngay cái số 2 là gì.
+Nên tụi mình gom đúng 6 khâu của một video thành 6 cái tool, xếp sẵn theo thứ tự:
 
-Tải video thì sạch logo, có nhạc nền với ảnh bìa. Chấm hook thì cho điểm trên 100 rồi viết lại giùm 5 bản. Dựng video thì xuất MP4 thẳng về máy, khỏi mua app edit. Chấm video thì AI coi hết, chỉ đúng giây đang hỏng.
+1. Tải video — dán link, ra video sạch logo, nhạc nền, ảnh bìa
+2. Soi video — coi vì sao video người ta nổ, mượn cái sườn về
+3. Chấm hook — hook của bạn mấy điểm trên 100, AI viết lại 5 bản khác
+4. Kịch bản — 11 khung dựng sẵn, biết trước giây nào người xem lướt
+5. Dựng video — xuất MP4 thẳng về máy, khỏi mua app edit
+6. Chấm video — AI coi hết video rồi chỉ đúng giây đang hỏng
+
+Làm xong cái số 1 là biết ngay cái số 2 làm gì. Khỏi nhớ, khỏi đoán.
+
+Nói thiệt luôn chứ tụi mình không làm từ thiện đâu: mấy bạn xài quen đồ của tụi mình thì sau này tụi mình có gì mới, mấy bạn cũng nhớ tới. Vậy thôi. Còn tool thì free thiệt, đăng nhập là dùng, mấy tính năng gọi AI tốn tiền máy chủ nên có giới hạn lượt, còn lại xài thoải mái.
+
+Mà nó còn thô lắm, tụi mình vừa làm vừa sửa. Bạn dùng thấy chỗ nào dở thì nhắn một câu, sửa được là tụi mình sửa liền.
 
 Mở trình duyệt trên điện thoại là xài, không cần cài app.
 
-Bạn đang kẹt ở khâu nào trong 6 khâu đó?
+Bạn đang kẹt ở khâu nào trong 6 khâu đó? Nói mình nghe, tool nào hợp mình chỉ cho.
 ```
 
 Bình luận đầu (ghim): `Link nè https://minhtoan8668.github.io/TikTok/ mở ra là thấy đủ 6 tool`
 
+Ba chỗ cố ý viết vậy, sửa thì giữ lại:
+- **Mở bằng cảnh thật** (viết xong hook rồi đực ra) thay vì "sau bao ngày ấp ủ". Người đọc thấy mình trong đó thì mới đọc tiếp.
+- **Nói mình được gì** khi cho free. Giấu mới bị nghi là lùa gà; nói ra thì hết chuyện để nghi.
+- **Nhận là còn thô.** Ai cũng biết bản đầu không thể hoàn hảo, nhận trước thì người ta tin phần còn lại.
+
+Đừng viết "hoàn toàn Free", "cam kết", "đảm bảo viral", cũng đừng ghi số lượt cụ thể.
+
 **Threads**
 
 ```
-làm 1 video tiktok thật ra đi qua 6 khâu: coi video mẫu, viết hook, viết kịch bản, quay, dựng, coi lại trước khi đăng
+tụi t vọc mấy tháng, xong bộ 6 tool xây kênh rồi
 
-người mới kẹt không phải vì lười, kẹt vì xong khâu này không biết khâu kế là gì
+đi dạy thấy hoài cảnh này: viết xong cái hook là ngồi đực ra không biết bước kế làm gì. nên tụi t gom đúng 6 khâu của 1 video thành 6 cái tool, xếp sẵn theo thứ tự, làm xong cái 1 biết ngay cái 2
 
-tụi t gom đúng 6 khâu đó thành 6 cái tool, xếp sẵn theo thứ tự, xài free
+free. nói thiệt chứ tụi t cũng không làm từ thiện, mn xài quen đồ của tụi t thì sau này tụi t ra gì mn cũng nhớ tới, vậy thôi
+
+còn thô lắm, mn xài thấy dở chỗ nào nói t sửa nha
 
 mn đang kẹt khâu nào?
 ```
@@ -474,9 +494,9 @@ mn đang kẹt khâu nào?
 **Group học viên**
 
 ```
-Cả lớp ơi, Viral Studio đủ 6 tool rồi nha, xếp đúng thứ tự làm 1 video.
+Cả lớp ơi, bộ 6 tool xong hết rồi nha, xếp đúng thứ tự làm một video.
 https://minhtoan8668.github.io/TikTok/
-Lưu tấm này lại, làm video nào cũng đi theo thứ tự đó cho khỏi sót khâu.
+Tool làm ra là để cả lớp xài chứ không phải để coi cho vui, tuần này ai cũng chạy thử ít nhất 2 cái rồi vô nói cho mình nghe chỗ nào khó dùng nha.
 ```
 
 **Ảnh bỏ bình luận:** `01`–`06` (mỗi tool một tấm 4:5), ai hỏi tool nào thì thả tấm đó.
