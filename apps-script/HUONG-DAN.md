@@ -834,6 +834,46 @@ Trình dựng kiểu Vyra, giao diện tối chuyên nghiệp: **Footage → AI 
 **Cài:** ➕ Script tên `DungVideo`, dán `DungVideo.gs`. Dán đè `HookAI.gs`, `Studio.gs`. Deploy → New version. Key Gemini phải dùng được model `gemini-3.5-transcribe` (key AI Studio thường có sẵn).
 
 
+### Ảnh kéo dài, bo góc & đổ bóng, mặt nạ đầy đủ, xuất tách riêng
+
+Test `t152` (8 bài), `t153` (20 bài), `t154` (8 bài); `t137`, `t149` cập nhật theo mặt nạ mới.
+
+**Ảnh kéo dài vô hạn.** Trước đây ảnh trên V1 bị chặn ở độ dài lúc thả vào (coi như video). Nay ảnh, chữ, sticker kéo mép phải bao xa cũng được; chỉ video và clip ghép bị giới hạn bởi độ dài nguồn.
+
+**Bo góc & đổ bóng** (tab Video của ảnh, video, b-roll, clip ghép):
+
+| Mục | Cách dùng |
+|---|---|
+| Bo góc | 0–100%, bo cả mặt nạ và viền |
+| Viền | màu, độ dày, độ đậm |
+| Đổ bóng | bật/tắt, 5 kiểu: **Bóng đổ**, **Bóng mềm** (nhoè rộng), **Bóng cứng** (không nhoè), **Bóng trong** (đổ vào trong khung), **Phát sáng** (toả đều quanh) |
+| Tuỳ chỉnh bóng | **Màu bóng**, **Độ đậm**, **Độ nhoè**, **Khoảng cách**, **Góc bóng**, **Độ lan** (nở bóng ra) |
+
+Bóng lấy theo đúng hình đang hiện (sau mặt nạ và bo góc), nên ảnh PNG nền trong hay video bị khoét mặt nạ tim vẫn có bóng ôm theo viền.
+
+**Mặt nạ làm lại theo cách của CapCut:**
+
+| Spec | Nay |
+|---|---|
+| 1 Luồng dùng | bấm một hình → vào **chế độ mặt nạ**: ẩn khung biến đổi của clip, vùng bị che hiện mờ 30% để thấy mình đang khoét gì; bấm ra ngoài khung xem trước hoặc chọn mục khác là thoát. Khi xuất không có lớp mờ này |
+| 2 Hình & mặc định | Tuyến tính, Gương (dải 50%), Tròn (rx = ry = 50% cạnh ngắn), Chữ nhật (50% × 50%, bo 0), Tim, Sao (50% cạnh ngắn) |
+| 3 Tay nắm trên khung | Tròn 4 núm trục; Chữ nhật 4 góc + 4 cạnh + núm bo góc vàng; Gương 2 mép dải; Tuyến tính mũi tên dời; Tim/Sao núm cỡ; mọi hình có núm xoay và núm **↕ mềm viền** kéo ra xa. Hít tâm mục/tâm khung 5 px (giữ Alt để tắt), Shift = giữ tỉ lệ / xoay bước 15°, bấm đúp núm = đặt lại thông số đó, chuột phải = Đặt lại / Đảo ngược / Bỏ mặt nạ, có nhãn số khi kéo, mỗi lần kéo là một bước hoàn tác |
+| 4 Bảng thuộc tính | Vị trí X/Y (px), Rộng/Cao hoặc Kích thước (%), Xoay, Mềm viền 0–100, Bo góc (chữ nhật), Đảo ngược, ↺ Đặt lại mặt nạ; mỗi thông số có ◇; bấm đúp nhãn = về mặc định; chọn nhiều mục thì chỉnh cùng lúc |
+| 5 Keyframe | vị trí, cỡ, xoay, mềm viền, bo góc; đổi hình giữ vị trí/xoay/mềm và keyframe của chúng |
+| 6 Không gian mục | mặt nạ dính theo mục: dời, phóng, xoay, lật clip thì mặt nạ đi theo; mềm viền tính theo px của mục |
+| 7 Dữ liệu | mặt nạ cũ trong dự án đã lưu tự đổi sang dạng mới khi mở |
+| 8 Mép mịn | tính bằng hàm khoảng cách + smoothstep, cả tim và sao |
+
+Đã sửa thêm: mặt nạ trên đồ hoạ có hiệu ứng xuất hiện trước đây đo khung lúc chữ chưa hiện hết nên bị lệch; đảo ngược mặt nạ trên đồ hoạ nay giữ đúng phần ngoài khung.
+
+**Xuất tách riêng.** Hộp Xuất chia 3 phần, tick phần nào thì ra file phần đó:
+
+- **Video**: định dạng, độ phân giải, fps, bitrate như cũ; ô "Tiếng trong video" để tắt tiếng.
+- **Âm thanh riêng**: MP3 / WAV / M4A, chọn kbps.
+- **Phụ đề riêng**: .srt / .txt, khớp đúng khoảng xuất.
+
+Tick nhiều phần thì xuất lần lượt, cùng tên file. Lựa chọn được nhớ cho lần sau.
+
 ### Nghiệm thu Xuất (§7) và Phụ đề (§4.5)
 
 Hai bộ test mới `t143` (xuất, 20 bài, xuất file thật rồi đọc lại bằng mediabunny) và `t144` (phụ đề, 15 bài).
