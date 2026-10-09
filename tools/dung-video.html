@@ -274,7 +274,7 @@
   .qlThe.dang{border-color:var(--ea)}.qlThe b{font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.qlThe small{font-size:10.5px;color:var(--em)}
   .qlThe .row{flex-wrap:wrap;gap:3px}.qlThe .btn{padding:3px 6px;font-size:10.5px}
   .qlBia{aspect-ratio:9/12;background:#000 center/cover;border-radius:7px;position:relative}.qlBia span{position:absolute;right:4px;bottom:4px;font-size:10px;background:rgba(0,0,0,.65);padding:0 4px;border-radius:4px}
-  #ruler .vungVR{position:absolute;top:0;height:100%;background:rgba(34,211,223,.18);border-left:2px solid #22d3df;border-right:2px solid #22d3df;pointer-events:none;z-index:1}
+  #ruler .vungVR{position:absolute;top:0;height:100%;background:rgba(34,211,223,.18);border-left:2px solid #22d3df;border-right:2px solid #22d3df;z-index:1;cursor:grab;touch-action:none}#ruler .vungVR .vrM{position:absolute;top:0;bottom:0;width:10px;cursor:ew-resize}#ruler .vungVR .vrM.l{left:-6px}#ruler .vungVR .vrM.r{right:-6px}#ruler .vungVR .vrM::after{content:'';position:absolute;top:2px;bottom:2px;left:3px;width:4px;border-radius:2px;background:#22d3df}
   #lopPhu{position:absolute;inset:0;pointer-events:none;z-index:3}#lopPhu svg{position:absolute;inset:0;width:100%;height:100%}
   .lpNhan{position:absolute;left:2%;font-size:9px;color:#fff;background:rgba(255,60,90,.6);padding:0 4px;border-radius:3px}
   .ed .khungVung.cuon{overflow:auto;display:block}.ed .khungVung .khung.zoomTay{max-height:none;max-width:none;min-height:0;aspect-ratio:auto;margin:auto}
@@ -1342,7 +1342,7 @@
       </div>
       <div class="etl-scroll" id="tlScroll">
         <div class="etl-in" id="tlIn">
-          <div class="ruler" id="ruler"></div>
+          <div class="ruler" id="ruler" title="Bấm để nhảy tới · Shift + kéo để quét vùng In–Out (xuất / phát lặp)"></div>
           <div class="tren" id="tlTren"></div>
           <div class="track o2" data-track="o2"><div class="lb"><i></i>O2 <small>chữ</small></div></div>
           <div class="track v1" data-track="v1"><div class="lb"><i></i>V1 <small>video</small></div></div>
@@ -1399,7 +1399,10 @@ const TIENG_KHO = {};
 function tiengNhe() { return P.tieng.map(t => { TIENG_KHO[t.id] = TIENG_KHO[t.id] || { b64: t.b64, url: t.url, el: t.el, gain: t.gain }; return { id: t.id, text: t.text, giong: t.giong, cach: t.cach, giay: t.giay, t_bd: t.t_bd }; }); }
 function tiengDay(ds) { return (ds || []).map(t => { const k = TIENG_KHO[t.id] || {}; const cu = P.tieng.find(x => x.id === t.id); return Object.assign(cu || {}, t, { b64: k.b64 || (cu && cu.b64), url: k.url || (cu && cu.url), el: k.el || (cu && cu.el), gain: k.gain || (cu && cu.gain) }); }).filter(t => t.url); }
 /* Ripple: V1 đổi độ dài tại điểm `diem` một lượng `delta` → chữ, đồ hoạ, b-roll từ điểm đó trở đi dồn theo */
-function ripple(diem, delta) { if (!P.ripple || !delta) return; P.gfx.forEach(g => { if (g.bd >= diem - 0.01) { g.bd = Math.max(0, g.bd + delta); g.kt = Math.max(g.bd + 0.3, g.kt + delta); } }); P.broll.forEach(b => { if (b.t_bd >= diem - 0.01) b.t_bd = Math.max(0, b.t_bd + delta); }); P.zoom = P.zoom.map(z => z >= diem - 0.01 ? Math.max(0, z + delta) : z); (P.am3 || []).forEach(a => { if (a.t_bd >= diem - 0.01) a.t_bd = Math.max(0, a.t_bd + delta); }); }
+function ripple(diem, delta, het) { if (!P.ripple || !delta) return; const ng = x => x >= diem - 0.01 && (het == null || x < het - 0.01);   /* het: mục bắt đầu từ đây trở đi (sau cuối track chính cũ) không nằm trên đoạn nào → giữ nguyên */ P.gfx.forEach(g => { if (ng(g.bd)) { g.bd = Math.max(0, g.bd + delta); g.kt = Math.max(g.bd + 0.3, g.kt + delta); } }); P.broll.forEach(b => { if (ng(b.t_bd)) b.t_bd = Math.max(0, b.t_bd + delta); }); P.zoom = P.zoom.map(z => ng(z) ? Math.max(0, z + delta) : z); (P.am3 || []).forEach(a => { if (ng(a.t_bd)) a.t_bd = Math.max(0, a.t_bd + delta); }); }
+/* chèn vào track chính: chỉ mục đang nằm trên các đoạn V1 phía sau (đã liên kết) mới dời theo đoạn của nó; chữ / lớp phủ không nằm trên đoạn nào (V1 trống, sau cuối V1) giữ nguyên lớp và thời điểm */
+function chupChen() { return P.ripple && P.lienKet !== false ? { lk: chupLienKet(), z: P.zoom.slice(), v1: P.clips.reduce((a, c) => a + daiC(c), 0) } : null; }
+function apChen(x, diem, delta) { if (!x) return; apLienKet(x.lk); if (delta) P.zoom = x.z.map(z => z >= diem - 0.01 && z < x.v1 ? z + delta : z); }
 $('#btnHoanTac').onclick = hoanTac;
 document.addEventListener('keydown', e => {
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.code === 'BracketRight' || e.code === 'BracketLeft') && P.chon && (P.chon.k === 'b' || P.chon.k === 'g')) { e.preventDefault(); lopCuc(P.chon.k, P.chon.i, e.code === 'BracketRight'); return; }
@@ -1855,8 +1858,9 @@ function keoItem(d, k, i, bd, dai) {
       nhom0.forEach(x => { if (x.o.k === 'b' || x.o.k === 'g' || x.o.k === 'a') datLopTha(x.o.k, x.o.m); });
       if (k === 'b' || k === 'g' || k === 'a') { const m = { b: P.broll, g: P.gfx, a: P.am3 }[k][i]; if (m && datLopTha(k, m)) toast('Chồng giờ với mục khác trong hàng → đặt sang hàng ' + (k === 'a' ? 'âm thanh' : 'cùng loại') + ' khác'); }
       if (k === 'v' && !mep && !P.slip && (vtMoi !== i || P.namCham === false)) datLaiV1(i, vtMoi, P.namCham === false ? bd + dxCuoi : null);
-      if (k === 'v' && mep === 'r') ripple(bd + daiC(goc), daiC(P.clips[i]) - daiC(goc));
-      if (k === 'v' && mep === 'l') ripple(bd, -(P.clips[i].bd - goc.bd) / tocC(goc));
+      const v1Cu = k === 'v' && mep ? P.clips.reduce((a, c, j) => a + (j === i ? daiC(goc) : daiC(c)), 0) : 0;
+      if (k === 'v' && mep === 'r') ripple(bd + daiC(goc), daiC(P.clips[i]) - daiC(goc), v1Cu);
+      if (k === 'v' && mep === 'l') ripple(bd, -(P.clips[i].bd - goc.bd) / tocC(goc), v1Cu);
       veTl(); veLoi(); veKhung();
     };
     d.addEventListener('pointermove', move); d.addEventListener('pointerup', up); d.addEventListener('pointercancel', up);
@@ -1864,10 +1868,14 @@ function keoItem(d, k, i, bd, dai) {
 }
 /* bấm vào ruler / track trống = đặt playhead; thả footage vào V1 */
 $('#tlIn').addEventListener('pointerdown', e => { if (e.target.closest('.item') || e.target.closest('.lb')) return; const r = $('#tlIn').getBoundingClientRect(); const t = Math.max(0, Math.min(tongGiay(), (e.clientX - r.left - LB) / PX())); if (P.dang) dung(); P.t = t; if (!e.target.closest('#ruler')) P.chon = null; veTl(); veKhung(); });
+$('#ruler').addEventListener('pointerdown', e => { if (!e.shiftKey || e.button || e.target.closest('.vungVR')) return; e.preventDefault(); e.stopPropagation(); const r = $('#tlIn').getBoundingClientRect(), T = tongGiay(), tAt = x => Math.max(0, Math.min(T, (x - r.left - LB) / PX())), a0 = hit(tAt(e.clientX)); luuHoanTac(); let doi = false;   /* Shift + kéo trên thước = quét vùng In–Out */
+  const mv = ev => { if (Math.abs(ev.clientX - e.clientX) < 3 && !doi) return; doi = true; const t = hit(tAt(ev.clientX)); P.vao = +Math.min(a0, t).toFixed(3); P.ra = +Math.max(a0, t).toFixed(3); veVaoRa(); hienTip(ev, 'In ' + fmt1(P.vao) + 's – Out ' + fmt1(P.ra) + 's'); };
+  const up = () => { document.removeEventListener('pointermove', mv); document.removeEventListener('pointerup', up); $('#snapLine').style.display = 'none'; hienTip(null); if (!doi || P.ra - P.vao < 0.05) { P.hoanTac.pop(); if (doi) { P.vao = P.ra = null; veVaoRa(); } } };
+  document.addEventListener('pointermove', mv); document.addEventListener('pointerup', up); }, true);
 $('#tlIn').addEventListener('dragover', e => { e.preventDefault(); });
 $('#tlIn').addEventListener('drop', async e => { e.preventDefault(); const fs = [...((e.dataTransfer && e.dataTransfer.files) || [])].filter(f => /^(video|image)\//.test(f.type)); if (fs.length) { const truoc = P.srcs.length, r0 = $('#tlIn').getBoundingClientRect(), t0 = Math.max(0, (e.clientX - r0.left - LB) / PX()), y0 = e.clientY; await themFile(fs); const moi = P.srcs.slice(truoc); let tt = t0; for (const s of moi) { thaVaoTl({ src: s.id, bd: 0, kt: s.loai === 'video' ? s.giay : (s.giay && s.giay < 60 ? s.giay : 3) }, tt, y0); tt += s.loai === 'video' ? s.giay : 3; } return; } try { const o = JSON.parse(e.dataTransfer.getData('text/plain')); if (!o.src) return; const r = $('#tlIn').getBoundingClientRect(), t = (e.clientX - r.left - LB) / PX(); thaVaoTl(o, t, e.clientY); } catch {} });
 function thaVaoTl(o, t, clientY) { {
-  const mTam = { t_bd: Math.max(0, hit(t)), bd: o.bd, kt: o.kt }, dt = dichTha(clientY, 'b', mTam); if (dt && !dt.v1 && dt.lop != null) { luuHoanTac(); P.broll.push({ id: uid(), src: o.src, bd: mTam.bd, kt: mTam.kt, t_bd: mTam.t_bd, kieu: 'full', lop: dt.lop }); veTl(); veKhung(); toast(dt.moi ? 'Đã đặt lên line mới' : 'Đã đặt lên line phủ. Chọn để đổi khung nhỏ, vừa khung.'); return; } let acc = 0, vt = P.clips.length; for (let j = 0; j < P.clips.length; j++) { const len = daiC(P.clips[j]); if (t < acc + len / 2) { vt = j; break; } acc += len; } luuHoanTac(); const cm = { src: o.src, bd: o.bd, kt: o.kt, ly_do: 'kéo vào' }; P.clips.splice(vt, 0, cm); ripple(acc, daiC(cm)); P.chon = { k: 'v', i: vt }; veTl(); veKhung(); veProp(); toast('Đã chèn ' + fmt1(daiC(cm)) + 's vào track chính'); } }
+  const mTam = { t_bd: Math.max(0, hit(t)), bd: o.bd, kt: o.kt }, dt = dichTha(clientY, 'b', mTam); if (dt && !dt.v1 && dt.lop != null) { luuHoanTac(); P.broll.push({ id: uid(), src: o.src, bd: mTam.bd, kt: mTam.kt, t_bd: mTam.t_bd, kieu: 'full', lop: dt.lop }); veTl(); veKhung(); toast(dt.moi ? 'Đã đặt lên line mới' : 'Đã đặt lên line phủ. Chọn để đổi khung nhỏ, vừa khung.'); return; } let acc = 0, vt = P.clips.length; for (let j = 0; j < P.clips.length; j++) { const len = daiC(P.clips[j]); if (t < acc + len / 2) { vt = j; break; } acc += len; } luuHoanTac(); const cm = { src: o.src, bd: o.bd, kt: o.kt, ly_do: 'kéo vào' }, ch = chupChen(); P.clips.splice(vt, 0, cm); apChen(ch, acc, daiC(cm)); P.chon = { k: 'v', i: vt }; veTl(); veKhung(); veProp(); toast('Đã chèn ' + fmt1(daiC(cm)) + 's vào track chính'); } }
 function viTri(t) { let acc = 0; for (let i = 0; i < P.clips.length; i++) { const c = P.clips[i], d = daiC(c); if (t < acc + d || i === P.clips.length - 1) return { clip: i, tSrc: c.dao ? Math.max(c.bd, c.kt - 0.001 - srcTuTl(c, Math.max(0, t - acc))) : Math.min(c.kt, c.bd + srcTuTl(c, Math.max(0, t - acc))), bdTl: acc }; acc += d; } return { clip: -1, tSrc: 0, bdTl: 0 }; }
 function xemTai(sid, tSrc) { let acc = 0; for (const c of P.clips) { if (c.src === sid && tSrc >= c.bd && tSrc <= c.kt) { P.t = acc + (tSrc - c.bd) / tocC(c); veKhung(); vePh(); return; } acc += daiC(c); } toast('Câu này đang bị cắt, tick lại để đưa vào'); }
 function lenh(act) {
@@ -2275,8 +2283,8 @@ function catNguon(c, s, im, so) {
   return [{ ...s, w: cw, h: ch, mat: (s.mat || []).map(m => ({ ...m, cx: (m.cx * s.w - sx) / sw })) }, cvx];
 }
 /* ── hoàn tác / làm lại: chụp toàn bộ dòng thời gian ── */
-function chupTT() { return JSON.stringify({ clips: P.clips, gfx: P.gfx, broll: P.broll, tieng: tiengNhe(), am3: am3Nhe(), moc: P.moc, zoom: P.zoom, hook: $('#hook').value }); }
-function apTT(s) { const o = JSON.parse(s); P.clips = o.clips; P.gfx = o.gfx; P.broll = o.broll || []; P.tieng = tiengDay(o.tieng); if (o.am3) P.am3 = am3Day(o.am3); if (o.moc) P.moc = o.moc; if (o.zoom) P.zoom = o.zoom; $('#hook').value = o.hook; if (P.chon && !mucChon()) P.chon = null; veTl(); veLoi(); veKhung(); }
+function chupTT() { return JSON.stringify({ clips: P.clips, gfx: P.gfx, broll: P.broll, tieng: tiengNhe(), am3: am3Nhe(), moc: P.moc, zoom: P.zoom, hook: $('#hook').value, vr: [P.vao == null ? null : P.vao, P.ra == null ? null : P.ra] }); }
+function apTT(s) { const o = JSON.parse(s); P.clips = o.clips; P.gfx = o.gfx; P.broll = o.broll || []; P.tieng = tiengDay(o.tieng); if (o.am3) P.am3 = am3Day(o.am3); if (o.moc) P.moc = o.moc; if (o.zoom) P.zoom = o.zoom; if (o.vr) { P.vao = o.vr[0]; P.ra = o.vr[1]; } $('#hook').value = o.hook; if (P.chon && !mucChon()) P.chon = null; veTl(); veLoi(); veKhung(); }
 function luuHoanTac() { if (P.xemCat) boXemCat(); if (P.gomUndo) return; P.hoanTac.push(chupTT()); if (P.hoanTac.length > 60) P.hoanTac.shift(); P.lamLai = []; }
 function hoanTac() { const s = P.hoanTac.pop(); if (!s) { toast('Không còn gì để hoàn tác'); return; } (P.lamLai = P.lamLai || []).push(chupTT()); apTT(s); }
 function lamLai() { const s = (P.lamLai || []).pop(); if (!s) { toast('Không còn gì để làm lại'); return; } P.hoanTac.push(chupTT()); apTT(s); }
@@ -2304,7 +2312,7 @@ function dan() {
       if (off < 1 / 30) { vt = clip; diem = bdTl; } else if (off > daiC(c) - 1 / 30) { vt = clip + 1; diem = bdTl + daiC(c); }
       else if (!c.trong && !c.cong && tachV1(clip, off)) { vt = clip + 1; diem = P.t; }   /* spec 1.8: dán giữa đoạn → tách đoạn rồi chèn bản dán vào giữa */
       else { vt = off < daiC(c) / 2 ? clip : clip + 1; diem = vt === clip ? bdTl : bdTl + daiC(c); } }
-    P.clips.splice(vt, 0, d); ripple(diem, daiC(d)); P.chon = { k: 'v', i: vt }; }
+    { const ch = chupChen(); P.clips.splice(vt, 0, d); apChen(ch, diem, daiC(d)); } P.chon = { k: 'v', i: vt }; }
   else if (b.k === 'b') { d.id = uid(); d.t_bd = +P.t.toFixed(2); P.broll.push(d); P.chon = { k: 'b', i: P.broll.length - 1 }; }
   else if (b.k === 'g') { const dai = d.kt - d.bd; d.id = uid(); d.bd = +P.t.toFixed(2); d.kt = +(P.t + dai).toFixed(2); P.gfx.push(d); P.chon = { k: 'g', i: P.gfx.length - 1 }; }
   else if (b.k === 'a') { d.id = uid(); d.t_bd = +P.t.toFixed(2); P.am3.push(am3Day([d])[0]); P.chon = { k: 'a', i: P.am3.length - 1 }; }
@@ -3112,7 +3120,7 @@ function doiLop(k, i, huong) {
 /* đoạn V1 → lớp phủ (giữ nguyên chỗ trên dòng thời gian, phía sau dồn lên) */
 function v1LenLop(i, lop) { const c = P.clips[i]; if (!c) return; let acc = 0; for (let j = 0; j < i; j++) acc += daiC(P.clips[j]); const dai = daiC(c); P.clips.splice(i, 1); ripple(acc + dai, -dai); P.broll.push({ id: uid(), src: c.src, bd: c.bd, kt: c.kt, t_bd: +acc.toFixed(3), kieu: 'full', lop, ...(c.toc ? { toc: c.toc } : {}) }); P.chon = { k: 'b', i: P.broll.length - 1 }; }
 /* lớp phủ → V1 (chèn vào chỗ gần nhất theo thời gian) */
-function lopXuongV1(i) { const b = P.broll[i]; if (!b) return; let acc = 0, vt = P.clips.length; for (let j = 0; j < P.clips.length; j++) { const len = daiC(P.clips[j]); if (b.t_bd < acc + len / 2) { vt = j; break; } acc += len; } P.broll.splice(i, 1); const c = { src: b.src, bd: b.bd, kt: b.kt, ly_do: 'từ lớp phủ', ...(b.toc ? { toc: b.toc } : {}) }; P.clips.splice(vt, 0, c); ripple(acc, daiC(c)); P.chon = { k: 'v', i: vt }; }
+function lopXuongV1(i) { const b = P.broll[i]; if (!b) return; let acc = 0, vt = P.clips.length; for (let j = 0; j < P.clips.length; j++) { const len = daiC(P.clips[j]); if (b.t_bd < acc + len / 2) { vt = j; break; } acc += len; } P.broll.splice(i, 1); const c = { src: b.src, bd: b.bd, kt: b.kt, ly_do: 'từ lớp phủ', ...(b.toc ? { toc: b.toc } : {}) }, ch = chupChen(); P.clips.splice(vt, 0, c); apChen(ch, acc, daiC(c)); P.chon = { k: 'v', i: vt }; }
 /* vẽ các lớp phủ theo thứ tự lớp (dùng chung cho xem trước và xuất) */
 function veCacLop(ctx, W, H, t) {
   [...P.broll.map(m => ({ k: 'b', m, l: lopCua('b', m) })), ...P.gfx.map(m => ({ k: 'g', m, l: lopCua('g', m) }))].sort((a, b) => a.l - b.l)
@@ -3210,7 +3218,7 @@ function xoaNhieu(yen) {
 function saoChepNhieu() { const ds = dsNhieu(); let acc = 0; const st = new Map(); P.clips.forEach(c => { st.set(c, acc); acc += daiC(c); }); const bd = o => o.k === 'v' ? st.get(o.m) : batDau2(o.k, o.m), min = Math.min(...ds.map(bd)); P.boNho = { nhieu: ds.map(o => ({ k: o.k, d: JSON.parse(JSON.stringify({ ...o.m, el: undefined, gain: undefined })), off: bd(o) - min, goc: o.k === 't' ? o.m : null })) }; toast('Đã sao chép ' + ds.length + ' mục'); }
 function danNhieu() {
   luuHoanTac(); const moi = []; const v1 = P.boNho.nhieu.filter(x => x.k === 'v');
-  if (v1.length) { const { clip, bdTl } = viTri(P.t); let vt = clip < 0 ? P.clips.length : (P.t - bdTl < daiC(P.clips[clip]) / 2 ? clip : clip + 1); const diem = P.clips.slice(0, vt).reduce((s, c) => s + daiC(c), 0); let them = 0; v1.forEach(x => { const c = JSON.parse(JSON.stringify(x.d)); P.clips.splice(vt++, 0, c); them += daiC(c); moi.push({ k: 'v', m: c }); }); ripple(diem, them); }
+  if (v1.length) { const { clip, bdTl } = viTri(P.t); let vt = clip < 0 ? P.clips.length : (P.t - bdTl < daiC(P.clips[clip]) / 2 ? clip : clip + 1); const diem = P.clips.slice(0, vt).reduce((s, c) => s + daiC(c), 0); let them = 0; const ch = chupChen(); v1.forEach(x => { const c = JSON.parse(JSON.stringify(x.d)); P.clips.splice(vt++, 0, c); them += daiC(c); moi.push({ k: 'v', m: c }); }); apChen(ch, diem, them); }
   P.boNho.nhieu.filter(x => x.k !== 'v').forEach(x => { if (x.k === 't') { if (!x.goc) return; const t = { ...x.goc, el: null, gain: null, id: uid() }; t.t_bd = +(P.t + x.off).toFixed(3); P.tieng.push(t); moi.push({ k: 't', m: t }); return; } const d = JSON.parse(JSON.stringify(x.d)); d.id = uid(); delete d.lop; if (d.nhom) d.nhom = 'n' + x.d.nhom; datBatDau(x.k, d, P.t + x.off); MANG()[x.k].push(d); moi.push({ k: x.k, m: d }); });
   P.nhieu = moi; veTl(); veLoi(); veKhung(); veProp(); toast('Đã dán ' + moi.length + ' mục tại ' + fmt1(P.t) + 's');
 }
@@ -3977,7 +3985,14 @@ function veLopPhu() { const k = $('#lopPhuChon') ? $('#lopPhuChon').value : 'kho
   if (k === 'an_toan' || k === 'ca_hai') s += '<rect x="0" y="0" width="100" height="9" fill="rgba(255,60,90,.22)"/><rect x="84" y="38" width="16" height="45" fill="rgba(255,60,90,.22)"/><rect x="0" y="81" width="100" height="19" fill="rgba(255,60,90,.22)"/><rect x="6" y="9" width="78" height="72" fill="none" stroke="rgba(34,211,223,.9)" stroke-width=".4" stroke-dasharray="2 1.5" vector-effect="non-scaling-stroke"/>';
   s += '</svg>'; o.innerHTML = s + (k === 'an_toan' || k === 'ca_hai' ? '<span class="lpNhan" style="top:2%">thanh trên TikTok</span><span class="lpNhan" style="top:60%;right:1%;left:auto">nút</span><span class="lpNhan" style="top:88%">tên, mô tả, nhạc</span>' : ''); }
 function datZoomKhung() { const z = $('#zoomKhung').value, kh = $('.khung'), vung = $('.khungVung'); if (z === 'vua') { kh.style.removeProperty('--zk'); kh.classList.remove('zoomTay'); vung.classList.remove('cuon'); datTiLe($('#tiLe').value, true); return; } kh.classList.add('zoomTay'); vung.classList.add('cuon'); kh.style.height = Math.round(cv.height * +z) + 'px'; kh.style.width = Math.round(cv.width * +z) + 'px'; }
-function veVaoRa() { $$('#ruler .vungVR').forEach(x => x.remove()); if (P.vao == null && P.ra == null) return; const px = PX(), a = P.vao || 0, b = P.ra == null ? tongGiay() : P.ra, d = el('i', 'vungVR'); d.style.left = a * px + 'px'; d.style.width = Math.max(2, (b - a) * px) + 'px'; d.title = 'Vùng In–Out ' + fmt1(a) + '–' + fmt1(b) + 's · Alt+X để bỏ'; $('#ruler').appendChild(d); }
+function veVaoRa() { $$('#ruler .vungVR').forEach(x => x.remove()); if (P.vao == null && P.ra == null) return; const px = PX(), a = P.vao || 0, b = P.ra == null ? tongGiay() : P.ra, d = el('i', 'vungVR'); d.style.left = a * px + 'px'; d.style.width = Math.max(2, (b - a) * px) + 'px'; d.title = 'Vùng In–Out ' + fmt1(a) + '–' + fmt1(b) + 's · kéo hai mép để nới / thu, kéo giữa để dời · bấm đúp hoặc Alt+X để bỏ'; d.appendChild(el('b', 'vrM l')); d.appendChild(el('b', 'vrM r')); $('#ruler').appendChild(d);
+  d.ondblclick = e => { e.stopPropagation(); datVao('bo'); };
+  d.onpointerdown = e => { if (e.button) return; e.preventDefault(); e.stopPropagation(); const mep = e.target.classList.contains('l') ? 'l' : e.target.classList.contains('r') ? 'r' : 'giua', x0 = e.clientX, a0 = P.vao || 0, b0 = P.ra == null ? tongGiay() : P.ra, T = tongGiay(); try { d.setPointerCapture(e.pointerId); } catch { } luuHoanTac(); let doi = false;
+    const mv = ev => { const dt = (ev.clientX - x0) / PX(); if (Math.abs(ev.clientX - x0) > 2) doi = true; if (!doi) return; let a = a0, b = b0;
+      if (mep === 'l') a = Math.max(0, Math.min(b0 - 0.1, hit(a0 + dt))); else if (mep === 'r') b = Math.min(T, Math.max(a0 + 0.1, hit(b0 + dt))); else { const w = b0 - a0; a = Math.max(0, Math.min(T - w, a0 + dt)); const a2 = hit(a); if (a2 !== a && a2 + w <= T) a = a2; else { const b2 = hit(a + w); if (b2 !== a + w && b2 - w >= 0) a = b2 - w; } b = a + w; }
+      P.vao = +a.toFixed(3); P.ra = +b.toFixed(3); d.style.left = a * PX() + 'px'; d.style.width = Math.max(2, (b - a) * PX()) + 'px'; hienTip(ev, 'In ' + fmt1(a) + 's – Out ' + fmt1(b) + 's · ' + fmt1(b - a) + 's'); };
+    const up = () => { d.removeEventListener('pointermove', mv); d.removeEventListener('pointerup', up); d.removeEventListener('pointercancel', up); $('#snapLine').style.display = 'none'; hienTip(null); if (!doi) { P.hoanTac.pop(); return; } veVaoRa(); };
+    d.addEventListener('pointermove', mv); d.addEventListener('pointerup', up); d.addEventListener('pointercancel', up); }; }
 function datVao(loai) { if (loai === 'bo') { P.vao = P.ra = null; toast('Bỏ vùng In–Out'); } else if (loai === 'vao') { P.vao = +P.t.toFixed(3); if (P.ra != null && P.ra <= P.vao) P.ra = null; toast('Điểm In: ' + fmt1(P.vao) + 's'); } else { P.ra = +P.t.toFixed(3); if (P.vao != null && P.vao >= P.ra) P.vao = null; toast('Điểm Out: ' + fmt1(P.ra) + 's'); } veVaoRa(); }
 let shuttleT = null;
 function shuttle(huong) { if (huong === 0) { P.tocPhat = 1; clearInterval(shuttleT); shuttleT = null; if (P.dang) dung(); return; }
@@ -4610,15 +4625,18 @@ function tachPdTaiChu(i, pos) {
 function gopPd(i) { if (i <= 0) return; luuHoanTac(); chuyenPdDocLap(true); const ds = dsPd(), a = P.pdNgoai[ds[i - 1].ng], b = P.pdNgoai[ds[i].ng]; a.kt = b.kt; a.tu = [...(a.tu || []), ...(b.tu || [])]; a.text = a.tu.map(w => w.w).join(' '); P.pdNgoai.splice(ds[i].ng, 1); lamMoiPd(); P.chon = { k: 'pd', i: i - 1 }; veProp(); veDsPd(); toast('Đã gộp với câu trước'); }
 function thayPd() { const tim = $('#pdTim').value, thay = $('#pdThay').value; if (!tim) { toast('Nhập chữ cần tìm'); return; } luuHoanTac(); let n = 0; const re = new RegExp(tim.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'); dsPd().forEach((c, i) => { const t = c.tu.map(w => w.w).join(' '); if (re.test(t)) { suaPdYen(i, t.replace(re, thay)); n++; } re.lastIndex = 0; }); lamMoiPd(); veDsPd(); toast(n ? 'Đã thay trong ' + n + ' câu' : 'Không thấy “' + tim + '”'); }
 /* ── bo góc, viền, bóng cho video / lớp phủ ── */
-function coTrangTri(c) { return !!(c.boGoc || c.vienDay || c.bongMo); }
+Object.assign(KF_TEN, { boGoc: 'Bo góc', vienDay: 'Viền', bongMo: 'Độ đậm bóng', bongNhoe: 'Độ nhoè bóng', bongKc: 'Khoảng cách bóng', bongGoc: 'Góc bóng', bongLan: 'Độ lan bóng' });
+const coKfTT = (c, k) => !!(c.kfs && c.kfs[k] && c.kfs[k].length);
+const gtTT = (c, k, off, md) => coKfTT(c, k) ? giaTriKf(c, k, off) : (c[k] == null ? md : c[k]);   /* bo góc / viền / bóng: có keyframe thì nội suy, không thì giá trị tĩnh */
+function coTrangTri(c) { return !!(c.boGoc || c.vienDay || c.bongMo || ['boGoc', 'vienDay', 'bongMo'].some(k => coKfTT(c, k))); }
 /* bo góc + viền + đổ bóng cho video / ảnh / video phủ / clip ghép: bóng lấy theo ĐÚNG hình của mục (sau mặt nạ, bo góc, phần trong suốt của ảnh) */
 const BONG_KIEU = { ngoai: ['Bóng đổ', { nhoe: 0.3, kc: 0.05, goc: -45, lan: 0, mau: '#000000', mo: 0.6 }], mem: ['Bóng mềm', { nhoe: 0.8, kc: 0.08, goc: -60, lan: 0.1, mau: '#000000', mo: 0.45 }], cung: ['Bóng cứng', { nhoe: 0, kc: 0.06, goc: -45, lan: 0, mau: '#000000', mo: 0.85 }], trong: ['Bóng trong', { nhoe: 0.35, kc: 0.04, goc: -45, lan: 0, mau: '#000000', mo: 0.7 }], sang: ['Phát sáng', { nhoe: 0.6, kc: 0, goc: 0, lan: 0.15, mau: '#ffd400', mo: 0.9 }] };
 const bongCvs = [document.createElement('canvas'), document.createElement('canvas')];
 function veTrangTri(ctx, W, H, c, off, L) {
-  const sc = giaTriKf(c, 'sc', off), x = giaTriKf(c, 'x', off), y = giaTriKf(c, 'y', off), xoay = giaTriKf(c, 'xoay', off), h0 = hopMuc(c.t_bd != null ? 'b' : 'v', c), rw = h0.w * W, rh = h0.h * H, r = Math.min(rw, rh) / 2 * (c.boGoc || 0), mn = Math.min(W, H);
+  const sc = giaTriKf(c, 'sc', off), x = giaTriKf(c, 'x', off), y = giaTriKf(c, 'y', off), xoay = giaTriKf(c, 'xoay', off), h0 = hopMuc(c.t_bd != null ? 'b' : 'v', c), rw = h0.w * W, rh = h0.h * H, boG = Math.max(0, gtTT(c, 'boGoc', off, 0)), r = Math.min(rw, rh) / 2 * boG, mn = Math.min(W, H);
   const khung = g => { g.translate(W / 2 + x * W, H / 2 + y * H); if (xoay) g.rotate(xoay * Math.PI / 180); g.scale(sc * giaTriKf(c, 'scX', off), sc * giaTriKf(c, 'scY', off)); g.translate((h0.cx - 0.5) * W, (h0.cy - 0.5) * H); g.beginPath(); g.roundRect(-rw / 2, -rh / 2, rw, rh, r); };
-  if (c.boGoc) { const g = L.getContext('2d'); g.save(); g.globalCompositeOperation = 'destination-in'; khung(g); g.fillStyle = '#fff'; g.fill(); g.restore(); }
-  const mo = Math.max(0, Math.min(1, c.bongMo || 0)), kieu = BONG_KIEU[c.bongKieu] ? c.bongKieu : 'ngoai', md = BONG_KIEU[kieu][1], gt = (k, v) => c[k] == null ? v : c[k];
+  if (boG > 0.001) { const g = L.getContext('2d'); g.save(); g.globalCompositeOperation = 'destination-in'; khung(g); g.fillStyle = '#fff'; g.fill(); g.restore(); }
+  const mo = c.bongMo || coKfTT(c, 'bongMo') ? Math.max(0, Math.min(1, gtTT(c, 'bongMo', off, 0))) : 0, kieu = BONG_KIEU[c.bongKieu] ? c.bongKieu : 'ngoai', md = BONG_KIEU[kieu][1], gt = (k, v) => gtTT(c, k, off, v);
   const nhoe = gt('bongNhoe', md.nhoe) * mn * 0.12, kc = (kieu === 'sang' ? 0 : gt('bongKc', md.kc)) * mn * 0.5, a = gt('bongGoc', md.goc) * Math.PI / 180, dx = Math.cos(a) * kc, dy = -Math.sin(a) * kc, lan = gt('bongLan', md.lan), mau = c.bongMau || md.mau;
   const [T] = bongCvs; if (T.width !== W || T.height !== H) { T.width = W; T.height = H; } const tg = T.getContext('2d');
   if (mo && kieu !== 'trong') {   // bóng ngoài / mềm / cứng / phát sáng: bóng mờ theo hình của mục, lan rộng quanh tâm
@@ -4630,22 +4648,29 @@ function veTrangTri(ctx, W, H, c, off, L) {
     tg.clearRect(0, 0, W, H); tg.globalCompositeOperation = 'source-over'; tg.fillStyle = mau; tg.fillRect(0, 0, W, H); tg.globalCompositeOperation = 'destination-out'; if (nhoe > 0.4) tg.filter = 'blur(' + nhoe.toFixed(1) + 'px)'; tg.drawImage(L, dx, dy); tg.filter = 'none'; tg.globalCompositeOperation = 'destination-in'; tg.drawImage(L, 0, 0); tg.globalCompositeOperation = 'source-over';
     ctx.save(); ctx.globalAlpha *= mo; ctx.drawImage(T, 0, 0); ctx.restore();
   }
-  if (c.vienDay) { ctx.save(); khung(ctx); ctx.lineWidth = c.vienDay * mn * 0.1 / sc; ctx.strokeStyle = c.vienMau || '#ffffff'; ctx.globalAlpha = c.vienMo == null ? 1 : c.vienMo; ctx.stroke(); ctx.restore(); }
+  const vd = gtTT(c, 'vienDay', off, 0); if (vd > 0.001) { ctx.save(); khung(ctx); ctx.lineWidth = vd * mn * 0.1 / sc; ctx.strokeStyle = c.vienMau || '#ffffff'; ctx.globalAlpha = c.vienMo == null ? 1 : c.vienMo; ctx.stroke(); ctx.restore(); }
 }
 function veThuocTinhTrangTri(box, m) {
   const n = el('div', 'nhom2'); n.appendChild(el('b', null, 'Bo góc & đổ bóng')); box.appendChild(n);
   const mau = (nhan, p, md) => { const l = el('label'); l.appendChild(el('span', null, nhan)); const i = el('input'); i.type = 'color'; i.value = /^#/.test(m[p] || '') ? m[p] : md; i.oninput = () => { m[p] = i.value; veKhung(); }; i.onchange = () => luuHoanTac(); l.appendChild(i); n.appendChild(l); };
-  oTruot(n, 'Bo góc', 0, 1, 0.01, m.boGoc || 0, pct, v => { if (v) m.boGoc = v; else delete m.boGoc; });
-  oTruot(n, 'Viền', 0, 1, 0.01, m.vienDay || 0, pct, v => { if (v) m.vienDay = v; else delete m.vienDay; }); if (m.vienDay) { mau('Màu viền', 'vienMau', '#ffffff'); oTruot(n, 'Độ đậm viền', 0, 1, 0.01, m.vienMo == null ? 1 : m.vienMo, pct, v => { m.vienMo = v; }); }
-  const lb = el('label'); lb.appendChild(el('span', null, 'Đổ bóng')); const cb = el('input'); cb.type = 'checkbox'; cb.className = 'bongBat'; cb.checked = !!m.bongMo; cb.onchange = () => { luuHoanTac(); if (cb.checked) { const md = BONG_KIEU[m.bongKieu] || BONG_KIEU.ngoai; m.bongMo = md[1].mo; } else delete m.bongMo; veProp(); veKhung(); }; lb.appendChild(cb); n.appendChild(lb);
-  if (!m.bongMo) return;
+  const k = m.t_bd != null ? 'b' : 'v', oKf = (nhan, min, max, buoc, ten, md, dd, dat) => {   /* thanh có ◇ keyframe riêng như Biến đổi */
+    const off = offMuc(k, m), co = coKfTT(m, ten), tai = co && kfTai(m, ten, off) >= 0;
+    const r = oTruot(n, nhan, min, max, buoc, gtTT(m, ten, off, md), dd, v => { if (coKfTT(m, ten)) datKf(m, ten, offMuc(k, m), v); else dat(v); });
+    const st = batDauMuc(k, m), ngoai = P.t < st - 0.01 || P.t > st + daiMuc(k, m) + 0.01, nut = el('button', 'kfn' + (tai ? ' co' : co ? ' nua' : ''), tai ? '◆' : '◇'); nut.type = 'button'; nut.disabled = ngoai; nut.dataset.kenh = ten;
+    nut.title = ngoai ? 'Đưa đầu phát vào trong đoạn để đặt keyframe' : (tai ? 'Bỏ keyframe ' : 'Thêm keyframe ') + KF_TEN[ten] + ' tại đầu phát';
+    nut.onclick = () => { luuHoanTac(); const o2 = offMuc(k, m); if (kfTai(m, ten, o2) >= 0) xoaKf(m, ten, o2); else datKf(m, ten, o2, gtTT(m, ten, o2, md)); veProp(); veTl(); veKhung(); };
+    r.parentNode.insertBefore(nut, r); return r; };
+  oKf('Bo góc', 0, 1, 0.01, 'boGoc', 0, pct, v => { if (v) m.boGoc = v; else delete m.boGoc; });
+  oKf('Viền', 0, 1, 0.01, 'vienDay', 0, pct, v => { if (v) m.vienDay = v; else delete m.vienDay; }); if (m.vienDay || coKfTT(m, 'vienDay')) { mau('Màu viền', 'vienMau', '#ffffff'); oTruot(n, 'Độ đậm viền', 0, 1, 0.01, m.vienMo == null ? 1 : m.vienMo, pct, v => { m.vienMo = v; }); }
+  const lb = el('label'); lb.appendChild(el('span', null, 'Đổ bóng')); const cb = el('input'); cb.type = 'checkbox'; cb.className = 'bongBat'; cb.checked = !!m.bongMo || coKfTT(m, 'bongMo'); cb.onchange = () => { luuHoanTac(); if (cb.checked) { const md = BONG_KIEU[m.bongKieu] || BONG_KIEU.ngoai; m.bongMo = md[1].mo; } else { delete m.bongMo; if (m.kfs) ['bongMo', 'bongNhoe', 'bongKc', 'bongGoc', 'bongLan'].forEach(x => delete m.kfs[x]); } veProp(); veTl(); veKhung(); }; lb.appendChild(cb); n.appendChild(lb);
+  if (!cb.checked) return;
   const chip = el('div', 'chips bongKieu'); Object.keys(BONG_KIEU).forEach(k => { const b = el('button', null, BONG_KIEU[k][0]); b.type = 'button'; b.dataset.bong = k; b.setAttribute('aria-pressed', String((m.bongKieu || 'ngoai') === k)); b.onclick = () => { luuHoanTac(); const md = BONG_KIEU[k][1]; m.bongKieu = k; m.bongMo = md.mo; m.bongNhoe = md.nhoe; m.bongKc = md.kc; m.bongGoc = md.goc; m.bongLan = md.lan; m.bongMau = md.mau; veProp(); veKhung(); }; chip.appendChild(b); }); n.appendChild(chip);
   const md = (BONG_KIEU[m.bongKieu] || BONG_KIEU.ngoai)[1], gt = (k, v) => m[k] == null ? v : m[k];
   mau('Màu bóng', 'bongMau', md.mau);
-  oTruot(n, 'Độ đậm', 0, 1, 0.01, m.bongMo, pct, v => { m.bongMo = Math.max(0.01, v); });
-  oTruot(n, 'Độ nhoè', 0, 1, 0.01, gt('bongNhoe', md.nhoe), pct, v => { m.bongNhoe = v; });
-  if (m.bongKieu !== 'sang') { oTruot(n, 'Khoảng cách', 0, 1, 0.01, gt('bongKc', md.kc), pct, v => { m.bongKc = v; }); oTruot(n, 'Góc bóng', -180, 180, 1, gt('bongGoc', md.goc), v => Math.round(v) + '°', v => { m.bongGoc = v; }); }
-  oTruot(n, 'Độ lan', 0, 1, 0.01, gt('bongLan', md.lan), pct, v => { m.bongLan = v; });
+  oKf('Độ đậm', 0, 1, 0.01, 'bongMo', md.mo, pct, v => { m.bongMo = Math.max(0.01, v); });
+  oKf('Độ nhoè', 0, 1, 0.01, 'bongNhoe', md.nhoe, pct, v => { m.bongNhoe = v; });
+  if (m.bongKieu !== 'sang') { oKf('Khoảng cách', 0, 1, 0.01, 'bongKc', md.kc, pct, v => { m.bongKc = v; }); oKf('Góc bóng', -180, 180, 1, 'bongGoc', md.goc, v => Math.round(v) + '°', v => { m.bongGoc = v; }); }
+  oKf('Độ lan', 0, 1, 0.01, 'bongLan', md.lan, pct, v => { m.bongLan = v; });
 }
 /* ── bóng chữ chi tiết ── */
 function bongChu(ctx, g, size) { const b = g.bongChu || {}; ctx.shadowColor = hexAlpha(b.mau || '#000000', b.mo == null ? 0.9 : b.mo); ctx.shadowBlur = size * (b.nhoe == null ? 0.45 : b.nhoe) * 0.6; const a = ((b.goc == null ? -45 : b.goc) * Math.PI) / 180, d = size * (b.kc == null ? 0.05 : b.kc) * 1.2; ctx.shadowOffsetX = Math.cos(a) * d; ctx.shadowOffsetY = -Math.sin(a) * d; }

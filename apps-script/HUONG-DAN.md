@@ -834,6 +834,17 @@ Trình dựng kiểu Vyra, giao diện tối chuyên nghiệp: **Footage → AI 
 **Cài:** ➕ Script tên `DungVideo`, dán `DungVideo.gs`. Dán đè `HookAI.gs`, `Studio.gs`. Deploy → New version. Key Gemini phải dùng được model `gemini-3.5-transcribe` (key AI Studio thường có sẵn).
 
 
+### Keyframe đổ bóng, kéo vùng In–Out, chèn vào track chính không đẩy chữ
+
+Test `t155` (15 bài).
+
+- **Keyframe cho Bo góc & đổ bóng:** Bo góc, Viền, Độ đậm, Độ nhoè, Khoảng cách, Góc bóng, Độ lan đều có nút ◇ như phần Biến đổi. Bấm ◇ để đặt keyframe tại đầu phát; khi thông số đã có keyframe, chỉ cần kéo thanh ở thời điểm khác là tự thêm keyframe. Ví dụ: bóng hiện dần, bóng xoay quanh, bo góc từ vuông thành tròn. Tắt Đổ bóng là bỏ luôn keyframe bóng.
+- **Vùng In–Out** (dải xanh ngọc trên thước thời gian, dùng cho Xuất "Khoảng xuất" và phát lặp):
+  - Tạo: bấm **I** / **O** tại đầu phát, **Shift + X** theo đoạn đang chọn, hoặc **giữ Shift rồi kéo trên thước**.
+  - Kéo **mép trái / phải** để nới hoặc thu, kéo **giữa** để dời cả vùng (hít vào mép đoạn, đầu phát, beat), có nhãn giờ khi kéo.
+  - **Bấm đúp** vùng hoặc **Alt + X** để bỏ. Ctrl+Z hoàn tác được.
+- **Chèn ảnh/video vào track chính không còn đẩy chữ đi:** trước đây thả một đoạn vào V1 thì mọi thứ từ điểm chèn trở về sau bị đẩy lùi, kể cả chữ đang đứng trên V1 trống. Nay mỗi lớp giữ nguyên chỗ của nó. Chỉ những mục **đang nằm trên một đoạn V1** mới đi theo đoạn đó khi đoạn bị dời (giống "liên kết" của CapCut). Muốn không mục nào đi theo, tắt nút 🔗 Liên kết (Ctrl+L). Kéo dài đoạn V1 cuối cũng không đẩy chữ đứng sau cuối track chính nữa.
+
 ### Ảnh kéo dài, bo góc & đổ bóng, mặt nạ đầy đủ, xuất tách riêng
 
 Test `t152` (8 bài), `t153` (20 bài), `t154` (8 bài); `t137`, `t149` cập nhật theo mặt nạ mới.
