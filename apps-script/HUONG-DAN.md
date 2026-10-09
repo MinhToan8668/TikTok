@@ -855,6 +855,19 @@ Hai bộ test mới `t143` (xuất, 20 bài, xuất file thật rồi đọc l�
 
 Đã đạt sẵn (test xác nhận): thời lượng file xuất đúng vùng In–Out ±0,05 s, Huỷ giữa chừng không tải file nào (cả file phụ đề), 60 s lời → 27 câu (≥ 10), mỗi câu ≤ 8 từ, Ctrl+B giữa câu thì phụ đề cắt đúng chỗ, xoá câu không dồn timeline, .srt theo dòng thời gian.
 
+### Nốt các mục còn lại của spec: co giãn không giữ tỉ lệ, khung bao chữ, đổi phím tắt, MP3, hiệu năng
+
+Test `t150` (12 bài) và `t151` (10 bài).
+
+| Spec | Trước | Nay |
+|---|---|---|
+| 3.1 Phóng to **1–1000%**, xoay **quá 360°** | 10–500%, ±180° | 1–1000%, ±720° (keyframe quay nhiều vòng) |
+| 2.4 **Kéo góc + Shift = không giữ tỉ lệ**; **4 tay nắm mép** khi tắt khoá tỉ lệ | chỉ phóng đều | Shift + góc co giãn rộng / cao riêng (tự tắt khoá); ô **Khoá tỉ lệ** trong Khung hình, tắt thì có thanh **Rộng / Cao** (keyframe được) và 4 tay nắm mép trên khung; mặt nạ, viền, bóng đi theo; bật khoá lại thì gộp về Phóng to |
+| 2.4 / 4.1 **Khung bao + tay nắm cho chữ / sticker** | chỉ kéo dời | chọn chữ → khung đúng vùng chữ đang vẽ: **góc** = cỡ chữ, **mép trái / phải** = độ rộng tối đa (**tự xuống dòng**), **núm xoay** (Shift = 15°), kéo bên trong để dời (hít tâm khung), bấm đúp = sửa chữ, có keyframe thì tự thêm keyframe |
+| 6 **Cài đặt → Phím tắt xem và đổi được** | chỉ xem | bảng **Tuỳ chỉnh phím** (30 lệnh): bấm ô → nhấn tổ hợp mới, báo trùng, ↺ từng phím, **Đặt lại tất cả**; lưu trong trình duyệt; phím mặc định đã đổi đi thì không còn tác dụng; mở từ Cài đặt → ⌨ Phím tắt… |
+| 7 Chỉ âm thanh **MP3** | không (dùng M4A / WAV) | **MP3 128 / 192 / 320 kbps** bằng bộ mã lamejs nạp khi cần (cdnjs), có % và Huỷ, kèm phụ đề được; không tải được bộ mã thì tự xuất WAV |
+| 8 Hiệu năng: vẽ dòng thời gian **< 16 ms** | ~39 ms (50 mục) | **~3 ms**: bảng thuộc tính gọi canh giữa khung xem trước ngay lập tức (đọc bố cục cả trang), nay gom chạy một lần mỗi khung hình. Tách mọi track ~4 ms, Q < 1 ms |
+
 ### Clip ghép theo spec 9.1 và mặt nạ theo spec 9.2
 
 Bản spec đầy đủ (kể cả 2 mục bổ sung này) lưu ở [`docs/capcut-spec-hanh-vi.md`](../docs/capcut-spec-hanh-vi.md) để các đợt sau đối chiếu. Test `t148` (clip ghép, 23 bài) và `t149` (mặt nạ, 14 bài).
