@@ -518,3 +518,27 @@ Mình làm ra là để cả lớp xài chứ không để coi cho vui. Tuần n
 ```
 
 **Ảnh bỏ bình luận:** `01`–`06` (mỗi tool một tấm 4:5), ai hỏi tool nào thì thả tấm đó.
+
+---
+
+## Ảnh cuộn TikTok · 7 tấm
+
+File `tt-0-bia` → `tt-6-cham-video`, khổ 1080×1920. Đăng dạng ảnh (photo post), chọn đúng thứ tự.
+
+**Caption**
+
+```
+6 cái tool để làm xong 1 video TikTok, xài free
+
+mình dạy xây kênh, dạy xong ai về nhà cũng tắc. không tắc ý tưởng thì tắc lúc dựng. nên gom hết thành tool luôn
+
+link ở bio nha, mở trình duyệt là xài, không cần cài app
+
+bạn đang tắc khâu nào trong 6 khâu đó?
+```
+
+Hashtag: `#xaykenh #tiktoktips #contentcreator`
+
+**Nhạc:** chọn nhạc đang thịnh, nhẹ, không lời. Ảnh cuộn ăn theo nhạc khá nhiều.
+
+**Ghim bình luận đầu:** `Tool nào mn muốn mình quay kỹ cách dùng thì nói nha`

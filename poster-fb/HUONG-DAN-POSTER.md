@@ -26,6 +26,7 @@ Chọn 5 ảnh trở lên, hay trộn ảnh 4:5 vào bộ 4 ảnh, là lưới �
 | Bài một ảnh ngang (nhiều ý trong một tấm) | 3:2, xuất 1920×1280 (class `ngang`) | Chứa được lưới 6 ô mà chữ vẫn đọc được; khổ dọc nhét 6 ô là chữ bé quá |
 | Ảnh bìa page | 1920×710 | Khổ điện thoại; máy tính là 1920×1080, lấy 1920×710 là an toàn cho cả hai |
 | Ảnh đại diện | 1000×1000 | Facebook cắt tròn, chừa lề an toàn quanh logo |
+| Ảnh cuộn TikTok | 1080×1920 (class `doc`) | Khổ dọc toàn màn. Caption và cột nút che đáy, xem mục dưới |
 
 Xuất gấp đôi (2160 px) để Facebook nén xong chữ vẫn nét.
 
@@ -70,6 +71,20 @@ Lưới ô đều tăm tắp đọc được nhưng trôi trong feed. Ba thứ k
 Danh sách tool rút còn số + tên, mô tả đẩy xuống caption. Tem (MỚI, 0Đ) đặt `position:absolute`
 ở góc ô, đừng để trong luồng chữ: tem nằm cùng dòng sẽ nở cột grid ra và chữ đội sang phần hình.
 Grid trong một cột hẹp thì dùng `minmax(0,1fr)`, `repeat(2,1fr)` sẽ nở theo chữ dài nhất.
+
+### Ảnh cuộn TikTok
+
+Khổ 1080×1920. Dựng ở `poster.html` với `class="poster doc"` rồi xuất, sau đó thu về đúng
+1080×1920 (`convert tt-*.png -resize 1080x1920`), vì `xuat.js` chụp gấp đôi.
+
+**Vùng an toàn:** TikTok phủ caption, tên kênh và cột nút lên khoảng 350–400 px dưới cùng và
+chừng 180 px mép phải. Mọi thứ cần đọc phải nằm trên y ≈ 1540. Khoảng trống dưới đó là cố ý,
+đừng nhét chữ vào cho đầy.
+
+- Tấm 1 là tấm quyết định: chữ to nhất, nói ngay bộ này là gì, có "Vuốt →" để người ta biết còn tấm sau.
+- Mỗi tấm sau ghi số khâu (`Khâu 3/6`) để người xem biết đang ở đâu, còn bao nhiêu tấm.
+- Một tấm một ý, một hình. Tấm cuối mới đặt lời mời ("Link ở bio").
+- Nền tối thì viền và bóng của mảnh giao diện phải đổi sang lime, để màu mực sẽ chìm mất.
 
 ## Màu, chữ, logo
 

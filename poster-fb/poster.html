@@ -207,6 +207,29 @@
   .poster:not(.toi) .chip6 em{color:var(--ink)}
   .poster:not(.toi) .chip6 i.free{border:2px solid var(--ink)}
   .poster:not(.toi) .nga-chan b{background:var(--ink);color:var(--lime)}
+
+  /* ══ ẢNH CUỘN TIKTOK · 1080×1920 ══
+     TikTok che đáy bằng caption và cột nút bên phải, nên mọi thứ phải đọc được
+     nằm trên y≈1500. Phần dưới để trống có chủ ý, không nhét chữ vào. */
+  .poster.doc{width:1080px;height:1920px}
+  .doc .d-dau{position:absolute;left:72px;right:72px;top:84px;display:flex;align-items:center;justify-content:space-between}
+  .doc .d-dau img{height:52px}
+  .doc .d-dau .so{font:800 26px/1 var(--font-display);letter-spacing:.04em;text-transform:uppercase;
+    background:var(--ink);color:var(--lime);padding:15px 22px;border-radius:999px}
+  .doc.toi .d-dau .so{background:var(--lime);color:var(--ink)}
+  .doc .d-chu{position:absolute;left:72px;right:72px;top:206px}
+  .doc .d-chu .nhan{font-size:30px;padding:13px 20px;border-radius:16px}
+  .doc h1{font:800 84px/1.06 var(--font-display);letter-spacing:-.025em;margin-top:24px}
+  .doc.toi h1 mark{background:none;color:var(--lime)}
+  .doc .d-chu p{font:500 35px/1.42 var(--font-ui);color:var(--moss);margin-top:22px}
+  .doc.toi .d-chu p{color:#d3d2bd}
+  .doc .d-anh{position:absolute;left:50%;transform:translateX(-50%) rotate(var(--r,0deg))}
+  .doc.toi .manh{border-color:var(--lime);box-shadow:11px 11px 0 rgba(153,223,0,.35)}
+  .doc .d-cuoi{position:absolute;left:72px;bottom:330px;display:flex;align-items:center;gap:20px}
+  .doc .d-cuoi b{font:800 38px/1.15 var(--font-display);background:var(--ink);color:var(--lime);padding:18px 26px;border-radius:20px}
+  .doc.toi .d-cuoi b{background:var(--lime);color:var(--ink)}
+  .doc .d-cuoi span{font:700 28px/1.3 var(--font-ui);color:var(--moss)}
+  .doc.toi .d-cuoi span{color:#c3c5ab}
   .tieude.nho h1{font-size:60px}
   .toi .buoc li{color:var(--ink)}
 </style>
@@ -655,6 +678,76 @@
   <h2>Trước khi đăng:<br><mark>AI coi hộ một lượt.</mark></h2>
   <div class="manh cat" style="width:624px;top:398px;height:532px"><img src="anh/cv-7thang.jpg" alt=""></div>
   <div class="o4-ghi">Chỉ đúng giây đang hỏng, không nói chung chung</div>
+</section>
+
+<!-- ═══════════ ẢNH CUỘN TIKTOK · 7 TẤM ═══════════
+     Đăng dạng ảnh cuộn (photo post). Thứ tự tt-0 → tt-6. -->
+<section class="poster doc toi" id="tt-0-bia">
+  <div class="d-dau"><img src="logo/lockup-nen-toi.svg" alt="Tự Mình Xây Kênh"><span class="so">Viral Studio</span></div>
+  <div class="d-chu">
+    <span class="nhan" style="color:var(--ink)">✦ Xài free</span>
+    <h1>6 cái tool<br>để làm xong<br><mark>1 video TikTok.</mark></h1>
+    <p>Mình dạy xây kênh. Dạy xong ai về nhà cũng tắc, không tắc ý tưởng thì tắc lúc dựng. Nên gom hết thành tool.</p>
+  </div>
+  <div class="d-cuoi" style="bottom:auto;top:880px"><b>Vuốt coi từng cái →</b></div>
+  <div class="dt d-anh" style="--w:296px;--sb:#FDFBF3;left:96px;top:1066px;transform:rotate(-4deg)"><div class="man"><img src="anh/tv-man-kq.jpg" alt=""></div></div>
+  <div class="dt d-anh" style="--w:296px;--sb:#FDFBF3;left:392px;top:1020px;transform:rotate(2deg)"><div class="man"><img src="anh/hook-3.jpg" alt=""></div></div>
+  <div class="dt d-anh" style="--w:296px;--sb:#FDFBF3;left:688px;top:1082px;transform:rotate(6deg)"><div class="man"><img src="anh/cv-2.jpg" alt=""></div></div>
+</section>
+
+<section class="poster doc" id="tt-1-tai-video">
+  <div class="d-dau"><img src="logo/lockup-nen-lime.svg" alt="Tự Mình Xây Kênh"><span class="so">Khâu 1/6</span></div>
+  <div class="d-chu">
+    <h1>Dán link vô,<br><mark>ra video sạch logo.</mark></h1>
+    <p>Kèm nhạc nền dạng mp3 với ảnh bìa gốc. Mười nền tảng, bài nhiều ảnh bấm một nút về hết.</p>
+  </div>
+  <div class="manh cat d-anh" style="width:700px;top:716px;height:824px;--r:-1.5deg"><img src="anh/tv-man-kq.jpg" alt=""></div>
+</section>
+
+<section class="poster doc" id="tt-2-soi-video">
+  <div class="d-dau"><img src="logo/lockup-nen-lime.svg" alt="Tự Mình Xây Kênh"><span class="so">Khâu 2/6</span></div>
+  <div class="d-chu">
+    <h1>Video người ta<br><mark>nổ nhờ cái gì?</mark></h1>
+    <p>AI mổ ra từng lớp: hook, khung kể chuyện, chỗ giữ chân. Mượn cái sườn về dùng cho kênh mình.</p>
+  </div>
+  <div class="manh cat d-anh" style="width:760px;top:716px;height:824px;--r:1.5deg"><img src="anh/soi-cua2.jpg" alt=""></div>
+</section>
+
+<section class="poster doc" id="tt-3-cham-hook">
+  <div class="d-dau"><img src="logo/lockup-nen-lime.svg" alt="Tự Mình Xây Kênh"><span class="so">Khâu 3/6</span></div>
+  <div class="d-chu">
+    <h1>Hook của bạn<br><mark>mấy điểm trên 100?</mark></h1>
+    <p>Chấm xong nó chỉ luôn chỗ yếu, rồi viết lại năm bản khác để bạn chọn.</p>
+  </div>
+  <div class="manh cat d-anh" style="width:700px;top:716px;height:824px;--r:-1.5deg"><img src="anh/hook-3.jpg" alt="" style="margin-top:-150px"></div>
+</section>
+
+<section class="poster doc" id="tt-4-kich-ban">
+  <div class="d-dau"><img src="logo/lockup-nen-lime.svg" alt="Tự Mình Xây Kênh"><span class="so">Khâu 4/6</span></div>
+  <div class="d-chu">
+    <h1>11 khung kịch bản<br><mark>dựng sẵn.</mark></h1>
+    <p>Chọn khung hợp chuyện của bạn rồi điền vô từng ô. Chấm xong biết trước giây nào người ta lướt.</p>
+  </div>
+  <div class="manh cat d-anh" style="width:700px;top:716px;height:824px;--r:1.5deg"><img src="anh/kb-3.jpg" alt=""></div>
+</section>
+
+<section class="poster doc toi" id="tt-5-dung-video">
+  <div class="d-dau"><img src="logo/lockup-nen-toi.svg" alt="Tự Mình Xây Kênh"><span class="so">Khâu 5/6</span></div>
+  <div class="d-chu">
+    <h1>Dựng video ngay<br><mark>trên trình duyệt.</mark></h1>
+    <p>Phụ đề tự chạy theo tiếng, cắt cảnh, zoom nhấn, xuất MP4 về máy. Khỏi mua app edit.</p>
+  </div>
+  <div class="manh d-anh" style="width:1000px;top:800px;--r:-1.5deg"><img src="anh/dung-2.jpg" alt=""></div>
+</section>
+
+<section class="poster doc" id="tt-6-cham-video">
+  <div class="d-dau"><img src="logo/lockup-nen-lime.svg" alt="Tự Mình Xây Kênh"><span class="so">Khâu 6/6</span></div>
+  <div class="d-chu">
+    <h1>Trước khi đăng,<br><mark>cho AI coi một lượt.</mark></h1>
+    <p>Nó coi hết video rồi chỉ đúng giây đang hỏng, không nói chung chung kiểu “hook chưa hay”.</p>
+  </div>
+  <div class="manh cat d-anh" style="width:760px;top:700px;height:706px;--r:1.5deg"><img src="anh/cv-7thang.jpg" alt=""></div>
+  <div class="d-cuoi" style="bottom:258px"><b>Link ở bio</b><span>Mở trình duyệt là xài,<br>không cần cài app</span></div>
 </section>
 
 </body>
