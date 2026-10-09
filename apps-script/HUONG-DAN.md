@@ -834,6 +834,34 @@ Trình dựng kiểu Vyra, giao diện tối chuyên nghiệp: **Footage → AI 
 **Cài:** ➕ Script tên `DungVideo`, dán `DungVideo.gs`. Dán đè `HookAI.gs`, `Studio.gs`. Deploy → New version. Key Gemini phải dùng được model `gemini-3.5-transcribe` (key AI Studio thường có sẵn).
 
 
+### Cắt khung trên khung xem, không thêm trùng ảnh, Inspector theo spec
+
+Test `t157` (17 bài), `t158` (18 bài).
+
+**Không còn hiện 2 ảnh giống nhau trong thư viện.** Khi kéo ảnh từ thư viện xuống dòng thời gian, trình duyệt tự đính kèm thêm một file ảnh (tên dạng mã `6ee0c95c-…`), nên trang tưởng là file mới. Nay kéo từ thư viện luôn dùng lại ảnh có sẵn (thẻ hiện "Đã dùng"). Thêm lại đúng file đã có thì chỉ báo "đã có trong thư viện" và dùng lại file đó.
+
+**Cắt khung (crop):**
+- **Cắt trên khung xem:** bấm nút ✂ cắt khung trên thanh công cụ, hoặc nút "✂ Cắt trên khung xem" trong mục Lật & cắt khung.
+  - Khung xem hiện cả hình gốc, phần bị cắt tối đi.
+  - Kéo **4 góc / 4 cạnh** để cắt, kéo **bên trong** để dời vùng cắt. Có lưới 3×3 và nhãn cỡ (px).
+  - Thanh dưới: Tự do · Gốc · 9:16 · 16:9 · 1:1 · 4:5 · 3:4 · 4:3 để khoá tỉ lệ; Shift + kéo góc = giữ tỉ lệ hiện tại.
+  - **Enter / ✓ Xong** để áp, **Esc / Huỷ** để bỏ, bấm đúp vùng cắt hoặc **↺ Đặt lại** để về nguyên hình. Một lần cắt = một bước Ctrl+Z.
+- **Cắt giữ chỗ:** trước đây cắt xong, hình bị phóng lại cho phủ kín khung, nên nhìn như không cắt gì. Nay phần còn lại đứng yên đúng chỗ cũ, giống CapCut. Áp dụng cả cho các thanh Cắt trái / phải / trên / dưới (nay cắt được tới 90%), kể cả khi clip đang xoay hay lật.
+
+**Kéo đổi độ rộng cột:** thêm chốt cuối để khung xem luôn còn tối thiểu ~260 px. Nếu cỡ cột đã lưu từ màn hình to hơn, thư viện co lại trước rồi tới bảng thuộc tính.
+
+**Inspector (bảng thuộc tính) theo spec:**
+
+| Spec | Nay |
+|---|---|
+| Bộ tab theo loại mục | Video: **Video · Âm thanh · Tốc độ · Hoạt ảnh · Điều chỉnh** (trước đây gộp "Tốc độ & âm"). Ảnh tĩnh: **Video · Hoạt ảnh · Điều chỉnh**. Chữ: **Văn bản · Hoạt ảnh · Bám theo**. Sticker: **Nhãn dán · Hoạt ảnh · Bám theo** (Hoà trộn nằm trong tab chính) |
+| Ô số: kéo ngang đổi giá trị, Enter xong, Esc huỷ; bấm đúp nhãn hoặc thanh = đặt lại | kéo ngang trên ô số (Shift nhanh ×10, Alt chậm), bấm để gõ, Enter / Esc; bấm đúp nhãn **hoặc thanh trượt** về mặc định; mỗi lần kéo = một bước hoàn tác |
+| Cuối tab: Reset + Apply to all | **↺ Đặt lại** (cả tab) và **Áp cho tất cả** (mọi mục cùng loại trên track: video với video, ảnh với ảnh, cùng hàng phủ, cùng kiểu chữ / sticker); áp tốc độ thì độ dài tự dồn lại |
+| Chọn nhiều cùng loại → giá trị mục đầu, ô khác nhau "–", chỉnh = áp cho tất cả | chọn nhiều đoạn cùng loại giờ hiện **bảng thuộc tính đầy đủ** thay cho bảng tóm tắt. Ô khác nhau hiện "–", kéo / gõ / bấm nút là áp cho cả nhóm. Vẫn có Tạo clip ghép, Gộp nhóm, Xoá, Bỏ chọn |
+| Canvas: lưới tỉ lệ có Original, 2:1, Custom | tab Khung hình có **lưới tỉ lệ**: Gốc (theo footage đầu), 9:16, 16:9, 1:1, 4:3, 3:4, 4:5, 21:9, 2:1, 2.35:1, **Tuỳ chỉnh** (gõ rộng × cao) |
+
+**Chưa làm (cần AI hoặc máy chủ riêng, hoặc là tính năng Pro của CapCut):** Chống rung (Stabilize), Làm đẹp mặt / dáng (Enhance), Upscale, khử nhấp nháy, đổi giọng, cọ tách nền tuỳ chỉnh, bám camera, bong bóng chữ / chữ nghệ thuật dạng lưới. Các mục đã có từ trước vẫn giữ nguyên: Chroma key (video phủ), xoá nền người nói (tab Khung hình, áp cả dự án), lồng tiếng AI (A2), khử ồn, Beat, tốc độ đường cong, hoạt ảnh vào / ra, bám vật thể, HSL / đường cong / bánh xe màu / LUT, kiểu chữ (B/I/U, giãn chữ, giãn dòng, nền bo góc, viền, bóng, phát sáng).
+
 ### Khung tay nắm ôm đúng hình, kéo đổi cỡ cột trên màn hẹp
 
 Test `t156` (12 bài); `t149`, `t152`, `t153` chỉnh lại số đo theo khung mới.
