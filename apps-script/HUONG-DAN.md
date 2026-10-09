@@ -834,6 +834,18 @@ Trình dựng kiểu Vyra, giao diện tối chuyên nghiệp: **Footage → AI 
 **Cài:** ➕ Script tên `DungVideo`, dán `DungVideo.gs`. Dán đè `HookAI.gs`, `Studio.gs`. Deploy → New version. Key Gemini phải dùng được model `gemini-3.5-transcribe` (key AI Studio thường có sẵn).
 
 
+### Khung tay nắm ôm đúng hình, kéo đổi cỡ cột trên màn hẹp
+
+Test `t156` (12 bài); `t149`, `t152`, `t153` chỉnh lại số đo theo khung mới.
+
+- **Khung tay nắm (chấm tròn) nay ôm đúng cỡ ảnh / video.** Trước đây khung luôn bằng khung hình 9:16. Ảnh 4:5 hay vuông được phủ kín khung nên thật ra rộng hơn; khi thu nhỏ hay dời, phần thừa lộ ra ngoài khung tay nắm. Nay khung tính theo đúng chỗ hình được vẽ:
+  - "Cắt giữa 9:16": khung bằng cả hình (có thể rộng hơn khung xem, thu nhỏ là thấy đủ 4 góc).
+  - "Giữ nguyên, nền mờ": khung đúng tỉ lệ video.
+  - B-roll "Vừa khung": khung đúng tỉ lệ hình.
+
+  Bo góc, đổ bóng và mặt nạ cũng tính theo khung này, nên bo góc ăn đúng mép ảnh thật.
+- **Kéo đổi độ rộng cột trên màn hình hẹp (dưới ~1180 px):** trước đây bảng thuộc tính bị đẩy ra ngoài và tay kéo giữa khung xem với bảng thuộc tính bị ẩn. Nay cả 3 cột luôn hiện. Kéo tay giữa thư viện và khung xem, hoặc giữa khung xem và bảng thuộc tính, để đổi độ rộng; bấm đúp tay kéo để về mặc định. Khung xem luôn giữ tối thiểu ~260 px.
+
 ### Keyframe đổ bóng, kéo vùng In–Out, chèn vào track chính không đẩy chữ
 
 Test `t155` (15 bài).

@@ -93,7 +93,7 @@
   .btn.ghost:hover{color:var(--et);background:var(--ep2)}
   /* thân: 3 cột */
   .ebody{display:grid;grid-template-columns:340px minmax(0,1fr) 300px;min-height:0}
-  @media (max-width:1180px){.ebody{grid-template-columns:320px minmax(0,1fr)}.ecol.phai{display:none}.ed.co-phai .ecol.phai{display:flex;position:fixed;right:12px;top:80px;bottom:12px;width:300px;z-index:30;border-radius:14px;border:1px solid var(--el);box-shadow:0 20px 50px rgba(0,0,0,.5)}}
+  @media (max-width:1180px){.ebody{grid-template-columns:320px minmax(0,1fr)}.ed:not(.ccw) .ecol.phai,.ed.ccw.mobi .ecol.phai{display:none}.ed.co-phai:not(.ccw) .ecol.phai,.ed.ccw.mobi.co-phai .ecol.phai{display:flex;position:fixed;right:12px;top:80px;bottom:12px;width:300px;z-index:30;border-radius:14px;border:1px solid var(--el);box-shadow:0 20px 50px rgba(0,0,0,.5)}}
   @media (max-width:980px){.ebody{grid-template-columns:1fr}.ecol.trai{order:2;border-right:0;border-top:1px solid var(--el);max-height:none}.ecol.giua{order:1}}
   .ecol{display:flex;flex-direction:column;min-height:0;overflow:hidden;background:var(--ep)}
   .ecol.trai{border-right:1px solid var(--el)}
@@ -363,7 +363,7 @@
   .keo:hover,.keo.dang{background:var(--ea)}
   .keo.ngang{cursor:col-resize;border-radius:3px;margin:40px 1px}
   .keo.doc{cursor:row-resize;border-radius:3px;margin:1px 40px}
-  @media (max-width:1180px){.ed .ebody{grid-template-columns:var(--wTrai,330px) 5px minmax(0,1fr)}.keo.k2{display:none}}
+  @media (max-width:1180px){.ed:not(.ccw) .ebody{grid-template-columns:var(--wTrai,330px) 5px minmax(0,1fr)}.ed:not(.ccw) .keo.k2{display:none}}   /* giao diện CapCut: màn hẹp vẫn giữ bảng thuộc tính + tay kéo của nó */
   @media (max-width:980px){.ed{grid-template-rows:auto auto auto auto}.ed .ebody{grid-template-columns:1fr;gap:4px}.keo{display:none}.ed.full{position:static;height:auto!important}}
   /* tab trái: thanh icon kiểu CapCut */
   .ed .ecol.trai .etabs{display:flex;gap:0;padding:4px 4px 0;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--el)}
@@ -2324,7 +2324,13 @@ function tinhSong(ab) { const d = ab.getChannelData(0), buoc = Math.max(1, Math.
 async function laySong(s) { if (s.song || s.dangSong || s.loai !== 'video' || !s.file || s.file.size > 400 * 1048576) return; s.dangSong = true; try { const ab = await giaiMaAm(s.file); s.song = tinhSong(ab); s.nl = tinhNL(ab); if (!P.dang) veTl(); } catch { } s.dangSong = false; }
 function veSongItem(d, s, bd, kt, wPx) { if (!s || !s.song || wPx < 8) return; const cvs = el('canvas', 'song'); const h = 16, w = Math.min(4000, Math.round(wPx)); cvs.width = w; cvs.height = h; const g = cvs.getContext('2d'); g.fillStyle = 'rgba(190,255,120,.55)'; const n = s.song.length; for (let x = 0; x < w; x++) { const t = bd + (kt - bd) * x / w, i = Math.min(n - 1, Math.floor(t * 50)), v = (s.song[i] || 0) / 255 * h; g.fillRect(x, h - v, 1, v); } d.appendChild(cvs); }
 /* ── tay cầm trên khung xem trước: kéo để dời, góc để phóng, núm trên để xoay (đồng bộ 2 chiều với Thuộc tính) ── */
-function hopMuc(k, m) { if (k === 'b' && m.kieu === 'pip') return { cx: 0.5, cy: 0.13 + 0.72 * 9 / 16 * (cv.width / cv.height) / 2, w: 0.72, h: 0.72 * 9 / 16 * cv.width / cv.height }; return { cx: 0.5, cy: 0.5, w: 1, h: 1 }; }
+function hopMuc(k, m) { if (k === 'b' && m.kieu === 'pip') return { cx: 0.5, cy: 0.13 + 0.72 * 9 / 16 * (cv.width / cv.height) / 2, w: 0.72, h: 0.72 * 9 / 16 * cv.width / cv.height };
+  /* khung của mục = đúng chỗ hình được vẽ (ảnh 4:5 phủ khung 9:16 thì rộng hơn khung) — để tay nắm, bo góc, bóng, mặt nạ ôm đúng hình khi thu nhỏ / dời */
+  const s = m && srcCua(m.src), W = cv.width, H = cv.height; if (!s || !s.w || !s.h || s.loai === 'ghep' || (typeof m.src === 'string' && m.src.startsWith('ghep:'))) return { cx: 0.5, cy: 0.5, w: 1, h: 1 };
+  const iw = s.w, ih = s.h, kieu = $('#khungKieu') ? $('#khungKieu').value : 'cat';
+  if (k === 'b' && m.vua === 'contain') { const q = Math.min(W / iw, H / ih); return { cx: 0.5, cy: 0.5, w: iw * q / W, h: ih * q / H }; }
+  if (iw / ih > W / H && (kieu === 'mo' || (kieu === 'bam_mat' && s.mat && s.mat.length))) return kieu === 'mo' ? { cx: 0.5, cy: 0.5, w: 1, h: ih * W / iw / H } : { cx: 0.5, cy: 0.5, w: 1, h: 1 };
+  const q = Math.max(W / iw, H / ih); return { cx: 0.5, cy: 0.5, w: iw * q / W, h: ih * q / H }; }
 function tinhHop(k, m) { const off = offMuc(k, m), sc = giaTriKf(m, 'sc', off), x = giaTriKf(m, 'x', off), y = giaTriKf(m, 'y', off), xoay = giaTriKf(m, 'xoay', off), h0 = hopMuc(k, m); const sx = giaTriKf(m, 'scX', off), sy = giaTriKf(m, 'scY', off); return { off, sc, sx, sy, x, y, xoay, cx: 0.5 + (h0.cx - 0.5) * sc + x, cy: 0.5 + (h0.cy - 0.5) * sc + y, w: h0.w * sc * sx, h: h0.h * sc * sy }; }
 function datHop(hop, b) { Object.assign(hop.style, { left: (b.cx - b.w / 2) * 100 + '%', top: (b.cy - b.h / 2) * 100 + '%', width: b.w * 100 + '%', height: b.h * 100 + '%', transform: 'rotate(' + b.xoay + 'deg)' }); }
 function veTay() {
@@ -2964,7 +2970,7 @@ function taoTayKeo(elm, loai) {
   elm.addEventListener('pointerdown', e => {
     e.preventDefault(); elm.classList.add('dang'); try { elm.setPointerCapture(e.pointerId); } catch { }
     const ed = $('#ed'), r = ed.getBoundingClientRect(), o = kichCo(), x0 = e.clientX, y0 = e.clientY, trai0 = $('.ecol.trai').offsetWidth, phai0 = $('.ecol.phai').offsetWidth, tl0 = $('.etl').offsetHeight;
-    const mv = ev => { if (loai === 'trai') o.trai = Math.round(Math.max(240, Math.min(r.width * 0.65, r.width - 12 - 360 - (ed.classList.contains('coChon') || ed.classList.contains('co-phai') ? phai0 : 0), trai0 + ev.clientX - x0))); else if (loai === 'phai') o.phai = Math.round(Math.max(240, Math.min(r.width * 0.4, phai0 - (ev.clientX - x0)))); else o.tl = Math.round(Math.max(150, Math.min(r.height - 260, tl0 - (ev.clientY - y0)))); apKichCo(o); };
+    const mv = ev => { if (loai === 'trai') o.trai = Math.round(Math.max(240, Math.min(r.width * 0.65, r.width - 12 - 260 - (ed.classList.contains('coChon') || ed.classList.contains('co-phai') ? phai0 : 0), trai0 + ev.clientX - x0))); else if (loai === 'phai') o.phai = Math.round(Math.max(240, Math.min(r.width * 0.45, r.width - 12 - trai0 - 260, phai0 - (ev.clientX - x0)))); else o.tl = Math.round(Math.max(150, Math.min(r.height - 260, tl0 - (ev.clientY - y0)))); apKichCo(o); };
     const up = () => { elm.classList.remove('dang'); elm.removeEventListener('pointermove', mv); elm.removeEventListener('pointerup', up); try { localStorage.setItem('dv_kc', JSON.stringify(o)); } catch { } if (!P.dang) veKhung(); };
     elm.addEventListener('pointermove', mv); elm.addEventListener('pointerup', up);
   });
@@ -5218,14 +5224,14 @@ function canhGiua() {
   const kc = typeof kichCo === 'function' ? kichCo() : {}; const eb = $('.ebody'); if (!eb) return; const coPhai = ed.classList.contains('coChon') || ed.classList.contains('co-phai');
   if (kc.trai || ed.classList.contains('thuGon')) {
     // người dùng đã tự kéo cỡ: vẫn kẹp lại để cột khung xem không bị ép mất và bảng thuộc tính không tràn ra ngoài màn hình
-    if (kc.phai) ed.style.setProperty('--wPhai', Math.max(240, Math.min(kc.phai, Math.round(eb.clientWidth * 0.4))) + 'px'); else ed.style.setProperty('--wPhai', Math.round(Math.max(321, Math.min(400, eb.clientWidth * 0.28))) + 'px');
-    if (kc.trai) { const wP = coPhai ? (parseFloat(getComputedStyle(ed).getPropertyValue('--wPhai')) || 321) + 6 : 0; ed.style.setProperty('--wTrai', Math.max(240, Math.min(kc.trai, eb.clientWidth - 12 - wP - 360)) + 'px'); }
+    if (kc.phai) ed.style.setProperty('--wPhai', Math.max(240, Math.min(kc.phai, Math.round(eb.clientWidth * 0.45))) + 'px'); else ed.style.setProperty('--wPhai', Math.round(Math.max(321, Math.min(400, eb.clientWidth * 0.28))) + 'px');
+    if (kc.trai) { const wP = coPhai ? (parseFloat(getComputedStyle(ed).getPropertyValue('--wPhai')) || 321) + 6 : 0; ed.style.setProperty('--wTrai', Math.max(240, Math.min(kc.trai, eb.clientWidth - 12 - wP - 260)) + 'px'); }
     return;
   }
   // bảng thuộc tính rộng như CapCut (321–400px) khi chưa tự kéo, để nhãn không bị xuống dòng
-  if (!kc.phai) ed.style.setProperty('--wPhai', Math.round(Math.max(321, Math.min(400, eb.clientWidth * 0.28))) + 'px');
+  if (!kc.phai) ed.style.setProperty('--wPhai', Math.round(Math.max(eb.clientWidth < 1100 ? 280 : 321, Math.min(400, eb.clientWidth * 0.28))) + 'px');
   const wPhai = coPhai ? (parseFloat(getComputedStyle(ed).getPropertyValue('--wPhai')) || 321) + 6 : 0;
-  const du = eb.clientWidth - 6 - wPhai - Math.max(420, can); ed.style.setProperty('--wTrai', Math.max(398, Math.min(du, Math.round(eb.clientWidth * 0.5))) + 'px');
+  const du = eb.clientWidth - 6 - wPhai - Math.max(420, can), san = Math.max(260, Math.min(398, eb.clientWidth - 12 - wPhai - 300)); ed.style.setProperty('--wTrai', Math.max(san, Math.min(du, Math.round(eb.clientWidth * 0.5))) + 'px');   /* màn hẹp: thư viện co lại để khung xem còn ≥ 300px */
 }
 function khoiTaoGon() {
   const ed = $('#ed'); if (!ed.classList.contains('ccw')) return;
