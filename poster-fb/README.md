@@ -4,7 +4,7 @@ Bộ poster quảng bá 6 tool Viral Studio cho page Tự Mình Xây Kênh, ản
 
 | Thư mục, file | Là gì |
 |---|---|
-| `xuat/*.png` | **Ảnh để đăng**, 2160×2700. `00` tổng quan, `01`–`06` từng tool, `…b-…-cach-dung` là ảnh 3 bước đi kèm, `07` nền xanh chốt tuần, `tn1`–`tn6` từng tính năng Tải video, `ng-6-toi`/`ng-6-lime`/`ng-6-tool` ba bản ảnh ngang 1920×1280 giới thiệu cả 6 tool, `b4-*` bộ 4 ảnh tool Tải video, `b6-*` bộ 4 ảnh giới thiệu 6 tool, `tt-*` 7 ảnh cuộn TikTok 1080×1920 (1 ngang 1920×1280 + 3 vuông 2160×2160) |
+| `xuat/*.png` | **Ảnh để đăng**, 2160×2700. `00` tổng quan, `01`–`06` từng tool, `…b-…-cach-dung` là ảnh 3 bước đi kèm, `07` nền xanh chốt tuần, `tn1`–`tn6` từng tính năng Tải video, `ng-6-toi`/`ng-6-lime`/`ng-6-tool` ba bản ảnh ngang 1920×1280 giới thiệu cả 6 tool, `b4-*` bộ 4 ảnh tool Tải video, `b6-*` bộ 4 ảnh giới thiệu 6 tool, `c-*` 7 ảnh cuộn khổ 4:5, `tt-*` 7 ảnh cuộn TikTok 1080×1920 (1 ngang 1920×1280 + 3 vuông 2160×2160) |
 | `HUONG-DAN-POSTER.md` | Quy tắc khổ ảnh, bố cục, logo theo nền, thuật toán, giọng văn. Đọc trước khi làm poster mới |
 | `bai-dang.md` | Caption từng bài, đoạn chia sẻ vào group, lịch đăng 7 ngày, link từng tool |
 | `poster.html` | Bố cục tất cả poster. Mở bằng trình duyệt để xem, sửa chữ ở đây |

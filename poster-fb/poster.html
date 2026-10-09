@@ -230,6 +230,33 @@
   .doc.toi .d-cuoi b{background:var(--lime);color:var(--ink)}
   .doc .d-cuoi span{font:700 28px/1.3 var(--font-ui);color:var(--moss)}
   .doc.toi .d-cuoi span{color:#c3c5ab}
+
+  /* ══ BỘ 4:5 GIỚI THIỆU 6 TOOL · 1080×1350 ══
+     Tên tool nằm ngay đầu mỗi tấm để lướt qua là biết đang xem cái nào. */
+  .n45 .n-dau{position:absolute;left:68px;right:68px;top:62px;display:flex;align-items:center;justify-content:space-between}
+  .n45 .n-dau img{height:46px}
+  .n45 .n-dau .so{font:800 23px/1 var(--font-display);letter-spacing:.04em;text-transform:uppercase;
+    background:var(--ink);color:var(--lime);padding:13px 19px;border-radius:999px}
+  .n45.toi .n-dau .so{background:var(--lime);color:var(--ink)}
+  .n-ten{position:absolute;left:68px;top:150px;display:inline-flex;align-items:center;gap:14px;
+    background:var(--ink);color:var(--lime);border-radius:18px;padding:14px 24px 14px 16px;box-shadow:6px 6px 0 rgba(38,33,15,.25)}
+  .n45.toi .n-ten{background:var(--lime);color:var(--ink);box-shadow:6px 6px 0 rgba(153,223,0,.25)}
+  .n-ten b{flex:none;width:44px;height:44px;border-radius:50%;background:var(--lime);color:var(--ink);
+    display:grid;place-items:center;font:800 25px/1 var(--font-display)}
+  .n45.toi .n-ten b{background:var(--ink);color:var(--lime)}
+  .n-ten em{font-style:normal;font:800 31px/1 var(--font-ui);letter-spacing:.02em;text-transform:uppercase}
+  .n45 .n-chu{position:absolute;left:68px;right:68px;top:242px}
+  .n45 h1{font:800 68px/1.05 var(--font-display);letter-spacing:-.025em;margin-top:0}
+  .n45.toi h1 mark{background:none;color:var(--lime)}
+  .n45 .n-chu p{font:500 29px/1.42 var(--font-ui);color:var(--moss);margin-top:18px}
+  .n45.toi .n-chu p{color:#d3d2bd}
+  .n45 .n-anh{position:absolute;left:50%;transform:translateX(-50%) rotate(var(--r,0deg))}
+  .n45.toi .manh{border-color:var(--lime);box-shadow:10px 10px 0 rgba(153,223,0,.3)}
+  .n45 .n-cuoi{position:absolute;left:68px;bottom:62px;display:flex;align-items:center;gap:18px}
+  .n45 .n-cuoi b{font:800 34px/1.15 var(--font-display);background:var(--ink);color:var(--lime);padding:16px 24px;border-radius:18px}
+  .n45.toi .n-cuoi b{background:var(--lime);color:var(--ink)}
+  .n45 .n-cuoi span{font:700 24px/1.3 var(--font-ui);color:var(--moss)}
+  .n45.toi .n-cuoi span{color:#c3c5ab}
   .tieude.nho h1{font-size:60px}
   .toi .buoc li{color:var(--ink)}
 </style>
@@ -748,6 +775,64 @@
   </div>
   <div class="manh cat d-anh" style="width:760px;top:700px;height:706px;--r:1.5deg"><img src="anh/cv-7thang.jpg" alt=""></div>
   <div class="d-cuoi" style="bottom:258px"><b>Link ở bio</b><span>Mở trình duyệt là xài,<br>không cần cài app</span></div>
+</section>
+
+<!-- ═══════════ BỘ 4:5 · 7 TẤM GIỚI THIỆU 6 TOOL ═══════════
+     1080×1350, xuất 2160×2700. Thứ tự c0 → c6. -->
+<section class="poster n45 toi" id="c0-bia">
+  <div class="n-dau"><img src="logo/lockup-nen-toi.svg" alt="Tự Mình Xây Kênh"><span class="so">Viral Studio</span></div>
+  <div class="n-ten"><em>✦ Gửi mấy đứa lười làm content</em></div>
+  <div class="n-chu">
+    <h1>Học xây kênh mà chưa biết<br><mark>content viral là gì?</mark></h1>
+    <p>Vô đây. Tụi tui code sẵn 6 cái tool viral rồi nè, khỏi mò khỏi đoán, xài free.</p>
+  </div>
+  <div class="dt n-anh" style="--w:276px;--sb:#FDFBF3;left:76px;top:672px;transform:rotate(-4deg)"><div class="man"><img src="anh/tv-man-kq.jpg" alt=""></div></div>
+  <div class="dt n-anh" style="--w:276px;--sb:#FDFBF3;left:402px;top:636px;transform:rotate(2deg)"><div class="man"><img src="anh/hook-3.jpg" alt=""></div></div>
+  <div class="dt n-anh" style="--w:276px;--sb:#FDFBF3;left:728px;top:688px;transform:rotate(6deg)"><div class="man"><img src="anh/cv-2.jpg" alt=""></div></div>
+  <div class="n-cuoi" style="bottom:auto;top:528px"><b>Vuốt coi từng cái →</b></div>
+</section>
+
+<section class="poster n45" id="c1-tai-video">
+  <div class="n-dau"><img src="logo/lockup-nen-lime.svg" alt="Tự Mình Xây Kênh"><span class="so">1/6</span></div>
+  <div class="n-ten"><b>1</b><em>Tải video</em></div>
+  <div class="n-chu"><h1>Dán link cái là có<br><mark>video sạch logo.</mark></h1><p>Kèm nhạc nền với ảnh bìa gốc luôn. Mười nền tảng, bài nhiều ảnh bấm một phát về hết.</p></div>
+  <div class="manh cat n-anh" style="width:640px;top:560px;height:744px;--r:-1.5deg"><img src="anh/tv-man-kq.jpg" alt=""></div>
+</section>
+
+<section class="poster n45" id="c2-soi-video">
+  <div class="n-dau"><img src="logo/lockup-nen-lime.svg" alt="Tự Mình Xây Kênh"><span class="so">2/6</span></div>
+  <div class="n-ten"><b>2</b><em>Soi video</em></div>
+  <div class="n-chu"><h1>Video người ta<br><mark>viral nhờ cái gì?</mark></h1><p>AI soi ra từng lớp: hook, khung kể chuyện, chỗ giữ chân. Mượn cái sườn về xài cho kênh mình.</p></div>
+  <div class="manh cat n-anh" style="width:700px;top:560px;height:744px;--r:1.5deg"><img src="anh/soi-cua2.jpg" alt=""></div>
+</section>
+
+<section class="poster n45" id="c3-cham-hook">
+  <div class="n-dau"><img src="logo/lockup-nen-lime.svg" alt="Tự Mình Xây Kênh"><span class="so">3/6</span></div>
+  <div class="n-ten"><b>3</b><em>Chấm hook</em></div>
+  <div class="n-chu"><h1>Hook của bạn<br><mark>mấy điểm trên 100?</mark></h1><p>Chấm xong nó chỉ luôn chỗ yếu, rồi viết lại năm bản khác cho bạn chọn.</p></div>
+  <div class="manh cat n-anh" style="width:640px;top:560px;height:744px;--r:-1.5deg"><img src="anh/hook-3.jpg" alt="" style="margin-top:-150px"></div>
+</section>
+
+<section class="poster n45" id="c4-kich-ban">
+  <div class="n-dau"><img src="logo/lockup-nen-lime.svg" alt="Tự Mình Xây Kênh"><span class="so">4/6</span></div>
+  <div class="n-ten"><b>4</b><em>Kịch bản</em></div>
+  <div class="n-chu"><h1>11 khung kịch bản<br><mark>dọn sẵn cho bạn.</mark></h1><p>Chọn khung hợp chuyện của mình rồi điền vô từng ô. Chấm xong biết trước giây nào người ta lướt.</p></div>
+  <div class="manh cat n-anh" style="width:640px;top:560px;height:744px;--r:1.5deg"><img src="anh/kb-3.jpg" alt=""></div>
+</section>
+
+<section class="poster n45 toi" id="c5-dung-video">
+  <div class="n-dau"><img src="logo/lockup-nen-toi.svg" alt="Tự Mình Xây Kênh"><span class="so">5/6</span></div>
+  <div class="n-ten"><b>5</b><em>Dựng video</em></div>
+  <div class="n-chu"><h1>Dựng ngay trên<br><mark>trình duyệt, khỏi mua app.</mark></h1><p>Phụ đề tự chạy theo tiếng, cắt cảnh, zoom nhấn, xuất MP4 về máy.</p></div>
+  <div class="manh n-anh" style="width:900px;top:600px;--r:-1.5deg"><img src="anh/dung-2.jpg" alt=""></div>
+</section>
+
+<section class="poster n45" id="c6-cham-video">
+  <div class="n-dau"><img src="logo/lockup-nen-lime.svg" alt="Tự Mình Xây Kênh"><span class="so">6/6</span></div>
+  <div class="n-ten"><b>6</b><em>Chấm video</em></div>
+  <div class="n-chu"><h1>Đăng thì đăng, nhưng<br><mark>cho AI coi trước đã.</mark></h1><p>Nó coi hết video rồi chỉ đúng giây đang hỏng, không nói chung chung kiểu “hook chưa hay”.</p></div>
+  <div class="manh cat n-anh" style="width:700px;top:556px;height:600px;--r:1.5deg"><img src="anh/cv-7thang.jpg" alt=""></div>
+  <div class="n-cuoi"><b>Link ở bio</b><span>Mở trình duyệt là xài,<br>không cần cài app</span></div>
 </section>
 
 </body>

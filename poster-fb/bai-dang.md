@@ -521,9 +521,16 @@ Mình làm ra là để cả lớp xài chứ không để coi cho vui. Tuần n
 
 ---
 
-## Ảnh cuộn TikTok · 7 tấm
+## Ảnh cuộn giới thiệu 6 tool · 7 tấm
 
-File `tt-0-bia` → `tt-6-cham-video`, khổ 1080×1920. Đăng dạng ảnh (photo post), chọn đúng thứ tự.
+Hai bộ, nội dung như nhau, khác khổ. Chọn một bộ, đừng trộn:
+
+| Bộ | Khổ | Dùng cho |
+|---|---|---|
+| `c0-bia` → `c6-cham-video` | 4:5, 2160×2700 | **Mặc định.** Đăng được cả TikTok lẫn Facebook, Threads |
+| `tt-0-bia` → `tt-6-cham-video` | 9:16, 1080×1920 | Chỉ TikTok, chiếm trọn màn hình |
+
+Bộ 4:5 có chip tên tool ngay đầu mỗi tấm, lướt qua là biết đang xem cái nào.
 
 **Caption**
 
