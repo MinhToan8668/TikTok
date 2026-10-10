@@ -502,6 +502,13 @@ function showPrev() {
 }
 function nenTuLink(u) { return /tiktok\.com/i.test(u) ? 'tiktok' : /youtu\.?be/i.test(u) ? 'youtube' : /instagram\.com/i.test(u) ? 'instagram' : /facebook\.com|fb\.watch/i.test(u) ? 'facebook' : ''; }
 let layBusy = false;
+/* chưa đăng nhập mà bấm Lấy video: mở bảng đăng nhập có nút ✕, đăng nhập xong tự lấy tiếp */
+let layLaiSauDangNhap = false;
+function canDangNhapLay(st, hetPhien) {
+  st.className = 'status'; st.textContent = hetPhien ? 'Phiên đăng nhập đã hết hạn. Đăng nhập lại là AI lấy video ngay, không tốn lượt.' : 'Đăng nhập hoặc tạo tài khoản miễn phí để AI lấy video từ link. Không tốn lượt; đăng nhập xong mình lấy tiếp luôn.';
+  layLaiSauDangNhap = true;
+  TK.mo('signup', hetPhien ? 'Phiên đăng nhập đã hết hạn, đăng nhập lại để AI lấy video từ link.' : 'Đăng nhập hoặc tạo tài khoản miễn phí để AI lấy video từ link. Mất 30 giây, không tốn lượt.');
+}
 async function layLink() {
   if (layBusy) return;
   const u = $('#link').value.trim(), st = $('#linkStatus'); if (!/^https?:\/\//i.test(u)) { st.className = 'status err'; st.textContent = 'Dán link đầy đủ bắt đầu bằng https://'; return; }
@@ -511,7 +518,12 @@ async function layLink() {
   try {
     let r;
     if (DEMO) { await new Promise(z => setTimeout(z, 600)); r = { ok: true, ho_tro: true, video: true, nen: 'tiktok', tac_gia: 'kenhmau', caption: 'Mẹ chồng bóc tôm cho mẹ đẻ mình #giadinh #mechong', anh: '', giay: 47, so_lieu: { view: 120000, like: 9000, cmt: 300, luu: 1500, share: 700, giay: 47 } }; }
-    else r = await callApi({ action: 'hook_ai', mode: 'link', token: TK.token(), dev: TK.dev(), link: u });
+    else {
+      // lấy video từ link cần tài khoản (máy chủ tải về cho AI): chưa đăng nhập thì mở bảng đăng nhập, không báo lỗi
+      if (!TK.token()) { canDangNhapLay(st); return; }
+      r = await callApi({ action: 'hook_ai', mode: 'link', token: TK.token(), dev: TK.dev(), link: u });
+      if (!r.ok && (r.error === 'can_dangky' || r.error === 'het_phien')) { canDangNhapLay(st, r.error === 'het_phien'); return; }
+    }
     if (!r.ok) { st.className = 'status err'; st.textContent = r.error === 'het_phien' ? 'Phiên đăng nhập hết hạn, đăng nhập lại ở tab Hook viral.' : r.error === 'unknown_action' || r.error === 'thieu_text' ? 'Máy chủ đang chạy HookAI.gs bản cũ, mentor cần dán bản mới rồi Deploy → New version.' : 'Không lấy được thông tin từ link. Tải file video lên hoặc dán lời thoại.'; return; }
     if (!r.ho_tro) { st.className = 'status'; st.textContent = 'Không lấy được từ link này (video riêng tư hoặc nền tảng chặn). Tải file video lên hoặc dán lời thoại.'; state.link = { tac_gia: '', caption: '', video: false, giay: 0 }; updateSrc(); return; }
     state.link = { tac_gia: r.tac_gia || '', caption: r.caption || '', video: !!r.video, giay: r.giay || 0 }; state.tuVideo = true;
@@ -868,7 +880,7 @@ $('#btnSoi').addEventListener('click', soi);
 $('#btnClear').addEventListener('click', () => { if (state.kq && !$('#kqBody').hidden === false) {} if (!$('#grid').classList.contains('has-kq') && !confirm('Xoá hết thông tin video đang điền?')) return; xoaKq(); ['link', 'loiThoai', 'giay', 'chuManHinh', 'binhLuan', 'nView', 'nLike', 'nCmt', 'nLuu', 'nShare'].forEach(id => $('#' + id).value = ''); state.image = ''; state.imageFrom = ''; state.link = { tac_gia: '', caption: '', video: false, giay: 0 }; state.file = null; state.tuVideo = true; state.kq = null; $('#vidprev').hidden = true; $('#linkStatus').textContent = ''; syncFrameUI(); updateCount(); updateRatios(); updateSrc(); saveDraft(); $('#kqBody').hidden = true; $('#kqEmpty').hidden = false; });
 $('#upClose').addEventListener('click', () => $('#upsell').classList.remove('show'));
 $('#upsell').addEventListener('click', e => { if (e.target === e.currentTarget) e.currentTarget.classList.remove('show'); });
-TK.khoiDong({ api: API, tool: 'soi', onDoi: () => { veQuota(); dienTuHoSo(); } });
+TK.khoiDong({ api: API, tool: 'soi', onDoi: () => { veQuota(); dienTuHoSo(); if (layLaiSauDangNhap && TK.token()) { layLaiSauDangNhap = false; layLink(); } } });
 loadQuota();
 </script>
 <script src="tro-ly.js?v=202610010900"></script>

@@ -319,7 +319,7 @@ Dán link là tải được video, ảnh, âm thanh. Không cần đăng nhập
 
 **Tải file:** trình duyệt tải thẳng trước. Nếu bị chặn thì máy chủ tải hộ (tối đa 35MB). Vẫn không được thì nút đổi thành "Mở để lưu".
 
-**Muốn tải đủ YouTube / Instagram / Facebook:** tự chạy một máy [cobalt](https://github.com/imputnet/cobalt) (Docker, VPS khoảng 5$/tháng), bật API key. Sau đó thêm vào Script properties: `COBALT_URL` = `https://địa-chỉ-cobalt-của-bạn` và `COBALT_KEY` = key đã tạo. Không cần sửa code. Cobalt công khai (api.cobalt.tools) đã khóa, không dùng được.
+**Muốn tải đủ YouTube / Instagram / Facebook:** dựng máy tải riêng của khoá trong thư mục `may-tai/` (yt-dlp, chạy trên Railway khoảng 5 USD/tháng, xem `may-tai/README.md`), rồi nhắn bot `/maytai https://ten-may.up.railway.app API_KEY`. Bot gọi thử, lưu `COBALT_URL` và `COBALT_KEY` vào Script properties. Máy nói đúng giao thức cobalt nên cũng dùng được một máy [cobalt](https://github.com/imputnet/cobalt) tự chạy. Cobalt công khai (api.cobalt.tools) đã khóa, không dùng được.
 
 ## Trợ lý AI · trò chuyện, nói, tự học (tools/tro-ly.js + TroLy.gs)
 

@@ -20,6 +20,7 @@ tự nhiên như trong code hiện có.
 | `apps-script/HookAI.gs` | Gọi Gemini/Claude cho Hook Pro, soi video, action `hook_ai`, `hook_status` | |
 | `apps-script/LocKichBan.gs` | Lọc kịch bản từ file phụ đề video dài thành nhiều video / series, action `hook_ai` mode `loc_srt` | |
 | `apps-script/HUONG-DAN*.md` | Cách cài backend, Script Properties, webhook | đọc trước khi sửa `.gs` |
+| `may-tai/app.py` | Máy tải video riêng (yt-dlp, giao thức cobalt) cho tool Tải video, deploy Railway | cài bằng bot `/maytai`, xem `may-tai/README.md` |
 | `bot-tai-video/bot.py` | Bot Telegram tải video bằng yt-dlp | token qua biến môi trường |
 | `.claude/skills/hook-text/` | Skill thiết kế chữ hook lên frame video cho học viên | skill riêng của dự án, không phải của ECC |
 | `assets/` | Logo, brand | |

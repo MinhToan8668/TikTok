@@ -759,7 +759,7 @@ function stNapHoSoMau(){
 
 /* ═══════ LỆNH BOT TELEGRAM (chỉ chat quản trị) ═══════
    Code.gs gọi:  if (quanTri && studioCoLenh(cmd)) return studioLenh(cmd, arg, chatId);  */
-var LENH_STUDIO = ['studio','keygemini','xuhuong','xhtao','xhsua','xhkey','xhyoutube','xhrss','xhlich','stk','giapro','ngaypro','ngayhv','giahv','uudaihv','maychu','luotthu','luotkb','luotsoi','luotcham','luottai','luotchat','luotdung','luotai','baihoc','duyetbh','tatbh','xoabh','day','chatngay','tuvan','tonghop','mopro','tatpro','dsck','timnd','ckkhoa','tienkhoa','hoso','lichsu','dshv','naphoso'];
+var LENH_STUDIO = ['studio','keygemini','xuhuong','xhtao','xhsua','xhkey','xhyoutube','xhrss','xhlich','stk','giapro','ngaypro','ngayhv','giahv','uudaihv','maychu','maytai','luotthu','luotkb','luotsoi','luotcham','luottai','luotchat','luotdung','luotai','baihoc','duyetbh','tatbh','xoabh','day','chatngay','tuvan','tonghop','mopro','tatpro','dsck','timnd','ckkhoa','tienkhoa','hoso','lichsu','dshv','naphoso'];
 function studioCoLenh(cmd){ return LENH_STUDIO.indexOf(cmd) > -1; }
 
 var ST_MA_NH = {vietcombank:'VCB', vcb:'VCB', mb:'MB', mbbank:'MB', quandoi:'MB', techcombank:'TCB', tcb:'TCB',
@@ -817,6 +817,7 @@ function studioLenh(cmd, arg, chatId, msg){
       '💬 /luotchat `15` — tin chat với Trợ lý AI cho tài khoản Free · /chatngay `60` — mỗi ngày cho Pro, học viên',
       '🗞 /xuhuong — bản tin xu hướng tuần cho các tool AI, kèm nút bấm · /xhtao tạo ngay · /xhsua tự viết · /xhkey key Gemini riêng · /xhyoutube key YouTube · /xhrss nguồn RSS · /xhlich tự chạy thứ Hai',
       '🔑 /keygemini — xem key Gemini đang rảnh hay hết hạn mức, bot hỏi lại để bạn gửi key mới hoặc `xoa 2`',
+      '⬇️ /maytai `link key` — máy tải riêng cho YouTube, Facebook, Instagram (thư mục may-tai/, chạy trên Railway) · hiện: ' + (cfgProp('COBALT_URL') ? '`' + cfgProp('COBALT_URL') + '`' : '_chưa cài_'),
       '☁️ /maychu `https://…workers.dev` — máy chủ phụ Cloudflare (kho B-roll, lồng tiếng AI, tải hộ file lớn) · hiện: ' + (stMayChu() ? '`' + stMayChu() + '`' : '_chưa cài_'),
       '🧠 /baihoc — bộ nhớ AI · /day `nội dung` — dạy AI · /duyetbh /tatbh /xoabh `id`',
       '💬 /tuvan — học viên đang hỏi trợ lý gì · /tonghop — AI tự rút bài học từ các lượt tư vấn mới',
@@ -875,6 +876,7 @@ function studioLenh(cmd, arg, chatId, msg){
   if (cmd === 'xuhuong' && typeof xhLenh === 'function') return xhLenh(arg, chatId, hoi, msg);   // bản tin xu hướng tuần (XuHuong.gs)
   if (/^xh/.test(cmd) && typeof xhLenhTat === 'function') return xhLenhTat(cmd, arg, chatId, msg);   // lệnh tắt /xhtao /xhyoutube… trong menu
   if (cmd === 'keygemini' && typeof hookLenhKey === 'function') return hookLenhKey(arg, chatId, msg, hoi);   // thêm / xoá / xem key Gemini (HookAI.gs)
+  if (cmd === 'maytai' && typeof tvLenhMayTai === 'function') return tvLenhMayTai(arg, chatId, hoi, msg);   // máy tải YouTube / FB / IG riêng (TaiVe.gs + may-tai/)
   if (cmd === 'maychu'){
     if (!arg) return hoi('☁️ Gửi link máy chủ Cloudflare Worker (dạng `https://ten.tai-khoan.workers.dev`), xem hướng dẫn cài trong `cloudflare/CAI-DAT.md`. Gửi `xoa` để tắt.' + (stMayChu() ? '\n\nHiện: `' + stMayChu() + '`' : ''));
     if (/^(xoa|xóa|0|tat|tắt)$/i.test(arg.trim())){ P.setProperty('CF_URL', 'tat'); return tgSend(chatId, '✅ Đã tắt máy chủ phụ. Tool vẫn chạy bằng Apps Script. Bật lại: /maychu <link>.'); }

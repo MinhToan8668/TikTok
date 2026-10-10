@@ -464,6 +464,13 @@ function nenTuLink(u) { return /tiktok\.com/i.test(u) ? 'tiktok' : /youtu\.?be/i
 /* Đổi link là mọi thứ lấy từ link cũ (tên kênh, ảnh bìa, cờ "có video", thời lượng) hết giá trị. */
 function resetLink() { state.link = { tac_gia: '', caption: '', video: false, giay: 0 }; state.image = ''; state.gioDangThat = 0; state.linkDaLay = ''; $('#vidprev').hidden = true; if (!state.file) $('#giay').value = ''; updateCount(); updateSrc(); }
 let layBusy = false;
+/* chưa đăng nhập mà bấm Lấy video: mở bảng đăng nhập có nút ✕, đăng nhập xong tự lấy tiếp */
+let layLaiSauDangNhap = false;
+function canDangNhapLay(st, hetPhien) {
+  st.className = 'status'; st.textContent = hetPhien ? 'Phiên đăng nhập đã hết hạn. Đăng nhập lại là AI lấy video ngay, không tốn lượt.' : 'Đăng nhập hoặc tạo tài khoản miễn phí để AI lấy video từ link. Không tốn lượt; đăng nhập xong mình lấy tiếp luôn.';
+  layLaiSauDangNhap = true;
+  TK.mo('signup', hetPhien ? 'Phiên đăng nhập đã hết hạn, đăng nhập lại để AI lấy video từ link.' : 'Đăng nhập hoặc tạo tài khoản miễn phí để AI lấy video từ link. Mất 30 giây, không tốn lượt.');
+}
 async function layLink() {
   if (layBusy) return;
   const u = $('#link').value.trim(), st = $('#linkStatus'); if (!/^https?:\/\//i.test(u)) { st.className = 'status err'; st.textContent = 'Dán link đầy đủ bắt đầu bằng https://'; return; }
@@ -473,7 +480,12 @@ async function layLink() {
   try {
     let r;
     if (DEMO) { await new Promise(z => setTimeout(z, 500)); r = { ok: true, ho_tro: true, video: true, nen: 'tiktok', tac_gia: 'kenhcuaban', caption: 'Cơm trưa cho vợ ngày mưa #bepnhaminh', anh: '', giay: 52, so_lieu: { view: 1800, like: 96, cmt: 7, luu: 14, share: 5, giay: 52 } }; }
-    else r = await callApi({ action: 'hook_ai', mode: 'link', token: TK.token(), dev: TK.dev(), link: u });
+    else {
+      // lấy video từ link cần tài khoản (máy chủ tải về cho AI): chưa đăng nhập thì mở bảng đăng nhập, không báo lỗi
+      if (!TK.token()) { canDangNhapLay(st); return; }
+      r = await callApi({ action: 'hook_ai', mode: 'link', token: TK.token(), dev: TK.dev(), link: u });
+      if (!r.ok && (r.error === 'can_dangky' || r.error === 'het_phien')) { canDangNhapLay(st, r.error === 'het_phien'); return; }
+    }
     if (!r.ok) { resetLink(); st.className = 'status err'; st.textContent = r.error === 'het_phien' ? 'Phiên đăng nhập hết hạn, đăng nhập lại.' : (r.error === 'unknown_action' || r.error === 'thieu_text') ? 'Máy chủ đang chạy HookAI.gs bản cũ, mentor cần dán bản mới rồi Deploy → New version.' : 'Không lấy được từ link. Tải file video lên nhé.'; return; }
     if (!r.ho_tro) { resetLink(); st.className = 'status'; st.textContent = 'Không lấy được từ link này (video riêng tư hoặc nền tảng chặn). Tải file video lên nhé.'; return; }
     state.link = { tac_gia: r.tac_gia || '', caption: r.caption || '', video: !!r.video, giay: r.giay || 0 }; state.linkDaLay = u; state.image = '';
@@ -915,7 +927,7 @@ tuThuHoSo(); setTimeout(tuThuHoSo, 1500); veThem();
 
 $('#btnCham').addEventListener('click', cham);
 $('#btnClear').addEventListener('click', () => xoaHet(true));
-TK.khoiDong({ api: API, tool: 'cham', onDoi: () => { veQuota(); dienTuHoSo(); } });
+TK.khoiDong({ api: API, tool: 'cham', onDoi: () => { veQuota(); dienTuHoSo(); if (layLaiSauDangNhap && TK.token()) { layLaiSauDangNhap = false; layLink(); } } });
 loadQuota();
 </script>
 <script src="tro-ly.js?v=202610010900"></script>

@@ -1119,6 +1119,7 @@ var MENU_BOT = [
     {command:'xhyoutube',  description:'▶️ Xu hướng: gửi key YouTube · thu · tat'},
     {command:'xhrss',      description:'📰 Xu hướng: nguồn RSS, gửi link để thêm'},
     {command:'xhlich',     description:'⏰ Xu hướng: tự chạy mỗi sáng thứ Hai'},
+    {command:'maytai',     description:'⬇️ Máy tải YouTube / FB / IG: gửi link + key'},
     {command:'keygemini',  description:'🔑 Key Gemini: xem · them AIza... · xoa 2'},
     {command:'dsck',       description:'🧾 Viral Studio: giao dịch chờ mở Pro'},
     {command:'lichtuan',   description:'📆 Lịch kèm 1:1 cả tuần + ai đã đặt'},
