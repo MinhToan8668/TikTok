@@ -6,8 +6,9 @@
 
    Trang web tự gọi tikwm (TikTok, Douyin) và fxtwitter (X) trực tiếp; máy chủ chỉ là đường dự phòng
    cho hai nguồn đó, và là đường chính cho nền tảng khác:
-   · COBALT_URL (+ COBALT_KEY) trong Script properties: nếu mentor tự chạy một máy cobalt
-     (github.com/imputnet/cobalt) thì YouTube, Instagram, Facebook, Threads, Reddit… tải được đầy đủ.
+   · COBALT_URL (+ COBALT_KEY) trong Script properties: máy tải riêng của khoá (thư mục may-tai/ trong repo,
+     chạy yt-dlp trên Railway, nói đúng giao thức cobalt) hoặc một máy cobalt (github.com/imputnet/cobalt).
+     Có máy này thì YouTube, Instagram, Facebook, Threads, Reddit… tải được đầy đủ. Cài bằng bot: /maytai.
    · Không có cobalt: đọc thẻ og:video / og:image / og:audio của trang (Pinterest, một số bài Facebook,
      Threads, Instagram công khai…). Được bao nhiêu trả bấy nhiêu, không hứa.
    ═══════════════════════════════════════════════════════════════ */
@@ -35,6 +36,25 @@ function taiVe(b){
     if (og && og.items.length) return jsonOut({ok:true, nen:nen, nguon:'og', tieu_de:og.tieu_de, tac_gia:og.tac_gia, items:og.items, co_cobalt: !!cfgProp('COBALT_URL')});
     return jsonOut({ok:false, error:'khong_lay_duoc', nen:nen, co_cobalt: !!cfgProp('COBALT_URL'), loi: cb && cb.loi ? cb.loi : ''});
   }catch(err){ return jsonOut({ok:false, error:'internal', loi:String(err).slice(0, 200)}); }
+}
+
+/* Bot /maytai: cài máy tải riêng (may-tai trên Railway hoặc cobalt). /maytai <link> <key> · /maytai tat · /maytai (xem) */
+function tvLenhMayTai(arg, chatId, hoi, msg){
+  arg = String(arg || '').trim(); var P = PropertiesService.getScriptProperties(), cu = cfgProp('COBALT_URL');
+  if (/^(tat|tắt|xoa|xóa)$/i.test(arg)){ P.deleteProperty('COBALT_URL'); P.deleteProperty('COBALT_KEY'); return tgSend(chatId, '✅ Đã tắt máy tải riêng. Tải video vẫn chạy cho TikTok, Douyin, X; YouTube chỉ lấy ảnh bìa.'); }
+  var m = arg.match(/^(https:\/\/[^\s]+)\s*([^\s]*)$/);
+  if (!m) return hoi((cu ? '✅ Đang dùng máy tải: `' + cu + '`\n\n' : '') + '⬇️ Gửi link máy tải và key, cách nhau một dấu cách. Ví dụ:\n`https://may-tai-production.up.railway.app keycuaban`\n\nCách dựng máy trên Railway: xem `may-tai/README.md` trong repo. Gửi `tat` để tắt. Tin chứa key sẽ được xoá khỏi chat.');
+  if (msg && msg.message_id) try{ tgApi('deleteMessage', {chat_id: chatId, message_id: msg.message_id}); }catch(e){}   // không để key nằm lại trong chat
+  var goc = m[1].replace(/\/+$/, ''), key = m[2] || '', h = {'Accept':'application/json'};
+  if (key) h['Authorization'] = 'Api-Key ' + key;
+  var tt = '', ma = 0, j = {};
+  try{ var r = UrlFetchApp.fetch(goc + '/', {method:'post', contentType:'application/json', payload: JSON.stringify({url:'khong-phai-link'}), headers:h, muteHttpExceptions:true}); ma = r.getResponseCode(); try{ j = JSON.parse(r.getContentText()); }catch(e){} }
+  catch(e){ return tgSend(chatId, '❌ Không gọi được `' + goc + '` (' + String(e).slice(0, 120) + '). Kiểm tra máy đã chạy và đã bật Public domain trên Railway chưa.'); }
+  if (ma === 401 || /auth/.test(JSON.stringify(j))) return tgSend(chatId, '❌ Máy tải trả lời nhưng key sai. Gửi lại `/maytai ' + goc + ' <key đúng>` (key là biến API_KEY trên Railway).');
+  if (!j || !j.status) return tgSend(chatId, '❌ Link này không phải máy tải (http ' + ma + '). Kiểm tra lại link.');
+  P.setProperty('COBALT_URL', goc); if (key) P.setProperty('COBALT_KEY', key); else P.deleteProperty('COBALT_KEY');
+  try{ var hh = JSON.parse(UrlFetchApp.fetch(goc + '/', {muteHttpExceptions:true}).getContentText()); if (hh.name) tt = '\nMáy: ' + hh.name + (hh.yt_dlp ? ' · yt-dlp ' + hh.yt_dlp : '') + (hh.ffmpeg === false ? ' · ⚠️ thiếu ffmpeg (không ghép được 1080p, không ra mp3)' : ''); }catch(e){}
+  return tgSend(chatId, '✅ Đã lưu máy tải riêng: `' + goc + '`' + tt + '\nThử: mở tab Tải video, dán link YouTube / Facebook / Instagram.');
 }
 
 function tvNen(url){
@@ -90,6 +110,10 @@ function tvCobalt(url){
   }
   try{
     var j = hoi({}), items = [];
+    if (Array.isArray(j.items) && j.items.length){   // máy tải riêng (may-tai) trả sẵn nhiều bản: 1080p, 360p, mp3, ảnh bìa
+      j.items.slice(0, 8).forEach(function(it){ if (it && it.url) items.push({loai: it.loai || 'video', url: String(it.url), ten: it.ten || '', nhan: it.nhan || 'File'}); });
+      return {ok:true, nen:tvNen(url), nguon:'may_tai', tieu_de: String(j.title || '').slice(0, 200), tac_gia: String(j.author || '').slice(0, 80), items:items};
+    }
     if (j.status === 'tunnel' || j.status === 'redirect'){
       items.push({loai: /\.(mp3|m4a|ogg|opus|wav)$/i.test(j.filename || '') ? 'am_thanh' : /\.(jpe?g|png|webp|gif)$/i.test(j.filename || '') ? 'anh' : 'video', url:j.url, ten:j.filename || '', nhan:'File gốc'});
       var a = hoi({downloadMode:'audio', audioFormat:'mp3'});   // thêm bản chỉ tiếng

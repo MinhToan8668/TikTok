@@ -161,7 +161,7 @@
         <span class="full" title="Video không logo, HD, ảnh slide, nhạc nền, ảnh bìa">TikTok</span>
         <span class="full" title="Video không logo, ảnh, nhạc nền">Douyin</span>
         <span class="full" title="Video, GIF, ảnh gốc">X / Twitter</span>
-        <span title="Ảnh bìa; video và mp3 khi máy chủ có cobalt">YouTube</span>
+        <span title="Ảnh bìa; video và mp3 khi có máy tải riêng của khoá">YouTube</span>
         <span title="Tùy bài công khai">Instagram</span>
         <span title="Tùy bài công khai">Facebook</span>
         <span title="Tùy bài công khai">Threads</span>
@@ -279,8 +279,8 @@ async function lay(tuLink) {
         const id = ytId(link);
         if (id) {
           kq = kq || { nen, id, tieu_de: '', items: [] }; kq.id = id; kq.bia = kq.bia || `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
-          kq.items.push({ loai: 'anh', url: `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`, nhan: 'Ảnh bìa gốc (1280×720)', bia: true }, { loai: 'anh', url: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`, nhan: 'Ảnh bìa nhỏ (480×360)', bia: true });
-          if (!r.ok) kq.ghi_chu = 'Tải video, mp3 YouTube cần máy chủ có cobalt (xem hướng dẫn cho mentor). Hiện lấy được ảnh bìa.';
+          if (!kq.items.some(x => x.loai === 'anh')) kq.items.push({ loai: 'anh', url: `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`, nhan: 'Ảnh bìa gốc (1280×720)', bia: true }, { loai: 'anh', url: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`, nhan: 'Ảnh bìa nhỏ (480×360)', bia: true });
+          if (!r.ok) kq.ghi_chu = r.co_cobalt ? 'Máy tải đang không lấy được video này (YouTube đôi khi chặn máy chủ). Thử lại sau ít phút; hiện lấy được ảnh bìa.' : 'Tải video, mp3 YouTube cần máy tải riêng của khoá (mentor cài bằng bot /maytai). Hiện lấy được ảnh bìa.';
           loi = '';
         }
       }
@@ -293,7 +293,7 @@ async function lay(tuLink) {
       may_chu_cu: 'Máy chủ chưa cập nhật phần Tải về. Mentor dán TaiVe.gs và HookAI.gs mới vào Apps Script rồi Deploy → New version.',
       loi_mang: 'Máy bạn đang mất mạng hoặc dịch vụ tải đang nghẽn. Kiểm tra mạng rồi bấm lại.',
       link_sai: 'Link không hợp lệ.',
-      khong_lay_duoc: nen === 'instagram' || nen === 'facebook' || nen === 'threads' ? `Bài ${TEN_NEN[nen]} này không mở công khai cho máy chủ đọc (thường do bài riêng tư hoặc bắt đăng nhập). Thử bài khác, hoặc mentor cài cobalt để tải đầy đủ.` : 'Không lấy được file từ link này. Kiểm tra bài còn công khai không, hoặc thử lại sau ít phút.'
+      khong_lay_duoc: nen === 'instagram' || nen === 'facebook' || nen === 'threads' ? `Bài ${TEN_NEN[nen]} này không mở công khai cho máy chủ đọc (thường do bài riêng tư hoặc bắt đăng nhập). Thử bài khác, hoặc mentor cài máy tải riêng (bot /maytai) để tải đầy đủ.` : 'Không lấy được file từ link này. Kiểm tra bài còn công khai không, hoặc thử lại sau ít phút.'
     })[loi] || 'Không lấy được file từ link này (' + loi + '). Thử lại sau ít phút.';
     return;
   }
