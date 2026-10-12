@@ -29,7 +29,7 @@
      ANTHROPIC_API_KEY, OPENAI_API_KEY   (Secret) key khi chọn claude / openai
    ═══════════════════════════════════════════════════════════════════════════ */
 
-const PHIEN_BAN = '2026.10.23';
+const PHIEN_BAN = '2026.10.24';
 /* link /exec của Apps Script đang dùng trong tool (công khai sẵn trong tools/*.html). Biến APPS_SCRIPT_URL trên Cloudflare, nếu có, sẽ được ưu tiên. */
 const APPS_SCRIPT_MD = 'https://script.google.com/macros/s/AKfycbyxe1nWupAl6VheDZHaU3Ojm-d6c8F_khhUMtkehNCLh5OnGW6f2uF0PKPYZ4eYUqyGjQ/exec';
 const asUrl = env => String(env.APPS_SCRIPT_URL || env.APPS_SCRIPT || APPS_SCRIPT_MD).trim();
@@ -313,7 +313,10 @@ async function ytTai(req, url, cors) {
     if (!f) return json({ ok: false, error: 'khong_co_ban' }, cors, 404);
     const ip = new URL(f.url).searchParams.get('ip') || '?';
     for (let lan = 0; lan < 4; lan++) {
-      r = await fetch(f.url, { headers: { 'user-agent': p.c.ua, range: rg || 'bytes=0-' } });
+      // giống yt-dlp: xin khúc bằng tham số &range= trên link (YouTube chặn header Range với nhiều khúc giữa file)
+      const m = /bytes=(\d+)-(\d*)/.exec(rg || ''), dau = m ? +m[1] : 0, cuoi = m && m[2] ? +m[2] : dau + 8388607;
+      r = await fetch(f.url + '&range=' + dau + '-' + cuoi + '&rn=' + (lan + 1), { headers: { 'user-agent': p.c.ua } });
+      if (r.ok && rg) r = new Response(r.body, { status: 206, headers: new Headers({ 'content-length': r.headers.get('content-length') || '', 'content-range': 'bytes ' + dau + '-' + (dau + (+r.headers.get('content-length') || 1) - 1) + '/' + (f.contentLength || '*') }) });
       if (r.ok || r.status === 206) break;
       vet.push(p.c.ten + ' ' + ip + ' → ' + r.status);
     }
