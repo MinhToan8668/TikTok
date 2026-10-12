@@ -557,18 +557,35 @@ Hashtag: `#xaykenh #tiktoktips #contentcreator`
 Ảnh `k4-tuyen-sinh.png` (4:5). Học phí 2 triệu (early bird), khai giảng 22/10, giữ chỗ trước 20/10,
 sĩ số tối đa 10. Đổi số thì sửa section `k4-tuyen-sinh` trong `poster.html` rồi xuất lại.
 
-**Tin nhắn gửi kèm vào group**
+**Tin nhắn gửi kèm poster**
 
 ```
-Cả lớp ơi, khoá 4 mở đăng ký rồi nha.
+Cả lớp ơi, khoá 4 mở đăng ký rồi nha 🧱
 
-Vẫn như cũ: mình kèm edit 1:1, ngồi cùng sửa từng video chứ không phải quay sẵn rồi để mọi người tự coi. Có mentor trả lời thắc mắc về content, hỏi là gặp người thật chứ không qua trợ lý.
+Vẫn như mọi khoá: mình kèm edit 1:1, ngồi cùng sửa từng video chứ không phải quay sẵn rồi để mọi người tự coi. Hỏi gì về content là gặp mentor trả lời thẳng, không qua trợ lý.
 
-Học viên khoá này dùng luôn Viral Studio bản Pro, 6 tool từ soi video tới chấm video.
+Khoá này học viên dùng luôn Viral Studio bản Pro, 6 tool từ soi video, chấm hook, kịch bản, tới dựng và chấm video.
 
 Học phí 2tr, giá early bird, trọn gói từ tài liệu tới kèm edit và công cụ.
 Khai giảng 22/10, giữ chỗ trước 20/10.
 
-Lớp nhận tối đa 10 bạn thôi vì kèm 1:1 mình không ôm nổi lớp đông. Ai muốn vô thì điền form này nha: [dán link form]
+Lớp nhận tối đa 10 bạn thôi, kèm 1:1 nên mình không ôm nổi lớp đông.
+
+Ai muốn vô thì điền form này nha: [dán link form]
+Thắc mắc gì cứ nhắn thẳng trong group hoặc inbox mình.
 ```
 
+**Nhắc lại sau 2–3 ngày** (đừng gửi lại cả bài, ai lướt qua rồi sẽ bỏ qua tiếp)
+
+```
+Nhắc nhẹ: khoá 4 còn [số] chỗ, giữ chỗ trước 20/10 nha.
+Học phí 2tr early bird, kèm edit 1:1 + Viral Studio bản Pro, khai giảng 22/10.
+Form đây: [dán link form]
+```
+
+**Nếu group có học viên khoá cũ**, thêm một tin riêng:
+
+```
+Mấy bạn học khoá trước rồi mà có bạn bè đang muốn xây kênh thì chỉ qua mình nha.
+Khoá 4 chỉ nhận 10 bạn, ai điền form trước thì mình xếp trước.
+```
