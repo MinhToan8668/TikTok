@@ -6,6 +6,8 @@
      GET  /broll       → tìm kho B-roll miễn phí (Pixabay và/hoặc Pexels), trả link đã qua /media để vẽ lên canvas; &loai=anh → ảnh minh hoạ
      GET  /media?u=    → phát lại file Pixabay/Pexels có CORS + Range (xem trước, xuất video)
      GET  /tai?u=&ten= → tải hộ file video/ảnh/nhạc từ CDN các nền tảng, không giới hạn 35MB, có tên file
+     GET  /yt?v=       → YouTube: giả làm ứng dụng YouTube VR / iOS để lấy danh sách bản tải (miễn phí, không cần máy riêng)
+     GET  /yt/tai?v=&itag=&ten= → chuyển file YouTube qua máy chủ này (link gốc của YouTube chỉ chạy với IP đã lấy nó)
      POST /tts         → lồng tiếng AI tiếng Việt (Gemini TTS), trả WAV; trừ lượt qua Apps Script
      POST /do_hoa      → AI tạo motion graphic mới theo mô tả: trả cảnh JSON (lớp hộp/tròn/chữ/đường/vòng/số + keyframe),
                          trình dựng tự vẽ, không chạy code lạ; trừ 1 lượt chat
@@ -27,7 +29,7 @@
      ANTHROPIC_API_KEY, OPENAI_API_KEY   (Secret) key khi chọn claude / openai
    ═══════════════════════════════════════════════════════════════════════════ */
 
-const PHIEN_BAN = '2026.10.20';
+const PHIEN_BAN = '2026.10.21';
 /* link /exec của Apps Script đang dùng trong tool (công khai sẵn trong tools/*.html). Biến APPS_SCRIPT_URL trên Cloudflare, nếu có, sẽ được ưu tiên. */
 const APPS_SCRIPT_MD = 'https://script.google.com/macros/s/AKfycbyxe1nWupAl6VheDZHaU3Ojm-d6c8F_khhUMtkehNCLh5OnGW6f2uF0PKPYZ4eYUqyGjQ/exec';
 const asUrl = env => String(env.APPS_SCRIPT_URL || env.APPS_SCRIPT || APPS_SCRIPT_MD).trim();
@@ -55,6 +57,8 @@ export default {
       if (path === '/am-thanh' && req.method === 'GET') return json(await timAmThanh(url, env), cors);
       if (path === '/media' && req.method === 'GET') return media(req, url, cors);
       if (path === '/tai' && req.method === 'GET') return taiHo(req, url, cors);
+      if (path === '/yt' && req.method === 'GET') return ytDs(url, cors);
+      if (path === '/yt/tai' && req.method === 'GET') return ytTai(req, url, cors);
       if (path === '/dich' && req.method === 'POST') { if (!cors['access-control-allow-origin']) return json({ ok: false, error: 'origin' }, cors, 403); return dichPhuDe(req, env, cors); }
       if (path === '/do_hoa' && req.method === 'POST') { if (!cors['access-control-allow-origin']) return json({ ok: false, error: 'origin' }, cors, 403); return doHoaAI(req, env, cors); }
       if (path === '/agent' && req.method === 'POST') { if (!cors['access-control-allow-origin']) return json({ ok: false, error: 'origin' }, cors, 403); return agent(req, env, cors); }
@@ -251,6 +255,65 @@ async function taiHo(req, url, cors) {
   const out = new Headers(cors); ['content-type', 'content-length', 'content-range', 'accept-ranges'].forEach(k => { const v = r.headers.get(k); if (v) out.set(k, v); });
   out.set('content-disposition', (url.searchParams.get('xem') ? 'inline' : 'attachment') + '; filename="' + ten + '"'); out.set('cache-control', 'private, max-age=600');
   return new Response(r.body, { status: r.status, headers: out });
+}
+
+/* ── YouTube miễn phí: hỏi thẳng API player của YouTube bằng danh tính ứng dụng di động (link trả về không cần giải mã chữ ký),
+   rồi chuyển file qua chính Worker. YouTube có thể bắt "xác nhận không phải bot" với IP của Cloudflare: khi đó trả lỗi để
+   trang Tải video chuyển sang máy tải riêng (nếu có). ── */
+const YT_CLIENTS = [
+  { ten: 'ANDROID_VR', so: 28, ban: '1.65.10', ua: 'com.google.android.apps.youtube.vr.oculus/1.65.10 (Linux; U; Android 12L; eureka-user Build/SQ3A.220605.009.A1) gzip', them: { deviceMake: 'Oculus', deviceModel: 'Quest 3', androidSdkVersion: 32, osName: 'Android', osVersion: '12L' } },
+  { ten: 'IOS', so: 5, ban: '20.10.4', ua: 'com.google.ios.youtube/20.10.4 (iPhone16,2; U; CPU iOS 18_3_2 like Mac OS X;)', them: { deviceMake: 'Apple', deviceModel: 'iPhone16,2', osName: 'iPhone', osVersion: '18.3.2.22D82' } },
+  { ten: 'ANDROID', so: 3, ban: '20.10.38', ua: 'com.google.android.youtube/20.10.38 (Linux; U; Android 14) gzip', them: { androidSdkVersion: 34, osName: 'Android', osVersion: '14' } }
+];
+async function ytPlayer(id, uuTien) {
+  const ds = uuTien ? [YT_CLIENTS.find(c => c.ten === uuTien), ...YT_CLIENTS.filter(c => c.ten !== uuTien)].filter(Boolean) : YT_CLIENTS;
+  const lyDo = [];
+  for (const c of ds) {
+    try {
+      const r = await fetch('https://www.youtube.com/youtubei/v1/player?prettyPrint=false', { method: 'POST',
+        headers: { 'content-type': 'application/json', 'user-agent': c.ua, 'x-youtube-client-name': String(c.so), 'x-youtube-client-version': c.ban, origin: 'https://www.youtube.com' },
+        body: JSON.stringify({ videoId: id, context: { client: { clientName: c.ten, clientVersion: c.ban, hl: 'vi', gl: 'VN', ...c.them } }, contentCheckOk: true, racyCheckOk: true }) });
+      const j = await r.json();
+      const st = (j.playabilityStatus || {}).status, sd = j.streamingData || {};
+      const co = [...(sd.formats || []), ...(sd.adaptiveFormats || [])].some(f => f.url);
+      if (st === 'OK' && co) return { j, c };
+      lyDo.push(c.ten + ': ' + (st || 'http ' + r.status) + ' ' + String((j.playabilityStatus || {}).reason || '').slice(0, 80));
+    } catch (e) { lyDo.push(c.ten + ': ' + String(e.message || e).slice(0, 60)); }
+  }
+  return { loi: lyDo.join(' · ') };
+}
+function ytCao(f) { return +(String(f.qualityLabel || '').match(/\d+/) || [])[0] || f.height || 0; }
+async function ytDs(url, cors) {
+  const id = String(url.searchParams.get('v') || ''); if (!/^[\w-]{11}$/.test(id)) return json({ ok: false, error: 'link_sai' }, cors, 400);
+  const p = await ytPlayer(id); if (!p.j) return json({ ok: false, error: 'youtube_chan', chi_tiet: p.loi }, cors, 502);
+  const sd = p.j.streamingData || {}, vd = p.j.videoDetails || {}, goc = url.origin, items = [];
+  const link = (f, ten) => `${goc}/yt/tai?v=${id}&itag=${f.itag}&c=${p.c.ten}&ten=${encodeURIComponent(ten)}`;
+  const lien = (sd.formats || []).filter(f => f.url).sort((a, b) => ytCao(b) - ytCao(a));   // video có sẵn tiếng
+  lien.slice(0, 2).forEach(f => items.push({ loai: 'video', url: link(f, (vd.title || id) + '-' + (f.qualityLabel || '')), nhan: 'Video ' + (f.qualityLabel || ''), size: +f.contentLength || 0 }));
+  const ad = (sd.adaptiveFormats || []).filter(f => f.url);
+  const tieng = ad.filter(f => /^audio\/mp4/.test(f.mimeType)).sort((a, b) => ((b.audioTrack || {}).audioIsDefault ? 1 : 0) - ((a.audioTrack || {}).audioIsDefault ? 1 : 0) || (b.bitrate || 0) - (a.bitrate || 0))[0];
+  if (tieng) items.push({ loai: 'am_thanh', url: link(tieng, (vd.title || id) + '-am-thanh'), nhan: 'Âm thanh (m4a)', size: +tieng.contentLength || 0 });
+  const net = ad.filter(f => /^video\/mp4/.test(f.mimeType) && ytCao(f) <= 1080).sort((a, b) => ytCao(b) - ytCao(a) || (b.bitrate || 0) - (a.bitrate || 0))[0];
+  if (net && ytCao(net) > (lien[0] ? ytCao(lien[0]) : 0)) items.push({ loai: 'video', url: link(net, (vd.title || id) + '-' + net.qualityLabel + '-khong-tieng'), nhan: 'Video ' + (net.qualityLabel || '') + ' · không tiếng (để dựng)', size: +net.contentLength || 0 });
+  if (!items.length) return json({ ok: false, error: 'youtube_chan', chi_tiet: 'khong co ban tai' }, cors, 502);
+  return json({ ok: true, nguon: 'worker_yt', client: p.c.ten, tieu_de: vd.title || '', tac_gia: vd.author || '', giay: +vd.lengthSeconds || 0, items }, { ...cors, 'cache-control': 'private, max-age=300' });
+}
+async function ytTai(req, url, cors) {
+  const id = String(url.searchParams.get('v') || ''), itag = String(url.searchParams.get('itag') || '');
+  if (!/^[\w-]{11}$/.test(id) || !/^\d+$/.test(itag)) return json({ ok: false, error: 'link_sai' }, cors, 400);
+  // lấy lại link ngay trong lượt này: link YouTube gắn với IP đã hỏi, nên hỏi và tải phải đi cùng một máy
+  const p = await ytPlayer(id, url.searchParams.get('c') || ''); if (!p.j) return json({ ok: false, error: 'youtube_chan', chi_tiet: p.loi }, cors, 502);
+  const sd = p.j.streamingData || {}, f = [...(sd.formats || []), ...(sd.adaptiveFormats || [])].find(x => String(x.itag) === itag && x.url);
+  if (!f) return json({ ok: false, error: 'khong_co_ban' }, cors, 404);
+  const rg = req.headers.get('range');
+  const r = await fetch(f.url, { headers: { 'user-agent': p.c.ua, range: rg || 'bytes=0-' } });
+  if (!r.ok && r.status !== 206) return json({ ok: false, error: 'cdn_' + r.status }, cors, 502);
+  const audio = /^audio/.test(f.mimeType || ''), ten = tenAscii(url.searchParams.get('ten'), 'youtube-' + id).replace(/\.[a-z0-9]{2,4}$/i, '') + (audio ? '.m4a' : '.mp4');
+  const out = new Headers(cors); out.set('content-type', audio ? 'audio/mp4' : 'video/mp4'); out.set('accept-ranges', 'bytes');
+  const len = r.headers.get('content-length'); if (len) out.set('content-length', len);
+  if (rg && r.headers.get('content-range')) out.set('content-range', r.headers.get('content-range'));
+  out.set('content-disposition', 'attachment; filename="' + ten + '"'); out.set('cache-control', 'private, no-store');
+  return new Response(r.body, { status: rg ? r.status : 200, headers: out });
 }
 
 /* ── lồng tiếng AI: kiểm đăng nhập + trừ 1 lượt "dung" qua Apps Script, rồi gọi Gemini TTS ── */
