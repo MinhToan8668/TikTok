@@ -6,7 +6,8 @@
      GET  /broll       → tìm kho B-roll miễn phí (Pixabay và/hoặc Pexels), trả link đã qua /media để vẽ lên canvas; &loai=anh → ảnh minh hoạ
      GET  /media?u=    → phát lại file Pixabay/Pexels có CORS + Range (xem trước, xuất video)
      GET  /tai?u=&ten= → tải hộ file video/ảnh/nhạc từ CDN các nền tảng, không giới hạn 35MB, có tên file
-     GET  /yt?v=       → YouTube: giả làm ứng dụng YouTube VR / iOS để lấy danh sách bản tải (miễn phí, không cần máy riêng)
+     GET  /yt?v=       → YouTube (THỬ NGHIỆM, trang đang tắt): giả làm ứng dụng YouTube VR / iOS để lấy danh sách bản tải.
+                         Đo 10/2026: chỉ tải được ~16MB đầu mỗi file rồi googlevideo trả 403 (thiếu PO token).
      GET  /yt/tai?v=&itag=&ten= → chuyển file YouTube qua máy chủ này (link gốc của YouTube chỉ chạy với IP đã lấy nó)
      POST /tts         → lồng tiếng AI tiếng Việt (Gemini TTS), trả WAV; trừ lượt qua Apps Script
      POST /do_hoa      → AI tạo motion graphic mới theo mô tả: trả cảnh JSON (lớp hộp/tròn/chữ/đường/vòng/số + keyframe),

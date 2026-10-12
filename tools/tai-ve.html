@@ -250,7 +250,8 @@ async function hoiMayChu(link) {
   return r;
 }
 
-/* YouTube qua máy chủ Cloudflare (/yt): miễn phí, nhưng YouTube có lúc chặn IP của Cloudflare → trả null để thử đường khác */
+/* YouTube qua máy chủ Cloudflare (/yt): THỬ NGHIỆM, đang tắt. Đo 10/2026: YouTube chỉ cho tải khoảng 16MB đầu mỗi file rồi trả 403
+   (thiếu mã PO token chống bot), nên file lớn bị tải dở. Giữ lại để bật khi YouTube nới hoặc có cách lấy PO token. */
 async function hoiYtWorker(id) {
   try {
     const mc = await TK.mayChu(); if (!mc.url) return null;
@@ -283,8 +284,8 @@ async function lay(tuLink) {
       kq = { nen, id: '', tieu_de: decodeURIComponent(link.split('/').pop().split('?')[0]), items: [{ loai: /mp3|m4a|wav|ogg|aac/i.test(ext) ? 'am_thanh' : /jpe?g|png|webp|gif/i.test(ext) ? 'anh' : 'video', url: link, nhan: 'File gốc', ext }] };
     } else {
       let r = null;
-      if (nen === 'youtube' && ytId(link)) r = await hoiYtWorker(ytId(link));   // miễn phí qua máy chủ Cloudflare, chặn thì mới hỏi máy tải riêng
-      if (!r || !r.ok) { try { r = await hoiMayChu(link); } catch (e) { r = { ok: false, error: 'loi_mang' }; } }
+      // YouTube qua máy chủ Cloudflare (hoiYtWorker) đã thử: YouTube chỉ cho tải ~16MB đầu rồi chặn, nên tạm không dùng
+      try { r = await hoiMayChu(link); } catch (e) { r = { ok: false, error: 'loi_mang' }; }
       if (r.ok) kq = { nen: r.nen || nen, id: '', tieu_de: r.tieu_de || '', tac_gia: r.tac_gia || '', items: r.items || [] };
       else loi = r.error || 'khong_lay_duoc';
       if (nen === 'youtube') {   // ảnh bìa YouTube luôn lấy được, video/mp3 cần cobalt trên máy chủ
