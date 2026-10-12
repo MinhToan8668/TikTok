@@ -29,7 +29,7 @@
      ANTHROPIC_API_KEY, OPENAI_API_KEY   (Secret) key khi chọn claude / openai
    ═══════════════════════════════════════════════════════════════════════════ */
 
-const PHIEN_BAN = '2026.10.21';
+const PHIEN_BAN = '2026.10.22';
 /* link /exec của Apps Script đang dùng trong tool (công khai sẵn trong tools/*.html). Biến APPS_SCRIPT_URL trên Cloudflare, nếu có, sẽ được ưu tiên. */
 const APPS_SCRIPT_MD = 'https://script.google.com/macros/s/AKfycbyxe1nWupAl6VheDZHaU3Ojm-d6c8F_khhUMtkehNCLh5OnGW6f2uF0PKPYZ4eYUqyGjQ/exec';
 const asUrl = env => String(env.APPS_SCRIPT_URL || env.APPS_SCRIPT || APPS_SCRIPT_MD).trim();
@@ -302,12 +302,18 @@ async function ytTai(req, url, cors) {
   const id = String(url.searchParams.get('v') || ''), itag = String(url.searchParams.get('itag') || '');
   if (!/^[\w-]{11}$/.test(id) || !/^\d+$/.test(itag)) return json({ ok: false, error: 'link_sai' }, cors, 400);
   // lấy lại link ngay trong lượt này: link YouTube gắn với IP đã hỏi, nên hỏi và tải phải đi cùng một máy
-  const p = await ytPlayer(id, url.searchParams.get('c') || ''); if (!p.j) return json({ ok: false, error: 'youtube_chan', chi_tiet: p.loi }, cors, 502);
-  const sd = p.j.streamingData || {}, f = [...(sd.formats || []), ...(sd.adaptiveFormats || [])].find(x => String(x.itag) === itag && x.url);
-  if (!f) return json({ ok: false, error: 'khong_co_ban' }, cors, 404);
-  const rg = req.headers.get('range');
-  const r = await fetch(f.url, { headers: { 'user-agent': p.c.ua, range: rg || 'bytes=0-' } });
-  if (!r.ok && r.status !== 206) return json({ ok: false, error: 'cdn_' + r.status }, cors, 502);
+  // Cloudflare có thể đi ra mạng bằng IP khác giữa hai lần gọi → YouTube trả 403: hỏi lại và thử tối đa 4 lần
+  const rg = req.headers.get('range'), vet = [];
+  let r = null, f = null, p = null;
+  for (let lan = 0; lan < 4 && !(r && (r.ok || r.status === 206)); lan++) {
+    p = await ytPlayer(id, lan ? '' : (url.searchParams.get('c') || '')); if (!p.j) return json({ ok: false, error: 'youtube_chan', chi_tiet: p.loi }, cors, 502);
+    const sd = p.j.streamingData || {};
+    f = [...(sd.formats || []), ...(sd.adaptiveFormats || [])].find(x => String(x.itag) === itag && x.url);
+    if (!f) return json({ ok: false, error: 'khong_co_ban' }, cors, 404);
+    r = await fetch(f.url, { headers: { 'user-agent': p.c.ua, range: rg || 'bytes=0-' } });
+    vet.push(p.c.ten + ' ip ' + (new URL(f.url).searchParams.get('ip') || '?') + ' → ' + r.status);
+  }
+  if (!r.ok && r.status !== 206) return json({ ok: false, error: 'cdn_' + r.status, chi_tiet: vet.join(' · ') }, cors, 502);
   const audio = /^audio/.test(f.mimeType || ''), ten = tenAscii(url.searchParams.get('ten'), 'youtube-' + id).replace(/\.[a-z0-9]{2,4}$/i, '') + (audio ? '.m4a' : '.mp4');
   const out = new Headers(cors); out.set('content-type', audio ? 'audio/mp4' : 'video/mp4'); out.set('accept-ranges', 'bytes');
   const len = r.headers.get('content-length'); if (len) out.set('content-length', len);
