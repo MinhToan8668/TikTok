@@ -29,7 +29,7 @@
      ANTHROPIC_API_KEY, OPENAI_API_KEY   (Secret) key khi chọn claude / openai
    ═══════════════════════════════════════════════════════════════════════════ */
 
-const PHIEN_BAN = '2026.10.22';
+const PHIEN_BAN = '2026.10.23';
 /* link /exec của Apps Script đang dùng trong tool (công khai sẵn trong tools/*.html). Biến APPS_SCRIPT_URL trên Cloudflare, nếu có, sẽ được ưu tiên. */
 const APPS_SCRIPT_MD = 'https://script.google.com/macros/s/AKfycbyxe1nWupAl6VheDZHaU3Ojm-d6c8F_khhUMtkehNCLh5OnGW6f2uF0PKPYZ4eYUqyGjQ/exec';
 const asUrl = env => String(env.APPS_SCRIPT_URL || env.APPS_SCRIPT || APPS_SCRIPT_MD).trim();
@@ -302,16 +302,21 @@ async function ytTai(req, url, cors) {
   const id = String(url.searchParams.get('v') || ''), itag = String(url.searchParams.get('itag') || '');
   if (!/^[\w-]{11}$/.test(id) || !/^\d+$/.test(itag)) return json({ ok: false, error: 'link_sai' }, cors, 400);
   // lấy lại link ngay trong lượt này: link YouTube gắn với IP đã hỏi, nên hỏi và tải phải đi cùng một máy
-  // Cloudflare có thể đi ra mạng bằng IP khác giữa hai lần gọi → YouTube trả 403: hỏi lại và thử tối đa 4 lần
+  // Link YouTube chỉ chạy với đúng IP đã hỏi, mà Cloudflare đi ra mạng bằng vài IP khác nhau: mỗi link thử tải 4 lần
+  // (thường trúng IP sau 1–3 lần), không được thì hỏi link mới, tối đa 3 vòng. Mỗi lần xin tối đa 8MB (trang tải từng khúc).
   const rg = req.headers.get('range'), vet = [];
   let r = null, f = null, p = null;
-  for (let lan = 0; lan < 4 && !(r && (r.ok || r.status === 206)); lan++) {
-    p = await ytPlayer(id, lan ? '' : (url.searchParams.get('c') || '')); if (!p.j) return json({ ok: false, error: 'youtube_chan', chi_tiet: p.loi }, cors, 502);
+  for (let vong = 0; vong < 3 && !(r && (r.ok || r.status === 206)); vong++) {
+    p = await ytPlayer(id, vong ? '' : (url.searchParams.get('c') || '')); if (!p.j) return json({ ok: false, error: 'youtube_chan', chi_tiet: p.loi }, cors, 502);
     const sd = p.j.streamingData || {};
     f = [...(sd.formats || []), ...(sd.adaptiveFormats || [])].find(x => String(x.itag) === itag && x.url);
     if (!f) return json({ ok: false, error: 'khong_co_ban' }, cors, 404);
-    r = await fetch(f.url, { headers: { 'user-agent': p.c.ua, range: rg || 'bytes=0-' } });
-    vet.push(p.c.ten + ' ip ' + (new URL(f.url).searchParams.get('ip') || '?') + ' → ' + r.status);
+    const ip = new URL(f.url).searchParams.get('ip') || '?';
+    for (let lan = 0; lan < 4; lan++) {
+      r = await fetch(f.url, { headers: { 'user-agent': p.c.ua, range: rg || 'bytes=0-' } });
+      if (r.ok || r.status === 206) break;
+      vet.push(p.c.ten + ' ' + ip + ' → ' + r.status);
+    }
   }
   if (!r.ok && r.status !== 206) return json({ ok: false, error: 'cdn_' + r.status, chi_tiet: vet.join(' · ') }, cors, 502);
   const audio = /^audio/.test(f.mimeType || ''), ten = tenAscii(url.searchParams.get('ten'), 'youtube-' + id).replace(/\.[a-z0-9]{2,4}$/i, '') + (audio ? '.m4a' : '.mp4');
