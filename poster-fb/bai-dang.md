@@ -554,21 +554,21 @@ Hashtag: `#xaykenh #tiktoktips #contentcreator`
 
 ## Poster tuyển sinh khoá 4 · gửi group Zalo
 
-Ảnh `k4-tuyen-sinh.png` (4:5). **Ba chỗ trong ảnh cần điền trước khi gửi:** học phí, ngày khai giảng,
-hạn giữ chỗ. Sửa trong `poster.html` ở section `k4-tuyen-sinh` rồi xuất lại.
+Ảnh `k4-tuyen-sinh.png` (4:5). Học phí 2 triệu (early bird), khai giảng 22/10, giữ chỗ trước 20/10,
+sĩ số tối đa 10. Đổi số thì sửa section `k4-tuyen-sinh` trong `poster.html` rồi xuất lại.
 
 **Tin nhắn gửi kèm vào group**
 
 ```
 Cả lớp ơi, khoá 4 mở đăng ký rồi nha.
 
-Vẫn như cũ: mình kèm edit 1:1, ngồi cùng sửa từng video chứ không phải quay sẵn rồi để mọi người tự coi. Học viên khoá này dùng luôn Viral Studio bản Pro, 6 tool từ soi video tới chấm video.
+Vẫn như cũ: mình kèm edit 1:1, ngồi cùng sửa từng video chứ không phải quay sẵn rồi để mọi người tự coi. Có mentor trả lời thắc mắc về content, hỏi là gặp người thật chứ không qua trợ lý.
 
-Học phí [điền], khai giảng [điền ngày].
+Học viên khoá này dùng luôn Viral Studio bản Pro, 6 tool từ soi video tới chấm video.
 
-Nhận ít người thôi vì kèm 1:1 mình không ôm nổi lớp đông. Ai muốn vô thì nhắn mình nha, mình giữ chỗ trước.
+Học phí 2tr, giá early bird, trọn gói từ tài liệu tới kèm edit và công cụ.
+Khai giảng 22/10, giữ chỗ trước 20/10.
 
-Ai học khoá trước rồi mà muốn học lại thì cũng nhắn mình, mình tính riêng cho.
+Lớp nhận tối đa 10 bạn thôi vì kèm 1:1 mình không ôm nổi lớp đông. Ai muốn vô thì điền form này nha: [dán link form]
 ```
 
-Câu cuối chỉ giữ nếu bạn thật sự có chính sách đó, không thì bỏ.
