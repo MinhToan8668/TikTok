@@ -262,27 +262,34 @@
   .kh .k-dau{position:absolute;left:68px;right:68px;top:60px;display:flex;align-items:center;justify-content:space-between}
   .kh .k-dau img{height:46px}
   .kh .k-dau .so{font:800 23px/1 var(--font-display);letter-spacing:.04em;text-transform:uppercase;
-    background:var(--lime);color:var(--ink);padding:13px 19px;border-radius:999px}
+    background:var(--ink);color:var(--lime);padding:13px 19px;border-radius:999px}
+  .kh.toi .k-dau .so{background:var(--lime);color:var(--ink)}
   .kh .k-chu{position:absolute;left:68px;right:68px;top:146px}
   .kh .k-chu .nhan{display:inline-flex;font:800 25px/1 var(--font-ui);background:var(--red);color:#fff;
     border:none;box-shadow:none;padding:11px 18px;border-radius:12px;letter-spacing:.02em}
   .kh h1{font:800 76px/1.04 var(--font-display);letter-spacing:-.025em;margin-top:20px}
-  .kh h1 mark{color:var(--lime);background:none}
-  .kh .k-chu p{font:500 28px/1.4 var(--font-ui);color:#d3d2bd;margin-top:16px}
+  .kh.toi h1 mark{color:var(--lime);background:none}
+  .kh .k-chu p{font:500 28px/1.4 var(--font-ui);color:var(--moss);margin-top:16px}
+  .kh.toi .k-chu p{color:#d3d2bd}
   .k-list{position:absolute;left:68px;right:68px;top:446px;display:flex;flex-direction:column;gap:24px}
   .k-list .m{display:flex;gap:18px;align-items:flex-start;background:var(--surface);color:var(--ink);
-    border-radius:20px;padding:22px 26px;box-shadow:7px 7px 0 rgba(153,223,0,.3)}
-  .k-list .m b{flex:none;width:52px;height:52px;border-radius:14px;background:var(--lime);color:var(--ink);
+    border-radius:20px;padding:22px 26px;border:3px solid var(--ink);box-shadow:7px 7px 0 var(--ink)}
+  .kh.toi .k-list .m{border:none;box-shadow:7px 7px 0 rgba(153,223,0,.3)}
+  .k-list .m b{flex:none;width:52px;height:52px;border-radius:14px;background:var(--ink);color:var(--lime);
     display:grid;place-items:center;font:800 27px/1 var(--font-display)}
   .k-list .m strong{display:block;font:800 31px/1.12 var(--font-ui)}
   .k-list .m span{display:block;font:500 22px/1.38 var(--font-ui);color:var(--muted);margin-top:6px}
-  .k-han{position:absolute;left:68px;right:68px;bottom:214px;text-align:center;font:700 27px/1.3 var(--font-ui);color:var(--lime)}
-  .k-chan{position:absolute;left:68px;right:68px;bottom:56px;background:var(--lime);color:var(--ink);
+  .k-han{position:absolute;left:68px;right:68px;bottom:214px;text-align:center;font:700 27px/1.3 var(--font-ui);color:var(--moss)}
+  .kh.toi .k-han{color:var(--lime)}
+  .k-chan{position:absolute;left:68px;right:68px;bottom:56px;background:var(--ink);color:var(--paper);
     border-radius:22px;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:20px}
   .k-chan .ng{font:800 30px/1.25 var(--font-ui)}
-  .k-chan .ng i{display:block;font-style:normal;font:500 22px/1.3 var(--font-ui);color:var(--moss);margin-top:5px}
-  .k-chan .nut{font:800 30px/1.15 var(--font-display);background:var(--ink);color:var(--lime);
+  .k-chan .ng i{display:block;font-style:normal;font:500 22px/1.3 var(--font-ui);color:#c3c5ab;margin-top:5px}
+  .kh.toi .k-chan{background:var(--lime);color:var(--ink)}
+  .kh.toi .k-chan .ng i{color:var(--moss)}
+  .k-chan .nut{font:800 30px/1.15 var(--font-display);background:var(--lime);color:var(--ink);
     padding:17px 24px;border-radius:16px;text-align:center}
+  .kh.toi .k-chan .nut{background:var(--ink);color:var(--lime)}
   .tieude.nho h1{font-size:60px}
   .toi .buoc li{color:var(--ink)}
 </style>
@@ -863,8 +870,8 @@
 
 <!-- ═══════════ TUYỂN SINH KHOÁ 4 · gửi group Zalo ═══════════
      Ba chỗ cần điền trước khi gửi: học phí, ngày khai giảng, hạn giữ chỗ. -->
-<section class="poster toi kh" id="k4-tuyen-sinh">
-  <div class="k-dau"><img src="logo/lockup-nen-toi.svg" alt="Tự Mình Xây Kênh"><span class="so">Khoá 4</span></div>
+<section class="poster kh" id="k4-tuyen-sinh">
+  <div class="k-dau"><img src="logo/lockup-nen-lime.svg" alt="Tự Mình Xây Kênh"><span class="so">Khoá 4</span></div>
   <div class="k-chu">
     <span class="nhan">MỞ ĐĂNG KÝ</span>
     <h1>Khoá 4 chốt sổ<br><mark>trong tháng này.</mark></h1>
