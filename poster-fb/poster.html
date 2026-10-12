@@ -257,6 +257,32 @@
   .n45.toi .n-cuoi b{background:var(--lime);color:var(--ink)}
   .n45 .n-cuoi span{font:700 24px/1.3 var(--font-ui);color:var(--moss)}
   .n45.toi .n-cuoi span{color:#c3c5ab}
+
+  /* ══ POSTER TUYỂN SINH KHOÁ HỌC · 1080×1350 ══ */
+  .kh .k-dau{position:absolute;left:68px;right:68px;top:60px;display:flex;align-items:center;justify-content:space-between}
+  .kh .k-dau img{height:46px}
+  .kh .k-dau .so{font:800 23px/1 var(--font-display);letter-spacing:.04em;text-transform:uppercase;
+    background:var(--lime);color:var(--ink);padding:13px 19px;border-radius:999px}
+  .kh .k-chu{position:absolute;left:68px;right:68px;top:146px}
+  .kh .k-chu .nhan{display:inline-flex;font:800 25px/1 var(--font-ui);background:var(--red);color:#fff;
+    border:none;box-shadow:none;padding:11px 18px;border-radius:12px;letter-spacing:.02em}
+  .kh h1{font:800 76px/1.04 var(--font-display);letter-spacing:-.025em;margin-top:20px}
+  .kh h1 mark{color:var(--lime);background:none}
+  .kh .k-chu p{font:500 28px/1.4 var(--font-ui);color:#d3d2bd;margin-top:16px}
+  .k-list{position:absolute;left:68px;right:68px;top:446px;display:flex;flex-direction:column;gap:24px}
+  .k-list .m{display:flex;gap:18px;align-items:flex-start;background:var(--surface);color:var(--ink);
+    border-radius:20px;padding:22px 26px;box-shadow:7px 7px 0 rgba(153,223,0,.3)}
+  .k-list .m b{flex:none;width:52px;height:52px;border-radius:14px;background:var(--lime);color:var(--ink);
+    display:grid;place-items:center;font:800 27px/1 var(--font-display)}
+  .k-list .m strong{display:block;font:800 31px/1.12 var(--font-ui)}
+  .k-list .m span{display:block;font:500 22px/1.38 var(--font-ui);color:var(--muted);margin-top:6px}
+  .k-han{position:absolute;left:68px;right:68px;bottom:214px;text-align:center;font:700 27px/1.3 var(--font-ui);color:var(--lime)}
+  .k-chan{position:absolute;left:68px;right:68px;bottom:56px;background:var(--lime);color:var(--ink);
+    border-radius:22px;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+  .k-chan .ng{font:800 30px/1.25 var(--font-ui)}
+  .k-chan .ng i{display:block;font-style:normal;font:500 22px/1.3 var(--font-ui);color:var(--moss);margin-top:5px}
+  .k-chan .nut{font:800 30px/1.15 var(--font-display);background:var(--ink);color:var(--lime);
+    padding:17px 24px;border-radius:16px;text-align:center}
   .tieude.nho h1{font-size:60px}
   .toi .buoc li{color:var(--ink)}
 </style>
@@ -833,6 +859,28 @@
   <div class="n-chu"><h1>Đăng thì đăng, nhưng<br><mark>cho AI coi trước đã.</mark></h1><p>Nó coi hết video rồi chỉ đúng giây đang hỏng, không nói chung chung kiểu “hook chưa hay”.</p></div>
   <div class="manh cat n-anh" style="width:700px;top:556px;height:600px;--r:1.5deg"><img src="anh/cv-7thang.jpg" alt=""></div>
   <div class="n-cuoi"><b>Cmt đi, tui gửi link cho</b><span>Xài free,<br>không cần cài app</span></div>
+</section>
+
+<!-- ═══════════ TUYỂN SINH KHOÁ 4 · gửi group Zalo ═══════════
+     Ba chỗ cần điền trước khi gửi: học phí, ngày khai giảng, hạn giữ chỗ. -->
+<section class="poster toi kh" id="k4-tuyen-sinh">
+  <div class="k-dau"><img src="logo/lockup-nen-toi.svg" alt="Tự Mình Xây Kênh"><span class="so">Khoá 4</span></div>
+  <div class="k-chu">
+    <span class="nhan">MỞ ĐĂNG KÝ</span>
+    <h1>Khoá 4 chốt sổ<br><mark>trong tháng này.</mark></h1>
+    <p>Học tới khi bạn lên được video, không phải học xong rồi tự bơi.</p>
+  </div>
+  <div class="k-list">
+    <div class="m"><b>1</b><div><strong>Kèm edit 1:1</strong><span>Mình ngồi cùng bạn sửa từng video, chỉ đúng chỗ đang hỏng. Không phải coi video quay sẵn rồi tự mò.</span></div></div>
+    <div class="m"><b>2</b><div><strong>Dùng Viral Studio bản Pro</strong><span>Soi video, chấm hook, kịch bản, dựng video, chấm video. Học viên dùng Pro suốt khoá.</span></div></div>
+    <div class="m"><b>3</b><div><strong>Học phí [điền]</strong><span>Rẻ hơn tiền mua app edit với mua khoá lẻ ngoài kia cộng lại.</span></div></div>
+    <div class="m"><b>4</b><div><strong>Nhóm riêng, hỏi là có người trả lời</strong><span>Đóng tiền xong không bị bỏ lại. Bí chỗ nào nhắn chỗ đó.</span></div></div>
+  </div>
+  <div class="k-han">Nhận ít người thôi, kèm 1:1 nên mình không ôm nổi lớp đông</div>
+  <div class="k-chan">
+    <div class="ng">Khai giảng [điền ngày]<i>Giữ chỗ trước [điền hạn]</i></div>
+    <div class="nut">Nhắn mình<br>để giữ chỗ</div>
+  </div>
 </section>
 
 </body>

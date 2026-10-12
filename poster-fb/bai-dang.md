@@ -549,3 +549,26 @@ Hashtag: `#xaykenh #tiktoktips #contentcreator`
 **Nhạc:** chọn nhạc đang thịnh, nhẹ, không lời. Ảnh cuộn ăn theo nhạc khá nhiều.
 
 **Ghim bình luận đầu:** `Tool nào mn muốn mình quay kỹ cách dùng thì nói nha`
+
+---
+
+## Poster tuyển sinh khoá 4 · gửi group Zalo
+
+Ảnh `k4-tuyen-sinh.png` (4:5). **Ba chỗ trong ảnh cần điền trước khi gửi:** học phí, ngày khai giảng,
+hạn giữ chỗ. Sửa trong `poster.html` ở section `k4-tuyen-sinh` rồi xuất lại.
+
+**Tin nhắn gửi kèm vào group**
+
+```
+Cả lớp ơi, khoá 4 mở đăng ký rồi nha.
+
+Vẫn như cũ: mình kèm edit 1:1, ngồi cùng sửa từng video chứ không phải quay sẵn rồi để mọi người tự coi. Học viên khoá này dùng luôn Viral Studio bản Pro, 6 tool từ soi video tới chấm video.
+
+Học phí [điền], khai giảng [điền ngày].
+
+Nhận ít người thôi vì kèm 1:1 mình không ôm nổi lớp đông. Ai muốn vô thì nhắn mình nha, mình giữ chỗ trước.
+
+Ai học khoá trước rồi mà muốn học lại thì cũng nhắn mình, mình tính riêng cho.
+```
+
+Câu cuối chỉ giữ nếu bạn thật sự có chính sách đó, không thì bỏ.
