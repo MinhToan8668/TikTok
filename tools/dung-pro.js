@@ -22,16 +22,45 @@ $('#themeBtn').onclick = () => { const dark = document.documentElement.dataset.t
 /* ── FilmCraft trong iframe ── */
 let MC = { url: '', dich_vu: {} }, fcSan = false;
 const F = () => { const w = $('#fc').contentWindow; return w && w.filmcraftLoad && w.filmcraftLoad.readyMs && w.filmcraft ? w.filmcraft : null; };
-function napFilmCraft() {
-  if ($('#fc').src) return;
-  $('#fcTt').hidden = false; $('#fcTt').textContent = 'Đang tải trình dựng (13 MB, lần đầu mất 10–40 giây)…';
+/* tải trước file wasm (13 MB nén) có thanh tiến độ và tự thử lại: lỗi hay gặp là mạng chập chờn làm
+   WebAssembly "Response body loading was aborted". Tải xong thì iframe lấy từ cache của trình duyệt (cùng URL ?v=). */
+async function buildFilmCraft() { const t = await (await fetch('filmcraft/index.html', { cache: 'no-cache' })).text(); const m = t.match(/const build = "([0-9a-f]+)"/); return m && !m[1].startsWith('__') ? '?v=' + m[1] : ''; }
+async function taiTruoc(url, baoTienDo) {
+  const r = await fetch(url); if (!r.ok) throw new Error('http ' + r.status);
+  const tong = +r.headers.get('content-length') || 0, rd = r.body.getReader(); let da = 0;
+  for (;;) { const { done, value } = await rd.read(); if (done) break; da += value.length; baoTienDo(da, tong); }
+}
+async function napFilmCraft() {
+  if ($('#fc').src || napFilmCraft.dang) return; napFilmCraft.dang = true;
+  const tt = $('#fcTt'); tt.hidden = false;
+  const MB = x => (x / 1048576).toFixed(1).replace('.', ',');
+  let v = ''; try { v = await buildFilmCraft(); } catch { }
+  for (let lan = 1; lan <= 3; lan++) {
+    try {
+      tt.textContent = 'Đang tải trình dựng' + (lan > 1 ? ' (thử lại lần ' + lan + ')' : '') + '…';
+      await taiTruoc('filmcraft/filmcraft_web_bg.wasm' + v, (da, tong) => { tt.textContent = 'Đang tải trình dựng: ' + MB(da) + (tong ? ' / ' + MB(tong) : '') + ' MB' + (lan > 1 ? ' (lần ' + lan + ')' : '') + '. Lần đầu lâu, lần sau mở ngay.'; });
+      await taiTruoc('filmcraft/filmcraft_web.js' + v, () => { });
+      break;
+    } catch (e) {
+      console.warn('[tải wasm]', e);
+      if (lan === 3) { tt.textContent = 'Mạng chập chờn, tải trình dựng 3 lần chưa xong. Đổi sang Wi-Fi ổn định hơn rồi bấm Tải lại.'; const b = el('button', 'btn', 'Tải lại'); b.type = 'button'; b.style.marginTop = '10px'; b.onclick = () => location.reload(); tt.appendChild(document.createElement('br')); tt.appendChild(b); napFilmCraft.dang = false; return; }
+      tt.textContent = 'Mạng chập chờn, 3 giây nữa thử lại…'; await new Promise(r => setTimeout(r, 3000));
+    }
+  }
+  tt.textContent = 'Đang khởi động trình dựng…';
   $('#fc').src = 'filmcraft/index.html?empty';
-  const t0 = Date.now();
+  const t0 = Date.now(); let lanIframe = 0;
   const cho = setInterval(() => {
     const w = $('#fc').contentWindow, ld = w && w.filmcraftLoad;
-    if (ld && (ld.fatal || ld.error)) { clearInterval(cho); $('#fcTt').textContent = 'FilmCraft không chạy được trên máy này: ' + String(ld.fatal || ld.error).slice(0, 200) + '. Dùng Chrome hoặc Edge mới nhất trên máy tính.'; return; }
-    if (F()) { clearInterval(cho); fcSan = true; $('#fcTt').hidden = true; $('#btnThemFootage').disabled = false; window.filmcraft = F(); window.filmcraftLoad = w.filmcraftLoad; window.filmcraftWindow = w; toast('Trình dựng sẵn sàng · kéo video vào hoặc bấm Thêm footage'); return; }
-    if (Date.now() - t0 > 120000) { clearInterval(cho); $('#fcTt').textContent = 'Tải quá lâu. Kiểm tra mạng rồi tải lại trang.'; }
+    if (ld && (ld.fatal || ld.error)) {
+      const chu = String(ld.fatal || ld.error);
+      if (/Network error|aborted|Failed to fetch|NetworkError/i.test(chu) && lanIframe < 2) { lanIframe++; tt.textContent = 'Mạng chập chờn lúc khởi động, thử lại lần ' + (lanIframe + 1) + '…'; $('#fc').src = 'filmcraft/index.html?empty&r=' + lanIframe; return; }
+      clearInterval(cho); napFilmCraft.dang = false;
+      tt.textContent = /Network error|aborted|Failed to fetch/i.test(chu) ? 'Mạng chập chờn, chưa tải xong trình dựng. Đổi sang Wi-Fi ổn định hơn rồi bấm Tải lại.' : 'FilmCraft không chạy được trên máy này: ' + chu.slice(0, 200) + '. Dùng Chrome hoặc Edge mới nhất trên máy tính.';
+      const b = el('button', 'btn', 'Tải lại'); b.type = 'button'; b.style.marginTop = '10px'; b.onclick = () => location.reload(); tt.appendChild(document.createElement('br')); tt.appendChild(b); return;
+    }
+    if (F()) { clearInterval(cho); fcSan = true; tt.hidden = true; $('#btnThemFootage').disabled = false; window.filmcraft = F(); window.filmcraftLoad = w.filmcraftLoad; window.filmcraftWindow = w; toast('Trình dựng sẵn sàng · kéo video vào hoặc bấm Thêm footage'); return; }
+    if (Date.now() - t0 > 180000) { clearInterval(cho); napFilmCraft.dang = false; tt.textContent = 'Khởi động quá lâu. Tải lại trang; vẫn vậy thì máy chưa hỗ trợ WebGPU/WebGL2.'; }
   }, 500);
 }
 async function themFootage(files) {
