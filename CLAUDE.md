@@ -10,11 +10,13 @@ tự nhiên như trong code hiện có.
 | Đường dẫn | Vai trò | Ghi chú |
 |---|---|---|
 | `index.html` | Landing page + đăng ký + lịch kèm 1:1 | ~4.400 dòng, một file gồm CSS/JS/HTML |
+| `tools/dung-video.html` + `tools/dung/*.js` | Dựng nhanh (style 1, kiểu CapCut): HTML/CSS trong `.html`, JS tách thành 9 file theo mục, `dung/nap.js` ghép lại thành một script lúc chạy (code dựa vào hoisting) | sửa JS ở `tools/dung/`, đổi `?v=` của `nap.js` khi deploy |
 | `tools/hook-text.html` | Viral Studio · Hook viral (Free không AI, Pro có AI) | ~3.100 dòng |
 | `tools/soi-video.html`, `cham-video.html`, `kich-ban.html` | Viral Studio · soi video, chấm video, kịch bản | mỗi file 600–800 dòng |
 | `tools/tai-khoan.js` | Module `TK` dùng chung: tài khoản, token, hồ sơ kênh, lượt dùng | nạp bằng `<script src="tai-khoan.js">` |
 | `tools/noi-thu-muc.js` | Nối thư mục trên máy với trình dựng: nạp footage, tự lưu dự án, chạy lệnh Claude ghi vào `.tmxk/lenh/` | dùng chung cho cả hai trình dựng qua `window.NTM_CFG`; cần Chrome/Edge máy tính |
-| `tools/claude-noi/` | `tmxk.mjs` (dòng lệnh cho Claude Code), `CLAUDE.md` (Dựng nhanh) và `CLAUDE-pro.md` (Dựng chuyên sâu) mẫu, trình dựng chép vào thư mục dự án khi nối | bộ lệnh lấy từ `AGENT_TOOLS` qua route `/agent_tools` của worker |
+| `tools/cau-noi-xa.js` | Nút "📡 Nối với Claude Code" trên hai trình dựng: hiện mã, poll `cc_nhan`, chạy lệnh qua `NTM.cfg`, nộp `cc_kq` | ảnh khung thu còn 640px JPEG để dưới 100 KB |
+| `tools/claude-noi/` | `tmxk.mjs` (qua thư mục), `tmxk-xa.mjs` (qua mã ghép nối, chạy từ bất kỳ đâu), `CLAUDE.md`/`CLAUDE-pro.md` mẫu cho thư mục dự án | bộ lệnh lấy từ `AGENT_TOOLS` qua route `/agent_tools` của worker |
 | `tools/dung-pro.html` + `dung-pro.js` | Dựng chuyên sâu (style 2, gói Pro): khung TMXK bọc FilmCraft trong iframe, tab Claude Code (nối thư mục, `NTM_CFG` cho `noi-thu-muc.js`), hướng dẫn phím tắt | dự án lưu theo FilmCraft (.fcproj), độc lập với Dựng video |
 | `tools/sang-filmcraft.js` | Nút "Mở trong FilmCraft": chuyển V1, b-roll, phụ đề, chữ, mốc sang FilmCraft; lệnh `fc_*` cho cầu nối thư mục | điều khiển tab FilmCraft qua `window.filmcraft` (cùng origin) |
 | `tools/filmcraft/` | FilmCraft web v0.7.2 (storytold/filmcraft, MIT/Apache), trình dựng kiểu Premiere bằng WebAssembly | bản build từ release; sửa duy nhất: `index.html` nhận `?wasm=&glue=` để tải từ worker (`/fc/<file>`), nâng cấp thì chép đè rồi thêm lại 2 dòng đó |
@@ -23,10 +25,12 @@ tự nhiên như trong code hiện có.
 | `apps-script/Lich.gs` | Lịch kèm 1:1, action tiền tố `hv_` | |
 | `apps-script/Studio.gs` | Tài khoản Viral Studio, gói Pro, action tiền tố `st_` | |
 | `apps-script/HookAI.gs` | Gọi Gemini/Claude cho Hook Pro, soi video, action `hook_ai`, `hook_status` | |
+| `apps-script/CauNoi.gs` | Cầu nối xa: hộp thư CacheService, action `cc_*`, ghép đôi bằng mã 6 ký tự giữa tab trình dựng và Claude Code | không cần Sheet; tab và Claude đều gọi `/exec` |
 | `apps-script/LocKichBan.gs` | Lọc kịch bản từ file phụ đề video dài thành nhiều video / series, action `hook_ai` mode `loc_srt` | |
 | `apps-script/HUONG-DAN*.md` | Cách cài backend, Script Properties, webhook | đọc trước khi sửa `.gs` |
 | `may-tai/app.py` | Máy tải video riêng (yt-dlp, giao thức cobalt) cho tool Tải video, deploy Railway | cài bằng bot `/maytai`, xem `may-tai/README.md` |
 | `bot-tai-video/bot.py` | Bot Telegram tải video bằng yt-dlp | token qua biến môi trường |
+| `.claude/skills/dung-video-xa/` | Skill: điều khiển trình dựng của người dùng qua mã ghép nối (`tmxk-xa.mjs`), dùng ngay trong phiên Claude Code cloud | đọc khi người dùng đưa mã 6 ký tự |
 | `.claude/skills/hook-text/` | Skill thiết kế chữ hook lên frame video cho học viên | skill riêng của dự án, không phải của ECC |
 | `assets/` | Logo, brand | |
 
@@ -44,6 +48,10 @@ tự nhiên như trong code hiện có.
   `cfgProp()`. Tuyệt đối không ghi token vào HTML, `.gs` hay commit.
 - Frontend lưu trạng thái ở `localStorage` với các key `vs_user`, `tmxk_hv`, `vs_dev`,
   `vs_hoso_tam`. Mọi truy cập `localStorage` phải bọc try/catch như trong `tai-khoan.js`.
+- Dựng nhanh (`tools/dung/`): thời gian trên dòng thời gian chốt vào lưới khung hình qua `khungGiay` /
+  `lamTronKhung` (fps lấy từ `fpsDuAn()`), không ghi số giây thô vào `bd`/`kt`/`t_bd`. Lệnh agent chạy
+  qua `agentXuLy` (giao dịch: ném lỗi là dự án về trạng thái trước), tham số số đi qua `kiemSo`. Âm
+  lượng đo bằng `tinhNL` (K-weighting) + `doLufs` (gate BS.1770), chuẩn `DB_CHUAN = -14` LUFS.
 - Tool Viral Studio phân biệt ba kiểu lỗi: `mang` (mất mạng), `mayChu` (Apps Script trả
   không phải JSON), lỗi nghiệp vụ (`ok:false`). Giữ cách phân loại này khi viết thông báo lỗi.
 

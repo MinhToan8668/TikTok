@@ -1060,3 +1060,17 @@ canvas.captureStream + MediaRecorder, thời gian thực (60 giây video ≈ 60 
 **Giới hạn:** chưa có B-roll từ kho ảnh ngoài (Pexels) vì video kho không cho vẽ lên canvas; điện thoại nên dùng footage dưới 3 phút; tải lại trang phải thêm lại file (kết quả hiểu thì còn); mỗi lượt AI mất 1–2 phút trên key miễn phí.
 
 **Đã học từ:** [Vyra](https://www.usevyra.com/ai-video-editor) (luồng footage understanding → chat → timeline → export tại máy, beat sync, ducking), [HyperFrames](https://github.com/heygen-com/hyperframes) (đồ hoạ seekable theo thời gian, catalog caption/kinetic), [Omniclip](https://github.com/omni-media/omniclip), [OpenCut](https://opencut.dev/), [OpenReel](https://github.com/Augani/openreel-video) (dựng và xuất hoàn toàn trong trình duyệt).
+
+## Cầu nối xa: chat với Claude Code để dựng video (bản 10/2026)
+
+File `CauNoi.gs` + một dòng trong `doPost` của `Code.gs` (`cc_` → `ccApi`). Không cần Sheet hay Script
+Property mới: hộp thư nằm trong CacheService, sống 6 giờ.
+
+Cách dùng: trên trình dựng (Dựng nhanh hoặc Dựng chuyên sâu) bấm **📡 Nối với Claude Code**, tab hiện
+mã 6 ký tự. Người dùng nói mã cho Claude Code (app trên máy hoặc claude.ai), Claude chạy
+`node tools/claude-noi/tmxk-xa.mjs --ma <MÃ> <lệnh>` trong repo này; tab nhận lệnh về chạy rồi trả
+kết quả (kể cả ảnh khung). Tab phải đang mở; đóng tab là Claude báo `tab_khong_mo`.
+
+Cài: dán `CauNoi.gs` thành file mới trong Apps Script editor, dán đè `Code.gs`, Deploy → Manage
+deployments → New version. URL `/exec` giữ nguyên. Kiểm tra: gửi `{"action":"cc_xem","ma":"ABCDEF"}`
+tới `/exec` phải trả `{"ok":false,"error":"chua_co_tab"}` (bản cũ trả `unknown_action`).

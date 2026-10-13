@@ -158,6 +158,6 @@ const NTM = (() => {
     b.onclick = bam; veNut();
     if (!window.showDirectoryPicker) { b.disabled = true; b.title = 'Cần Chrome hoặc Edge trên máy tính'; }
   }
-  return { khoiTao, ghiXuat, daNoi: () => !!goc };
+  return { khoiTao, ghiXuat, daNoi: () => !!goc, cfg: CFG };
 })();
 NTM.khoiTao();
