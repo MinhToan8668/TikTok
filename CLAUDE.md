@@ -13,6 +13,8 @@ tự nhiên như trong code hiện có.
 | `tools/hook-text.html` | Viral Studio · Hook viral (Free không AI, Pro có AI) | ~3.100 dòng |
 | `tools/soi-video.html`, `cham-video.html`, `kich-ban.html` | Viral Studio · soi video, chấm video, kịch bản | mỗi file 600–800 dòng |
 | `tools/tai-khoan.js` | Module `TK` dùng chung: tài khoản, token, hồ sơ kênh, lượt dùng | nạp bằng `<script src="tai-khoan.js">` |
+| `tools/noi-thu-muc.js` | Nối thư mục trên máy với trình Dựng video: nạp footage, tự lưu dự án, chạy lệnh Claude ghi vào `.tmxk/lenh/` | nạp cuối `dung-video.html`, cần Chrome/Edge máy tính |
+| `tools/claude-noi/` | `tmxk.mjs` (dòng lệnh cho Claude Code) và `CLAUDE.md` mẫu, trình dựng chép vào thư mục dự án khi nối | bộ lệnh lấy từ `AGENT_TOOLS` qua route `/agent_tools` của worker |
 | `tools/tao-nen-teams.html` | Tạo nền Teams, độc lập, không gọi API | |
 | `apps-script/Code.gs` | `doGet`/`doPost`, đăng ký, Telegram bot, config công khai | điểm vào duy nhất, route theo `body.action` |
 | `apps-script/Lich.gs` | Lịch kèm 1:1, action tiền tố `hv_` | |

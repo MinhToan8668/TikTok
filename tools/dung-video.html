@@ -1293,6 +1293,8 @@
           <div class="row"><button class="btn nho" id="btnAnhTinh" type="button" title="Lưu khung tại đầu phát thành ảnh PNG đúng độ phân giải xuất">🖼 Xuất ảnh tĩnh (PNG)</button></div>
           <h3>Dự án</h3>
           <div class="row"><button class="btn nho" id="btnLuuDA" type="button">💾 Lưu dự án</button><button class="btn nho" id="btnMoDA" type="button">📂 Mở dự án</button><input type="file" id="moDAIn" accept="application/json" hidden></div>
+          <div class="row"><button class="btn nho" id="btnNoiTM" type="button" title="Nối một thư mục trên máy: trình dựng tự nạp footage, tự lưu dự án, và Claude Code mở thư mục đó là ra lệnh dựng được">🔗 Nối thư mục trên máy</button></div>
+          <div class="quota" id="noiTMTt"></div>
           <div class="row"><select id="phienBan" title="Phiên bản dòng thời gian" style="flex:1;min-width:0"></select><button class="btn nho" id="btnLuuBan" type="button" title="Lưu dòng thời gian hiện tại thành một phiên bản để so sánh">＋ Bản</button></div>
           <div class="row"><select id="shortSo" title="Số short"><option value="2">2 short</option><option value="3" selected>3 short</option><option value="5">5 short</option></select><select id="shortDai" title="Độ dài mỗi short"><option value="20">~20s</option><option value="40" selected>~40s</option><option value="60">~60s</option></select><button class="btn nho xanh" id="btnShorts" type="button" title="AI cắt footage dài thành nhiều short, mỗi short một phiên bản (1 lượt chat)">✂ Tạo short</button></div>
           <div class="row"><button class="btn nho" id="btnSrt" type="button" title="Phụ đề theo dòng thời gian, nhập vào CapCut, Premiere, YouTube">📝 Phụ đề .srt</button><button class="btn nho" id="btnFcp" type="button" title="Dòng thời gian V1 để mở tiếp trong Premiere, DaVinci Resolve, Final Cut (nối lại file gốc)">🎞 .fcpxml</button></div>
@@ -2212,7 +2214,7 @@ function luuFile(blob, ghiChu) {
   const u = URL.createObjectURL(blob); const a = $('#xuatTai'); a.href = u; a.download = ten; a.textContent = /^audio/.test(blob.type) ? '⬇️ Tải âm thanh' : /gif/.test(blob.type) ? '⬇️ Tải GIF' : '⬇️ Tải video';
   $('#xuatTieuDe').textContent = '✓ Xong · ' + ten + ' (' + (blob.size / 1048576).toFixed(1).replace('.', ',') + ' MB)'; $('#xuatBar').style.width = '100%'; $('#xuatTt').textContent = ghiChu ? ghiChu : mp4 ? 'Bấm Tải video rồi đăng, hoặc đưa sang Chấm video để AI chấm bản này.' : 'Máy này xuất WebM (không có bộ mã H.264). TikTok web vẫn nhận; cần MP4 thì mở lại bằng Chrome trên máy tính hoặc Safari.';
   $('#xuatXong').style.display = ''; $('#xuatHuy').style.display = 'none';
-  a.click(); toast('Đã lưu ' + ten); xuatPdKem(ten); P.t = 0; veKhung();
+  a.click(); toast('Đã lưu ' + ten); if (typeof NTM !== 'undefined') NTM.ghiXuat(blob, ten); xuatPdKem(ten); P.t = 0; veKhung();
 }
 
 /* ═════════ tab, kéo thả, boot ═════════ */
@@ -6656,6 +6658,7 @@ function khoiTaoInspector2() {
 }
 khoiTaoB(); khoiTaoC(); khoiTaoUI(); khoiTaoLop(); khoiTaoBang(); khoiTaoDot1(); khoiTaoDot2(); khoiTaoDot3(); khoiTaoM1(); khoiTaoM2(); khoiTaoM3(); khoiTaoN(); khoiTaoMobi(); khoiTaoCCW(); khoiTaoKho(); khoiTaoDoc(); khoiTaoGon(); khoiTaoMediaCC(); khoiTaoCC2(); khoiTaoFsBar(); khoiTaoKfGfx(); khoiTaoVanBanCC(); khoiTaoBangFont(); khoiTaoLopFx(); khoiTaoKhoTrucTuyen(); khoiTaoMediaKho(); khoiTaoMauDoHoa(); khoiTaoMatNaEl(); khoiTaoTruotTo(); khoiTaoClipGhep(); khoiTaoKeoTha(); khoiTaoKhoangTrong(); khoiTaoXuatPd(); khoiTaoSpecCon(); khoiTaoTayChu(); khoiTaoDoiPhim(); khoiTaoMatNa2(); khoiTaoCatKhung(); khoiTaoInspector2(); veTl();
 </script>
+<script src="noi-thu-muc.js?v=202610131200"></script>
 <script src="tro-ly.js?v=202610011200"></script>
 </body>
 </html>

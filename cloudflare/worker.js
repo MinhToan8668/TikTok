@@ -62,6 +62,8 @@ export default {
       if (path === '/yt/tai' && req.method === 'GET') return ytTai(req, url, cors);
       if (path === '/dich' && req.method === 'POST') { if (!cors['access-control-allow-origin']) return json({ ok: false, error: 'origin' }, cors, 403); return dichPhuDe(req, env, cors); }
       if (path === '/do_hoa' && req.method === 'POST') { if (!cors['access-control-allow-origin']) return json({ ok: false, error: 'origin' }, cors, 403); return doHoaAI(req, env, cors); }
+      /* bộ lệnh của trợ lý dựng, công khai (không có bí mật): trình dựng ghi ra thư mục dự án cho Claude trên máy học viên đọc */
+      if (path === '/agent_tools' && req.method === 'GET') return json({ ok: true, tools: AGENT_TOOLS.map(([ten, mo_ta, tham_so, bat_buoc]) => ({ ten, mo_ta, tham_so, bat_buoc: bat_buoc || [] })), he_thong: AGENT_HE_THONG }, cors);
       if (path === '/agent' && req.method === 'POST') { if (!cors['access-control-allow-origin']) return json({ ok: false, error: 'origin' }, cors, 403); return agent(req, env, cors); }
       if (path === '/tts' && req.method === 'POST') { if (!cors['access-control-allow-origin']) return json({ ok: false, error: 'origin' }, cors, 403); return tts(req, env, cors); }
       return json({ ok: false, error: 'khong_co' }, cors, 404);
