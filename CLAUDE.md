@@ -15,6 +15,7 @@ tự nhiên như trong code hiện có.
 | `tools/tai-khoan.js` | Module `TK` dùng chung: tài khoản, token, hồ sơ kênh, lượt dùng | nạp bằng `<script src="tai-khoan.js">` |
 | `tools/noi-thu-muc.js` | Nối thư mục trên máy với trình Dựng video: nạp footage, tự lưu dự án, chạy lệnh Claude ghi vào `.tmxk/lenh/` | nạp cuối `dung-video.html`, cần Chrome/Edge máy tính |
 | `tools/claude-noi/` | `tmxk.mjs` (dòng lệnh cho Claude Code) và `CLAUDE.md` mẫu, trình dựng chép vào thư mục dự án khi nối | bộ lệnh lấy từ `AGENT_TOOLS` qua route `/agent_tools` của worker |
+| `tools/dung-pro.html` + `dung-pro.js` | Dựng chuyên sâu (style 2, gói Pro): khung TMXK bọc FilmCraft trong iframe, trợ lý AI `bo:'filmcraft'`, hướng dẫn phím tắt | dự án lưu theo FilmCraft (.fcproj), độc lập với Dựng video |
 | `tools/sang-filmcraft.js` | Nút "Mở trong FilmCraft": chuyển V1, b-roll, phụ đề, chữ, mốc sang FilmCraft; lệnh `fc_*` cho cầu nối thư mục | điều khiển tab FilmCraft qua `window.filmcraft` (cùng origin) |
 | `tools/filmcraft/` | FilmCraft web v0.7.2 (storytold/filmcraft, MIT/Apache), trình dựng kiểu Premiere bằng WebAssembly | bản build nguyên gốc từ release, không sửa; nâng cấp bằng cách chép đè `filmcraft-web-<ver>.zip` |
 | `tools/tao-nen-teams.html` | Tạo nền Teams, độc lập, không gọi API | |

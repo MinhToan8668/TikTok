@@ -30,7 +30,7 @@
      ANTHROPIC_API_KEY, OPENAI_API_KEY   (Secret) key khi chọn claude / openai
    ═══════════════════════════════════════════════════════════════════════════ */
 
-const PHIEN_BAN = '2026.10.24';
+const PHIEN_BAN = '2026.10.25';
 /* link /exec của Apps Script đang dùng trong tool (công khai sẵn trong tools/*.html). Biến APPS_SCRIPT_URL trên Cloudflare, nếu có, sẽ được ưu tiên. */
 const APPS_SCRIPT_MD = 'https://script.google.com/macros/s/AKfycbyxe1nWupAl6VheDZHaU3Ojm-d6c8F_khhUMtkehNCLh5OnGW6f2uF0PKPYZ4eYUqyGjQ/exec';
 const asUrl = env => String(env.APPS_SCRIPT_URL || env.APPS_SCRIPT || APPS_SCRIPT_MD).trim();
@@ -63,7 +63,7 @@ export default {
       if (path === '/dich' && req.method === 'POST') { if (!cors['access-control-allow-origin']) return json({ ok: false, error: 'origin' }, cors, 403); return dichPhuDe(req, env, cors); }
       if (path === '/do_hoa' && req.method === 'POST') { if (!cors['access-control-allow-origin']) return json({ ok: false, error: 'origin' }, cors, 403); return doHoaAI(req, env, cors); }
       /* bộ lệnh của trợ lý dựng, công khai (không có bí mật): trình dựng ghi ra thư mục dự án cho Claude trên máy học viên đọc */
-      if (path === '/agent_tools' && req.method === 'GET') return json({ ok: true, tools: AGENT_TOOLS.map(([ten, mo_ta, tham_so, bat_buoc]) => ({ ten, mo_ta, tham_so, bat_buoc: bat_buoc || [] })), he_thong: AGENT_HE_THONG }, cors);
+      if (path === '/agent_tools' && req.method === 'GET') { const bl = boLenh(url.searchParams.get('bo')); return json({ ok: true, tools: bl.tools.map(([ten, mo_ta, tham_so, bat_buoc]) => ({ ten, mo_ta, tham_so, bat_buoc: bat_buoc || [] })), he_thong: bl.heThong }, cors); }
       if (path === '/agent' && req.method === 'POST') { if (!cors['access-control-allow-origin']) return json({ ok: false, error: 'origin' }, cors, 403); return agent(req, env, cors); }
       if (path === '/tts' && req.method === 'POST') { if (!cors['access-control-allow-origin']) return json({ ok: false, error: 'origin' }, cors, 403); return tts(req, env, cors); }
       return json({ ok: false, error: 'khong_co' }, cors, 404);
@@ -433,6 +433,27 @@ Quy tắc:
 - Keyframe từng thuộc tính: keyframe. Overlay/sticker nằm trên: sua_broll lop 3, vua contain. Màu/hiệu ứng cả video: ap_tat_ca. Cắt nhanh đầu/cuối đoạn: cat_dau_phat. Chữ đẹp nhanh: mau_chu rồi sua_do_hoa để chỉnh kiểu chữ. Âm thanh: them_am_thanh (SFX, vừa phải), tach_am_thanh (J/L-cut), chuan_hoa_am.
 - Cắt dead air: dùng cat_khoang_lang. Chữ tự do/emoji: them_do_hoa kieu chu/sticker. Tốc độ, zoom chậm, màu, âm lượng: sua_doan. Khung vuông/ngang, phong cách: cai_dat. Nhiều short từ video dài: tao_shorts (tốn lượt, chỉ khi được yêu cầu).
 - Kết thúc bằng 1–3 câu tóm tắt đã làm gì và gợi ý bước tiếp (không liệt kê lại từng lệnh).`;
+/* ── Bộ lệnh cho trình Dựng chuyên sâu (FilmCraft chạy WebAssembly trong tools/dung-pro.html) ──
+   FilmCraft có ~700 lệnh nên không khai báo từng lệnh; AI tìm lệnh bằng fc_ds rồi gọi fc_chay. Tab chạy lệnh qua window.filmcraft. */
+const FC_TOOLS = [
+  ['fc_ds', 'Tìm lệnh FilmCraft theo từ khoá (id, nhãn, tham số, đang bật hay không). Ví dụ loc="lumetri", "trim", "captions", "export", "markers", "clip.speed". Gọi trước khi dùng lệnh chưa chắc tham số.', { loc: { type: 'string' }, chi_dang_bat: { type: 'boolean' } }, ['loc']],
+  ['fc_xem', 'Xem dự án và sequence đang mở: bin + item (id, tên, giây), track video/audio/caption, từng clip (id, start, end, sourceIn, sourceOut theo tick, speed), transition, marker, playhead, selection. Kết quả này đã đính kèm mỗi lượt, chỉ gọi lại sau khi đổi nhiều.', {}],
+  ['fc_chay', 'Chạy một lệnh FilmCraft: lenh = id lệnh (từ fc_ds), tham_so = object đúng schema. Mọi lệnh sửa đều hoàn tác được bằng lenh "edit.undo".', { lenh: { type: 'string' }, tham_so: { type: 'object' } }, ['lenh']],
+  ['fc_lo', 'Chạy nhiều lệnh FilmCraft theo thứ tự, dừng ở lệnh lỗi đầu tiên. buoc = [{lenh, tham_so}].', { buoc: { type: 'array', items: { type: 'object', properties: { lenh: { type: 'string' }, tham_so: { type: 'object' } }, required: ['lenh'] } } }, ['buoc']],
+  ['fc_khung', 'Ảnh khung hình Program monitor tại giây t (không đổi playhead), để tự kiểm màu, bố cục, chữ trước khi kết luận.', { t: { type: 'number' } }],
+  ['fc_man_hinh', 'Ảnh chụp toàn cửa sổ FilmCraft (hoặc một panel: panel="Lumetri Color", "Timeline", "Program"…) để xem người dùng đang ở đâu.', { panel: { type: 'string' } }]
+];
+const FC_HE_THONG = `Bạn là Trợ lý dựng chuyên sâu của Viral Studio (khoá Tự Mình Xây Kênh), làm việc trên FilmCraft: trình dựng kiểu Adobe Premiere (Source/Program monitor, timeline nhiều track, Lumetri Color, Effect Controls, Audio Mixer). Nói tiếng Việt có dấu, ngắn gọn, gọi tên panel và lệnh bằng tên gốc tiếng Anh của FilmCraft để người dùng tìm được trên màn hình.
+Quy tắc:
+- Thời gian trong FilmCraft là tick nguyên: 254016000000 tick = 1 giây. Nhiều lệnh nhận "seconds" hoặc "frame" thay cho "time"; xem schema trong fc_ds. Id clip, item, track lấy từ trạng thái sequence đính kèm hoặc fc_xem.
+- Chưa chắc tham số thì gọi fc_ds trước, đừng đoán. Lệnh "đang tắt" (enabled=false) thường vì chưa chọn clip hoặc chưa có sequence: dùng lệnh có tham số id thay vì lệnh theo selection.
+- Làm đúng yêu cầu, không tự ý làm quá. Sửa xong màu, chữ, bố cục thì fc_khung tại thời điểm liên quan để tự kiểm rồi sửa tiếp nếu lệch. Tối đa ~12 lệnh một lượt.
+- Không export, không xoá track, không tạo project mới nếu người dùng không yêu cầu. Lỗi thì nói rõ lệnh nào lỗi và cách người dùng làm tay.
+- Video ngắn TikTok/Reels: 3 giây đầu phải mạnh, tiếng về khoảng -14 LUFS, màu da tự nhiên, phụ đề không che mặt.
+- Mỗi lệnh chỉ gọi MỘT lần; trạng thái đính kèm đã phản ánh thay đổi. Gọi nhiều lệnh độc lập cùng lúc được.
+- Kết thúc bằng 1–3 câu tóm tắt đã làm gì và gợi ý bước tiếp.`;
+/* bộ lệnh theo tool: trình dựng nhanh (mặc định) hay dựng chuyên sâu */
+function boLenh(bo) { return bo === 'filmcraft' ? { tools: FC_TOOLS, heThong: FC_HE_THONG } : { tools: AGENT_TOOLS, heThong: AGENT_HE_THONG }; }
 /* vé cho một lượt agent: HMAC(token người dùng + hạn 10 phút) ký bằng khoá bí mật của máy chủ.
    Bước đầu đã kiểm đăng nhập và trừ lượt qua Apps Script, các bước sau chỉ cần vé, không gọi Apps Script lại. */
 async function khoaVe(env) { const bi = String(env.VE_SECRET || dsKey(env)[0] || env.ANTHROPIC_API_KEY || env.OPENAI_API_KEY || ''); return crypto.subtle.importKey('raw', new TextEncoder().encode('viral-studio-ve|' + bi), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']); }
@@ -456,15 +477,16 @@ async function agent(req, env, cors) {
     ve = await taoVe(env, b.token);
   }
   const hs = b.ho_so && typeof b.ho_so === 'object' ? Object.entries(b.ho_so).filter(([k, v]) => v).map(([k, v]) => k + ': ' + String(v).slice(0, 200)).join('; ') : '';
-  const heThong = AGENT_HE_THONG + (hs ? '\nHồ sơ kênh người dùng: ' + hs : '');
+  const bl = boLenh(b.bo), tools = bl.tools;
+  const heThong = bl.heThong + (hs ? '\nHồ sơ kênh người dùng: ' + hs : '');
   const duAn = 'Trạng thái dự án hiện tại:\n' + JSON.stringify(b.du_an || {}).slice(0, 60000);
   try {
-    const kq = await ({ gemini: goiGeminiAgent, claude: goiClaudeAgent, openai: goiOpenAIAgent })[llmNcc(env)](env, heThong, ls, duAn);
+    const kq = await ({ gemini: goiGeminiAgent, claude: goiClaudeAgent, openai: goiOpenAIAgent })[llmNcc(env)](env, heThong, ls, duAn, tools);
     return json({ ok: true, text: kq.text || '', ky_text: kq.ky_text, goi: kq.goi || [], luot_con: luotCon, ve, ncc: llmNcc(env), model: llmModel(env) }, cors);
   } catch (e) { return json({ ok: false, error: 'llm_loi', chi_tiet: String(e && e.message || e).slice(0, 300), luot_con: luotCon }, cors, 502); }
 }
 /* ── Gemini: functionDeclarations, functionCall / functionResponse ── */
-async function goiGeminiAgent(env, heThong, ls, duAn) {
+async function goiGeminiAgent(env, heThong, ls, duAn, tools) {
   const contents = []; const cuoiNd = ls.map(m => m.vai).lastIndexOf('nd');
   ls.forEach((m, i) => {
     if (m.vai === 'nd') contents.push({ role: 'user', parts: [{ text: m.text + (i === cuoiNd ? '\n\n' + duAn : '') }] });
@@ -473,7 +495,7 @@ async function goiGeminiAgent(env, heThong, ls, duAn) {
   });
   // trạng thái mới nhất luôn đi kèm lượt tool gần nhất để model không dùng số cũ
   const last = contents[contents.length - 1]; if (last && last.role === 'user' && !/Trạng thái dự án/.test(JSON.stringify(last.parts).slice(0, 200))) last.parts.push({ text: duAn });
-  const body = { systemInstruction: { parts: [{ text: heThong }] }, contents, tools: [{ functionDeclarations: AGENT_TOOLS.map(([name, description, props, required]) => ({ name, description, parameters: { type: 'object', properties: props, required: required || [] } })) }], generationConfig: { temperature: 0.4, maxOutputTokens: 2000 } };
+  const body = { systemInstruction: { parts: [{ text: heThong }] }, contents, tools: [{ functionDeclarations: tools.map(([name, description, props, required]) => ({ name, description, parameters: { type: 'object', properties: props, required: required || [] } })) }], generationConfig: { temperature: 0.4, maxOutputTokens: 2000 } };
   let j, model = llmModel(env);
   try { j = await goiGemini(env, model, body); }
   catch (e) { if (!/429|503|RESOURCE_EXHAUSTED|overloaded/i.test(String(e.message)) || model === 'gemini-3.5-flash-lite') throw e; model = 'gemini-3.5-flash-lite'; j = await goiGemini(env, model, body); }   // hết hạn mức model chính → lùi về flash-lite
@@ -482,27 +504,27 @@ async function goiGeminiAgent(env, heThong, ls, duAn) {
   return { text: parts.filter(p => p.text).map(p => p.text).join('\n').trim(), ky_text: tp ? tp.thoughtSignature : undefined, goi: parts.filter(p => p.functionCall).map((p, k) => ({ id: 'g' + Date.now().toString(36) + k, ten: p.functionCall.name, args: p.functionCall.args || {}, ky: p.thoughtSignature })) };
 }
 /* ── Claude (Anthropic Messages API): tools, tool_use / tool_result (ảnh nằm trong tool_result) ── */
-async function goiClaudeAgent(env, heThong, ls, duAn) {
+async function goiClaudeAgent(env, heThong, ls, duAn, tools) {
   const messages = []; const cuoiNd = ls.map(m => m.vai).lastIndexOf('nd');
   ls.forEach((m, i) => {
     if (m.vai === 'nd') messages.push({ role: 'user', content: m.text + (i === cuoiNd ? '\n\n' + duAn : '') });
     else if (m.vai === 'ai') { const c = []; if (m.text) c.push({ type: 'text', text: m.text }); (m.goi || []).forEach(g => c.push({ type: 'tool_use', id: g.id, name: g.ten, input: g.args || {} })); if (c.length) messages.push({ role: 'assistant', content: c }); }
     else if (m.vai === 'tool') { const c = (m.kq || []).map(k => { const content = [{ type: 'text', text: (k.text || '').slice(0, 30000) }]; if (k.image && k.image.data) content.push({ type: 'image', source: { type: 'base64', media_type: k.image.mime || 'image/png', data: k.image.data } }); return { type: 'tool_result', tool_use_id: k.id, content, is_error: !!k.isError }; }); c.push({ type: 'text', text: duAn }); messages.push({ role: 'user', content: c }); }
   });
-  const r = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: { 'content-type': 'application/json', 'x-api-key': env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' }, body: JSON.stringify({ model: llmModel(env), max_tokens: 2000, system: heThong, messages, tools: AGENT_TOOLS.map(([name, description, props, required]) => ({ name, description, input_schema: { type: 'object', properties: props, required: required || [] } })) }) });
+  const r = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: { 'content-type': 'application/json', 'x-api-key': env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' }, body: JSON.stringify({ model: llmModel(env), max_tokens: 2000, system: heThong, messages, tools: tools.map(([name, description, props, required]) => ({ name, description, input_schema: { type: 'object', properties: props, required: required || [] } })) }) });
   if (!r.ok) throw new Error('claude ' + r.status + ' ' + (await r.text()).slice(0, 200));
   const j = await r.json(); const c = j.content || [];
   return { text: c.filter(x => x.type === 'text').map(x => x.text).join('\n').trim(), goi: c.filter(x => x.type === 'tool_use').map(x => ({ id: x.id, ten: x.name, args: x.input || {} })) };
 }
 /* ── OpenAI Chat Completions: tools/function, tool_calls, role tool (ảnh gửi thêm bằng image_url) ── */
-async function goiOpenAIAgent(env, heThong, ls, duAn) {
+async function goiOpenAIAgent(env, heThong, ls, duAn, tools) {
   const messages = [{ role: 'system', content: heThong }]; const cuoiNd = ls.map(m => m.vai).lastIndexOf('nd');
   ls.forEach((m, i) => {
     if (m.vai === 'nd') messages.push({ role: 'user', content: m.text + (i === cuoiNd ? '\n\n' + duAn : '') });
     else if (m.vai === 'ai') { const msg = { role: 'assistant', content: m.text || null }; if (m.goi && m.goi.length) msg.tool_calls = m.goi.map(g => ({ id: g.id, type: 'function', function: { name: g.ten, arguments: JSON.stringify(g.args || {}) } })); messages.push(msg); }
     else if (m.vai === 'tool') { const anh = []; (m.kq || []).forEach(k => { messages.push({ role: 'tool', tool_call_id: k.id, content: (k.isError ? 'LỖI: ' : '') + (k.text || '').slice(0, 30000) }); if (k.image && k.image.data) anh.push({ type: 'image_url', image_url: { url: 'data:' + (k.image.mime || 'image/png') + ';base64,' + k.image.data } }); }); messages.push({ role: 'user', content: [{ type: 'text', text: (anh.length ? 'Ảnh khung hình vừa xem ở trên.\n' : '') + duAn }, ...anh] }); }
   });
-  const r = await fetch('https://api.openai.com/v1/chat/completions', { method: 'POST', headers: { 'content-type': 'application/json', authorization: 'Bearer ' + env.OPENAI_API_KEY }, body: JSON.stringify({ model: llmModel(env), messages, tools: AGENT_TOOLS.map(([name, description, props, required]) => ({ type: 'function', function: { name, description, parameters: { type: 'object', properties: props, required: required || [] } } })), temperature: 0.4 }) });
+  const r = await fetch('https://api.openai.com/v1/chat/completions', { method: 'POST', headers: { 'content-type': 'application/json', authorization: 'Bearer ' + env.OPENAI_API_KEY }, body: JSON.stringify({ model: llmModel(env), messages, tools: tools.map(([name, description, props, required]) => ({ type: 'function', function: { name, description, parameters: { type: 'object', properties: props, required: required || [] } } })), temperature: 0.4 }) });
   if (!r.ok) throw new Error('openai ' + r.status + ' ' + (await r.text()).slice(0, 200));
   const j = await r.json(); const m = (((j.choices || [])[0] || {}).message) || {};
   return { text: (m.content || '').trim(), goi: (m.tool_calls || []).map(t => { let a = {}; try { a = JSON.parse(t.function.arguments || '{}'); } catch { } return { id: t.id, ten: t.function.name, args: a }; }) };

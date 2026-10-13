@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Viral Studio · Dựng chuyên sâu · Tự Mình Xây Kênh</title>
+<meta name="description" content="Trình dựng video chuyên sâu kiểu Premiere chạy ngay trên trình duyệt: Lumetri Color, scopes, trim ripple/roll/slip, keyframe, mixer, đo loudness, kèm trợ lý AI tiếng Việt. Dành cho gói Pro.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Cg%20transform%3D%22rotate%28-9%2032%2017%29%22%3E%3Crect%20x%3D%2219%22%20y%3D%2211%22%20width%3D%2226%22%20height%3D%2212%22%20rx%3D%223%22%20fill%3D%22%2399df00%22/%3E%3Cpath%20d%3D%22M30%2014.4v5.2a1%201%200%200%200%201.52.86l4.6-2.6a1%201%200%200%200%200-1.72l-4.6-2.6A1%201%200%200%200%2030%2014.4z%22%20fill%3D%22%2326210f%22/%3E%3C/g%3E%3Crect%20x%3D%2219%22%20y%3D%2228%22%20width%3D%2226%22%20height%3D%2212%22%20rx%3D%223%22%20fill%3D%22%2326210f%22/%3E%3Crect%20x%3D%224%22%20y%3D%2244%22%20width%3D%2226%22%20height%3D%2212%22%20rx%3D%223%22%20fill%3D%22%2326210f%22/%3E%3Crect%20x%3D%2234%22%20y%3D%2244%22%20width%3D%2226%22%20height%3D%2212%22%20rx%3D%223%22%20fill%3D%22%2326210f%22/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F9E8DD; --ink:#26210F; --lime:#99DF00; --moss:#1B220D;
+    --bg:#99DF00; --surface:#FDFBF3; --surface-2:#F1F6E0; --line:#C9DE93; --line-strong:#5F8C00;
+    --text:#1C2600; --muted:#57612F; --accent:#99DF00; --accent-ink:#1C2600; --accent-soft:#E6F6BC;
+    --pro:#26210F; --pro-text:#F9E8DD; --danger:#B4432A; --warn:#B8860B; --ok:#3E7D1F;
+    --radius:14px; --shadow:0 10px 30px rgba(38,33,15,.10);
+    --font-ui:'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --font-display:'Bricolage Grotesque', 'Be Vietnam Pro', system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme:dark;
+      --bg:#0B0C08; --surface:#15170F; --surface-2:#1E2114; --line:#4E6E10; --line-strong:#99DF00;
+      --text:#F3F0E4; --muted:#B7B89A; --accent:#99DF00; --accent-ink:#0B0C08; --accent-soft:#233207;
+      --pro:#99DF00; --pro-text:#1B220D; --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme:dark;
+    --bg:#0B0C08; --surface:#15170F; --surface-2:#1E2114; --line:#4E6E10; --line-strong:#99DF00;
+    --text:#F3F0E4; --muted:#B7B89A; --accent:#99DF00; --accent-ink:#0B0C08; --accent-soft:#233207;
+    --pro:#99DF00; --pro-text:#1B220D; --shadow:0 10px 30px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size:14px;line-height:1.5;display:flex;flex-direction:column;overflow:hidden}
+  .top{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 14px;background:var(--surface);border-bottom:1px solid var(--line);flex:none}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit}
+  .tmxk-logo{width:32px;height:32px;flex:none}
+  .brand h1{font:800 16px/1.1 var(--font-display);margin:0}
+  .brand p{margin:0;font-size:11.5px;color:var(--muted)}
+  .row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .theme-btn{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--text);cursor:pointer;font-size:15px}
+  .pill{border:1px solid var(--line-strong);background:var(--surface);color:var(--text);border-radius:999px;padding:6px 12px;font:inherit;font-weight:700;cursor:pointer;text-decoration:none;font-size:12.5px;white-space:nowrap}
+  .pill.pro{background:var(--pro);color:var(--pro-text);border-color:transparent}
+  .pill:disabled{opacity:.45;cursor:default}
+  .quota{font-size:12px;color:var(--muted)}
+  .nhan{font-size:11px;font-weight:800;letter-spacing:.04em;padding:3px 8px;border-radius:999px;background:var(--accent);color:var(--accent-ink)}
+  main{flex:1;display:flex;min-height:0}
+  #trai{flex:1;position:relative;min-width:0;background:#1b1c1f}
+  #fc{width:100%;height:100%;border:0;display:block;background:#1b1c1f}
+  #fcTt{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:var(--surface);color:var(--text);padding:14px 18px;border-radius:12px;box-shadow:var(--shadow);max-width:min(520px,90%);text-align:center;font-weight:600}
+  #khoa{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:var(--bg);z-index:5;padding:20px}
+  #khoa .hop{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:26px;max-width:460px;text-align:center}
+  #khoa h2{font:800 22px/1.2 var(--font-display);margin:0 0 10px}
+  #khoa p{color:var(--muted);margin:0 0 16px}
+  #khoa ul{text-align:left;margin:0 0 18px;padding-left:20px;color:var(--text)}
+  #khoa li{margin:4px 0}
+  .btn{border:1px solid var(--line-strong);background:var(--surface);color:var(--text);border-radius:10px;padding:9px 16px;font:inherit;font-weight:800;cursor:pointer}
+  .btn.chinh{background:linear-gradient(135deg,#ff6a2b,#ff3d1f);color:#fff;border-color:transparent;box-shadow:0 4px 0 #7a1e00}
+  #ben{width:360px;flex:none;display:flex;flex-direction:column;background:var(--surface);border-left:1px solid var(--line);min-height:0}
+  body.anBen #ben{display:none}
+  .tabs{display:flex;border-bottom:1px solid var(--line);flex:none}
+  .tab{flex:1;border:0;background:transparent;color:var(--muted);font:inherit;font-weight:800;padding:10px;cursor:pointer;border-bottom:2px solid transparent}
+  .tab.on{color:var(--text);border-bottom-color:var(--accent)}
+  .panel{flex:1;display:flex;flex-direction:column;min-height:0}
+  #ds{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+  .m{max-width:95%;padding:8px 11px;border-radius:12px;white-space:pre-wrap;word-break:break-word;font-size:13.5px}
+  .m.nd{align-self:flex-end;background:var(--accent-soft);border-bottom-right-radius:4px}
+  .m.ai{align-self:flex-start;background:var(--surface-2);border:1px solid var(--line);border-bottom-left-radius:4px}
+  .m.buoc{font-size:12.5px;color:var(--muted);padding:6px 9px}
+  .bc{padding:2px 0}
+  .bc.loi{color:var(--danger)}
+  .bc.dang{font-style:italic}
+  .khungnho{display:block;max-width:150px;max-height:150px;border-radius:6px;margin-top:4px;border:1px solid var(--line)}
+  .goiy{display:flex;flex-direction:column;gap:6px}
+  .goiyNut{text-align:left;border:1px solid var(--line);background:var(--surface-2);color:var(--text);border-radius:10px;padding:8px 10px;font:inherit;font-size:13px;cursor:pointer}
+  .goiyNut:hover{border-color:var(--line-strong)}
+  .nhap{display:flex;gap:6px;padding:10px;border-top:1px solid var(--line);flex:none}
+  .nhap textarea{flex:1;resize:none;height:58px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;background:var(--surface-2);color:var(--text)}
+  .nhap .cot{display:flex;flex-direction:column;gap:6px}
+  .nho{border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:8px;padding:5px 9px;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+  .nho.xanh{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+  #aiHop.khong #ds::before{content:"Máy chủ trợ lý chưa bật. Bạn vẫn dựng tay bình thường.";color:var(--muted);font-size:13px}
+  #hd{flex:1;overflow:auto;padding:14px;font-size:13.5px}
+  #hd h3{font:800 14px/1.3 var(--font-display);margin:16px 0 6px;color:var(--text)}
+  #hd h3:first-child{margin-top:0}
+  #hd table{width:100%;border-collapse:collapse;font-size:12.5px}
+  #hd td{padding:4px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+  #hd td:first-child{white-space:nowrap;font-weight:800}
+  #hd kbd{font:700 11.5px/1 ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--surface-2);border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:2px 5px}
+  #hd p{margin:4px 0 8px;color:var(--muted)}
+  #hd ol{padding-left:18px;margin:4px 0}
+  #hd li{margin:3px 0}
+  #toast{position:fixed;left:50%;bottom:18px;transform:translate(-50%,16px);background:var(--ink);color:#fff;padding:9px 14px;border-radius:10px;font-size:13px;opacity:0;transition:.2s;pointer-events:none;z-index:50;max-width:90%}
+  #toast.show{opacity:1;transform:translate(-50%,0)}
+  #canMay{background:var(--warn);color:#fff;padding:8px 14px;font-weight:700;font-size:13px;text-align:center;flex:none}
+  @media (max-width:1100px){#ben{width:300px}}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="../index.html" aria-label="Tự Mình Xây Kênh, về trang chủ">
+    <svg class="tmxk-logo" viewBox="0 0 64 64" aria-hidden="true"><g transform="rotate(-9 32 17)"><rect x="19" y="11" width="26" height="12" rx="3" fill="#99df00"/><path d="M30 14.4v5.2a1 1 0 0 0 1.52.86l4.6-2.6a1 1 0 0 0 0-1.72l-4.6-2.6A1 1 0 0 0 30 14.4z" fill="#26210f"/></g><rect x="19" y="28" width="26" height="12" rx="3" fill="#26210f"/><rect x="4" y="44" width="26" height="12" rx="3" fill="#26210f"/><rect x="34" y="44" width="26" height="12" rx="3" fill="#26210f"/></svg>
+    <div><h1>Viral Studio · Dựng chuyên sâu <span class="nhan">PRO</span></h1><p>by Tự Mình Xây Kênh · kiểu Premiere, chạy trên trình duyệt</p></div>
+  </a>
+  <div class="row">
+    <span class="quota" id="quota"></span>
+    <button class="pill" id="btnThemFootage" type="button" disabled title="Thêm video, ảnh, nhạc, phụ đề vào Project">➕ Thêm footage</button>
+    <input type="file" id="fileIn" multiple hidden accept="video/*,audio/*,image/*,.srt,.vtt,.fcproj">
+    <a class="pill" href="dung-video.html" title="Về trình dựng nhanh kiểu CapCut">⚡ Dựng nhanh</a>
+    <button class="pill" id="btnBen" type="button" title="Ẩn hoặc hiện bảng trợ lý">🤖 Trợ lý</button>
+    <button class="pill" id="btnToanMan" type="button" title="Toàn màn hình">⛶</button>
+    <button class="theme-btn" id="themeBtn" type="button" aria-label="Đổi giao diện sáng hoặc tối">◐</button>
+    <button class="pill pro" id="acctBtn" type="button">Tài khoản</button>
+  </div>
+</header>
+<div id="canMay" hidden>Dựng chuyên sâu cần màn hình máy tính và Chrome hoặc Edge. Trên điện thoại hãy dùng ⚡ Dựng nhanh.</div>
+<main>
+  <div id="trai">
+    <iframe id="fc" title="FilmCraft, trình dựng video" allow="fullscreen; clipboard-read; clipboard-write"></iframe>
+    <div id="fcTt" hidden></div>
+    <div id="khoa">
+      <div class="hop">
+        <h2 id="khoaTieuDe">Dựng chuyên sâu dành cho gói Pro</h2>
+        <p id="khoaMoTa"></p>
+        <ul>
+          <li>Trình dựng kiểu Premiere: Source/Program monitor, timeline nhiều track, trim ripple, roll, slip, slide</li>
+          <li>Lumetri Color: curves, bánh xe màu, HSL, vignette, kèm scopes đo màu thật</li>
+          <li>Keyframe đồ thị Bezier, 93 hiệu ứng, 30 chuyển cảnh, mask</li>
+          <li>Mixer âm thanh, EQ, compressor, đo loudness chuẩn TikTok</li>
+          <li>Trợ lý AI tiếng Việt ra lệnh thẳng cho trình dựng</li>
+        </ul>
+        <button class="btn chinh" id="khoaNut" type="button">Đăng nhập</button>
+      </div>
+    </div>
+  </div>
+  <aside id="ben">
+    <div class="tabs"><button class="tab on" data-t="tl" type="button">🤖 Trợ lý</button><button class="tab" data-t="hd" type="button">📖 Hướng dẫn</button></div>
+    <section class="panel" data-t="tl" id="aiHop">
+      <div id="ds"></div>
+      <div class="nhap">
+        <textarea id="yc" placeholder="Nói với trợ lý: “xếp 3 clip lên timeline, cắt bỏ 2 giây đầu clip 1, chỉnh màu ấm”…"></textarea>
+        <div class="cot"><button class="nho xanh" id="btnGui" type="button">Gửi</button><button class="nho" id="btnHoanTac" type="button" title="Hoàn tác thao tác gần nhất trong FilmCraft">↶</button><button class="nho" id="btnXoaLs" type="button" title="Xoá lịch sử chat">🗑</button></div>
+      </div>
+    </section>
+    <section class="panel" data-t="hd" hidden>
+      <div id="hd">
+        <h3>Bắt đầu một video</h3>
+        <ol>
+          <li>Bấm <b>➕ Thêm footage</b> hoặc kéo video thả vào trình dựng. File ở lại máy bạn, không tải lên đâu.</li>
+          <li>Chuột phải clip trong <b>Project</b> → <b>New Sequence From Clip</b>, hoặc nhờ trợ lý “tạo sequence dọc 1080×1920”.</li>
+          <li>Dựng xong vào tab <b>Export</b> ở góc trên trái → H.264 MP4.</li>
+          <li>Lưu dự án: <b>File → Save</b> tải file <code>.fcproj</code> về máy. Lỡ đóng tab thì mở lại, trình dựng tự khôi phục bản gần nhất.</li>
+        </ol>
+        <h3>Phím tắt hay dùng</h3>
+        <table>
+          <tr><td><kbd>I</kbd> <kbd>O</kbd></td><td>Đánh dấu In / Out trong Source hoặc Timeline</td></tr>
+          <tr><td><kbd>,</kbd> <kbd>.</kbd></td><td>Insert (chèn, đẩy phần sau) / Overwrite (ghi đè) clip từ Source xuống timeline</td></tr>
+          <tr><td><kbd>;</kbd> <kbd>'</kbd></td><td>Lift (nhấc, để trống) / Extract (rút, dồn lại) khoảng In–Out</td></tr>
+          <tr><td><kbd>Q</kbd> <kbd>W</kbd></td><td>Cắt bỏ phần trước / sau đầu phát và dồn lại (ripple)</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>K</kbd></td><td>Add Edit: cắt clip tại đầu phát</td></tr>
+          <tr><td><kbd>J</kbd> <kbd>K</kbd> <kbd>L</kbd></td><td>Lùi / dừng / tới, bấm nhiều lần để tăng tốc</td></tr>
+          <tr><td><kbd>V</kbd> <kbd>C</kbd></td><td>Công cụ chọn / dao cắt (Razor)</td></tr>
+          <tr><td><kbd>B</kbd> <kbd>N</kbd></td><td>Ripple Edit / Rolling Edit: kéo mép clip</td></tr>
+          <tr><td><kbd>Y</kbd> <kbd>U</kbd></td><td>Slip / Slide</td></tr>
+          <tr><td><kbd>Alt</kbd>+<kbd>←</kbd> <kbd>→</kbd></td><td>Nhích điểm cắt 1 khung hình (thêm <kbd>Shift</kbd> = 5 khung)</td></tr>
+          <tr><td><kbd>E</kbd></td><td>Kéo mép clip đang chọn tới đầu phát</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>Z</kbd></td><td>Hoàn tác, không giới hạn</td></tr>
+          <tr><td><kbd>Alt</kbd>+<kbd>Ctrl</kbd>+<kbd>K</kbd></td><td>Bảng phím tắt, đổi sang bộ phím Premiere / Final Cut / Avid</td></tr>
+        </table>
+        <h3>Chỉnh màu</h3>
+        <p>Chọn workspace <b>Color</b> ở thanh trên. Panel <b>Lumetri Color</b> đi từ trên xuống: Basic Correction (nhiệt độ, phơi sáng, tương phản) → Creative (look) → Curves → Color Wheels → HSL Secondary (chọn riêng màu da) → Vignette. Nhìn <b>Lumetri Scopes</b> bên cạnh: waveform da người thường nằm quanh 60–70.</p>
+        <h3>Âm thanh</h3>
+        <p>Workspace <b>Audio</b>. Đồng hồ bên phải timeline hiện LUFS; TikTok/Reels nên quanh <b>−14 LUFS</b>. Chọn clip → Effect Controls → thêm Dynamics (compressor) cho giọng đều, EQ cắt dưới 80 Hz cho hết ù.</p>
+        <h3>Phụ đề</h3>
+        <p>Menu <b>Sequence → Captions → Add New Caption Track</b>, rồi <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>C</kbd> thêm câu tại đầu phát. Có file .srt thì kéo vào là thành caption track. Trợ lý cũng thêm được theo lời bạn.</p>
+        <h3>Trợ lý làm được gì</h3>
+        <p>Xếp clip, cắt, đổi tốc độ, thêm chuyển cảnh, chỉnh màu, thêm phụ đề, đặt marker, chỉnh âm lượng, xem khung hình để tự kiểm. Nói rõ clip nào, giây nào. Không ưng thì bấm ↶ hoặc <kbd>Ctrl</kbd>+<kbd>Z</kbd>.</p>
+      </div>
+    </section>
+  </aside>
+</main>
+<div id="toast" role="status" aria-live="polite"></div>
+<script src="tai-khoan.js?v=202610041200"></script>
+<script>document.addEventListener("DOMContentLoaded",function(){if(typeof TK==="undefined"){var k=document.createElement("div");k.style.cssText="position:fixed;left:12px;right:12px;bottom:12px;z-index:9999;background:#ff4d6d;color:#fff;padding:12px 14px;border-radius:12px;font:14px system-ui;display:flex;gap:10px;align-items:center;justify-content:space-between";k.innerHTML="Trang tải thiếu một phần (mạng chập chờn). <button onclick=\"location.reload()\" style=\"background:#fff;color:#000;border:0;border-radius:8px;padding:6px 12px;font-weight:700\">Tải lại trang</button>";document.body.appendChild(k);}});</script>
+<script src="dung-pro.js?v=202610131800"></script>
+</body>
+</html>

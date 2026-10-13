@@ -21,6 +21,7 @@ const NFC = (() => {
     while (Date.now() - t0 < CHO_TOI_DA) {
       if (!cuaSo || cuaSo.closed) throw new Error('Tab FilmCraft đã đóng');
       const ld = cuaSo.filmcraftLoad;
+      if (cuaSo.filmcraftKhoa) throw new Error(cuaSo.filmcraftKhoa === 'pro' ? 'Dựng chuyên sâu dành cho gói Pro. Nâng cấp ở tab vừa mở rồi bấm lại.' : 'Đăng nhập ở tab vừa mở rồi bấm lại');
       if (ld && (ld.fatal || ld.error)) throw new Error('FilmCraft không chạy được trên máy này: ' + String(ld.fatal || ld.error).slice(0, 160));
       if (fc()) return fc();
       await new Promise(r => setTimeout(r, 400));
@@ -31,7 +32,7 @@ const NFC = (() => {
   /* mở tab trước (phải ngay trong lúc bấm, kẻo trình duyệt chặn popup), rồi mới chờ */
   function moTab() {
     if (fc()) { cuaSo.focus(); return cuaSo; }
-    cuaSo = window.open('filmcraft/index.html?empty&norecover', 'tmxk_filmcraft');
+    cuaSo = window.open('dung-pro.html', 'tmxk_filmcraft');
     if (!cuaSo) throw new Error('Trình duyệt chặn mở tab mới, cho phép popup của trang này rồi bấm lại');
     return cuaSo;
   }
@@ -41,7 +42,8 @@ const NFC = (() => {
     for (const s of srcs) {
       if (!s.file) { loi.push(s.ten + ' (chưa có file)'); continue; }
       /* File phải tạo trong chính tab FilmCraft: wasm kiểm instanceof File theo window của tab đó */
-      const f = new cuaSo.File([s.file], s.file.name, { type: s.file.type, lastModified: s.file.lastModified });
+      const W = cuaSo.filmcraftWindow || cuaSo;
+      const f = new W.File([s.file], s.file.name, { type: s.file.type, lastModified: s.file.lastModified });
       const r = await F.importFiles([f]);
       if (r.items && r.items.length) id.set(s.id, r.items[0]); else loi.push(s.ten + ': ' + (r.errors || []).join(', '));
     }
@@ -118,7 +120,7 @@ const NFC = (() => {
     try {
       const { dem, bo, chuaChuyen } = await chuyen();
       cuaSo.focus();
-      toast('Đã chuyển sang FilmCraft: ' + dem.v1 + ' đoạn, ' + dem.broll + ' b-roll, ' + dem.pd + ' câu phụ đề, ' + dem.chu + ' chữ' + (chuaChuyen.length ? ' · chưa chuyển ' + chuaChuyen.join(', ') : '') + (bo.length ? ' · ' + bo.length + ' lỗi nhỏ (xem console)' : ''));
+      toast('Đã chuyển sang Dựng chuyên sâu: ' + dem.v1 + ' đoạn, ' + dem.broll + ' b-roll, ' + dem.pd + ' câu phụ đề, ' + dem.chu + ' chữ' + (chuaChuyen.length ? ' · chưa chuyển ' + chuaChuyen.join(', ') : '') + (bo.length ? ' · ' + bo.length + ' lỗi nhỏ (xem console)' : ''));
       if (bo.length) console.warn('[sang FilmCraft]', bo);
     } catch (e) { console.warn('[sang FilmCraft]', e); toast('Không chuyển được: ' + (e.message || e)); }
   }
