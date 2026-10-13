@@ -147,9 +147,13 @@
     <div class="tabs"><button class="tab on" data-t="cc" type="button">🤖 Claude Code</button><button class="tab" data-t="hd" type="button">📖 Hướng dẫn</button></div>
     <section class="panel" data-t="cc">
       <div id="cc">
-        <h3>Dựng bằng Claude Code trên máy bạn</h3>
-        <p>Nối một thư mục trên máy. Claude Code mở thư mục đó là ra lệnh cho trình dựng này được: xếp clip, cắt, chỉnh màu, phụ đề, xem khung hình để tự kiểm. Mọi lệnh hoàn tác được bằng <kbd>Ctrl</kbd>+<kbd>Z</kbd>.</p>
-        <button class="btn chinh" id="btnNoiTM" type="button">🔗 Nối thư mục trên máy</button>
+        <h3>Chat với Claude Code để dựng</h3>
+        <p>Bấm nút dưới, trình dựng hiện một mã 6 ký tự. Nói mã đó cho Claude Code ở bất cứ đâu (app trên máy, hay claude.ai trên web) là Claude ra lệnh được cho tab này: xếp clip, cắt, chỉnh màu, phụ đề, tự xem khung hình để kiểm. Không cần cài gì. Hoàn tác bằng <kbd>Ctrl</kbd>+<kbd>Z</kbd>.</p>
+        <button class="btn chinh" id="btnCauXa" type="button">📡 Nối với Claude Code</button>
+        <p class="quota" id="cauXaTt"></p>
+        <h3>Hoặc nối thư mục trên máy</h3>
+        <p>Dành cho Claude Code app chạy ngay trên máy này: Claude đọc thư mục dự án, trình dựng tự nạp <code>footage/</code>.</p>
+        <button class="btn" id="btnNoiTM" type="button">🔗 Nối thư mục trên máy</button>
         <p class="quota" id="noiTMTt"></p>
         <ol>
           <li>Tạo một thư mục cho video này, bỏ video gốc vào thư mục con <code>footage/</code>.</li>
@@ -201,6 +205,7 @@
 <script src="tai-khoan.js?v=202610041200"></script>
 <script>document.addEventListener("DOMContentLoaded",function(){if(typeof TK==="undefined"){var k=document.createElement("div");k.style.cssText="position:fixed;left:12px;right:12px;bottom:12px;z-index:9999;background:#ff4d6d;color:#fff;padding:12px 14px;border-radius:12px;font:14px system-ui;display:flex;gap:10px;align-items:center;justify-content:space-between";k.innerHTML="Trang tải thiếu một phần (mạng chập chờn). <button onclick=\"location.reload()\" style=\"background:#fff;color:#000;border:0;border-radius:8px;padding:6px 12px;font-weight:700\">Tải lại trang</button>";document.body.appendChild(k);}});</script>
 <script src="dung-pro.js?v=202610140300"></script>
-<script src="noi-thu-muc.js?v=202610140300"></script>
+<script src="noi-thu-muc.js?v=202610140600"></script>
+<script src="cau-noi-xa.js?v=202610140600"></script>
 </body>
 </html>

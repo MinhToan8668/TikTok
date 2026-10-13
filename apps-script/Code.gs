@@ -375,6 +375,8 @@ function doPost(e){
     if (body.action === 'hook_status') return hookTrangThai(body);
     // Viral Studio: tài khoản người dùng, mua Pro (xem Studio.gs)
     if (String(body.action||'').indexOf('st_') === 0) return studioApi(body);
+    // Cầu nối xa: Claude Code ↔ tab trình dựng qua mã ghép nối (xem CauNoi.gs)
+    if (String(body.action||'').indexOf('cc_') === 0) return jsonOut(ccApi(body));
 
 
     return jsonOut({ok:false, error:'unknown_action'});
