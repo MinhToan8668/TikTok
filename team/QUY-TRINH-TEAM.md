@@ -83,6 +83,7 @@ Không đăng y chang một nội dung ở mọi kênh: đổi giọng theo bả
 | Phong cách dựng chung | Tool Dựng video → chọn phong cách → **Chia sẻ** → gửi link vào nhóm Zalo team. Người nhận mở link là có |
 | Trao đổi | Một nhóm Zalo riêng của team, chỉ để nộp bài và duyệt, chuyện khác nhắn riêng |
 | Quy chuẩn | `team/QUY-CHUAN-THUONG-HIEU.md`, `poster-fb/HUONG-DAN-POSTER.md` |
+| Kế hoạch chạy thử | `team/KE-HOACH-30-NGAY.md`: bảng việc, chấm điểm tuần, gặp riêng từng người, họp tổng kết |
 
 ## 6. Trả công theo kết quả (gợi ý)
 
