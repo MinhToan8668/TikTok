@@ -35,26 +35,33 @@ async function napFilmCraft() {
   const tt = $('#fcTt'); tt.hidden = false;
   const MB = x => (x / 1048576).toFixed(1).replace('.', ',');
   let v = ''; try { v = await buildFilmCraft(); } catch { }
-  for (let lan = 1; lan <= 3; lan++) {
+  /* nguồn file: máy chủ Cloudflare trước (có điểm nút ở VN, tự nén), github.io sau. Thử luân phiên tối đa 4 lần. */
+  try { if (!MC.url) MC = await TK.mayChu(); } catch { }
+  const nguon = []; if (MC.url) nguon.push(MC.url + '/fc/'); nguon.push(new URL('filmcraft/', location.href).href);
+  let wasmUrl = '', glueUrl = '';
+  for (let lan = 1; lan <= 4; lan++) {
+    const goc = nguon[(lan - 1) % nguon.length], tenGoc = /workers\.dev|\/fc\/$/.test(goc) ? 'Cloudflare' : 'GitHub';
     try {
-      tt.textContent = 'Đang tải trình dựng' + (lan > 1 ? ' (thử lại lần ' + lan + ')' : '') + '…';
-      await taiTruoc('filmcraft/filmcraft_web_bg.wasm' + v, (da, tong) => { tt.textContent = 'Đang tải trình dựng: ' + MB(da) + (tong ? ' / ' + MB(tong) : '') + ' MB' + (lan > 1 ? ' (lần ' + lan + ')' : '') + '. Lần đầu lâu, lần sau mở ngay.'; });
-      await taiTruoc('filmcraft/filmcraft_web.js' + v, () => { });
+      tt.textContent = 'Đang tải trình dựng từ ' + tenGoc + (lan > 1 ? ' (thử lại lần ' + lan + ')' : '') + '…';
+      await taiTruoc(goc + 'filmcraft_web_bg.wasm' + v, (da, tong) => { tt.textContent = 'Đang tải trình dựng từ ' + tenGoc + ': ' + MB(da) + (tong ? ' / ' + MB(tong) : '') + ' MB' + (lan > 1 ? ' (lần ' + lan + ')' : '') + '. Lần đầu lâu, lần sau mở ngay.'; });
+      await taiTruoc(goc + 'filmcraft_web.js' + v, () => { });
+      wasmUrl = goc + 'filmcraft_web_bg.wasm' + v; glueUrl = goc + 'filmcraft_web.js' + v;
       break;
     } catch (e) {
-      console.warn('[tải wasm]', e);
-      if (lan === 3) { tt.textContent = 'Mạng chập chờn, tải trình dựng 3 lần chưa xong. Đổi sang Wi-Fi ổn định hơn rồi bấm Tải lại.'; const b = el('button', 'btn', 'Tải lại'); b.type = 'button'; b.style.marginTop = '10px'; b.onclick = () => location.reload(); tt.appendChild(document.createElement('br')); tt.appendChild(b); napFilmCraft.dang = false; return; }
+      console.warn('[tải wasm]', goc, e);
+      if (lan === 4) { tt.textContent = 'Tải trình dựng 4 lần (cả Cloudflare lẫn GitHub) chưa xong. Thử tắt VPN/ad-block, đổi sang Wi-Fi hoặc 4G khác rồi bấm Tải lại.'; const b = el('button', 'btn', 'Tải lại'); b.type = 'button'; b.style.marginTop = '10px'; b.onclick = () => location.reload(); tt.appendChild(document.createElement('br')); tt.appendChild(b); napFilmCraft.dang = false; return; }
       tt.textContent = 'Mạng chập chờn, 3 giây nữa thử lại…'; await new Promise(r => setTimeout(r, 3000));
     }
   }
   tt.textContent = 'Đang khởi động trình dựng…';
-  $('#fc').src = 'filmcraft/index.html?empty';
+  const themUrl = wasmUrl && !wasmUrl.startsWith(new URL('filmcraft/', location.href).href) ? '&wasm=' + encodeURIComponent(wasmUrl) + '&glue=' + encodeURIComponent(glueUrl) : '';
+  $('#fc').src = 'filmcraft/index.html?empty' + themUrl;
   const t0 = Date.now(); let lanIframe = 0;
   const cho = setInterval(() => {
     const w = $('#fc').contentWindow, ld = w && w.filmcraftLoad;
     if (ld && (ld.fatal || ld.error)) {
       const chu = String(ld.fatal || ld.error);
-      if (/Network error|aborted|Failed to fetch|NetworkError/i.test(chu) && lanIframe < 2) { lanIframe++; tt.textContent = 'Mạng chập chờn lúc khởi động, thử lại lần ' + (lanIframe + 1) + '…'; $('#fc').src = 'filmcraft/index.html?empty&r=' + lanIframe; return; }
+      if (/Network error|aborted|Failed to fetch|NetworkError/i.test(chu) && lanIframe < 2) { lanIframe++; tt.textContent = 'Mạng chập chờn lúc khởi động, thử lại lần ' + (lanIframe + 1) + '…'; $('#fc').src = 'filmcraft/index.html?empty&r=' + lanIframe + themUrl; return; }
       clearInterval(cho); napFilmCraft.dang = false;
       tt.textContent = /Network error|aborted|Failed to fetch/i.test(chu) ? 'Mạng chập chờn, chưa tải xong trình dựng. Đổi sang Wi-Fi ổn định hơn rồi bấm Tải lại.' : 'FilmCraft không chạy được trên máy này: ' + chu.slice(0, 200) + '. Dùng Chrome hoặc Edge mới nhất trên máy tính.';
       const b = el('button', 'btn', 'Tải lại'); b.type = 'button'; b.style.marginTop = '10px'; b.onclick = () => location.reload(); tt.appendChild(document.createElement('br')); tt.appendChild(b); return;
