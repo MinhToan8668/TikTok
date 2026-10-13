@@ -10,6 +10,7 @@ tự nhiên như trong code hiện có.
 | Đường dẫn | Vai trò | Ghi chú |
 |---|---|---|
 | `index.html` | Landing page + đăng ký + lịch kèm 1:1 | ~4.400 dòng, một file gồm CSS/JS/HTML |
+| `tools/dung-video.html` + `tools/dung/*.js` | Dựng nhanh (style 1, kiểu CapCut): HTML/CSS trong `.html`, JS tách thành 9 file theo mục, `dung/nap.js` ghép lại thành một script lúc chạy (code dựa vào hoisting) | sửa JS ở `tools/dung/`, đổi `?v=` của `nap.js` khi deploy |
 | `tools/hook-text.html` | Viral Studio · Hook viral (Free không AI, Pro có AI) | ~3.100 dòng |
 | `tools/soi-video.html`, `cham-video.html`, `kich-ban.html` | Viral Studio · soi video, chấm video, kịch bản | mỗi file 600–800 dòng |
 | `tools/tai-khoan.js` | Module `TK` dùng chung: tài khoản, token, hồ sơ kênh, lượt dùng | nạp bằng `<script src="tai-khoan.js">` |
