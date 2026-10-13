@@ -45,6 +45,7 @@ const NTM = (() => {
       if (MC.url) { const r = await fetch(MC.url + '/agent_tools'); const j = await r.json(); if (j.ok) md = '# Lệnh của trình Dựng video\n\nChạy: `node .tmxk/tmxk.mjs <ten> \'<json tham số>\'`\n\n' + j.tools.map(t => '## ' + t.ten + (ten[t.ten] ? ' · ' + ten[t.ten] : '') + '\n\n' + t.mo_ta + '\n\nTham số: `' + JSON.stringify(t.tham_so) + '`' + (t.bat_buoc.length ? ' · bắt buộc: ' + t.bat_buoc.join(', ') : '')).join('\n\n') + '\n\n## Quy tắc gốc của trợ lý dựng\n\n' + j.he_thong + '\n'; }
     } catch { }
     if (!md) md = '# Lệnh của trình Dựng video\n\nMáy chủ chưa trả mô tả chi tiết, đây là tên lệnh. Gọi thử với tham số thiếu, lỗi trả về sẽ nói cần gì.\n\n' + Object.keys(ten).map(k => '- `' + k + '`: ' + ten[k]).join('\n') + '\n';
+    md += '\n# FilmCraft (bản dựng chuyên nghiệp, khoảng 700 lệnh kiểu Premiere)\n\nChỉ chạy khi người dùng đã bấm "🎬 Mở trong FilmCraft" trong trình dựng. Thời gian của FilmCraft tính bằng tick: 254016000000 tick = 1 giây (hoặc dùng tham số seconds khi lệnh có).\n\n- `fc_ds` `{"loc":"lumetri"}`: tìm lệnh FilmCraft theo từ khoá, trả id + tham số\n- `fc_xem` `{}`: project + sequence đang mở (id clip, track, thời gian)\n- `fc_chay` `{"lenh":"effects.setParam","tham_so":{...}}`: chạy một lệnh FilmCraft\n- `fc_lo` `{"buoc":[{"lenh":"...","tham_so":{...}}]}`: chạy nhiều lệnh theo thứ tự\n- `fc_khung` `{}`: ảnh chụp màn hình FilmCraft để tự kiểm\n';
     await ghi(tmxk, 'CONG-CU.md', md);
   }
   async function ghiFileCau() {
@@ -80,7 +81,7 @@ const NTM = (() => {
     const ds = Array.isArray(goi.lenh) ? goi.lenh.slice(0, 30) : [], ket = [];
     for (const g of ds) {
       const ten = String(g && g.ten || ''), nhan = (AGENT_TEN[ten] || ten);
-      let res; try { res = await agentXuLy(ten, (g && g.a) || {}); } catch (e) { res = { isError: true, text: String(e && e.message || e) }; }
+      let res; try { res = typeof NFC !== 'undefined' && NFC.laLenh(ten) ? await NFC.lenh(ten, (g && g.a) || {}) : await agentXuLy(ten, (g && g.a) || {}); } catch (e) { res = { isError: true, text: String(e && e.message || e) }; }
       ket.push({ ten, text: res.text, image: res.image, isError: !!res.isError });
       toast((res.isError ? '⚠ Claude: ' : '✓ Claude: ') + nhan);
       if (res.isError) break;                                    // lệnh sau thường dựa vào lệnh trước, dừng để Claude sửa

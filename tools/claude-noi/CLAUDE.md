@@ -37,6 +37,22 @@ Lệnh lỗi trả `⚠` kèm lý do. Đọc lý do rồi sửa tham số, đừ
 - Không gọi `xuat_video`, `long_tieng`, `hieu_footage`, `tao_shorts` khi người dùng chưa yêu cầu.
 - Cuối mỗi lượt: tóm tắt 1–3 câu đã làm gì, gợi ý bước tiếp.
 
+## Dựng chuyên nghiệp trong FilmCraft
+
+Khi cần chỉnh màu kỹ (curves, color wheels, HSL, scopes), trim chính xác từng khung,
+keyframe Bezier, mixer âm thanh, đo loudness: bảo người dùng bấm **🎬 Mở trong FilmCraft**
+trong trình dựng. Dòng thời gian (V1, b-roll, phụ đề, chữ, mốc) được chuyển sang một tab
+FilmCraft, sau đó bạn điều khiển FilmCraft bằng các lệnh `fc_*`:
+
+- `node .tmxk/tmxk.mjs fc_ds '{"loc":"lumetri"}'`: tìm lệnh FilmCraft và tham số
+- `node .tmxk/tmxk.mjs fc_xem`: xem id clip, track, thời gian của sequence
+- `node .tmxk/tmxk.mjs fc_chay '{"lenh":"<id lệnh>","tham_so":{...}}'`
+- `node .tmxk/tmxk.mjs fc_khung`: chụp màn hình FilmCraft để tự kiểm
+
+Thời gian FilmCraft tính bằng tick: 254016000000 tick = 1 giây. Mọi lệnh đều hoàn tác được
+(`edit.undo`). Sau khi chuyển sang FilmCraft, sửa tiếp bên FilmCraft, đừng sửa song song bên
+trình dựng TMXK, vì hai bên không tự đồng bộ.
+
 ## Khi trình dựng thiếu tính năng
 
 Nếu người dùng muốn một thao tác mà không lệnh nào làm được, nói rõ là trình dựng chưa có,
