@@ -30,7 +30,7 @@
      ANTHROPIC_API_KEY, OPENAI_API_KEY   (Secret) key khi chọn claude / openai
    ═══════════════════════════════════════════════════════════════════════════ */
 
-const PHIEN_BAN = '2026.10.25';
+const PHIEN_BAN = '2026.10.26';
 /* link /exec của Apps Script đang dùng trong tool (công khai sẵn trong tools/*.html). Biến APPS_SCRIPT_URL trên Cloudflare, nếu có, sẽ được ưu tiên. */
 const APPS_SCRIPT_MD = 'https://script.google.com/macros/s/AKfycbyxe1nWupAl6VheDZHaU3Ojm-d6c8F_khhUMtkehNCLh5OnGW6f2uF0PKPYZ4eYUqyGjQ/exec';
 const asUrl = env => String(env.APPS_SCRIPT_URL || env.APPS_SCRIPT || APPS_SCRIPT_MD).trim();
@@ -56,6 +56,7 @@ export default {
       if (path === '/kho-key' && req.method === 'GET') { if (!cors['access-control-allow-origin'] || cors['access-control-allow-origin'] === '*') return json({ ok: false, error: 'origin' }, cors, 403); if (!String(url.searchParams.get('token') || '').trim()) return json({ ok: false, error: 'can_dang_nhap' }, cors, 401); return json({ ok: true, pixabay: env.PIXABAY_KEY || '' }, { ...cors, 'cache-control': 'private, no-store' }); }
       if (path === '/nhan-dan' && req.method === 'GET') return json(await timSticker(url, env), cors);
       if (path === '/am-thanh' && req.method === 'GET') return json(await timAmThanh(url, env), cors);
+      if (path.startsWith('/fc/') && req.method === 'GET') return fcFile(req, path.slice(4), cors);
       if (path === '/media' && req.method === 'GET') return media(req, url, cors);
       if (path === '/tai' && req.method === 'GET') return taiHo(req, url, cors);
       if (path === '/yt' && req.method === 'GET') return ytDs(url, cors);
@@ -243,6 +244,23 @@ async function media(req, url, cors) {
   return new Response(r.body, { status: r.status, headers: out });
 }
 
+/* ── file của trình Dựng chuyên sâu (FilmCraft wasm 40 MB) phát qua Cloudflare: github.io hay bị chậm/đứt ở Việt Nam với file lớn,
+   Cloudflare có điểm nút trong nước và tự nén. Lấy từ GitHub raw rồi cache ở edge 1 ngày; URL có ?v=hash nên trình duyệt cache 1 năm. ── */
+const FC_GOC = 'https://raw.githubusercontent.com/MinhToan8668/TikTok/main/tools/filmcraft/';
+const FC_MIME = { wasm: 'application/wasm', js: 'text/javascript; charset=utf-8', html: 'text/html; charset=utf-8', png: 'image/png' };
+async function fcFile(req, ten, cors) {
+  if (!/^[A-Za-z0-9_.-]+$/.test(ten) || !FC_MIME[ten.split('.').pop()]) return json({ ok: false, error: 'khong_co' }, cors, 404);
+  const cache = caches.default, khoa = new Request(new URL(req.url).toString(), { method: 'GET' });
+  let r = await cache.match(khoa);
+  if (!r) {
+    const g = await fetch(FC_GOC + ten, { headers: { 'user-agent': UA }, cf: { cacheEverything: true, cacheTtl: 86400 } });
+    if (!g.ok) return json({ ok: false, error: 'goc_' + g.status }, cors, 502);
+    r = new Response(g.body, { status: 200, headers: { 'content-type': FC_MIME[ten.split('.').pop()], 'cache-control': 'public, max-age=31536000, immutable', 'x-content-type-options': 'nosniff' } });
+    try { CTX && CTX.waitUntil(cache.put(khoa, r.clone())); } catch { }
+  }
+  const out = new Headers(r.headers); Object.entries(cors).forEach(([k, v]) => out.set(k, v)); out.set('access-control-allow-origin', '*');
+  return new Response(r.body, { status: 200, headers: out });
+}
 /* ── tải hộ: stream thẳng từ CDN về máy người dùng, kèm tên file để trình duyệt lưu ── */
 async function taiHo(req, url, cors) {
   const x = hostHopLe(url.searchParams.get('u') || '', HOST_TAI); if (!x) return json({ ok: false, error: 'link_khong_ho_tro' }, cors, 400);

@@ -72,8 +72,9 @@
     const t0 = performance.now();
     const params = new URLSearchParams(location.search);
     try {
-      const { default: init, start } = await import("./filmcraft_web.js" + v);
-      await init({ module_or_path: new URL("filmcraft_web_bg.wasm" + v, location.href) });
+      // TMXK: ?wasm=<url>&glue=<url> để tải wasm/glue từ máy chủ Cloudflare (github.io hay đứt với file lớn ở VN); sửa duy nhất so với bản gốc
+      const { default: init, start } = await import(params.get("glue") || ("./filmcraft_web.js" + v));
+      await init({ module_or_path: params.get("wasm") ? new URL(params.get("wasm")) : new URL("filmcraft_web_bg.wasm" + v, location.href) });
       window.filmcraftLoad.wasmMs = performance.now() - t0;
       await start("filmcraft_canvas");
       window.filmcraftLoad.readyMs = performance.now() - t0;

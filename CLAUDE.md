@@ -17,7 +17,7 @@ tự nhiên như trong code hiện có.
 | `tools/claude-noi/` | `tmxk.mjs` (dòng lệnh cho Claude Code) và `CLAUDE.md` mẫu, trình dựng chép vào thư mục dự án khi nối | bộ lệnh lấy từ `AGENT_TOOLS` qua route `/agent_tools` của worker |
 | `tools/dung-pro.html` + `dung-pro.js` | Dựng chuyên sâu (style 2, gói Pro): khung TMXK bọc FilmCraft trong iframe, trợ lý AI `bo:'filmcraft'`, hướng dẫn phím tắt | dự án lưu theo FilmCraft (.fcproj), độc lập với Dựng video |
 | `tools/sang-filmcraft.js` | Nút "Mở trong FilmCraft": chuyển V1, b-roll, phụ đề, chữ, mốc sang FilmCraft; lệnh `fc_*` cho cầu nối thư mục | điều khiển tab FilmCraft qua `window.filmcraft` (cùng origin) |
-| `tools/filmcraft/` | FilmCraft web v0.7.2 (storytold/filmcraft, MIT/Apache), trình dựng kiểu Premiere bằng WebAssembly | bản build nguyên gốc từ release, không sửa; nâng cấp bằng cách chép đè `filmcraft-web-<ver>.zip` |
+| `tools/filmcraft/` | FilmCraft web v0.7.2 (storytold/filmcraft, MIT/Apache), trình dựng kiểu Premiere bằng WebAssembly | bản build từ release; sửa duy nhất: `index.html` nhận `?wasm=&glue=` để tải từ worker (`/fc/<file>`), nâng cấp thì chép đè rồi thêm lại 2 dòng đó |
 | `tools/tao-nen-teams.html` | Tạo nền Teams, độc lập, không gọi API | |
 | `apps-script/Code.gs` | `doGet`/`doPost`, đăng ký, Telegram bot, config công khai | điểm vào duy nhất, route theo `body.action` |
 | `apps-script/Lich.gs` | Lịch kèm 1:1, action tiền tố `hv_` | |
