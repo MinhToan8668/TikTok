@@ -47,7 +47,7 @@ function catNguon(c, s, im, so) {
 /* ── hoàn tác / làm lại: chụp toàn bộ dòng thời gian ── */
 function chupTT() { return JSON.stringify({ clips: P.clips, gfx: P.gfx, broll: P.broll, tieng: tiengNhe(), am3: am3Nhe(), moc: P.moc, zoom: P.zoom, hook: $('#hook').value, vr: [P.vao == null ? null : P.vao, P.ra == null ? null : P.ra] }); }
 function apTT(s) { const o = JSON.parse(s); P.clips = o.clips; P.gfx = o.gfx; P.broll = o.broll || []; P.tieng = tiengDay(o.tieng); if (o.am3) P.am3 = am3Day(o.am3); if (o.moc) P.moc = o.moc; if (o.zoom) P.zoom = o.zoom; if (o.vr) { P.vao = o.vr[0]; P.ra = o.vr[1]; } $('#hook').value = o.hook; if (P.chon && !mucChon()) P.chon = null; veTl(); veLoi(); veKhung(); }
-function luuHoanTac() { if (P.xemCat) boXemCat(); if (P.gomUndo) return; P.hoanTac.push(chupTT()); if (P.hoanTac.length > 60) P.hoanTac.shift(); P.lamLai = []; }
+function luuHoanTac() { if (P.xemCat) boXemCat(); if (P.gomUndo) return; P.hoanTac.push(chupTT()); if (P.hoanTac.length > 200) P.hoanTac.shift(); P.lamLai = []; }
 function hoanTac() { const s = P.hoanTac.pop(); if (!s) { toast('Không còn gì để hoàn tác'); return; } (P.lamLai = P.lamLai || []).push(chupTT()); apTT(s); }
 function lamLai() { const s = (P.lamLai || []).pop(); if (!s) { toast('Không còn gì để làm lại'); return; } P.hoanTac.push(chupTT()); apTT(s); }
 /* ── Q / W: xoá phần trước / sau đầu phát trong đoạn (thao tác cắt talking-head nhanh nhất của CapCut) ── */
@@ -327,7 +327,22 @@ const AM3_KHO = {};
 let am3Nguon = [], am3Ghi = null;
 const LOAI_AM3 = { sfx: '🔊 Hiệu ứng', tach: '⤓ Tách từ video', thu: '🎙 Ghi âm', file: '📂 File' };
 const SFX = { whoosh: ['💨 Whoosh', 0.6], pop: ['🫧 Pop', 0.18], ding: ['🔔 Ding', 1.1], click: ['🖱 Click', 0.06], boom: ['💥 Boom', 1.2], riser: ['📈 Riser', 1.6], tick: ['⏱ Tíc tắc', 1.0], chup: ['📸 Chụp ảnh', 0.35] };
-function tinhNL(ab) { const d = ab.getChannelData(0), buoc = Math.max(1, Math.floor(ab.sampleRate / 50)), n = Math.floor(d.length / buoc), out = new Float32Array(n); for (let i = 0; i < n; i++) { let s = 0, m = 0; for (let j = i * buoc, e = j + buoc; j < e; j += 2) { s += d[j] * d[j]; m++; } out[i] = s / Math.max(1, m); } return out; }
+/* K-weighting (ITU-R BS.1770, như FilmCraft audio-dsp/loudness.rs và ffmpeg ebur128): shelf +4 dB trên 1,5 kHz rồi highpass 38 Hz; hệ số tính theo sample rate */
+function kHeSo(fs) {
+  let f0 = 1681.974450955533, G = 3.999843853973347, Q = 0.7071752369554196, K = Math.tan(Math.PI * f0 / fs), Vh = Math.pow(10, G / 20), Vb = Math.pow(Vh, 0.4996667741545416), a0 = 1 + K / Q + K * K;
+  const s1 = [(Vh + Vb * K / Q + K * K) / a0, 2 * (K * K - Vh) / a0, (Vh - Vb * K / Q + K * K) / a0, 2 * (K * K - 1) / a0, (1 - K / Q + K * K) / a0];
+  f0 = 38.13547087602444; Q = 0.5003270373238773; K = Math.tan(Math.PI * f0 / fs); a0 = 1 + K / Q + K * K;
+  return [s1, [1, -2, 1, 2 * (K * K - 1) / a0, (1 - K / Q + K * K) / a0]];
+}
+/* mỗi ô 20 ms: trung bình bình phương sau K-weighting, cộng các kênh (tối đa 2) → doDb / doLufs đọc ra LUFS */
+function tinhNL(ab) {
+  const fs = ab.sampleRate, buoc = Math.max(1, Math.floor(fs / 50)), n = Math.floor(ab.length / buoc), out = new Float32Array(n), [s1, s2] = kHeSo(fs), nk = Math.min(2, ab.numberOfChannels);
+  for (let ch = 0; ch < nk; ch++) {
+    const d = ab.getChannelData(ch); let x1 = 0, x2 = 0, y1 = 0, y2 = 0, u1 = 0, u2 = 0, z1 = 0, z2 = 0;
+    for (let i = 0; i < n; i++) { let sum = 0; for (let j = i * buoc, e = j + buoc; j < e; j++) { const x = d[j], y = s1[0] * x + s1[1] * x1 + s1[2] * x2 - s1[3] * y1 - s1[4] * y2; x2 = x1; x1 = x; y2 = y1; y1 = y; const z = y + s2[1] * u1 + s2[2] * u2 - s2[3] * z1 - s2[4] * z2; u2 = u1; u1 = y; z2 = z1; z1 = z; sum += z * z; } out[i] += sum / buoc; }
+  }
+  return out;
+}
 const dbTu = v => 20 * Math.log10(Math.max(1e-5, v));
 const dbChu = v => v <= -30 ? 'tắt' : (v >= 0 ? '+' : '') + v.toFixed(1).replace('.', ',') + ' dB';
 async function taoSfx(k) {
@@ -377,17 +392,28 @@ function am3BatDau() { am3Dung(); if (!ac) return; const t0 = P.t, now = ac.curr
 function am3Dung() { am3Nguon.forEach(s => { try { s.stop(); } catch { } }); am3Nguon = []; }
 async function am3Nghe(a) { moAm(); try { await ac.resume(); } catch { } try { await am3NapKho(a.kho); } catch { toast('Chưa nạp được âm thanh này'); return; } const s = am3Lich({ ...a, t_bd: 0 }, 0, ac.currentTime + 0.02, false); if (s) am3Nguon.push(s); }
 /* âm lượng trung bình (bỏ khoảng im) theo năng lượng 50 khung/giây → dB */
-function doDb(nl, bd, kt) { if (!nl) return null; const i0 = Math.max(0, Math.floor(bd * 50)), i1 = Math.min(nl.length, Math.ceil(kt * 50)); let t = 0, n = 0; for (let i = i0; i < i1; i++) if (nl[i] > 1e-5) { t += nl[i]; n++; } return n ? 10 * Math.log10(t / n) : null; }
-const DB_CHUAN = -19;
+/* độ to không gate (LUFS, K-weighted) của khúc bd–kt; ô im lặng tuyệt đối bỏ qua */
+function doDb(nl, bd, kt) { if (!nl) return null; const i0 = Math.max(0, Math.floor(bd * 50)), i1 = Math.min(nl.length, Math.ceil(kt * 50)); let t = 0, n = 0; for (let i = i0; i < i1; i++) if (nl[i] > 1e-7) { t += nl[i]; n++; } return n ? -0.691 + 10 * Math.log10(t / n) : null; }
+/* integrated loudness có gate theo BS.1770: khối 400 ms bước 100 ms, gate tuyệt đối −70 LUFS rồi gate tương đối −10 LU (cách TikTok/YouTube đo để chuẩn hoá) */
+function doLufs(nl, bd, kt) {
+  if (!nl) return null; const i0 = Math.max(0, Math.floor(bd * 50)), i1 = Math.min(nl.length, Math.ceil(kt * 50)), khoi = [];
+  for (let a = i0; a + 20 <= i1; a += 5) { let t = 0; for (let i = a; i < a + 20; i++) t += nl[i]; khoi.push(t / 20); }
+  if (!khoi.length) return doDb(nl, bd, kt);
+  const L = p => -0.691 + 10 * Math.log10(Math.max(1e-12, p)), tb = ds => ds.reduce((a, b) => a + b, 0) / ds.length;
+  const qua1 = khoi.filter(p => L(p) > -70); if (!qua1.length) return null;
+  const nguong = L(tb(qua1)) - 10, qua2 = qua1.filter(p => L(p) > nguong);
+  return L(tb(qua2.length ? qua2 : qua1));
+}
+const DB_CHUAN = -14;   /* LUFS integrated, chuẩn TikTok / Reels / YouTube Shorts */
 async function canNL(s) { if (!s || s.loai !== 'video') return null; if (s.nl) return s.nl; while (s.dangSong) await new Promise(r => setTimeout(r, 100)); if (!s.nl) { const cu = s.song; s.song = null; await laySong(s); if (!s.song) s.song = cu; } return s.nl || null; }
-function chuanHoaAm3(a) { const k = AM3_KHO[a.kho], L = k && doDb(k.nl, a.bd, a.kt); if (L == null) return false; a.am = Math.max(0.1, Math.min(4, Math.pow(10, (DB_CHUAN - L) / 20))); return true; }
+function chuanHoaAm3(a) { const k = AM3_KHO[a.kho], L = k && doLufs(k.nl, a.bd, a.kt); if (L == null) return false; a.am = Math.max(0.1, Math.min(4, Math.pow(10, (DB_CHUAN - L) / 20))); return true; }
 async function chuanHoaTatCa() {
   const tt = $('#am3Tt'); tt.textContent = 'Đang đo âm lượng…'; let so = 0;
   for (const s of new Set(P.clips.map(c => srcCua(c.src)))) await canNL(s);
   await am3NapThieu(); luuHoanTac();
-  P.clips.forEach(c => { const s = srcCua(c.src), L = s && doDb(s.nl, c.bd, c.kt); if (L == null || !(c.am == null || c.am > 0)) return; const cu = c.am == null ? 1 : c.am, moi = Math.max(0.25, Math.min(2, Math.pow(10, (DB_CHUAN - L) / 20))); c.am = +moi.toFixed(3); if (c.kfs && c.kfs.am) c.kfs.am.forEach(k => { k.v = Math.max(0, Math.min(2, k.v * moi / (cu || 1))); }); so++; });
+  P.clips.forEach(c => { const s = srcCua(c.src), L = s && doLufs(s.nl, c.bd, c.kt); if (L == null || !(c.am == null || c.am > 0)) return; const cu = c.am == null ? 1 : c.am, moi = Math.max(0.25, Math.min(2, Math.pow(10, (DB_CHUAN - L) / 20))); c.am = +moi.toFixed(3); if (c.kfs && c.kfs.am) c.kfs.am.forEach(k => { k.v = Math.max(0, Math.min(2, k.v * moi / (cu || 1))); }); so++; });
   (P.am3 || []).forEach(a => { if (a.loai !== 'sfx' && chuanHoaAm3(a)) so++; });
-  tt.textContent = so ? 'Đã chuẩn hoá ' + so + ' đoạn về khoảng ' + DB_CHUAN + ' dB (to đều nhau). Ctrl+Z để hoàn tác.' : 'Chưa đo được âm thanh (cần footage có tiếng).'; veTl(); veProp(); veKhung();
+  tt.textContent = so ? 'Đã chuẩn hoá ' + so + ' đoạn về ' + DB_CHUAN + ' LUFS (chuẩn TikTok, đo theo BS.1770 như YouTube/Spotify). Giọng còn lúc to lúc nhỏ thì bật Nén giọng ở tab Âm thanh. Ctrl+Z để hoàn tác.' : 'Chưa đo được âm thanh (cần footage có tiếng).'; veTl(); veProp(); veKhung();
 }
 /* ── cắt khoảng lặng có xem trước: vùng đỏ = sẽ cắt; vạch vàng = từ đệm cần nghe lại (thì, là, kiểu, à) ── */
 const FILLER_NGO = /^(thì|là|kiểu|à+|ơ+)[,.!?…]*$/i;
@@ -522,7 +548,7 @@ async function tronAmThanh(tong, sr) {
   for (const c of P.clips) {
     const dai = daiC(c), s = srcCua(c.src), bd0 = acc; acc += dai; if (!s || s.loai !== 'video' || trTat('v1') || c.an) continue;
     let buf; try { buf = (await am3NapKho('src:' + s.id)).buf; } catch { continue; } if (c.bd >= buf.duration) continue; if (c.khuOn) buf = khuOnBuf(buf, c.khuOn, s.id);
-    const k = tocC(c), src = oc.createBufferSource(), g = oc.createGain(), doiCao = !!c.doiCao && !c.cong && !c.dao && k !== 1; src.buffer = c.dao ? daoBuf(oc, buf, c, k) : c.cong ? gianCong(oc, buf, c) : (k === 1 || doiCao) ? buf : gianDoan(oc, buf, c.bd, Math.min(c.kt, buf.duration), k); if (doiCao) src.playbackRate.value = k; src.connect(g); { const ch = taoChuoiGiong(oc, c.giong || 'khong'), pn = oc.createStereoPanner(); pn.pan.value = c.pan || 0; g.connect(ch.vao); ch.ra.connect(pn); pn.connect(ra); }   // tua nhanh/chậm: giữ cao độ giọng như lúc xem trước
+    const k = tocC(c), src = oc.createBufferSource(), g = oc.createGain(), doiCao = !!c.doiCao && !c.cong && !c.dao && k !== 1; src.buffer = c.dao ? daoBuf(oc, buf, c, k) : c.cong ? gianCong(oc, buf, c) : (k === 1 || doiCao) ? buf : gianDoan(oc, buf, c.bd, Math.min(c.kt, buf.duration), k); if (doiCao) src.playbackRate.value = k; src.connect(g); { const ch = taoChuoiGiong(oc, c.giong || 'khong', !!c.nen), pn = oc.createStereoPanner(); pn.pan.value = c.pan || 0; g.connect(ch.vao); ch.ra.connect(pn); pn.connect(ra); }   // tua nhanh/chậm: giữ cao độ giọng như lúc xem trước
     let cu = -1; for (let o = 0; o <= dai + 1e-6; o += 0.02) { const v = Math.max(0, giaTriKf(c, 'am', o) * fadeHeSo(c, o) * (coLongTai(bd0 + o) ? 0.25 : 1)); if (cu < 0) g.gain.setValueAtTime(v, bd0); else if (Math.abs(v - cu) > 0.001) g.gain.linearRampToValueAtTime(v, bd0 + o); cu = v; }
     if ((k === 1 && !c.cong && !c.dao) || doiCao) src.start(bd0, c.bd, Math.max(0.01, Math.min(c.kt, buf.duration) - c.bd)); else src.start(bd0, 0, Math.min(dai, src.buffer.duration));
   }

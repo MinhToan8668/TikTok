@@ -632,8 +632,10 @@ function hexAlpha(h, a) { const m = String(h).match(/^#([0-9a-f]{2})([0-9a-f]{2}
 function veBongChuProp(n, g) { if ((g.nen || 'vien') !== 'bong' && !g.bong) return; g.bongChu = g.bongChu || {}; const b = g.bongChu; const l = el('label'); l.appendChild(el('span', null, 'Màu bóng')); const i = el('input'); i.type = 'color'; i.value = b.mau || '#000000'; i.oninput = () => { b.mau = i.value; veKhung(); }; i.onchange = () => luuHoanTac(); l.appendChild(i); n.appendChild(l); oTruot(n, 'Độ đậm bóng', 0, 1, 0.01, b.mo == null ? 0.9 : b.mo, pct, v => { b.mo = v; }); oTruot(n, 'Độ nhoè', 0, 1, 0.01, b.nhoe == null ? 0.45 : b.nhoe, pct, v => { b.nhoe = v; }); oTruot(n, 'Khoảng cách', 0, 0.3, 0.005, b.kc == null ? 0.05 : b.kc, v => Math.round(v * 100) + '', v => { b.kc = v; }); oTruot(n, 'Góc', -180, 180, 1, b.goc == null ? -45 : b.goc, v => Math.round(v) + '°', v => { b.goc = v; }); }
 /* ── âm thanh: pan trái/phải, bộ lọc giọng ── */
 const GIONG = { khong: 'Không', dien_thoai: 'Điện thoại', radio: 'Radio cũ', tram: 'Trầm ấm', sang: 'Sáng rõ', vang: 'Vang (hội trường)', echo: 'Echo', nho: 'Thì thầm' };
-function taoChuoiGiong(C, giong) {
+function taoChuoiGiong(C, giong, nen) {
   const vao = C.createGain(), ra = C.createGain(); let cuoi = vao;
+  /* nén giọng (như Dynamics của FilmCraft/Premiere, mức dành cho talking-head): ngưỡng −18 dB, tỉ lệ 3:1, knee mềm, bù +4 dB → tiếng đều, câu nói nhỏ không bị chìm */
+  if (nen) { const cp = C.createDynamicsCompressor(); cp.threshold.value = -18; cp.knee.value = 8; cp.ratio.value = 3; cp.attack.value = 0.005; cp.release.value = 0.12; const bu = C.createGain(); bu.gain.value = Math.pow(10, 4 / 20); cuoi.connect(cp); cp.connect(bu); cuoi = bu; }
   const bq = (type, f, q, gain) => { const b = C.createBiquadFilter(); b.type = type; b.frequency.value = f; if (q) b.Q.value = q; if (gain) b.gain.value = gain; cuoi.connect(b); cuoi = b; };
   if (giong === 'dien_thoai') { bq('highpass', 400, 0.8); bq('lowpass', 3000, 0.8); bq('peaking', 1500, 1, 6); }
   else if (giong === 'radio') { bq('highpass', 250); bq('lowpass', 4500); bq('peaking', 900, 1.2, 5); const w = C.createWaveShaper(); const cur = new Float32Array(256); for (let i = 0; i < 256; i++) { const x = i / 127.5 - 1; cur[i] = Math.tanh(x * 2.2); } w.curve = cur; cuoi.connect(w); cuoi = w; }
@@ -645,9 +647,10 @@ function taoChuoiGiong(C, giong) {
   return { vao, ra };
 }
 const nutGiong = {};
-function apGiongXem(s, c) { const g = nutAm[s.id]; if (!g) return; const khoa = (c.giong || 'khong') + ':' + (c.pan || 0); const cu = nutGiong[s.id]; if (cu && cu.khoa === khoa) return; if (cu) { try { g.disconnect(); cu.ra.disconnect(); } catch { } } else { try { g.disconnect(); } catch { } }
-  const ch = taoChuoiGiong(ac, c.giong || 'khong'), pan = ac.createStereoPanner(); pan.pan.value = c.pan || 0; g.connect(ch.vao); ch.ra.connect(pan); pan.connect(ac.destination); if (dest) pan.connect(dest); nutGiong[s.id] = { khoa, ra: pan }; }
+function apGiongXem(s, c) { const g = nutAm[s.id]; if (!g) return; const khoa = (c.giong || 'khong') + ':' + (c.pan || 0) + ':' + (c.nen ? 1 : 0); const cu = nutGiong[s.id]; if (cu && cu.khoa === khoa) return; if (cu) { try { g.disconnect(); cu.ra.disconnect(); } catch { } } else { try { g.disconnect(); } catch { } }
+  const ch = taoChuoiGiong(ac, c.giong || 'khong', !!c.nen), pan = ac.createStereoPanner(); pan.pan.value = c.pan || 0; g.connect(ch.vao); ch.ra.connect(pan); pan.connect(ac.destination); if (dest) pan.connect(dest); nutGiong[s.id] = { khoa, ra: pan }; }
 function veAmThanhThem(n3, c) {
+  oChon(n3, 'Nén giọng (đều tiếng)', [['0', 'Tắt'], ['1', 'Bật · câu nhỏ không bị chìm']], c.nen ? '1' : '0', v => { if (v === '1') c.nen = true; else delete c.nen; });
   oChon(n3, 'Bộ lọc giọng', Object.keys(GIONG).map(k => [k, GIONG[k]]), c.giong || 'khong', v => { if (v === 'khong') delete c.giong; else c.giong = v; });
   oTruot(n3, 'Cân bằng trái / phải', -1, 1, 0.01, c.pan || 0, v => Math.abs(v) < 0.005 ? 'giữa' : (v < 0 ? 'Trái ' : 'Phải ') + Math.round(Math.abs(v) * 100), v => { if (Math.abs(v) < 0.005) delete c.pan; else c.pan = v; });
 }

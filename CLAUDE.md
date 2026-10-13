@@ -45,6 +45,10 @@ tự nhiên như trong code hiện có.
   `cfgProp()`. Tuyệt đối không ghi token vào HTML, `.gs` hay commit.
 - Frontend lưu trạng thái ở `localStorage` với các key `vs_user`, `tmxk_hv`, `vs_dev`,
   `vs_hoso_tam`. Mọi truy cập `localStorage` phải bọc try/catch như trong `tai-khoan.js`.
+- Dựng nhanh (`tools/dung/`): thời gian trên dòng thời gian chốt vào lưới khung hình qua `khungGiay` /
+  `lamTronKhung` (fps lấy từ `fpsDuAn()`), không ghi số giây thô vào `bd`/`kt`/`t_bd`. Lệnh agent chạy
+  qua `agentXuLy` (giao dịch: ném lỗi là dự án về trạng thái trước), tham số số đi qua `kiemSo`. Âm
+  lượng đo bằng `tinhNL` (K-weighting) + `doLufs` (gate BS.1770), chuẩn `DB_CHUAN = -14` LUFS.
 - Tool Viral Studio phân biệt ba kiểu lỗi: `mang` (mất mạng), `mayChu` (Apps Script trả
   không phải JSON), lỗi nghiệp vụ (`ok:false`). Giữ cách phân loại này khi viết thông báo lỗi.
 
