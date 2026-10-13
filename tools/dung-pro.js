@@ -8,7 +8,7 @@
    ═══════════════════════════════════════════════════════════════ */
 const API = 'https://script.google.com/macros/s/AKfycbyxe1nWupAl6VheDZHaU3Ojm-d6c8F_khhUMtkehNCLh5OnGW6f2uF0PKPYZ4eYUqyGjQ/exec';
 const TICK = 254016000000;
-const LS_LS = 'vs_pro_ls', LS_PANEL = 'vs_pro_panel';
+const LS_PANEL = 'vs_pro_panel';
 const $ = s => document.querySelector(s);
 const ls = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch { } }, del(k) { try { localStorage.removeItem(k); } catch { } } };
 function el(t, c, txt) { const e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; }
@@ -102,13 +102,13 @@ $('#acctBtn').onclick = () => TK.mo();
 if (innerWidth < 900) $('#canMay').hidden = false;
 TK.khoiDong({ api: API, tool: 'dung', onDoi: veKhoa });
 veKhoa();
-(async () => { try { MC = await TK.mayChu(); } catch { } $('#aiHop').classList.toggle('khong', !(MC.url && MC.dich_vu.agent)); })();
+(async () => { try { MC = await TK.mayChu(); } catch { } })();
 
 /* ── bảng bên phải: trợ lý / hướng dẫn ── */
 function moPanel(t) { $$('.tab').forEach(b => b.classList.toggle('on', b.dataset.t === t)); $$('.panel').forEach(p => p.hidden = p.dataset.t !== t); ls.set(LS_PANEL, t); }
 const $$ = s => [...document.querySelectorAll(s)];
 $$('.tab').forEach(b => b.onclick = () => moPanel(b.dataset.t));
-moPanel(ls.get(LS_PANEL) || 'tl');
+{ const t = ls.get(LS_PANEL); moPanel(t === 'hd' ? 'hd' : 'cc'); }
 $('#btnBen').onclick = () => { document.body.classList.toggle('anBen'); setTimeout(() => dispatchEvent(new Event('resize')), 50); };
 
 /* ── tóm tắt sequence cho AI: tick → giây, cắt gọn ── */
@@ -142,54 +142,24 @@ async function fcLenh(ten, a) {
 }
 const FC_TEN = { fc_ds: 'Tìm lệnh', fc_xem: 'Xem sequence', fc_chay: 'Chạy lệnh', fc_lo: 'Chạy nhiều lệnh', fc_khung: 'Xem khung hình', fc_man_hinh: 'Xem màn hình' };
 
-/* ── trợ lý: vòng lặp agent ── */
-const AG = { ls: [], dang: false, hienThi: [] };
-try { AG.hienThi = JSON.parse(ls.get(LS_LS) || '[]').slice(-40); } catch { }
-function luuLs() { ls.set(LS_LS, JSON.stringify(AG.hienThi.slice(-40))); }
-function veDs() {
-  const box = $('#ds'); box.innerHTML = '';
-  if (!AG.hienThi.length) { const g = el('div', 'goiy'); ['Xếp các clip trong Project lên timeline theo thứ tự', 'Chỉnh màu cho ấm hơn, da tự nhiên', 'Thêm phụ đề cho đoạn đang chọn', 'Tiếng nhỏ quá, đưa về -14 LUFS', 'Cắt 2 giây đầu của clip 1'].forEach(t => { const b = el('button', 'goiyNut', t); b.type = 'button'; b.onclick = () => { $('#yc').value = t; guiYc(); }; g.appendChild(b); }); box.appendChild(g); return; }
-  AG.hienThi.forEach(m => { const d = el('div', 'm ' + m.vai); if (m.buoc) { m.dong.forEach(x => { const r = el('div', 'bc' + (x.loi ? ' loi' : ''), x.t); if (x.anh) { const im = el('img', 'khungnho'); im.src = x.anh; im.alt = 'khung'; r.appendChild(im); } d.appendChild(r); }); } else d.textContent = m.text; box.appendChild(d); });
-  box.scrollTop = 1e9;
-}
-async function guiYc() {
-  const yc = $('#yc').value.trim(); if (!yc || AG.dang) return;
-  if (!F()) { toast('Trình dựng chưa sẵn sàng'); return; }
-  if (!(await TK.canCo('chat'))) return;
-  if (!MC.url || !MC.dich_vu.agent) { toast('Máy chủ trợ lý chưa bật'); return; }
-  AG.dang = true; $('#btnGui').disabled = true; $('#yc').value = '';
-  AG.hienThi.push({ vai: 'nd', text: yc }); AG.ls.push({ vai: 'nd', text: yc }); veDs();
-  const dong = [], hop = el('div', 'm ai buoc'); $('#ds').appendChild(hop);
-  const ghi = (t, cls) => { const d = el('div', 'bc' + (cls ? ' ' + cls : ''), t); hop.appendChild(d); $('#ds').scrollTop = 1e9; return d; };
-  const cho = ghi('Đang đọc sequence và yêu cầu…', 'dang'); const t0 = Date.now(); let ve = '', buoc = 0;
-  try {
-    for (; buoc < 16; buoc++) {
-      cho.textContent = (buoc ? 'Đang nghĩ bước tiếp… ' : 'Đang đọc sequence và yêu cầu… ') + Math.round((Date.now() - t0) / 1000) + 's';
-      const r = await fetch(MC.url + '/agent', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ token: TK.token(), bo: 'filmcraft', buoc, ve, lich_su: AG.ls.slice(-30), du_an: await fcTomTat(), ho_so: TK.hoSo() }) });
-      let j = {}; try { j = await r.json(); } catch { }
-      if (!j.ok) { const ma = j.error || ('http_' + r.status); if (ma === 'het_luot_thu') TK.moHet('chat'); AG.hienThi.push({ vai: 'ai', text: '⚠️ ' + (ma === 'het_luot_thu' ? 'Hết lượt chat miễn phí.' : ma === 'het_phien' ? 'Phiên hết hạn, đăng nhập lại.' : 'Trợ lý chưa trả lời (' + ma + (j.chi_tiet ? ': ' + j.chi_tiet : '') + ').') }); break; }
-      if (j.ve) ve = j.ve;
-      if (j.goi && j.goi.length) {
-        AG.ls.push({ vai: 'ai', text: j.text || '', ky_text: j.ky_text, goi: j.goi }); const kq = [];
-        for (const g of j.goi) {
-          const nhan = (FC_TEN[g.ten] || g.ten) + ' · ' + (g.args && (g.args.lenh || g.args.loc || (g.args.t != null ? g.args.t + 's' : '') || (g.args.buoc ? g.args.buoc.length + ' bước' : '')) || '');
-          const d = ghi('🔧 ' + nhan, 'lenh'); let res;
-          try { res = await fcLenh(g.ten, g.args || {}); } catch (e) { res = { isError: true, text: String(e && e.message || e) }; }
-          d.textContent = (res.isError ? '⚠ ' : '✓ ') + nhan; if (res.isError) { d.classList.add('loi'); d.title = typeof res.text === 'string' ? res.text : JSON.stringify(res.text).slice(0, 300); }
-          let anh = ''; if (res.image && res.image.data) { anh = 'data:' + (res.image.mime || 'image/png') + ';base64,' + res.image.data; const im = el('img', 'khungnho'); im.src = anh; im.alt = 'khung'; d.appendChild(im); }
-          dong.push({ t: d.textContent, anh, loi: !!res.isError });
-          kq.push({ id: g.id, ten: g.ten, text: typeof res.text === 'string' ? res.text : JSON.stringify(res.text), image: res.image, isError: !!res.isError });
-        }
-        AG.ls.push({ vai: 'tool', kq }); continue;
-      }
-      const tl = (j.text || 'Xong.').trim(); AG.ls.push({ vai: 'ai', text: tl }); AG.hienThi.push({ vai: 'ai', text: tl }); break;
-    }
-    if (buoc >= 16) AG.hienThi.push({ vai: 'ai', text: 'Mình dừng sau 16 bước, bạn xem lại rồi ra lệnh tiếp nhé.' });
-  } catch (e) { console.error('[agent pro]', e); AG.hienThi.push({ vai: 'ai', text: '⚠️ Mất kết nối máy chủ trợ lý.' }); }
-  finally { hop.remove(); if (dong.length) AG.hienThi.splice(AG.hienThi.length - (AG.hienThi.length && AG.hienThi[AG.hienThi.length - 1].vai === 'ai' && !AG.hienThi[AG.hienThi.length - 1].buoc ? 1 : 0), 0, { vai: 'ai', buoc: true, dong: dong.map(x => ({ t: x.t, anh: '', loi: x.loi })) }); AG.dang = false; $('#btnGui').disabled = false; luuLs(); veDs(); }
-}
-$('#btnGui').onclick = guiYc;
-$('#yc').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); guiYc(); } });
-$('#btnXoaLs').onclick = () => { AG.hienThi = []; AG.ls = []; luuLs(); veDs(); };
-$('#btnHoanTac').onclick = async () => { const f = F(); if (!f) return; try { await f.execute('edit.undo', {}); toast('Đã hoàn tác trong FilmCraft'); } catch (e) { toast('Không hoàn tác được: ' + (e.message || e)); } };
-veDs();
+/* ── cầu nối thư mục cho Claude Code (noi-thu-muc.js nạp sau, đọc cấu hình này) ── */
+let dsDaNap = [];                                               // tên file đã đưa vào FilmCraft qua thư mục
+window.NTM_CFG = {
+  ten: 'Dựng chuyên sâu',
+  claudeMd: 'claude-noi/CLAUDE-pro.md',
+  sanSang: () => !!F(),
+  coRoi: f => dsDaNap.includes(f.name),
+  napFootage: async files => { await themFootage(files); dsDaNap = dsDaNap.concat(files.map(f => f.name)); },
+  trong: () => false,                                           // dự án do FilmCraft tự lưu trong trình duyệt, không đọc du-an.*
+  docDuAn: async () => { },
+  luuDuAn: () => null,
+  tomTat: fcTomTat,
+  chay: fcLenh,
+  nhan: ten => FC_TEN[ten] || ten,
+  veSau: () => { },
+  congCu: async () => {
+    const f = F(); let ds = []; try { const r = await f.commands(); ds = r.commands || r; } catch { }
+    return '# Lệnh cầu nối (chạy: `node .tmxk/tmxk.mjs <ten> \'<json>\'`)\n\n- `fc_ds` `{"loc":"lumetri","chi_dang_bat":false}`: tìm lệnh FilmCraft theo từ khoá\n- `fc_xem` `{}`: project + sequence đang mở\n- `fc_chay` `{"lenh":"<id>","tham_so":{...}}`: chạy một lệnh FilmCraft\n- `fc_lo` `{"buoc":[{"lenh":"...","tham_so":{...}}]}`: nhiều lệnh theo thứ tự, dừng ở lệnh lỗi\n- `fc_khung` `{"t":<giây>}`: ảnh Program monitor tại giây t (không đổi playhead)\n- `fc_man_hinh` `{"panel":"Timeline"}`: ảnh cửa sổ hoặc một panel\n\nThời gian: 254016000000 tick = 1 giây; nhiều lệnh nhận seconds/frame.\n\n# Toàn bộ lệnh FilmCraft (' + ds.length + ')\n\nCột: id · nhãn · menu · tham số. "đang tắt" = lúc ghi file chưa đủ điều kiện (chưa chọn clip, chưa có sequence), vẫn gọi được khi đủ.\n\n' + ds.map(x => '- `' + x.id + '` · ' + x.label + (x.menu && x.menu.length ? ' · ' + x.menu.join(' › ') : '') + ' · `' + x.params + '`' + (x.enabled ? '' : ' · đang tắt')).join('\n') + '\n';
+  }
+};
+document.addEventListener('ntm', e => { const tt = $('#noiTMTt'); if (tt) tt.textContent = e.detail.noi ? 'Đã nối “' + e.detail.ten + '”. Mở Claude Code trong thư mục này rồi ra lệnh. Thêm footage vào footage/ thì bấm lại nút để nạp.' : ''; });
