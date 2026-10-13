@@ -295,6 +295,45 @@
   .k-chan .nut{font:800 34px/1.12 var(--font-display);background:var(--lime);color:var(--ink);
     padding:20px 28px;border-radius:18px;text-align:center}
   .kh.toi .k-chan .nut{background:var(--ink);color:var(--lime)}
+
+  /* ══ BẢNG GIÁ 3 GÓI · 1080×1350 ══
+     Ba gói xếp dọc cho dễ đọc trên điện thoại. Gói giữa nền mực, to hơn, có nhãn. */
+  .gg .g-dau{position:absolute;left:68px;right:68px;top:60px;display:flex;align-items:center;justify-content:space-between}
+  .gg .g-dau img{height:46px}
+  .gg .g-dau .so{font:800 23px/1 var(--font-display);letter-spacing:.04em;text-transform:uppercase;background:var(--ink);color:var(--lime);padding:13px 19px;border-radius:999px}
+  .gg .g-chu{position:absolute;left:68px;right:68px;top:140px}
+  .gg h1{font:800 60px/1.04 var(--font-display);letter-spacing:-.025em;margin:0}
+  .gg .g-chu p{font:500 26px/1.4 var(--font-ui);color:var(--moss);margin-top:10px}
+  .g-list{position:absolute;left:68px;right:68px;top:336px;display:flex;flex-direction:column;gap:20px}
+  .goi{position:relative;display:flex;gap:26px;background:var(--surface);color:var(--ink);border:3px solid var(--ink);
+    border-radius:24px;padding:20px 28px;box-shadow:8px 8px 0 var(--ink)}
+  .goi .trai{flex:none;width:262px}
+  .goi .ten{display:inline-block;font:800 21px/1 var(--font-ui);letter-spacing:.06em;text-transform:uppercase;
+    background:var(--ink);color:var(--lime);padding:9px 14px;border-radius:10px}
+  .goi .gia{font:800 86px/1 var(--font-display);letter-spacing:-.04em;margin-top:14px;white-space:nowrap}
+  .goi .gia small{font:800 30px/1 var(--font-display);letter-spacing:-.01em;margin-left:4px}
+  .goi .ai{font:600 19px/1.35 var(--font-ui);color:var(--muted);margin-top:10px}
+  .goi ul{list-style:none;flex:1;display:flex;flex-direction:column;gap:9px;margin:0;padding:4px 0 0}
+  .goi li{display:flex;gap:11px;font:600 22px/1.32 var(--font-ui)}
+  .goi li::before{content:"✓";flex:none;width:28px;height:28px;border-radius:8px;background:var(--lime);color:var(--ink);
+    display:grid;place-items:center;font:900 17px/1 var(--font-ui);margin-top:1px}
+  .goi li.khong{color:#9a9a8c}
+  .goi li.khong::before{content:"✕";background:#e4e2d6;color:#8a8a7c}
+  .goi li.them{font:700 18px/1.3 var(--font-ui);color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+  .goi li.them::before{display:none}
+  .goi.chinh{background:var(--ink);color:var(--paper);margin:0 -14px;padding:32px 42px 28px;box-shadow:10px 10px 0 rgba(38,33,15,.35)}
+  .goi.chinh .ten{background:var(--lime);color:var(--ink)}
+  .goi.chinh .gia{color:var(--lime)}
+  .goi.chinh .ai{color:#c9c8b3}
+  .goi.chinh li.them{color:#aeb199}
+  .goi .tem{position:absolute;top:-17px;right:30px;font:900 17px/1 var(--font-ui);letter-spacing:.05em;text-transform:uppercase;
+    background:var(--red);color:#fff;padding:9px 14px;border-radius:10px}
+  .goi .cho{display:inline-block;margin-top:12px;font:800 16px/1 var(--font-ui);letter-spacing:.04em;text-transform:uppercase;
+    border:2px solid var(--ink);padding:7px 10px;border-radius:8px}
+  .g-chan{position:absolute;left:68px;right:68px;bottom:44px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+  .g-chan .ghi{font:600 22px/1.35 var(--font-ui);color:var(--moss)}
+  .g-chan .ghi b{color:var(--ink)}
+  .g-chan .nut{flex:none;font:800 30px/1.15 var(--font-display);background:var(--ink);color:var(--lime);padding:18px 26px;border-radius:18px;text-align:center}
   .tieude.nho h1{font-size:60px}
   .toi .buoc li{color:var(--ink)}
 </style>
@@ -893,6 +932,53 @@
     <div class="ng">Khai giảng<i>22/10</i></div>
     <div class="ng">Sĩ số<i>10 bạn</i></div>
     <div class="nut">Điền form<br>để giữ chỗ</div>
+  </div>
+</section>
+
+<!-- ═══════════ BẢNG GIÁ 3 GÓI ═══════════ -->
+<section class="poster gg" id="bang-gia-3-goi">
+  <div class="g-dau"><img src="logo/lockup-nen-lime.svg" alt="Tự Mình Xây Kênh"><span class="so">Bảng giá</span></div>
+  <div class="g-chu">
+    <h1>Chọn gói hợp<br><mark>với cách bạn học.</mark></h1>
+    <p>Gói nào cũng có tài liệu và Viral Studio bản Pro.</p>
+  </div>
+  <div class="g-list">
+    <div class="goi">
+      <div class="trai"><span class="ten">Tự học</span><div class="gia">990<small>k</small></div>
+        <div class="ai">Bạn tự làm được, chỉ cần lộ trình và công cụ</div></div>
+      <ul>
+        <li>Trọn bộ tài liệu khoá</li>
+        <li>Viral Studio bản Pro 3 tháng</li>
+        <li>Group hỏi đáp, trả lời trong 24 giờ</li>
+        <li class="khong">Không học lớp, không kèm edit</li>
+      </ul>
+    </div>
+    <div class="goi chinh">
+      <span class="tem">Nhiều người chọn nhất</span>
+      <div class="trai"><span class="ten">Có kèm</span><div class="gia">2<small>triệu</small></div>
+        <div class="ai">Bạn cần có người sửa video cùng tới khi ra bài</div></div>
+      <ul>
+        <li class="them">Mọi thứ ở gói Tự học, thêm:</li>
+        <li>Học cùng lớp, tối đa 10 người</li>
+        <li>Kèm edit 1:1, mỗi tuần 1 video sửa tới khi ra bài</li>
+        <li>Mentor trả lời thẳng, không qua trợ lý</li>
+      </ul>
+    </div>
+    <div class="goi">
+      <div class="trai"><span class="ten">1 kèm 1</span><div class="gia">5<small>triệu</small></div>
+        <div class="ai">Bạn muốn đi nhanh, cần người soi kênh riêng</div>
+        <span class="cho">Tối đa 3 người/khoá</span></div>
+      <ul>
+        <li class="them">Mọi thứ ở gói Có kèm, thêm:</li>
+        <li>4 buổi riêng 1 kèm 1, 60 phút/buổi</li>
+        <li>Soi kênh mỗi tuần suốt khoá</li>
+        <li>Viral Studio bản Pro 6 tháng</li>
+      </ul>
+    </div>
+  </div>
+  <div class="g-chan">
+    <div class="ghi">Học rồi muốn lên gói cao hơn?<br><b>Chỉ bù phần chênh lệch.</b></div>
+    <div class="nut">Nhắn mình<br>để chọn gói</div>
   </div>
 </section>
 
