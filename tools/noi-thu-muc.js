@@ -12,8 +12,28 @@
      .tmxk/trang-thai.json  tóm tắt dự án + nhịp (để Claude biết tab còn mở)
    Claude chỉ ra lệnh qua bộ lệnh của trợ lý dựng, không sửa thẳng file dự án, nên mọi thay đổi
    đều qua kiểm tra tham số và có hoàn tác như khi bấm tay.
+   Trang khác (dung-pro.html) dùng lại bằng cách đặt window.NTM_CFG trước khi nạp: các móc dưới đây
+   mặc định trỏ vào Dựng video (P, agentXuLy…), Dựng chuyên sâu thay bằng FilmCraft.
    ═══════════════════════════════════════════════════════════════ */
 const NTM = (() => {
+  const CFG = Object.assign({
+    ten: 'Dựng video',
+    claudeMd: 'claude-noi/CLAUDE.md',
+    sanSang: () => true,                                      // trình dựng đã sẵn sàng nhận footage/lệnh chưa
+    coRoi: f => P.srcs.some(s => s.ten === f.name && (!s.file || s.file.size === f.size)),
+    napFootage: files => themFile(files),
+    trong: () => !P.srcs.length && !P.clips.length,            // dự án đang trống thì mới đọc du-an.* trong thư mục
+    docDuAn: async (txt, tenThuMuc) => {
+      if (txt) { try { const o = JSON.parse(txt); P.duAnCho = o; $('#tenDuAn').value = o.ten || tenThuMuc; Object.keys(o.cai || {}).forEach(k => { const x = $('#' + k); if (!x) return; if (x.type === 'checkbox') x.checked = !!o.cai[k]; else x.value = o.cai[k]; }); } catch { toast('du-an.tmxk.json bị hỏng, mở footage như dự án mới'); } }
+      else if (!P.srcs.length && !$('#tenDuAn').value.trim()) $('#tenDuAn').value = tenThuMuc;
+    },
+    luuDuAn: () => (P.srcs.length || P.clips.length) ? JSON.stringify(duAnJson()) : null,
+    tomTat: async () => agentTomTat(),
+    chay: async (ten, a) => typeof NFC !== 'undefined' && NFC.laLenh(ten) ? NFC.lenh(ten, a) : agentXuLy(ten, a),
+    nhan: ten => (typeof AGENT_TEN === 'object' && AGENT_TEN[ten]) || ten,
+    veSau: () => { veDs(); veTl(); veLoi(); if (!P.dang) veKhung(); docTuNhan(); },
+    congCu: null                                               // null = lấy từ máy chủ /agent_tools (ghiCongCuMacDinh)
+  }, window.NTM_CFG || {});
   const DUOI_MEDIA = /\.(mp4|mov|webm|m4v|jpe?g|png|webp)$/i;
   const NHIP_MS = 2000, QUET_MS = 700;
   const KHO = 'tmxk_noi', KHOA = 'thu_muc';
@@ -35,10 +55,12 @@ const NTM = (() => {
     const b = $('#btnNoiTM'), tt = $('#noiTMTt'); if (!b) return;
     b.textContent = goc ? '🔗 Đã nối: ' + goc.name : '🔗 Nối thư mục trên máy';
     if (tt) tt.textContent = goc ? 'Claude Code mở thư mục này là ra lệnh dựng được. Thêm footage vào footage/ rồi bấm lại nút để nạp.' : 'Nối một thư mục để Claude Code trên máy dựng cùng bạn (Chrome/Edge máy tính).';
+    document.dispatchEvent(new CustomEvent('ntm', { detail: { noi: !!goc, ten: goc && goc.name } }));
   }
 
   /* ── ghi các file hướng dẫn cho Claude ── */
   async function ghiCongCu() {
+    if (CFG.congCu) { await ghi(tmxk, 'CONG-CU.md', await CFG.congCu()); return; }
     const ten = typeof AGENT_TEN === 'object' ? AGENT_TEN : {};
     let md = '';
     try {
@@ -51,7 +73,7 @@ const NTM = (() => {
   async function ghiFileCau() {
     const lay = async u => { const r = await fetch(u, { cache: 'no-cache' }); if (!r.ok) throw new Error(u); return r.text(); };
     await ghi(tmxk, 'tmxk.mjs', await lay('claude-noi/tmxk.mjs'));
-    if (!(await coFile(goc, 'CLAUDE.md'))) await ghi(goc, 'CLAUDE.md', await lay('claude-noi/CLAUDE.md'));
+    if (!(await coFile(goc, 'CLAUDE.md'))) await ghi(goc, 'CLAUDE.md', await lay(CFG.claudeMd));
     await ghiCongCu();
   }
 
@@ -59,16 +81,10 @@ const NTM = (() => {
   async function napThuMuc() {
     const footage = await thuMuc(goc, 'footage');
     let files = await dsMedia(footage); if (!files.length) files = await dsMedia(goc);
-    const daCo = new Set(P.srcs.map(s => s.ten + '|' + (s.file ? s.file.size : '')));
-    const moi = files.filter(f => !daCo.has(f.name + '|' + f.size));
-    const txt = !P.srcs.length && !P.clips.length ? await doc(goc, 'du-an.tmxk.json') : null;
-    if (txt) {
-      try {
-        const o = JSON.parse(txt); P.duAnCho = o; $('#tenDuAn').value = o.ten || goc.name;
-        Object.keys(o.cai || {}).forEach(k => { const x = $('#' + k); if (!x) return; if (x.type === 'checkbox') x.checked = !!o.cai[k]; else x.value = o.cai[k]; });
-      } catch { toast('du-an.tmxk.json bị hỏng, mở footage như dự án mới'); }
-    } else if (!P.srcs.length && !$('#tenDuAn').value.trim()) $('#tenDuAn').value = goc.name;
-    if (moi.length) await themFile(moi);
+    const moi = files.filter(f => !CFG.coRoi(f));
+    const txt = CFG.trong() ? await doc(goc, 'du-an.tmxk.json') : null;
+    await CFG.docDuAn(txt, goc.name);
+    if (moi.length) await CFG.napFootage(moi);
     return { tong: files.length, moi: moi.length };
   }
 
@@ -80,21 +96,20 @@ const NTM = (() => {
     const id = String(goi.id || tep.replace(/\.json$/, '')).replace(/[^\w-]/g, '').slice(0, 40) || 'x';
     const ds = Array.isArray(goi.lenh) ? goi.lenh.slice(0, 30) : [], ket = [];
     for (const g of ds) {
-      const ten = String(g && g.ten || ''), nhan = (AGENT_TEN[ten] || ten);
-      let res; try { res = typeof NFC !== 'undefined' && NFC.laLenh(ten) ? await NFC.lenh(ten, (g && g.a) || {}) : await agentXuLy(ten, (g && g.a) || {}); } catch (e) { res = { isError: true, text: String(e && e.message || e) }; }
+      const ten = String(g && g.ten || ''), nhan = CFG.nhan(ten);
+      let res; try { res = await CFG.chay(ten, (g && g.a) || {}); } catch (e) { res = { isError: true, text: String(e && e.message || e) }; }
       ket.push({ ten, text: res.text, image: res.image, isError: !!res.isError });
       toast((res.isError ? '⚠ Claude: ' : '✓ Claude: ') + nhan);
       if (res.isError) break;                                    // lệnh sau thường dựa vào lệnh trước, dừng để Claude sửa
     }
-    try { veDs(); veTl(); veLoi(); if (!P.dang) veKhung(); docTuNhan(); } catch { }
+    try { CFG.veSau(); } catch { }
     await ghi(await thuMuc(tmxk, 'ket-qua'), id + '.json', JSON.stringify({ id, ket_qua: ket }));
     await ghiTrangThai(true);
   }
   async function ghiTrangThai(ep) {
-    let du_an = null; try { du_an = agentTomTat(); } catch { }
-    await ghi(tmxk, 'trang-thai.json', JSON.stringify({ nhip: Date.now(), du_an }));
-    if (!P.srcs.length && !P.clips.length) return;
-    const j = JSON.stringify(duAnJson());
+    let du_an = null; try { du_an = await CFG.tomTat(); } catch (e) { du_an = { loi: String(e && e.message || e) }; }
+    await ghi(tmxk, 'trang-thai.json', JSON.stringify({ nhip: Date.now(), trinh_dung: CFG.ten, du_an }));
+    const j = CFG.luuDuAn(); if (j == null) return;
     if (ep || j !== khoaLuu) { await ghi(goc, 'du-an.tmxk.json', j); khoaLuu = j; }
   }
   async function vong() {
@@ -126,6 +141,7 @@ const NTM = (() => {
 
   async function bam() {
     if (!window.showDirectoryPicker) { toast('Trình duyệt này chưa nối thư mục được. Dùng Chrome hoặc Edge trên máy tính.'); return; }
+    if (!CFG.sanSang()) { toast('Trình dựng chưa sẵn sàng, chờ tải xong rồi bấm lại'); return; }
     try {
       if (goc) { const n = await napThuMuc(); await ghiFileCau(); toast(n.moi ? 'Đã nạp thêm ' + n.moi + ' footage' : 'Thư mục không có footage mới'); return; }
       const cu = await khoDoc();

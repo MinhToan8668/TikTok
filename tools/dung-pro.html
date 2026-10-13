@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Viral Studio · Dựng chuyên sâu · Tự Mình Xây Kênh</title>
-<meta name="description" content="Trình dựng video chuyên sâu kiểu Premiere chạy ngay trên trình duyệt: Lumetri Color, scopes, trim ripple/roll/slip, keyframe, mixer, đo loudness, kèm trợ lý AI tiếng Việt. Dành cho gói Pro.">
+<meta name="description" content="Trình dựng video chuyên sâu kiểu Premiere chạy ngay trên trình duyệt: Lumetri Color, scopes, trim ripple/roll/slip, keyframe, mixer, đo loudness, nối với Claude Code để dựng bằng lời. Dành cho gói Pro.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Cg%20transform%3D%22rotate%28-9%2032%2017%29%22%3E%3Crect%20x%3D%2219%22%20y%3D%2211%22%20width%3D%2226%22%20height%3D%2212%22%20rx%3D%223%22%20fill%3D%22%2399df00%22/%3E%3Cpath%20d%3D%22M30%2014.4v5.2a1%201%200%200%200%201.52.86l4.6-2.6a1%201%200%200%200%200-1.72l-4.6-2.6A1%201%200%200%200%2030%2014.4z%22%20fill%3D%22%2326210f%22/%3E%3C/g%3E%3Crect%20x%3D%2219%22%20y%3D%2228%22%20width%3D%2226%22%20height%3D%2212%22%20rx%3D%223%22%20fill%3D%22%2326210f%22/%3E%3Crect%20x%3D%224%22%20y%3D%2244%22%20width%3D%2226%22%20height%3D%2212%22%20rx%3D%223%22%20fill%3D%22%2326210f%22/%3E%3Crect%20x%3D%2234%22%20y%3D%2244%22%20width%3D%2226%22%20height%3D%2212%22%20rx%3D%223%22%20fill%3D%22%2326210f%22/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -84,8 +84,13 @@
   .nhap .cot{display:flex;flex-direction:column;gap:6px}
   .nho{border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:8px;padding:5px 9px;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
   .nho.xanh{background:var(--accent);color:var(--accent-ink);border-color:transparent}
-  #aiHop.khong #ds::before{content:"Máy chủ trợ lý chưa bật. Bạn vẫn dựng tay bình thường.";color:var(--muted);font-size:13px}
-  #hd{flex:1;overflow:auto;padding:14px;font-size:13.5px}
+  #hd,#cc{flex:1;overflow:auto;padding:14px;font-size:13.5px}
+  #cc h3{font:800 15px/1.3 var(--font-display);margin:0 0 8px}
+  #cc p{margin:6px 0 10px;color:var(--muted)}
+  #cc ol{padding-left:18px;margin:10px 0}
+  #cc li{margin:5px 0}
+  #cc .btn{width:100%;margin:6px 0 4px}
+  #cc kbd,#cc code{font:700 11.5px/1 ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--surface-2);border:1px solid var(--line);border-radius:5px;padding:2px 5px}
   #hd h3{font:800 14px/1.3 var(--font-display);margin:16px 0 6px;color:var(--text)}
   #hd h3:first-child{margin-top:0}
   #hd table{width:100%;border-collapse:collapse;font-size:12.5px}
@@ -112,7 +117,7 @@
     <button class="pill" id="btnThemFootage" type="button" disabled title="Thêm video, ảnh, nhạc, phụ đề vào Project">➕ Thêm footage</button>
     <input type="file" id="fileIn" multiple hidden accept="video/*,audio/*,image/*,.srt,.vtt,.fcproj">
     <a class="pill" href="dung-video.html" title="Về trình dựng nhanh kiểu CapCut">⚡ Dựng nhanh</a>
-    <button class="pill" id="btnBen" type="button" title="Ẩn hoặc hiện bảng trợ lý">🤖 Trợ lý</button>
+    <button class="pill" id="btnBen" type="button" title="Ẩn hoặc hiện bảng bên">🤖 Claude Code</button>
     <button class="pill" id="btnToanMan" type="button" title="Toàn màn hình">⛶</button>
     <button class="theme-btn" id="themeBtn" type="button" aria-label="Đổi giao diện sáng hoặc tối">◐</button>
     <button class="pill pro" id="acctBtn" type="button">Tài khoản</button>
@@ -132,19 +137,27 @@
           <li>Lumetri Color: curves, bánh xe màu, HSL, vignette, kèm scopes đo màu thật</li>
           <li>Keyframe đồ thị Bezier, 93 hiệu ứng, 30 chuyển cảnh, mask</li>
           <li>Mixer âm thanh, EQ, compressor, đo loudness chuẩn TikTok</li>
-          <li>Trợ lý AI tiếng Việt ra lệnh thẳng cho trình dựng</li>
+          <li>Nối với Claude Code trên máy để dựng bằng lời</li>
         </ul>
         <button class="btn chinh" id="khoaNut" type="button">Đăng nhập</button>
       </div>
     </div>
   </div>
   <aside id="ben">
-    <div class="tabs"><button class="tab on" data-t="tl" type="button">🤖 Trợ lý</button><button class="tab" data-t="hd" type="button">📖 Hướng dẫn</button></div>
-    <section class="panel" data-t="tl" id="aiHop">
-      <div id="ds"></div>
-      <div class="nhap">
-        <textarea id="yc" placeholder="Nói với trợ lý: “xếp 3 clip lên timeline, cắt bỏ 2 giây đầu clip 1, chỉnh màu ấm”…"></textarea>
-        <div class="cot"><button class="nho xanh" id="btnGui" type="button">Gửi</button><button class="nho" id="btnHoanTac" type="button" title="Hoàn tác thao tác gần nhất trong FilmCraft">↶</button><button class="nho" id="btnXoaLs" type="button" title="Xoá lịch sử chat">🗑</button></div>
+    <div class="tabs"><button class="tab on" data-t="cc" type="button">🤖 Claude Code</button><button class="tab" data-t="hd" type="button">📖 Hướng dẫn</button></div>
+    <section class="panel" data-t="cc">
+      <div id="cc">
+        <h3>Dựng bằng Claude Code trên máy bạn</h3>
+        <p>Nối một thư mục trên máy. Claude Code mở thư mục đó là ra lệnh cho trình dựng này được: xếp clip, cắt, chỉnh màu, phụ đề, xem khung hình để tự kiểm. Mọi lệnh hoàn tác được bằng <kbd>Ctrl</kbd>+<kbd>Z</kbd>.</p>
+        <button class="btn chinh" id="btnNoiTM" type="button">🔗 Nối thư mục trên máy</button>
+        <p class="quota" id="noiTMTt"></p>
+        <ol>
+          <li>Tạo một thư mục cho video này, bỏ video gốc vào thư mục con <code>footage/</code>.</li>
+          <li>Bấm <b>Nối thư mục</b> ở trên, chọn thư mục đó và cho phép đọc ghi. Trình dựng tự nạp footage và ghi file hướng dẫn cho Claude.</li>
+          <li>Mở Claude Code (app máy tính) trong chính thư mục đó, gõ yêu cầu: “tạo sequence dọc, xếp 3 clip lên, cắt 2 giây đầu clip 1, chỉnh màu ấm”.</li>
+          <li>Thêm footage sau này: bỏ vào <code>footage/</code> rồi bấm lại nút Nối thư mục.</li>
+        </ol>
+        <p>Cần giữ tab này mở trong lúc Claude làm việc. Claude chỉ gửi lệnh, không sửa thẳng file dự án.</p>
       </div>
     </section>
     <section class="panel" data-t="hd" hidden>
@@ -178,8 +191,8 @@
         <p>Workspace <b>Audio</b>. Đồng hồ bên phải timeline hiện LUFS; TikTok/Reels nên quanh <b>−14 LUFS</b>. Chọn clip → Effect Controls → thêm Dynamics (compressor) cho giọng đều, EQ cắt dưới 80 Hz cho hết ù.</p>
         <h3>Phụ đề</h3>
         <p>Menu <b>Sequence → Captions → Add New Caption Track</b>, rồi <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>C</kbd> thêm câu tại đầu phát. Có file .srt thì kéo vào là thành caption track. Trợ lý cũng thêm được theo lời bạn.</p>
-        <h3>Trợ lý làm được gì</h3>
-        <p>Xếp clip, cắt, đổi tốc độ, thêm chuyển cảnh, chỉnh màu, thêm phụ đề, đặt marker, chỉnh âm lượng, xem khung hình để tự kiểm. Nói rõ clip nào, giây nào. Không ưng thì bấm ↶ hoặc <kbd>Ctrl</kbd>+<kbd>Z</kbd>.</p>
+        <h3>Claude làm được gì</h3>
+        <p>Qua tab Claude Code: xếp clip, cắt, đổi tốc độ, thêm chuyển cảnh, chỉnh màu, thêm phụ đề, đặt marker, chỉnh âm lượng, xem khung hình để tự kiểm. Nói rõ clip nào, giây nào. Không ưng thì <kbd>Ctrl</kbd>+<kbd>Z</kbd>.</p>
       </div>
     </section>
   </aside>
@@ -187,6 +200,7 @@
 <div id="toast" role="status" aria-live="polite"></div>
 <script src="tai-khoan.js?v=202610041200"></script>
 <script>document.addEventListener("DOMContentLoaded",function(){if(typeof TK==="undefined"){var k=document.createElement("div");k.style.cssText="position:fixed;left:12px;right:12px;bottom:12px;z-index:9999;background:#ff4d6d;color:#fff;padding:12px 14px;border-radius:12px;font:14px system-ui;display:flex;gap:10px;align-items:center;justify-content:space-between";k.innerHTML="Trang tải thiếu một phần (mạng chập chờn). <button onclick=\"location.reload()\" style=\"background:#fff;color:#000;border:0;border-radius:8px;padding:6px 12px;font-weight:700\">Tải lại trang</button>";document.body.appendChild(k);}});</script>
-<script src="dung-pro.js?v=202610140100"></script>
+<script src="dung-pro.js?v=202610140300"></script>
+<script src="noi-thu-muc.js?v=202610140300"></script>
 </body>
 </html>
