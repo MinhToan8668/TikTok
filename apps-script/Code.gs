@@ -296,9 +296,11 @@ function dsChat(key){
 function isAdmin(chatId){
   return dsChat('ADMIN_CHAT_IDS').indexOf(String(chatId)) > -1;
 }
-/* Thông báo tự động (đăng ký mới, chuyển khoản, lịch kèm…) chỉ gửi vào chat riêng của admin, không gửi vào group.
-   Group trong NOTIFY_CHAT_IDS vẫn dùng được các lệnh chỉ xem. */
-function dsNhanBao(){ return []; }
+/* Group TMXK (NOTIFY_CHAT_IDS) bật hay tắt — bot /group bat · tat. Mặc định TẮT:
+   tắt = group không nhận thông báo tự động và bot im lặng với mọi lệnh trong group (cả /trangthai, /danhsach);
+   bật = group nhận thông báo và dùng được các lệnh chỉ xem như trước. Admin luôn nhận đủ trong chat riêng. */
+function groupBat(){ return String(cfgProp('GROUP_BAT') || '').toLowerCase() === 'bat'; }
+function dsNhanBao(){ return groupBat() ? dsChat('NOTIFY_CHAT_IDS') : []; }
 function isNotify(chatId){
   return dsChat('NOTIFY_CHAT_IDS').indexOf(String(chatId)) > -1;
 }
@@ -556,6 +558,7 @@ function handleTelegram(update){
   var text = msg.text.trim();
 
   var quanTri = isAdmin(chatId);
+  if (!quanTri && isNotify(chatId) && !groupBat()) return;   // group đang tắt (/group tat): bot im lặng hoàn toàn
   var chiXem  = !quanTri && isNotify(chatId);   // group nội bộ
 
   if (!quanTri && !chiXem){
@@ -629,7 +632,8 @@ function handleTelegram(update){
         '💬 /zalo `https://zalo.me/g/...` — link group Zalo',
         '🎵 /tiktok `https://tiktok.com/@...` — link kênh',
         '📢 /thongbao `nội dung` — bật banner đầu trang',
-        '🔕 /tatthongbao — tắt banner','',
+        '🔕 /tatthongbao — tắt banner',
+        '👥 /group tat · bat — tắt hẳn / bật lại group TMXK (thông báo + lệnh trong group)','',
         '*🚦 Trạng thái đăng ký*',
         '🟢 /mo — mở đăng ký',
         '🟡 /du — báo đủ chỗ (chuyển sang danh sách chờ)',
@@ -747,6 +751,13 @@ function handleTelegram(update){
       cfg.schedule.time=parts[1].trim();
       saveConfig(cfg);
       return tgSend(chatId,'✅ Lịch học: *'+cfg.schedule.days+' · '+cfg.schedule.time+'*');
+    }
+
+    case 'group': {
+      var ng = dsChat('NOTIFY_CHAT_IDS').length, P0 = PropertiesService.getScriptProperties();
+      if (/^(bat|bật|on|1)$/i.test(arg)){ P0.setProperty('GROUP_BAT','bat'); return tgSend(chatId,'👥 Đã BẬT group TMXK'+(ng?'':' (nhưng NOTIFY_CHAT_IDS chưa có group nào)')+': group nhận thông báo tự động và dùng được /trangthai, /danhsach. Tắt: /group tat'); }
+      if (/^(tat|tắt|off|0)$/i.test(arg)){ P0.setProperty('GROUP_BAT','tat'); return tgSend(chatId,'🔕 Đã TẮT group TMXK: không gửi thông báo vào group, bot cũng không trả lời lệnh nào trong group. Mọi thông báo chỉ gửi cho bạn. Bật lại: /group bat'); }
+      return tgSend(chatId,'👥 Group TMXK đang '+(groupBat()?'*BẬT* (nhận thông báo, dùng được lệnh xem)':'*TẮT* (không nhận thông báo, bot im lặng trong group)')+'.\n\n`/group tat` tắt hẳn · `/group bat` bật lại.');
     }
 
     case 'zalo':
@@ -1108,6 +1119,7 @@ var MENU_BOT = [
     {command:'ngoaihethong',description:'👤 HV ngoài web — /ngoaihethong 2'},
     {command:'dadangky',   description:'👥 Đặt số đã đăng ký — /dadangky 12 · auto'},
     {command:'zalo',       description:'💬 Link group Zalo'},
+    {command:'group',      description:'👥 Group TMXK: /group tat · bat'},
     {command:'thongbao',   description:'📢 Bật banner thông báo'},
     {command:'tatthongbao',description:'🔕 Tắt banner'},
     {command:'mo',         description:'🟢 Mở đăng ký'},
@@ -1336,7 +1348,7 @@ function kiemTra(){
   }
   out.push('Đăng ký trong sheet: '+allRegs().length+' dòng');
   out.push('Chat ra lệnh được: '+(dsChat('ADMIN_CHAT_IDS').join(', ')||'(chưa có)'));
-  out.push('Group chỉ nhận báo: '+(dsChat('NOTIFY_CHAT_IDS').join(', ')||'(chưa có)')+' · thông báo tự động: chỉ gửi admin, không gửi group');
+  out.push('Group chỉ nhận báo: '+(dsChat('NOTIFY_CHAT_IDS').join(', ')||'(chưa có)')+' · group: '+(groupBat()?'BẬT':'TẮT (/group bat để bật)'));
   out.push('ADMIN_KEY: '+cfgProp('ADMIN_KEY'));
   Logger.log(out.join('\n'));
 }
