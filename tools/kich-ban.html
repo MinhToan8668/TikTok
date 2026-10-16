@@ -109,6 +109,15 @@
   @media (prefers-reduced-motion:reduce){.story-khung span{animation:none;opacity:1}}
   .khung-nhom{grid-column:1/-1;font-family:var(--font-display);font-weight:800;font-size:12.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin:8px 0 -2px}
   .khung-nhom:first-child{margin-top:0}
+  .khung-hang{display:contents}
+  @media (max-width:640px){
+    .khung-grid{display:block}
+    .khung-nhom{margin:14px 0 6px}
+    .khung-hang{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 2px 6px;scrollbar-width:none}
+    .khung-hang::-webkit-scrollbar{display:none}
+    .khung-hang .khung{flex:0 0 72%;scroll-snap-align:start;align-content:start}
+    .khung-hang .khung:only-child{flex-basis:100%}
+  }
   .tl-lbl-moc{position:relative;height:16px}
   .tl-lbl-moc .moc{position:absolute;transform:translateX(-50%)}
   .tl-lbl-moc span:last-child{position:absolute;right:0}
@@ -280,6 +289,7 @@
     .brand h1{font-size:19px}
   }
 </style>
+<link rel="stylesheet" href="dien-thoai.css?v=202610161200">
 </head>
 <body>
 <div class="wrap">
@@ -296,12 +306,12 @@
   </header>
 
   <nav class="feat-tabs" aria-label="Công cụ trong Viral Studio">
-    <a class="ft" href="tai-ve.html" data-tool="taive"><span class="fi" aria-hidden="true">⬇️</span>Tải video</a>
-    <a class="ft" href="soi-video.html"><span class="fi" aria-hidden="true">🎬</span>Soi video viral</a>
-    <a class="ft" href="hook-text.html"><span class="fi" aria-hidden="true">⚡</span>Hook viral</a>
-    <a class="ft on" href="#" aria-current="page"><span class="fi" aria-hidden="true">📝</span>Kịch bản viral</a>
-    <a class="ft" href="dung-video.html"><span class="fi" aria-hidden="true">🎞️</span>Dựng video</a>
-    <a class="ft" href="cham-video.html"><span class="fi" aria-hidden="true">🎯</span>Chấm video của bạn</a>
+    <a data-ngan="Tải" class="ft" href="tai-ve.html" data-tool="taive"><span class="fi" aria-hidden="true">⬇️</span>Tải video</a>
+    <a data-ngan="Soi" class="ft" href="soi-video.html"><span class="fi" aria-hidden="true">🎬</span>Soi video viral</a>
+    <a data-ngan="Hook" class="ft" href="hook-text.html"><span class="fi" aria-hidden="true">⚡</span>Hook viral</a>
+    <a data-ngan="Kịch bản" class="ft on" href="#" aria-current="page"><span class="fi" aria-hidden="true">📝</span>Kịch bản viral</a>
+    <a data-ngan="Dựng" class="ft" href="dung-video.html"><span class="fi" aria-hidden="true">🎞️</span>Dựng video</a>
+    <a data-ngan="Chấm" class="ft" href="cham-video.html"><span class="fi" aria-hidden="true">🎯</span>Chấm video của bạn</a>
   </nav>
 
   <div class="kb-tabs" role="tablist" aria-label="Hai cách làm kịch bản">
@@ -623,13 +633,17 @@ function buildKhung() {
   for (const [nhom, tenNhom] of NHOM_KHUNG) {
     const ds = KHUNG.filter(K => (K.nhom || 'khac') === nhom); if (!ds.length) continue;
     box.append(el('div', 'khung-nhom', tenNhom));
+    const hang = el('div', 'khung-hang'); box.append(hang);
     for (const K of ds) {
       const b = el('button', 'khung'); b.type = 'button'; b.dataset.k = K.k; b.setAttribute('aria-pressed', String(K.k === state.khung));
       const g = gKhung(K); b.append(el('b', null, K.n), el('small', null, K.d), el('span', 'use', 'Hợp: ' + K.use + ' · ' + g[0] + '–' + g[1] + 's'));
       b.onclick = () => { state.khung = K.k; document.querySelectorAll('.khung').forEach(x => x.setAttribute('aria-pressed', String(x === b))); chonDangTheoKhung(K, true); buildPhan(); saveDraft(); thuKhung(true); $('#phanList').closest('section').scrollIntoView({ behavior: 'smooth', block: 'start' }); };
-      box.append(b);
+      hang.append(b);
     }
   }
+  // điện thoại: mỗi nhóm là một hàng vuốt ngang, đưa khung đang chọn vào tầm mắt
+  const dang = box.querySelector('.khung[aria-pressed="true"]');
+  if (dang) requestAnimationFrame(() => { const h = dang.parentElement; if (h.scrollWidth > h.clientWidth) h.scrollLeft = dang.offsetLeft - h.offsetLeft - 8; });
 }
 const COLORS = ['#99DF00', '#5EE7C6', '#FFD166', '#FF9A3C', '#FF6FB5', '#B07CFF', '#4DA3FF'];
 function buildPhan() {
