@@ -262,6 +262,7 @@
   .ph::before{content:"";position:absolute;top:0;left:-6px;border:7px solid transparent;border-top:9px solid var(--eo)}
   .snap{position:absolute;top:22px;bottom:0;width:1px;background:var(--emg);z-index:3;pointer-events:none;display:none}
   .etl-trong{padding:14px 12px;color:var(--em);font-size:12.5px}
+  .chiDt{display:none}
   .tong{font-size:12px;color:var(--em)}
   .tong.warn{color:#ffb08a}
   /* xuất */
@@ -298,6 +299,14 @@
     #mobTao button{flex:0 0 auto;min-width:60px;display:flex;flex-direction:column;align-items:center;gap:2px;background:transparent;border:0;color:var(--et);font-size:10.5px;padding:4px 6px;border-radius:8px}#mobTao button i{font-style:normal;font-size:18px;line-height:1}#mobTao button:active{background:rgba(255,255,255,.08)}
     .ed.mobi .cmenu{left:8px!important;right:8px!important;max-width:none;bottom:70px;top:auto!important;max-height:60dvh;overflow:auto}
     .ed.mobi .xuat .box{max-height:88dvh;overflow:auto}
+    /* điện thoại: thanh công cụ vuốt ngang thay vì bị cắt; tab dưới mờ dần ở mép còn tab; khung trống có nút thêm */
+    .ed.mobi .etool{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}.ed.mobi .etool::-webkit-scrollbar{display:none}.ed.mobi .etool > *{flex:none}
+    .ed.mobi .ecol.trai .etabs{scrollbar-width:none}.ed.mobi .ecol.trai .etabs::-webkit-scrollbar{display:none}
+    .ed.mobi .vuot.conPhai{-webkit-mask-image:linear-gradient(90deg,#000 82%,transparent);mask-image:linear-gradient(90deg,#000 82%,transparent)}
+    .ed.mobi .vuot.conTrai.conPhai{-webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 82%,transparent);mask-image:linear-gradient(90deg,transparent,#000 12%,#000 82%,transparent)}
+    .ed.mobi .vuot.conTrai:not(.conPhai){-webkit-mask-image:linear-gradient(90deg,transparent,#000 12%);mask-image:linear-gradient(90deg,transparent,#000 12%)}
+    .ed.mobi .chiMay{display:none}.ed.mobi .chiDt{display:inline}
+    .ed.mobi .etl-trong{padding:18px 12px;text-align:center}.ed.mobi .etl-trong .chiDt{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}.ed.mobi .etl-trong .btn{padding:10px 16px;font-size:14px;min-height:44px}
   }
   .anLuoi{grid-template-columns:repeat(auto-fill,minmax(72px,1fr))}.anTab .btn[aria-pressed="true"]{background:var(--ea);color:#000}
   .anXem{width:100%;height:44px;background:#15161a;border-radius:5px;overflow:hidden;display:grid;place-items:center}.anXem i{display:block;width:26px;height:26px;border-radius:4px;background:linear-gradient(135deg,#22d3df,#9b5bff);animation:1.6s ease-in-out infinite}
@@ -1221,7 +1230,7 @@
 
       <div class="ecol giua">
         <div class="phead"><span>Trình phát</span><span id="pheadTt"></span></div>
-        <div class="khungVung"><div class="khung"><canvas id="cv" width="540" height="960"></canvas><div id="tayCam"></div><div id="lopPhu"></div><div class="trong" id="trong">Thêm footage ở bên trái.<br>Kéo cảnh vào dòng thời gian, hoặc để Trợ lý dựng.</div></div><div id="scopeHop" hidden><canvas id="scHist" width="160" height="80" title="Biểu đồ màu RGB"></canvas><canvas id="scWave" width="160" height="80" title="Dạng sóng độ sáng"></canvas><canvas id="scVec" width="80" height="80" title="Vectorscope (vạch: màu da)"></canvas></div></div>
+        <div class="khungVung"><div class="khung"><canvas id="cv" width="540" height="960"></canvas><div id="tayCam"></div><div id="lopPhu"></div><div class="trong" id="trong"><span class="chiMay">Thêm footage ở bên trái.<br>Kéo cảnh vào dòng thời gian, hoặc để Trợ lý dựng.</span><span class="chiDt">Bấm <b>Media</b> ở dưới để thêm video,<br>hoặc mở <b>Trợ lý AI</b> để AI dựng giúp.</span></div></div><div id="scopeHop" hidden><canvas id="scHist" width="160" height="80" title="Biểu đồ màu RGB"></canvas><canvas id="scWave" width="160" height="80" title="Dạng sóng độ sáng"></canvas><canvas id="scVec" width="80" height="80" title="Vectorscope (vạch: màu da)"></canvas></div></div>
         <div class="ctl">
           <input type="range" id="seek" min="0" max="1000" value="0" aria-label="Vị trí">
           <span class="tg" id="tg">00:00:00:00 / 00:00:00:00</span>
@@ -1358,7 +1367,7 @@
           <div class="ph" id="ph"></div><div class="snap" id="snapLine"></div>
         </div>
       </div>
-      <div class="etl-trong" id="tlTrong">Chưa có đoạn nào trên V1. Bấm ＋ ở footage, kéo một cảnh vào, hoặc để Trợ lý dựng.</div>
+      <div class="etl-trong" id="tlTrong"><span class="chiMay">Chưa có đoạn nào trên V1. Bấm ＋ ở footage, kéo một cảnh vào, hoặc để Trợ lý dựng.</span><span class="chiDt"><button type="button" class="btn xanh" data-mo-tab="footage">＋ Thêm video</button><button type="button" class="btn" data-mo-tab="ai">✨ Để AI dựng</button></span></div>
     </div>
   </div>
 </div>
@@ -1369,6 +1378,6 @@
 <script>document.addEventListener("DOMContentLoaded",function(){if(typeof TK==="undefined"){var k=document.createElement("div");k.style.cssText="position:fixed;left:12px;right:12px;bottom:12px;z-index:9999;background:#ff4d6d;color:#fff;padding:12px 14px;border-radius:12px;font:14px system-ui;display:flex;gap:10px;align-items:center;justify-content:space-between";k.innerHTML="Trang tải thiếu một phần (mạng chập chờn) nên nút AI chưa chạy được. <button onclick=\"location.reload()\" style=\"background:#fff;color:#000;border:0;border-radius:8px;padding:6px 12px;font-weight:700\">Tải lại trang</button>";document.body.appendChild(k);}});</script>
 <script src="kho/kho.js?v=20261006c"></script>
 <!-- phần JS của trình dựng tách thành tools/dung/*.js (cùng global scope, giữ nguyên thứ tự) -->
-<script src="dung/nap.js?v=202610140600" data-phu="sang-filmcraft.js?v=202610131900,noi-thu-muc.js?v=202610140600,cau-noi-xa.js?v=202610140600,tro-ly.js?v=202610011200"></script>
+<script src="dung/nap.js?v=202610161500" data-phu="sang-filmcraft.js?v=202610131900,noi-thu-muc.js?v=202610140600,cau-noi-xa.js?v=202610140600,tro-ly.js?v=202610011200"></script>
 </body>
 </html>

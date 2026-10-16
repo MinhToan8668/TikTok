@@ -44,10 +44,26 @@
   .tl-fab{font-size:0!important;gap:0!important;padding:4px!important;bottom:calc(env(safe-area-inset-bottom,0px) + var(--thanh-day) + 20px)!important}
   #tkNutPro{bottom:calc(env(safe-area-inset-bottom,0px) + var(--thanh-day) + 20px)!important}
   .toast{bottom:calc(env(safe-area-inset-bottom,0px) + var(--thanh-day) + 22px)!important}
+  #tkNutPro{display:none!important}   /* header đã có nút Pro, khỏi nút nổi thứ hai ở góc */
+
+  /* đỡ cuộn: giải thích dài thu 2 dòng, khung kết quả trống bỏ danh sách dài */
+  .card p.hint.gon{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:2px}
+  .xem-them{display:inline-block;border:0;background:none;padding:2px 0 8px;margin:0;color:var(--muted);font:inherit;font-size:12.5px;font-weight:800;cursor:pointer;min-height:0!important;text-decoration:underline;text-underline-offset:2px}
+  .card.kq .empty ul{display:none}
+  .card{padding:16px 14px}
+
+  /* nút chính nổi */
+  .nut-noi{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + var(--thanh-day) + 18px);z-index:49;
+    border:0;border-radius:999px;padding:12px 22px;font:inherit;font-weight:800;font-size:15px;white-space:nowrap;max-width:calc(100vw - 140px);overflow:hidden;text-overflow:ellipsis;
+    background:var(--text);color:var(--bg);box-shadow:0 8px 22px rgba(0,0,0,.28);cursor:pointer}
+  .nut-noi:disabled{opacity:.55}
+  body.dang-go nav.feat-tabs,body.dang-go .nut-noi,body.dang-go .tl-fab{display:none!important}
+  body.dang-go{padding-bottom:16px}
   .tk-viec{bottom:calc(env(safe-area-inset-bottom,0px) + var(--thanh-day) + 76px)!important}
 }
 @media (max-width:640px) and (prefers-color-scheme: dark){
   :root:not([data-theme="light"]) nav.feat-tabs .ft{border:0;box-shadow:none}
   :root:not([data-theme="light"]) nav.feat-tabs .ft.on{background:rgba(153,223,0,.16);color:#99DF00}
 }
-@media print{nav.feat-tabs{display:none}}
+@media (min-width:641px){.xem-them,.nut-noi{display:none!important}}
+@media print{nav.feat-tabs,.nut-noi{display:none}}
