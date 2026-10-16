@@ -135,6 +135,10 @@ function khoiTaoMobi() {
   sc.addEventListener('touchstart', e => { if (e.touches.length === 2) { pinch = { d: Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY), px: P.pxs }; } }, { passive: true });
   sc.addEventListener('touchmove', e => { if (!pinch || e.touches.length !== 2) return; e.preventDefault(); const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY), px = Math.round(Math.max(6, Math.min(80, pinch.px * d / pinch.d))); if (px !== P.pxs) { P.pxs = px; $('#zoomTl').value = px; veTl(); } }, { passive: false });
   sc.addEventListener('touchend', () => { pinch = null; }, { passive: true });
+  // tab dưới: mờ mép bên nào còn tab để người dùng biết vuốt ngang được
+  [$('.ecol.trai .etabs'), $('.etl .etool'), $('#mobTao')].filter(Boolean).forEach(h => { h.classList.add('vuot', 'conPhai'); const mep = () => { if (!h.clientWidth) return; h.classList.toggle('conTrai', h.scrollLeft > 4); h.classList.toggle('conPhai', h.scrollLeft + h.clientWidth < h.scrollWidth - 4); };
+    h.addEventListener('scroll', mep, { passive: true }); addEventListener('resize', mep); setTimeout(mep, 0); });
+  document.querySelectorAll('[data-mo-tab]').forEach(b => b.addEventListener('click', () => doiTab(b.dataset.moTab)));
   datMobi(); addEventListener('resize', datMobi);
 }
 

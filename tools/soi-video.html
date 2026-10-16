@@ -261,7 +261,8 @@
   .tr{max-height:180px}
   @media (max-width:900px){ .nums{grid-template-columns:repeat(3,1fr)} .linkrow{grid-template-columns:1fr} .sumbar .row{margin-left:0;width:100%} .door{padding:10px 12px} .kv{grid-template-columns:1fr;gap:2px} .kv dt{margin-top:6px} .map .peak::after{display:none} }
 </style>
-<link rel="stylesheet" href="dien-thoai.css?v=202610161200">
+<link rel="stylesheet" href="dien-thoai.css?v=202610161600">
+<script src="dien-thoai.js?v=202610161600" defer></script>
 </head>
 <body>
 <div class="wrap">
@@ -374,7 +375,7 @@
         <label class="lbl" for="mongMuon">Bạn muốn nói về chuyện gì? (không bắt buộc)</label>
         <textarea id="mongMuon" rows="2" placeholder="VD: quay quán cà phê nhà mình lúc mở cửa sáng sớm, không muốn nói nhiều, muốn khách thấy quán chill."></textarea>
         <div class="row" style="margin-top:14px;gap:10px">
-          <button class="btn pro lg" id="btnSoi" type="button">🔎 Soi video <small style="font-weight:500;opacity:.8">· 1 lượt AI</small></button>
+          <button class="btn pro lg" id="btnSoi" type="button" data-nut-noi>🔎 Soi video <small style="font-weight:500;opacity:.8">· 1 lượt AI</small></button>
           <button class="btn" id="btnClear" type="button">Xoá form</button>
         </div>
         <div class="status" id="soiStatus" role="status" aria-live="polite"></div>
