@@ -2786,6 +2786,16 @@ function undoDesign() {
   state.combo = null; selectTemplate(p.template); restore(p.layers); state.sel = p.sel; syncLayerPanel(); scheduleRender();
   const o = $('#designOut'); o.className = 'status'; o.textContent = 'Đã trả lại bố cục cũ.';
 }
+// Câu báo lỗi AI cho học viên: nói rõ phải làm gì, luôn kèm mã để chụp gửi mentor khi lỗi lạ
+function loiAiChu(r, mo) {
+  const map = { can_dangky: 'AI thiết kế chữ cần tài khoản. Tạo tài khoản miễn phí, mất 30 giây.', can_pro: 'Tính năng này cần tài khoản Pro hoặc học viên.', het_han_hv: 'Gói Pro dành cho học viên của bạn đã hết hạn. Nâng cấp Pro để dùng tiếp, hoặc nhắn mentor.',
+    het_luot_thu: 'Bạn đã dùng hết lượt AI miễn phí. Mua Pro hoặc đăng ký học viên để dùng tiếp.', het_luot: 'Hết lượt AI hôm nay, mai quay lại nhé.', het_phien: 'Phiên đăng nhập hết hạn, đăng nhập lại nhé.',
+    ban_qua: 'AI đang quá tải vì nhiều người dùng cùng lúc, đợi khoảng một phút rồi bấm lại.', het_gio: 'AI trả lời quá lâu nên máy chủ dừng, bấm lại nhé (không mất lượt).',
+    sai_key: 'Khóa AI trên máy chủ đang hỏng hoặc bị chặn. Báo mentor thay khóa.', chua_cai_key: 'Máy chủ chưa cài khóa AI. Báo mentor.', loi_mang: 'Máy chủ không gọi được AI, thử lại sau ít phút.',
+    tu_choi: 'AI không xử lý được ảnh hoặc câu này, thử ảnh khác hoặc diễn đạt khác.', anh_qua_lon: 'Ảnh quá lớn, chọn ảnh nhỏ hơn.', thieu_text: 'Nhập câu hook trước đã.', internal: 'Máy chủ gặp lỗi khi xử lý. Chụp mã lỗi gửi mentor.' };
+  const ma = r.chi_tiet || r.error || 'khong_ro';
+  return (map[r.error] || mo + ', thử lại nhé.') + (map[r.error] && !r.chi_tiet ? '' : ' Mã lỗi: ' + ma);
+}
 async function runDesign() {
   if (aiBusy || !state.frame) return;
   const text = $('#text').value.trim() || state.layers.map(L => runsText(L.runs)).join('\n').trim();
@@ -2803,7 +2813,9 @@ async function runDesign() {
     clearInterval(tick);
     if (!r.ok) {
       out.className = 'status err';
-      out.textContent = ({ can_pro: 'AI thiết kế chữ cần tài khoản.', het_luot_thu: 'Bạn đã dùng hết lượt AI miễn phí. Mua Pro hoặc đăng ký học viên để dùng tiếp.', het_luot: 'Hết lượt AI hôm nay, mai quay lại nhé.', het_phien: 'Phiên đăng nhập hết hạn, đăng nhập lại nhé.', ban_qua: 'AI đang quá tải vì nhiều người dùng cùng lúc, thử lại sau một phút.', sai_key: 'Khóa AI trên máy chủ không hợp lệ. Báo mentor.', chua_cai_key: 'Máy chủ chưa cài khóa AI. Báo mentor.' }[r.error] || 'AI chưa thiết kế được, thử lại nhé.') + (r.chi_tiet ? ' Mã lỗi: ' + r.chi_tiet : '');
+      out.textContent = loiAiChu(r, 'AI chưa thiết kế được');
+      if (r.error === 'can_dangky') TK.mo('signup', 'Tạo tài khoản miễn phí để dùng AI thiết kế bố cục chữ.');
+      if (r.error === 'het_phien') setPro(false);
       if (r.error === 'het_luot_thu') { state.acct && (state.acct.luot_con = 0); setAcct(state.acct); openUpsell(); }
       return;
     }

@@ -457,7 +457,7 @@ function goiGemini(key, img, prompt, schema, maxTok, media, nhiet, hetGio){
   var dsKey = fileRieng ? [gemKeyCuaFile(fileRieng.file_data.file_uri, key)] : gemDsKey(key);
   var rr = gemKeyBatDau(dsKey.length);
   // thống kê để biết vì sao quá tải: gửi bot cho admin, chi tiết cho mentor, số giây chờ cho học viên
-  var tk = {phut:0, ngay:0, google:0, choMin:0, keyNgay:{}, keyPhut:{}, models:[]};
+  var tk = {phut:0, ngay:0, google:0, choMin:0, keyNgay:{}, keyPhut:{}, keyHong:{}, models:[]};
   function ghiCho(g){ if (g > 0 && (!tk.choMin || g < tk.choMin)) tk.choMin = g; }
   function quaTai(){ return tk.phut || tk.ngay || tk.google; }
   function thatBai(loi, model, macDinh){
@@ -479,7 +479,7 @@ function goiGemini(key, img, prompt, schema, maxTok, media, nhiet, hetGio){
     for (var q = 0; q < dsKey.length; q++){
       var kq0 = dsKey[(rr + q) % dsKey.length], ng = gemConNghi(kq0, model);
       if (!ng.giay){ hang.push(kq0); continue; }
-      if (ng.loai === 'h') continue;
+      if (ng.loai === 'h'){ tk.keyHong[gemKh(kq0)] = 1; continue; }   // key Google báo sai / bị chặn, đang nghỉ 10 phút
       ghiCho(ng.giay);
       if (ng.loai === 'n'){ tk.ngay++; tk.keyNgay[gemKh(kq0)] = 1; } else { tk.phut++; tk.keyPhut[gemKh(kq0)] = 1; }
     }
@@ -540,6 +540,10 @@ function goiGemini(key, img, prompt, schema, maxTok, media, nhiet, hetGio){
       // 400 khác: định dạng không hợp → thử kiểu kế tiếp
     }
   }
+  // không gọi được lần nào: nói rõ vì sao thay vì trả lỗi rỗng (trước đây trang chỉ hiện "thử lại nhé" không kèm mã)
+  var soHong = Object.keys(tk.keyHong).length;
+  if (!loiCuoi) loiCuoi = soHong ? soHong + '/' + dsKey.length + ' key Gemini đang tạm khoá vì Google báo key sai hoặc bị chặn, xem /keygemini' : 'không có model Gemini nào gọi được: ' + models.join(', ');
+  if (!quaTai() && soHong && soHong >= dsKey.length) return {ok:false, error:'sai_key', loi:loiCuoi, model:modelCuoi};
   return thatBai(loiCuoi, modelCuoi, 'loi_ai');
 }
 
@@ -701,7 +705,7 @@ function hookDesign(b, ai, provider, key){
           stroke:{type:'boolean'}, shadow:{type:'boolean'} } } },
       accent:{type:'string'}, top_y:{type:'number'}, x:{type:'number'}, note:{type:'string'} } };
 
-  var kq = provider === 'claude' ? goiClaude(key, img, prompt, schema, 2000) : goiGemini(key, img, prompt, schema, 2000);
+  var kq = provider === 'claude' ? goiClaude(key, img, prompt, schema, 2000) : goiGemini(key, img, prompt, schema, 6000);   // model có suy nghĩ tính cả token nghĩ vào trần: 2000 dễ cụt JSON
   if (!kq.ok){
     hookHoan(ai);
     hookLog(me, '[thietke] ' + text, false, kq.loi, kq.vin || 0, kq.vout || 0, kq.model, ai);
