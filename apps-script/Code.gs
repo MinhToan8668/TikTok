@@ -1141,6 +1141,7 @@ var MENU_BOT = [
     {command:'dsck',       description:'🧾 Viral Studio: giao dịch chờ mở Pro'},
     {command:'lichtuan',   description:'📆 Lịch kèm 1:1 cả tuần + ai đã đặt'},
     {command:'dstk',       description:'👥 Tài khoản: chờ duyệt · mentor · học viên'},
+    {command:'giahanhv',   description:'🎓 Gia hạn Pro một học viên — /giahanhv mail 30'},
     {command:'vaitro',     description:'🎚 Phân vai — /vaitro mail hv · mentor · pro'},
     {command:'xoatk',      description:'🗑 Xoá tài khoản — /xoatk mail'},
     {command:'doimk',      description:'🔒 Cấp lại mật khẩu — /doimk mail'},
