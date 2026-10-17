@@ -23,7 +23,7 @@ var SHEET_HV   = 'HocVien';
 var LICH_HEADERS = ['id','mentor_ma','mentor_ten','ngay','batdau','ketthuc','trangthai',
                     'hv_ma','hv_ten','hv_email','nhac_luc','da_nhac','tao'];
 var HV_HEADERS   = ['ma','email','ten','ten_goi','salt','hash','vaitro','trangthai',
-                    'token','token_han','tao','dangnhap_cuoi','sdt'];   // sdt thêm sau: bang() tự nối cột, không mất tài khoản cũ
+                    'token','token_han','tao','dangnhap_cuoi','sdt','pro_den'];   // sdt, pro_den thêm sau: bang() tự nối cột, không mất tài khoản cũ
 
 /* Ba ca mặc định — sửa ở đây là đổi cho cả web lẫn bot */
 var CA = [
@@ -125,7 +125,7 @@ function oMoc(v){   // mốc thời gian ISO — giữ để new Date() đọc l
 }
 
 var CHUAN_LICH = {ngay:oNgay, batdau:oGio, ketthuc:oGio, nhac_luc:oMoc};
-var CHUAN_HV   = {token_han:oMoc};
+var CHUAN_HV   = {token_han:oMoc, pro_den:oMoc};
 
 function moiLich(){ return docBang(SHEET_LICH, LICH_HEADERS, CHUAN_LICH); }
 function moiHV(){   return docBang(SHEET_HV,   HV_HEADERS,   CHUAN_HV); }

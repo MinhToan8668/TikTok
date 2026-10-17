@@ -47,11 +47,23 @@ function stNgayTu(s){
   if (m) return new Date(+m[3], +m[2] - 1, +m[1]);
   var d = new Date(s); return isNaN(d) ? null : d;
 }
-/* Học viên còn trong hạn Pro không? Mentor và tài khoản không rõ ngày tạo thì luôn còn. */
-function stHVConHan(hv){
-  var n = stHV().ngay; if (!n || !hv || hv.vaitro !== 'hv') return true;
-  var t = stNgayTu(hv.tao); return !t || (Date.now() - t.getTime()) < n * 864e5;
+/* Học viên còn trong hạn Pro không? Mentor và tài khoản không rõ ngày tạo thì luôn còn.
+   Hạn riêng (cột pro_den, bot /giahanhv) và hạn chung (/ngayhv tính từ ngày tạo): lấy hạn nào xa hơn. */
+function stHVHanRieng(hv){
+  var v = String((hv && hv.pro_den) || '').trim(); if (!v) return null;
+  if (v === 'suot_doi') return 'suot_doi';
+  var d = new Date(v); return isNaN(d) ? null : d;
 }
+function stHVHetLuc(hv){   // null = không giới hạn; Date = mốc hết Pro
+  if (!hv || hv.vaitro !== 'hv') return null;
+  var rieng = stHVHanRieng(hv); if (rieng === 'suot_doi') return null;
+  var n = stHV().ngay, t = stNgayTu(hv.tao);
+  if (!n || !t){ if (!rieng) return null; }
+  var chung = (n && t) ? new Date(t.getTime() + n * 864e5) : null;
+  if (!chung) return rieng;
+  return rieng && rieng > chung ? rieng : chung;
+}
+function stHVConHan(hv){ var h = stHVHetLuc(hv); return !h || h.getTime() > Date.now(); }
 
 var ST_SHEET       = 'NguoiDung';
 var ST_HEADERS     = ['ma','email','sdt','ten','salt','hash','goi','pro_han','luot_dung',
@@ -759,7 +771,7 @@ function stNapHoSoMau(){
 
 /* ═══════ LỆNH BOT TELEGRAM (chỉ chat quản trị) ═══════
    Code.gs gọi:  if (quanTri && studioCoLenh(cmd)) return studioLenh(cmd, arg, chatId);  */
-var LENH_STUDIO = ['studio','keygemini','xuhuong','xhtao','xhsua','xhkey','xhyoutube','xhrss','xhlich','stk','giapro','ngaypro','ngayhv','giahv','uudaihv','maychu','maytai','luotthu','luotkb','luotsoi','luotcham','luottai','luotchat','luotdung','luotai','baihoc','duyetbh','tatbh','xoabh','day','chatngay','tuvan','tonghop','mopro','tatpro','dsck','timnd','ckkhoa','tienkhoa','hoso','lichsu','dshv','naphoso'];
+var LENH_STUDIO = ['studio','keygemini','xuhuong','xhtao','xhsua','xhkey','xhyoutube','xhrss','xhlich','stk','giapro','ngaypro','ngayhv','giahanhv','giahv','uudaihv','maychu','maytai','luotthu','luotkb','luotsoi','luotcham','luottai','luotchat','luotdung','luotai','baihoc','duyetbh','tatbh','xoabh','day','chatngay','tuvan','tonghop','mopro','tatpro','dsck','timnd','ckkhoa','tienkhoa','hoso','lichsu','dshv','naphoso'];
 function studioCoLenh(cmd){ return LENH_STUDIO.indexOf(cmd) > -1; }
 
 var ST_MA_NH = {vietcombank:'VCB', vcb:'VCB', mb:'MB', mbbank:'MB', quandoi:'MB', techcombank:'TCB', tcb:'TCB',
@@ -806,6 +818,7 @@ function studioLenh(cmd, arg, chatId, msg){
       '💰 /giapro `50000` — giá gói Pro',
       '📆 /ngaypro `30` — gói dùng bao nhiêu ngày',
       '🎓 /ngayhv `30` — học viên khoá được Pro mấy ngày (`0` = suốt đời)',
+      '🎓 /giahanhv `email 30` — gia hạn Pro riêng một học viên (`0` = suốt đời, chỉ email = xem hạn)',
       '🎓 /giahv `0` — giá gói học viên hiện trên landing (`0` = miễn phí)',
       '🎁 /uudaihv `câu ưu đãi` — dòng mời đăng ký học viên trong bảng Nâng cấp Pro (`xoa` = về mặc định)',
       '🎁 /luotthu `10` — lượt AI phân tích hook cho tài khoản mới',
@@ -865,6 +878,27 @@ function studioLenh(cmd, arg, chatId, msg){
     var nh = parseInt(arg, 10); if (isNaN(nh) || nh < 0) return hoi('Gửi một con số, ví dụ `30`.');
     var h1 = stHV(); h1.ngay = nh; P.setProperty('ST_HV', JSON.stringify(h1));
     return tgSend(chatId, '✅ Học viên khoá: Pro *' + (nh ? nh + ' ngày' : 'suốt đời') + '* · ' + (h1.gia ? 'gói học viên *' + stTien(h1.gia) + '*' : '*miễn phí*') + '. Landing và tool cập nhật ngay lần mở sau.');
+  }
+  if (cmd === 'giahanhv'){
+    // gia hạn Pro riêng cho MỘT học viên, không đụng hạn chung /ngayhv của cả khoá
+    if (!arg) return hoi('🎓 Gửi `email số_ngày` để gia hạn Pro cho một học viên.\nVD: `an@gmail.com 30` · `an@gmail.com 0` = suốt đời · `an@gmail.com xoa` = về hạn chung · chỉ gửi email = xem hạn');
+    var pg = String(arg).trim().split(/\s+/), hvg = hvTheoEmail(pg[0]) || hvTheoMa(pg[0]);
+    if (!hvg) return tgSend(chatId, 'Không thấy học viên `' + pg[0] + '`. Gõ /dstk để xem danh sách.');
+    var tenG = '*' + (hvg.ten || hvg.email) + '* (' + hvg.email + ')';
+    var hanChu = function(h){ var x = stHVHetLuc(h); return !x ? '*suốt đời*' : (x.getTime() > Date.now() ? 'tới *' + stHan(x) + '*' : '*đã hết hạn từ ' + stHan(x) + '*'); };
+    if (hvg.vaitro !== 'hv') return tgSend(chatId, tenG + ' đang là *' + hvg.vaitro + '*, không bị giới hạn ngày Pro của học viên. Muốn đổi vai: /vaitro');
+    var lenhG = String(pg[1] || '').toLowerCase();
+    if (!lenhG) return tgSend(chatId, '🎓 ' + tenG + ': Pro ' + hanChu(hvg) + (stHVHanRieng(hvg) ? ' _(hạn riêng)_' : ' _(theo hạn chung /ngayhv)_'));
+    var giaTri;
+    if (/^(xoa|xoá|bo|bỏ|het|hết)$/.test(lenhG)) giaTri = '';
+    else {
+      var soG = parseInt(lenhG, 10); if (isNaN(soG) || soG < 0) return hoi('Số ngày phải là con số, ví dụ `' + hvg.email + ' 30`, hoặc `0` = suốt đời.');
+      if (soG === 0) giaTri = 'suot_doi';
+      else { var goc = stHVHetLuc(hvg), tu = goc && goc.getTime() > Date.now() ? goc.getTime() : Date.now(); giaTri = new Date(tu + soG * 864e5).toISOString(); }   // còn hạn thì cộng nối tiếp, hết rồi thì tính từ hôm nay
+    }
+    ghiO(SHEET_HV, HV_HEADERS, hvg.row, 'pro_den', giaTri);
+    hvg.pro_den = giaTri;
+    return tgSend(chatId, '✅ ' + tenG + (giaTri ? ' giờ dùng Pro ' : ' bỏ hạn riêng, về hạn chung /ngayhv: Pro ') + hanChu(hvg) + '. Có hiệu lực ngay, không cần đăng nhập lại.');
   }
   if (cmd === 'giahv'){
     if (!arg) return hoi('🎓 Gói cho học viên khoá bao nhiêu tiền? Gửi `0` = miễn phí, hoặc ví dụ `20000`');
