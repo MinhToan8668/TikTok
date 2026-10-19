@@ -263,6 +263,7 @@
   .snap{position:absolute;top:22px;bottom:0;width:1px;background:var(--emg);z-index:3;pointer-events:none;display:none}
   .etl-trong{padding:14px 12px;color:var(--em);font-size:12.5px}
   .chiDt{display:none}
+  #mobVe,#mobCongCu{display:none}
   .tong{font-size:12px;color:var(--em)}
   .tong.warn{color:#ffb08a}
   /* xuất */
@@ -307,6 +308,26 @@
     .ed.mobi .vuot.conTrai:not(.conPhai){-webkit-mask-image:linear-gradient(90deg,transparent,#000 12%);mask-image:linear-gradient(90deg,transparent,#000 12%)}
     .ed.mobi .chiMay{display:none}.ed.mobi .chiDt{display:inline}
     .ed.mobi .etl-trong{padding:18px 12px;text-align:center}.ed.mobi .etl-trong .chiDt{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}.ed.mobi .etl-trong .btn{padding:10px 16px;font-size:14px;min-height:44px}
+    /* kiểu CapCut: nút ‹ về tool khác; bảng chức năng chiếm nửa dưới, khung xem thu nhỏ ở trên vẫn thấy; ✓ to; thanh kéo để vuốt xuống đóng */
+    .ed.mobi .etop .logo{display:none}.ed.mobi #mobVe{display:flex;align-items:center;justify-content:center;width:36px;height:36px;padding:0 0 3px!important;font-size:28px;line-height:1;border-radius:10px;flex:none}
+    .ed.mobi.sheet .ecol.giua,.ed.mobi.co-phai .ecol.giua{height:calc(44dvh - 52px);min-height:150px}
+    .ed.mobi.sheet .ecol.trai .epane.on{max-height:calc(56dvh - var(--hBar,58px) - 50px)}
+    .ed.mobi.co-phai .ecol.phai{height:calc(56dvh - var(--hBar,58px))}
+    .ed.mobi.sheet .sheetDau,.ed.mobi.co-phai .ecol.phai > .etabs{position:relative;padding-top:14px;touch-action:none}
+    .ed.mobi.sheet .sheetDau::before,.ed.mobi.co-phai .ecol.phai > .etabs::before{content:'';position:absolute;left:50%;top:5px;width:38px;height:4px;margin-left:-19px;border-radius:4px;background:var(--el)}
+    .ed.mobi .sheetDau .btn,.ed.mobi #btnDongPhai{min-width:58px;height:34px;border-radius:10px;border:0;background:var(--ea);color:#06110a;font-size:0!important;flex:none!important}
+    .ed.mobi .sheetDau .btn::after,.ed.mobi #btnDongPhai::after{content:'✓ Xong';font-size:13.5px;font-weight:800}
+    .ed.mobi .epane.on.coBen{display:flex!important;flex-direction:column!important}
+    .ed.mobi .epane.coBen > .ben{flex-direction:row;width:auto!important;border-right:0!important;border-bottom:1px solid var(--el);padding:6px 8px!important;overflow-x:auto;overflow-y:hidden;flex:none}
+    .ed.mobi .epane.coBen > .ben button{flex:none;white-space:nowrap;padding:6px 12px!important;border-radius:999px!important;font-size:12.5px!important}
+    .ed.mobi .epane.coBen > .noi{flex:1;min-height:0;overflow:auto}
+    .ed.mobi #mobTao .quayLai{color:var(--ea);font-weight:800}.ed.mobi #mobTao .quayLai i{font-size:24px}
+    .ed.mobi #mobCongCu.mo{display:flex;position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.55);align-items:flex-end}
+    #mobCongCu .hop{width:100%;background:var(--ep);border-radius:16px 16px 0 0;padding:14px 14px calc(14px + env(safe-area-inset-bottom));box-shadow:0 -10px 30px rgba(0,0,0,.5)}
+    #mobCongCu .dau{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:16px;color:var(--et)}
+    #mobCongCu .luoi{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    #mobCongCu a{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 6px;border-radius:12px;background:var(--ep2);color:var(--et);text-decoration:none;font-size:12.5px;font-weight:700;text-align:center;line-height:1.25}
+    #mobCongCu a i{font-style:normal;font-size:24px}#mobCongCu .ghi{margin:10px 2px 0;color:var(--em);font-size:12px}
   }
   .anLuoi{grid-template-columns:repeat(auto-fill,minmax(72px,1fr))}.anTab .btn[aria-pressed="true"]{background:var(--ea);color:#000}
   .anXem{width:100%;height:44px;background:#15161a;border-radius:5px;overflow:hidden;display:grid;place-items:center}.anXem i{display:block;width:26px;height:26px;border-radius:4px;background:linear-gradient(135deg,#22d3df,#9b5bff);animation:1.6s ease-in-out infinite}
@@ -1378,6 +1399,6 @@
 <script>document.addEventListener("DOMContentLoaded",function(){if(typeof TK==="undefined"){var k=document.createElement("div");k.style.cssText="position:fixed;left:12px;right:12px;bottom:12px;z-index:9999;background:#ff4d6d;color:#fff;padding:12px 14px;border-radius:12px;font:14px system-ui;display:flex;gap:10px;align-items:center;justify-content:space-between";k.innerHTML="Trang tải thiếu một phần (mạng chập chờn) nên nút AI chưa chạy được. <button onclick=\"location.reload()\" style=\"background:#fff;color:#000;border:0;border-radius:8px;padding:6px 12px;font-weight:700\">Tải lại trang</button>";document.body.appendChild(k);}});</script>
 <script src="kho/kho.js?v=20261006c"></script>
 <!-- phần JS của trình dựng tách thành tools/dung/*.js (cùng global scope, giữ nguyên thứ tự) -->
-<script src="dung/nap.js?v=202610161500" data-phu="sang-filmcraft.js?v=202610131900,noi-thu-muc.js?v=202610140600,cau-noi-xa.js?v=202610140600,tro-ly.js?v=202610011200"></script>
+<script src="dung/nap.js?v=202610191200" data-phu="sang-filmcraft.js?v=202610131900,noi-thu-muc.js?v=202610140600,cau-noi-xa.js?v=202610140600,tro-ly.js?v=202610011200"></script>
 </body>
 </html>

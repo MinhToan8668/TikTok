@@ -139,7 +139,57 @@ function khoiTaoMobi() {
   [$('.ecol.trai .etabs'), $('.etl .etool'), $('#mobTao')].filter(Boolean).forEach(h => { h.classList.add('vuot', 'conPhai'); const mep = () => { if (!h.clientWidth) return; h.classList.toggle('conTrai', h.scrollLeft > 4); h.classList.toggle('conPhai', h.scrollLeft + h.clientWidth < h.scrollWidth - 4); };
     h.addEventListener('scroll', mep, { passive: true }); addEventListener('resize', mep); setTimeout(mep, 0); });
   document.querySelectorAll('[data-mo-tab]').forEach(b => b.addEventListener('click', () => doiTab(b.dataset.moTab)));
+  khoiTaoMobiCC();
   datMobi(); addEventListener('resize', datMobi);
+}
+/* Điện thoại kiểu CapCut: nút ‹ về các tool, bảng chức năng chừa khung xem, đóng bảng bằng ✓ / vuốt xuống / nút Back của máy */
+const MOB_TOOL = [['⬇️', 'Tải video', 'tai-ve.html'], ['🎬', 'Soi video viral', 'soi-video.html'], ['⚡', 'Hook viral', 'hook-text.html'], ['📝', 'Kịch bản viral', 'kich-ban.html'], ['🎯', 'Chấm video', 'cham-video.html'], ['🏠', 'Trang khoá học', '../index.html']];
+function moCongCu(bat) {
+  let h = $('#mobCongCu');
+  if (!h) {
+    h = el('div'); h.id = 'mobCongCu'; h.setAttribute('role', 'dialog'); h.setAttribute('aria-label', 'Chuyển sang công cụ khác');
+    const hop = el('div', 'hop'), dau = el('div', 'dau'); dau.append(el('b', null, 'Viral Studio'));
+    const x = el('button', 'btn nho'); x.type = 'button'; x.textContent = 'Ở lại dựng'; x.onclick = () => moCongCu(false); dau.append(x); hop.append(dau);
+    const luoi = el('div', 'luoi');
+    MOB_TOOL.forEach(([ic, ten, url]) => { const a = el('a'); a.href = url; a.innerHTML = '<i>' + ic + '</i><span>' + ten + '</span>'; a.onclick = async e => { e.preventDefault(); try { await tuLuu(true); } catch { } location.href = url; }; luoi.append(a); });
+    hop.append(luoi, el('p', 'ghi', 'Dự án đang dựng được tự lưu, quay lại là thấy tiếp.'));
+    h.append(hop); h.onclick = e => { if (e.target === h) moCongCu(false); }; $('#ed').append(h);
+  }
+  h.classList.toggle('mo', !!bat); $('#ed').classList.toggle('coCongCu', !!bat);
+}
+function khoiTaoMobiCC() {
+  const ed = $('#ed');
+  // nút ‹ ở góc trái thanh trên: chỗ duy nhất trên điện thoại để sang tool khác
+  const ve = el('button', 'btn'); ve.type = 'button'; ve.id = 'mobVe'; ve.innerHTML = '‹'; ve.title = 'Về Viral Studio'; ve.setAttribute('aria-label', 'Về các công cụ khác'); ve.onclick = () => moCongCu(true);
+  $('.etop').prepend(ve);
+  // thanh thao tác đoạn: "‹" quay lại đứng đầu như CapCut thay vì "Bỏ chọn" nằm cuối
+  const tao = $('#mobTao'), bo = tao && [...tao.children].find(b => /Bỏ chọn/.test(b.textContent));
+  if (bo) { bo.innerHTML = '<i>‹</i><span>Quay lại</span>'; bo.classList.add('quayLai'); tao.prepend(bo); }
+  // nút đóng bảng thuộc tính: ✓ to, rõ
+  const dp = $('#btnDongPhai'); if (dp) { dp.classList.add('xongMobi'); }
+  // vuốt xuống ở đầu bảng để đóng
+  const dongHet = () => { if (ed.classList.contains('sheet')) moSheet(false); if (ed.classList.contains('co-phai')) { ed.classList.remove('co-phai'); veTaoMobi(); } };
+  [$('.ecol.trai .sheetDau'), $('.ecol.phai .etabs')].filter(Boolean).forEach(dau => {
+    let y0 = null;
+    dau.addEventListener('touchstart', e => { y0 = e.touches[0].clientY; }, { passive: true });
+    dau.addEventListener('touchmove', e => { if (y0 != null && e.touches[0].clientY - y0 > 60) { y0 = null; dongHet(); } }, { passive: true });
+    dau.addEventListener('touchend', () => { y0 = null; }, { passive: true });
+  });
+  // nút Back của máy / vuốt lùi: đóng bảng đang mở thay vì rời trang
+  let boQua = false;
+  const coLop = () => laMobi() && ['sheet', 'co-phai', 'coCongCu'].some(c => ed.classList.contains(c));
+  let moTruoc = false;
+  new MutationObserver(() => {
+    const mo = !!coLop(), st = history.state && history.state.dvLop;
+    if (mo !== moTruoc && laMobi() && !P.dang) setTimeout(veKhung, 80);   // khung xem đổi cỡ khi bảng mở / đóng
+    moTruoc = mo;
+    if (mo && !st) history.pushState({ dvLop: 1 }, '');
+    else if (!mo && st) { boQua = true; history.back(); }
+  }).observe(ed, { attributes: true, attributeFilter: ['class'] });
+  addEventListener('popstate', () => {
+    if (boQua) { boQua = false; return; }
+    if (ed.classList.contains('coCongCu')) moCongCu(false); else dongHet();
+  });
 }
 
 /* ===== Bố cục CapCut Web (capcut-clone-spec/SPEC.md): rail 71 + thư viện 327, thanh trên 56 kính mờ, nút Tỉ lệ, bảng thuộc tính nổi, timeline toolbar giữa, Hand (H), zoom khung, ẩn timeline ===== */
