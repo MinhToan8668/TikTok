@@ -190,12 +190,12 @@ khoiTao09();
 
 /* ═════════ ĐỢT 3: keyframe cỡ / màu chữ · đồ thị keyframe dạng làn + đường chuyển động · bản xem nhẹ cho footage nặng ═════════ */
 Object.assign(KF_TEN, { co: 'Cỡ chữ', mau: 'Màu chữ' });
-function hexRgb(h) { h = String(h || '#ffffff').replace('#', ''); if (h.length === 3) h = h.split('').map(c => c + c).join(''); const n = parseInt(h.slice(0, 6), 16) || 0; return [n >> 16 & 255, n >> 8 & 255, n & 255]; }
-function rgbHex(r) { return '#' + r.map(v => Math.round(Math.max(0, Math.min(255, v))).toString(16).padStart(2, '0')).join(''); }
+function hexRgb255(h) { h = String(h || '#ffffff').replace('#', ''); if (h.length === 3) h = h.split('').map(c => c + c).join(''); const n = parseInt(h.slice(0, 6), 16) || 0; return [n >> 16 & 255, n >> 8 & 255, n & 255]; }
+function rgbHex255(r) { return '#' + r.map(v => Math.round(Math.max(0, Math.min(255, v))).toString(16).padStart(2, '0')).join(''); }
 /* màu keyframe: nội suy từng kênh RGB theo đường cong của keyframe sau */
 function mauKf(g, off) {
   const ds = g.kfs.mau; if (off <= ds[0].t) return ds[0].v; const cuoi = ds[ds.length - 1]; if (off >= cuoi.t) return cuoi.v;
-  for (let i = 1; i < ds.length; i++) { const a = ds[i - 1], b = ds[i]; if (off <= b.t) { const p = (off - a.t) / Math.max(1e-4, b.t - a.t), e = (b.bz ? bezierFn(b.bz) : (EASE_KF[b.e] || EASE_KF.mem))(p), A = hexRgb(a.v), B = hexRgb(b.v); return rgbHex(A.map((x, j) => x + (B[j] - x) * e)); } }
+  for (let i = 1; i < ds.length; i++) { const a = ds[i - 1], b = ds[i]; if (off <= b.t) { const p = (off - a.t) / Math.max(1e-4, b.t - a.t), e = (b.bz ? bezierFn(b.bz) : (EASE_KF[b.e] || EASE_KF.mem))(p), A = hexRgb255(a.v), B = hexRgb255(b.v); return rgbHex255(A.map((x, j) => x + (B[j] - x) * e)); } }
   return cuoi.v;
 }
 { const goc = veDoHoa; veDoHoa = function (ctx, W, H, g, t) {
@@ -452,3 +452,226 @@ function khoiTao09c() {
   { const goc = moMenu; moMenu = function (x, y, ds) { if (Array.isArray(ds) && ds.some(o => o && o.t === 'Phím tắt')) { const i = ds.findIndex(o => o && o.t === 'Phím tắt'); ds = [...ds.slice(0, i), { ic: 'target', t: 'Làm mờ / che một vùng', f: () => setTimeout(() => themVungMo('mo'), 30) }, ...ds.slice(i)]; } return goc.call(this, x, y, ds); }; }
 }
 khoiTao09c();
+
+/* ═════════ ĐỢT 5: thư viện kiểu FilmCraft dễ dùng · tick chọn đoạn để áp · chồng nhiều hiệu ứng · tuỳ chỉnh bộ lọc / hiệu ứng · nhạc nền tự tạo ═════════ */
+const HU_TOI_DA = 5;   // số hiệu ứng chồng tối đa trên một đoạn
+/* ảnh mẫu cho ô xem trước khi khung hiện tại trống / một màu: trời, mặt trời, đồi, da người */
+function anhMauDung() {
+  const c = document.createElement('canvas'); c.width = 56; c.height = 56; const g = c.getContext('2d');
+  const tr = g.createLinearGradient(0, 0, 0, 34); tr.addColorStop(0, '#3a7bd5'); tr.addColorStop(1, '#f6c27a'); g.fillStyle = tr; g.fillRect(0, 0, 56, 56);
+  g.fillStyle = '#fff3c4'; g.beginPath(); g.arc(40, 16, 6, 0, 7); g.fill();
+  g.fillStyle = '#2f7d4a'; g.beginPath(); g.moveTo(0, 38); g.quadraticCurveTo(20, 26, 56, 36); g.lineTo(56, 56); g.lineTo(0, 56); g.fill();
+  g.fillStyle = '#d9a37a'; g.beginPath(); g.arc(18, 40, 9, 0, 7); g.fill(); g.fillStyle = '#3b2a20'; g.beginPath(); g.arc(18, 35, 8, Math.PI, 0); g.fill();
+  return g.getImageData(0, 0, 56, 56);
+}
+{ const goc = anhMauKho; anhMauKho = function () { let d = null; try { d = goc.apply(this, arguments); } catch { } if (!d) return anhMauDung(); let mn = 1e9, mx = -1, trong = 0; for (let i = 0; i < d.data.length; i += 16) { const v = d.data[i] + d.data[i + 1] + d.data[i + 2]; if (v < mn) mn = v; if (v > mx) mx = v; if (d.data[i + 3] < 20) trong++; } return mx - mn < 60 || trong > d.data.length / 32 ? anhMauDung() : d; }; }
+
+/* ── tick chọn đoạn để áp (chung cho Hiệu ứng, Bộ lọc, Chuyển cảnh) ── */
+P.tick = []; P.tickTay = false;
+function dsTick() { P.tick = P.tick.filter(c => P.clips.includes(c)); return P.tick; }
+function dongBoTickAp() { const ch = P.chon; if (P.tickTay) return; P.tick = ch && ch.k === 'v' && P.clips[ch.i] ? [P.clips[ch.i]] : []; }
+/* mục sẽ nhận: lớp phủ đang chọn > các đoạn đã tick > (không tick gì) mọi đoạn */
+function dsApDung() { const ch = P.chon; if (ch && ch.k === 'b' && P.broll[ch.i]) return [P.broll[ch.i]]; const t = dsTick(); return t.length ? t : P.clips.slice(); }
+function mucMau() { const ds = dsApDung(); return ds[0] || null; }
+function veThanhTick(hop, loai) {
+  const noi = hop.querySelector(':scope > .noi') || hop; let bar = hop.querySelector('.tickBar'); if (bar && bar.parentNode !== noi) bar.remove(), bar = null; if (!bar) { bar = el('div', 'tickBar'); noi.insertBefore(bar, noi.firstChild); }
+  bar.innerHTML = ''; const ch = P.chon;
+  if (ch && ch.k === 'b' && P.broll[ch.i]) { bar.append(el('span', 'nhan', 'Áp cho: lớp phủ đang chọn')); const bo = el('button', 'chip'); bo.type = 'button'; bo.textContent = 'Chọn đoạn V1'; bo.onclick = () => { P.chon = null; veProp(); capNhatTick(); }; bar.append(bo); return; }
+  if (!P.clips.length) { bar.append(el('span', 'nhan', 'Thêm footage vào dòng thời gian để áp.')); return; }
+  const chon = new Set(dsTick()), n = loai === 'chuyen' ? P.clips.length - 1 : P.clips.length;
+  bar.append(el('span', 'nhan', loai === 'chuyen' ? 'Áp cho điểm cắt:' : 'Áp cho đoạn:'));
+  const tatCa = el('label', 'chip tat' + (chon.size && [...Array(n).keys()].every(i => chon.has(P.clips[i])) ? ' on' : '')), cbT = el('input'); cbT.type = 'checkbox'; cbT.checked = tatCa.classList.contains('on'); tatCa.append(cbT, el('span', null, 'Tất cả'));
+  cbT.onchange = () => { P.tickTay = true; P.tick = cbT.checked ? P.clips.slice(0, n) : []; capNhatTick(); }; bar.append(tatCa);
+  for (let i = 0; i < n; i++) { const c = P.clips[i], l = el('label', 'chip' + (chon.has(c) ? ' on' : '')), cb = el('input'); cb.type = 'checkbox'; cb.checked = chon.has(c); l.title = loai === 'chuyen' ? 'Điểm cắt giữa đoạn ' + (i + 1) + ' và ' + (i + 2) : 'Đoạn ' + (i + 1);
+    l.append(cb, el('span', null, loai === 'chuyen' ? (i + 1) + '→' + (i + 2) : String(i + 1)));
+    cb.onchange = () => { P.tickTay = true; const s = new Set(dsTick()); if (cb.checked) s.add(c); else s.delete(c); P.tick = P.clips.filter(x => s.has(x)); capNhatTick(); }; bar.append(l); }
+  if (!chon.size) bar.append(el('span', 'goi', loai === 'chuyen' ? 'Chưa tick: áp cho mọi điểm cắt' : 'Chưa tick: áp cho mọi đoạn'));
+}
+function capNhatTick() {
+  const h = $('[data-pane="hieu"]'), l = $('[data-pane="loc"]'), c = $('[data-pane="chuyen"]');
+  try { if (h) { veThanhTick(h, 'hieu'); danhDauHu(); veDangApHu(); } if (l) { veThanhTick(l, 'loc'); danhDauLoc(); veTuyLoc(); } if (c) { veThanhTick(c, 'chuyen'); danhDauChuyen(); veTuyChuyen(); } } catch (e) { console.warn('tick', e); }
+}
+
+/* ── chồng hiệu ứng: c.huDs = [{id, muc, toc, p}] ; c.hu2 / c.huMuc / c.huP luôn là phần tử đầu để code cũ (kéo thả, trợ lý, xuất) vẫn đúng ──
+   Hiệu ứng cơ bản (rung, nhịp…) không phải shader: tối đa một cái và luôn đứng đầu. */
+const laHuShader = id => String(id || '').startsWith('kho:'), huDef = id => KHO_OK ? KHO.hieuUng.find(x => 'kho:' + x.id === id) : null;
+function huDsCua(c) { if (Array.isArray(c.huDs) && c.huDs.length) { if (!c.hu2 || c.hu2 === 'khong') return []; if (c.huDs[0].id !== c.hu2) return [{ id: c.hu2, muc: c.huMuc == null ? 1 : c.huMuc, toc: 1, p: c.huP || {} }, ...c.huDs.slice(1).filter(e => e.id !== c.hu2)]; return c.huDs; }   /* hu2 bị đổi ở chỗ khác (ô chọn trong Thuộc tính, trợ lý) thì hu2 làm đầu chồng */ return c.hu2 && c.hu2 !== 'khong' ? [{ id: c.hu2, muc: c.huMuc == null ? 1 : c.huMuc, toc: 1, p: c.huP || {} }] : []; }
+function ganHuDs(c, ds) {
+  ds = ds.slice(0, HU_TOI_DA); const co = ds.findIndex(e => !laHuShader(e.id)); if (co > 0) ds.unshift(ds.splice(co, 1)[0]);
+  if (!ds.length) { ['huDs', 'huMuc', 'huP'].forEach(k => delete c[k]); c.hu2 = 'khong'; return; }
+  c.huDs = ds; c.hu2 = ds[0].id; c.huMuc = ds[0].muc; if (Object.keys(ds[0].p || {}).length) c.huP = ds[0].p; else delete c.huP;
+}
+{ const g0 = laHuKho; laHuKho = function (c) { return g0.apply(this, arguments) || !!(c && Array.isArray(c.huDs) && c.huDs.some(e => laHuShader(e.id))); }; }
+{ const goc = apHuKho; apHuKho = function (c, s, im, off) {
+    if (!c || !Array.isArray(c.huDs) || !c.huDs.length) return goc.apply(this, arguments);
+    let r = [s, im]; huDsCua(c).forEach((e, i) => { if (!laHuShader(e.id)) return; const o = i === 0 ? c : { hu2: e.id, huMuc: e.muc, huP: e.p }; r = goc.call(this, o, r[0], r[1], (off || 0) * (e.toc || 1)); }); return r;
+  }; }
+/* bấm thẻ hiệu ứng: chưa có thì tick thêm vào chồng, có rồi thì bỏ; "Không" xoá hết */
+apHieuUngKho = function (k) {
+  const ds = dsApDung(); if (!ds.length || !ds[0]) { toast('Chưa có đoạn nào'); return; } luuHoanTac();
+  if (k === 'khong') { ds.forEach(c => ganHuDs(c, [])); toast('Đã bỏ mọi hiệu ứng của ' + ds.length + ' đoạn'); }
+  else { const dang = huDsCua(ds[0]).some(e => e.id === k);
+    if (!dang) P.huMo = k; ds.forEach(c => { let cur = huDsCua(c).map(e => ({ ...e })); if (dang) cur = cur.filter(e => e.id !== k); else if (!cur.some(e => e.id === k)) { if (!laHuShader(k)) cur = cur.filter(e => laHuShader(e.id)); cur.push({ id: k, muc: 1, toc: 1, p: {} }); } ganHuDs(c, cur); });
+    const n = huDsCua(ds[0]).length; toast((dang ? 'Bỏ “' : 'Thêm “') + HIEU_UNG[k] + '” · ' + ds.length + ' đoạn' + (n > 1 ? ' · đang chồng ' + n + ' hiệu ứng' : '') + (!dang && n >= HU_TOI_DA ? ' (tối đa ' + HU_TOI_DA + ')' : '')); }
+  veTl(); veKhung(); veProp(); capNhatTick();
+};
+function danhDauHu() { const m = mucMau(), ds = m ? huDsCua(m).map(e => e.id) : []; $$('#huLuoi > button').forEach(b => { const k = b.dataset.k, i = ds.indexOf(k); b.classList.toggle('daTick', i >= 0 || (k === 'khong' && !ds.length)); b.dataset.thuTu = i >= 0 && ds.length > 1 ? String(i + 1) : ''; }); }
+/* bảng "Đang áp": chỉnh cường độ, tốc độ, tham số riêng từng hiệu ứng; đổi thứ tự; bỏ */
+function veDangApHu() {
+  const pane = $('[data-pane="hieu"]'), luoi = $('#huLuoi'); if (!pane || !luoi) return; let h = pane.querySelector('.dangAp'); if (!h) { h = el('div', 'dangAp'); luoi.before(h); }
+  h.innerHTML = ''; const m = mucMau(), ds = m ? huDsCua(m) : []; if (!ds.length) { h.hidden = true; return; } h.hidden = false; const moId = P.huMo === '' ? '' : ds.some(e => e.id === P.huMo) ? P.huMo : ds[ds.length - 1].id;
+  const dau = el('div', 'dau'); dau.append(el('b', null, 'Đang áp (' + ds.length + ')'), el('small', null, 'Hiệu ứng trên áp sau, chồng lên hiệu ứng dưới')); h.append(dau);
+  const ganTat = (id, f) => { luuHoanTac(); dsApDung().forEach(c => { const cur = huDsCua(c).map(e => ({ ...e, p: { ...(e.p || {}) } })); const e = cur.find(x => x.id === id); if (e) { f(e, cur); ganHuDs(c, cur); } }); veKhung(); };
+  ds.forEach((e, i) => {
+    const def = huDef(e.id), the = el('div', 'muc'), hang = el('div', 'hang1'), mo = e.id === moId, ten = el('button', 'ten'); ten.type = 'button'; ten.textContent = (mo ? '▾ ' : '▸ ') + (def ? def.ic + ' ' : '') + (HIEU_UNG[e.id] || e.id); ten.title = mo ? 'Thu gọn' : 'Mở để chỉnh'; ten.onclick = () => { P.huMo = mo ? '' : e.id; veDangApHu(); }; hang.append(ten);
+    const len = el('button', 'nut'); len.type = 'button'; len.textContent = '↑'; len.title = 'Đưa lên trước'; len.disabled = i === 0 || !laHuShader(e.id) || !laHuShader(ds[i - 1].id); len.onclick = () => { ganTat(e.id, (x, cur) => { const j = cur.indexOf(x); if (j > 0) { cur.splice(j, 1); cur.splice(j - 1, 0, x); } }); capNhatTick(); };
+    const bo = el('button', 'nut'); bo.type = 'button'; bo.textContent = '✕'; bo.title = 'Bỏ hiệu ứng này'; bo.onclick = () => apHieuUngKho(e.id); hang.append(len, bo); the.append(hang); if (!mo) { h.append(the); return; }
+    const truot = (nhan, min, max, buoc, gt, dv, f) => { const l = el('label', 'tr'); l.append(el('span', null, nhan)); const r = el('input'); r.type = 'range'; r.min = min; r.max = max; r.step = buoc; r.value = gt; const o = el('output'), viet = () => { o.textContent = dv === '%' ? Math.round(+r.value * 100) + '%' : dv === 'x' ? (+r.value).toFixed(2).replace('.', ',') + '×' : Math.round(+r.value * 100) / 100 + (dv || ''); }; viet(); let luu = false;
+      r.oninput = () => { if (!luu) { luuHoanTac(); luu = true; } viet(); dsApDung().forEach(c => { const cur = huDsCua(c).map(z => ({ ...z, p: { ...(z.p || {}) } })); const z = cur.find(q => q.id === e.id); if (z) { f(z, +r.value); ganHuDs(c, cur); } }); veKhung(); }; r.onchange = () => { luu = false; veTl(); };
+      l.append(r, o); the.append(l); };
+    truot('Cường độ', 0, 1.5, 0.01, e.muc == null ? 1 : e.muc, '%', (z, v) => { z.muc = v; });
+    if (laHuShader(e.id)) truot('Tốc độ', 0.25, 3, 0.05, e.toc || 1, 'x', (z, v) => { z.toc = v; });
+    (def && def.ts || []).forEach(([k, nhan, min, max, buoc, md, dv]) => truot(nhan, min, max, buoc, (e.p || {})[k] != null ? e.p[k] : md, dv === '%' ? '%' : dv, (z, v) => { z.p = { ...(z.p || {}), [k]: v }; }));
+    h.append(the);
+  });
+}
+
+/* ── bộ lọc: tick chọn đoạn + tuỳ chỉnh từng thông số (sinh LUT riêng 'tuy:<gốc>:<json>') ── */
+const TUY_LOC = [['sang', 'Độ sáng', -0.3, 0.3, 0.01], ['tp', 'Tương phản', -0.5, 0.6, 0.01], ['nhiet', 'Nhiệt độ', -1, 1, 0.02], ['tint', 'Sắc xanh ↔ hồng', -1, 1, 0.02], ['bh', 'Bão hoà', -1, 1, 0.02], ['vib', 'Độ rực', -0.5, 1, 0.02], ['phai', 'Phai', 0, 0.4, 0.01], ['mono', 'Đen trắng', 0, 1, 0.02]];
+function locGoc(c) { const l = String(c.lut || ''); if (l.startsWith('tuy:')) return l.split(':')[1] || ''; return l.startsWith('kho:') ? l.slice(4) : ''; }
+function thamSoTuy(goc, d) { const b = goc && KHO_OK ? (KHO.boLoc.find(x => x.id === goc) || {}).p || {} : {}, p = JSON.parse(JSON.stringify(b));
+  Object.keys(d || {}).forEach(k => { const v = +d[k]; if (!v) return; if (k === 'bh') p.bh = (p.bh == null ? 1 : p.bh) * (1 + v); else p[k] = (p[k] || 0) + v; }); return p; }
+function dangKyLutTuy(id) { if (P.luts[id]) return P.luts[id]; const m = /^tuy:([^:]*):(.*)$/.exec(id); if (!m) return null; let d = {}; try { d = JSON.parse(m[2]); } catch { return null; } const ten = m[1] ? ((KHO.boLoc.find(x => x.id === m[1]) || {}).ten || m[1]) : 'Chỉnh tay';
+  const lut = taoLutKho({ id: 'tuy', ten, p: thamSoTuy(m[1], d) }); lut.id = id; lut.ten = ten + ' (tuỳ chỉnh)'; return (P.luts[id] = lut); }
+{ const g1 = chinhMau; chinhMau = function (c) { if (c && typeof c.lut === 'string' && c.lut.startsWith('tuy:') && !P.luts[c.lut]) dangKyLutTuy(c.lut); return g1.apply(this, arguments); };
+  const g2 = coChinhMau; coChinhMau = function (c) { if (c && typeof c.lut === 'string' && c.lut.startsWith('tuy:') && !P.luts[c.lut]) dangKyLutTuy(c.lut); return g2.apply(this, arguments); }; }
+function donLutTuy() { const dung = new Set([...P.clips, ...P.broll].map(c => c.lut)); Object.keys(P.luts || {}).forEach(id => { if (id.startsWith('tuy:') && !dung.has(id)) { delete P.luts[id]; if (typeof MAU_GL === 'object' && MAU_GL.luts && MAU_GL.luts[id]) { try { MAU_GL.gl && MAU_GL.gl.deleteTexture(MAU_GL.luts[id]); } catch { } delete MAU_GL.luts[id]; } } }); }
+function apLutTuy(c) { const goc = c.locGoc != null ? c.locGoc : locGoc(c), d = c.locTuy || {}, co = Object.keys(d).some(k => +d[k]); if (!co) { if (goc) { dangKyLutKho(goc); c.lut = 'kho:' + goc; } else delete c.lut; return; } const sach = {}; Object.keys(d).sort().forEach(k => { if (+d[k]) sach[k] = +(+d[k]).toFixed(3); }); const id = 'tuy:' + goc + ':' + JSON.stringify(sach); dangKyLutTuy(id); c.lut = id; }
+apLutChon = function (id) {
+  const ds = dsApDung(); if (!ds.length) { toast('Chưa có đoạn nào'); return; } luuHoanTac(); const mu = $('#locMucChung') ? +$('#locMucChung').value : 1;
+  ds.forEach(c => { if (id) { c.lut = id; if (c.lutMuc == null) c.lutMuc = mu; c.locGoc = String(id).startsWith('kho:') ? id.slice(4) : ''; if (c.locTuy && Object.keys(c.locTuy).length && String(id).startsWith('kho:')) apLutTuy(c); } else { delete c.lut; delete c.locGoc; delete c.locTuy; } });
+  donLutTuy(); veTl(); veKhung(); veProp(); capNhatTick(); toast(id ? 'Áp “' + ((P.luts[id] || {}).ten || id) + '” cho ' + ds.length + (P.chon && P.chon.k === 'b' ? ' lớp phủ' : ' đoạn') : 'Bỏ bộ lọc');
+};
+function danhDauLoc() { const m = mucMau(), g = m ? locGoc(m) : ''; $$('#khoLocLuoi > button').forEach(b => b.classList.toggle('daTick', !!g && b.dataset.kho === g)); $$('#locLuoi > button, #lutLuoi > button').forEach(b => b.classList.toggle('daTick', !!m && !!m.lut && (b.dataset.id === m.lut || b.dataset.k === m.lut))); }
+function veTuyLoc() {
+  const pane = $('[data-pane="loc"]'); if (!pane) return; let h = pane.querySelector('.tuyLoc'); const neo = $('#khoLocLuoi') || $('#locLuoi'); if (!h) { h = el('div', 'dangAp tuyLoc'); if (neo) neo.before(h); else pane.append(h); }
+  h.innerHTML = ''; const m = mucMau(); if (!m || !m.lut) { h.hidden = true; return; } h.hidden = false;
+  const goc = locGoc(m), ten = goc ? ((KHO.boLoc.find(x => x.id === goc) || {}).ten || goc) : ((P.luts[m.lut] || {}).ten || 'LUT');
+  const dau = el('div', 'dau'); dau.append(el('b', null, 'Đang áp: ' + ten)); const bo = el('button', 'nut'); bo.type = 'button'; bo.textContent = 'Bỏ'; bo.onclick = () => apLutChon(''); dau.append(bo); h.append(dau);
+  const ds = () => dsApDung().filter(c => c.lut);
+  const truot = (nhan, min, max, buoc, gt, viet, f) => { const l = el('label', 'tr'); l.append(el('span', null, nhan)); const r = el('input'); r.type = 'range'; r.min = min; r.max = max; r.step = buoc; r.value = gt; const o = el('output'); o.textContent = viet(+r.value); let luu = false;
+    r.oninput = () => { if (!luu) { luuHoanTac(); luu = true; } o.textContent = viet(+r.value); ds().forEach(c => f(c, +r.value)); veKhung(); }; r.onchange = () => { luu = false; donLutTuy(); veTl(); }; l.append(r, o); h.append(l); };
+  truot('Cường độ', 0, 1, 0.01, m.lutMuc == null ? 1 : m.lutMuc, v => Math.round(v * 100) + '%', (c, v) => { c.lutMuc = v; });
+  if (String(m.lut).startsWith('kho:') || String(m.lut).startsWith('tuy:')) {
+    h.append(el('small', 'ghiTuy', 'Tuỳ chỉnh thêm trên nền bộ lọc này:'));
+    TUY_LOC.forEach(([k, nhan, min, max, buoc]) => truot(nhan, min, max, buoc, (m.locTuy || {})[k] || 0, v => (v > 0 ? '+' : '') + Math.round(v * 100), (c, v) => { c.locTuy = { ...(c.locTuy || {}), [k]: v }; if (!v) delete c.locTuy[k]; if (c.locGoc == null) c.locGoc = locGoc(c); apLutTuy(c); }));
+    const dl = el('button', 'nut rong'); dl.type = 'button'; dl.textContent = 'Đặt lại tuỳ chỉnh'; dl.onclick = () => { luuHoanTac(); ds().forEach(c => { delete c.locTuy; apLutTuy(c); }); donLutTuy(); veKhung(); capNhatTick(); }; h.append(dl);
+  }
+}
+
+/* ── chuyển cảnh: áp cho các điểm cắt đã tick, ngẫu nhiên, thời lượng ── */
+datChuyen = function (k) {
+  if (P.clips.length < 2) { toast('Cần ít nhất 2 đoạn trên V1'); return; }
+  let ds = dsTick().filter(c => P.clips.indexOf(c) < P.clips.length - 1);
+  if (!ds.length) { let i = P.chon && P.chon.k === 'v' ? P.chon.i : -1; if (i < 0 || i >= P.clips.length - 1) { let acc = 0, gan = 1e9; P.clips.forEach((c, j) => { acc += daiC(c); if (j < P.clips.length - 1 && Math.abs(acc - P.t) < gan) { gan = Math.abs(acc - P.t); i = j; } }); } ds = [P.clips[i]]; }
+  luuHoanTac(); const dai = +$('#chuyenDai').value; ds.forEach(c => { if (k === 'cat') { delete c.chuyen; delete c.chuyen_dai; } else { c.chuyen = k; c.chuyen_dai = dai; } }); if (k !== 'cat') gltNap(); veTl(); veKhung(); capNhatTick();
+  toast((k === 'cat' ? 'Bỏ chuyển cảnh ở ' : 'Chuyển cảnh “' + CHUYEN_TEN[k] + '” cho ') + ds.length + ' điểm cắt');
+};
+function danhDauChuyen() { const t = dsTick(), m = t.find(c => P.clips.indexOf(c) < P.clips.length - 1) || (P.chon && P.chon.k === 'v' ? P.clips[P.chon.i] : null), k = m ? (m.chuyen || 'cat') : null; $$('#chuyenLuoi > button').forEach(b => { b.classList.toggle('daTick', b.dataset.k === k); b.setAttribute('aria-pressed', String(b.dataset.k === k)); }); }
+function veTuyChuyen() {
+  const pane = $('[data-pane="chuyen"]'), luoi = $('#chuyenLuoi'); if (!pane || !luoi) return; let h = pane.querySelector('.tuyChuyen'); if (!h) { h = el('div', 'dangAp tuyChuyen'); luoi.before(h); } h.innerHTML = '';
+  const r = el('div', 'hang1'); const ng = el('button', 'nut rong'); ng.type = 'button'; ng.textContent = '🎲 Ngẫu nhiên cho điểm cắt đã tick'; ng.title = 'Mỗi điểm cắt một chuyển cảnh khác nhau';
+  ng.onclick = () => { let ds = dsTick().filter(c => P.clips.indexOf(c) < P.clips.length - 1); if (!ds.length) ds = P.clips.slice(0, -1); if (!ds.length) { toast('Cần ít nhất 2 đoạn'); return; } const ten = Object.keys(CHUYEN_TEN).filter(k => k !== 'cat'); luuHoanTac(); let truoc = ''; ds.forEach(c => { let k; do { k = ten[Math.floor(Math.random() * ten.length)]; } while (k === truoc && ten.length > 1); truoc = k; c.chuyen = k; c.chuyen_dai = +$('#chuyenDai').value; }); gltNap(); veTl(); veKhung(); capNhatTick(); toast('Đã đặt ngẫu nhiên cho ' + ds.length + ' điểm cắt'); };
+  const bo = el('button', 'nut'); bo.type = 'button'; bo.textContent = 'Bỏ hết'; bo.onclick = () => datChuyen('cat'); r.append(ng, bo); h.append(r);
+}
+/* ô xem trước chuyển cảnh: vẽ khung giữa chừng (A → B) bằng chính shader */
+function anhAB(chu, m1, m2) { const c = document.createElement('canvas'); c.width = 64; c.height = 64; const g = c.getContext('2d'); const gr = g.createLinearGradient(0, 0, 64, 64); gr.addColorStop(0, m1); gr.addColorStop(1, m2); g.fillStyle = gr; g.fillRect(0, 0, 64, 64); g.fillStyle = 'rgba(255,255,255,.92)'; g.font = '800 34px Inter,system-ui,sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(chu, 32, 34); return c; }
+let anhChuyen = null;
+function veAnhChuyen() {
+  const luoi = $('#chuyenLuoi'); if (!luoi || !GLT.json) return; anhChuyen = anhChuyen || [anhAB('A', '#ff7a59', '#ffcc4d'), anhAB('B', '#3b82f6', '#22d3df')];
+  $$('#chuyenLuoi > button').forEach(b => { const k = b.dataset.k, the = b.querySelector('.the'); if (!the || the.dataset.anh || !GLT_MAP[k]) return; try { const cv2 = gltVe(k, anhChuyen[0], anhChuyen[1], 0.5, 64, 64); if (!cv2) return; const o = document.createElement('canvas'); o.width = 64; o.height = 64; o.getContext('2d').drawImage(cv2, 0, 0); o.className = 'anhCC'; the.dataset.anh = 1; the.innerHTML = ''; the.append(o); } catch { } });
+}
+function danhDauMoi() { const moi = new Set(KHO_OK ? [...KHO.chuyenCanh.filter(x => x.fc).map(x => x.id), ...KHO.hieuUng.filter(x => x.fc).map(x => 'kho:' + x.id)] : []), moiLoc = new Set(KHO_OK ? KHO.boLoc.filter(x => x.fc).map(x => x.id) : []);
+  $$('#chuyenLuoi > button, #huLuoi > button').forEach(b => b.classList.toggle('moi', moi.has(b.dataset.k))); $$('#khoLocLuoi > button').forEach(b => b.classList.toggle('moi', moiLoc.has(b.dataset.kho))); }
+
+/* ── nhạc nền tự tạo: tổng hợp ngay trên máy (hợp âm, bass, trống, giai điệu), không bản quyền ── */
+const NHAC_TU = {
+  vui: { ten: 'Vui tươi', bpm: 118, khoa: 0, thu: 'truong', vong: [0, 5, 3, 4], trong: 'pop', giai: 'pluck' },
+  chill: { ten: 'Chill lofi', bpm: 80, khoa: 5, thu: 'truong', vong: [0, 5, 1, 4], trong: 'lofi', giai: 'ep', bay: 1 },
+  dien_anh: { ten: 'Điện ảnh', bpm: 70, khoa: 2, thu: 'thu', vong: [0, 5, 2, 6], trong: 'dien_anh', giai: 'pad' },
+  nang_dong: { ten: 'Năng động', bpm: 126, khoa: 9, thu: 'thu', vong: [0, 5, 2, 6], trong: 'edm', giai: 'arp' },
+  hoi_hop: { ten: 'Hồi hộp', bpm: 92, khoa: 4, thu: 'thu', vong: [0, 0, 5, 4], trong: 'hoi_hop', giai: 'ost' },
+  doanh_nghiep: { ten: 'Doanh nghiệp', bpm: 104, khoa: 7, thu: 'truong', vong: [0, 4, 5, 3], trong: 'clap', giai: 'marimba' },
+  hiphop: { ten: 'Hip-hop', bpm: 88, khoa: 1, thu: 'thu', vong: [0, 5, 3, 4], trong: 'boombap', giai: 'ep' }
+};
+const THANG = { truong: [0, 2, 4, 5, 7, 9, 11], thu: [0, 2, 3, 5, 7, 8, 10] };
+function soNgau(h) { let x = h >>> 0 || 1; return () => { x ^= x << 13; x ^= x >>> 17; x ^= x << 5; return ((x >>> 0) % 100000) / 100000; }; }
+async function taoNhacTu(kieu, giay, giong) {
+  const m = NHAC_TU[kieu] || NHAC_TU.vui, sr = 44100, o = new OfflineAudioContext(2, Math.ceil(sr * giay), sr), rnd = soNgau(giong || 7), nhip = 60 / m.bpm, o4 = nhip * 4, soO = Math.ceil(giay / o4);
+  const nen = o.createDynamicsCompressor(); nen.threshold.value = -16; nen.ratio.value = 3; nen.attack.value = 0.01; nen.release.value = 0.2; const tong = o.createGain(); tong.gain.setValueAtTime(0, 0); tong.gain.linearRampToValueAtTime(0.9, 0.8); tong.gain.setValueAtTime(0.9, Math.max(1, giay - 2.5)); tong.gain.linearRampToValueAtTime(0, giay); nen.connect(tong); tong.connect(o.destination);
+  const bus = o.createGain(); bus.connect(nen); const tre = o.createDelay(1); tre.delayTime.value = nhip * 0.75; const hoi = o.createGain(); hoi.gain.value = 0.22; const vang = o.createGain(); vang.gain.value = 0.18; bus.connect(tre); tre.connect(hoi); hoi.connect(tre); hoi.connect(vang); vang.connect(nen);
+  const nb = o.createBuffer(1, sr, sr), nd = nb.getChannelData(0); for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
+  const hz = n => 440 * Math.pow(2, (n - 69) / 12), tl = THANG[m.thu], goc = 48 + m.khoa;
+  const not = (bac, qd) => { const b = ((bac % 7) + 7) % 7; return goc + tl[b] + 12 * Math.floor(bac / 7) + 12 * (qd || 0); };
+  const env = (g, t, a, d, dinh) => { g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(dinh, t + a); g.gain.exponentialRampToValueAtTime(0.0001, t + a + d); };
+  const ton = (f, t, dai, kieuSong, dinh, a, loc, ra) => { if (t >= giay) return; const s = o.createOscillator(); s.type = kieuSong; s.frequency.value = f; const g = o.createGain(); env(g, t, a || 0.005, dai, dinh); let cuoi = s; if (loc) { const fl = o.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = loc; s.connect(fl); cuoi = fl; } cuoi.connect(g); g.connect(ra || bus); s.start(t); s.stop(Math.min(giay, t + (a || 0.005) + dai + 0.05)); };
+  const on = (t, dai, kieuLoc, f, q, dinh, ra) => { if (t >= giay) return; const s = o.createBufferSource(); s.buffer = nb; const fl = o.createBiquadFilter(); fl.type = kieuLoc; fl.frequency.value = f; fl.Q.value = q || 1; const g = o.createGain(); env(g, t, 0.002, dai, dinh); s.connect(fl); fl.connect(g); g.connect(ra || nen); s.start(t, rnd() * 0.5); s.stop(Math.min(giay, t + dai + 0.05)); };
+  const kick = (t, dinh) => { if (t >= giay) return; const s = o.createOscillator(); s.frequency.setValueAtTime(150, t); s.frequency.exponentialRampToValueAtTime(42, t + 0.12); const g = o.createGain(); env(g, t, 0.002, 0.32, dinh || 0.9); s.connect(g); g.connect(nen); s.start(t); s.stop(Math.min(giay, t + 0.4)); };
+  const snare = (t, dinh) => { on(t, 0.16, 'bandpass', 1800, 0.8, (dinh || 0.5)); ton(185, t, 0.08, 'triangle', 0.25 * (dinh || 0.5) / 0.5, 0.002, 0, nen); };
+  const hat = (t, mo, dinh) => on(t, mo ? 0.22 : 0.04, 'highpass', 7500, 0.7, dinh || 0.18);
+  const clap = t => { [0, 0.012, 0.025].forEach(d => on(t + d, 0.09, 'bandpass', 1300, 1.2, 0.35)); };
+  const giaiNhip = Array.from({ length: 8 }, () => rnd());
+  for (let b = 0; b < soO; b++) {
+    const t0 = b * o4, bac = m.vong[b % m.vong.length], dau = b < 2, cuoi = b >= soO - 1, ch = [bac, bac + 2, bac + 4, bac + 6];
+    // hợp âm (pad): hai lớp sóng răng cưa lệch nhẹ qua lọc thấp
+    ch.slice(0, m.giai === 'pad' || m.trong === 'lofi' || m.giai === 'ep' ? 4 : 3).forEach(n => [-4, 4].forEach(lech => { const s = o.createOscillator(); s.type = m.giai === 'ep' ? 'sine' : 'sawtooth'; s.frequency.value = hz(not(n, 1)); s.detune.value = lech; const fl = o.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = m.giai === 'pad' ? 900 : 1500; const g = o.createGain(); const dinh = m.giai === 'ep' ? 0.05 : 0.035; g.gain.setValueAtTime(0.0001, t0); g.gain.linearRampToValueAtTime(dinh, t0 + (m.giai === 'pad' ? 0.8 : 0.08)); g.gain.setValueAtTime(dinh, t0 + o4 - 0.15); g.gain.linearRampToValueAtTime(0.0001, t0 + o4 + 0.25);
+      if (m.trong === 'edm') for (let q = 0; q < 4; q++) { const tq = t0 + q * nhip; g.gain.setValueAtTime(dinh * 0.25, tq); g.gain.linearRampToValueAtTime(dinh, tq + nhip * 0.6); }
+      s.connect(fl); fl.connect(g); g.connect(bus); s.start(t0); s.stop(Math.min(giay, t0 + o4 + 0.3)); }));
+    // bass
+    if (!dau || m.trong === 'dien_anh') { const nb2 = hz(not(bac, -1)); if (m.trong === 'edm') for (let q = 0; q < 8; q++) ton(nb2, t0 + q * nhip / 2 + nhip / 4, nhip * 0.35, 'sawtooth', 0.16, 0.005, 400, nen); else if (m.giai === 'ost') for (let q = 0; q < 16; q++) ton(nb2 * (q % 4 === 3 ? 1.5 : 1), t0 + q * nhip / 4, nhip * 0.2, 'sawtooth', 0.12, 0.003, 700, nen); else [0, 2].concat(m.trong === 'pop' || m.trong === 'clap' ? [2.5, 3] : m.trong === 'boombap' ? [1.5] : []).forEach(q => ton(nb2, t0 + q * nhip, nhip * (m.trong === 'dien_anh' ? 3.5 : 0.9), m.trong === 'dien_anh' ? 'sine' : 'triangle', 0.32, 0.01, 0, nen)); }
+    // trống
+    if (!dau && !cuoi) for (let q = 0; q < 4; q++) { const tq = t0 + q * nhip, lech = m.bay ? nhip * 0.08 : 0;
+      if (m.trong === 'edm') { kick(tq); hat(tq + nhip / 2, true, 0.12); if (q % 2) clap(tq); }
+      else if (m.trong === 'pop') { if (q % 2 === 0) kick(tq); else snare(tq); hat(tq, false); hat(tq + nhip / 2, false, 0.12); }
+      else if (m.trong === 'lofi') { if (q === 0 || (q === 2 && rnd() < 0.7)) kick(tq, 0.7); if (q % 2) snare(tq, 0.35); hat(tq, false, 0.1); hat(tq + nhip / 2 + lech, false, 0.07); }
+      else if (m.trong === 'boombap') { if (q === 0 || q === 2) kick(tq); if (q === 2) kick(tq + nhip * 0.75, 0.6); if (q % 2) snare(tq, 0.6); hat(tq, false, 0.12); hat(tq + nhip / 2 + nhip * 0.06, false, 0.08); }
+      else if (m.trong === 'clap') { if (q % 2 === 0) kick(tq, 0.7); else clap(tq); hat(tq + nhip / 2, false, 0.1); }
+      else if (m.trong === 'hoi_hop') { if (q === 0 || q === 1) kick(tq + (q ? 0.18 : 0), 0.75); hat(tq + nhip / 2, false, 0.06); }
+      else if (m.trong === 'dien_anh' && q === 0 && b % 2 === 0) { kick(tq, 1); on(tq, 1.2, 'lowpass', 300, 0.7, 0.35); } }
+    // giai điệu / rải hợp âm
+    if (!dau && !cuoi) { const buoc = m.giai === 'arp' ? 8 : m.giai === 'pad' || m.giai === 'ost' ? 0 : 8;
+      for (let q = 0; q < buoc; q++) { if (m.giai !== 'arp' && giaiNhip[q] < 0.45) continue; const n = m.giai === 'arp' ? ch[[0, 1, 2, 1, 3, 2, 1, 2][q]] : ch[Math.floor(giaiNhip[(q + b) % 8] * 3)] + (q % 4 === 0 ? 7 : 0); const tq = t0 + q * nhip / 2;
+        if (m.giai === 'marimba') ton(hz(not(n, 2)), tq, 0.25, 'sine', 0.14, 0.002, 0, bus); else if (m.giai === 'ep') ton(hz(not(n, 2)), tq, 0.6, 'triangle', 0.08, 0.01, 2200, bus); else ton(hz(not(n, 2)), tq, m.giai === 'arp' ? 0.16 : 0.3, m.giai === 'arp' ? 'sawtooth' : 'triangle', m.giai === 'arp' ? 0.07 : 0.12, 0.003, m.giai === 'arp' ? 2600 : 3200, bus); } }
+    if (m.trong === 'lofi' || m.bay) on(t0, o4, 'highpass', 4000, 0.5, 0.012);   // tiếng xè đĩa than nhẹ
+  }
+  return o.startRendering();
+}
+let nhacThu = null;
+function veNhacTu() {
+  const pane = $('[data-pane="am"]'); if (!pane || pane.querySelector('.nhacTu')) return; const h3 = [...pane.querySelectorAll('h3.pt')].find(x => x.textContent.trim() === 'Nhạc nền'); if (!h3) return;
+  const box = el('section', 'nhacTu'); box.append(el('h3', 'pt', 'Nhạc tự tạo (không bản quyền)'), el('div', 'quota', 'Máy tự soạn nhạc nền theo không khí bạn chọn. Không cần mạng, đăng TikTok không lo bản quyền. Bấm “Bài khác” để nghe phiên bản mới.'));
+  const chip = el('div', 'chipNhac'); let kieu = 'vui', hat = 1 + Math.floor(Math.random() * 1e6), buf = null;
+  Object.entries(NHAC_TU).forEach(([k, m]) => { const b = el('button', 'chip' + (k === kieu ? ' on' : '')); b.type = 'button'; b.textContent = m.ten; b.onclick = () => { kieu = k; buf = null; dungThu(); chip.querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x === b)); }; chip.append(b); }); box.append(chip);
+  const l = el('label'); l.append(el('span', null, 'Độ dài')); const sl = el('select'); [['auto', 'Bằng video'], ['15', '15 giây'], ['30', '30 giây'], ['60', '60 giây'], ['90', '90 giây']].forEach(([v, t]) => { const op = el('option', null, t); op.value = v; sl.append(op); }); sl.onchange = () => { buf = null; dungThu(); }; l.append(sl); box.append(l);
+  const r = el('div', 'row'), nghe = el('button', 'btn nho', '▶ Nghe thử'), khac = el('button', 'btn nho ghost', '🎲 Bài khác'), dat = el('button', 'btn nho xanh', 'Đặt làm nhạc nền'), tt = el('div', 'quota'); [nghe, khac, dat].forEach(b => { b.type = 'button'; r.append(b); }); box.append(r, tt);
+  const dai = () => sl.value === 'auto' ? Math.max(10, Math.min(180, Math.ceil(tongGiay() || 30))) : +sl.value;
+  const tao = async () => { if (buf && buf._k === kieu + ':' + hat + ':' + dai()) return buf; tt.textContent = 'Đang soạn nhạc…'; const t0 = performance.now(); buf = await taoNhacTu(kieu, dai(), hat); buf._k = kieu + ':' + hat + ':' + dai(); tt.textContent = NHAC_TU[kieu].ten + ' · ' + NHAC_TU[kieu].bpm + ' BPM · ' + Math.round(dai()) + ' giây (soạn trong ' + ((performance.now() - t0) / 1000).toFixed(1).replace('.', ',') + 's)'; return buf; };
+  function dungThu() { if (nhacThu) { try { nhacThu.stop(); } catch { } nhacThu = null; } nghe.textContent = '▶ Nghe thử'; }
+  nghe.onclick = async () => { if (nhacThu) { dungThu(); return; } nghe.disabled = true; try { const b = await tao(); moAm(); await ac.resume(); const s = ac.createBufferSource(); s.buffer = b; s.connect(ac.destination); s.onended = () => { if (nhacThu === s) dungThu(); }; s.start(); nhacThu = s; nghe.textContent = '■ Dừng'; } catch (e) { tt.textContent = 'Không soạn được: ' + (e.message || e); } nghe.disabled = false; };
+  khac.onclick = () => { hat = 1 + Math.floor(Math.random() * 1e6); buf = null; const dang = !!nhacThu; dungThu(); if (dang) nghe.onclick(); else tt.textContent = 'Đã đổi bài, bấm Nghe thử'; };
+  dat.onclick = async () => { dat.disabled = true; try { const b = await tao(); dungThu(); const f = new File([wavTuBuf(b)], 'nhac-' + kieu + '-' + hat + '.wav', { type: 'audio/wav' }); const inp = $('#nhacIn'), dt = new DataTransfer(); dt.items.add(f); inp.files = dt.files; inp.dispatchEvent(new Event('change')); toast('Đã đặt nhạc “' + NHAC_TU[kieu].ten + '” làm nhạc nền'); } catch (e) { toast('Không đặt được nhạc: ' + (e.message || e)); } dat.disabled = false; };
+  h3.before(box);
+}
+
+function khoiTao09d() {
+  ['loc'].forEach(() => { const l = $('#locTatCa'); if (l && l.closest('label')) l.closest('label').hidden = true; });   // thay bằng thanh tick chọn đoạn
+  const q = $('[data-pane="chuyen"] .quota'); if (q) q.textContent = 'Tick các điểm cắt cần áp rồi bấm một chuyển cảnh. Không tick: áp ở điểm cắt đang chọn / gần đầu phát.';
+  // lưới vẽ lại (đổi nhóm, tìm, mở tab) thì gắn lại dấu tick, nhãn Mới, ảnh chuyển cảnh
+  const theo = (sel, f) => { const n = $(sel); if (!n) return; let cho = 0; new MutationObserver(() => { if (cho) return; cho = requestAnimationFrame(() => { cho = 0; try { f(); } catch (e) { console.warn(e); } }); }).observe(n, { childList: true }); };
+  theo('#huLuoi', () => { danhDauHu(); danhDauMoi(); }); theo('#khoLocLuoi', () => { danhDauLoc(); danhDauMoi(); }); theo('#chuyenLuoi', () => { danhDauChuyen(); danhDauMoi(); gltNap().then(veAnhChuyen); });
+  { const goc = veProp; veProp = function () { const r = goc.apply(this, arguments); const ch = P.chon, kh = ch ? ch.k + ':' + ch.i : ''; if (kh !== P._tickChon) { P._tickChon = kh; if (ch && ch.k === 'v') P.tickTay = false; dongBoTickAp(); } capNhatTick(); return r; }; }
+  { const goc = veTl; let cho = 0; veTl = function () { const r = goc.apply(this, arguments); if (!cho) cho = requestAnimationFrame(() => { cho = 0; capNhatTick(); }); return r; }; }
+  $$('.etabs button[data-tab]').forEach(b => { if (['hieu', 'loc', 'chuyen'].includes(b.dataset.tab)) b.addEventListener('click', () => setTimeout(() => { capNhatTick(); danhDauMoi(); if (b.dataset.tab === 'chuyen') gltNap().then(veAnhChuyen); }, 30)); });
+  veNhacTu(); danhDauMoi(); capNhatTick(); gltNap().then(veAnhChuyen);
+}
+khoiTao09d();

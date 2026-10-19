@@ -336,7 +336,7 @@ function huGL() {
   HU_GL.tex = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, HU_GL.tex); [gl.TEXTURE_WRAP_S, gl.TEXTURE_WRAP_T].forEach(p => gl.texParameteri(gl.TEXTURE_2D, p, gl.CLAMP_TO_EDGE)); [gl.TEXTURE_MIN_FILTER, gl.TEXTURE_MAG_FILTER].forEach(p => gl.texParameteri(gl.TEXTURE_2D, p, gl.LINEAR)); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
   return gl;
 }
-const HU_DAU = 'precision mediump float;varying vec2 uv;uniform sampler2D s;uniform float t,muc;uniform vec2 res;const float PI=3.14159265;float rnd(vec2 p){return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453);}float nse(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(rnd(i),rnd(i+vec2(1.,0.)),f.x),mix(rnd(i+vec2(0.,1.)),rnd(i+vec2(1.,1.)),f.x),f.y);}vec4 tx(vec2 p){return texture2D(s,clamp(p,0.,1.));}';
+const HU_DAU = 'precision mediump float;varying vec2 uv;uniform sampler2D s;uniform float t,muc,p1,p2,p3;uniform vec2 res;const float PI=3.14159265;float rnd(vec2 p){return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453);}float nse(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(rnd(i),rnd(i+vec2(1.,0.)),f.x),mix(rnd(i+vec2(0.,1.)),rnd(i+vec2(1.,1.)),f.x),f.y);}vec4 tx(vec2 p){return texture2D(s,clamp(p,0.,1.));}';
 function huProg(id) {
   if (id in HU_GL.prog) return HU_GL.prog[id]; const h = KHO_OK && KHO.hieuUng.find(x => x.id === id); const gl = huGL(); if (!h || !gl) return (HU_GL.prog[id] = null);
   const vs = gl.createShader(gl.VERTEX_SHADER); gl.shaderSource(vs, 'attribute vec2 p;varying vec2 uv;void main(){uv=(p+1.)/2.;gl_Position=vec4(p,0.,1.);}'); gl.compileShader(vs);
@@ -349,7 +349,7 @@ function apHuKho(c, s, im, off) {
   const k = Math.min(1, canhXuLy(1280) / Math.max(s.w, s.h)), w = Math.round(s.w * k), h = Math.round(s.h * k); if (HU_GL.cv.width !== w || HU_GL.cv.height !== h) { HU_GL.cv.width = w; HU_GL.cv.height = h; gl.viewport(0, 0, w, h); }
   gl.useProgram(pr); gl.bindBuffer(gl.ARRAY_BUFFER, HU_GL.buf); const loc = gl.getAttribLocation(pr, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
   gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, HU_GL.tex); try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, im); } catch { return [s, im]; }
-  gl.uniform1i(gl.getUniformLocation(pr, 's'), 0); gl.uniform1f(gl.getUniformLocation(pr, 't'), off || 0); gl.uniform1f(gl.getUniformLocation(pr, 'muc'), c.huMuc == null ? 1 : +c.huMuc); gl.uniform2f(gl.getUniformLocation(pr, 'res'), w, h);
+  gl.uniform1i(gl.getUniformLocation(pr, 's'), 0); gl.uniform1f(gl.getUniformLocation(pr, 't'), off || 0); gl.uniform1f(gl.getUniformLocation(pr, 'muc'), c.huMuc == null ? 1 : +c.huMuc); gl.uniform2f(gl.getUniformLocation(pr, 'res'), w, h); { const def = KHO_OK && KHO.hieuUng.find(x => x.id === id), tp = c.huP || {}; ['p1', 'p2', 'p3'].forEach(k => { const d = def && def.ts && def.ts.find(z => z[0] === k); gl.uniform1f(gl.getUniformLocation(pr, k), tp[k] != null ? +tp[k] : d ? d[5] : 0); }); }   /* tham số riêng của hiệu ứng (kho-filmcraft) */
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); if (huCv.width !== w || huCv.height !== h) { huCv.width = w; huCv.height = h; } const g = huCv.getContext('2d'); g.clearRect(0, 0, w, h); g.drawImage(HU_GL.cv, 0, 0);
   return [{ ...s, w, h }, huCv];
 }
