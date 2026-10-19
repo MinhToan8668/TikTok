@@ -36,7 +36,7 @@
   [hidden]{display:none!important}
   body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size:15px;line-height:1.5}
   .wrap{max-width:760px;margin:0 auto;padding-inline:16px;padding-block:18px 60px}
-  header.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px}
+  header.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:8px}
   .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit}
   .tmxk-logo{width:38px;height:38px;flex:none}
   .tmxk-logo .ink{fill:var(--text)}
@@ -44,22 +44,25 @@
   .brand small{color:var(--muted);font-size:12px}
   .theme-btn{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--text);cursor:pointer;font-size:16px;flex:none}
 
-  .hero{background:var(--pro);color:var(--pro-text);border-radius:20px;padding:20px 18px;box-shadow:var(--shadow);margin-bottom:14px}
-  .hero h1{font-family:var(--font-display);font-weight:800;font-size:clamp(24px,6vw,34px);line-height:1.08;margin:0 0 8px;letter-spacing:-.02em}
-  .hero p{margin:0;opacity:.85;font-size:14px}
-  .tien-do{position:sticky;top:0;z-index:5;margin:0 -16px 14px;padding:10px 16px;background:var(--bg)}
-  .tien-do .khung{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:6px;display:flex;align-items:center;gap:10px}
-  .thanh{flex:1;height:12px;border-radius:999px;background:var(--surface-2);overflow:hidden}
-  .thanh i{display:block;height:100%;width:0;background:var(--line-strong);border-radius:999px;transition:width .3s ease}
-  .tien-do b{font-size:13px;min-width:64px;text-align:right;padding-right:8px;font-variant-numeric:tabular-nums}
+  .wrap{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;padding-block:14px 0}
 
-  section.nhom{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:12px}
-  .nhom h2{font-family:var(--font-display);font-weight:800;font-size:18px;margin:0 0 2px;display:flex;align-items:baseline;gap:8px}
-  .nhom h2 .dem{margin-left:auto;font-family:var(--font-ui);font-size:12px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
-  .nhom h2 .dem.xong{color:var(--ok)}
-  .nhom > p{margin:0 0 10px;color:var(--muted);font-size:13px}
+  /* thanh bước: mỗi bước một vạch, bấm để nhảy */
+  .cac-buoc{display:flex;gap:6px;margin-bottom:12px}
+  .cac-buoc button{flex:1;height:30px;padding:0;border:0;background:none;cursor:pointer;display:flex;align-items:center}
+  .cac-buoc button::before{content:"";display:block;width:100%;height:8px;border-radius:999px;background:var(--surface);border:1px solid var(--line);transition:background .2s}
+  .cac-buoc button.xong::before{background:var(--line-strong);border-color:var(--line-strong)}
+  .cac-buoc button[aria-current="step"]::before{background:var(--text);border-color:var(--text);height:10px}
+  .cac-buoc button:focus-visible{outline:3px solid var(--line-strong);outline-offset:2px;border-radius:6px}
+
+  .man{flex:1;display:flex;flex-direction:column}
+  .the{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:16px;box-shadow:var(--shadow)}
+  .the .so{font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;display:flex;justify-content:space-between}
+  .the .so .xong{color:var(--ok)}
+  .the h2{font-family:var(--font-display);font-weight:800;font-size:clamp(22px,6vw,28px);line-height:1.1;margin:4px 0 6px;letter-spacing:-.02em;outline:none}
+  .the > p{margin:0 0 12px;color:var(--muted);font-size:13.5px}
+
   ul.muc{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
-  .muc label{display:grid;grid-template-columns:26px 1fr;gap:10px;align-items:start;padding:10px;border-radius:12px;cursor:pointer;background:var(--surface-2);border:1px solid transparent;transition:background .15s,border-color .15s}
+  .muc label{display:grid;grid-template-columns:26px 1fr;gap:10px;align-items:start;padding:10px;border-radius:12px;cursor:pointer;background:var(--surface-2);border:1px solid transparent;transition:border-color .15s}
   .muc label:hover{border-color:var(--line)}
   .muc input{appearance:none;-webkit-appearance:none;width:24px;height:24px;margin:0;border:2px solid var(--line-strong);border-radius:7px;background:var(--surface);cursor:pointer;display:grid;place-items:center}
   .muc input::after{content:"";width:12px;height:7px;border:3px solid var(--accent-ink);border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px);opacity:0}
@@ -69,25 +72,35 @@
   .muc .nd b{display:block;font-weight:700;font-size:14.5px}
   .muc .nd > span{display:block;color:var(--muted);font-size:13px;margin-top:2px}
   .muc input:checked + .nd b{text-decoration:line-through;text-decoration-color:var(--line-strong);opacity:.7}
-  .muc .tag{display:inline-block;font-size:11px;font-weight:800;border-radius:6px;padding:1px 6px;margin-left:4px;vertical-align:1px;background:var(--danger);color:var(--surface);text-decoration:none}
+  .tag{display:inline-block;font-size:11px;font-weight:800;border-radius:6px;padding:1px 6px;margin-left:4px;vertical-align:1px;background:var(--danger);color:var(--surface);text-decoration:none}
 
-  .ket{border-radius:var(--radius);padding:16px;margin-bottom:12px;border:2px solid var(--line-strong);background:var(--accent-soft)}
-  .ket h2{font-family:var(--font-display);font-weight:800;font-size:18px;margin:0 0 4px}
-  .ket p{margin:0;font-size:14px}
-  .canh-bao{background:var(--surface);border:1px dashed var(--line-strong);border-radius:var(--radius);padding:16px;margin-bottom:12px}
-  .canh-bao h2{font-family:var(--font-display);font-weight:800;font-size:16px;margin:0 0 8px}
-  .canh-bao ul{margin:0;padding-left:18px;font-size:13.5px;color:var(--muted)}
+  /* nút dưới cùng luôn trong tầm ngón cái */
+  .dieu-huong{position:sticky;bottom:0;display:flex;gap:8px;padding:12px 0 calc(12px + env(safe-area-inset-bottom));margin-top:auto;background:linear-gradient(transparent,var(--bg) 30%)}
+  .dieu-huong button,.nut a,.nut button{min-height:50px;display:inline-flex;align-items:center;justify-content:center;gap:6px;font:inherit;font-weight:800;font-size:15px;border-radius:14px;padding:10px 14px;text-decoration:none;cursor:pointer;border:2px solid var(--text);background:var(--surface);color:var(--text)}
+  .dieu-huong .lui{flex:0 0 auto;width:58px}
+  .dieu-huong .tiep,.nut a.chinh{flex:1;background:var(--text);color:var(--accent)}
+  .dieu-huong button:disabled{display:none}
+  :root[data-theme="dark"] .dieu-huong button,:root[data-theme="dark"] .nut a,:root[data-theme="dark"] .nut button{border-color:var(--accent)}
+  :root[data-theme="dark"] .dieu-huong .tiep,:root[data-theme="dark"] .nut a.chinh{background:var(--accent);color:var(--accent-ink)}
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]) .dieu-huong button,:root:not([data-theme="light"]) .nut a,:root:not([data-theme="light"]) .nut button{border-color:var(--accent)}
+    :root:not([data-theme="light"]) .dieu-huong .tiep,:root:not([data-theme="light"]) .nut a.chinh{background:var(--accent);color:var(--accent-ink)}
+  }
+
+  /* màn kết quả */
+  .ket-qua .lon{font-size:44px;line-height:1;margin-bottom:6px}
+  .thieu{list-style:none;margin:0 0 12px;padding:0;display:flex;flex-direction:column;gap:6px}
+  .thieu button{width:100%;text-align:left;font:inherit;font-size:14px;font-weight:600;color:var(--text);background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;cursor:pointer;display:flex;gap:8px;align-items:center}
+  .thieu button::after{content:"›";margin-left:auto;font-size:20px;color:var(--muted)}
+  details.canh-bao{margin-top:12px;border:1px dashed var(--line-strong);border-radius:14px;padding:12px 14px;background:var(--surface-2)}
+  .canh-bao summary{font-weight:800;cursor:pointer;min-height:24px}
+  .canh-bao ul{margin:8px 0 0;padding-left:18px;font-size:13.5px;color:var(--muted)}
   .canh-bao li{margin-bottom:4px}
   .canh-bao li b{color:var(--text)}
-  .nut{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}
-  .nut a,.nut button{flex:1 1 200px;min-height:46px;display:inline-flex;align-items:center;justify-content:center;gap:6px;font:inherit;font-weight:800;font-size:14px;border-radius:12px;padding:10px 14px;text-decoration:none;cursor:pointer;border:2px solid var(--text);background:var(--surface);color:var(--text)}
-  .nut a.chinh{background:var(--text);color:var(--accent);}
-  :root[data-theme="dark"] .nut a,:root[data-theme="dark"] .nut button{border-color:var(--accent)}
-  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .nut a,:root:not([data-theme="light"]) .nut button{border-color:var(--accent)}}
-  .nguon{font-size:12px;color:var(--muted)}
+  .nut{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+  .nguon{font-size:12px;color:var(--muted);margin:12px 0 0}
   .nguon a{color:inherit}
-  .nguon ul{padding-left:18px;margin:6px 0 0}
-  @media (prefers-reduced-motion: reduce){.thanh i{transition:none}}
+  @media (prefers-reduced-motion: reduce){.cac-buoc button::before{transition:none}}
 </style>
 </head>
 <body>
@@ -95,79 +108,47 @@
   <header class="top">
     <a class="brand" href="../index.html" aria-label="Tự Mình Xây Kênh, về trang chủ">
       <svg class="tmxk-logo" viewBox="0 0 64 64" aria-hidden="true"><g transform="rotate(-9 32 17)"><rect x="19" y="11" width="26" height="12" rx="3" fill="#99df00"/><path d="M30 14.4v5.2a1 1 0 0 0 1.52.86l4.6-2.6a1 1 0 0 0 0-1.72l-4.6-2.6A1 1 0 0 0 30 14.4z" fill="#26210f"/></g><rect class="ink" x="19" y="28" width="26" height="12" rx="3"/><rect class="ink" x="4" y="44" width="26" height="12" rx="3"/><rect class="ink" x="34" y="44" width="26" height="12" rx="3"/></svg>
-      <div><b>Tự Mình Xây Kênh</b><small>Checklist trước khi đăng</small></div>
+      <div><b>Checklist trước khi đăng</b><small>Tự Mình Xây Kênh</small></div>
     </a>
     <button class="theme-btn" id="themeBtn" type="button" aria-label="Đổi giao diện sáng hoặc tối">◐</button>
   </header>
 
-  <div class="hero">
-    <h1>Tick hết rồi hãy bấm đăng</h1>
-    <p>Không có mẹo nào bắt TikTok hay Facebook đẩy video ngay. Cái bạn làm được là để video được coi là nguyên bản, không bị bóp từ đầu, và đủ sức qua vòng phát thử.</p>
+  <nav class="cac-buoc" id="cacBuoc" aria-label="Các bước"></nav>
+  <main class="man" id="man" aria-live="polite"></main>
+
+  <div class="dieu-huong">
+    <button class="lui" id="lui" type="button" aria-label="Quay lại bước trước">←</button>
+    <button class="tiep" id="tiep" type="button">Tiếp →</button>
   </div>
-
-  <div class="tien-do" aria-live="polite">
-    <div class="khung"><div class="thanh" aria-hidden="true"><i id="thanh"></i></div><b id="tongDem">0/0</b></div>
-  </div>
-
-  <main id="ds"></main>
-
-  <div class="ket" id="ket" hidden>
-    <h2>✅ Sẵn sàng đăng</h2>
-    <p>Đăng xong đừng xoá đi đăng lại. Sau 24 giờ mở Analytics xem người xem rời đi ở giây thứ mấy, video sau sửa đúng chỗ đó.</p>
-  </div>
-
-  <aside class="canh-bao">
-    <h2>⚠️ Đừng tin mấy chiêu này</h2>
-    <ul>
-      <li><b>Chèn mã, hash, file "đặc biệt" vào video.</b> Nền tảng nén lại video và tự tính dấu vân tay từ hình và tiếng, nên dữ liệu bạn nhét vào không còn lại gì.</li>
-      <li><b>Lật hình, zoom, đổi tốc độ, thêm viền để reup.</b> Facebook ghi rõ đây là chỉnh sửa giá trị thấp và giảm phân phối, TikTok cũng nhận ra.</li>
-      <li><b>Mua view, mua tim, dùng tool buff.</b> Bị coi là thao túng nền tảng, nặng thì khoá kênh.</li>
-      <li><b>"Video nào cũng được 200–500 view đầu", "có giờ vàng chung".</b> Nền tảng không công bố con số này. Giờ đăng hợp lý xem trong Analytics của chính kênh bạn.</li>
-    </ul>
-  </aside>
-
-  <div class="nut">
-    <a class="chinh" href="cham-video.html">🎯 Chấm video trước khi đăng</a>
-    <a href="hook-text.html">⚡ Viết lại hook</a>
-    <button type="button" id="lamLai">↺ Làm lại cho video mới</button>
-  </div>
-
-  <footer class="nguon">
-    Tổng hợp từ tài liệu chính thức của nền tảng, cập nhật 10/2026:
-    <ul>
-      <li><a href="https://newsroom.tiktok.com/en-us/how-tiktok-recommends-videos-for-you/" target="_blank" rel="noopener">TikTok – How TikTok recommends videos #ForYou</a></li>
-      <li><a href="https://creators.facebook.com/blog/supporting-original-content-on-facebook" target="_blank" rel="noopener">Meta – Supporting original content on Facebook (13/3/2026)</a></li>
-    </ul>
-  </footer>
 </div>
 
 <script>
-// mỗi mục: [mã, tiêu đề, giải thích, bắt buộc?]; mã giữ cố định để tick đã lưu không lệch khi sửa chữ
+// mỗi mục: [mã, tiêu đề, giải thích, quan trọng?]; mã giữ cố định để tick đã lưu không lệch khi sửa chữ
 const NHOM = [
-  { ma: 'nb', ten: '1 · Video là của bạn', mo: 'Nền tảng coi là nguyên bản khi bạn tự làm ra, hoặc bạn xuất hiện và thêm góc nhìn mới.', muc: [
+  { ma: 'nb', ten: 'Video là của bạn', mo: 'Nền tảng coi là nguyên bản khi bạn tự làm ra, hoặc bạn xuất hiện và thêm góc nhìn mới.', muc: [
     ['tu_quay', 'Tự quay, hoặc có mặt / giọng / tay của bạn', 'Đây là tín hiệu nguyên bản mạnh nhất.', true],
     ['goc_nhin', 'Tư liệu người khác chỉ là phụ', 'Nếu có chèn, phần chính vẫn là lời phân tích, bình luận hay câu chuyện của bạn.', true],
     ['khong_wm', 'Không còn logo, watermark nền tảng khác', 'TikTok, CapCut, Douyin, Reels… Video có watermark khác thường không được đề xuất.', true],
     ['nhac_tv', 'Nhạc lấy từ thư viện của nền tảng', 'Không tách nhạc từ video người khác: dễ bị tắt tiếng hoặc chặn.', false]
   ]},
-  { ma: 'xuat', ten: '2 · File xuất ra', mo: 'Hình vỡ, tiếng rè làm người xem lướt đi trước khi kịp xem nội dung.', muc: [
+  { ma: 'xuat', ten: 'File xuất ra', mo: 'Hình vỡ, tiếng rè làm người xem lướt đi trước khi kịp xem nội dung.', muc: [
     ['khung_doc', 'Dọc 9:16, 1080×1920, 30 khung hình/giây', 'Đủ nét cho TikTok và Reels, file không quá nặng.', false],
     ['file_goc', 'Đăng file gốc vừa xuất', 'Không dùng file tải về từ nền tảng khác hay file đã nén lại nhiều lần.', true],
     ['nghe_ro', 'Mở lên xem lại một lượt bằng điện thoại', 'Giọng nghe rõ hơn nhạc, chữ không bị che bởi nút của app.', false]
   ]},
-  { ma: 'nd', ten: '3 · Nội dung qua được vòng thử', mo: 'TikTok chấm theo hành vi người xem: xem hết, xem lại, bình luận, chia sẻ, lưu.', muc: [
+  { ma: 'nd', ten: 'Nội dung qua được vòng thử', mo: 'TikTok chấm theo hành vi người xem: xem hết, xem lại, bình luận, chia sẻ, lưu.', muc: [
     ['hook', '3 giây đầu khiến người ta dừng lướt', 'Không mở bằng "Chào mọi người, hôm nay mình…". Vào thẳng cảnh hay nhất hoặc câu gây tò mò.', true],
     ['chu_hook', 'Có chữ hook to, đọc được khi tắt tiếng', 'Đặt ở 1/3 trên, 1–2 dòng.', false],
     ['khong_cho_chet', 'Cắt hết khoảng chết', 'Không có đoạn nào trên 3 giây mà người xem không thấy gì mới.', false],
     ['ly_do_tuong_tac', 'Có lý do để bình luận, lưu hoặc chia sẻ', 'Một câu hỏi, một mẹo đáng lưu, hoặc một quan điểm để người xem phản hồi.', false]
   ]},
-  { ma: 'dang', ten: '4 · Lúc bấm đăng', mo: 'Thuật toán đọc caption, chữ trên video và lời nói để hiểu video nói về gì, phát cho ai.', muc: [
+  { ma: 'dang', ten: 'Lúc bấm đăng', mo: 'Thuật toán đọc caption, chữ trên video và lời nói để hiểu video nói về gì, phát cho ai.', muc: [
     ['tu_khoa', 'Caption có từ khoá người ta hay tìm', 'Ví dụ "cá kho tộ", "nấu cơm nhanh" thay vì chỉ có emoji.', false],
     ['dung_chu_de', 'Đúng chủ đề kênh đang đi', 'Mỗi kênh một chủ đề, nhất là 10–20 video đầu.', false],
     ['dang_mot_lan', 'Chỉ đăng một lần', 'Không xoá đi đăng lại cùng video: dễ bị coi là trùng lặp.', true],
     ['tk_sach', 'Tài khoản không mua follow, tim, view', 'Tương tác ảo làm hỏng tín hiệu của cả kênh.', true]
   ]},
-  { ma: 'sau', ten: '5 · Giờ đầu sau khi đăng', mo: 'Video vừa đăng có thể còn đang được duyệt, chưa lên For You ngay. Đó là bình thường.', muc: [
+  { ma: 'sau', ten: 'Giờ đầu sau khi đăng', mo: 'Video vừa đăng có thể còn đang được duyệt, chưa lên For You ngay. Đó là bình thường.', muc: [
     ['tra_loi', 'Trả lời bình luận sớm', 'Ghim một bình luận gợi mở để kéo thêm người tham gia.', false],
     ['khong_xoa', 'Không xoá dù view đầu thấp', 'Giữ video lại, đọc số liệu để làm video sau tốt hơn.', false],
     ['xem_so', 'Hẹn sau 24 giờ xem Analytics', 'Nhìn tỉ lệ xem hết và giây người xem rời đi, không chỉ nhìn view.', false]
@@ -175,6 +156,7 @@ const NHOM = [
 ];
 
 const KEY = 'tmxk_checklist';
+const KET = NHOM.length;          // chỉ số màn kết quả, sau nhóm cuối
 const ls = {
   get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
   set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
@@ -184,68 +166,156 @@ function docDaTick() {
   try { const v = JSON.parse(ls.get(KEY) || '[]'); return Array.isArray(v) ? v : []; } catch (e) { return []; }
 }
 let daTick = new Set(docDaTick());
+let buoc = 0;
 
 const $ = s => document.querySelector(s);
 const tao = (tag, cls, text) => { const el = document.createElement(tag); if (cls) el.className = cls; if (text != null) el.textContent = text; return el; };
+const idsNhom = n => n.muc.map(m => n.ma + '.' + m[0]);
+const xongNhom = n => idsNhom(n).every(id => daTick.has(id));
 
-function veDanhSach() {
-  const ds = $('#ds');
-  ds.replaceChildren();
-  NHOM.forEach(n => {
-    const sec = tao('section', 'nhom');
-    sec.setAttribute('aria-labelledby', 'h-' + n.ma);
-    const h = tao('h2', null, n.ten); h.id = 'h-' + n.ma;
-    const dem = tao('span', 'dem'); dem.dataset.nhom = n.ma; h.append(dem);
-    const ul = tao('ul', 'muc');
-    n.muc.forEach(([ma, td, gt, batBuoc]) => {
-      const id = n.ma + '.' + ma;
-      const li = tao('li'); const lb = tao('label');
-      const cb = tao('input'); cb.type = 'checkbox'; cb.dataset.id = id; cb.checked = daTick.has(id);
-      const nd = tao('span', 'nd'); const b = tao('b', null, td);
-      if (batBuoc) b.append(tao('span', 'tag', 'quan trọng'));
-      nd.append(b, tao('span', null, gt));
-      lb.append(cb, nd); li.append(lb); ul.append(li);
+// bước nằm trên hash (#b1…#b6) để nút Back của điện thoại quay lại bước trước
+function buocTuHash() {
+  const m = /^#b(\d)$/.exec(location.hash);
+  const i = m ? Number(m[1]) - 1 : 0;
+  return i >= 0 && i <= KET ? i : 0;
+}
+function di(i) {
+  if (i === buoc) return;
+  location.hash = 'b' + (i + 1);
+}
+
+function veThanhBuoc() {
+  const nav = $('#cacBuoc');
+  nav.replaceChildren();
+  [...NHOM, { ten: 'Kết quả' }].forEach((n, i) => {
+    const b = tao('button');
+    b.type = 'button';
+    b.setAttribute('aria-label', 'Bước ' + (i + 1) + ': ' + n.ten);
+    if (i < KET && xongNhom(n)) b.classList.add('xong');
+    if (i === buoc) b.setAttribute('aria-current', 'step');
+    b.addEventListener('click', () => di(i));
+    nav.append(b);
+  });
+}
+
+function veNhom(n, i) {
+  const the = tao('section', 'the');
+  const ids = idsNhom(n);
+  const so = tao('div', 'so');
+  so.append(tao('span', null, 'Bước ' + (i + 1) + '/' + KET));
+  const dem = tao('span', null, ids.filter(id => daTick.has(id)).length + '/' + ids.length + ' đã tick');
+  if (xongNhom(n)) dem.className = 'xong';
+  so.append(dem);
+  const h = tao('h2', null, n.ten); h.tabIndex = -1;
+  const ul = tao('ul', 'muc');
+  n.muc.forEach(([ma, td, gt, quanTrong]) => {
+    const id = n.ma + '.' + ma;
+    const li = tao('li'); const lb = tao('label');
+    const cb = tao('input'); cb.type = 'checkbox'; cb.dataset.id = id; cb.checked = daTick.has(id);
+    const nd = tao('span', 'nd'); const b = tao('b', null, td);
+    if (quanTrong) b.append(tao('span', 'tag', 'quan trọng'));
+    nd.append(b, tao('span', null, gt));
+    lb.append(cb, nd); li.append(lb); ul.append(li);
+  });
+  the.append(so, h, tao('p', null, n.mo), ul);
+  return the;
+}
+
+function veKetQua() {
+  const the = tao('section', 'the ket-qua');
+  const thieu = [];
+  NHOM.forEach((n, i) => n.muc.forEach(([ma, td, , quanTrong]) => {
+    if (!daTick.has(n.ma + '.' + ma)) thieu.push({ i, td, quanTrong });
+  }));
+  thieu.sort((a, b) => (b.quanTrong ? 1 : 0) - (a.quanTrong ? 1 : 0));
+  const h = tao('h2'); h.tabIndex = -1;
+  if (!thieu.length) {
+    the.append(tao('div', 'lon', '✅'));
+    h.textContent = 'Sẵn sàng đăng';
+    the.append(h, tao('p', null, 'Đăng xong đừng xoá đi đăng lại. Sau 24 giờ mở Analytics xem người xem rời đi ở giây thứ mấy, video sau sửa đúng chỗ đó.'));
+  } else {
+    the.append(tao('div', 'lon', thieu.some(t => t.quanTrong) ? '🛑' : '👀'));
+    h.textContent = 'Còn ' + thieu.length + ' mục chưa tick';
+    the.append(h, tao('p', null, 'Chạm vào từng mục để quay lại bước đó. Mục đỏ nên làm xong rồi mới đăng.'));
+    const ul = tao('ul', 'thieu');
+    thieu.forEach(t => {
+      const li = tao('li'); const b = tao('button', null, t.td);
+      b.type = 'button';
+      if (t.quanTrong) b.append(tao('span', 'tag', 'quan trọng'));
+      b.addEventListener('click', () => di(t.i));
+      li.append(b); ul.append(li);
     });
-    sec.append(h, tao('p', null, n.mo), ul);
-    ds.append(sec);
-  });
+    the.append(ul);
+  }
+
+  const cb = tao('details', 'canh-bao');
+  cb.append(tao('summary', null, '⚠️ Đừng tin mấy chiêu này'));
+  const ul = tao('ul');
+  [
+    ['Chèn mã, hash, file "đặc biệt" vào video.', ' Nền tảng nén lại video và tự tính dấu vân tay từ hình và tiếng, nên dữ liệu bạn nhét vào không còn lại gì.'],
+    ['Lật hình, zoom, đổi tốc độ, thêm viền để reup.', ' Facebook ghi rõ đây là chỉnh sửa giá trị thấp và giảm phân phối, TikTok cũng nhận ra.'],
+    ['Mua view, mua tim, dùng tool buff.', ' Bị coi là thao túng nền tảng, nặng thì khoá kênh.'],
+    ['"Video nào cũng được 200–500 view đầu", "có giờ vàng chung".', ' Nền tảng không công bố con số này. Giờ đăng hợp lý xem trong Analytics của chính kênh bạn.']
+  ].forEach(([dam, thuong]) => { const li = tao('li'); li.append(tao('b', null, dam), thuong); ul.append(li); });
+  cb.append(ul);
+
+  const nut = tao('div', 'nut');
+  const a1 = tao('a', 'chinh', '🎯 Chấm video trước khi đăng'); a1.href = 'cham-video.html';
+  const a2 = tao('a', null, '⚡ Viết lại hook'); a2.href = 'hook-text.html';
+  const lamLai = tao('button', null, '↺ Làm lại cho video mới'); lamLai.type = 'button';
+  lamLai.addEventListener('click', () => { daTick = new Set(); ls.del(KEY); di(0); });
+  nut.append(a1, a2, lamLai);
+
+  const nguon = tao('p', 'nguon', 'Nguồn: ');
+  const n1 = tao('a', null, 'TikTok – How TikTok recommends videos'); n1.href = 'https://newsroom.tiktok.com/en-us/how-tiktok-recommends-videos-for-you/';
+  const n2 = tao('a', null, 'Meta – Supporting original content (3/2026)'); n2.href = 'https://creators.facebook.com/blog/supporting-original-content-on-facebook';
+  [n1, n2].forEach(a => { a.target = '_blank'; a.rel = 'noopener'; });
+  nguon.append(n1, ' · ', n2);
+
+  the.append(cb, nut, nguon);
+  return the;
 }
 
-function capNhat() {
-  let tong = 0, xong = 0;
-  NHOM.forEach(n => {
-    const ids = n.muc.map(m => n.ma + '.' + m[0]);
-    const x = ids.filter(id => daTick.has(id)).length;
-    tong += ids.length; xong += x;
-    const dem = document.querySelector('.dem[data-nhom="' + n.ma + '"]');
-    dem.textContent = x + '/' + ids.length;
-    dem.classList.toggle('xong', x === ids.length);
-  });
-  $('#tongDem').textContent = xong + '/' + tong;
-  $('#thanh').style.width = (tong ? xong / tong * 100 : 0) + '%';
-  $('#ket').hidden = xong < tong;
+function ve() {
+  buoc = buocTuHash();
+  veThanhBuoc();
+  const man = $('#man');
+  man.replaceChildren(buoc < KET ? veNhom(NHOM[buoc], buoc) : veKetQua());
+  $('#lui').disabled = buoc === 0;
+  $('#tiep').hidden = buoc === KET;
+  $('#tiep').textContent = buoc === KET - 1 ? 'Xem kết quả →' : 'Tiếp →';
+  window.scrollTo(0, 0);
+  const h = man.querySelector('h2');
+  if (h && document.activeElement && document.activeElement !== document.body) h.focus({ preventScroll: true });
 }
 
-$('#ds').addEventListener('change', e => {
+$('#man').addEventListener('change', e => {
   const id = e.target.dataset && e.target.dataset.id;
   if (!id) return;
   daTick = new Set(daTick);
   if (e.target.checked) daTick.add(id); else daTick.delete(id);
   ls.set(KEY, JSON.stringify([...daTick]));
-  capNhat();
+  const n = NHOM[buoc];
+  const so = $('#man .so span:last-child');
+  const ids = idsNhom(n);
+  so.textContent = ids.filter(x => daTick.has(x)).length + '/' + ids.length + ' đã tick';
+  so.className = xongNhom(n) ? 'xong' : '';
+  veThanhBuoc();
+  // tick đủ nhóm thì tự sang bước sau, chờ một nhịp để thấy dấu tick
+  if (e.target.checked && xongNhom(n)) {
+    const tu = buoc;
+    setTimeout(() => { if (buoc === tu && xongNhom(n)) di(tu + 1); }, 450);
+  }
 });
-
-$('#lamLai').addEventListener('click', () => {
-  daTick = new Set(); ls.del(KEY);
-  veDanhSach(); capNhat();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-});
+$('#lui').addEventListener('click', () => { if (buoc > 0) di(buoc - 1); });
+$('#tiep').addEventListener('click', () => { if (buoc < KET) di(buoc + 1); });
+window.addEventListener('hashchange', ve);
 
 function applyTheme(t) { if (t) document.documentElement.dataset.theme = t; else delete document.documentElement.dataset.theme; }
 applyTheme(ls.get('hook.theme'));
 $('#themeBtn').addEventListener('click', () => { const dark = document.documentElement.dataset.theme ? document.documentElement.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; const t = dark ? 'light' : 'dark'; applyTheme(t); ls.set('hook.theme', t); });
 
-veDanhSach(); capNhat();
+ve();
 </script>
 </body>
 </html>

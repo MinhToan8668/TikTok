@@ -21,7 +21,7 @@ tự nhiên như trong code hiện có.
 | `tools/sang-filmcraft.js` | Nút "Mở trong FilmCraft": chuyển V1, b-roll, phụ đề, chữ, mốc sang FilmCraft; lệnh `fc_*` cho cầu nối thư mục | điều khiển tab FilmCraft qua `window.filmcraft` (cùng origin) |
 | `tools/filmcraft/` | FilmCraft web v0.7.2 (storytold/filmcraft, MIT/Apache), trình dựng kiểu Premiere bằng WebAssembly | bản build từ release; sửa duy nhất: `index.html` nhận `?wasm=&glue=` để tải từ worker (`/fc/<file>`), nâng cấp thì chép đè rồi thêm lại 2 dòng đó |
 | `tools/tao-nen-teams.html` | Tạo nền Teams, độc lập, không gọi API | |
-| `tools/checklist-dang.html` | Checklist trước khi đăng (nguyên bản, file xuất, hook, giờ đầu), độc lập, không gọi API | tick lưu ở `localStorage` key `tmxk_checklist`; danh sách mục ở hằng `NHOM` |
+| `tools/checklist-dang.html` | Checklist trước khi đăng, mỗi màn một nhóm (nguyên bản, file xuất, hook, lúc đăng, giờ đầu) rồi màn kết quả, độc lập, không gọi API | bước nằm trên hash `#b1`…`#b6`; tick lưu ở `localStorage` key `tmxk_checklist`; danh sách mục ở hằng `NHOM` |
 | `apps-script/Code.gs` | `doGet`/`doPost`, đăng ký, Telegram bot, config công khai | điểm vào duy nhất, route theo `body.action` |
 | `apps-script/Lich.gs` | Lịch kèm 1:1, action tiền tố `hv_` | |
 | `apps-script/Studio.gs` | Tài khoản Viral Studio, gói Pro, action tiền tố `st_` | |
