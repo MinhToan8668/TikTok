@@ -675,3 +675,68 @@ function khoiTao09d() {
   veNhacTu(); danhDauMoi(); capNhatTick(); gltNap().then(veAnhChuyen);
 }
 khoiTao09d();
+
+/* ═════════ ĐỢT 6: chỉnh âm lượng và fade ngay trên lớp (như CapCut) ═════════
+   Rê chuột vào đoạn có tiếng (V1, A3): đường âm lượng kéo lên / xuống, hai núm ở mép trên kéo vào để fade.
+   Dạng sóng vẽ theo mức thật × âm lượng: phần vượt −1 dB (sắp vỡ tiếng) tô đỏ, có vạch ngưỡng. */
+const AM_MIN = -30, AM_NGUONG = 0.891, AM_CANH = 0.708;   // −1 dBFS vỡ tiếng · −3 dBFS sắp chạm
+function amLopTT(k, m) { const v = m.am == null ? 1 : m.am; return { db: v <= 0.0005 ? AM_MIN : Math.max(AM_MIN, 20 * Math.log10(v)), max: k === 'v' ? 10 : 12, coKf: !!(m.kfs && m.kfs.am && m.kfs.am.length) }; }
+function datAmLop(m, db) { m.am = db <= AM_MIN + 0.01 ? 0 : +Math.pow(10, db / 20).toFixed(4); }
+const dbYLop = (db, max, H) => Math.max(2, Math.min(H - 2, H * (1 - (db - AM_MIN) / (max - AM_MIN))));
+function nguonSong(k, m) { if (k === 'a') { const kk = AM3_KHO[m.kho]; return kk && kk.song ? kk : null; } const s = srcCua(m.src); return s && s.song ? s : null; }
+function daiLop(k, m) { return k === 'a' ? m.kt - m.bd : daiC(m); }
+/* hệ số âm lượng tại off (giây trong đoạn): âm lượng (kể cả keyframe) × fade */
+function heSoLop(k, m, off) { const dai = daiLop(k, m), v = k === 'v' ? giaTriKf(m, 'am', off) : (m.am == null ? 1 : m.am); let f = 1; if (m.fi > 0) f = Math.min(f, Math.max(0, off / m.fi)); if (m.fo > 0) f = Math.min(f, Math.max(0, (dai - off) / m.fo)); return v * f; }
+function veSongLop(d, k, m, W, H) {
+  const src = nguonSong(k, m); d.querySelectorAll(':scope > canvas.song, :scope > canvas.songAm').forEach(x => x.remove()); if (!src || W < 8) return 0;
+  const cvs = el('canvas', 'songAm' + (k === 'v' ? ' v' : '')), h = k === 'v' ? Math.min(22, Math.round(H * 0.42)) : H, w = Math.min(4000, Math.round(W)); cvs.width = w; cvs.height = h; const g = cvs.getContext('2d');
+  const song = src.song, n = song.length, dinh = song.max || 1, bd = m.bd, kt = m.kt, dai = daiLop(k, m); let lon = 0;
+  for (let x = 0; x < w; x++) { const t = bd + (kt - bd) * x / w, i = Math.min(n - 1, Math.floor(t * 50)), a = (song[i] || 0) / 255 * dinh * heSoLop(k, m, dai * x / w); if (a > lon) lon = a; const v = Math.min(1, a) * h;
+    g.fillStyle = a >= AM_NGUONG ? '#ff4d4f' : a >= AM_CANH ? '#ffb020' : 'rgba(190,255,120,.6)'; g.fillRect(x, h - v, 1, v); }
+  const yN = h * (1 - AM_NGUONG); g.strokeStyle = 'rgba(255,90,90,.85)'; g.setLineDash([4, 3]); g.lineWidth = 1; g.beginPath(); g.moveTo(0, yN + 0.5); g.lineTo(w, yN + 0.5); g.stroke();
+  const hop = d.querySelector(':scope > .amLop'); if (k === 'v') d.insertBefore(cvs, hop); else d.insertBefore(cvs, d.firstChild); return lon;   /* V1: nằm trên dải ảnh thu nhỏ */
+}
+function veLopAm(d, k, m) {
+  d.querySelectorAll(':scope > .amLop').forEach(x => x.remove()); const W = d.clientWidth, H = d.clientHeight; if (W < 24 || H < 14) return;
+  const tt = amLopTT(k, m), dai = daiLop(k, m), pxs = W / Math.max(0.01, dai), NS = 'http://www.w3.org/2000/svg';
+  const hop = el('div', 'amLop' + (tt.coKf ? ' coKf' : '')), sv = document.createElementNS(NS, 'svg'); sv.setAttribute('viewBox', '0 0 ' + W + ' ' + H); sv.setAttribute('preserveAspectRatio', 'none');
+  const toi = document.createElementNS(NS, 'path'), duong = document.createElementNS(NS, 'path'); toi.setAttribute('class', 'toi'); duong.setAttribute('class', 'bao'); sv.append(toi, duong); hop.append(sv);
+  const nhan = el('span', 'amNhan'), quaTo = el('span', 'amQuaTo', '⚠ Quá to'); quaTo.title = 'Có chỗ vượt −1 dB, dễ bị vỡ tiếng khi đăng. Kéo đường âm lượng xuống tới khi hết đỏ.'; hop.append(nhan, quaTo);
+  const o = { d, k, m, W, H, pxs, dai, max: tt.max, toi, duong, nhan, quaTo };
+  if (!tt.coKf) { o.tay = el('div', 'amTay'); o.tay.title = 'Kéo lên / xuống để chỉnh âm lượng · bấm đúp: về 0 dB'; hop.append(o.tay); keoAmLop(o); }
+  o.fl = el('i', 'fdK l'); o.fr = el('i', 'fdK r'); hop.append(o.fl, o.fr); keoFadeLop(o, 'l'); keoFadeLop(o, 'r');
+  d.classList.add('coAmLop'); d.append(hop); capNhatLopAm(o);
+}
+/* cập nhật tại chỗ (không tạo lại phần tử nên kéo không bị ngắt) */
+function capNhatLopAm(o) {
+  const { d, k, m, W, H, pxs, dai, max } = o, tt = amLopTT(k, m), fi = Math.min(m.fi || 0, dai), fo = Math.min(m.fo || 0, dai), lon = veSongLop(d, k, m, W, H);
+  const y = off => { const v = k === 'v' ? giaTriKf(m, 'am', off) : (m.am == null ? 1 : m.am); return dbYLop(v <= 0.0005 ? AM_MIN : Math.max(AM_MIN, 20 * Math.log10(v)), max, H); };
+  // đường bao: từ đáy lên mức âm lượng sau fade vào, ngang (theo keyframe nếu có), xuống đáy ở fade ra
+  let dd = 'M0 ' + H + ' L' + (fi * pxs).toFixed(1) + ' ' + y(fi).toFixed(1); const N = tt.coKf ? 40 : 1; for (let i = 1; i <= N; i++) { const t = fi + (dai - fi - fo) * i / N; dd += ' L' + (t * pxs).toFixed(1) + ' ' + y(t).toFixed(1); } dd += ' L' + W + ' ' + H;
+  o.toi.setAttribute('d', dd + ' L' + W + ' 0 L0 0 Z'); o.duong.setAttribute('d', dd);
+  const yv = dbYLop(tt.db, max, H); o.nhan.textContent = o.chu || (tt.coKf ? 'Âm lượng có keyframe' : dbChu(tt.db)); o.nhan.style.top = Math.max(0, Math.min(H - 16, yv - 18)) + 'px'; o.nhan.style.left = Math.max(2, fi * pxs + 4) + 'px';
+  o.quaTo.hidden = lon < AM_NGUONG;
+  if (o.tay) Object.assign(o.tay.style, { left: fi * pxs + 'px', width: Math.max(6, W - (fi + fo) * pxs) + 'px', top: (yv - 6) + 'px' });
+  [[o.fl, 'l', fi], [o.fr, 'r', fo]].forEach(([n, ben, v]) => { n.classList.toggle('co', v > 0); n.title = (ben === 'l' ? 'Kéo vào để fade in' : 'Kéo vào để fade out') + (v > 0 ? ' · ' + fmt1(v) + 's' : '') + ' · bấm đúp: bỏ'; n.style.left = (ben === 'l' ? Math.max(9, fi * pxs) : Math.min(W - 9, W - fo * pxs)) + 'px'; });
+}
+function chanKeo(e) { if (e.button !== 0) return false; e.stopPropagation(); e.preventDefault(); return true; }
+function keoAmLop(o) {
+  const { tay, d, k, m, H, max } = o;
+  tay.ondblclick = e => { e.stopPropagation(); luuHoanTac(); datAmLop(m, 0); veTl(); veProp(); toast('Âm lượng về 0 dB'); };
+  tay.onpointerdown = e => { if (!chanKeo(e)) return; if (khoaMuc(k, m)) { baoKhoa(); return; } try { tay.setPointerCapture(e.pointerId); } catch { } luuHoanTac(); const y0 = e.clientY, db0 = amLopTT(k, m).db; let doi = false; d.classList.add('dangKeoAm');
+    tay.onpointermove = ev => { doi = true; let db = db0 - (ev.clientY - y0) * (max - AM_MIN) / H * (ev.shiftKey ? 0.25 : 1); if (Math.abs(db) < 0.6) db = 0; db = Math.max(AM_MIN, Math.min(max, Math.round(db * 2) / 2)); datAmLop(m, db); o.chu = ''; capNhatLopAm(o); const sm = d.querySelector(':scope > small'); if (sm && k === 'a') sm.textContent = fmt1(m.kt - m.bd) + 's · ' + dbChu(db); };
+    tay.onpointerup = tay.onpointercancel = () => { tay.onpointermove = tay.onpointerup = tay.onpointercancel = null; d.classList.remove('dangKeoAm'); if (!doi) { huyHoanTac(); return; } veTl(); veProp(); }; };
+}
+function keoFadeLop(o, ben) {
+  const { d, k, m, pxs, dai } = o, n = ben === 'l' ? o.fl : o.fr, key = ben === 'l' ? 'fi' : 'fo', khac = ben === 'l' ? 'fo' : 'fi';
+  n.ondblclick = e => { e.stopPropagation(); luuHoanTac(); delete m[key]; veTl(); veProp(); };
+  n.onpointerdown = e => { if (!chanKeo(e)) return; if (khoaMuc(k, m)) { baoKhoa(); return; } try { n.setPointerCapture(e.pointerId); } catch { } luuHoanTac(); const x0 = e.clientX, v0 = m[key] || 0; let doi = false; d.classList.add('dangKeoAm');
+    n.onpointermove = ev => { doi = true; const dx = (ev.clientX - x0) * (ben === 'l' ? 1 : -1); let v = Math.max(0, Math.min(dai - (m[khac] || 0) - 0.05, v0 + dx / pxs)); v = Math.round(v * 20) / 20; if (v < 0.05) delete m[key]; else m[key] = v; o.chu = (ben === 'l' ? 'Fade in ' : 'Fade out ') + fmt1(v) + 's'; capNhatLopAm(o); };
+    n.onpointerup = n.onpointercancel = () => { n.onpointermove = n.onpointerup = n.onpointercancel = null; o.chu = ''; d.classList.remove('dangKeoAm'); if (!doi) { huyHoanTac(); return; } veTl(); veProp(); }; };
+}
+function veMoiLopAm() {
+  $$('.item[data-k="a"]').forEach(d => { const m = (P.am3 || [])[+d.dataset.i]; if (m) try { veLopAm(d, 'a', m); } catch (e) { console.warn('amLop', e); } });
+  $$('.item[data-k="v"]').forEach(d => { const m = P.clips[+d.dataset.i]; if (!m || m.trong || d.classList.contains('trong')) return; const s = srcCua(m.src); if (!s || s.loai !== 'video' || (typeof laGhep === 'function' && laGhep(m))) return; try { veLopAm(d, 'v', m); } catch (e) { console.warn('amLop', e); } });
+}
+function khoiTao09e() { const goc = veTl; veTl = function () { const r = goc.apply(this, arguments); try { veMoiLopAm(); } catch (e) { console.warn(e); } return r; }; if (!P.dang) veTl(); }
+khoiTao09e();
