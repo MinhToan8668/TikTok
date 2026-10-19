@@ -39,9 +39,9 @@ function anTai(c, off, dai) {
 const catCvs = [document.createElement('canvas'), document.createElement('canvas')];
 function catNguon(c, s, im, so) {
   const k = c && c.cat; if (!k || !(k.l || k.t || k.r || k.b) || !s.w) return [s, im];
-  const sx = k.l * s.w, sy = k.t * s.h, sw = Math.max(8, s.w * (1 - k.l - k.r)), sh = Math.max(8, s.h * (1 - k.t - k.b)), sc = Math.min(1, 1920 / Math.max(sw, sh));
+  const sx = k.l * s.w, sy = k.t * s.h, sw = Math.max(8, s.w * (1 - k.l - k.r)), sh = Math.max(8, s.h * (1 - k.t - k.b)), sc = Math.min(1, 1920 / Math.max(sw, sh)), ks = ((im.videoWidth || im.naturalWidth || im.width) || s.w) / s.w;   // ks: bản xem nhẹ nhỏ hơn file gốc
   const cvx = catCvs[so || 0], cw = Math.round(sw * sc), ch = Math.round(sh * sc); if (cvx.width !== cw || cvx.height !== ch) { cvx.width = cw; cvx.height = ch; }
-  try { cvx.getContext('2d').drawImage(im, sx, sy, sw, sh, 0, 0, cw, ch); } catch { return [s, im]; }
+  try { cvx.getContext('2d').drawImage(im, sx * ks, sy * ks, sw * ks, sh * ks, 0, 0, cw, ch); } catch { return [s, im]; }
   return [{ ...s, w: cw, h: ch, mat: (s.mat || []).map(m => ({ ...m, cx: (m.cx * s.w - sx) / sw })) }, cvx];
 }
 /* ── hoàn tác / làm lại: chụp toàn bộ dòng thời gian ── */
@@ -217,7 +217,7 @@ function veThuocTinhChu(box, g) {
       oTruot(n, 'Giãn dòng', 1, 2, 0.01, g.dongCao || 1.22, v => v.toFixed(2), v => { g.dongCao = v; });
     }
   }
-  oTruot(n, 'Cỡ', 0.03, stk ? 0.4 : 0.2, 0.005, g.co || (stk ? 0.16 : 0.075), v => Math.round(v * 1000) / 10 + '', v => { g.co = v; });
+  if (g.co == null) g.co = stk ? 0.16 : 0.075; oTruotKf(n, 'Cỡ', 0.03, stk ? 0.4 : 0.2, 0.005, 'g', g, 'co', v => Math.round(v * 1000) / 10 + '');   /* cỡ chữ keyframe được: chữ to dần / nhỏ dần */
   const n2 = el('div', 'nhom2'); n2.appendChild(el('b', null, 'Hoạt ảnh chữ')); box.appendChild(n2);
   oChon(n2, 'Vào', [['pop', 'Bật'], ['mo', 'Hiện dần'], ['truot', 'Trượt vào'], ['len', 'Nổi lên'], ['phong', 'Phóng to vào'], ['xoay', 'Xoay vào'], ['nhoe', 'Nhoè vào'], ['go', 'Gõ chữ'], ['nay', 'Nảy liên tục'], ['lac', 'Lắc'], ['khong', 'Không']], g.hu || 'pop', v => { g.hu = v; delete g.boVao; });
   oChon(n2, 'Ra', [['mo', 'Mờ dần'], ['thu', 'Thu nhỏ'], ['truot', 'Trượt ra'], ['roi', 'Rơi xuống'], ['khong', 'Không']], g.ra || 'mo', v => { g.ra = v; delete g.boRa; });
