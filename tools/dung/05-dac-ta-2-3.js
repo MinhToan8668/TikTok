@@ -379,11 +379,13 @@ const MAU_TAG = [['#ff4d6d', 'Đỏ'], ['#ffb020', 'Cam'], ['#ffd400', 'Vàng'],
 /* ── chế độ Chọn (V) / Cắt (C) ── */
 function datCheDo(m, im) { P.cheDo = m; $('#tlIn').classList.toggle('cheDoCat', m === 'cat'); $('#btnCheChon').setAttribute('aria-pressed', String(m !== 'cat')); $('#btnCheCat').setAttribute('aria-pressed', String(m === 'cat')); if (!im) toast(m === 'cat' ? 'Chế độ Cắt (C): bấm lên đoạn để tách đúng chỗ bấm · V để về Chọn' : 'Chế độ Chọn (V)'); if (m !== 'cat' && $('#catLine')) $('#catLine').style.display = 'none'; }
 /* tách một mục tại t (giây trên dòng thời gian) */
+/* thêm keyframe nội suy tại điểm cắt (lớp phủ, chữ) để hai nửa không nhảy giá trị, giống tách V1 */
+function ghimKfCat(m, off) { if (m.kfs) Object.keys(m.kfs).forEach(p => { const ds = m.kfs[p]; if (!ds || !ds.length || kfTai(m, p, off) >= 0) return; ds.push({ t: +off.toFixed(3), v: giaTriKf(m, p, off), e: 'deu' }); ds.sort((a, b) => a.t - b.t); }); }
 function tachMot(k, m, t) {
   if (!m || khoaMuc(k, m)) return false;
   if (k === 'v') { const i = P.clips.indexOf(m), off = t - batDauC(m); if (m.trong || m.cong || off < 1 / fpsDuAn() - 1e-6 || off > daiC(m) - 1 / fpsDuAn() + 1e-6) return false; return tachV1(i, off); }
-  if (k === 'b') { const toc = tocC(m), off = t - m.t_bd, len = (m.kt - m.bd) / toc; if (off <= 0.05 || off >= len - 0.05) return false; const cat = +(m.bd + off * toc).toFixed(3), m2 = JSON.parse(JSON.stringify(m)); m2.id = uid(); m2.bd = cat; m2.t_bd = khungGiay(t); delete m2.nhom; m.kt = cat; doiKf(m, 0); doiKf(m2, -off); P.broll.push(m2); return true; }
-  if (k === 'g') { if (t <= m.bd + 0.05 || t >= m.kt - 0.05) return false; const off = t - m.bd, m2 = JSON.parse(JSON.stringify(m)); m2.id = uid(); m2.bd = khungGiay(t); m2.boVao = true; delete m2.nhom; m.kt = khungGiay(t); m.boRa = true; doiKf(m, 0); doiKf(m2, -off); P.gfx.push(m2); return true; }
+  if (k === 'b') { const toc = tocC(m), off = t - m.t_bd, len = (m.kt - m.bd) / toc; if (off <= 0.05 || off >= len - 0.05) return false; ghimKfCat(m, off); const cat = +(m.bd + off * toc).toFixed(3), m2 = JSON.parse(JSON.stringify(m)); m2.id = uid(); m2.bd = cat; m2.t_bd = khungGiay(t); delete m2.nhom; m.kt = cat; doiKf(m, 0); doiKf(m2, -off); P.broll.push(m2); return true; }
+  if (k === 'g') { if (t <= m.bd + 0.05 || t >= m.kt - 0.05) return false; const off = t - m.bd; ghimKfCat(m, off); const m2 = JSON.parse(JSON.stringify(m)); m2.id = uid(); m2.bd = khungGiay(t); m2.boVao = true; delete m2.nhom; m.kt = khungGiay(t); m.boRa = true; doiKf(m, 0); doiKf(m2, -off); P.gfx.push(m2); return true; }
   if (k === 'a') { const off = t - m.t_bd; if (off <= 0.05 || off >= m.kt - m.bd - 0.05) return false; const giua = +(m.bd + off).toFixed(3); P.am3.push(am3Day([{ ...JSON.parse(JSON.stringify(m)), id: uid(), bd: giua, t_bd: khungGiay(t), fi: 0 }])[0]); m.kt = giua; m.fo = 0; return true; }
   return false;
 }
