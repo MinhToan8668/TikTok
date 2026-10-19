@@ -1,6 +1,6 @@
 /* ═════════ BẢN ĐẦY ĐỦ (10/2026): thuộc tính đoạn kiểu CapCut/Vyra · keyframe · màu · chữ tự do · chroma key ·
    cắt khoảng lặng · đóng băng · mốc · tỉ lệ khung · phong cách · phiên bản & tạo short ═════════ */
-const PROP_MD = { x: 0, y: 0, sc: 1, xoay: 0, mo: 1, am: 1, toc: 1, fi: 0, fo: 0, loc: 'khong', locMuc: 1, sang: 0, tuong_phan: 0, bao_hoa: 0, phoi: 0, nhiet: 0, tint: 0, sang_cao: 0, toi: 0, vignette: 0, hat: 0, hu2: 'khong', latX: false, latY: false, cat: null, kfs: null, anVao: null, anRa: null, kf: false, sc2: null, x2: null, y2: null };
+const PROP_MD = { huMuc: 1, trang: 0, den: 0, hue: 0, vib: 0, phai: 0, net: 0, ro: 0, x: 0, y: 0, sc: 1, xoay: 0, mo: 1, am: 1, toc: 1, fi: 0, fo: 0, loc: 'khong', locMuc: 1, sang: 0, tuong_phan: 0, bao_hoa: 0, phoi: 0, nhiet: 0, tint: 0, sang_cao: 0, toi: 0, vignette: 0, hat: 0, hu2: 'khong', latX: false, latY: false, cat: null, kfs: null, anVao: null, anRa: null, kf: false, sc2: null, x2: null, y2: null };
 Object.assign(PROP_MD, { scX: 1, scY: 1 });   /* spec 2.4: co giãn rộng / cao riêng (bỏ khoá tỉ lệ) */
 function propsC(c) { const o = {}; Object.keys(PROP_MD).forEach(k => { if (c[k] != null && c[k] !== PROP_MD[k]) o[k] = c[k]; }); return o; }
 function fadeHeSo(c, off) { const dai = daiC(c); let a = 1; if (c.fi > 0) a = Math.min(a, Math.max(0, off / c.fi)); if (c.fo > 0) a = Math.min(a, Math.max(0, (dai - off) / c.fo)); return a; }
@@ -83,16 +83,17 @@ function veThuocTinhDoan(box, c) {
   veKhuOn(n3, c); veAmThanhThem(n3, c);
   const n4 = el('div', 'nhom2'); n4.appendChild(el('b', null, 'Màu')); box.appendChild(n4);
   oChon(n4, 'Bộ lọc', Object.keys(LOC).map(k => [k, LOC[k][0]]), c.loc || 'khong', v => { c.loc = v; });
-  oTruot(n4, 'Độ sáng', -50, 50, 1, c.sang || 0, sgn, v => { c.sang = v; });
-  oTruot(n4, 'Tương phản', -50, 50, 1, c.tuong_phan || 0, sgn, v => { c.tuong_phan = v; });
-  oTruot(n4, 'Bão hoà', -100, 100, 1, c.bao_hoa || 0, sgn, v => { c.bao_hoa = v; });
-  if (c.loc && c.loc !== 'khong') oTruot(n4, 'Cường độ bộ lọc', 0, 1, 0.01, c.locMuc == null ? 1 : c.locMuc, pct, v => { c.locMuc = v; });
-  [['phoi', 'Phơi sáng'], ['nhiet', 'Nhiệt độ (ấm/lạnh)'], ['tint', 'Tint (xanh/hồng)'], ['sang_cao', 'Vùng sáng'], ['toi', 'Vùng tối']].forEach(([k, t]) => oTruot(n4, t, -100, 100, 1, c[k] || 0, sgn, v => { c[k] = v; }));
-  [['vignette', 'Viền tối (vignette)'], ['hat', 'Hạt phim']].forEach(([k, t]) => oTruot(n4, t, 0, 100, 1, c[k] || 0, v => Math.round(v) + '', v => { c[k] = v; }));
-  [['trang', 'Trắng (whites)', -100, 100], ['den', 'Đen (blacks)', -100, 100], ['hue', 'Sắc độ (hue)', -180, 180], ['vib', 'Độ rực (vibrance)', -100, 100], ['phai', 'Phai màu (fade)', 0, 100], ['net', 'Độ nét (sharpen)', 0, 100], ['ro', 'Độ trong (clarity)', -100, 100]].forEach(([k, t, a, b]) => oTruot(n4, t, a, b, 1, c[k] || 0, k === 'hue' ? v => Math.round(v) + '°' : sgn, v => { c[k] = v; }));
+  /* mọi thanh màu đều có ◇ keyframe (học từ Lumetri của FilmCraft): kéo dần màu, sáng, nhiệt độ… theo thời gian */
+  oTruotKf(n4, 'Độ sáng', -50, 50, 1, 'v', c, 'sang', sgn);
+  oTruotKf(n4, 'Tương phản', -50, 50, 1, 'v', c, 'tuong_phan', sgn);
+  oTruotKf(n4, 'Bão hoà', -100, 100, 1, 'v', c, 'bao_hoa', sgn);
+  if (c.loc && c.loc !== 'khong') oTruotKf(n4, 'Cường độ bộ lọc', 0, 1, 0.01, 'v', c, 'locMuc', pct);
+  [['phoi', 'Phơi sáng'], ['nhiet', 'Nhiệt độ (ấm/lạnh)'], ['tint', 'Tint (xanh/hồng)'], ['sang_cao', 'Vùng sáng'], ['toi', 'Vùng tối']].forEach(([k, t]) => oTruotKf(n4, t, -100, 100, 1, 'v', c, k, sgn));
+  [['vignette', 'Viền tối (vignette)'], ['hat', 'Hạt phim']].forEach(([k, t]) => oTruotKf(n4, t, 0, 100, 1, 'v', c, k, v => Math.round(v) + ''));
+  [['trang', 'Trắng (whites)', -100, 100], ['den', 'Đen (blacks)', -100, 100], ['hue', 'Sắc độ (hue)', -180, 180], ['vib', 'Độ rực (vibrance)', -100, 100], ['phai', 'Phai màu (fade)', 0, 100], ['net', 'Độ nét (sharpen)', 0, 100], ['ro', 'Độ trong (clarity)', -100, 100]].forEach(([k, t, a, b]) => oTruotKf(n4, t, a, b, 1, 'v', c, k, k === 'hue' ? v => Math.round(v) + '°' : sgn));
   oChon(n4, 'LUT', [['', 'Không'], ...Object.values(P.luts || {}).map(l => [l.id, l.ten + ' (' + l.n + '³)'])], c.lut && P.luts[c.lut] ? c.lut : '', v => { if (v) c.lut = v; else delete c.lut; veProp(); });
   if (c.lut && P.luts[c.lut]) oTruot(n4, 'Cường độ LUT', 0, 1, 0.01, c.lutMuc == null ? 1 : c.lutMuc, pct, v => { c.lutMuc = v; });
-  oChon(n4, 'Hiệu ứng', Object.keys(HIEU_UNG).map(k => [k, HIEU_UNG[k]]), c.hu2 || 'khong', v => { c.hu2 = v; veProp(); }); if (typeof laHuKho === 'function' && laHuKho(c)) oTruot(n4, 'Cường độ hiệu ứng', 0, 1, 0.01, c.huMuc == null ? 1 : c.huMuc, pct, v => { c.huMuc = v; });
+  oChon(n4, 'Hiệu ứng', Object.keys(HIEU_UNG).map(k => [k, HIEU_UNG[k]]), c.hu2 || 'khong', v => { c.hu2 = v; veProp(); }); if (typeof laHuKho === 'function' && laHuKho(c)) oTruotKf(n4, 'Cường độ hiệu ứng', 0, 1, 0.01, 'v', c, 'huMuc', pct);
   const r2 = el('div', 'row'); const ap = el('button', 'btn nho', 'Áp màu cho mọi đoạn'); ap.type = 'button'; ap.onclick = () => { luuHoanTac(); P.clips.forEach(k => { ['loc', 'locMuc', 'sang', 'tuong_phan', 'bao_hoa', 'phoi', 'nhiet', 'tint', 'sang_cao', 'toi', 'vignette', 'hat', 'trang', 'den', 'hue', 'vib', 'phai', 'net', 'ro', 'lut', 'lutMuc', 'banh', 'cmau', 'hsl'].forEach(p => { if (c[p] == null) delete k[p]; else k[p] = JSON.parse(JSON.stringify(c[p])); }); }); veTl(); veKhung(); toast('Đã áp màu cho ' + P.clips.length + ' đoạn'); }; r2.appendChild(ap);
   const dl = el('button', 'btn nho ghost', 'Đặt lại thuộc tính'); dl.type = 'button'; dl.onclick = () => { luuHoanTac(); let acc = 0; for (const k of P.clips) { if (k === c) break; acc += daiC(k); } const cu = daiC(c); [...Object.keys(PROP_MD), 'trang', 'den', 'hue', 'vib', 'phai', 'net', 'ro', 'lut', 'lutMuc', 'mn', 'banh', 'cmau', 'hsl', 'khuOn'].forEach(k => { delete c[k]; }); ripple(acc + cu, daiC(c) - cu); veTl(); veProp(); veKhung(); }; r2.appendChild(dl); n4.appendChild(r2);
   veBanhXe(box, c); veDuongCong(box, c); veHsl(box, c); veThuocTinhTrangTri(box, c); veThuocTinhMb(box, 'v', c); veThuocTinhMatNa(box, 'v', c);
@@ -423,7 +424,7 @@ function anhBia() { try { const c = document.createElement('canvas'); c.width = 
 let luuDangCho = null, luuKhoa = '';
 async function tuLuu(ngay) {
   if (!window.indexedDB || (!P.clips.length && !P.srcs.length)) return;
-  const j = duAnJson(), khoa = JSON.stringify([j.clips, j.gfx, j.broll, j.am3, j.ten, j.moc, j.cai, P.srcs.length, j.tieng.map(t => [t.id, t.t_bd]), j.pdNgoai, j.pdY, j.mau]);   // đổi lồng tiếng, phụ đề nhập, vị trí phụ đề cũng tự lưu if (!ngay && khoa === luuKhoa) return;
+  const j = duAnJson(), khoa = JSON.stringify([j.clips, j.gfx, j.broll, j.am3, j.ten, j.moc, j.cai, P.srcs.length, j.tieng.map(t => [t.id, t.t_bd]), j.pdNgoai, j.pdY, j.mau, j.tr]);   // đổi lồng tiếng, phụ đề nhập, vị trí phụ đề cũng tự lưu if (!ngay && khoa === luuKhoa) return;
   P.duAnId = P.duAnId || 'da_' + uid(); const cu = await dbLay(KHO_DA, P.duAnId).catch(() => null);
   const rec = { id: P.duAnId, ten: j.ten || 'Video mới', tao: (cu && cu.tao) || Date.now(), sua: Date.now(), xoa: null, bia: P.bia || anhBia() || (cu && cu.bia) || '', biaTay: P.bia || '', giay: +tongGiay().toFixed(2), dungLuong: P.srcs.reduce((s, x) => s + (x.file ? x.file.size : 0), 0), media: P.srcs.filter(s => s.file).map(s => ({ ten: s.ten, size: s.file.size })), json: j };
   try { await dbGhi(KHO_DA, rec); luuKhoa = khoa; const tt = $('#luuTt'); if (tt) tt.textContent = '✓ Tự lưu ' + new Date().toTimeString().slice(0, 8); } catch (e) { console.warn('tự lưu', e); }

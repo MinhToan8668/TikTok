@@ -8,7 +8,7 @@
 <meta name="description" content="Trình dựng video AI kiểu Vyra: thêm footage, AI chép lời từng từ, nhận diện cảnh và khoảnh khắc, dựng nhiều track theo yêu cầu, phụ đề karaoke, đồ hoạ, nhạc theo beat, xuất MP4 ngay trên máy.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Montserrat:wght@800;900&family=Lexend:wght@700;800&family=Oswald:wght@700&family=Anton&family=Playfair+Display:ital,wght@0,800;1,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Montserrat:wght@800;900&family=Lexend:wght@700;800&family=Oswald:wght@700&family=Anton&family=Playfair+Display:ital,wght@0,800;1,800&display=swap" rel="stylesheet">
 <style>
   :root{
     --paper:#F9E8DD; --ink:#26210F; --lime:#99DF00; --moss:#1B220D;
@@ -1076,6 +1076,7 @@
   .ed.ccw .item .h:hover::after,.ed.ccw .item .h:active::after{display:block}
   .ed .track .gapChon{position:absolute;top:2px;bottom:2px;background:rgba(255,255,255,.14);border:1px dashed rgba(255,255,255,.55);border-radius:4px;pointer-events:none;z-index:1}
 </style>
+<link rel="stylesheet" href="dung/giao-dien-fc.css?v=202610201400">
 </head>
 <body>
 <div class="wrap">
@@ -1100,7 +1101,7 @@
     <a class="ft" href="cham-video.html"><span class="fi" aria-hidden="true">🎯</span>Chấm video của bạn</a>
   </nav>
 
-  <div class="ed" id="ed">
+  <div class="ed fc" id="ed">
     <div class="etop">
       <div class="logo"><i data-ic="scissor"></i><b>Viral Studio</b></div>
       <button class="btn ghost nho" id="btnMenu" type="button" title="Menu">Menu ▾</button>
@@ -1400,6 +1401,6 @@
 <script>document.addEventListener("DOMContentLoaded",function(){if(typeof TK==="undefined"){var k=document.createElement("div");k.style.cssText="position:fixed;left:12px;right:12px;bottom:12px;z-index:9999;background:#ff4d6d;color:#fff;padding:12px 14px;border-radius:12px;font:14px system-ui;display:flex;gap:10px;align-items:center;justify-content:space-between";k.innerHTML="Trang tải thiếu một phần (mạng chập chờn) nên nút AI chưa chạy được. <button onclick=\"location.reload()\" style=\"background:#fff;color:#000;border:0;border-radius:8px;padding:6px 12px;font-weight:700\">Tải lại trang</button>";document.body.appendChild(k);}});</script>
 <script src="kho/kho.js?v=20261006c"></script>
 <!-- phần JS của trình dựng tách thành tools/dung/*.js (cùng global scope, giữ nguyên thứ tự) -->
-<script src="dung/nap.js?v=202610201000" data-phu="sang-filmcraft.js?v=202610131900,noi-thu-muc.js?v=202610140600,cau-noi-xa.js?v=202610140600,tro-ly.js?v=202610011200"></script>
+<script src="dung/nap.js?v=202610201400" data-phu="sang-filmcraft.js?v=202610131900,noi-thu-muc.js?v=202610140600,cau-noi-xa.js?v=202610140600,tro-ly.js?v=202610011200"></script>
 </body>
 </html>

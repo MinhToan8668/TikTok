@@ -7,7 +7,7 @@
    ═══════════════════════════════════════════════════════════════ */
 (function () {
   var me = document.currentScript, v = (me && me.src.split('?v=')[1]) || '';
-  var DS = ['00-loi', '01-dong-thoi-gian', '02-thao-tac', '03-giao-dien-capcut', '04-day-du', '05-dac-ta-2-3', '06-m3-mobile-kho', '07-chi-tiet', '08-clip-ghep-spec'];
+  var DS = ['00-loi', '01-dong-thoi-gian', '02-thao-tac', '03-giao-dien-capcut', '04-day-du', '05-dac-ta-2-3', '06-m3-mobile-kho', '07-chi-tiet', '08-clip-ghep-spec', '09-chuyen-nghiep'];
   var PHU = (me && me.dataset.phu ? me.dataset.phu.split(',') : []);
   function loi(chu) {
     var k = document.createElement('div');
