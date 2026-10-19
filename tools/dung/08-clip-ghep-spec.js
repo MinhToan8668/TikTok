@@ -227,20 +227,20 @@ function khoiTaoKeoTha() {
 function mucCuaLan(l) { return moiMuc().filter(o => (o.k === 'b' || o.k === 'g') && lopCua(o.k, o.m) === l); }
 function veKhoangChon() { $$('#tlIn .gapChon').forEach(x => x.remove()); const g = P.gapChon; if (!g) return; const tr = hangCua(g.lop); if (!tr) return; const d = el('div', 'gapChon'); d.style.left = g.t0 * PX() + 'px'; d.style.width = Math.max(2, (g.t1 - g.t0) * PX()) + 'px'; d.title = 'Khoảng trống ' + fmt1(g.t1 - g.t0) + 's · Delete để dồn các mục phía sau lên'; tr.appendChild(d); }
 function xoaKhoangTrong() {
-  const g = P.gapChon; if (!g) return false; const d = g.t1 - g.t0; if (!(d > 1e-3)) { P.gapChon = null; veKhoangChon(); return false; }
+  const g = P.gapChon; if (!g) return false; if (trKhoa(keyLop(g.lop))) { baoKhoa(); return false; } const d = g.t1 - g.t0; if (!(d > 1e-3)) { P.gapChon = null; veKhoangChon(); return false; }
   luuHoanTac(); mucCuaLan(g.lop).forEach(o => { const [a] = khoangMuc(o.k, o.m); if (a >= g.t1 - 1e-3) datBatDau(o.k, o.m, a - d); });
   P.gapChon = null; veTl(); veKhung(); toast('Đã xoá khoảng trống ' + fmt1(d) + 's'); return true;
 }
 function khoiTaoKhoangTrong() {
   const tin = $('#tlIn'); if (!tin) return;
   tin.addEventListener('pointerdown', e => {
-    if (e.button !== 0) return; if (e.target.closest('.item')) { if (P.gapChon) { P.gapChon = null; veKhoangChon(); } return; }
+    if (e.button !== 0) return; if (e.target.closest('.item, .trn')) { if (P.gapChon) { P.gapChon = null; veKhoangChon(); } return; }
     const tr = e.target.closest('.track[data-lop]'); if (!tr) { if (P.gapChon) { P.gapChon = null; veKhoangChon(); } return; }
     const l = +tr.dataset.lop, r = tr.getBoundingClientRect(), t = (e.clientX - r.left) / PX(); let t0 = 0, t1 = null;
     mucCuaLan(l).forEach(o => { const [a, b] = khoangMuc(o.k, o.m); if (b <= t + 1e-6) t0 = Math.max(t0, b); if (a >= t - 1e-6) t1 = t1 == null ? a : Math.min(t1, a); });
     P.gapChon = t1 != null && t1 - t0 > 1e-3 ? { lop: l, t0: +t0.toFixed(3), t1: +t1.toFixed(3) } : null; setTimeout(veKhoangChon, 0);
-  });
-  document.addEventListener('keydown', e => { const a = document.activeElement; if (a && (/INPUT|TEXTAREA|SELECT/.test(a.tagName) || a.isContentEditable)) return; if (P.gapChon && (e.key === 'Delete' || e.key === 'Backspace')) { e.preventDefault(); e.stopImmediatePropagation(); xoaKhoangTrong(); } }, true);
+  }, true);   // pha capture: mục trên dòng thời gian chặn bubble nên phải bắt trước
+  document.addEventListener('keydown', e => { const a = document.activeElement; if (a && (/INPUT|TEXTAREA|SELECT/.test(a.tagName) || a.isContentEditable)) return; if (P.gapChon && !P.chon && !dsNhieu().length && (e.key === 'Delete' || e.key === 'Backspace')) { e.preventDefault(); e.stopImmediatePropagation(); xoaKhoangTrong(); } }, true);
   const veTlG = veTl; veTl = function () { const r = veTlG.apply(this, arguments); try { veKhoangChon(); } catch { } return r; };
   // Alt giữ khi kéo → tắt hít
   ['keydown', 'keyup'].forEach(ev => document.addEventListener(ev, e => { P.giuAlt = e.altKey; }, true));
@@ -252,19 +252,19 @@ function khoiTaoKhoangTrong() {
 /* spec 7: chỉ âm thanh MP3 — bộ mã lamejs nạp khi cần (trình duyệt không có sẵn MP3), mã hoá từng khúc, có % và Huỷ */
 const LAME_URL = 'https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js';
 let lameCho = null; function napLame() { if (window.lamejs) return Promise.resolve(window.lamejs); return lameCho || (lameCho = new Promise((ok, loi) => { const sc = document.createElement('script'); sc.src = LAME_URL; sc.crossOrigin = 'anonymous'; sc.onload = () => window.lamejs ? ok(window.lamejs) : loi(new Error('không nạp được bộ mã MP3')); sc.onerror = () => { lameCho = null; loi(new Error('không tải được bộ mã MP3')); }; document.head.appendChild(sc); })); }
-async function xuatMp3(o) {
-  const L = await napLame(), [ka, kb] = khoangXuat(o), mix = catBuf(await tronAmThanh(tongGiay()), ka, kb); if (P.huyXuat) return null;
+async function xuatMp3(o) { const phien = P.phienXuat;
+  const L = await napLame(), [ka, kb] = khoangXuat(o), mix = catBuf(await tronAmThanh(tongGiay()), ka, kb); if ((P.huyXuat || phien !== P.phienXuat)) return null;
   const sr = mix.sampleRate, ch = Math.min(2, mix.numberOfChannels), kbps = [128, 192, 320].includes(o.am) ? o.am : 192, enc = new L.Mp3Encoder(ch, sr, kbps), toI16 = f => { const o2 = new Int16Array(f.length); for (let i = 0; i < f.length; i++) { const v = Math.max(-1, Math.min(1, f[i])); o2[i] = v < 0 ? v * 0x8000 : v * 0x7fff; } return o2; };
   const Lc = toI16(mix.getChannelData(0)), Rc = ch > 1 ? toI16(mix.getChannelData(1)) : null, out = [], buoc = 1152 * 40, t0 = performance.now();
-  for (let i = 0; i < Lc.length; i += buoc) { if (P.huyXuat) return null; const a = Lc.subarray(i, i + buoc), b = Rc ? Rc.subarray(i, i + buoc) : null, d = b ? enc.encodeBuffer(a, b) : enc.encodeBuffer(a); if (d.length) out.push(new Uint8Array(d)); const pc = Math.min(1, (i + buoc) / Lc.length), tg = (performance.now() - t0) / 1000; $('#xuatBar').style.width = (pc * 100).toFixed(1) + '%'; $('#xuatTt').textContent = Math.floor(pc * 100) + '% · còn ~' + tgCon(tg / pc * (1 - pc)) + ' · MP3 ' + kbps + ' kbps'; await new Promise(r => setTimeout(r, 0)); }
+  for (let i = 0; i < Lc.length; i += buoc) { if ((P.huyXuat || phien !== P.phienXuat)) return null; const a = Lc.subarray(i, i + buoc), b = Rc ? Rc.subarray(i, i + buoc) : null, d = b ? enc.encodeBuffer(a, b) : enc.encodeBuffer(a); if (d.length) out.push(new Uint8Array(d)); const pc = Math.min(1, (i + buoc) / Lc.length), tg = (performance.now() - t0) / 1000; $('#xuatBar').style.width = (pc * 100).toFixed(1) + '%'; $('#xuatTt').textContent = Math.floor(pc * 100) + '% · còn ~' + tgCon(tg / pc * (1 - pc)) + ' · MP3 ' + kbps + ' kbps'; await new Promise(r => setTimeout(r, 0)); }
   const cuoi = enc.flush(); if (cuoi.length) out.push(new Uint8Array(cuoi)); return new Blob(out, { type: 'audio/mpeg' });
 }
 function tgCon(g) { g = Math.max(0, Math.ceil(g)); return g < 60 ? g + 's' : Math.floor(g / 60) + ':' + String(g % 60).padStart(2, '0'); }
-async function xuatM4a(o) {
+async function xuatM4a(o) { const phien = P.phienXuat;
   const M = await napMB(), [ka, kb] = khoangXuat(o), fmt = new M.Mp4OutputFormat({ fastStart: 'in-memory' });
   const acd = await M.getFirstEncodableAudioCodec(['aac'], { numberOfChannels: 2, sampleRate: 48000 }); if (!acd) throw new Error('máy không mã hoá được AAC');
   const out = new M.Output({ format: fmt, target: new M.BufferTarget() }), as = new M.AudioBufferSource({ codec: acd, bitrate: (o.am || 192) * 1000 }); out.addAudioTrack(as); await out.start();
-  const mix = catBuf(await tronAmThanh(tongGiay()), ka, kb); if (P.huyXuat) { await out.cancel(); return null; }
+  const mix = catBuf(await tronAmThanh(tongGiay()), ka, kb); if ((P.huyXuat || phien !== P.phienXuat)) { await out.cancel(); return null; }
   $('#xuatBar').style.width = '60%'; $('#xuatTt').textContent = '60% · đang mã hoá AAC ' + (o.am || 192) + ' kbps…'; await as.add(mix); as.close(); await out.finalize();
   return new Blob([out.target.buffer], { type: 'audio/mp4' });
 }

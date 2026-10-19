@@ -346,7 +346,7 @@ function huProg(id) {
 }
 function apHuKho(c, s, im, off) {
   const id = String(c.hu2).slice(4), pr = huProg(id); const gl = HU_GL.gl; if (!pr || !gl || !s.w) return [s, im];
-  const k = Math.min(1, 1280 / Math.max(s.w, s.h)), w = Math.round(s.w * k), h = Math.round(s.h * k); if (HU_GL.cv.width !== w || HU_GL.cv.height !== h) { HU_GL.cv.width = w; HU_GL.cv.height = h; gl.viewport(0, 0, w, h); }
+  const k = Math.min(1, canhXuLy(1280) / Math.max(s.w, s.h)), w = Math.round(s.w * k), h = Math.round(s.h * k); if (HU_GL.cv.width !== w || HU_GL.cv.height !== h) { HU_GL.cv.width = w; HU_GL.cv.height = h; gl.viewport(0, 0, w, h); }
   gl.useProgram(pr); gl.bindBuffer(gl.ARRAY_BUFFER, HU_GL.buf); const loc = gl.getAttribLocation(pr, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
   gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, HU_GL.tex); try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, im); } catch { return [s, im]; }
   gl.uniform1i(gl.getUniformLocation(pr, 's'), 0); gl.uniform1f(gl.getUniformLocation(pr, 't'), off || 0); gl.uniform1f(gl.getUniformLocation(pr, 'muc'), c.huMuc == null ? 1 : +c.huMuc); gl.uniform2f(gl.getUniformLocation(pr, 'res'), w, h);
