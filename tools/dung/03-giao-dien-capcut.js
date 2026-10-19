@@ -1,5 +1,16 @@
 /* ═════════ GIAO DIỆN KIỂU CAPCUT (bố cục, icon, thao tác học từ OpenCut) ═════════ */
 const IC = {
+  back: '<path d="m15 18-6-6 6-6"/>',
+  speed: '<path d="M12 14l4-4"/><path d="M3.3 14a9 9 0 1 1 17.4 0"/><path d="M12 3v2M5.6 5.6l1.4 1.4M18.4 5.6 17 7"/>',
+  anim: '<path d="M5 12h4M3 7h6M5 17h4"/><circle cx="15.5" cy="12" r="5.5"/>',
+  props: '<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>',
+  dl: '<path d="M12 3v12M7 10l5 5 5-5M5 21h14"/>',
+  film: '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 3v18M17 3v18M3 8h4M3 16h4M17 8h4M17 16h4"/>',
+  bolt: '<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>',
+  doc: '<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/>',
+  target: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
+  home: '<path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10"/>',
+  check: '<path d="M20 6 9 17l-5-5"/>',
   scissor: '<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.1 15.9M14.5 14.5 20 20M8.1 8.1 12 12"/>',
   media: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m10 9 5 3-5 3z"/>',
   audio: '<path d="M9 18V6l10-2v12"/><circle cx="6" cy="18" r="3"/><circle cx="16" cy="16" r="3"/>',
@@ -50,7 +61,7 @@ const IC = {
   group: '<rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/><path d="M11 7h6v6M13 17H7v-6"/>',
   paste: '<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>'
 };
-function ic(k) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (IC[k] || '') + '</svg>'; }
+function ic(k) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (IC[k] || '') + '</svg>'; }
 /* đồng hồ kiểu CapCut: giờ:phút:giây:khung */
 function tc(t) { return fmtTC(t); }
 function datTg(tong) { const g = $('#tg'); if (g && !g.querySelector('input')) g.innerHTML = '<b>' + tc(P.t) + '</b> / ' + tc(tong); const t2 = $('#tiLe2'); if (t2 && t2.value !== $('#tiLe').value) t2.value = $('#tiLe').value; }
@@ -243,7 +254,7 @@ function khoiTaoUI() {
   veTl(); veProp();
 }
 
-function veMotBroll(ctx, W, H, t, b) { if (b.an) return; const dai = (b.kt - b.bd) / tocC(b); if (t < b.t_bd || t >= b.t_bd + dai) return; const sb = srcCua(b.src); if (!sb || !sb.el) return; let im = sb.loai === 'video' ? elPhu(sb, 'elB') : sb.el; if (b.chroma) im = chromaKey(im, sb, b) || im; let sbx = sb; [sbx, im] = catNguon(b, sb, im, 1); [sbx, im] = chinhMau(b, sbx, im, t); const a = b.kieu === 'ghep' ? 1 : Math.min(1, (t - b.t_bd) / 0.25, (b.t_bd + dai - t) / 0.25);   // độ mờ b.mo đã tính trong apDoan (clip ghép không tự mờ hai đầu)
+function veMotBroll(ctx, W, H, t, b) { if (b.an) return; const dai = (b.kt - b.bd) / tocC(b); if (t < b.t_bd || t >= b.t_bd + dai) return; const sb = srcCua(b.src); if (!sb || !sb.el) return; let im = sb.loai === 'video' ? elPhu(sb, 'elB') : sb.el; if (b.chroma) im = chromaKey(im, sb, b) || im; let sbx = sb; [sbx, im] = catNguon(b, sb, im, 1); [sbx, im] = chinhMau(mauTai(b, t - b.t_bd), sbx, im, t); const a = b.kieu === 'ghep' ? 1 : Math.min(1, (t - b.t_bd) / 0.25, (b.t_bd + dai - t) / 0.25);   // độ mờ b.mo đã tính trong apDoan (clip ghép không tự mờ hai đầu)
     apDoan(ctx, W, H, b, t - b.t_bd, ctx => { ctx.save(); ctx.globalAlpha *= Math.max(0, a); const sb = sbx;
     if (b.kieu === 'pip') { const pw = W * 0.72, ph = pw * 9 / 16, px0 = W / 2 - pw / 2, py0 = H * 0.13; ctx.beginPath(); ctx.roundRect(px0, py0, pw, ph, W * 0.03); ctx.fillStyle = '#000'; ctx.fill(); ctx.clip(); const iw = sb.w || 1, ih = sb.h || 1, sc = Math.max(pw / iw, ph / ih); ctx.drawImage(im, px0 + pw / 2 - iw * sc / 2, py0 + ph / 2 - ih * sc / 2, iw * sc, ih * sc); ctx.restore(); ctx.save(); ctx.strokeStyle = mauNhan(); ctx.lineWidth = W * 0.008; ctx.beginPath(); ctx.roundRect(px0, py0, pw, ph, W * 0.03); ctx.stroke(); }
     else if (b.vua === 'contain') { const iw = sb.w || 1, ih = sb.h || 1, k = Math.min(W / iw, H / ih); ctx.drawImage(im, W / 2 - iw * k / 2, H / 2 - ih * k / 2, iw * k, ih * k); }

@@ -124,8 +124,8 @@ function veTaoMobi() { const ed = $('#ed'); if (laMobi()) doHBar(); ed.classList
 function khoiTaoMobi() {
   const trai = $('.ecol.trai'); const dau = el('div', 'sheetDau'); dau.innerHTML = '<span id="sheetTen"></span>'; const x = el('button', 'btn nho xanh'); x.type = 'button'; x.id = 'sheetDong'; x.textContent = '✓'; x.title = 'Xong'; x.onclick = () => moSheet(false); dau.appendChild(x); trai.appendChild(dau);
   const tao = el('div'); tao.id = 'mobTao'; const nut = (ic, t, f) => { const b = el('button'); b.type = 'button'; b.innerHTML = '<i>' + ic + '</i><span>' + t + '</span>'; b.onclick = f; tao.appendChild(b); };
-  nut('✂', 'Tách', () => lenh('tach')); nut('⏱', 'Tốc độ', () => { P.propTab = 'Tốc độ'; moSheet(false); $('#ed').classList.add('co-phai'); veProp(); moTabProp('Tốc độ'); }); nut('🔊', 'Âm lượng', () => { moSheet(false); $('#ed').classList.add('co-phai'); veProp(); moTabProp('Âm thanh'); });
-  nut('✨', 'Hoạt ảnh', () => { moSheet(false); $('#ed').classList.add('co-phai'); veProp(); moTabProp('Hoạt ảnh'); }); nut('⧉', 'Nhân đôi', () => lenh('nhan')); nut('⚙', 'Thuộc tính', () => { moSheet(false); $('#ed').classList.add('co-phai'); veProp(); }); nut('🗑', 'Xoá', () => lenh('xoa')); nut('✕', 'Bỏ chọn', () => { P.chon = null; P.nhieu = []; chonHien(); veProp(); $('#ed').classList.remove('co-phai'); });
+  nut(ic('split'), 'Tách', () => lenh('tach')); nut(ic('speed'), 'Tốc độ', () => { P.propTab = 'Tốc độ'; moSheet(false); $('#ed').classList.add('co-phai'); veProp(); moTabProp('Tốc độ'); }); nut(ic('vol'), 'Âm lượng', () => { moSheet(false); $('#ed').classList.add('co-phai'); veProp(); moTabProp('Âm thanh'); });
+  nut(ic('anim'), 'Hoạt ảnh', () => { moSheet(false); $('#ed').classList.add('co-phai'); veProp(); moTabProp('Hoạt ảnh'); }); nut(ic('copy'), 'Nhân đôi', () => lenh('nhan')); nut(ic('props'), 'Thuộc tính', () => { moSheet(false); $('#ed').classList.add('co-phai'); veProp(); }); nut(ic('trash'), 'Xoá', () => lenh('xoa')); nut('✕', 'Bỏ chọn', () => { P.chon = null; P.nhieu = []; chonHien(); veProp(); $('#ed').classList.remove('co-phai'); });
   $('#ed').appendChild(tao);
   const chonHienCu = chonHien; chonHien = function () { chonHienCu.apply(this, arguments); veTaoMobi(); };
   const doiTabCu = doiTab; doiTab = function (t) { const cung = laMobi() && $('#ed').classList.contains('sheet') && $('[data-pane="' + t + '"]').classList.contains('on'); doiTabCu(t); if (laMobi()) moSheet(!cung); };
@@ -143,7 +143,7 @@ function khoiTaoMobi() {
   datMobi(); addEventListener('resize', datMobi);
 }
 /* Điện thoại kiểu CapCut: nút ‹ về các tool, bảng chức năng chừa khung xem, đóng bảng bằng ✓ / vuốt xuống / nút Back của máy */
-const MOB_TOOL = [['⬇️', 'Tải video', 'tai-ve.html'], ['🎬', 'Soi video viral', 'soi-video.html'], ['⚡', 'Hook viral', 'hook-text.html'], ['📝', 'Kịch bản viral', 'kich-ban.html'], ['🎯', 'Chấm video', 'cham-video.html'], ['🏠', 'Trang khoá học', '../index.html']];
+const MOB_TOOL = [['dl', 'Tải video', 'tai-ve.html'], ['film', 'Soi video viral', 'soi-video.html'], ['bolt', 'Hook viral', 'hook-text.html'], ['doc', 'Kịch bản viral', 'kich-ban.html'], ['target', 'Chấm video', 'cham-video.html'], ['home', 'Trang khoá học', '../index.html']];
 function moCongCu(bat) {
   let h = $('#mobCongCu');
   if (!h) {
@@ -151,7 +151,7 @@ function moCongCu(bat) {
     const hop = el('div', 'hop'), dau = el('div', 'dau'); dau.append(el('b', null, 'Viral Studio'));
     const x = el('button', 'btn nho'); x.type = 'button'; x.textContent = 'Ở lại dựng'; x.onclick = () => moCongCu(false); dau.append(x); hop.append(dau);
     const luoi = el('div', 'luoi');
-    MOB_TOOL.forEach(([ic, ten, url]) => { const a = el('a'); a.href = url; a.innerHTML = '<i>' + ic + '</i><span>' + ten + '</span>'; a.onclick = async e => { e.preventDefault(); try { await tuLuu(true); } catch { } location.href = url; }; luoi.append(a); });
+    MOB_TOOL.forEach(([icon, ten, url]) => { const a = el('a'); a.href = url; a.innerHTML = '<i>' + ic(icon) + '</i><span>' + ten + '</span>'; a.onclick = async e => { e.preventDefault(); try { await tuLuu(true); } catch { } location.href = url; }; luoi.append(a); });
     hop.append(luoi, el('p', 'ghi', 'Dự án đang dựng được tự lưu, quay lại là thấy tiếp.'));
     h.append(hop); h.onclick = e => { if (e.target === h) moCongCu(false); }; $('#ed').append(h);
   }
@@ -160,11 +160,11 @@ function moCongCu(bat) {
 function khoiTaoMobiCC() {
   const ed = $('#ed');
   // nút ‹ ở góc trái thanh trên: chỗ duy nhất trên điện thoại để sang tool khác
-  const ve = el('button', 'btn'); ve.type = 'button'; ve.id = 'mobVe'; ve.innerHTML = '‹'; ve.title = 'Về Viral Studio'; ve.setAttribute('aria-label', 'Về các công cụ khác'); ve.onclick = () => moCongCu(true);
+  const ve = el('button', 'btn'); ve.type = 'button'; ve.id = 'mobVe'; ve.innerHTML = ic('back'); ve.title = 'Về Viral Studio'; ve.setAttribute('aria-label', 'Về các công cụ khác'); ve.onclick = () => moCongCu(true);
   $('.etop').prepend(ve);
   // thanh thao tác đoạn: "‹" quay lại đứng đầu như CapCut thay vì "Bỏ chọn" nằm cuối
   const tao = $('#mobTao'), bo = tao && [...tao.children].find(b => /Bỏ chọn/.test(b.textContent));
-  if (bo) { bo.innerHTML = '<i>‹</i><span>Quay lại</span>'; bo.classList.add('quayLai'); tao.prepend(bo); }
+  if (bo) { bo.innerHTML = '<i>' + ic('back') + '</i><span>Quay lại</span>'; bo.classList.add('quayLai'); tao.prepend(bo); }
   // nút đóng bảng thuộc tính: ✓ to, rõ
   const dp = $('#btnDongPhai'); if (dp) { dp.classList.add('xongMobi'); }
   // vuốt xuống ở đầu bảng để đóng

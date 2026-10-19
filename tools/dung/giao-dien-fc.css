@@ -1,0 +1,126 @@
+/* ═══════════════════════════════════════════════════════════════
+   GIAO DIỆN KIỂU FILMCRAFT cho Dựng nhanh: giữ bố cục CapCut (rail công cụ trái, thư viện, khung xem giữa,
+   thuộc tính phải, dòng thời gian dưới; điện thoại: khung xem trên, thanh công cụ dưới), đổi "chất liệu"
+   sang kiểu FilmCraft / Premiere: xám trung tính, viền 1px, chữ Inter nhẹ, icon nét mảnh một màu,
+   màu nhấn xanh dương, mã thời gian xanh, tab gạch chân.
+   Bật bằng class .fc trên #ed (06-m3-mobile-kho.js · khoiTaoMobiCC). Nạp sau <style> của trang.
+   ═══════════════════════════════════════════════════════════════ */
+.ed.fc{
+  --eb:#141416; --ep:#1b1c1f; --ep2:#26272b; --ep3:#2f3035; --el:#303136; --vien:#2a2b30; --sang:transparent; --bong:none; --kinh:none;
+  --et:#e6e6e8; --em:#9b9ca4; --emo:#6e6f77;
+  --ea:#3b82f6; --eaChu:#6aa4ff; --eaInk:#ffffff; --ea2:#4aa3ff; --eaMo:rgba(59,130,246,.16);
+  --eo:#4aa3ff; --etxt:#c58af9; --emg:#43b581; --ev:#8b7cf6;
+  --ccTl:#17181b; --ccCv:#0f1012; --ccPop:#26272b;
+  --fcTc:#4aa3ff;
+  font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-feature-settings:"cv11","ss01";
+  letter-spacing:0;
+  background:var(--eb);color:var(--et);
+}
+.ed.fc.sang{
+  --eb:#e9eaee; --ep:#f6f6f8; --ep2:#e8e9ed; --ep3:#dcdde2; --el:#d2d3d9; --vien:#d9dadf;
+  --et:#1b1c1f; --em:#5c5d66; --emo:#8a8b93;
+  --ea:#2f6fe4; --eaChu:#2f6fe4; --eaMo:rgba(47,111,228,.12); --fcTc:#2f6fe4; --eo:#2f6fe4;
+  --ccTl:#f1f2f5; --ccCv:#e3e4e8; --ccPop:#ffffff;
+}
+.ed.fc, .ed.fc button, .ed.fc input, .ed.fc select, .ed.fc textarea{font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+
+/* chữ: bỏ đậm 800/900 tràn lan, giữ phân cấp bằng cỡ + màu như FilmCraft */
+.ed.fc b, .ed.fc strong, .ed.fc h3, .ed.fc .btn, .ed.fc .etabs button, .ed.fc .ptabs button, .ed.fc label > span{font-weight:500}
+.ed.fc h3, .ed.fc .nhom2 > b, .ed.fc .nhom2 > summary{font-size:11.5px;font-weight:600;letter-spacing:.02em;color:var(--em);text-transform:none}
+.ed.fc .etop .ten, .ed.fc #tenDuAn{font-weight:600;font-size:13.5px}
+
+/* mặt phẳng: panel phẳng xám, viền 1px, bo nhỏ */
+.ed.fc .ecol, .ed.fc .etl, .ed.fc .epane{background:var(--ep);border-color:var(--vien)!important;box-shadow:none!important;backdrop-filter:none!important}
+.ed.fc.ccw .ecol, .ed.fc.ccw .etl{border-radius:6px}
+.ed.fc .etop{background:var(--ep);border-bottom:1px solid var(--vien);box-shadow:none!important;backdrop-filter:none!important}
+.ed.fc .ecol.giua, .ed.fc .khungVung{background:var(--ccCv)}
+
+/* nút: phẳng, viền mảnh, hover sáng nhẹ */
+.ed.fc .btn{background:var(--ep2);border:1px solid var(--vien);color:var(--et);border-radius:6px;box-shadow:none}
+.ed.fc .btn:hover{background:var(--ep3)}
+.ed.fc .btn.ghost, .ed.fc .btn.nho.ghost{background:transparent;border-color:transparent}
+.ed.fc .btn.xanh, .ed.fc #btnXuat, .ed.fc .tk-chinh{background:var(--ea)!important;border-color:var(--ea)!important;color:#fff!important;font-weight:600;border-radius:999px}
+.ed.fc .btn.xanh:hover, .ed.fc #btnXuat:hover{filter:brightness(1.08)}
+.ed.fc .ic, .ed.fc .etool .btn.nho{color:var(--em)}
+.ed.fc .ic:hover, .ed.fc .etool .btn.nho:hover{color:var(--et);background:var(--ep2)}
+.ed.fc .ic[aria-pressed="true"], .ed.fc .etool .btn.nho[aria-pressed="true"]{color:var(--eaChu)!important;background:var(--eaMo)!important;border-color:transparent!important}
+.ed.fc svg{stroke-width:1.5}
+
+/* rail công cụ + tab: icon xám, mục đang chọn xanh, tab ngang gạch chân như Program / Source */
+.ed.fc .etabs button{color:var(--em);background:transparent!important;border-color:transparent}
+.ed.fc .etabs button:hover{color:var(--et)}
+.ed.fc .etabs button[aria-selected="true"]{color:var(--eaChu)!important;background:var(--eaMo)!important}
+.ed.fc .ptabs button{background:transparent!important;color:var(--em);border-radius:0;border-bottom:2px solid transparent!important;padding-bottom:6px}
+.ed.fc .ptabs button.on{color:var(--et)!important;border-bottom-color:var(--ea)!important}
+
+/* điều khiển: thanh trượt, ô số, công tắc màu xanh */
+.ed.fc input[type=range]{accent-color:var(--ea)}
+.ed.fc input[type=text], .ed.fc input[type=number], .ed.fc select, .ed.fc textarea{background:var(--ccTl);border:1px solid var(--vien);color:var(--et);border-radius:6px}
+.ed.fc input:focus-visible, .ed.fc select:focus-visible, .ed.fc textarea:focus-visible, .ed.fc button:focus-visible{outline:2px solid var(--ea);outline-offset:1px}
+.ed.fc input[type=checkbox]{accent-color:var(--ea)}
+
+/* mã thời gian xanh, số đều như FilmCraft */
+.ed.fc .tg, .ed.fc .etool .tg, .ed.fc .ctl .tg, .ed.fc #tgHien{color:var(--fcTc);font-variant-numeric:tabular-nums;font-weight:500}
+.ed.fc .tg small{color:var(--em)}
+
+/* dòng thời gian: nền tối hơn panel, thước số nhỏ, đầu phát xanh, đoạn bo nhỏ viền mảnh */
+.ed.fc .etl-scroll, .ed.fc .ruler, .ed.fc .track .lb, .ed.fc .etl-trong{background:var(--ccTl)}
+.ed.fc .ruler{color:var(--emo);font-size:10.5px;font-variant-numeric:tabular-nums}
+.ed.fc .ph{background:var(--eo)!important;box-shadow:0 0 0 .5px rgba(0,0,0,.4)}
+.ed.fc .item{border-radius:4px}
+.ed.fc .item b{font-weight:500;font-size:11px}
+.ed.fc .item.sel, .ed.fc .item[aria-selected="true"], .ed.fc .item.chon{outline:2px solid #fff;outline-offset:-1px}
+
+/* menu, toast, hộp thoại */
+.ed.fc .cmenu, body:has(.ed.fc) .cmenu{background:var(--ccPop);border:1px solid var(--vien);border-radius:8px;box-shadow:0 12px 32px rgba(0,0,0,.45)}
+body:has(.ed.fc) .toast{background:#2a2b30;color:#e6e6e8;border:1px solid #34353a;font-family:"Inter",system-ui,sans-serif;font-weight:500}
+
+/* điện thoại: thanh dưới phẳng như app chuyên nghiệp, nhãn nhỏ, icon 22px */
+.ed.fc.mobi .ecol.trai .etabs, .ed.fc.mobi #mobTao{background:var(--ep);border-top:1px solid var(--vien)}
+.ed.fc.mobi .ecol.trai .etabs button{font-size:10.5px;font-weight:500}
+.ed.fc.mobi .ecol.trai .etabs button svg, .ed.fc #mobTao button svg{width:22px;height:22px}
+.ed.fc #mobTao button{color:var(--et);font-size:10.5px;font-weight:500}
+.ed.fc #mobTao button i{display:flex;align-items:center;justify-content:center;height:22px}
+.ed.fc #mobTao .quayLai{color:var(--eaChu)}
+.ed.fc.mobi .sheetDau, .ed.fc.mobi.co-phai .ecol.phai > .etabs{background:var(--ep)}
+.ed.fc.mobi .sheetDau .btn, .ed.fc.mobi #btnDongPhai{background:var(--ea)!important;color:#fff!important}
+.ed.fc #mobCongCu .hop{background:var(--ep);border-top:1px solid var(--vien)}
+.ed.fc #mobCongCu a{background:var(--ep2);border:1px solid var(--vien);font-weight:500}
+.ed.fc #mobCongCu a i svg{width:24px;height:24px}
+.ed.fc #mobVe{background:transparent;border:0;color:var(--et)}.ed.fc #mobVe svg{width:24px;height:24px}
+.ed.fc .etop .logo{background:transparent}
+.ed.fc .tg b, .ed.fc #tg b, .ed.fc #tgXem b{color:var(--fcTc)!important;font-weight:500}
+
+/* ── bảng mới: bàn trộn, chọn khúc, đồng hồ âm lượng ── */
+#fcTron, #fcKhuc{position:fixed;inset:0;z-index:85;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.5);padding:16px}
+#fcTron .hop, #fcKhuc .hop{width:min(560px,100%);max-height:calc(100dvh - 32px);overflow:auto;background:var(--ep);color:var(--et);border:1px solid var(--vien);border-radius:10px;padding:14px 16px;box-shadow:0 24px 60px rgba(0,0,0,.55);font-family:"Inter",system-ui,sans-serif}
+#fcTron .dau, #fcKhuc .dau{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;font-size:14px}
+#fcTron .dau b, #fcKhuc .dau b{font-weight:600}
+#fcTron .hang{display:grid;grid-template-columns:minmax(90px,1fr) 30px 30px minmax(120px,2fr) 64px;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--vien);font-size:13px}
+#fcTron .hang .ten{color:var(--et);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#fcTron .hang .so{color:var(--fcTc,#4aa3ff);font-variant-numeric:tabular-nums;text-align:right;font-size:12px}
+#fcTron .hang .btn{min-width:30px;height:28px;padding:0;font-weight:600;font-size:12px}
+#fcTron .hang .btn.bat{background:var(--ea);color:#fff;border-color:var(--ea)}
+#fcTron input[type=range], #fcKhuc input[type=range]{width:100%;accent-color:var(--ea)}
+#fcTron .ghi, #fcKhuc .ghi{color:var(--em);font-size:12px;margin:10px 0 0}
+#fcKhuc video{width:100%;max-height:52dvh;background:#000;border-radius:6px;display:block}
+#fcKhuc .thanh{position:relative;height:28px;margin:10px 0 6px;background:var(--ccTl,#17181b);border:1px solid var(--vien);border-radius:4px;cursor:pointer;touch-action:none}
+#fcKhuc .vung{position:absolute;top:0;bottom:0;background:rgba(59,130,246,.28);border-left:2px solid var(--ea);border-right:2px solid var(--ea)}
+#fcKhuc .ph{position:absolute;top:-3px;bottom:-3px;width:2px;margin-left:-1px;background:#fff}
+#fcKhuc .tg{font-size:12px;color:var(--em);font-variant-numeric:tabular-nums;margin-bottom:10px}#fcKhuc .tg b{color:var(--fcTc,#4aa3ff);font-weight:500}
+#fcKhuc .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.ed .btnKhuc{display:inline-flex;align-items:center;gap:4px}.ed .btnKhuc svg{width:14px;height:14px}
+.ed .nutTrim.bat{color:var(--eaChu)!important;background:var(--eaMo)!important}
+#fcMeter{position:absolute;right:8px;top:50%;transform:translateY(-50%);height:min(260px,60%);display:grid;grid-template-columns:6px 6px;grid-template-rows:1fr auto;gap:3px 2px;padding:6px 5px;background:rgba(15,16,18,.72);border:1px solid var(--vien);border-radius:6px;z-index:3;pointer-events:auto}
+#fcMeter .cot{position:relative;background:#26272b;border-radius:2px;overflow:hidden}
+#fcMeter .cot i{position:absolute;left:0;right:0;bottom:0;height:0;background:linear-gradient(to top,#43b581 0%,#43b581 70%,#e6c547 85%,#e5534b 100%);background-size:100% 260px;background-position:bottom;transition:height .06s linear}
+#fcMeter .lufs{grid-column:1/-1;font:500 9.5px/1 "Inter",system-ui,sans-serif;color:#9b9ca4;text-align:center;font-variant-numeric:tabular-nums;min-width:22px}
+#fcMeter .lufs.to{color:#e6c547}#fcMeter.vo .lufs{color:#e5534b}
+@media (max-width:760px){#fcMeter{top:8px;right:8px;transform:none;height:90px;grid-template-columns:4px 4px;padding:4px}#fcTron .hang{grid-template-columns:1fr 30px 30px;grid-template-rows:auto auto}#fcTron .hang input{grid-column:1/3}#fcTron .hang .so{grid-column:3}}
+.ed #btnLichSu, .ed #btnTron, .ed .etool .nutTrim{background:transparent;border:0;width:30px;height:30px;padding:5px;color:var(--em);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex:none}
+.ed #btnLichSu svg, .ed #btnTron svg, .ed .etool .nutTrim svg{width:18px;height:18px}
+.ed #btnLichSu:hover, .ed #btnTron:hover, .ed .etool .nutTrim:hover{color:var(--et);background:var(--ep2)}
+.ed .cmenu{max-height:min(70vh,560px);overflow:auto}
+.ed .thWrap .hhKhuc{position:absolute;left:5px;bottom:26px;width:24px;height:24px;border-radius:50%;border:0;background:rgba(20,21,24,.82);color:#fff;padding:4px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.ed .thWrap .hhKhuc svg{width:16px;height:16px}.ed .thWrap .hhKhuc:hover{background:var(--ea)}
