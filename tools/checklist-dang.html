@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Checklist trước khi đăng · Tự Mình Xây Kênh</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Cg%20transform%3D%22rotate%28-9%2032%2017%29%22%3E%3Crect%20x%3D%2219%22%20y%3D%2211%22%20width%3D%2226%22%20height%3D%2212%22%20rx%3D%223%22%20fill%3D%22%2399df00%22/%3E%3Cpath%20d%3D%22M30%2014.4v5.2a1%201%200%200%200%201.52.86l4.6-2.6a1%201%200%200%200%200-1.72l-4.6-2.6A1%201%200%200%200%2030%2014.4z%22%20fill%3D%22%2326210f%22/%3E%3C/g%3E%3Crect%20x%3D%2219%22%20y%3D%2228%22%20width%3D%2226%22%20height%3D%2212%22%20rx%3D%223%22%20fill%3D%22%2326210f%22/%3E%3Crect%20x%3D%224%22%20y%3D%2244%22%20width%3D%2226%22%20height%3D%2212%22%20rx%3D%223%22%20fill%3D%22%2326210f%22/%3E%3Crect%20x%3D%2234%22%20y%3D%2244%22%20width%3D%2226%22%20height%3D%2212%22%20rx%3D%223%22%20fill%3D%22%2326210f%22/%3E%3C/svg%3E">
+<meta name="description" content="Tick từng mục trước khi bấm đăng TikTok hay Reels: video có nguyên bản không, có bị bóp từ đầu không, và làm gì trong giờ đầu sau khi đăng.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#99DF00; --surface:#FDFBF3; --surface-2:#F1F6E0; --line:#C9DE93; --line-strong:#5F8C00;
+    --text:#1C2600; --muted:#57612F; --accent:#99DF00; --accent-ink:#1C2600; --accent-soft:#E6F6BC;
+    --pro:#26210F; --pro-text:#F9E8DD; --danger:#B4432A; --warn:#B8860B; --ok:#3E7D1F;
+    --radius:14px; --shadow:0 10px 30px rgba(38,33,15,.10);
+    --font-ui:'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --font-display:'Bricolage Grotesque', 'Be Vietnam Pro', system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme:dark;
+      --bg:#0B0C08; --surface:#15170F; --surface-2:#1E2114; --line:#4E6E10; --line-strong:#99DF00;
+      --text:#F3F0E4; --muted:#B7B89A; --accent:#99DF00; --accent-ink:#0B0C08; --accent-soft:#233207;
+      --pro:#99DF00; --pro-text:#1B220D; --danger:#E0795F; --warn:#E3B341; --ok:#8FD15A; --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme:dark;
+    --bg:#0B0C08; --surface:#15170F; --surface-2:#1E2114; --line:#4E6E10; --line-strong:#99DF00;
+    --text:#F3F0E4; --muted:#B7B89A; --accent:#99DF00; --accent-ink:#0B0C08; --accent-soft:#233207;
+    --pro:#99DF00; --pro-text:#1B220D; --danger:#E0795F; --warn:#E3B341; --ok:#8FD15A; --shadow:0 10px 30px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size:15px;line-height:1.5}
+  .wrap{max-width:760px;margin:0 auto;padding-inline:16px;padding-block:18px 60px}
+  header.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px}
+  .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit}
+  .tmxk-logo{width:38px;height:38px;flex:none}
+  .tmxk-logo .ink{fill:var(--text)}
+  .brand b{display:block;font-family:var(--font-display);font-weight:800;font-size:20px;letter-spacing:-.01em;line-height:1.1}
+  .brand small{color:var(--muted);font-size:12px}
+  .theme-btn{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--text);cursor:pointer;font-size:16px;flex:none}
+
+  .hero{background:var(--pro);color:var(--pro-text);border-radius:20px;padding:20px 18px;box-shadow:var(--shadow);margin-bottom:14px}
+  .hero h1{font-family:var(--font-display);font-weight:800;font-size:clamp(24px,6vw,34px);line-height:1.08;margin:0 0 8px;letter-spacing:-.02em}
+  .hero p{margin:0;opacity:.85;font-size:14px}
+  .tien-do{position:sticky;top:0;z-index:5;margin:0 -16px 14px;padding:10px 16px;background:var(--bg)}
+  .tien-do .khung{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:6px;display:flex;align-items:center;gap:10px}
+  .thanh{flex:1;height:12px;border-radius:999px;background:var(--surface-2);overflow:hidden}
+  .thanh i{display:block;height:100%;width:0;background:var(--line-strong);border-radius:999px;transition:width .3s ease}
+  .tien-do b{font-size:13px;min-width:64px;text-align:right;padding-right:8px;font-variant-numeric:tabular-nums}
+
+  section.nhom{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+  .nhom h2{font-family:var(--font-display);font-weight:800;font-size:18px;margin:0 0 2px;display:flex;align-items:baseline;gap:8px}
+  .nhom h2 .dem{margin-left:auto;font-family:var(--font-ui);font-size:12px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+  .nhom h2 .dem.xong{color:var(--ok)}
+  .nhom > p{margin:0 0 10px;color:var(--muted);font-size:13px}
+  ul.muc{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+  .muc label{display:grid;grid-template-columns:26px 1fr;gap:10px;align-items:start;padding:10px;border-radius:12px;cursor:pointer;background:var(--surface-2);border:1px solid transparent;transition:background .15s,border-color .15s}
+  .muc label:hover{border-color:var(--line)}
+  .muc input{appearance:none;-webkit-appearance:none;width:24px;height:24px;margin:0;border:2px solid var(--line-strong);border-radius:7px;background:var(--surface);cursor:pointer;display:grid;place-items:center}
+  .muc input::after{content:"";width:12px;height:7px;border:3px solid var(--accent-ink);border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px);opacity:0}
+  .muc input:checked{background:var(--accent);border-color:var(--accent)}
+  .muc input:checked::after{opacity:1}
+  .muc input:focus-visible{outline:3px solid var(--line-strong);outline-offset:2px}
+  .muc .nd b{display:block;font-weight:700;font-size:14.5px}
+  .muc .nd > span{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+  .muc input:checked + .nd b{text-decoration:line-through;text-decoration-color:var(--line-strong);opacity:.7}
+  .muc .tag{display:inline-block;font-size:11px;font-weight:800;border-radius:6px;padding:1px 6px;margin-left:4px;vertical-align:1px;background:var(--danger);color:var(--surface);text-decoration:none}
+
+  .ket{border-radius:var(--radius);padding:16px;margin-bottom:12px;border:2px solid var(--line-strong);background:var(--accent-soft)}
+  .ket h2{font-family:var(--font-display);font-weight:800;font-size:18px;margin:0 0 4px}
+  .ket p{margin:0;font-size:14px}
+  .canh-bao{background:var(--surface);border:1px dashed var(--line-strong);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+  .canh-bao h2{font-family:var(--font-display);font-weight:800;font-size:16px;margin:0 0 8px}
+  .canh-bao ul{margin:0;padding-left:18px;font-size:13.5px;color:var(--muted)}
+  .canh-bao li{margin-bottom:4px}
+  .canh-bao li b{color:var(--text)}
+  .nut{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}
+  .nut a,.nut button{flex:1 1 200px;min-height:46px;display:inline-flex;align-items:center;justify-content:center;gap:6px;font:inherit;font-weight:800;font-size:14px;border-radius:12px;padding:10px 14px;text-decoration:none;cursor:pointer;border:2px solid var(--text);background:var(--surface);color:var(--text)}
+  .nut a.chinh{background:var(--text);color:var(--accent);}
+  :root[data-theme="dark"] .nut a,:root[data-theme="dark"] .nut button{border-color:var(--accent)}
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .nut a,:root:not([data-theme="light"]) .nut button{border-color:var(--accent)}}
+  .nguon{font-size:12px;color:var(--muted)}
+  .nguon a{color:inherit}
+  .nguon ul{padding-left:18px;margin:6px 0 0}
+  @media (prefers-reduced-motion: reduce){.thanh i{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="../index.html" aria-label="Tự Mình Xây Kênh, về trang chủ">
+      <svg class="tmxk-logo" viewBox="0 0 64 64" aria-hidden="true"><g transform="rotate(-9 32 17)"><rect x="19" y="11" width="26" height="12" rx="3" fill="#99df00"/><path d="M30 14.4v5.2a1 1 0 0 0 1.52.86l4.6-2.6a1 1 0 0 0 0-1.72l-4.6-2.6A1 1 0 0 0 30 14.4z" fill="#26210f"/></g><rect class="ink" x="19" y="28" width="26" height="12" rx="3"/><rect class="ink" x="4" y="44" width="26" height="12" rx="3"/><rect class="ink" x="34" y="44" width="26" height="12" rx="3"/></svg>
+      <div><b>Tự Mình Xây Kênh</b><small>Checklist trước khi đăng</small></div>
+    </a>
+    <button class="theme-btn" id="themeBtn" type="button" aria-label="Đổi giao diện sáng hoặc tối">◐</button>
+  </header>
+
+  <div class="hero">
+    <h1>Tick hết rồi hãy bấm đăng</h1>
+    <p>Không có mẹo nào bắt TikTok hay Facebook đẩy video ngay. Cái bạn làm được là để video được coi là nguyên bản, không bị bóp từ đầu, và đủ sức qua vòng phát thử.</p>
+  </div>
+
+  <div class="tien-do" aria-live="polite">
+    <div class="khung"><div class="thanh" aria-hidden="true"><i id="thanh"></i></div><b id="tongDem">0/0</b></div>
+  </div>
+
+  <main id="ds"></main>
+
+  <div class="ket" id="ket" hidden>
+    <h2>✅ Sẵn sàng đăng</h2>
+    <p>Đăng xong đừng xoá đi đăng lại. Sau 24 giờ mở Analytics xem người xem rời đi ở giây thứ mấy, video sau sửa đúng chỗ đó.</p>
+  </div>
+
+  <aside class="canh-bao">
+    <h2>⚠️ Đừng tin mấy chiêu này</h2>
+    <ul>
+      <li><b>Chèn mã, hash, file "đặc biệt" vào video.</b> Nền tảng nén lại video và tự tính dấu vân tay từ hình và tiếng, nên dữ liệu bạn nhét vào không còn lại gì.</li>
+      <li><b>Lật hình, zoom, đổi tốc độ, thêm viền để reup.</b> Facebook ghi rõ đây là chỉnh sửa giá trị thấp và giảm phân phối, TikTok cũng nhận ra.</li>
+      <li><b>Mua view, mua tim, dùng tool buff.</b> Bị coi là thao túng nền tảng, nặng thì khoá kênh.</li>
+      <li><b>"Video nào cũng được 200–500 view đầu", "có giờ vàng chung".</b> Nền tảng không công bố con số này. Giờ đăng hợp lý xem trong Analytics của chính kênh bạn.</li>
+    </ul>
+  </aside>
+
+  <div class="nut">
+    <a class="chinh" href="cham-video.html">🎯 Chấm video trước khi đăng</a>
+    <a href="hook-text.html">⚡ Viết lại hook</a>
+    <button type="button" id="lamLai">↺ Làm lại cho video mới</button>
+  </div>
+
+  <footer class="nguon">
+    Tổng hợp từ tài liệu chính thức của nền tảng, cập nhật 10/2026:
+    <ul>
+      <li><a href="https://newsroom.tiktok.com/en-us/how-tiktok-recommends-videos-for-you/" target="_blank" rel="noopener">TikTok – How TikTok recommends videos #ForYou</a></li>
+      <li><a href="https://creators.facebook.com/blog/supporting-original-content-on-facebook" target="_blank" rel="noopener">Meta – Supporting original content on Facebook (13/3/2026)</a></li>
+    </ul>
+  </footer>
+</div>
+
+<script>
+// mỗi mục: [mã, tiêu đề, giải thích, bắt buộc?]; mã giữ cố định để tick đã lưu không lệch khi sửa chữ
+const NHOM = [
+  { ma: 'nb', ten: '1 · Video là của bạn', mo: 'Nền tảng coi là nguyên bản khi bạn tự làm ra, hoặc bạn xuất hiện và thêm góc nhìn mới.', muc: [
+    ['tu_quay', 'Tự quay, hoặc có mặt / giọng / tay của bạn', 'Đây là tín hiệu nguyên bản mạnh nhất.', true],
+    ['goc_nhin', 'Tư liệu người khác chỉ là phụ', 'Nếu có chèn, phần chính vẫn là lời phân tích, bình luận hay câu chuyện của bạn.', true],
+    ['khong_wm', 'Không còn logo, watermark nền tảng khác', 'TikTok, CapCut, Douyin, Reels… Video có watermark khác thường không được đề xuất.', true],
+    ['nhac_tv', 'Nhạc lấy từ thư viện của nền tảng', 'Không tách nhạc từ video người khác: dễ bị tắt tiếng hoặc chặn.', false]
+  ]},
+  { ma: 'xuat', ten: '2 · File xuất ra', mo: 'Hình vỡ, tiếng rè làm người xem lướt đi trước khi kịp xem nội dung.', muc: [
+    ['khung_doc', 'Dọc 9:16, 1080×1920, 30 khung hình/giây', 'Đủ nét cho TikTok và Reels, file không quá nặng.', false],
+    ['file_goc', 'Đăng file gốc vừa xuất', 'Không dùng file tải về từ nền tảng khác hay file đã nén lại nhiều lần.', true],
+    ['nghe_ro', 'Mở lên xem lại một lượt bằng điện thoại', 'Giọng nghe rõ hơn nhạc, chữ không bị che bởi nút của app.', false]
+  ]},
+  { ma: 'nd', ten: '3 · Nội dung qua được vòng thử', mo: 'TikTok chấm theo hành vi người xem: xem hết, xem lại, bình luận, chia sẻ, lưu.', muc: [
+    ['hook', '3 giây đầu khiến người ta dừng lướt', 'Không mở bằng "Chào mọi người, hôm nay mình…". Vào thẳng cảnh hay nhất hoặc câu gây tò mò.', true],
+    ['chu_hook', 'Có chữ hook to, đọc được khi tắt tiếng', 'Đặt ở 1/3 trên, 1–2 dòng.', false],
+    ['khong_cho_chet', 'Cắt hết khoảng chết', 'Không có đoạn nào trên 3 giây mà người xem không thấy gì mới.', false],
+    ['ly_do_tuong_tac', 'Có lý do để bình luận, lưu hoặc chia sẻ', 'Một câu hỏi, một mẹo đáng lưu, hoặc một quan điểm để người xem phản hồi.', false]
+  ]},
+  { ma: 'dang', ten: '4 · Lúc bấm đăng', mo: 'Thuật toán đọc caption, chữ trên video và lời nói để hiểu video nói về gì, phát cho ai.', muc: [
+    ['tu_khoa', 'Caption có từ khoá người ta hay tìm', 'Ví dụ "cá kho tộ", "nấu cơm nhanh" thay vì chỉ có emoji.', false],
+    ['dung_chu_de', 'Đúng chủ đề kênh đang đi', 'Mỗi kênh một chủ đề, nhất là 10–20 video đầu.', false],
+    ['dang_mot_lan', 'Chỉ đăng một lần', 'Không xoá đi đăng lại cùng video: dễ bị coi là trùng lặp.', true],
+    ['tk_sach', 'Tài khoản không mua follow, tim, view', 'Tương tác ảo làm hỏng tín hiệu của cả kênh.', true]
+  ]},
+  { ma: 'sau', ten: '5 · Giờ đầu sau khi đăng', mo: 'Video vừa đăng có thể còn đang được duyệt, chưa lên For You ngay. Đó là bình thường.', muc: [
+    ['tra_loi', 'Trả lời bình luận sớm', 'Ghim một bình luận gợi mở để kéo thêm người tham gia.', false],
+    ['khong_xoa', 'Không xoá dù view đầu thấp', 'Giữ video lại, đọc số liệu để làm video sau tốt hơn.', false],
+    ['xem_so', 'Hẹn sau 24 giờ xem Analytics', 'Nhìn tỉ lệ xem hết và giây người xem rời đi, không chỉ nhìn view.', false]
+  ]}
+];
+
+const KEY = 'tmxk_checklist';
+const ls = {
+  get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
+  del(k) { try { localStorage.removeItem(k); } catch (e) {} }
+};
+function docDaTick() {
+  try { const v = JSON.parse(ls.get(KEY) || '[]'); return Array.isArray(v) ? v : []; } catch (e) { return []; }
+}
+let daTick = new Set(docDaTick());
+
+const $ = s => document.querySelector(s);
+const tao = (tag, cls, text) => { const el = document.createElement(tag); if (cls) el.className = cls; if (text != null) el.textContent = text; return el; };
+
+function veDanhSach() {
+  const ds = $('#ds');
+  ds.replaceChildren();
+  NHOM.forEach(n => {
+    const sec = tao('section', 'nhom');
+    sec.setAttribute('aria-labelledby', 'h-' + n.ma);
+    const h = tao('h2', null, n.ten); h.id = 'h-' + n.ma;
+    const dem = tao('span', 'dem'); dem.dataset.nhom = n.ma; h.append(dem);
+    const ul = tao('ul', 'muc');
+    n.muc.forEach(([ma, td, gt, batBuoc]) => {
+      const id = n.ma + '.' + ma;
+      const li = tao('li'); const lb = tao('label');
+      const cb = tao('input'); cb.type = 'checkbox'; cb.dataset.id = id; cb.checked = daTick.has(id);
+      const nd = tao('span', 'nd'); const b = tao('b', null, td);
+      if (batBuoc) b.append(tao('span', 'tag', 'quan trọng'));
+      nd.append(b, tao('span', null, gt));
+      lb.append(cb, nd); li.append(lb); ul.append(li);
+    });
+    sec.append(h, tao('p', null, n.mo), ul);
+    ds.append(sec);
+  });
+}
+
+function capNhat() {
+  let tong = 0, xong = 0;
+  NHOM.forEach(n => {
+    const ids = n.muc.map(m => n.ma + '.' + m[0]);
+    const x = ids.filter(id => daTick.has(id)).length;
+    tong += ids.length; xong += x;
+    const dem = document.querySelector('.dem[data-nhom="' + n.ma + '"]');
+    dem.textContent = x + '/' + ids.length;
+    dem.classList.toggle('xong', x === ids.length);
+  });
+  $('#tongDem').textContent = xong + '/' + tong;
+  $('#thanh').style.width = (tong ? xong / tong * 100 : 0) + '%';
+  $('#ket').hidden = xong < tong;
+}
+
+$('#ds').addEventListener('change', e => {
+  const id = e.target.dataset && e.target.dataset.id;
+  if (!id) return;
+  daTick = new Set(daTick);
+  if (e.target.checked) daTick.add(id); else daTick.delete(id);
+  ls.set(KEY, JSON.stringify([...daTick]));
+  capNhat();
+});
+
+$('#lamLai').addEventListener('click', () => {
+  daTick = new Set(); ls.del(KEY);
+  veDanhSach(); capNhat();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+function applyTheme(t) { if (t) document.documentElement.dataset.theme = t; else delete document.documentElement.dataset.theme; }
+applyTheme(ls.get('hook.theme'));
+$('#themeBtn').addEventListener('click', () => { const dark = document.documentElement.dataset.theme ? document.documentElement.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; const t = dark ? 'light' : 'dark'; applyTheme(t); ls.set('hook.theme', t); });
+
+veDanhSach(); capNhat();
+</script>
+</body>
+</html>
