@@ -356,3 +356,99 @@ function moXemNhe() {
   ve();
 }
 khoiTao09b();
+
+/* ═════════ ĐỢT 4: làm mờ / khảm vùng (che mặt, biển số, thông tin riêng) · ổn định hình (chống rung) ═════════ */
+/* hình vẽ tô bằng "Làm mờ" hoặc "Khảm": lấy chính khung đã dựng bên dưới, chỉ trong hình (chữ nhật, elip…). Dùng chung Bám vật thể, keyframe, tay cầm của hình */
+const TO_HINH = { mau: 'Màu', mo: 'Làm mờ', kham: 'Khảm (ô vuông)' }, toCvs = [document.createElement('canvas'), document.createElement('canvas')];
+{ const goc = veHinhGfx; veHinhGfx = function (ctx, W, H, g, tl, dai) {
+    if (g.to !== 'mo' && g.to !== 'kham') return goc.apply(this, arguments);
+    const cvs = ctx.canvas; if (!cvs || !cvs.width) return true;
+    const w = (g.w || 0.4) * W, h = (g.h || 0.25) * H, b = bamTai(g, tl), x = ((g.x == null ? 0.5 : g.x) + (b ? b.dx : 0)) * W, y = ((g.y == null ? 0.5 : g.y) + (b ? b.dy : 0)) * H, kieu = g.hinh === 'duong' ? 'chu_nhat' : (g.hinh || 'chu_nhat'), muc = g.muc == null ? 0.5 : g.muc;
+    const [tam, nho] = toCvs; if (tam.width !== cvs.width || tam.height !== cvs.height) { tam.width = cvs.width; tam.height = cvs.height; }
+    const tg = tam.getContext('2d'); tg.clearRect(0, 0, tam.width, tam.height); tg.drawImage(cvs, 0, 0);
+    ctx.save(); ctx.translate(x, y); if (g.xoay) ctx.rotate(g.xoay * Math.PI / 180); ctx.globalAlpha *= g.mo == null ? 1 : g.mo; duongHinh(ctx, kieu, w, h, g.bo); ctx.clip(); ctx.setTransform(1, 0, 0, 1, 0, 0);
+    if (g.to === 'mo') { ctx.filter = 'blur(' + Math.max(1, cvs.width * (0.008 + muc * 0.06)).toFixed(1) + 'px)'; ctx.drawImage(tam, 0, 0); }
+    else { const o = Math.max(3, cvs.width * (0.012 + muc * 0.05)), nw = Math.max(1, Math.ceil(cvs.width / o)), nh = Math.max(1, Math.ceil(cvs.height / o)); if (nho.width !== nw || nho.height !== nh) { nho.width = nw; nho.height = nh; } const ng = nho.getContext('2d'); ng.imageSmoothingEnabled = true; ng.drawImage(tam, 0, 0, nw, nh); ctx.imageSmoothingEnabled = false; ctx.drawImage(nho, 0, 0, nw, nh, 0, 0, nw * o, nh * o); }
+    ctx.restore(); return true;
+  }; }
+{ const goc = veThuocTinhGfx3; veThuocTinhGfx3 = function (box, g) {
+    const r = goc.apply(this, arguments); if (!g || g.kieu !== 'hinh') return r;
+    const n = [...box.querySelectorAll('.nhom2')].find(x => { const b = x.querySelector(':scope > b'); return b && b.textContent === 'Hình vẽ'; }); if (!n) return r;
+    const truoc = n.children[2] || null, tam = el('div'); oChon(tam, 'Tô bằng', Object.keys(TO_HINH).map(k => [k, TO_HINH[k]]), g.to || 'mau', v => { if (v === 'mau') delete g.to; else g.to = v; setTimeout(veProp, 0); });
+    if (g.to) oTruot(tam, 'Độ mạnh', 0, 1, 0.05, g.muc == null ? 0.5 : g.muc, v => Math.round(v * 100) + '%', v => { g.muc = v; });
+    [...tam.children].forEach(c => n.insertBefore(c, truoc)); return r;
+  }; }
+/* thêm nhanh vùng làm mờ ở đầu phát (mặc định elip giữa khung, 3 giây hoặc tới hết đoạn đang chọn) */
+function themVungMo(to) {
+  luuHoanTac(); const m = mucChon(), k = P.chon && P.chon.k, bd = khungGiay(P.t), kt = m && ['v', 'b'].includes(k) ? khungGiay(batDauMuc(k, m) + daiMuc(k, m)) : khungGiay(P.t + 3);
+  const g = { id: uid(), kieu: 'hinh', ...GX_MD.hinh, hinh: 'tron', to: to || 'mo', muc: 0.6, w: 0.34, h: 0.2, x: 0.5, y: 0.38, mau: 'khong', vien_day: 0, hu: 'khong', boVao: true, boRa: true, text: '', phu: '', bd, kt: Math.max(kt, bd + 1) };
+  P.gfx.push(g); P.chon = { k: 'g', i: P.gfx.length - 1 }; veTl(); veProp(); veKhung(); if (typeof moPhaiNeuCan === 'function') moPhaiNeuCan();
+  toast('Kéo vùng mờ lên chỗ cần che. Muốn che theo người/vật đang chạy: Thuộc tính → Bám theo vật thể.');
+}
+
+/* ── ổn định hình: đo dịch chuyển cả khung giữa các khung hình (so khối, ảnh xám 128px), làm mượt quỹ đạo,
+   bù phần rung bằng dời + phóng nhẹ. Lưu theo thời gian nguồn nên cắt / tách đoạn vẫn đúng ── */
+const OD_FPS = 15, OD_RONG = 128, OD_MUC = { nhe: 'Nhẹ', vua: 'Vừa', manh: 'Mạnh' }, OD_CUA = { nhe: 0.35, vua: 0.8, manh: 1.6 };
+function xamNho(v, cw, ch, g) { g.drawImage(v, 0, 0, cw, ch); const d = g.getImageData(0, 0, cw, ch).data, o = new Float32Array(cw * ch); let tb = 0; for (let i = 0; i < o.length; i++) { o[i] = d[i * 4] * 0.299 + d[i * 4 + 1] * 0.587 + d[i * 4 + 2] * 0.114; tb += o[i]; } tb /= o.length; for (let i = 0; i < o.length; i++) o[i] -= tb; return o; }
+/* độ dời (dx, dy) của b so với a: thử mọi độ dời trong ±R, lấy sai khác nhỏ nhất (lấy mẫu cách 2 điểm) rồi tinh chỉnh dưới điểm ảnh */
+function doDoi(a, b, cw, ch, R) {
+  let tot = [0, 0], min = Infinity; const sai = (dx, dy) => { let s = 0, n = 0; for (let y = R; y < ch - R; y += 2) { const ra = y * cw, rb = (y + dy) * cw + dx; for (let x = R; x < cw - R; x += 2) { s += Math.abs(a[ra + x] - b[rb + x]); n++; } } return s / n; };
+  const bang = {}; for (let dy = -R; dy <= R; dy++) for (let dx = -R; dx <= R; dx++) { const s = sai(dx, dy); bang[dx + ',' + dy] = s; if (s < min) { min = s; tot = [dx, dy]; } }
+  const tinh = (c, l, r) => { const m = l + r - 2 * c; return m > 1e-6 ? 0.5 * (l - r) / m : 0; }, [X, Y] = tot, q = (dx, dy) => bang[dx + ',' + dy];
+  const fx = Math.abs(X) < R ? tinh(min, q(X - 1, Y), q(X + 1, Y)) : 0, fy = Math.abs(Y) < R ? tinh(min, q(X, Y - 1), q(X, Y + 1)) : 0;
+  return [X + Math.max(-0.5, Math.min(0.5, fx)), Y + Math.max(-0.5, Math.min(0.5, fy))];
+}
+/* quỹ đạo thô → đường mượt (trung bình có trọng số tam giác) → phần bù = mượt − thô */
+function lamMuotQD(ds, cua) { const n = ds.length, r = Math.max(1, Math.round(cua)), kq = new Array(n); for (let i = 0; i < n; i++) { let s = 0, w = 0; for (let j = Math.max(0, i - r); j <= Math.min(n - 1, i + r); j++) { const k = r + 1 - Math.abs(i - j); s += ds[j] * k; w += k; } kq[i] = s / w; } return kq; }
+async function phanTichOnDinh(c, muc, tienDo, giu) {
+  const s = srcCua(c.src); if (!s || s.loai !== 'video') throw new Error('Chỉ ổn định được đoạn video');
+  const v = elPhu(s, 'elOD'), cw = OD_RONG, ch = Math.max(16, Math.round(OD_RONG * (s.h || 9) / (s.w || 16))), R = 10, cv2 = document.createElement('canvas'); cv2.width = cw; cv2.height = ch; const g = cv2.getContext('2d', { willReadFrequently: true });
+  const bd0 = Math.max(0, c.bd), kt0 = Math.min(s.giay || c.kt, c.kt), n = Math.max(2, Math.round((kt0 - bd0) * OD_FPS) + 1), tx = [0], ty = [0]; let truoc = null;
+  for (let i = 0; i < n; i++) {
+    if (giu && giu.huy) throw new Error('huy');
+    await seekTo(v, Math.min(kt0 - 0.001, bd0 + i / OD_FPS)); const nay = xamNho(v, cw, ch, g);
+    if (truoc) { const [dx, dy] = doDoi(truoc, nay, cw, ch, R); tx.push(tx[tx.length - 1] + dx); ty.push(ty[ty.length - 1] + dy); }
+    truoc = nay; if (tienDo) tienDo((i + 1) / n);
+  }
+  const cua = OD_CUA[muc] * OD_FPS, mx = lamMuotQD(tx, cua), my = lamMuotQD(ty, cua);
+  // ảnh dời theo vật (dx dương = khung sau trượt sang phải) → bù ngược lại về đường mượt
+  const u = tx.map((x, i) => +((mx[i] - x) / cw).toFixed(4)), w = ty.map((y, i) => +((my[i] - y) / ch).toFixed(4));
+  const lon = Math.max(...u.map(Math.abs), ...w.map(Math.abs)), z = +Math.min(1.25, 1 + 2 * lon).toFixed(3);
+  return { muc, fps: OD_FPS, bd0: +bd0.toFixed(3), u, v: w, z };
+}
+function onDinhTai(c, off) {
+  const o = c.onDinh; if (!o || !o.u || !o.u.length) return null;
+  const tSrc = c.dao ? c.kt - srcTuTl(c, off) : c.bd + srcTuTl(c, off), f = Math.max(0, Math.min(o.u.length - 1, (tSrc - o.bd0) * o.fps)), i = Math.floor(f), j = Math.min(o.u.length - 1, i + 1), p = f - i;
+  return { u: o.u[i] + (o.u[j] - o.u[i]) * p, v: o.v[i] + (o.v[j] - o.v[i]) * p, z: o.z || 1 };
+}
+/* áp khi vẽ: trong lúc apDoanGoc vẽ đoạn có onDinh, x/y/sc của chính đoạn đó cộng phần bù (chỉ khi vẽ, thuộc tính lưu không đổi) */
+let OD_DANG = null;
+{ const g0 = giaTriKf; giaTriKf = function (c, ten, off) { const v = g0.apply(this, arguments); const o = OD_DANG; if (!o || o.c !== c || !(ten === 'x' || ten === 'y' || ten === 'sc')) return v;
+    if (ten === 'sc') return v * o.b.z; const sc = g0.call(this, c, 'sc', off) * o.b.z; return v + (ten === 'x' ? o.b.u * o.hop.w : o.b.v * o.hop.h) * sc; }; }
+{ const goc = apDoanGoc; apDoanGoc = function (ctx, W, H, c, off, ve) {
+    const b = c && c.onDinh && !c.onDinh.tat ? onDinhTai(c, off) : null; if (!b) return goc.apply(this, arguments);
+    const cu = OD_DANG; OD_DANG = { c, b, hop: hopMuc(P.clips.includes(c) ? 'v' : 'b', c) }; try { return goc.apply(this, arguments); } finally { OD_DANG = cu; }
+  }; }
+function veOnDinh(box, k, c) {
+  const n = el('div', 'nhom2 odNhom'); n.appendChild(el('b', null, 'Ổn định hình (chống rung)')); box.appendChild(n);
+  const s = srcCua(c.src); if (!s || s.loai !== 'video') { n.appendChild(el('div', 'quota', 'Chỉ dùng cho đoạn video.')); return; }
+  const o = c.onDinh;
+  n.appendChild(el('div', 'quota', o ? '✓ Đã ổn định mức ' + (OD_MUC[o.muc] || o.muc) + (o.tat ? ' (đang tắt)' : '') + ' · phóng ' + Math.round(((o.z || 1) - 1) * 100) + '% để giấu mép.' : 'Máy đo độ rung của cả khung rồi bù lại, khung hơi phóng to để không lộ mép. Quay cầm tay, đi bộ dùng Vừa; chạy, xe máy dùng Mạnh.'));
+  const tam = el('div'); oChon(tam, 'Mức', Object.keys(OD_MUC).map(x => [x, OD_MUC[x]]), (o && o.muc) || 'vua', v => { c._odMuc = v; }); [...tam.children].forEach(x => n.appendChild(x));
+  const sl = n.querySelector('select'); if (sl) sl.onchange = () => { c._odMuc = sl.value; };
+  const r = el('div', 'row'), b = el('button', 'btn nho xanh', o ? 'Phân tích lại' : 'Ổn định'); b.type = 'button'; const tt = el('div', 'quota odTt'); tt.hidden = true;
+  b.onclick = async () => {
+    if (c._odGiu) { c._odGiu.huy = true; return; } const giu = c._odGiu = {}; b.textContent = 'Huỷ'; tt.hidden = false; tt.textContent = 'Đang đo độ rung… 0%';
+    try { const kq = await phanTichOnDinh(c, (sl && sl.value) || c._odMuc || 'vua', p => { tt.textContent = 'Đang đo độ rung… ' + Math.round(p * 100) + '%'; }, giu); luuHoanTac(); c.onDinh = kq; toast('Đã ổn định hình đoạn này'); }
+    catch (e) { if (!giu.huy) toast('Chưa ổn định được: ' + (e.message || e)); }
+    finally { c._odGiu = null; delete c._odMuc; veProp(); veKhung(); }
+  }; r.appendChild(b);
+  if (o) { const t = el('button', 'btn nho ghost', o.tat ? 'Bật lại' : 'Tắt thử'); t.type = 'button'; t.onclick = () => { luuHoanTac(); if (o.tat) delete o.tat; else o.tat = true; veProp(); veKhung(); }; r.appendChild(t);
+    const x = el('button', 'btn nho ghost', 'Bỏ ổn định'); x.type = 'button'; x.onclick = () => { luuHoanTac(); delete c.onDinh; veProp(); veKhung(); }; r.appendChild(x); }
+  n.appendChild(r); n.appendChild(tt);
+}
+function khoiTao09c() {
+  { const goc = veProp; veProp = function () { const r = goc.apply(this, arguments); try { const ch = P.chon, box = $('#propChon'); if (ch && (ch.k === 'v' || ch.k === 'b') && box && !box.querySelector('.odNhom')) { const m = mucChon(); if (m && !m.trong && !(typeof laGhep === 'function' && laGhep(m))) veOnDinh(box, ch.k, m); } } catch (e) { console.warn('onDinh', e); } return r; }; }
+  { const goc = moMenu; moMenu = function (x, y, ds) { if (Array.isArray(ds) && ds.some(o => o && o.t === 'Phím tắt')) { const i = ds.findIndex(o => o && o.t === 'Phím tắt'); ds = [...ds.slice(0, i), { ic: 'target', t: 'Làm mờ / che một vùng', f: () => setTimeout(() => themVungMo('mo'), 30) }, ...ds.slice(i)]; } return goc.call(this, x, y, ds); }; }
+}
+khoiTao09c();
