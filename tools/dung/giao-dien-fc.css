@@ -163,3 +163,43 @@ body:has(.ed.fc) .toast{background:#2a2b30;color:#e6e6e8;border:1px solid #34353
 #fcNhe .btn, #fcDoThi .btn{background:var(--ep3,#2f3035);color:var(--et,#e6e6e8);border:1px solid var(--vien,#2a2b30);border-radius:6px;padding:6px 12px;font:500 12.5px "Inter",system-ui,sans-serif;cursor:pointer;min-height:30px}
 #fcNhe .btn:hover, #fcDoThi .btn:hover{background:var(--el,#303136)}
 #fcNhe .hang .btn{background:var(--ea,#3b82f6);border-color:var(--ea,#3b82f6);color:#fff}
+
+/* ── đợt 5: thanh tick chọn đoạn, thẻ đang dùng, bảng tuỳ chỉnh, nhạc tự tạo ── */
+.tickBar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 10px;padding:8px 10px;border:1px solid var(--vien,#2a2b30);border-radius:8px;background:var(--ep2,#26272b);font-size:12px}
+.tickBar .nhan{color:var(--em,#9b9ca4);font-weight:600;margin-right:2px}
+.tickBar .goi{color:var(--emo,#6e6f77);font-size:11.5px;flex-basis:100%}
+.tickBar .chip, .chipNhac .chip{display:inline-flex;align-items:center;gap:5px;min-height:28px;padding:0 10px;border:1px solid var(--vien,#2a2b30);border-radius:999px;background:var(--ep,#1b1c1f);color:var(--et,#e6e6e8);font:600 12px/1 "Inter",system-ui,sans-serif;cursor:pointer;user-select:none;font-variant-numeric:tabular-nums}
+.tickBar .chip input{width:14px;height:14px;margin:0;accent-color:var(--ea,#3b82f6);cursor:pointer}
+.tickBar .chip.on, .chipNhac .chip.on{border-color:var(--ea,#3b82f6);background:var(--eaMo,rgba(59,130,246,.16));color:var(--eaChu,#6aa4ff)}
+.tickBar .chip.tat{font-weight:700}
+.tickBar button.chip{appearance:none}
+/* thẻ đang áp dụng cho đoạn: viền xanh + dấu ✓ (chồng nhiều hiệu ứng thì hiện thứ tự) */
+.mauLuoi > button{position:relative}
+.mauLuoi > button.daTick .the{outline:2px solid var(--ea,#3b82f6);outline-offset:-2px}
+.mauLuoi > button.daTick::after{content:"✓";position:absolute;top:4px;right:4px;width:18px;height:18px;border-radius:50%;background:var(--ea,#3b82f6);color:#fff;font:700 11px/18px "Inter",system-ui,sans-serif;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.4);z-index:2}
+.mauLuoi > button.daTick[data-thu-tu]:not([data-thu-tu=""])::after{content:attr(data-thu-tu)}
+.mauLuoi > button:not(.daTick):hover::after{content:"";position:absolute;top:4px;right:4px;width:16px;height:16px;border-radius:50%;border:1.5px solid rgba(255,255,255,.75);background:rgba(0,0,0,.25);z-index:2}
+.mauLuoi > button.moi::before{content:"Mới";position:absolute;top:4px;left:4px;padding:1px 5px;border-radius:4px;background:#f59e0b;color:#111;font:700 9.5px/14px "Inter",system-ui,sans-serif;z-index:2}
+.mauLuoi > button canvas.anhCC{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit}
+/* bảng đang áp / tuỳ chỉnh */
+.dangAp{margin:0 0 12px;padding:10px 12px;border:1px solid var(--vien,#2a2b30);border-radius:8px;background:var(--ep,#1b1c1f);font-size:12.5px}
+.dangAp[hidden]{display:none}
+.dangAp .dau{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.dangAp .dau b{font-weight:600}.dangAp .dau small{color:var(--emo,#6e6f77);font-size:11px}
+.dangAp .muc{padding:8px 0;border-top:1px solid var(--vien,#2a2b30)}
+.dangAp .hang1{display:flex;align-items:center;gap:6px}
+.dangAp .hang1 .ten{flex:1;min-width:0;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dangAp .nut{min-width:28px;height:26px;padding:0 8px;border:1px solid var(--vien,#2a2b30);border-radius:6px;background:var(--ep3,#2f3035);color:var(--et,#e6e6e8);font:600 12px "Inter",system-ui,sans-serif;cursor:pointer}
+.dangAp .nut:hover:not(:disabled){background:var(--el,#303136)}.dangAp .nut:disabled{opacity:.35;cursor:default}
+.dangAp .nut.rong{flex:1;margin-top:6px}
+.dangAp label.tr{display:grid;grid-template-columns:minmax(78px,108px) 1fr 52px;align-items:center;gap:8px;margin:5px 0 0;font-size:12px;color:var(--em,#9b9ca4)}
+.dangAp label.tr input{width:100%;accent-color:var(--ea,#3b82f6);margin:0}
+.dangAp label.tr output{text-align:right;color:var(--fcTc,#4aa3ff);font-variant-numeric:tabular-nums;font-size:11.5px}
+.dangAp .ghiTuy{display:block;margin:10px 0 2px;color:var(--emo,#6e6f77);font-size:11px}
+/* nhạc tự tạo */
+.nhacTu{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.chipNhac{display:flex;flex-wrap:wrap;gap:6px}
+.chipNhac .chip{min-height:30px;padding:0 12px}
+@media (max-width:760px){.tickBar{padding:8px}.tickBar .chip{min-height:32px;padding:0 12px}.dangAp label.tr{grid-template-columns:90px 1fr 48px}.mauLuoi > button:not(.daTick):hover::after{display:none}}
+.dangAp .hang1 button.ten{border:0;background:none;color:var(--et,#e6e6e8);text-align:left;padding:2px 0;cursor:pointer;font:600 12.5px "Inter",system-ui,sans-serif}
+.dangAp .hang1 button.ten:hover{color:var(--eaChu,#6aa4ff)}
