@@ -384,7 +384,7 @@ function am3KhoNap(o) { Object.entries(o || {}).forEach(([kho, v]) => { if (!AM3
 function am3MoiItem(kho, ten, loai, dai) { return { id: uid(), kho, ten, loai, t_bd: +P.t.toFixed(2), bd: 0, kt: +dai.toFixed(3), giay: +dai.toFixed(3), am: 1, fi: 0, fo: 0 }; }
 /* phát A3 bằng Web Audio, hẹn giờ theo đầu phát; nối cả vào luồng xuất */
 /* bus tổng: limiter chặn đỉnh ~−1 dBFS cho cả xem trước lẫn bản xuất, đẩy âm lượng 200% hay chồng nhạc + SFX không còn vỡ tiếng */
-function boGioiHan(C) { const L = C.createDynamicsCompressor(); L.threshold.value = -2; L.knee.value = 0; L.ratio.value = 20; L.attack.value = 0.002; L.release.value = 0.12; L.connect(C.destination); return L; }
+function boGioiHan(C) { const T = -2, R = 20, L = C.createDynamicsCompressor(), bu = C.createGain(); L.threshold.value = T; L.knee.value = 0; L.ratio.value = R; L.attack.value = 0.002; L.release.value = 0.12; bu.gain.value = Math.pow(10, 0.6 * T * (1 - 1 / R) / 20); L.connect(bu); bu.connect(C.destination); return L; }   /* bộ nén Web Audio tự cộng makeup gain 0,6×|T(1−1/R)| dB: trừ lại để không làm lệch độ to −14 LUFS */
 function raAc() { if (!ac._lim) ac._lim = boGioiHan(ac); return ac._lim; }
 function am3Lich(a, t0, now, raXuat) {
   if (a.an) return null;
@@ -455,7 +455,7 @@ function tinhCatLang(nguong, boDem) {
   return { moi, cat, bot, soDem, ngo, theoAm };
 }
 /* khúc con của đoạn c (nguồn x–y): fade vào chỉ ở khúc đầu, fade ra + chuyển cảnh chỉ ở khúc cuối, keyframe dời đúng chỗ */
-function khucCon(c, x, y, dau, cuoi) { const m = JSON.parse(JSON.stringify(c)); m.bd = +x.toFixed(4); m.kt = +y.toFixed(4); if (c.id) m.id = uid(); if (!dau) { m.fi = 0; delete m.anVao; } if (!cuoi) { m.fo = 0; delete m.anRa; delete m.chuyen; delete m.chuyen_dai; } if (m.kfs) doiKf(m, -(x - c.bd) / tocC(c)); return m; }
+function khucCon(c, x, y, dau, cuoi) { const m = JSON.parse(JSON.stringify(c)); m.bd = +x.toFixed(4); m.kt = +y.toFixed(4); if (c.id) m.id = uid(); if (!dau) { m.fi = 0; delete m.anVao; } if (!cuoi) { m.fo = 0; delete m.anRa; delete m.chuyen; delete m.chuyen_dai; } if (c.kfs) { const k = tocC(c), o0 = (x - c.bd) / k, o1 = (y - c.bd) / k, kf = {}; Object.keys(c.kfs).forEach(p => { const ds = c.kfs[p] || []; if (!ds.length) return; const trong = ds.filter(f => f.t > o0 + 1e-3 && f.t < o1 - 1e-3).map(f => ({ ...f, t: +(f.t - o0).toFixed(4) })), e0 = (ds.filter(f => f.t <= o0 + 1e-3).pop() || ds[0]).e; kf[p] = [{ t: 0, v: giaTriKf(c, p, o0), e: e0 || 'deu' }, ...trong, { t: +(o1 - o0).toFixed(4), v: giaTriKf(c, p, o1), e: 'deu' }]; }); m.kfs = kf; } return m; }   /* keyframe: giữ cái nằm trong khúc, thêm điểm nội suy ở hai mép để đường cong không gãy */
 function apCatLang(r) { if (r.bot < 0.05) return; luuHoanTac(); r.cat.slice().sort((a, b) => b[0] - a[0]).forEach(([diem, len]) => ripple(diem + len, -len)); P.clips = r.moi.filter(c => c.kt - c.bd > 0.12); veTl(); veLoi(); veKhung(); }
 function catLang(nguong, boDem) { const r = tinhCatLang(nguong, boDem); if (r.bot < 0.05) return { bot: 0, soDem: r.soDem }; apCatLang(r); return { bot: r.bot, soDem: r.soDem, so: r.cat.length }; }
 function boXemCat() { P.xemCat = null; const h = $('#langXem'); if (h) { h.hidden = true; h.innerHTML = ''; } }
