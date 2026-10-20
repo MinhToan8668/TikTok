@@ -545,3 +545,28 @@ label.trMau output{text-align:right;font:600 11.5px "Inter",system-ui,sans-serif
 .ed #tlIn .bongKeo.moi{background:color-mix(in srgb,var(--ea) 25%,transparent)}
 .ed #tlIn .bongKeo.moi b{top:-19px;border-radius:6px}
 body.keoTv .ed .themCuoi{visibility:hidden}
+/* đợt 12: khung xem trước */
+.ed.fc.ccw .ecol.giua > .xemDau, .ed.fc.ccw .ecol.giua > .xemPhat{align-self:stretch;width:auto;max-width:none;box-sizing:border-box}
+.ed.fc.ccw .xemDau .ccTop{margin-left:auto}
+.ed.fc.ccw .xemPhat .xemGiua{justify-self:center}
+.ed.fc.ccw .xemPhat .xemPhai{justify-self:end}
+.ed.fc .ic12{display:inline-grid!important;place-items:center;width:28px;height:28px;padding:0!important;color:var(--em)}
+.ed.fc .ic12:hover{color:var(--et)}
+.ed.fc .ic12[aria-pressed="true"]{color:var(--ea);background:var(--eaMo)!important}
+.ed.fc .lopPhuO{display:inline-flex;align-items:center;gap:6px;color:var(--em);padding-left:4px;cursor:pointer}
+.ed.fc .lopPhuO select{background:transparent;border:0;color:var(--et)}
+.ed.fc.ccw .khungVung{position:relative}
+.ed.fc #fcMeter.docMep{top:12px;bottom:12px;right:10px;height:auto;transform:none;background:transparent;border:0;padding:0 0 0 18px;grid-template-columns:4px 4px;gap:4px 3px}
+.ed.fc #fcMeter.docMep .cot{background:rgba(255,255,255,.07)}
+.ed.fc #fcMeter.docMep .thang{position:absolute;left:0;top:0;bottom:14px;width:16px;pointer-events:none}
+.ed.fc #fcMeter.docMep .thang span{position:absolute;right:2px;transform:translateY(50%);font:500 8.5px/1 "Inter",system-ui,sans-serif;color:var(--emo);font-variant-numeric:tabular-nums}
+.ed.fc #fcMeter.docMep .lufs{grid-column:1/-1;margin-left:-18px;min-width:30px;text-align:right}
+.ed.fc.ccw .xemDau .xemTt{flex:0 1 auto;text-align:left}
+/* khung chọn chữ: viền nới ra 6px để góc / mép không đè lên chữ, nút xoay đặt phía trên */
+.ed #tayCam .tay.tayChu{border-color:transparent!important;box-shadow:none!important}
+.ed #tayCam .tay.tayChu::after{content:"";position:absolute;inset:-6px;border:1px solid #fff;border-radius:3px;box-shadow:0 0 0 1px rgba(0,0,0,.35);pointer-events:none}
+.ed #tayCam .tay.tayChu .goc.tl{left:-7px!important;top:-7px!important}.ed #tayCam .tay.tayChu .goc.tr{right:-7px!important;top:-7px!important}
+.ed #tayCam .tay.tayChu .goc.bl{left:-7px!important;bottom:-7px!important}.ed #tayCam .tay.tayChu .goc.br{right:-7px!important;bottom:-7px!important}
+.ed #tayCam .tay.tayChu .m_l{transform:translateX(-6px)}.ed #tayCam .tay.tayChu .m_r{transform:translateX(6px)}
+.ed #tayCam .tay.tayChu .xoay{top:auto!important;bottom:calc(100% + 12px)!important}
+.ed #tayCam .tay.tayChu .tayNhan{margin-top:6px}
