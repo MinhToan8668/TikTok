@@ -368,3 +368,164 @@ label.trMau output{text-align:right;font:600 11.5px "Inter",system-ui,sans-serif
 /* điện thoại: tiêu đề bảng là chữ thường (không phải nút xanh), bỏ dòng "… đang chọn" lặp */
 .ed.mobi #phaiTieuDe{background:none!important;border:0!important;box-shadow:none!important;color:var(--et,#e6e6e8)!important;font:700 15px "Inter",system-ui,sans-serif!important;text-align:left!important;padding:0 4px!important;justify-content:flex-start!important;pointer-events:none}
 .ed.mobi #propChon > h3:first-child{display:none}
+
+/* ═════════ ĐỢT 9: chất liệu kiểu Concat — nền đen sâu, ba khung bo tròn tách nhau, nhấn tím, đoạn có thanh tiêu đề màu theo loại ═════════ */
+.ed.fc{
+  --eb:#0c0c0e; --ep:#1a1a1d; --ep2:#232327; --ep3:#2b2b30; --el:#2e2e34; --vien:#26262b;
+  --et:#ececef; --em:#8e8e98; --emo:#62626b;
+  --ea:#7c5cff; --eaChu:#a491ff; --eaInk:#ffffff; --ea2:#8f74ff; --eaMo:rgba(124,92,255,.18);
+  --fcTc:#a491ff; --ccTl:#141416; --ccCv:#0f0f11; --ccPop:#232327;
+  --kV:#3d6fd8; --kVnen:#1c2740; --kA:#3aa865; --kAnen:#14301f; --kT:#c4528c; --kTnen:#3a1a2b; --kB:#2d8ea0; --kBnen:#13313a; --kFx:#6b4fd8; --kFxnen:#251d47;
+}
+.ed.fc.sang{--ea:#6a4cf0; --eaChu:#5a3de6; --eaMo:rgba(106,76,240,.14); --fcTc:#5a3de6}
+/* khung tách nhau, bo tròn */
+.ed.fc.ccw{background:var(--eb)}
+.ed.fc.ccw .ebody{gap:8px;padding:0 8px;background:var(--eb)}
+.ed.fc.ccw .ecol.trai, .ed.fc.ccw .ecol.giua, .ed.fc.ccw .ecol.phai{background:var(--ep)!important;border:1px solid var(--vien)!important;border-radius:12px!important;overflow:hidden}
+.ed.fc.ccw .ecol.trai{overflow:visible!important}
+.ed.fc.ccw .keo.ngang{width:0!important;margin:0 -4px;opacity:0}
+.ed.fc.ccw .keo.doc{height:8px!important;background:transparent!important}
+.ed.fc.ccw .etl{margin:0 8px 8px;background:var(--ep)!important;border:1px solid var(--vien);border-radius:12px;overflow:hidden}
+.ed.fc.ccw .etop{background:var(--eb)!important;border:0!important}
+.ed.fc .nutXuat, .ed.fc #btnXuat{background:var(--ea)!important;border-color:var(--ea)!important;color:#fff!important;border-radius:8px!important}
+.ed.fc .nutXuat:hover, .ed.fc #btnXuat:hover{background:var(--ea2)!important}
+
+/* cột trái: tab ngang biểu tượng trên chữ dưới */
+.ed.fc.ccw .ecol.trai{grid-template-columns:minmax(0,1fr)!important;grid-template-rows:auto minmax(0,1fr)!important}
+.ed.fc.ccw .ecol.trai > .etabs{grid-column:1!important;grid-row:1!important;flex-direction:row!important;align-items:stretch!important;gap:2px!important;padding:6px 8px!important;border:0!important;border-bottom:1px solid var(--vien)!important;background:transparent!important;overflow-x:auto!important;overflow-y:hidden!important;height:auto!important;border-radius:12px 12px 0 0}
+.ed.fc.ccw .ecol.trai > .etabs > button:not(.cuonMui){flex:none!important;width:auto!important;min-width:58px!important;height:50px!important;padding:4px 8px!important;border-radius:8px!important;font-size:11px!important;gap:3px!important;color:var(--em)!important}
+.ed.fc.ccw .ecol.trai > .etabs > button:not(.cuonMui):hover{background:var(--ep2)!important;color:var(--et)!important}
+.ed.fc.ccw .ecol.trai > .etabs > button[aria-selected="true"]{background:var(--ep2)!important;color:var(--et)!important;box-shadow:inset 0 0 0 1px var(--el)}
+.ed.fc.ccw .ecol.trai > .etabs > button svg{width:18px!important;height:18px!important}
+.ed.fc.ccw .ecol.trai > .epane{grid-column:1!important;grid-row:2!important;min-height:0}
+.cuonNgang > .cuonMui{position:sticky;top:0;bottom:0;z-index:2;flex:none;width:22px;margin:0;padding:0!important;border:0!important;display:none;align-items:center;justify-content:center;color:var(--et,#e6e6e8)!important;font:700 15px/1 "Inter",system-ui,sans-serif!important;cursor:pointer;border-radius:0!important;min-width:0!important;height:auto!important}
+.cuonNgang > .cuonMui.trai{left:0;order:-1;margin-right:-22px;background:linear-gradient(90deg,var(--ep,#1b1c1f) 55%,transparent)!important}
+.cuonNgang > .cuonMui.phai{right:0;order:99;margin-left:-22px;background:linear-gradient(270deg,var(--ep,#1b1c1f) 55%,transparent)!important}
+.cuonNgang.conTrai > .cuonMui.trai, .cuonNgang.conPhai > .cuonMui.phai{display:flex}
+/* mục con dạng cây như Concat */
+.ed.fc.ccw .epane .ben, .ed.fc.ccw .epane .snav{border-right:1px solid var(--vien)!important;padding-right:6px}
+.ed.fc.ccw .epane .ben button, .ed.fc.ccw .epane .snav button{border-radius:6px!important;padding:6px 8px!important;font:500 12.5px/1.3 "Inter",system-ui,sans-serif!important;color:var(--em)!important;background:transparent!important}
+.ed.fc.ccw .epane .ben button.on, .ed.fc.ccw .epane .snav button.on{background:var(--ep2)!important;color:var(--et)!important;font-weight:600!important}
+
+/* khung xem: đầu đề + thanh phát dưới */
+.ed.fc.ccw .ecol.giua{display:flex!important;flex-direction:column!important}
+.ed.fc.ccw .xemDau{display:flex;align-items:center;gap:12px;padding:8px 12px;border-bottom:1px solid var(--vien);min-height:44px}
+.ed.fc.ccw .xemDau > b{font:600 14px "Inter",system-ui,sans-serif;color:var(--et)}
+.ed.fc.ccw .xemDau .xemTt{flex:1;text-align:center;font:500 12px "Inter",system-ui,sans-serif;color:var(--em);font-variant-numeric:tabular-nums}
+.ed.fc.ccw .xemDau > .ccTop{position:static!important;transform:none!important;margin:0!important;padding:0!important;background:none!important;border:0!important;box-shadow:none!important;display:flex;gap:6px;width:auto!important}
+.ed.fc.ccw .ecol.giua > .khungVung{flex:1;min-height:0}
+.ed.fc.ccw .xemPhat{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;padding:8px 12px;border-top:1px solid var(--vien)}
+.ed.fc.ccw .xemTrai{display:flex;align-items:center;gap:6px;font:500 12.5px "Inter",system-ui,sans-serif;font-variant-numeric:tabular-nums;min-width:0}
+.ed.fc.ccw .xemTc{background:var(--ep2);border:1px solid var(--vien);border-radius:7px;padding:5px 9px;color:var(--et);white-space:nowrap}
+.ed.fc.ccw .xemTong{color:var(--em);white-space:nowrap}
+.ed.fc.ccw .xemGiua{display:flex;align-items:center;gap:4px}
+.ed.fc.ccw .xemPhat button.ic{width:30px;height:30px;border:0;border-radius:7px;background:transparent;color:var(--et);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.ed.fc.ccw .xemPhat button.ic:hover{background:var(--ep2)}
+.ed.fc.ccw .xemPhat button.xemPlay{color:var(--eaChu)}
+.ed.fc.ccw .xemPhai{display:flex;align-items:center;justify-content:flex-end;gap:6px}
+.ed.fc.ccw .xemPhai select{background:var(--ep2);border:1px solid var(--vien);border-radius:7px;color:var(--et);height:30px;padding:0 8px;font:500 12px "Inter",system-ui,sans-serif}
+.ed.fc.ccw .etool .ccGiua{display:none!important}   /* phát / giờ đã nằm dưới khung xem */
+@media (max-width:1100px){.ed.fc.ccw .xemTong{display:none}}
+
+/* khung chọn: tay cầm tím như Concat, nhãn cỡ · góc */
+.ed.fc #tayCam .tay{border-color:var(--ea)!important;box-shadow:0 0 0 1px rgba(0,0,0,.35)!important}
+.ed.fc #tayCam .goc.tl, .ed.fc #tayCam .goc.tr, .ed.fc #tayCam .goc.bl, .ed.fc #tayCam .goc.br{border-color:#fff!important}
+.ed.fc #tayCam .tayNhan{position:absolute;left:50%;bottom:-24px;transform:translateX(-50%);padding:2px 7px;border-radius:6px;background:var(--ea);color:#fff;font:600 10.5px/1.4 "Inter",system-ui,sans-serif;white-space:nowrap;pointer-events:none;font-variant-numeric:tabular-nums;box-shadow:0 2px 6px rgba(0,0,0,.4)}
+
+
+/* dòng thời gian: đầu kim tím, đoạn có thanh tiêu đề màu theo loại */
+.ed.fc #ph{background:var(--ea)!important;box-shadow:none!important}
+.ed.fc #ph::before, .ed.fc #ph::after{border-top-color:var(--ea)!important}
+.ed.fc.ccw .etool{background:transparent!important;border-bottom:1px solid var(--vien)!important}
+.ed.fc.ccw .track{border-bottom:1px solid rgba(255,255,255,.035)}
+.ed.fc.ccw .item{border-radius:6px!important;border:1px solid transparent!important;padding-top:18px!important}
+.ed.fc.ccw .item > b{position:absolute;left:0;right:0;top:0;height:17px;padding:0 7px;display:flex;align-items:center;gap:4px;font:600 11px/17px "Inter",system-ui,sans-serif!important;color:#fff!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;z-index:2;background:var(--kV)}
+.ed.fc.ccw .item > small{position:relative;z-index:2}
+.ed.fc.ccw .item canvas.phim{top:17px!important;height:calc(100% - 17px)!important}
+.ed.fc.ccw .item.v{background:var(--kVnen)!important;border-color:var(--kV)!important}
+.ed.fc.ccw .item.v > b{background:var(--kV)}
+.ed.fc.ccw .item.b{background:var(--kBnen)!important;border-color:var(--kB)!important}.ed.fc.ccw .item.b > b{background:var(--kB)}
+.ed.fc.ccw .item.g{background:var(--kTnen)!important;border-color:var(--kT)!important}.ed.fc.ccw .item.g > b{background:var(--kT)}
+.ed.fc.ccw .item.g > b::before{content:"T";font:700 11px "Inter",sans-serif;opacity:.9;margin-right:2px}
+.ed.fc.ccw .item.a3, .ed.fc.ccw .item.a{background:var(--kAnen)!important;border-color:var(--kA)!important}.ed.fc.ccw .item.a3 > b, .ed.fc.ccw .item.a > b{background:var(--kA)}
+.ed.fc.ccw .item.chon{border-color:#fff!important;box-shadow:0 0 0 1px #fff!important}
+.ed.fc.ccw .item.trong{background:repeating-linear-gradient(45deg,transparent 0 6px,rgba(255,255,255,.05) 6px 12px)!important;border:1px dashed var(--el)!important;padding-top:0!important}
+.ed.fc.ccw .item canvas.songAm:not(.v){top:17px;height:calc(100% - 17px)}
+.ed.fc.ccw .item .amLop{top:17px}
+.ed.fc.ccw .item .fdK{top:-14px}
+/* thuộc tính: tab dạng nút gạt như Concat, ô số có nền */
+.ed.fc.ccw .prop .ptabs.cuonNgang{background:var(--ep2)!important;border:0!important;border-radius:9px!important;padding:3px!important;margin:0 0 10px!important;gap:2px!important;position:relative!important;top:auto!important}
+.ed.fc.ccw .prop .ptabs.cuonNgang > button:not(.cuonMui){flex:1 0 auto!important;border:0!important;border-radius:7px!important;padding:7px 12px!important;color:var(--em)!important;font:600 12.5px "Inter",system-ui,sans-serif!important}
+.ed.fc.ccw .prop .ptabs.cuonNgang > button.on{background:var(--ep3)!important;color:var(--et)!important;box-shadow:0 1px 2px rgba(0,0,0,.35)!important}
+.ed.fc.ccw .prop .ccSo{background:var(--ep2)!important;border:1px solid var(--vien)!important;border-radius:7px!important}
+.ed.fc input[type=checkbox][role=switch]:checked, .ed.fc .ccTog:checked{accent-color:var(--ea)}
+/* chỉnh sau khi xem: đầu đề không xuống dòng, cột hẹp thì bớt chữ; chữ / đồ hoạ là thanh màu đặc như Concat */
+.ed.fc.ccw .ecol.giua{container-type:inline-size}
+.ed.fc.ccw .xemDau > b{white-space:nowrap}
+.ed.fc.ccw .xemDau .xemTt{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ed.fc.ccw .xemPhat{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)}
+.ed.fc.ccw .xemTrai{overflow:hidden}
+@container (max-width:520px){.ed.fc.ccw .xemDau .xemTt, .ed.fc.ccw .xemTong{display:none}.ed.fc.ccw .xemPhat{gap:4px;padding:6px 8px}.ed.fc.ccw .xemPhat button.ic{width:26px;height:26px}}
+@container (max-width:420px){.ed.fc.ccw .xemDau > b{display:none}.ed.fc.ccw .xemPhai select{max-width:70px}}
+.ed.fc.ccw .item.g{background:var(--kT)!important;border-color:var(--kT)!important;padding-top:4px!important;display:flex;align-items:center}
+.ed.fc.ccw .item.g > b{position:static!important;height:auto!important;background:none!important;padding:0!important}
+.ed.fc.ccw .item.g > small{font:600 11px "Inter",system-ui,sans-serif!important;color:#fff!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ed.fc.ccw .item.g.fx, .ed.fc.ccw .item.g.hinh, .ed.fc.ccw .item.g.bieuDo{background:var(--kFx)!important;border-color:var(--kFx)!important}
+.ed.fc.ccw .item.g.fx::after{content:"fx";position:absolute;right:5px;top:50%;transform:translateY(-50%);padding:0 5px;border-radius:4px;background:rgba(0,0,0,.35);font:700 10px/16px "Inter",sans-serif;color:#fff}
+.ed.fc.ccw .item.g.chon{box-shadow:0 0 0 2px #fff!important}
+.ed.fc.ccw .xemPhat{grid-template-columns:max-content minmax(0,1fr) max-content!important}
+.ed.fc.ccw .xemGiua{justify-self:center}
+.ed.fc.ccw .xemTrai{overflow:visible}
+.ed.fc #tayCam .tayNhan.trongKhung{bottom:auto!important;top:8px}
+
+/* ═════════ ĐỢT 10: nhấn xanh lime TMXK (thay tím) · khung Media kiểu Concat ═════════ */
+.ed.fc{--ea:#99DF00; --eaChu:#b8ef3a; --ea2:#aee62a; --eaMo:rgba(153,223,0,.15); --eaInk:#0f1400; --fcTc:#b8ef3a;
+  --kV:#3d6fd8; --kVnen:#1c2740; --kA:#20a184; --kAnen:#0f2e27; --kT:#c4528c; --kTnen:#3a1a2b; --kB:#c08a2d; --kBnen:#382712; --kFx:#7a52d9; --kFxnen:#251d47}
+.ed.fc.sang{--ea:#5f9a00; --eaChu:#4a7a00; --eaMo:rgba(95,154,0,.14); --eaInk:#ffffff; --fcTc:#4a7a00}
+/* chữ trên nền lime phải tối */
+.ed.fc .nutXuat, .ed.fc #btnXuat, .ed.fc #tayCam .tayNhan, .mauLuoi > button.daTick::after, #fcNhe .hang .btn, .ed.fc .btn.xanh{color:var(--eaInk)!important}
+.ed.fc #btnChonCT[aria-pressed="true"], .ed.fc .ccIc[aria-pressed="true"]{color:var(--eaInk)!important}
+.ed.fc #tayCam .tay{border-color:var(--ea)!important}
+.ed.fc #ph{background:var(--ea)!important}
+/* khung Media */
+.ed.fc.ccw .epane[data-pane="footage"] .snav.coCay > button{display:none!important}
+.ed.fc.ccw .epane[data-pane="footage"] .snav.coCay{gap:0;padding-top:2px}
+.ed.fc .cay{display:flex;flex-direction:column;gap:1px}
+.ed.fc .cayDau{display:flex;align-items:center;gap:5px;padding:8px 6px 4px;color:var(--em);font:600 12px "Inter",system-ui,sans-serif}
+.ed.fc .cayDau:not(:first-child){margin-top:8px}
+.ed.fc .cay > button{display:flex!important;align-items:center;justify-content:space-between;gap:6px;width:100%;border:0;background:transparent;color:var(--em);font:500 12.5px "Inter",system-ui,sans-serif;padding:6px 8px 6px 22px;border-radius:6px;cursor:pointer;text-align:left}
+.ed.fc .cay > button:hover{background:var(--ep2);color:var(--et)}
+.ed.fc .cay > button.on{background:var(--ep2);color:var(--et);font-weight:600;box-shadow:inset 2px 0 0 var(--ea)}
+.ed.fc .cay > button small{color:var(--emo);font-size:11px;font-variant-numeric:tabular-nums}
+/* hàng đầu: nút Nhập viền đứt nét gọn + ô tìm cùng một hàng */
+.ed.fc.ccw .epane[data-pane="footage"] .snoi > section:first-child{display:grid!important;grid-template-columns:auto minmax(0,1fr);gap:8px 8px;align-content:start}
+.ed.fc.ccw .epane[data-pane="footage"] .snoi > section:first-child > *:not(#drop):not(.tim){grid-column:1 / -1}
+.ed.fc.ccw #drop{font-size:0!important;display:inline-flex!important;align-items:center;justify-content:center;gap:6px;height:34px!important;min-height:0!important;padding:0 14px!important;border:1.5px dashed var(--el)!important;border-radius:8px!important;background:transparent!important;cursor:pointer;margin:0!important;text-align:center}
+.ed.fc.ccw #drop b{display:inline-flex!important;align-items:center;gap:6px;font:600 12.5px "Inter",system-ui,sans-serif!important;color:var(--et);margin:0!important}
+.ed.fc.ccw #drop:hover, .ed.fc.ccw #drop.over{border-color:var(--ea)!important;background:var(--eaMo)!important}
+.ed.fc.ccw #drop:hover b{color:var(--eaChu)}
+.ed.fc.ccw .epane[data-pane="footage"] .tim{display:flex;gap:6px;align-items:center;margin:0!important}
+.ed.fc.ccw .epane[data-pane="footage"] .tim #tim{flex:1;min-width:0;height:34px;border-radius:8px;background:var(--ep2);border:1px solid var(--vien);color:var(--et);padding:0 10px}
+.ed.fc.ccw .epane[data-pane="footage"] .tim #locMedia{display:none}
+/* lưới thẻ sạch: ảnh bo tròn, thời lượng góc dưới phải, tên một dòng; nút phụ chỉ hiện khi rê */
+.ed.fc.ccw #srcs.luoi{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(112px,1fr))!important;gap:12px 10px!important}
+.ed.fc.ccw #srcs .fsrc{background:transparent!important;border:0!important;padding:0!important;position:relative}
+.ed.fc.ccw #srcs .fsrc .thWrap{border-radius:8px;overflow:hidden;background:#000;aspect-ratio:16/10}
+.ed.fc.ccw #srcs .fsrc .thWrap img.th{width:100%!important;height:100%!important;object-fit:cover;border-radius:0!important;display:block}
+.ed.fc.ccw #srcs .fsrc .hhTg{right:6px!important;bottom:6px!important;left:auto!important;top:auto!important;background:rgba(0,0,0,.72)!important;color:#fff!important;font:600 10.5px/1 "Inter",system-ui,sans-serif!important;padding:3px 5px!important;border-radius:4px!important}
+.ed.fc.ccw #srcs .fsrc .hhDung{left:6px!important;top:6px!important;background:var(--ea)!important;color:var(--eaInk)!important;font:700 9.5px/1 "Inter",system-ui,sans-serif!important;padding:3px 5px!important;border-radius:4px!important}
+.ed.fc.ccw #srcs .fsrc .moRong{padding:6px 2px 0!important}
+.ed.fc.ccw #srcs .fsrc .moRong b{display:block;font:500 12px/1.3 "Inter",system-ui,sans-serif!important;color:var(--et);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ed.fc.ccw #srcs .fsrc .moRong small{display:none}
+.ed.fc.ccw #srcs .fsrc .acts{display:none!important;position:absolute;left:4px;right:4px;top:4px;gap:4px;z-index:3;flex-wrap:wrap}
+.ed.fc.ccw #srcs .fsrc:hover .acts, .ed.fc.ccw #srcs .fsrc:focus-within .acts{display:flex!important}
+.ed.fc.ccw #srcs .fsrc .acts .btn{height:24px!important;min-height:0!important;padding:0 8px!important;font:600 11px "Inter",system-ui,sans-serif!important;border-radius:6px!important;background:rgba(15,15,17,.85)!important;color:#fff!important;border:0!important}
+.ed.fc.ccw #srcs .fsrc .acts .btn.xanh{background:var(--ea)!important;color:var(--eaInk)!important}
+.ed.fc.ccw #srcs .fsrc:hover .hhDung, .ed.fc.ccw #srcs .fsrc:hover .hhAi{display:none}
+.ed.fc.ccw #srcs .fsrc .hhThem{background:var(--ea)!important;color:var(--eaInk)!important}
+.ed.fc.ccw #srcStatus{display:flex;align-items:center;gap:8px;margin-top:4px}
+@media (hover:none){.ed.fc.ccw #srcs .fsrc .acts{display:flex!important;position:static;margin-top:4px}}
+/* cây Media: cột đủ rộng để nhãn nằm một dòng */
+.ed.fc.ccw .epane.on[data-pane="footage"]{grid-template-columns:122px minmax(0,1fr)}
+.ed.fc .cayDau, .ed.fc .cay > button{white-space:nowrap}
+.ed.fc .cay > button > span{overflow:hidden;text-overflow:ellipsis}
