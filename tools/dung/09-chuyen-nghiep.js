@@ -742,7 +742,7 @@ function khoiTao09e() { const goc = veTl; veTl = function () { const r = goc.app
 khoiTao09e();
 
 /* ═════════ ĐỢT 7: bảng Thuộc tính gọn kiểu FilmCraft / CapCut · chỉnh màu chuyên nghiệp · tay cầm khung xem mảnh · thêm footage thẳng vào dòng thời gian ═════════ */
-Object.assign(TAB_NHOM, { 'Ổn định hình (chống rung)': 'Video', 'Đoạn': 'Video' }); Object.assign(SUB_NHOM, { 'Ổn định hình (chống rung)': 'Ổn định' });
+Object.assign(TAB_NHOM, { 'Ổn định hình (chống rung)': 'Video', 'Đoạn': '*' });   // '*': về tab chính của loại mục (Video / Văn bản / Đồ hoạ…) Object.assign(SUB_NHOM, { 'Ổn định hình (chống rung)': 'Ổn định' });
 /* thanh tab cuộn ngang: lăn chuột cuộn ngang, mũi tên ‹ › khi còn tab bị che, tab đang mở luôn nằm trong tầm nhìn */
 function ganCuonNgang(bar) {
   if (!bar || bar._cuon) return; bar._cuon = 1; bar.classList.add('cuonNgang');
@@ -755,8 +755,8 @@ function ganCuonNgang(bar) {
 }
 /* gom các ô lẻ (chuyển cảnh, thông tin đoạn, nút xoá…) vào nhóm "Đoạn" của Video › Cơ bản để không hiện ở mọi tab */
 function gomOLe(box) {
-  const ch = P.chon; if (!ch || !(ch.k === 'v' || ch.k === 'b')) return; if (box.querySelector(':scope > .nhomRoi')) return;
-  const le = [...box.children].filter(x => !x.classList.contains('nhom2') && !x.classList.contains('ptabs') && !x.classList.contains('psub') && !x.classList.contains('lopHang') && x.tagName !== 'H3'); if (!le.length) return;
+  const ch = P.chon; if (!ch || (typeof dsNhieu === 'function' && dsNhieu().length > 1)) return; if (box.querySelector(':scope > .nhomRoi')) return;
+  const le = [...box.children].filter(x => !x.classList.contains('nhom2') && !x.classList.contains('ptabs') && !x.classList.contains('psub') && !x.classList.contains('lopHang') && !x.classList.contains('tabCuoi') && x.tagName !== 'H3'); if (!le.length || !box.querySelector(':scope > .nhom2')) return;
   const n = el('div', 'nhom2 nhomRoi'); n.appendChild(el('b', null, 'Đoạn')); box.insertBefore(n, le[0]); le.forEach(x => n.appendChild(x));
 }
 { const goc = tabHoaProp; tabHoaProp = function () {
@@ -851,6 +851,13 @@ function veNutThemCuoi() {
   const b = el('button', 'themCuoi'); b.type = 'button'; b.title = 'Thêm video / ảnh vào cuối dòng thời gian'; b.setAttribute('aria-label', b.title); b.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>';
   let acc = 0; P.clips.forEach(c => { acc += daiC(c); }); b.style.left = (acc * PX() + 10) + 'px'; b.onpointerdown = e => e.stopPropagation(); b.onclick = e => { e.stopPropagation(); P.t = tongGiay(); moChonFileTl(); }; hang.appendChild(b);
 }
+/* mũi tên › nổi ở mép phải một thanh cuộn ngang trên điện thoại (thanh công cụ, thanh tab dưới) khi còn nút bị che */
+function ganMuiCuon(mt, id) {
+  const mui = el('button'); mui.id = id; mui.className = 'muiCuon'; mui.type = 'button'; mui.textContent = '›'; mui.setAttribute('aria-label', 'Xem thêm'); document.body.appendChild(mui);
+  const dat = () => { const r = mt.getBoundingClientRect(), co = innerWidth <= 760 && r.width > 0 && getComputedStyle(mt).display !== 'none' && getComputedStyle(mt).flexDirection !== 'column' && mt.scrollLeft + mt.clientWidth < mt.scrollWidth - 4; mui.classList.toggle('hien', co); if (co) { mui.style.top = r.top + 'px'; mui.style.height = r.height + 'px'; } };
+  mui.onclick = () => { mt.scrollBy({ left: mt.clientWidth * 0.6, behavior: 'smooth' }); }; mt.addEventListener('scroll', dat, { passive: true }); addEventListener('resize', dat);
+  new MutationObserver(() => requestAnimationFrame(dat)).observe(mt, { childList: true, attributes: true, attributeFilter: ['class', 'style', 'hidden'] }); new MutationObserver(() => requestAnimationFrame(dat)).observe($('#ed') || document.body, { attributes: true, attributeFilter: ['class'] }); setInterval(dat, 1500); dat();
+}
 function khoiTao09f() {
   // nút "＋ Thêm video" trên điện thoại: mở chọn file và đặt thẳng vào dòng thời gian (trước đây chỉ mở thư viện)
   document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('#tlTrong [data-mo-tab="footage"]'); if (!b) return; e.preventDefault(); e.stopImmediatePropagation(); moChonFileTl(); }, true);
@@ -860,9 +867,41 @@ function khoiTao09f() {
   { const box = $('#propChon'); if (box) { box.addEventListener('pointerdown', () => { P._keoProp = true; }, true); const tha = () => { if (!P._keoProp) return; P._keoProp = false; if (P._propHoan) { P._propHoan = false; setTimeout(() => veProp(), 0); } }; addEventListener('pointerup', tha, true); addEventListener('pointercancel', tha, true); }
     const goc = veProp; veProp = function () { if (P._keoProp) { P._propHoan = true; return; } return goc.apply(this, arguments); }; }
   // thanh công cụ dưới trên điện thoại: mũi tên › khi còn nút bị che, chạm để cuộn tiếp
-  const mt = $('#mobTao'); if (mt) { const mui = el('button'); mui.id = 'mobMui'; mui.type = 'button'; mui.textContent = '›'; mui.setAttribute('aria-label', 'Xem thêm công cụ'); document.body.appendChild(mui);
-    const dat = () => { const r = mt.getBoundingClientRect(), co = r.width > 0 && getComputedStyle(mt).display !== 'none' && mt.scrollLeft + mt.clientWidth < mt.scrollWidth - 4; mui.classList.toggle('hien', co); if (co) { mui.style.top = r.top + 'px'; mui.style.height = r.height + 'px'; } };
-    mui.onclick = () => { mt.scrollBy({ left: mt.clientWidth * 0.6, behavior: 'smooth' }); }; mt.addEventListener('scroll', dat, { passive: true }); addEventListener('resize', dat); new MutationObserver(() => requestAnimationFrame(dat)).observe(mt, { childList: true, attributes: true, attributeFilter: ['class', 'style', 'hidden'] }); new MutationObserver(() => requestAnimationFrame(dat)).observe($('#ed') || document.body, { attributes: true, attributeFilter: ['class'] }); setInterval(dat, 1500); dat(); }
+  [$('#mobTao'), $('.ecol.trai .etabs')].forEach((mt, k) => { if (mt) ganMuiCuon(mt, k ? 'mobMui2' : 'mobMui'); });
   if (!P.dang) veTl();
 }
 khoiTao09f();
+
+/* ═════════ ĐỢT 8: rà soát giao diện — hoạt ảnh chữ dạng lưới thẻ, chữ đang chọn hiện đủ khi dừng, nút trùng, ô chọn file, nhãn dán đang tải ═════════ */
+/* chữ / nhãn dán đang chọn và đang dừng: vẽ trạng thái đầy đủ (bỏ hoạt ảnh vào / ra) để chỉnh cho dễ; khi phát và khi xuất vẫn đủ hoạt ảnh */
+{ const goc = veDoHoa; veDoHoa = function (ctx, W, H, g, t) {
+    const ch = P.chon; if (!g || P.dang || (typeof dangXuat === 'function' && dangXuat()) || !ch || ch.k !== 'g' || P.gfx[ch.i] !== g || !(g.kieu === 'chu' || g.kieu === 'sticker')) return goc.apply(this, arguments);
+    const luu = { boVao: g.boVao, boRa: g.boRa }; g.boVao = true; g.boRa = true;
+    try { return goc.apply(this, arguments); } finally { ['boVao', 'boRa'].forEach(k => { if (luu[k] === undefined) delete g[k]; else g[k] = luu[k]; }); }
+  }; }
+/* hoạt ảnh chữ: Vào / Ra / Lặp thành lưới thẻ có hình động khi rê (như hoạt ảnh của video), thay cho ô thả xuống */
+const AN_CHU_LOP = { pop: 'anPop', mo: 'anMo', truot: 'anTruot', len: 'anLen', phong: 'anPhong', xoay: 'anXoay', nhoe: 'anNhoe', go: 'anGo', nay: 'anNay', lac: 'anLac', thu: 'anThu', roi: 'anRoi', nhip: 'anNhip', nhap_nhay: 'anNhay', khong: '' };
+function luoiAnChu(box) {
+  const n = [...box.querySelectorAll(':scope > .nhom2')].find(x => { const b = x.querySelector(':scope > b'); return b && b.textContent.trim() === 'Hoạt ảnh chữ'; }); if (!n || n.querySelector('.anChuLuoi')) return;
+  const hang = ['Vào', 'Ra', 'Lặp'].map(t => [...n.querySelectorAll(':scope > label')].find(l => { const s = l.querySelector(':scope > span'); return s && s.textContent.trim() === t && l.querySelector('select'); })).filter(Boolean); if (hang.length < 2) return;
+  P.anChuTab = P.anChuTab || 'Vào'; const seg = el('div', 'anChuSeg'), luoi = el('div', 'anChuLuoi');
+  const ve = () => { seg.innerHTML = ''; luoi.innerHTML = ''; hang.forEach(l => { const t = l.querySelector('span').textContent.trim(), b = el('button', t === P.anChuTab ? 'on' : null, t); b.type = 'button'; b.onclick = () => { P.anChuTab = t; ve(); }; seg.append(b); });
+    const l = hang.find(x => x.querySelector('span').textContent.trim() === P.anChuTab) || hang[0], sl = l.querySelector('select');
+    [...sl.options].forEach(o => { const the = el('button', 'anThe' + (o.value === sl.value ? ' on' : '')); the.type = 'button'; the.title = o.textContent; const hinh = el('span', 'anHinh'), chu = el('i', AN_CHU_LOP[o.value] || '', o.value === 'khong' ? '⦸' : 'Aa'); hinh.append(chu); the.append(hinh, el('span', 'anTen', o.textContent));
+      the.onclick = () => { sl.value = o.value; sl.dispatchEvent(new Event('change')); }; luoi.append(the); }); };
+  hang.forEach(l => l.classList.add('anCC')); const dau = hang[0]; n.insertBefore(seg, dau); n.insertBefore(luoi, dau); ve();
+}
+function khoiTao09g() {
+  { const goc = veProp; veProp = function () { const r = goc.apply(this, arguments); try { const box = $('#propChon'); if (box) luoiAnChu(box); } catch (e) { console.warn(e); } return r; }; }
+  // nhãn dán động đang tải: ô nhấp nháy, tải xong thì thôi (lỗi thì ô tự bỏ như cũ)
+  if (typeof veNotoLuoi === 'function') { const goc = veNotoLuoi; veNotoLuoi = function (box) { const r = goc.apply(this, arguments); try { box.querySelectorAll('.the').forEach(t => { const im = t.querySelector('img'); if (!im || im.complete) return; t.classList.add('dangTai'); im.addEventListener('load', () => t.classList.remove('dangTai'), { once: true }); }); } catch { } return r; }; }
+  // nút "Áp cho tất cả" trong từng nhóm trùng với nút cuối tab → giữ nút cuối tab
+  { const goc = nutApTatCa; nutApTatCa = function () { const r = goc.apply(this, arguments); try { const n = arguments[0], hang = n && n.lastElementChild; if (hang && hang.classList.contains('row')) hang.classList.add('apTatCaCu'); } catch { } return r; }; }
+  // ô chọn video tham chiếu ở Trợ lý AI: nút tiếng Việt thay cho "Choose File"
+  const tc = $('#thamChieuIn'); if (tc && !tc._dep) { tc._dep = 1; tc.hidden = true; const b = el('button', 'btn nho ghost', '＋ Chọn video mẫu'); b.type = 'button'; b.id = 'thamChieuNut'; b.onclick = () => tc.click(); tc.after(b); tc.addEventListener('change', () => { b.textContent = tc.files && tc.files[0] ? '✓ ' + tc.files[0].name.slice(0, 24) : '＋ Chọn video mẫu'; }); }
+  // nút chỉ có biểu tượng mà chưa có tên: lấy tên từ title / nội dung gần nhất cho trình đọc màn hình
+  const danTen = () => $$('#ed button').forEach(b => { if (b.textContent.trim() || b.title || b.getAttribute('aria-label')) return; const t = b.closest('[title]'); if (t && t.title) b.setAttribute('aria-label', t.title); });
+  danTen(); new MutationObserver(() => { clearTimeout(danTen._h); danTen._h = setTimeout(danTen, 400); }).observe($('#ed') || document.body, { childList: true, subtree: true });
+  if (!P.dang) veProp();
+}
+khoiTao09g();
