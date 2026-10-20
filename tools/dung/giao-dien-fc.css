@@ -225,3 +225,97 @@ body:has(.ed.fc) .toast{background:#2a2b30;color:#e6e6e8;border:1px solid #34353
 .item .amLop .amQuaTo{position:absolute;right:18px;top:3px;padding:0 5px;border-radius:4px;background:#ff4d4f;color:#fff;font:700 10px/15px "Inter",system-ui,sans-serif;pointer-events:auto;cursor:help}
 .item[data-k="v"] .amLop .amQuaTo{top:auto;bottom:24px}
 @media (hover:none){.item .amLop .amTay{height:22px}.item .amLop .amTay{margin-top:-5px}.item .amLop .fdK{width:16px;height:16px;margin-left:-8px}}
+
+/* ── đợt 7: thanh tab cuộn ngang có mũi tên, tab con không cắt chữ ── */
+.ed .prop .ptabs.cuonNgang, .ed .prop .psub.cuonNgang{position:relative;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;flex-wrap:nowrap;scroll-behavior:smooth}
+.ed .prop .ptabs.cuonNgang::-webkit-scrollbar, .ed .prop .psub.cuonNgang::-webkit-scrollbar{display:none}
+.ed .prop .ptabs.cuonNgang > button:not(.cuonMui){flex:none}
+.ed.ccw .prop .psub.cuonNgang > button:not(.cuonMui){flex:1 0 auto;overflow:visible;text-overflow:clip;padding:5px 10px;font-size:11px}
+.ed .prop .cuonMui{position:sticky;top:0;bottom:0;z-index:2;flex:none;width:22px;margin:0;padding:0!important;border:0!important;display:none;align-items:center;justify-content:center;color:var(--et,#e6e6e8)!important;font:700 15px/1 "Inter",system-ui,sans-serif!important;cursor:pointer;border-radius:0!important}
+.ed .prop .cuonMui.trai{left:0;order:-1;margin-right:-22px;background:linear-gradient(90deg,var(--ep,#1b1c1f) 55%,transparent)!important}
+.ed .prop .cuonMui.phai{right:0;order:99;margin-left:-22px;background:linear-gradient(270deg,var(--ep,#1b1c1f) 55%,transparent)!important}
+.ed .prop .psub .cuonMui.trai{background:linear-gradient(90deg,var(--ep2,#26272b) 55%,transparent)!important}
+.ed .prop .psub .cuonMui.phai{background:linear-gradient(270deg,var(--ep2,#26272b) 55%,transparent)!important}
+.ed .prop .cuonNgang.conTrai > .cuonMui.trai, .ed .prop .cuonNgang.conPhai > .cuonMui.phai{display:flex}
+/* nhóm lẻ "Đoạn" không cần tiêu đề; tab con chỉ có một mục thì bỏ tiêu đề mục đó */
+.nhomRoi > .ccHd, .nhomRoi > b{display:none!important}
+.nhom2.mot > .ccHd{display:none!important}
+.nhom2.mot{border-top:0!important;padding-top:2px!important}
+
+/* ── bánh xe màu ── */
+.banhLuoi{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:4px 0 8px}
+.banhO{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;padding:8px 6px 6px;border-radius:8px;background:var(--ep2,#26272b);border:1px solid var(--vien,#2a2b30)}
+.banhO.doi{border-color:rgba(59,130,246,.55)}
+.banhDau{display:flex;align-items:baseline;gap:4px;width:100%;font:600 11.5px "Inter",system-ui,sans-serif;color:var(--et,#e6e6e8)}
+.banhDau small{color:var(--emo,#6e6f77);font-weight:500;font-size:10px}
+.banhDl{margin-left:auto;border:0;background:none;color:var(--em,#9b9ca4);cursor:pointer;font-size:12px;padding:0 2px;line-height:1}.banhDl:hover{color:var(--et,#e6e6e8)}
+.banhCv{width:100%;max-width:118px;aspect-ratio:1;height:auto;cursor:crosshair;touch-action:none;border-radius:50%}
+.banhL{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:2px;background:linear-gradient(90deg,#000,#777,#fff);outline:none;margin:4px 0}
+.banhL::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:#fff;border:1.5px solid #1b1c1f;box-shadow:0 1px 3px rgba(0,0,0,.5);cursor:pointer}
+.banhL::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:#fff;border:1.5px solid #1b1c1f;cursor:pointer}
+.banhSo{display:flex;justify-content:space-between;width:100%;font:500 10px "Inter",system-ui,sans-serif;color:var(--emo,#6e6f77);font-variant-numeric:tabular-nums}
+.banhSo b{color:var(--fcTc,#4aa3ff);font-weight:600}
+@media (max-width:760px){.banhLuoi{gap:6px}.banhO{padding:6px 4px}.banhSo{font-size:9.5px}}
+
+/* ── đường cong ── */
+.kenhChon{display:flex;gap:4px;flex-wrap:wrap;margin:2px 0 8px}
+.kenhChon button{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border:1px solid var(--vien,#2a2b30);border-radius:999px;background:var(--ep2,#26272b);color:var(--em,#9b9ca4);font:600 11.5px "Inter",system-ui,sans-serif;cursor:pointer}
+.kenhChon button i{width:8px;height:8px;border-radius:50%}
+.kenhChon button.on{color:var(--et,#e6e6e8);border-color:var(--ea,#3b82f6);background:var(--eaMo,rgba(59,130,246,.16))}
+.kenhChon button.doi::after{content:"•";color:var(--fcTc,#4aa3ff);margin-left:-2px}
+.congFc canvas.congCv{display:block;width:100%;max-width:300px;aspect-ratio:1;height:auto;margin:0 auto;border-radius:8px;border:1px solid var(--vien,#2a2b30);cursor:crosshair;touch-action:none}
+.congCuoi{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px}.congCuoi .quota{margin:0;font-size:11px}
+
+/* ── HSL ── */
+.hslCham{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 10px}
+.hslCham button{position:relative;width:24px;height:24px;border-radius:50%;border:2px solid transparent;background:var(--m);box-shadow:inset 0 0 0 2px var(--ep,#1b1c1f);cursor:pointer;padding:0}
+.hslCham button.on{border-color:#fff}
+.hslCham button.doi::after{content:"";position:absolute;right:-3px;top:-3px;width:7px;height:7px;border-radius:50%;background:var(--fcTc,#4aa3ff);border:1.5px solid var(--ep,#1b1c1f)}
+.hslTen{display:flex;align-items:center;gap:6px;font:600 12px "Inter",system-ui,sans-serif;margin-bottom:4px}.hslTen i{width:10px;height:10px;border-radius:50%}
+label.trMau{display:grid!important;grid-template-columns:72px 1fr 44px;align-items:center;gap:8px;margin:6px 0}
+label.trMau > span{font-size:12px;color:var(--em,#9b9ca4)}
+label.trMau input{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:3px;background:var(--nen);outline:none;margin:0}
+label.trMau input::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#fff;border:2px solid #1b1c1f;box-shadow:0 1px 3px rgba(0,0,0,.5);cursor:pointer}
+label.trMau input::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:#fff;border:2px solid #1b1c1f;cursor:pointer}
+label.trMau output{text-align:right;font:600 11.5px "Inter",system-ui,sans-serif;color:var(--fcTc,#4aa3ff);font-variant-numeric:tabular-nums}
+
+/* ── tay cầm trên khung xem: viền mảnh trắng, góc vuông nhỏ đặt đúng góc, vùng chạm rộng hơn hình ── */
+.ed #tayCam .tay{border:1px solid rgba(255,255,255,.95)!important;box-shadow:0 0 0 1px rgba(0,0,0,.35)!important}
+.ed #tayCam .goc{width:9px!important;height:9px!important;border-radius:2px!important;background:#fff!important;border:1px solid rgba(0,0,0,.55)!important;box-shadow:0 1px 3px rgba(0,0,0,.45)!important}
+.ed #tayCam .goc.tl{left:-5px!important;top:-5px!important}.ed #tayCam .goc.tr{right:-5px!important;top:-5px!important}.ed #tayCam .goc.bl{left:-5px!important;bottom:-5px!important}.ed #tayCam .goc.br{right:-5px!important;bottom:-5px!important}
+.ed #tayCam .goc::before{content:"";position:absolute;inset:-9px}
+.ed #tayCam .mepTay{background:#fff!important;border:1px solid rgba(0,0,0,.55)!important;border-radius:2px!important}
+.ed #tayCam .xoay{width:22px!important;height:22px!important;margin-left:-11px!important;top:auto!important;bottom:10px!important;border-radius:50%!important;background:rgba(20,20,22,.78) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 11a8 8 0 1 0-2.3 5.7'/%3E%3Cpath d='M20 4v7h-7'/%3E%3C/svg%3E") center/13px no-repeat!important;border:1px solid rgba(255,255,255,.55)!important;box-shadow:0 1px 4px rgba(0,0,0,.45)!important}
+.ed #tayCam .xoay::before{content:"";position:absolute;inset:-8px}
+@media (hover:none){.ed #tayCam .goc{width:12px!important;height:12px!important}.ed #tayCam .goc.tl{left:-6px!important;top:-6px!important}.ed #tayCam .goc.tr{right:-6px!important;top:-6px!important}.ed #tayCam .goc.bl{left:-6px!important;bottom:-6px!important}.ed #tayCam .goc.br{right:-6px!important;bottom:-6px!important}.ed #tayCam .goc::before{inset:-14px}.ed #tayCam .xoay{width:28px!important;height:28px!important;margin-left:-14px!important}}
+
+/* ── nút ＋ cuối track chính ── */
+.track .themCuoi{position:absolute;top:50%;width:34px;height:34px;margin-top:-17px;border-radius:8px;border:0;background:#fff;color:#111;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.4);z-index:2}
+.track .themCuoi:hover{background:#e6e6e8}
+.ed .prop .banhO input.banhL, .ed .prop label.trMau input[type=range]{-webkit-appearance:none!important;appearance:none!important;box-sizing:border-box!important;min-width:0!important;padding:0!important;border:0!important;accent-color:auto!important}
+.ed .prop .banhO input.banhL{width:100%!important;height:4px!important;margin:4px 0!important;background:linear-gradient(90deg,#000,#777,#fff)!important;border-radius:2px!important}
+.ed .prop label.trMau input[type=range]{width:100%!important;height:6px!important;margin:0!important;background:var(--nen)!important;border-radius:3px!important}
+.ed .prop .banhO input.banhL::-webkit-slider-runnable-track, .ed .prop label.trMau input[type=range]::-webkit-slider-runnable-track{background:transparent!important;height:100%!important;border:0!important}
+.ed .prop .banhO input.banhL::-webkit-slider-thumb, .ed .prop label.trMau input[type=range]::-webkit-slider-thumb{-webkit-appearance:none!important;width:13px!important;height:13px!important;margin-top:calc((100% - 13px) / 2)!important;border-radius:50%!important;background:#fff!important;border:2px solid #1b1c1f!important;box-shadow:0 1px 3px rgba(0,0,0,.5)!important}
+.ed .prop .banhO input.banhL::-webkit-slider-thumb{margin-top:-4.5px!important}
+.ed .prop label.trMau input[type=range]::-webkit-slider-thumb{margin-top:-3.5px!important}
+.ed .prop .banhO input.banhL::-moz-range-track, .ed .prop label.trMau input[type=range]::-moz-range-track{background:transparent!important}
+.ed .prop .banhO input.banhL::-moz-range-progress, .ed .prop label.trMau input[type=range]::-moz-range-progress{background:transparent!important}
+.banhDau small{display:none}
+.banhO{overflow:hidden}
+.ed .prop label.trMau input[type=range], .ed .prop .banhO input.banhL{max-width:none!important;flex:none!important}
+/* tab con trên điện thoại (không có lớp .ccw) */
+.ed .prop .psub{display:flex;gap:2px;background:var(--ep2,#26272b);border-radius:8px;padding:2px;margin:0 0 10px}
+.ed .prop .psub > button:not(.cuonMui){flex:1 0 auto;border:0;border-radius:6px;background:transparent;color:var(--em,#9b9ca4);font:600 12px/1.2 "Inter",system-ui,sans-serif;padding:8px 12px;white-space:nowrap;cursor:pointer;min-height:32px}
+.ed .prop .psub > button.on{background:var(--ep,#1b1c1f);color:var(--et,#e6e6e8);box-shadow:0 1px 2px rgba(0,0,0,.35)}
+@media (hover:none){.item .amLop .fdK{width:13px;height:13px;margin-left:-6.5px}}
+/* dấu "còn nút, vuốt sang" cho thanh công cụ dưới trên điện thoại */
+#mobMui{position:fixed;right:0;z-index:44;width:34px;display:none;align-items:center;justify-content:center;border:0;padding:0;color:var(--et,#e6e6e8);font:700 22px/1 "Inter",system-ui,sans-serif;background:linear-gradient(270deg,var(--ep2,#26272b) 55%,transparent)}
+#mobMui.hien{display:flex}
+/* góc chữ L nằm trong khung (không bị cắt khi hình phủ kín), viền đen mảnh để nổi trên nền sáng */
+.ed #tayCam .goc{width:14px!important;height:14px!important;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;filter:drop-shadow(0 0 1px rgba(0,0,0,.85))}
+.ed #tayCam .goc.tl{left:-1px!important;top:-1px!important;border-left:3px solid #fff!important;border-top:3px solid #fff!important}
+.ed #tayCam .goc.tr{right:-1px!important;top:-1px!important;border-right:3px solid #fff!important;border-top:3px solid #fff!important}
+.ed #tayCam .goc.bl{left:-1px!important;bottom:-1px!important;border-left:3px solid #fff!important;border-bottom:3px solid #fff!important}
+.ed #tayCam .goc.br{right:-1px!important;bottom:-1px!important;border-right:3px solid #fff!important;border-bottom:3px solid #fff!important}
+@media (hover:none){.ed #tayCam .goc{width:18px!important;height:18px!important}.ed #tayCam .goc.tl{left:-1px!important;top:-1px!important}.ed #tayCam .goc.tr{right:-1px!important;top:-1px!important}.ed #tayCam .goc.bl{left:-1px!important;bottom:-1px!important}.ed #tayCam .goc.br{right:-1px!important;bottom:-1px!important}}
