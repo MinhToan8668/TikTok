@@ -529,3 +529,19 @@ label.trMau output{text-align:right;font:600 11.5px "Inter",system-ui,sans-serif
 .ed.fc.ccw .epane.on[data-pane="footage"]{grid-template-columns:122px minmax(0,1fr)}
 .ed.fc .cayDau, .ed.fc .cay > button{white-space:nowrap}
 .ed.fc .cay > button > span{overflow:hidden;text-overflow:ellipsis}
+/* đợt 11: kéo thả kiểu Concat */
+.chipKeo{position:fixed;top:-200px;left:-400px;display:flex;align-items:center;gap:6px;padding:5px 9px 5px 6px;border-radius:7px;background:#1b1d22;border:1px solid var(--ea,#99DF00);color:#f2f4f0;font:600 12px "Inter",system-ui,sans-serif;white-space:nowrap;box-shadow:0 6px 18px rgba(0,0,0,.45);pointer-events:none;z-index:9999}
+.chipKeo i{width:14px;height:14px;border-radius:4px;background:var(--kV,#3d6fd8)}
+.chipKeo.anh i{background:var(--kB,#c08a2d)}.chipKeo.fx i{background:var(--kFx,#7a52d9)}.chipKeo.chu i{background:var(--kT,#c4528c)}
+.chipKeo span{color:#a9b0a0;font-weight:500;font-variant-numeric:tabular-nums}
+.keoNguon{opacity:.45!important}
+.ed #tlIn .bongKeo{position:absolute;z-index:40;pointer-events:none;border-radius:6px;border:2px solid var(--ea);background:color-mix(in srgb,var(--kV,#3d6fd8) 70%,transparent);overflow:visible}
+.ed #tlIn .bongKeo.anh{background:color-mix(in srgb,var(--kB,#c08a2d) 70%,transparent)}
+.ed #tlIn .bongKeo.fx{background:color-mix(in srgb,var(--kFx,#7a52d9) 70%,transparent)}
+.ed #tlIn .bongKeo.chu{background:color-mix(in srgb,var(--kT,#c4528c) 70%,transparent)}
+.ed #tlIn .bongKeo.moi{border-style:dashed}
+.ed #tlIn .bongKeo b{position:absolute;left:-2px;top:-2px;min-width:calc(100% + 4px);width:max-content;border-radius:6px 6px 6px 0;height:17px;line-height:17px;padding:0 6px;font:600 10.5px "Inter",system-ui,sans-serif;color:var(--eaInk,#0f1400);background:var(--ea);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ed #tlIn .vachChen{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;background:var(--ea);box-shadow:0 0 0 1px rgba(0,0,0,.35),0 0 8px var(--ea);z-index:41;pointer-events:none}
+.ed #tlIn .bongKeo.moi{background:color-mix(in srgb,var(--ea) 25%,transparent)}
+.ed #tlIn .bongKeo.moi b{top:-19px;border-radius:6px}
+body.keoTv .ed .themCuoi{visibility:hidden}
