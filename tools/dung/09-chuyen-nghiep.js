@@ -1048,3 +1048,22 @@ function khoiTao09j() {
   }, true);
 }
 khoiTao09j();
+
+/* ═════════ ĐỢT 12: khung xem trước gọn như Concat ═════════
+   Nút lặp / scopes thành icon nét như các nút khác, ô lớp phủ có icon lưới,
+   đồng hồ âm lượng nằm sát mép phải vùng xem (không còn là hộp nổi), có vạch thang dB. */
+const IC_LAP = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 2l3 3-3 3"/><path d="M4 11V9a4 4 0 0 1 4-4h12"/><path d="M7 22l-3-3 3-3"/><path d="M20 13v2a4 4 0 0 1-4 4H4"/></svg>';
+const IC_SCOPE = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>';
+const IC_LUOI = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/></svg>';
+const DB_THANG = [0, -6, -12, -24, -48];
+function khoiTao09k() {
+  if (!$('#ed') || !$('#ed').classList.contains('ccw')) return;
+  [['#btnLap', IC_LAP, 'Phát lặp'], ['#btnScope', IC_SCOPE, 'Scopes màu']].forEach(([s, ic, ten]) => { const b = $(s); if (!b || b.dataset.ic12) return; b.dataset.ic12 = 1; b.innerHTML = ic; b.classList.add('ic12'); b.setAttribute('aria-label', ten); });
+  const lp = $('#lopPhuChon'); if (lp && !lp.parentElement.classList.contains('lopPhuO')) { const o = el('label', 'lopPhuO'); o.title = lp.title; o.innerHTML = IC_LUOI; lp.before(o); o.appendChild(lp); }
+  const m = $('#fcMeter'), kv = $('.ecol.giua .khungVung');
+  if (m && kv && m.parentElement !== kv) {
+    kv.appendChild(m); m.classList.add('docMep');
+    if (!m.querySelector('.thang')) { const th = el('div', 'thang'); DB_THANG.forEach(d => { const v = el('span', null, String(d)); v.style.bottom = (100 * (1 + d / 60)) + '%'; th.appendChild(v); }); m.prepend(th); }
+  }
+}
+khoiTao09k();
