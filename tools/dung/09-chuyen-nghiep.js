@@ -905,3 +905,66 @@ function khoiTao09g() {
   if (!P.dang) veProp();
 }
 khoiTao09g();
+
+/* ═════════ ĐỢT 9: giao diện kiểu Concat (học bố cục / thao tác, không dùng code của họ) ═════════
+   - khung xem có đầu đề (Xem trước · độ phân giải · fps) và thanh phát riêng ngay dưới (mã thời gian, lùi / tới từng khung, về đầu / cuối, phóng khung, toàn màn hình)
+   - khung chọn trên khung xem ghi "cỡ % · góc °"
+   - thanh tab cột trái nằm ngang (biểu tượng trên, chữ dưới), cuộn được */
+function veDauXem() {
+  const g = $('.ecol.giua'); if (!g || g.querySelector(':scope > .xemDau')) return;
+  const dau = el('div', 'xemDau'), ten = el('b', null, 'Xem trước'), tt = el('span', 'xemTt'); dau.append(ten, tt); g.insertBefore(dau, g.firstChild);
+  const top = g.querySelector(':scope > .ccTop'); if (top) dau.append(top);
+  const ve = () => { const c = $('#cv'); if (c) tt.textContent = c.width + ' × ' + c.height + ' · ' + (typeof fpsDuAn === 'function' ? fpsDuAn() : 30) + ' fps'; }; ve(); setInterval(ve, 2000);
+}
+function vePhatXem() {
+  const g = $('.ecol.giua'); if (!g || g.querySelector(':scope > .xemPhat')) return;
+  const bar = el('div', 'xemPhat'), tc0 = el('span', 'xemTc'), tong = el('span', 'xemTong');
+  const nut = (tenIc, title, f, lop) => { const b = el('button', 'ic' + (lop ? ' ' + lop : '')); b.type = 'button'; b.title = title; b.setAttribute('aria-label', title); b.innerHTML = tenIc; b.onclick = f; return b; };
+  const SVG = d => '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + d + '</svg>';
+  const buoc = k => { if (P.dang) dung(); const f = 1 / (typeof fpsDuAn === 'function' ? fpsDuAn() : 30); P.t = Math.max(0, Math.min(tongGiay(), khungGiay(P.t + k * f))); veKhung(); vePh(); if (typeof datTg === 'function') datTg(tongGiay()); };
+  const den = t => { if (P.dang) dung(); P.t = t; veKhung(); vePh(); if (typeof datTg === 'function') datTg(tongGiay()); };
+  const play = nut(SVG('<path d="M7 4.5v15l12-7.5z" fill="currentColor" stroke="none"/>'), 'Phát / dừng (Space)', () => $('#btnPlay').click(), 'xemPlay');
+  const giua = el('div', 'xemGiua'); giua.append(
+    nut(SVG('<path d="M6 5v14M18 6l-9 6 9 6z"/>'), 'Về đầu (Home)', () => den(0)),
+    nut(SVG('<path d="M15 6l-6 6 6 6"/>'), 'Lùi 1 khung (←)', () => buoc(-1)), play,
+    nut(SVG('<path d="M9 6l6 6-6 6"/>'), 'Tới 1 khung (→)', () => buoc(1)),
+    nut(SVG('<path d="M18 5v14M6 6l9 6-9 6z"/>'), 'Về cuối (End)', () => den(Math.max(0, tongGiay() - 0.001))));
+  const trai = el('div', 'xemTrai'); trai.append(tc0, tong);
+  const phai = el('div', 'xemPhai'); const zk = $('#zoomKhung'); if (zk) phai.append(zk);
+  phai.append(nut(SVG('<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>'), 'Xem toàn màn hình', () => { const b = $('#btnToanManHinh'); if (b) b.click(); }));
+  bar.append(trai, giua, phai); g.append(bar);
+  const ve = () => { tc0.textContent = typeof tc === 'function' ? tc(P.t) : fmt1(P.t); tong.textContent = '/ ' + (typeof tc === 'function' ? tc(tongGiay()) : fmt1(tongGiay())); play.innerHTML = P.dang ? SVG('<rect x="6" y="5" width="4" height="14" fill="currentColor" stroke="none"/><rect x="14" y="5" width="4" height="14" fill="currentColor" stroke="none"/>') : SVG('<path d="M7 4.5v15l12-7.5z" fill="currentColor" stroke="none"/>'); };
+  { const goc = datTg; datTg = function () { const r = goc.apply(this, arguments); try { ve(); } catch { } return r; }; } ve(); setInterval(() => { if (!P.dang) ve(); }, 700);
+  (function vong() { if (P.dang) ve(); requestAnimationFrame(vong); })();
+}
+/* khung chọn: nhãn "cỡ % · góc °" dưới khung như Concat */
+{ const goc = datHop; datHop = function (hop, b) { const r = goc.apply(this, arguments); try { if (hop && hop.classList && hop.classList.contains('tay') && b) { let n = hop.querySelector(':scope > .tayNhan'); if (!n) { n = el('span', 'tayNhan'); hop.appendChild(n); } n.textContent = Math.round((b.sc || 1) * 100) + '% · ' + Math.round(b.xoay || 0) + '°'; n.classList.toggle('trongKhung', (b.cy || 0.5) + (b.h || 1) / 2 > 0.92); }   /* khung chạm đáy: nhãn vào trong, sát mép trên */ } catch { } return r; }; }
+/* tỉ lệ cột như Concat: thư viện ~30%, khung xem rộng ở giữa (chỉ khi người dùng chưa tự kéo cỡ) */
+{ const goc = canhGiua0; canhGiua0 = function () { const r = goc.apply(this, arguments); try { const ed = $('#ed'), eb = $('.ebody'); const kc = typeof kichCo === 'function' ? kichCo() : {}; if (ed && eb && ed.classList.contains('ccw') && !ed.classList.contains('mobi') && !ed.classList.contains('bocDoc') && !ed.classList.contains('thuGon') && !kc.trai && !$('.keo.dang')) ed.style.setProperty('--wTrai', Math.round(Math.max(320, Math.min(470, eb.clientWidth * 0.3))) + 'px'); } catch { } return r; }; }
+function khoiTao09h() {
+  if (!$('#ed') || !$('#ed').classList.contains('ccw')) return;
+  veDauXem(); vePhatXem(); try { canhGiua0(); } catch { }
+  const et = $('.ecol.trai .etabs'); if (et) ganCuonNgang(et);
+}
+khoiTao09h();
+
+/* ═════════ ĐỢT 10: khung Media kiểu Concat — cây mục có đếm số (Media: Tất cả / Video / Ảnh · Kho miễn phí), nút Nhập gọn, lưới thẻ sạch ═════════ */
+const CHEVRON = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+function veCayMedia() {
+  const pane = $('[data-pane="footage"]'), nav = pane && pane.querySelector(':scope > .snav'); if (!nav) return;
+  let cay = nav.querySelector(':scope > .cay'); if (!cay) { cay = el('div', 'cay'); nav.prepend(cay); nav.classList.add('coCay'); }
+  const goc = [...nav.querySelectorAll(':scope > button')], loc = $('#locMedia'), cur = loc ? loc.value : 'tat', o0 = goc[0] && goc[0].classList.contains('on');
+  const dem = k => P.srcs.filter(s => k === 'tat' || s.loai === k).length;
+  const loc0 = k => () => { if (goc[0] && !goc[0].classList.contains('on')) goc[0].click(); if (loc) { loc.value = k; if (typeof locMedia === 'function') locMedia(); } veCayMedia(); };
+  const mo = i => () => { if (goc[i]) goc[i].click(); veCayMedia(); };
+  cay.innerHTML = '';
+  const nhom = (ten, ds) => { const h = el('div', 'cayDau'); h.innerHTML = CHEVRON + '<span>' + ten + '</span>'; cay.append(h); ds.forEach(([nhan, so, on, f]) => { const b = el('button', on ? 'on' : null); b.type = 'button'; b.append(el('span', null, nhan)); if (so != null) b.append(el('small', null, String(so))); b.onclick = f; cay.append(b); }); };
+  nhom('Media', [['Tất cả', dem('tat'), o0 && cur === 'tat', loc0('tat')], ['Video', dem('video'), o0 && cur === 'video', loc0('video')], ['Ảnh', dem('anh'), o0 && cur === 'anh', loc0('anh')]]);
+  nhom('Kho miễn phí', [['Video B-roll', null, !!(goc[1] && goc[1].classList.contains('on')), mo(1)], ['Ảnh minh hoạ', null, !!(goc[2] && goc[2].classList.contains('on')), mo(2)]]);
+}
+function khoiTao09i() {
+  const d = $('#drop'); if (d && !d._gon) { d._gon = 1; d.title = 'Nhập video, ảnh (hoặc kéo thả vào đây). AI sẽ chép lời từng từ, nhận diện cảnh và khoảnh khắc đáng giữ.'; const b = d.querySelector('b'); if (b) b.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><span>Nhập</span>'; }
+  { const goc = veSrcs; veSrcs = function () { const r = goc.apply(this, arguments); try { veCayMedia(); } catch (e) { console.warn(e); } return r; }; }
+  veCayMedia();
+}
+khoiTao09i();
