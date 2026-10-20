@@ -968,3 +968,83 @@ function khoiTao09i() {
   veCayMedia();
 }
 khoiTao09i();
+
+/* ═════════ ĐỢT 11: kéo thả kiểu Concat ═════════
+   Kéo từ thư viện: chip nhỏ đi theo con trỏ (màu theo loại), thẻ nguồn mờ đi, trên dòng thời gian hiện bóng đúng độ dài
+   ở đúng lane sẽ rơi vào (V1: vạch chèn + bóng; line phủ: bóng; line mới: vạch), vạch hít như khi kéo đoạn.
+   Kéo sát mép trái / phải dòng thời gian thì tự cuộn, cả khi kéo đoạn có sẵn (bù phần đã cuộn để đoạn vẫn dưới con trỏ). */
+const KEO_MEP = 40, KEO_BUOC = 12;
+let KEO_TV = null;
+function moTaKeo(o) {
+  if (!o) return null;
+  if (o.src) { const i = P.srcs.findIndex(s => s.id === o.src), s = P.srcs[i]; if (!s) return null; const ten = 'S' + (i + 1) + ' · ' + String(s.ten || '').replace(/\.[a-z0-9]{2,5}$/i, ''); return { loai: s.loai === 'anh' ? 'anh' : 'video', ten, dai: Math.max(1 / fpsDuAn(), (o.kt || s.giay || 3) - (o.bd || 0)) }; }
+  if (o.fx) return { loai: 'fx', ten: o.loai === 'bo_loc' ? 'Bộ lọc' : 'Hiệu ứng', dai: 3 };
+  if (o.chu != null) return { loai: 'chu', ten: 'Chữ', dai: 3 };
+  return null;
+}
+function chipKeo(mt) {
+  let c = $('#chipKeo'); if (!c) { c = el('div'); c.id = 'chipKeo'; document.body.appendChild(c); }
+  c.className = 'chipKeo ' + mt.loai; c.innerHTML = ''; c.appendChild(el('i')); c.appendChild(el('b', null, mt.ten)); c.appendChild(el('span', null, fmt1(mt.dai) + 's'));
+  return c;
+}
+function boBongKeo() {
+  $$('#tlIn .bongKeo, #tlIn .vachChen').forEach(x => x.remove()); $$('#tlIn .chen, #tlIn .dich').forEach(x => x.classList.remove('chen', 'dich'));
+  const t = $('#tlTren'); if (t) t.classList.remove('chen'); const sl = $('#snapLine'); if (sl) sl.style.display = 'none';
+}
+function oBong(tin, x, top, h, w, lop, nhan) {
+  const g = el('div', 'bongKeo ' + lop); g.style.left = x + 'px'; g.style.top = top + 'px'; g.style.height = h + 'px'; g.style.width = Math.max(6, w) + 'px';
+  if (nhan) g.appendChild(el('b', null, nhan)); tin.appendChild(g); return g;
+}
+function veBongKeo(e) {
+  const tin = $('#tlIn'), o = KEO_TV; boBongKeo(); if (!tin || !o) return;
+  const mt = moTaKeo(o); if (!mt) return;
+  const r = tin.getBoundingClientRect(), t = Math.max(0, (e.clientX - r.left - LB) / PX()), xT = tg => LB + tg * PX(), yT = el2 => el2.getBoundingClientRect().top - r.top;
+  if (o.fx || o.chu != null) {
+    const it = e.target.closest && e.target.closest('.item[data-k="v"],.item[data-k="b"]'); if (it && o.fx) return;   /* thả lên đoạn: đoạn đã sáng viền (dropHot) */
+    const v = el('div', 'vachChen'); v.style.left = xT(t) + 'px'; tin.appendChild(v); oBong(tin, xT(t), Math.max(0, yT($('#ruler') || tin) + 22), 20, mt.dai * PX(), mt.loai, (mt.loai === 'chu' ? 'Chữ mới' : mt.ten) + ' · ' + fmt1(mt.dai) + 's'); return;
+  }
+  const mTam = { t_bd: Math.max(0, hit(t)), bd: o.bd || 0, kt: o.kt }, dt = dichTha(e.clientY, 'b', mTam);
+  if (dt && !dt.v1 && dt.lop != null) {
+    dt.hang.classList.add(dt.moi ? 'chen' : 'dich'); const hr = dt.hang.getBoundingClientRect();
+    if (dt.moi) oBong(tin, xT(mTam.t_bd), yT(dt.hang) - 9, 18, mt.dai * PX(), mt.loai + ' moi', 'Line mới · ' + fmt1(mt.dai) + 's');
+    else oBong(tin, xT(mTam.t_bd), yT(dt.hang) + 3, hr.height - 6, mt.dai * PX(), mt.loai, mt.ten + ' · ' + fmt1(mt.dai) + 's');
+    return;
+  }
+  const v1 = $('#tlIn .track.v1'); if (!v1) return;
+  let acc = 0; for (let j = 0; j < P.clips.length; j++) { const len = daiC(P.clips[j]); if (t < acc + len / 2) break; acc += len; }
+  const v = el('div', 'vachChen'); v.style.left = xT(acc) + 'px'; tin.appendChild(v);
+  const hr = v1.getBoundingClientRect(); oBong(tin, xT(acc), yT(v1) + 3, hr.height - 6, mt.dai * PX(), mt.loai + ' chenV1', 'Chèn · ' + fmt1(mt.dai) + 's');
+}
+function cuonKhiKeo(clientX) {
+  const sc = $('#tlScroll'); if (!sc) return 0; const r = sc.getBoundingClientRect();
+  if (clientX > r.right - KEO_MEP && sc.scrollLeft < sc.scrollWidth - sc.clientWidth) return KEO_BUOC;
+  if (clientX < r.left + LB + KEO_MEP && sc.scrollLeft > 0) return -KEO_BUOC;
+  return 0;
+}
+function khoiTao09j() {
+  const tin = $('#tlIn'), sc = $('#tlScroll'); if (!tin || !sc) return;
+  /* kéo từ thư viện / bảng hiệu ứng / mẫu chữ: các nút đã setData ở bộ xử lý riêng, ở đây (pha nổi) đọc lại để vẽ chip + bóng */
+  document.addEventListener('dragstart', e => {
+    let o = null; try { o = JSON.parse(e.dataTransfer.getData('text/plain')); } catch { }
+    const mt = moTaKeo(o); KEO_TV = mt ? o : null; if (!mt) return; document.body.classList.add('keoTv');
+    const ng = e.target.closest && e.target.closest('.fsrc, .canh, button'); if (ng) { ng.classList.add('keoNguon'); KEO_TV._ng = ng; }
+    try { e.dataTransfer.setDragImage(chipKeo(mt), -10, -6); } catch { }
+  });
+  const xong = () => { if (KEO_TV && KEO_TV._ng) KEO_TV._ng.classList.remove('keoNguon'); document.body.classList.remove('keoTv'); KEO_TV = null; boBongKeo(); };
+  document.addEventListener('dragend', xong); document.addEventListener('drop', () => setTimeout(boBongKeo, 0));
+  tin.addEventListener('dragover', e => { if (KEO_TV) veBongKeo(e); });
+  tin.addEventListener('dragleave', e => { if (!tin.contains(e.relatedTarget)) boBongKeo(); });
+  document.addEventListener('dragover', e => { if (!KEO_TV) return; const r = sc.getBoundingClientRect(); if (e.clientY < r.top || e.clientY > r.bottom) return; const d = cuonKhiKeo(e.clientX); if (d) sc.scrollLeft += d * 2; });
+  /* kéo đoạn có sẵn (P.dangKeo): sát mép thì cuộn; gửi lại pointermove đã cộng phần cuộn để keoItem tính đúng vị trí */
+  const gia = new WeakSet(); let bu = 0, cuoi = null, chay = false;
+  const phat = () => { if (!cuoi || !cuoi.tg || !document.contains(cuoi.tg)) return; const ev = new PointerEvent('pointermove', { bubbles: true, cancelable: true, pointerId: cuoi.id, pointerType: cuoi.pt, clientX: cuoi.x + bu, clientY: cuoi.y, buttons: 1, altKey: cuoi.alt, shiftKey: cuoi.sh, ctrlKey: cuoi.ct, metaKey: cuoi.me }); gia.add(ev); cuoi.tg.dispatchEvent(ev); };
+  const tick = () => { if (!P.dangKeo || !cuoi) { chay = false; return; } const d = cuonKhiKeo(cuoi.x); if (!d) { chay = false; return; } const s0 = sc.scrollLeft; sc.scrollLeft += d; bu += sc.scrollLeft - s0; phat(); requestAnimationFrame(tick); };
+  window.addEventListener('pointerdown', () => { bu = 0; cuoi = null; }, true);
+  window.addEventListener('pointermove', e => {
+    if (gia.has(e) || !P.dangKeo || !(e.buttons & 1)) return;
+    cuoi = { tg: e.target, id: e.pointerId, pt: e.pointerType, x: e.clientX, y: e.clientY, alt: e.altKey, sh: e.shiftKey, ct: e.ctrlKey, me: e.metaKey };
+    if (!bu) { if (cuonKhiKeo(e.clientX) && !chay) { chay = true; requestAnimationFrame(tick); } return; }
+    e.stopImmediatePropagation(); phat(); if (cuonKhiKeo(e.clientX) && !chay) { chay = true; requestAnimationFrame(tick); }
+  }, true);
+}
+khoiTao09j();
