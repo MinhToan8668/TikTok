@@ -1057,8 +1057,8 @@ const IC_SCOPE = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" st
 const IC_LUOI = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/></svg>';
 const DB_THANG = [0, -6, -12, -24, -48];
 function khoiTao09k() {
-  if (!$('#ed') || !$('#ed').classList.contains('ccw')) return;
   [['#btnLap', IC_LAP, 'Phát lặp'], ['#btnScope', IC_SCOPE, 'Scopes màu']].forEach(([s, ic, ten]) => { const b = $(s); if (!b || b.dataset.ic12) return; b.dataset.ic12 = 1; b.innerHTML = ic; b.classList.add('ic12'); b.setAttribute('aria-label', ten); });
+  if (!$('#ed') || !$('#ed').classList.contains('ccw')) return;
   const lp = $('#lopPhuChon'); if (lp && !lp.parentElement.classList.contains('lopPhuO')) { const o = el('label', 'lopPhuO'); o.title = lp.title; o.innerHTML = IC_LUOI; lp.before(o); o.appendChild(lp); }
   const m = $('#fcMeter'), kv = $('.ecol.giua .khungVung');
   if (m && kv && m.parentElement !== kv) {
@@ -1067,3 +1067,39 @@ function khoiTao09k() {
   }
 }
 khoiTao09k();
+
+/* ═════════ ĐỢT 13: điện thoại ═════════
+   Hàng công cụ dòng thời gian chỉ giữ nút hay dùng (to cỡ ngón tay, không phải vuốt); thanh thao tác đoạn thêm
+   Lật / Xoay / Cắt khung / Đóng băng / Tách âm (bấm hộ nút gốc trên hàng công cụ); dưới V1 có làn gợi ý
+   "Thêm âm thanh" / "Thêm chữ" như CapCut, chạm là mở đúng bảng. */
+const DT_GIU = ['#btnHoanTac', '#btnLamLai', '#btnLichSu', '#btnKfNhanh', '#btnSnap'];
+const DT_THEM = [['#btnLat', 'Lật'], ['#btnXoay90', 'Xoay'], ['#btnCrop', 'Cắt khung'], ['#btnDongBang', 'Đóng băng'], ['#btnTachAmTl', 'Tách âm']];
+function gonCongCuDt() {
+  const et = $('.etl .etool'); if (!et || et.dataset.dt13) return; et.dataset.dt13 = 1;
+  const giu = new Set(DT_GIU.map(s => $(s)).filter(Boolean));
+  et.querySelectorAll('button, .sep, input, select, label').forEach(x => { if (!giu.has(x)) x.classList.add('anDt'); });
+  const kf = $('#btnKfNhanh'); if (kf) kf.classList.add('dtPhai');
+}
+function themNutDoanDt() {
+  const tao = $('#mobTao'); if (!tao || tao.dataset.dt13) return; tao.dataset.dt13 = 1;
+  const xoa = [...tao.children].find(b => /Xoá/.test(b.textContent));
+  DT_THEM.forEach(([s, ten]) => { const g = $(s); if (!g) return; const b = el('button'); b.type = 'button'; b.innerHTML = '<i>' + ic(g.dataset.ic || 'panel') + '</i><span>' + ten + '</span>'; b.onclick = () => g.click(); xoa ? xoa.before(b) : tao.appendChild(b); });
+}
+function veLanGoiY() {
+  const tin = $('#tlIn'); if (!tin) return; tin.querySelectorAll('.lanGoiY').forEach(x => x.remove());
+  if (!laMobi() || !P.clips.length) return;
+  const lan = el('div', 'lanGoiY'); lan.style.marginLeft = LB + 'px';
+  [['am', 'audio', 'Thêm âm thanh', (P.am3 || []).length], ['chu', 'text', 'Thêm chữ', (P.gfx || []).length]].forEach(([tab, icn, ten, co]) => {
+    if (co) return; const b = el('button', 'goiY'); b.type = 'button'; b.innerHTML = ic(icn) + '<span>' + ten + '</span>';
+    b.onclick = () => { const t = $('.etabs [data-tab="' + tab + '"]'); if (t) t.click(); }; lan.appendChild(b);
+  });
+  lan.addEventListener('pointerdown', e => e.stopPropagation());   /* chạm nút gợi ý không tua đầu phát */
+  if (lan.children.length) tin.appendChild(lan);
+}
+function khoiTao09l() {
+  if (!$('#ed')) return;
+  const lam = () => { if (!laMobi()) return; gonCongCuDt(); themNutDoanDt(); veLanGoiY(); };
+  const veTlGoc = veTl; veTl = function () { const r = veTlGoc.apply(this, arguments); try { veLanGoiY(); } catch { } return r; };
+  lam(); window.addEventListener('resize', () => setTimeout(lam, 80));
+}
+khoiTao09l();

@@ -570,3 +570,26 @@ body.keoTv .ed .themCuoi{visibility:hidden}
 .ed #tayCam .tay.tayChu .m_l{transform:translateX(-6px)}.ed #tayCam .tay.tayChu .m_r{transform:translateX(6px)}
 .ed #tayCam .tay.tayChu .xoay{top:auto!important;bottom:calc(100% + 12px)!important}
 .ed #tayCam .tay.tayChu .tayNhan{margin-top:6px}
+/* đợt 13: điện thoại */
+.ed.mobi .etl .etool .anDt{display:none!important}
+.ed.mobi .etl .etool{overflow:visible!important}
+.ed.mobi .etl .etool .cum{display:flex;align-items:center;gap:4px;width:100%;flex-wrap:nowrap}
+.ed.mobi .etl .etool button.ic:not(.anDt){width:40px!important;height:40px!important;min-width:40px;border-radius:10px}
+.ed.mobi .etl .etool button.ic svg{width:20px;height:20px}
+.ed.mobi .etl .etool .dtPhai{margin-left:auto}
+.ed.mobi .ctl #btnLap, .ed.mobi .ctl #btnScope{display:none!important}
+.ed.mobi .ctl .play{width:44px!important;height:44px!important;border-radius:50%;font-size:18px}
+.ed.mobi #fcMeter{top:10px;bottom:auto;right:6px;height:110px;background:transparent;border:0;padding:0;grid-template-columns:3px 3px;gap:3px 2px}
+.ed.mobi #fcMeter .cot{background:rgba(255,255,255,.08)}
+.ed.mobi #fcMeter .lufs{display:none}
+.ed .lanGoiY{display:flex;flex-direction:column;gap:6px;padding:6px 0 10px;position:sticky;left:0;width:max-content}
+.ed .lanGoiY .goiY{display:flex;align-items:center;gap:8px;height:36px;padding:0 14px;border-radius:8px;border:1px dashed color-mix(in srgb,var(--ea) 55%,transparent);background:color-mix(in srgb,var(--ea) 7%,transparent);color:var(--et);font:600 13px "Inter",system-ui,sans-serif;cursor:pointer}
+.ed .lanGoiY .goiY svg{width:16px;height:16px;color:var(--ea)}
+/* bảng trên điện thoại: hàng chủ đề vuốt ngang một dòng, ô Nhập gọn, tên dự án cắt bằng dấu … */
+.ed.mobi .khoChip{flex-wrap:nowrap!important;overflow-x:auto!important;scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;padding-bottom:2px;-webkit-mask-image:linear-gradient(90deg,#000 88%,transparent);mask-image:linear-gradient(90deg,#000 88%,transparent)}
+.ed.mobi .khoChip::-webkit-scrollbar{display:none}
+.ed.mobi .khoChip > *{flex:0 0 auto!important;scroll-snap-align:start;min-height:34px}
+.ed.mobi #drop{padding:12px 14px!important;font-size:0!important;display:flex!important;align-items:center;justify-content:center;gap:8px;min-height:48px}
+.ed.mobi #drop b{font-size:14px!important;margin:0!important}
+.ed.mobi #drop::after{content:"video · ảnh · nhiều đoạn";font:400 12px "Inter",system-ui,sans-serif;color:var(--emo)}
+.ed.mobi #tenDuAn{text-overflow:ellipsis;min-width:0}
