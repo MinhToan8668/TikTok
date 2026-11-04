@@ -31,7 +31,12 @@ Claude sẽ tạo thư mục dự án (ví dụ `npx hyperframes init ten-video 
 
 ## Nguồn và cập nhật
 
-- Chép từ `heygen-com/hyperframes` commit `76da5f6` (CLI 0.9.10), thư mục `skills/`.
+- Chép từ `heygen-com/hyperframes` commit `183614b` (CLI 0.9.10), thư mục `skills/`.
   Mỗi skill có file `LICENSE` (Apache 2.0) đi kèm. Nội dung skill giữ nguyên, không sửa.
-- Cập nhật: clone lại repo đó, chép đè 6 thư mục `skills/<tên>` vào `.claude/skills/<tên>`, giữ file
-  `LICENSE`, rồi sửa commit và phiên bản CLI ở trên.
+- Tự cập nhật: workflow `.github/workflows/cap-nhat-hyperframes.yml` chạy mỗi ngày lúc 03:17 giờ Việt Nam,
+  lấy bản phát hành mới nhất (tag `vX.Y.Z`, khớp phiên bản CLI), chép đè 6 skill bằng
+  `.github/scripts/cap-nhat-hyperframes.sh`, sửa commit và phiên bản ở trên, rồi commit thẳng lên `main`.
+  Không có bản mới thì không làm gì. Muốn chạy ngay: tab Actions → "Cập nhật skill HyperFrames" → Run workflow.
+- Nếu bản mới bỏ hoặc đổi tên một skill, workflow dừng báo lỗi (không xoá gì); khi đó sửa danh sách
+  `SKILLS` trong script và bảng ở đầu file này.
+- Cập nhật tay: chạy `.github/scripts/cap-nhat-hyperframes.sh` từ gốc repo rồi commit.
