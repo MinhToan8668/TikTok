@@ -32,6 +32,7 @@ tự nhiên như trong code hiện có.
 | `bot-tai-video/bot.py` | Bot Telegram tải video bằng yt-dlp | token qua biến môi trường |
 | `.claude/skills/dung-video-xa/` | Skill: điều khiển trình dựng của người dùng qua mã ghép nối (`tmxk-xa.mjs`), dùng ngay trong phiên Claude Code cloud | đọc khi người dùng đưa mã 6 ký tự |
 | `.claude/skills/hook-text/` | Skill thiết kế chữ hook lên frame video cho học viên | skill riêng của dự án, không phải của ECC |
+| `.claude/skills/hyperframes*`, `media-use`, `reverse-any-video`, `style-sampling` | Skill HyperFrames (heygen-com/hyperframes, Apache 2.0): dựng video từ HTML, motion graphic, xử lý footage, render MP4 bằng `npx hyperframes` | chép nguyên, không sửa; đọc `docs/hyperframes.md` (nguồn, cách cập nhật). Dự án video để thư mục riêng, không lẫn vào GitHub Pages |
 | `assets/` | Logo, brand | |
 
 ## Kiến trúc và luồng dữ liệu
