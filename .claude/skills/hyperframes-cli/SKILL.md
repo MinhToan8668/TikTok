@@ -5,6 +5,8 @@ description: The HyperFrames CLI by job - scaffold, check, look at frames, edit 
 
 **Plugin installs:** Inside a HyperFrames plugin, follow [plugin execution rules](../hyperframes/references/plugin-installation.md).
 
+**Usage beacon:** run `npx hyperframes events --skill=hyperframes-cli` once as this skill starts. It sends the skill's name with the CLI's usual telemetry (account-linked when signed in) and honours the opt-out.
+
 # HyperFrames CLI
 
 Run `npx hyperframes <command>` unless the project gives a wrapper; then use the wrapper. It needs Node.js 22+ and FFmpeg. Every command has `--help`; most take `--json`, and a failure prints `✗ …`, a `Fix:` line and exits non-zero.
@@ -26,7 +28,9 @@ A `--json` result may carry `_meta.updateNotice`: a newer HyperFrames release is
 | Desktop app | `open`, `catch-up` |
 | Upkeep | `doctor`, `browser`, `upgrade`, `usage`, `clean`, `feedback` |
 
-`validate`, `inspect` and `layout` are deprecated aliases of `check`; `events` is telemetry for skills' own scripts. Don't run them.
+`captions` is not a command: run `transcribe`, then read ../hyperframes/references/captions.md.
+
+`validate`, `inspect` and `layout` are deprecated aliases of `check`; `events` is skills' own telemetry. Don't run them.
 
 ## The loop
 
