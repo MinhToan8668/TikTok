@@ -23,7 +23,7 @@ Nói với Claude, ví dụ:
 Claude sẽ tạo thư mục dự án (ví dụ `npx hyperframes init ten-video --resolution portrait`), viết
 `index.html`, chạy `npx hyperframes check`, rồi `npx hyperframes render` ra `renders/*.mp4`.
 
-- Cần Node 22 trở lên; CLI chạy bằng `npx hyperframes@0.9.25`, không cài gì vào frontend của repo.
+- Cần Node 22 trở lên; CLI chạy bằng `npx hyperframes@0.9.28`, không cài gì vào frontend của repo.
 - Dự án video là thư mục riêng, đừng đặt trong `tools/` hay cạnh `index.html` để khỏi lẫn vào GitHub Pages.
 - Một số việc trong `media-use` (giọng đọc AI, avatar, video tạo bằng AI) gọi HeyGen và tốn credit;
   phần còn lại (phụ đề bằng whisper, tách nền, chỉnh màu, trộn âm) chạy miễn phí trên máy.
@@ -31,7 +31,7 @@ Claude sẽ tạo thư mục dự án (ví dụ `npx hyperframes init ten-video 
 
 ## Nguồn và cập nhật
 
-- Chép từ `heygen-com/hyperframes` commit `327e202` (CLI 0.9.25), thư mục `skills/`.
+- Chép từ `heygen-com/hyperframes` commit `58686a7` (CLI 0.9.28), thư mục `skills/`.
   Mỗi skill có file `LICENSE` (Apache 2.0) đi kèm. Nội dung skill giữ nguyên, không sửa.
 - Tự cập nhật: workflow `.github/workflows/cap-nhat-hyperframes.yml` chạy mỗi ngày lúc 03:17 giờ Việt Nam,
   lấy bản phát hành mới nhất (tag `vX.Y.Z`, khớp phiên bản CLI), chép đè 6 skill bằng
